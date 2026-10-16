@@ -34,6 +34,7 @@ import buscaminasRouter from './routes/buscaminas.js';
 import popularRouter from './routes/popular.js';
 import masmenosRouter from './routes/masmenos.js';
 import cancionRouter from './routes/cancion.js';
+import ciegasRouter from './routes/ciegas.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -89,6 +90,7 @@ app.use('/api/buscaminas', buscaminasRouter);
 app.use('/api/popular', popularRouter);
 app.use('/api/masmenos', masmenosRouter);
 app.use('/api/cancion', cancionRouter);
+app.use('/api/ciegas', ciegasRouter);
 
 // 5. Redirección para React Router (Single Page Application)
 app.get('*', (req, res) => {

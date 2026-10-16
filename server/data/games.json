@@ -130,5 +130,11 @@
     "name": "Afina ese oído",
     "description": "Escucha la canción subiendo gradualmente de volumen. Pulsa el botón antes de los 30 segundos para adivinar el tema y sumar tantos puntos como segundos queden.",
     "isNew": true
+  },
+  {
+    "id": "ciegas",
+    "name": "Ranking a Ciegas",
+    "description": "Ordena de 1 a 5 cada elemento sin saber qué saldrá después. Los rivales votan cuántos has acertado.",
+    "isNew": true
   }
 ]

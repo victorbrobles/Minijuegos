@@ -131,6 +131,12 @@ export const META = {
     icono: 'music',
     colores: ['#10b981', '#059669'],
     descripcion: 'Escucha la canción subiendo gradualmente de volumen. Pulsa el botón antes de los 30 segundos para adivinar el tema y sumar tantos puntos como segundos queden.'
+  },
+  'ciegas': {
+    titulo: 'Ranking a Ciegas',
+    icono: 'trophy',
+    colores: ['#f59e0b', '#d97706'],
+    descripcion: 'Ordena de 1 a 5 cada elemento sin saber qué saldrá después. Los rivales votan cuántos has acertado.'
   }
 };
 export const META_POR_DEFECTO = { icono: 'star', colores: ['#8b5cf6', '#6366f1'], descripcion: '' };
