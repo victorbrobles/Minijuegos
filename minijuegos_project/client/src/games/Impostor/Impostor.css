@@ -1,0 +1,114 @@
+/* client/src/games/Impostor/Impostor.css */
+
+.imp-restriccion-box {
+  background: #fef2f2;
+  border: 1.5px solid #fecaca;
+  border-radius: 14px;
+  padding: 1.1rem 1.4rem;
+  margin: 1rem auto 0;
+  max-width: 500px;
+  text-align: center;
+}
+
+.imp-restriccion-tag {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #dc2626;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.35rem;
+}
+
+.imp-restriccion-texto {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #991b1b;
+  line-height: 1.4;
+}
+
+/* Botones de selección de ganador (Impostor / Pueblo) */
+.imp-btn-ganador {
+  flex: 1;
+  padding: 1.1rem 1rem !important;
+  background: #ffffff !important;
+  color: #1e293b !important; /* Texto oscuro visible */
+  border: 2px solid #cbd5e1 !important;
+  border-radius: 16px !important;
+  font-size: 1.05rem !important;
+  font-weight: 800 !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+}
+
+.imp-btn-ganador:hover {
+  border-color: #6366f1 !important;
+  color: #4f46e5 !important;
+  background: #f8fafc !important;
+}
+
+/* Estado seleccionado */
+.imp-btn-ganador.activa {
+  background: #eef2ff !important;
+  color: #4338ca !important; /* Texto violeta oscuro con máximo contraste */
+  border-color: #4f46e5 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25) !important;
+}
+
+/* client/src/games/Impostor/Impostor.css */
+
+.imp-restriccion-box {
+  background: #fef2f2;
+  border: 1.5px solid #fecaca;
+  border-radius: 14px;
+  padding: 1.1rem 1.4rem;
+  margin: 1rem auto 0;
+  max-width: 500px;
+  text-align: center;
+}
+
+.imp-restriccion-tag {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #dc2626;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.35rem;
+}
+
+.imp-restriccion-texto {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #991b1b;
+  line-height: 1.4;
+}
+
+/* Botones de selección de ganador (Impostor / Pueblo) */
+.imp-btn-ganador {
+  flex: 1;
+  padding: 1.1rem 1rem !important;
+  background: #ffffff !important;
+  color: #1e293b !important;
+  border: 2px solid #cbd5e1 !important;
+  border-radius: 16px !important;
+  font-size: 1.05rem !important;
+  font-weight: 800 !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+}
+
+.imp-btn-ganador:hover {
+  border-color: #6366f1 !important;
+  color: #4f46e5 !important;
+  background: #f8fafc !important;
+}
+
+.imp-btn-ganador.activa {
+  background: #eef2ff !important;
+  color: #4338ca !important;
+  border-color: #4f46e5 !important;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25) !important;
+}

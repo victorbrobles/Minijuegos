@@ -1,0 +1,134 @@
+[
+  {
+    "id": "siglas",
+    "name": "Descifra el Código",
+    "description": "Adivina qué significan. Elige categoría, 20 segundos por sigla y sin fallar.",
+    "isNew": true
+  },
+  {
+    "id": "quien-es-quien",
+    "name": "¿Quién Anda Ahí?",
+    "description": "El clásico juego de adivinar el personaje o elemento oculto. Elige jugadores, categoría y anota los aciertos.",
+    "isNew": true
+  },
+  {
+    "id": "rapidfire",
+    "name": "A Quemarropa",
+    "description": "Retos de 60 segundos por categoría: di todos los elementos antes de que se acabe el tiempo o pasa el rebote.",
+    "isNew": true
+  },
+  {
+    "id": "trayectoria",
+    "name": "El Currículum Oculto",
+    "description": "Adivina el futbolista por los clubes en los que jugó",
+    "isNew": true
+  },
+  {
+    "id": "rasgos",
+    "name": "Zoom a la Fama",
+    "description": "Adivina qué famoso es por un detalle de su cara. ¡Cuanto antes aciertes, más puntos!",
+    "isNew": true
+  },
+  {
+    "id": "rankings",
+    "name": "Ponte en Orden",
+    "description": "Adivina los puestos ocultos de rankings reales con pistas, rebotes y contrarreloj.",
+    "isNew": true
+  },
+  {
+    "id": "aproximacion",
+    "name": "A Ojo de Buen Cubero",
+    "description": "Aproxímate a la cantidad numérica real. Confía en las respuestas de los demás o arriésgate con la tuya.",
+    "isNew": true
+  },
+  {
+    "id": "ubicacion",
+    "name": "¿Dónde Diablos Está?",
+    "description": "Memoriza la foto de un lugar famoso y colócalo en el mapa con un marcador real y dos señuelos.",
+    "isNew": true
+  },
+  {
+    "id": "adivina",
+    "name": "Luces, Cámara... ¡Música!",
+    "description": "Adivina la película o la canción con hasta tres pistas: frases, acordes, actores o sinopsis.",
+    "isNew": true
+  },
+  {
+    "id": "pistas",
+    "name": "Seis Bajo Sospecha",
+    "description": "Adivina cualquier enigma a través de 10 pistas progresivas. Enfréntate al modo Estándar o sobrevive con 3 vidas.",
+    "isNew": true
+  },
+  {
+    "id": "velocidad",
+    "name": "Minuto de Infarto",
+    "description": "Test contrarreloj de 60 segundos. Acierta el mayor número de preguntas y supera la pregunta especial para ganar 30s extra.",
+    "isNew": true
+  },
+  {
+    "id": "quienmas",
+    "name": "¿De verdad os conocéis?",
+    "description": "Votad quién encaja más con cada pregunta. Si votas al más votado sumas punto, pero si hay empate nadie puntúa.",
+    "isNew": true
+  },
+  {
+    "id": "confianzaciega",
+    "name": "Confianza Ciega",
+    "description": "Elige una consigna en secreto, deja que tus amigos apuesten a ciegas sobre tu capacidad y demuestra cuántas puedes decir en 2 minutos.",
+    "isNew": true
+  },
+  {
+    "id": "lobos",
+    "name": "Luna de Sangre",
+    "description": "Lobos contra pueblo con roles nuevos y caóticos. Composiciones recomendadas según el número de jugadores y consulta de rol en tu turno.",
+    "isNew": true
+  },
+  {
+    "id": "frasescelebres",
+    "name": "Frases Célebres",
+    "description": "¿Quién dijo qué? Adivina el autor de las frases más recordadas de la historia, la política, el deporte y el famoseo.",
+    "isNew": true
+  },
+  {
+    "id": "conecta",
+    "name": "Conecta 4",
+    "description": "Encuentra las 4 conexiones secretas entre los 16 elementos del tablero antes de quedarte sin vidas.",
+    "isNew": true
+  },
+  {
+    "id": "impostor",
+    "name": "Miente como puedas",
+    "description": "Descubre al impostor antes de que se salga con la suya, pero ojo a la restricción que todos debéis cumplir al hablar.",
+    "isNew": true
+  },
+  {
+    "id": "colores",
+    "name": "La vida en colores",
+    "description": "Adivina la combinación exacta de colores de personajes, marcas y cosas míticas que todo el mundo ha visto.",
+    "isNew": true
+  },
+  {
+    "id": "buscaminas",
+    "name": "Cuidado que explota",
+    "description": "Un tablero de 15 casillas con 10 aciertos y 5 bombas ocultas. Elige por turnos, suma puntos según la dificultad y evita pisar la mina para no quedar eliminado de la ronda.",
+    "isNew": true
+  },
+  {
+    "id": "popular",
+    "name": "Sigue la Moda",
+    "description": "¿Qué es lo que respondería la mayoría? Adivina los 5 elementos más populares de cada categoría y suma desde 1 hasta 5 puntos por acierto.",
+    "isNew": true
+  },
+  {
+    "id": "masmenos",
+    "name": "Entre dos aguas",
+    "description": "Compara dos datos numéricos frente a frente y elige el más grande para encadenar la racha de aciertos más larga.",
+    "isNew": true
+  },
+  {
+    "id": "cancion",
+    "name": "Afina ese oído",
+    "description": "Escucha la canción subiendo gradualmente de volumen. Pulsa el botón antes de los 30 segundos para adivinar el tema y sumar tantos puntos como segundos queden.",
+    "isNew": true
+  }
+]

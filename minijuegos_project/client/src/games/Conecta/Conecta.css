@@ -1,0 +1,546 @@
+/* client/src/games/Conecta/Conecta.css */
+
+/* Selector de Categorías */
+.conecta-cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.conecta-btn-cat {
+  background: #ffffff !important;
+  border: 2px solid #e2e8f0 !important;
+  border-radius: 18px !important;
+  padding: 1.25rem 1rem !important;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04);
+}
+
+.conecta-btn-cat:hover {
+  border-color: #2563eb !important;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.12);
+}
+
+.conecta-cat-badge {
+  font-size: 0.75rem;
+  color: #2563eb;
+  font-weight: 800;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.conecta-btn-cat h4 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: #0f172a;
+}
+
+/* Tablero 4x4 */
+.conecta-tablero-panel {
+  padding: 1.2rem !important;
+}
+
+.conecta-grid-16 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .conecta-grid-16 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.conecta-item-btn {
+  background: #f8fafc !important;
+  border: 2px solid #cbd5e1 !important;
+  border-radius: 14px !important;
+  padding: 1.1rem 0.5rem !important;
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  color: #1e293b !important;
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.conecta-item-btn:hover:not(:disabled) {
+  border-color: #2563eb !important;
+  background: #ffffff !important;
+  transform: translateY(-2px);
+}
+
+.conecta-item-btn.seleccionado {
+  background: #eff6ff !important;
+  border-color: #2563eb !important;
+  color: #1d4ed8 !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25) !important;
+}
+
+.conecta-item-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Grupos descubiertos */
+.conecta-resueltos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.conecta-grupo-resuelto-card {
+  background: #ecfdf5;
+  border: 1.5px solid #6ee7b7;
+  border-radius: 16px;
+  padding: 0.9rem 1.25rem;
+  text-align: left;
+}
+
+.conecta-resuelto-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.05rem;
+  color: #065f46;
+}
+
+.conecta-resuelto-items {
+  margin-top: 0.35rem;
+  font-size: 0.9rem;
+  color: #047857;
+  font-weight: 500;
+}
+
+/* Pulsadores */
+.conecta-pulsadores-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.conecta-btn-pulsador {
+  background: #ffffff !important;
+  border: 2px solid #cbd5e1 !important;
+  border-radius: 16px !important;
+  padding: 0.85rem 0.5rem !important;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.conecta-btn-pulsador:hover:not(:disabled) {
+  border-color: #2563eb !important;
+  transform: scale(1.04);
+}
+
+.conecta-btn-pulsador.pulsado {
+  background: #eff6ff !important;
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25) !important;
+}
+
+.conecta-btn-pulsador.sin-vidas {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.conecta-pulsador-nombre {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.conecta-pulsador-vidas {
+  font-size: 0.8rem;
+  margin-top: 0.3rem;
+}
+
+.conecta-pulsador-vidas .corazon.vacio {
+  filter: grayscale(1);
+  opacity: 0.3;
+}
+
+.conecta-feedback-banner {
+  margin-top: 1rem;
+  padding: 0.85rem;
+  border-radius: 12px;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  color: #92400e;
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+/* Banners de feedback para adivinar la temática */
+.conecta-feedback-banner-acierto {
+  padding: 1rem 1.4rem;
+  border-radius: 14px;
+  background: #dcfce7;
+  color: #15803d;
+  border: 1.5px solid #86efac;
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-align: center;
+}
+
+.conecta-feedback-banner-fallo {
+  padding: 1rem 1.4rem;
+  border-radius: 14px;
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1.5px solid #fca5a5;
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-align: center;
+}
+
+.conecta-feedback-banner-info {
+  padding: 1rem 1.4rem;
+  border-radius: 14px;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1.5px solid #cbd5e1;
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-align: center;
+}
+
+/* Cuadrícula de categorías con CategoryCard */
+.conecta-categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 640px) {
+  .conecta-categories-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* client/src/games/Conecta/Conecta.css */
+
+/* Selector de Categorías */
+.conecta-cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.conecta-btn-cat {
+  background: #ffffff !important;
+  border: 2px solid #e2e8f0 !important;
+  border-radius: 18px !important;
+  padding: 1.25rem 1rem !important;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04);
+}
+
+.conecta-btn-cat:hover {
+  border-color: #2563eb !important;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.12);
+}
+
+.conecta-cat-badge {
+  font-size: 0.75rem;
+  color: #2563eb;
+  font-weight: 800;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.conecta-btn-cat h4 {
+  margin: 0;
+  font-size: 1.15rem;
+  color: #0f172a;
+}
+
+/* Tablero 4x4 */
+.conecta-tablero-panel {
+  padding: 1.2rem !important;
+}
+
+.conecta-grid-16 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+}
+
+@media (max-width: 640px) {
+  .conecta-grid-16 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.conecta-item-btn {
+  background: #f8fafc !important;
+  border: 2px solid #cbd5e1 !important;
+  border-radius: 14px !important;
+  padding: 1.1rem 0.5rem !important;
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  color: #1e293b !important;
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.conecta-item-btn:hover:not(:disabled) {
+  border-color: #2563eb !important;
+  background: #ffffff !important;
+  transform: translateY(-2px);
+}
+
+.conecta-item-btn.seleccionado {
+  background: #eff6ff !important;
+  border-color: #2563eb !important;
+  color: #1d4ed8 !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25) !important;
+}
+
+.conecta-item-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Grupos descubiertos */
+.conecta-resueltos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.conecta-grupo-resuelto-card {
+  background: #ecfdf5;
+  border: 1.5px solid #6ee7b7;
+  border-radius: 16px;
+  padding: 0.9rem 1.25rem;
+  text-align: left;
+}
+
+.conecta-resuelto-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.05rem;
+  color: #065f46;
+}
+
+.conecta-resuelto-items {
+  margin-top: 0.35rem;
+  font-size: 0.9rem;
+  color: #047857;
+  font-weight: 500;
+}
+
+.conecta-feedback-banner {
+  margin-top: 1rem;
+  padding: 0.85rem;
+  border-radius: 12px;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  color: #92400e;
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+.conecta-feedback-banner-acierto {
+  padding: 1rem 1.4rem;
+  border-radius: 14px;
+  background: #dcfce7;
+  color: #15803d;
+  border: 1.5px solid #86efac;
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-align: center;
+}
+
+.conecta-feedback-banner-fallo {
+  padding: 1rem 1.4rem;
+  border-radius: 14px;
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1.5px solid #fca5a5;
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-align: center;
+}
+
+.conecta-feedback-banner-info {
+  padding: 1rem 1.4rem;
+  border-radius: 14px;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1.5px solid #cbd5e1;
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-align: center;
+}
+
+.conecta-categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 640px) {
+  .conecta-categories-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ========================================================
+   PULSADOR ROJO Y RESPUESTA SINCRONIZADA
+   ======================================================== */
+
+.pulsador-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  width: 100%;
+}
+
+.btn-pulsador-rojo {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 24px !important;
+  padding: 1.35rem 2rem !important;
+  font-size: 1.25rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  box-shadow: 0 8px 0 #991b1b, 0 16px 25px rgba(239, 68, 68, 0.4) !important;
+  transition: transform 0.1s, box-shadow 0.1s;
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  text-transform: uppercase;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.btn-pulsador-rojo:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 0 #991b1b, 0 20px 28px rgba(239, 68, 68, 0.5) !important;
+}
+
+.btn-pulsador-rojo:active:not(:disabled) {
+  transform: translateY(6px);
+  box-shadow: 0 2px 0 #991b1b, 0 6px 12px rgba(239, 68, 68, 0.4) !important;
+}
+
+.btn-pulsador-rojo:disabled {
+  background: #94a3b8 !important;
+  box-shadow: 0 6px 0 #64748b !important;
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.pulsador-icono {
+  font-size: 1.6rem;
+}
+
+.respuesta-pulsada-box {
+  background: #ffffff;
+  border: 2.5px solid #ef4444;
+  border-radius: 22px;
+  padding: 1.4rem;
+  box-shadow: 0 10px 25px rgba(239, 68, 68, 0.15);
+  animation: qqSlideIn 0.2s ease-out;
+}
+
+.respuesta-pulsada-header {
+  text-align: center;
+  margin-bottom: 0.8rem;
+}
+
+.pulsado-badge {
+  background: #fee2e2;
+  color: #b91c1c;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+.modal-players-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 0.65rem;
+  margin-top: 0.8rem;
+}
+
+.btn-modal-player {
+  background: #f8fafc;
+  border: 2px solid #e0e7ff;
+  border-radius: 14px;
+  padding: 0.8rem 1rem;
+  font-weight: 700;
+  color: #1e293b;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-modal-player:hover:not(:disabled) {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.btn-modal-cancel {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+}
+
+/* Previsualización en directo del rival (Online) */
+.online-tecleo-preview-card {
+  background: #f8fafc;
+  border: 2px dashed #94a3b8;
+  border-radius: 20px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.online-tecleo-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  color: #0f172a;
+}

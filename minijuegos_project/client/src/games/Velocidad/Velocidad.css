@@ -1,0 +1,408 @@
+.vel-contenedor {
+  width: 100%;
+  position: relative;
+}
+
+/* Insignia de récord histórico */
+.vel-record-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  background: #fef9c3;
+  color: #854d0e;
+  border: 1.5px solid #fde047;
+  padding: 0.7rem 1.2rem;
+  border-radius: 16px;
+  margin-bottom: 1.2rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Círculo de cuenta atrás de 10s */
+.vel-cuenta-circulo {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.5rem;
+  font-weight: 900;
+  margin: 1.5rem auto;
+  box-shadow: 0 8px 24px rgba(79, 70, 229, 0.35);
+  animation: pulsoCuenta 1s infinite alternate;
+}
+
+@keyframes pulsoCuenta {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}
+
+/* Tarjeta de preguntas normales */
+.vel-tarjeta-pregunta {
+  margin-top: 0.5rem;
+  text-align: left;
+}
+
+.vel-pregunta-num {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #6366f1;
+  background: #e0e7ff;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  margin-bottom: 0.6rem;
+}
+
+.vel-pregunta-texto {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1e1b4b;
+  margin: 0 0 1.2rem 0;
+  line-height: 1.35;
+}
+
+/* Rejilla de opciones de respuesta */
+.vel-opciones-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.65rem;
+}
+
+@media (min-width: 600px) {
+  .vel-opciones-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.vel-btn-opcion {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.9rem 1rem;
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  color: #1e293b;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.vel-btn-opcion:hover:not(:disabled) {
+  border-color: #6366f1;
+  background: #f8fafc;
+  transform: translateY(-2px);
+}
+
+.vel-letra-opcion {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+/* Feedback instantáneo en opciones */
+.vel-btn-opcion.acierto-flash {
+  background: #dcfce7 !important;
+  border-color: #22c55e !important;
+  color: #15803d !important;
+}
+
+.vel-btn-opcion.acierto-flash .vel-letra-opcion {
+  background: #22c55e;
+  color: #ffffff;
+}
+
+.vel-btn-opcion.fallo-flash {
+  background: #fee2e2 !important;
+  border-color: #ef4444 !important;
+  color: #b91c1c !important;
+}
+
+.vel-btn-opcion.fallo-flash .vel-letra-opcion {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+/* Modal de la pregunta especial a los 30s */
+.vel-modal-especial {
+  max-width: 520px !important;
+  text-align: center !important;
+}
+
+.vel-especial-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.vel-especial-estrella {
+  font-size: 1.8rem;
+  animation: pulsoCuenta 0.8s infinite alternate;
+}
+
+.vel-especial-header h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #d97706;
+}
+
+.vel-especial-sub {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin: 0 0 1.2rem 0;
+}
+
+.vel-especial-caja-pregunta {
+  background: #fffbeb;
+  border: 2px dashed #fcd34d;
+  border-radius: 16px;
+  padding: 1.2rem;
+  margin-bottom: 1.2rem;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #78350f;
+  line-height: 1.4;
+}
+
+.vel-feedback-esp {
+  padding: 1rem;
+  border-radius: 14px;
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+.vel-feedback-esp.exito {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1.5px solid #86efac;
+}
+
+.vel-feedback-esp.fallo {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1.5px solid #fca5a5;
+}
+
+/* Velocidad: Estilos del juego, turnos y modo online */
+
+.vel-contenedor {
+  width: 100%;
+  position: relative;
+}
+
+/* Insignia de récord histórico */
+.vel-record-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  background: #fef9c3;
+  color: #854d0e;
+  border: 1.5px solid #fde047;
+  padding: 0.7rem 1.2rem;
+  border-radius: 16px;
+  margin-bottom: 1.2rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* Círculo de cuenta atrás de 10s */
+.vel-cuenta-circulo {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3.5rem;
+  font-weight: 900;
+  margin: 1.5rem auto;
+  box-shadow: 0 8px 24px rgba(79, 70, 229, 0.35);
+  animation: pulsoCuenta 1s infinite alternate;
+}
+
+@keyframes pulsoCuenta {
+  from { transform: scale(1); }
+  to { transform: scale(1.08); }
+}
+
+/* Tarjeta de preguntas normales */
+.vel-tarjeta-pregunta {
+  margin-top: 0.5rem;
+  text-align: left;
+}
+
+.vel-pregunta-num {
+  display: inline-block;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #6366f1;
+  background: #e0e7ff;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  margin-bottom: 0.6rem;
+}
+
+.vel-pregunta-texto {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1e1b4b;
+  margin: 0 0 1.2rem 0;
+  line-height: 1.35;
+}
+
+/* Rejilla de opciones de respuesta */
+.vel-opciones-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.65rem;
+}
+
+@media (min-width: 600px) {
+  .vel-opciones-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.vel-btn-opcion {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.9rem 1rem;
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  color: #1e293b;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.vel-btn-opcion:hover:not(:disabled) {
+  border-color: #6366f1;
+  background: #f8fafc;
+  transform: translateY(-2px);
+}
+
+.vel-letra-opcion {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 900;
+  flex-shrink: 0;
+}
+
+.vel-btn-opcion.acierto-flash {
+  background: #dcfce7 !important;
+  border-color: #22c55e !important;
+  color: #15803d !important;
+}
+
+.vel-btn-opcion.acierto-flash .vel-letra-opcion {
+  background: #22c55e;
+  color: #ffffff;
+}
+
+.vel-btn-opcion.fallo-flash {
+  background: #fee2e2 !important;
+  border-color: #ef4444 !important;
+  color: #b91c1c !important;
+}
+
+.vel-btn-opcion.fallo-flash .vel-letra-opcion {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+/* Modal de la pregunta especial a los 30s */
+.vel-modal-especial {
+  max-width: 520px !important;
+  text-align: center !important;
+}
+
+.vel-especial-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+}
+
+.vel-especial-estrella {
+  font-size: 1.8rem;
+  animation: pulsoCuenta 0.8s infinite alternate;
+}
+
+.vel-especial-header h3 {
+  margin: 0;
+  font-size: 1.4rem;
+  color: #d97706;
+}
+
+.vel-especial-sub {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin: 0 0 1.2rem 0;
+}
+
+.vel-especial-caja-pregunta {
+  background: #fffbeb;
+  border: 2px dashed #fcd34d;
+  border-radius: 16px;
+  padding: 1.2rem;
+  margin-bottom: 1.2rem;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #78350f;
+  line-height: 1.4;
+}
+
+.vel-feedback-esp {
+  padding: 1rem;
+  border-radius: 14px;
+  font-weight: 800;
+  font-size: 1rem;
+}
+
+.vel-feedback-esp.exito {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1.5px solid #86efac;
+}
+
+.vel-feedback-esp.fallo {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1.5px solid #fca5a5;
+}

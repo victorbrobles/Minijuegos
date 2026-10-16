@@ -1,0 +1,570 @@
+/* client/src/games/QuienEsQuien/QuienEsQuien.css */
+
+/* Selector de modalidad (Local / Online) */
+.qq-modo-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+@media (max-width: 640px) {
+  .qq-modo-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.qq-btn-modo {
+  background: #ffffff !important;
+  border: 2px solid #e2e8f0 !important;
+  border-radius: 20px !important;
+  padding: 1.8rem 1.2rem !important;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.04);
+  color: #1e293b !important;
+}
+
+.qq-btn-modo:hover {
+  border-color: #3b82f6 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 18px -3px rgba(59, 130, 246, 0.15);
+}
+
+.qq-modo-icono {
+  font-size: 2.8rem;
+  display: block;
+  margin-bottom: 0.6rem;
+}
+
+.qq-btn-modo h4 {
+  margin: 0 0 0.4rem;
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.qq-btn-modo p {
+  margin: 0;
+  font-size: 0.88rem;
+  color: #64748b;
+  line-height: 1.4;
+}
+
+/* Botón grande para copiar el código */
+.qq-codigo-btn {
+  background: #eff6ff !important;
+  border: 2.5px dashed #3b82f6 !important;
+  border-radius: 18px !important;
+  padding: 0.5rem 1.8rem !important;
+  font-size: 3.2rem !important;
+  letter-spacing: 6px;
+  color: #1d4ed8 !important;
+  font-weight: 900 !important;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin: 0.6rem auto;
+  display: inline-block;
+}
+
+.qq-codigo-btn:hover {
+  transform: scale(1.03);
+  background: #dbeafe !important;
+}
+
+/* Tarjeta secreta personal */
+.qq-tarjeta-secreta-panel {
+  padding: 2.5rem 1.5rem !important;
+  text-align: center;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+}
+
+.qq-tarjeta-avatar {
+  font-size: 4rem;
+  margin: 0.6rem 0 0.2rem;
+}
+
+.qq-tarjeta-nombre {
+  font-size: 2.4rem;
+  font-weight: 900;
+  color: #1e1b4b;
+  margin: 0.4rem 0 0.8rem;
+  letter-spacing: -0.5px;
+}
+
+/* Selector de modalidad (Local / Online) con la estética de Los Lobos */
+.qq-modo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.25rem;
+  margin-top: 1.2rem;
+}
+
+@media (max-width: 640px) {
+  .qq-modo-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.qq-btn-modo {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  background: #ffffff !important;
+  border: 2px solid #e2e8f0 !important;
+  border-radius: 24px !important;
+  padding: 2rem 1.4rem !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.06);
+  color: #1e293b !important;
+}
+
+.qq-btn-modo:hover {
+  border-color: #2563eb !important;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 20px -4px rgba(37, 99, 235, 0.15);
+}
+
+/* Contenedor del icono estilo ficha de Los Lobos */
+.qq-modo-icono-circulo {
+  width: 72px;
+  height: 72px;
+  border-radius: 22px;
+  background: #eff6ff;
+  color: #2563eb;
+  display: grid;
+  place-items: center;
+  font-size: 2.2rem;
+  margin-bottom: 0.9rem;
+}
+
+.qq-btn-modo h4 {
+  margin: 0 0 0.5rem 0 !important;
+  font-size: 1.25rem !important;
+  font-weight: 800 !important;
+  color: #0f172a !important;
+}
+
+.qq-btn-modo p {
+  margin: 0 !important;
+  font-size: 0.9rem !important;
+  color: #64748b !important;
+  line-height: 1.45 !important;
+  max-width: 260px;
+}
+
+/* Botón de copiar código de sala */
+.qq-codigo-btn {
+  background: #eff6ff !important;
+  border: 2.5px dashed #3b82f6 !important;
+  border-radius: 18px !important;
+  padding: 0.5rem 1.8rem !important;
+  font-size: 3.2rem !important;
+  letter-spacing: 6px;
+  color: #1d4ed8 !important;
+  font-weight: 900 !important;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin: 0.6rem auto;
+  display: inline-block;
+}
+
+.qq-codigo-btn:hover {
+  transform: scale(1.03);
+  background: #dbeafe !important;
+}
+
+/* Tarjeta secreta personal */
+.qq-tarjeta-secreta-panel {
+  padding: 2.5rem 1.5rem !important;
+  text-align: center;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+}
+
+.qq-tarjeta-avatar {
+  font-size: 4rem;
+  margin: 0.6rem 0 0.2rem;
+}
+
+.qq-tarjeta-nombre {
+  font-size: 2.4rem;
+  font-weight: 900;
+  color: #1e1b4b;
+  margin: 0.4rem 0 0.8rem;
+  letter-spacing: -0.5px;
+}
+
+/* Menú vertical idéntico al de Luna de Sangre */
+.lb-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  margin-top: 1.5rem;
+  width: 100%;
+}
+
+.lb-luna {
+  display: grid;
+  place-items: center;
+  margin: 0 auto 0.8rem;
+}
+
+.lb-luna.chica {
+  width: 68px;
+  height: 68px;
+  color: #3b82f6;
+  background: #eff6ff;
+  border-radius: 50%;
+}
+
+/* Formulario de entrada */
+.lb-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.lb-input-codigo {
+  font-size: 1.6rem !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 4px !important;
+  text-align: center !important;
+  padding: 0.7rem !important;
+}
+
+/* Código en la sala */
+.qq-codigo-btn {
+  background: #eff6ff !important;
+  border: 2.5px dashed #3b82f6 !important;
+  border-radius: 18px !important;
+  padding: 0.5rem 1.8rem !important;
+  font-size: 3.2rem !important;
+  letter-spacing: 6px;
+  color: #1d4ed8 !important;
+  font-weight: 900 !important;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin: 0.6rem auto;
+  display: inline-block;
+}
+
+.qq-codigo-btn:hover {
+  transform: scale(1.03);
+  background: #dbeafe !important;
+}
+
+/* Tarjeta secreta personal */
+.qq-tarjeta-secreta-panel {
+  padding: 2.5rem 1.5rem !important;
+  text-align: center;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+}
+
+.qq-tarjeta-avatar {
+  font-size: 4rem;
+  margin: 0.6rem 0 0.2rem;
+}
+
+.qq-tarjeta-nombre {
+  font-size: 2.4rem;
+  font-weight: 900;
+  color: #1e1b4b;
+  margin: 0.4rem 0 0.8rem;
+  letter-spacing: -0.5px;
+}
+
+/* Panel donde el propio jugador ve su personaje oculto */
+.qq-mi-panel-oculto {
+  background: #ffffff !important;
+  border: 2px dashed #f59e0b !important;
+  border-radius: 24px !important;
+  padding: 1.5rem !important;
+  text-align: center;
+}
+
+/* Cuadrícula de los personajes de los rivales */
+.qq-rivales-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.qq-rival-tarjeta {
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 1.1rem 1rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.qq-rival-tarjeta.oculta {
+  background: #f8fafc;
+  border-style: dashed;
+}
+
+.qq-rival-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.qq-rival-avatar {
+  font-size: 1.4rem;
+}
+
+.qq-rival-nombre {
+  font-size: 1rem;
+  color: #0f172a;
+  flex: 1;
+}
+
+.qq-rival-personaje {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #2563eb;
+  background: #eff6ff;
+  padding: 0.6rem 0.8rem;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.qq-rival-tarjeta.oculta .qq-rival-personaje {
+  color: #94a3b8;
+  background: #f1f5f9;
+}
+
+/* Carrusel de tarjetas deslizables */
+.qq-carrusel-contenedor {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0.6rem 0;
+  width: 100%;
+}
+
+.qq-tarjeta-deslizable {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border: 3px solid #3b82f6;
+  border-radius: 28px;
+  padding: 2.2rem 1.4rem;
+  text-align: center;
+  box-shadow: 0 12px 28px -6px rgba(59, 130, 246, 0.2);
+  user-select: none;
+  animation: qqSlideIn 0.2s ease-out;
+}
+
+@keyframes qqSlideIn {
+  from { opacity: 0.6; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.qq-tarjeta-rival-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #eff6ff;
+  color: #1d4ed8;
+  padding: 0.4rem 1rem;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  margin-bottom: 0.8rem;
+}
+
+.qq-tarjeta-icono-categoria {
+  font-size: 3.2rem;
+  margin: 0.4rem 0;
+}
+
+.qq-tarjeta-nombre-destacado {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #0f172a;
+  line-height: 1.2;
+  margin: 0.5rem 0 1rem;
+  letter-spacing: -0.5px;
+}
+
+/* Navegación y puntos */
+.qq-carrusel-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+  margin-top: 1rem;
+}
+
+.qq-carrusel-btn {
+  width: 46px;
+  height: 46px;
+  border-radius: 50% !important;
+  background: #ffffff !important;
+  border: 2px solid #cbd5e1 !important;
+  color: #1e293b !important;
+  font-size: 1.1rem !important;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: all 0.15s ease;
+}
+
+.qq-carrusel-btn:hover {
+  background: #eff6ff !important;
+  border-color: #3b82f6 !important;
+  color: #1d4ed8 !important;
+  transform: scale(1.08);
+}
+
+.qq-carrusel-dots {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.qq-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.qq-dot.activo {
+  width: 22px;
+  border-radius: 999px;
+  background: #3b82f6;
+}
+
+/* ========================================================
+   CUBIERTA INTERACTIVA Y TARJETA GRUPAL
+   ======================================================== */
+
+.qq-cubierta-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  margin: 0.8rem auto 1rem;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 14px 30px -8px rgba(37, 99, 235, 0.2);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* Cubierta que tapa la lista (sube al mantener pulsado) */
+.qq-cubierta-cortina {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  background: linear-gradient(145deg, #1e1b4b 0%, #312e81 60%, #4338ca 100%);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem 1.5rem;
+  cursor: pointer;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+  transform: translateY(0);
+}
+
+.qq-cubierta-cortina.levantada {
+  transform: translateY(-94%);
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+.qq-cubierta-icono {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  display: grid;
+  place-items: center;
+  margin-bottom: 0.8rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+}
+
+.qq-cubierta-titulo {
+  font-size: 1.25rem;
+  font-weight: 900;
+  letter-spacing: 1px;
+  margin: 0.2rem 0 0.5rem;
+  color: #fde68a;
+}
+
+.qq-cubierta-sub {
+  font-size: 0.9rem;
+  color: #c7d2fe;
+  max-width: 280px;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Tarjeta interior con todos los rivales */
+.qq-tarjeta-grupal-interior {
+  background: #ffffff;
+  padding: 1.6rem 1.4rem;
+  border-radius: 28px;
+  border: 3px solid #e0e7ff;
+}
+
+.qq-grupal-header {
+  text-align: center;
+  margin-bottom: 1.2rem;
+}
+
+.qq-filas-rivales-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.qq-fila-rival-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.1rem;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 16px;
+  gap: 0.8rem;
+}
+
+.qq-rival-nombre-label {
+  font-weight: 800;
+  color: #334155;
+  font-size: 1.05rem;
+}
+
+.qq-rival-tarjeta-badge {
+  background: #eff6ff;
+  color: #1d4ed8;
+  padding: 0.4rem 0.9rem;
+  border-radius: 12px;
+  font-size: 1.15rem;
+  font-weight: 900;
+  border: 1px solid #bfdbfe;
+  text-align: right;
+}
+
+/* Botón grande para presionar con comodidad */
+.qq-btn-pulsador-mirar {
+  margin-top: 0.4rem;
+  background: linear-gradient(135deg, #4338ca 0%, #6366f1 100%) !important;
+  user-select: none;
+  -webkit-user-select: none;
+}

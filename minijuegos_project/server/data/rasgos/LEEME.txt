@@ -1,0 +1,3 @@
+Aquí van las fotos originales de los famosos del minijuego "Rasgos de famosos".
+Cada foto se declara en server/data/rasgos.seed.js (nombre, alias, rasgo y zona de recorte).
+Esta carpeta es privada: el navegador nunca accede a ella directamente, solo al recorte que sirve el servidor.

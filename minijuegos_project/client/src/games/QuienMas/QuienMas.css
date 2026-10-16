@@ -1,0 +1,78 @@
+/* ¿De verdad os conocéis? — usa los estilos compartidos de styles.css; aquí solo lo propio */
+/* Referencia de posición para el botón flotante de ayuda (queda dentro de la tarjeta de cabecera) */
+.qm-contenedor { position: relative; width: 100%; }
+/* Deja sitio al botón "?" para que no tape el título de la cabecera */
+.qm-contenedor .intro-title { padding-right: 2.8rem; }
+.qm-pregunta { text-align: center; }
+.qm-pregunta .title { font-size: clamp(1.4rem, 5.5vw, 1.9rem); }
+.qm-pregunta .names-grid button { position: relative; }
+.qm-pregunta .badge { margin-left: .2rem; }
+
+/* ¿De verdad os conocéis? — estilos compartidos y modo online */
+
+.qm-contenedor {
+  position: relative;
+  width: 100%;
+}
+
+.qm-contenedor .intro-title {
+  padding-right: 2.8rem;
+}
+
+.qm-pregunta {
+  text-align: center;
+}
+
+.qm-pregunta .title {
+  font-size: clamp(1.4rem, 5.5vw, 1.9rem);
+}
+
+.qm-pregunta .names-grid button {
+  position: relative;
+}
+
+.qm-pregunta .badge {
+  margin-left: .2rem;
+}
+
+/* Desglose de votos */
+.reveal-panel {
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 1.25rem;
+}
+
+.reveal-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  color: #1e1b4b;
+  margin: 0 0 0.8rem 0;
+}
+
+.reveal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.reveal-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.65rem 0.9rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 0.95rem;
+}
+
+.reveal-card {
+  font-weight: 800;
+  color: #4f46e5;
+  background: #eef2ff;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+}

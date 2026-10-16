@@ -1,0 +1,621 @@
+// client/src/games/Rasgos/RasgosOnline.jsx
+import React, { useState, useEffect, useRef } from 'react';
+import Icon from '../../components/Icon.jsx';
+import './Rasgos.css';
+
+const CLAVE_SESION_RASGOS = 'rasgos_online_session';
+
+export default function RasgosOnline({ onLocal, onSalir }) {
+  const [vista, setVista] = useState('menu'); // 'menu' | 'crear' | 'unirse' | 'sala'
+  const [nombre, setNombre] = useState('');
+  const [codigoInput, setCodigoInput] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  const [cargando, setCargando] = useState(false);
+
+  const [sesion, setSesion] = useState(() => {
+    try {
+      return JSON.parse(sessionStorage.getItem(CLAVE_SESION_RASGOS));
+    } catch {
+      return null;
+    }
+  });
+
+  const [sala, setSala] = useState(null);
+  const [codigoCopiado, setCodigoCopiado] = useState(false);
+  const [miTexto, setMiTexto] = useState('');
+
+  const intervalRef = useRef(null);
+
+  useEffect(() => {
+    if (!sesion) {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      setSala(null);
+      return;
+    }
+
+    const consultarEstado = () => {
+      fetch(`/api/rasgos/online/sala/${sesion.code}?token=${sesion.token}`)
+        .then((r) => {
+          if (!r.ok) throw new Error('Sala no disponible');
+          return r.json();
+        })
+        .then((d) => {
+          if (d.success) {
+            setSala(d);
+            setVista('sala');
+          }
+        })
+        .catch(() => {
+          sessionStorage.removeItem(CLAVE_SESION_RASGOS);
+          setSesion(null);
+          setSala(null);
+          setVista('menu');
+          setErrorMsg('La sala se ha cerrado o se ha perdido la conexión.');
+        });
+    };
+
+    consultarEstado();
+    intervalRef.current = setInterval(consultarEstado, 500);
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [sesion]);
+
+  const handleCrear = async () => {
+    if (!nombre.trim()) return;
+    setErrorMsg('');
+    setCargando(true);
+    try {
+      const res = await fetch('/api/rasgos/online/crear', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombre: nombre.trim() })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error al crear sala.');
+
+      const nueva = { code: data.code, token: data.token };
+      sessionStorage.setItem(CLAVE_SESION_RASGOS, JSON.stringify(nueva));
+      setSesion(nueva);
+    } catch (err) {
+      setErrorMsg(err.message);
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  const handleUnirse = async () => {
+    if (!nombre.trim() || !codigoInput.trim()) return;
+    setErrorMsg('');
+    setCargando(true);
+    try {
+      const res = await fetch('/api/rasgos/online/unirse', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: codigoInput.trim().toUpperCase(), nombre: nombre.trim() })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Error al unirse.');
+
+      const nueva = { code: data.code, token: data.token };
+      sessionStorage.setItem(CLAVE_SESION_RASGOS, JSON.stringify(nueva));
+      setSesion(nueva);
+    } catch (err) {
+      setErrorMsg(err.message);
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  const handleIniciarJuego = async () => {
+    if (!sesion) return;
+    try {
+      await fetch(`/api/rasgos/online/sala/${sesion.code}/iniciar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: sesion.token })
+      });
+    } catch (err) {
+      setErrorMsg(err.message);
+    }
+  };
+
+  const handlePulsarRojo = async () => {
+    if (!sesion) return;
+    try {
+      setMiTexto('');
+      await fetch(`/api/rasgos/online/sala/${sesion.code}/pulsar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: sesion.token })
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleCambioTexto = (val) => {
+    setMiTexto(val);
+    if (!sesion) return;
+    fetch(`/api/rasgos/online/sala/${sesion.code}/teclear`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: sesion.token, texto: val })
+    }).catch(() => {});
+  };
+
+  const handleEnviarRespuesta = async (e) => {
+    e.preventDefault();
+    if (!miTexto.trim() || !sesion) return;
+    try {
+      await fetch(`/api/rasgos/online/sala/${sesion.code}/responder`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: sesion.token, respuesta: miTexto })
+      });
+      setMiTexto('');
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleSiguienteRonda = async () => {
+    if (!sesion) return;
+    try {
+      setMiTexto('');
+      await fetch(`/api/rasgos/online/sala/${sesion.code}/siguiente-ronda`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: sesion.token })
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleReiniciarPartida = async () => {
+    if (!sesion) return;
+    try {
+      await fetch(`/api/rasgos/online/sala/${sesion.code}/reiniciar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: sesion.token })
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleSalir = async () => {
+    if (sesion) {
+      try {
+        await fetch(`/api/rasgos/online/sala/${sesion.code}/salir`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: sesion.token })
+        });
+      } catch {
+        /* ignorar */
+      }
+    }
+    sessionStorage.removeItem(CLAVE_SESION_RASGOS);
+    setSesion(null);
+    setSala(null);
+    setVista('menu');
+  };
+
+  const copiarCodigo = () => {
+    if (!sala?.code) return;
+    navigator.clipboard?.writeText(sala.code);
+    setCodigoCopiado(true);
+    setTimeout(() => setCodigoCopiado(false), 2000);
+  };
+
+  const ronda = sala?.ronda;
+  const esAdmin = sala?.esAdmin;
+  const yoId = sala?.yoId;
+  const soyElQueHaPulsado = Boolean(ronda?.pulsado && ronda.pulsado.jugadorId === yoId);
+  const alguienHaPulsado = Boolean(ronda?.pulsado);
+  const estoyBloqueado = Boolean(sala?.jugadores?.find((j) => j.id === yoId)?.bloqueado);
+
+  return (
+    <div className="aprox-contenedor">
+      {/* 1. MENÚ PRINCIPAL */}
+      {vista === 'menu' && (
+        <section className="game">
+          <div className="panel center">
+            <span className="lb-luna chica">
+              <Icon name="eye" size={42} strokeWidth={1.6} />
+            </span>
+            <h1 className="title">Rasgos de famosos</h1>
+            <p className="hint">
+              Adivina el famoso por un detalle físico de su rostro. El anfitrión crea la partida y comparte el código.
+            </p>
+
+            {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
+
+            <div className="lb-menu">
+              <button className="big full" onClick={() => { setVista('crear'); setErrorMsg(''); }}>
+                <Icon name="crown" size={22} /> Crear partida
+              </button>
+              <button className="big full" onClick={() => { setVista('unirse'); setErrorMsg(''); }}>
+                <Icon name="users" size={22} /> Unirse a partida
+              </button>
+              <button className="secondary full" onClick={onLocal}>
+                <Icon name="home" size={20} /> Jugar en un solo dispositivo
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 2. CREAR SALA */}
+      {vista === 'crear' && (
+        <section className="game">
+          <div className="panel center">
+            <span className="lb-luna chica">
+              <Icon name="crown" size={40} strokeWidth={1.6} />
+            </span>
+            <h2 className="title">Crear partida</h2>
+            <p className="hint">Introduce tu nombre para crear la sala y ser el anfitrión.</p>
+
+            <div className="lb-form" style={{ marginTop: '1.2rem', textAlign: 'left' }}>
+              <label className="field-label" htmlFor="rg-host-nombre">Tu nombre</label>
+              <input
+                id="rg-host-nombre"
+                type="text"
+                placeholder="Tu nombre"
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value)}
+                maxLength={20}
+                autoFocus
+              />
+              {errorMsg && <p className="error">{errorMsg}</p>}
+
+              <button
+                className="big full"
+                style={{ marginTop: '1rem' }}
+                disabled={cargando || !nombre.trim()}
+                onClick={handleCrear}
+              >
+                <Icon name="check" size={22} strokeWidth={2.5} /> Crear sala
+              </button>
+              <button
+                className="secondary full"
+                style={{ marginTop: '0.6rem' }}
+                onClick={() => { setVista('menu'); setErrorMsg(''); }}
+              >
+                Volver
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 3. UNIRSE A SALA */}
+      {vista === 'unirse' && (
+        <section className="game">
+          <div className="panel center">
+            <span className="lb-luna chica">
+              <Icon name="users" size={40} strokeWidth={1.6} />
+            </span>
+            <h2 className="title">Unirse a partida</h2>
+            <p className="hint">Introduce el código de 4 letras que te ha dado el anfitrión.</p>
+
+            <div className="lb-form" style={{ marginTop: '1.2rem', textAlign: 'left' }}>
+              <label className="field-label" htmlFor="rg-code-input">Código de la sala</label>
+              <input
+                id="rg-code-input"
+                className="lb-input-codigo"
+                type="text"
+                placeholder="ABCD"
+                value={codigoInput}
+                onChange={(e) => setCodigoInput(e.target.value.toUpperCase())}
+                maxLength={4}
+                style={{ textTransform: 'uppercase', letterSpacing: '4px', textAlign: 'center', fontWeight: '800' }}
+                autoFocus
+              />
+
+              <label className="field-label" htmlFor="rg-guest-nombre" style={{ marginTop: '1rem' }}>Tu nombre</label>
+              <input
+                id="rg-guest-nombre"
+                type="text"
+                placeholder="Tu nombre"
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value)}
+                maxLength={20}
+              />
+              {errorMsg && <p className="error">{errorMsg}</p>}
+
+              <button
+                className="big full"
+                style={{ marginTop: '1rem' }}
+                disabled={cargando || !nombre.trim() || codigoInput.trim().length < 4}
+                onClick={handleUnirse}
+              >
+                <Icon name="check" size={22} strokeWidth={2.5} /> Entrar en la partida
+              </button>
+              <button
+                className="secondary full"
+                style={{ marginTop: '0.6rem' }}
+                onClick={() => { setVista('menu'); setErrorMsg(''); }}
+              >
+                Volver
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 4. SALA: LOBBY */}
+      {vista === 'sala' && sala && sala.estado === 'lobby' && (
+        <section className="game">
+          <div className="panel center">
+            <p className="categoria"><Icon name="lock" size={16} />Sala de espera</p>
+            <p className="hint">Código de la partida</p>
+            <button
+              type="button"
+              className="qq-codigo-btn"
+              onClick={copiarCodigo}
+              title="Copiar código"
+            >
+              {sala.code}
+            </button>
+            <p className="hint small">
+              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Pulsa el código para copiarlo y compártelo con los demás.'}
+            </p>
+          </div>
+
+          <div className="panel" style={{ marginTop: '1rem' }}>
+            <h3 className="panel-title"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length})</h3>
+            <div className="lb-lista">
+              {sala.jugadores.map((j) => (
+                <div key={j.id} className={`lb-jug ${j.id === yoId ? 'yo' : ''}`}>
+                  <span className="lb-punto on" />
+                  <span className="lb-jug-nombre">
+                    {j.nombre}{j.id === yoId ? ' (tú)' : ''}{j.id === 1 ? ' 👑 anfitrión' : ''}
+                  </span>
+                </div>
+              ))}
+            </div>
+            {sala.jugadores.length < 2 && (
+              <p className="hint" style={{ marginTop: '0.8rem' }}>
+                Falta al menos 1 jugador más para poder empezar.
+              </p>
+            )}
+          </div>
+
+          {esAdmin ? (
+            <div style={{ marginTop: '1.2rem' }}>
+              <button
+                className="big full"
+                disabled={sala.jugadores.length < 2}
+                onClick={handleIniciarJuego}
+              >
+                <Icon name="play" size={22} />
+                {sala.jugadores.length < 2 ? 'Esperando jugadores...' : '¡Empezar Partida!'}
+              </button>
+            </div>
+          ) : (
+            <div className="panel center" style={{ padding: '2rem 1.5rem', marginTop: '1rem' }}>
+              <span className="lb-luna chica"><Icon name="hourglass" size={40} /></span>
+              <h3 style={{ margin: '0.5rem 0' }}>Esperando al anfitrión...</h3>
+              <p className="hint">En cuanto empiece la partida, aparecerá el rasgo recortado.</p>
+            </div>
+          )}
+
+          <div className="actions" style={{ marginTop: '1rem' }}>
+            <button className="secondary danger full" onClick={handleSalir}>
+              <Icon name="door" size={20} /> Salir de la sala
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* 5. SALA: PODIO FINAL */}
+      {vista === 'sala' && sala && sala.estado === 'podio' && (
+        <section className="game">
+          <div className="end-card">
+            <span className="end-icon"><Icon name="crown" size={44} /></span>
+            <h1 className="title">Puntuaciones finales</h1>
+            <p className="categoria"><Icon name="flagFinish" size={16} />Partida finalizada</p>
+
+            <div className="scoreboard" style={{ marginTop: '1.2rem' }}>
+              {[...sala.jugadores].sort((a, b) => b.puntos - a.puntos).map((j, idx) => (
+                <div key={j.id} className={`score-row ${idx === 0 ? 'first' : ''}`}>
+                  <span className="score-name">
+                    {idx === 0 ? <Icon name="crown" size={22} /> : <span className="pos">{idx + 1}</span>}
+                    {j.nombre} {j.id === yoId ? '(Tú)' : ''}
+                  </span>
+                  <span className="score-pts">{j.puntos} pts</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="actions" style={{ marginTop: '1.5rem' }}>
+            {esAdmin && (
+              <button className="big full" onClick={handleReiniciarPartida}>
+                <Icon name="refresh" size={20} /> Otra Partida (mismos jugadores)
+              </button>
+            )}
+            <button className="secondary danger full" onClick={handleSalir}>
+              <Icon name="door" size={20} /> Salir al menú principal
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* 6. SALA: JUGANDO ONLINE */}
+      {vista === 'sala' && sala && sala.estado === 'jugando' && ronda && (
+        <section className="game">
+          <div className="hud">
+            <span className="chip"><Icon name="flagFinish" size={18} />Ronda {sala.rondaIdx + 1} de {sala.totalRondas}</span>
+            {ronda.rasgo && <span className="chip alt"><Icon name="eye" size={18} />{ronda.rasgo}</span>}
+          </div>
+
+          {/* MARCADOR DE PUNTOS ONLINE */}
+          <div className="scoreboard-container" style={{ justifyContent: 'center' }}>
+            {sala.jugadores.map((j) => (
+              <div key={j.id} className={`score-pill ${j.bloqueado ? 'locked' : ''}`}>
+                <span>{j.nombre}: <strong>{j.puntos} pts</strong></span>
+                {j.bloqueado && <span style={{ marginLeft: '4px' }}>❌</span>}
+              </div>
+            ))}
+          </div>
+
+          {/* FOTO RECORTADA (O COMPLETA SI TERMINÓ LA RONDA) */}
+          <div className="rg-foto">
+            {ronda.estadoRonda === 'activa' ? (
+              <img
+                src={`/api/rasgos/online/sala/${sala.code}/imagen?r=${sala.rondaIdx}`}
+                alt="Detalle físico de un famoso"
+                draggable={false}
+              />
+            ) : (
+              <img
+                className="rg-reveal-foto"
+                src={`/api/rasgos/online/sala/${sala.code}/foto?r=${sala.rondaIdx}`}
+                alt="Foto completa"
+              />
+            )}
+          </div>
+
+          {/* TEMPORIZADOR BARRA */}
+          <div className="timer" role="timer">
+            <div
+              className={`timer-bar ${ronda.segundosRestantes <= 10 ? 'low' : ''}`}
+              style={{ width: `${(ronda.segundosRestantes / 60) * 100}%` }}
+            />
+          </div>
+          <p className="timer-text">
+            <Icon name="clock" size={16} />
+            {Math.ceil(ronda.segundosRestantes)} s
+          </p>
+
+          {/* CONTROLES DE PULSADOR Y RESPUESTA */}
+          {ronda.estadoRonda === 'activa' ? (
+            <div className="interactive-controls" style={{ marginTop: '0.8rem' }}>
+              {/* CASO A: NADIE HA PULSADO */}
+              {!alguienHaPulsado && (
+                <div className="pulsador-container">
+                  <button
+                    type="button"
+                    className="btn-pulsador-rojo"
+                    onClick={handlePulsarRojo}
+                    disabled={estoyBloqueado}
+                  >
+                    <span className="pulsador-icono">🔴</span>
+                    <span className="pulsador-texto">
+                      {estoyBloqueado ? 'BLOQUEADO EN ESTA RONDA' : '¡PULSAR PARA RESPONDER!'}
+                    </span>
+                  </button>
+                </div>
+              )}
+
+              {/* CASO B: YO HE PULSADO */}
+              {soyElQueHaPulsado && (
+                <form onSubmit={handleEnviarRespuesta} className="respuesta-pulsada-box">
+                  <div className="respuesta-pulsada-header">
+                    <span className="pulsado-badge">🔴 ¡Has pulsado! Tiempo detenido (+{Math.ceil(ronda.segundosRestantes)} pts)</span>
+                    <p className="hint small" style={{ margin: '0.3rem 0 0.8rem' }}>
+                      Escribe el nombre del famoso. Los demás ven lo que escribes en directo:
+                    </p>
+                  </div>
+
+                  <div className="answer-form">
+                    <input
+                      autoFocus
+                      type="text"
+                      className="player-text-input respuesta-input-grande"
+                      placeholder="Nombre del famoso..."
+                      value={miTexto}
+                      onChange={(e) => handleCambioTexto(e.target.value)}
+                    />
+                    <button
+                      type="submit"
+                      className="btn-start"
+                      disabled={!miTexto.trim()}
+                    >
+                      Responder
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* CASO C: OTRO JUGADOR HA PULSADO */}
+              {alguienHaPulsado && !soyElQueHaPulsado && (
+                <div className="online-tecleo-preview-card">
+                  <div className="online-tecleo-header">
+                    <span className="pulsador-icono">🔴</span>
+                    <strong>¡{ronda.pulsado.nombre} ha pulsado el botón!</strong>
+                  </div>
+                  <p className="hint small" style={{ margin: '0.4rem 0 0.8rem' }}>
+                    Tiempo detenido. Está escribiendo su respuesta en directo:
+                  </p>
+                  <div className="online-tecleo-box">
+                    {ronda.pulsado.texto ? (
+                      <span className="online-tecleo-texto">{ronda.pulsado.texto}</span>
+                    ) : (
+                      <span className="online-tecleo-esperando">Escribiendo...</span>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {ronda.mensaje && (
+                <div className={`status-alert ${ronda.mensaje.tipo}`} style={{ marginTop: '1rem' }}>
+                  {ronda.mensaje.texto}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="round-finished-box">
+              <p className="rg-nombre-famoso">{ronda.solucion}</p>
+
+              {ronda.attribution && (
+                <p className="rg-atribucion">
+                  Foto original por{' '}
+                  <a href={ronda.attribution.fuenteUrl} target="_blank" rel="noopener noreferrer">
+                    {ronda.attribution.autor}
+                  </a>{' '}
+                  (Wikimedia Commons), bajo licencia{' '}
+                  <a href={ronda.attribution.licenciaUrl} target="_blank" rel="noopener noreferrer">
+                    {ronda.attribution.licencia}
+                  </a>.
+                </p>
+              )}
+
+              <div className={`status-alert ${ronda.mensaje?.tipo || 'info'}`} style={{ margin: '1rem 0' }}>
+                {ronda.mensaje?.texto || `El famoso era: ${ronda.solucion}`}
+              </div>
+
+              {esAdmin ? (
+                <div className="round-finished-actions">
+                  {sala.rondaIdx + 1 < sala.totalRondas ? (
+                    <button className="btn-start" onClick={handleSiguienteRonda}>
+                      Siguiente Ronda ➔
+                    </button>
+                  ) : (
+                    <button className="btn-start" onClick={handleSiguienteRonda}>
+                      Ver Puntuaciones Finales 🏆
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <p className="hint center">Esperando a que el anfitrión avance de ronda...</p>
+              )}
+            </div>
+          )}
+
+          <div className="actions" style={{ marginTop: '1.2rem' }}>
+            <button className="secondary danger full" onClick={handleSalir}>
+              <Icon name="door" size={20} /> Salir de la sala
+            </button>
+          </div>
+        </section>
+      )}
+    </div>
+  );
+}

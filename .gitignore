@@ -1,0 +1,7 @@
+node_modules
+.env
+dist
+server/data/*.db
+server/data/*.db-*
+server/data/.admin-secret
+server/data/.admin-totp
