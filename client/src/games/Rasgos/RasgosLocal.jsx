@@ -141,7 +141,6 @@ function Ronda({ partidaId, indice, total, rasgo, jugadores, puntos, onPuntos, o
     <section className="game">
       <div className="hud">
         <span className="chip"><Icon name="flagFinish" size={18} />Ronda {indice + 1} de {total}</span>
-        {rasgo && <span className="chip alt"><Icon name="eye" size={18} />{rasgo}</span>}
       </div>
 
       <div className="rg-foto">

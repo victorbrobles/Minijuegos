@@ -11,6 +11,7 @@ const MIN_JUGADORES = 3;
 const MAX_JUGADORES = 10;
 const RONDAS = 10;
 const SEGUNDOS_IMAGEN = 10;
+const SEGUNDOS_TURNO = 90; // <-- NUEVO: Límite de tiempo por turno
 const CANDIDATOS = 16;
 
 const COLORES = ['#ef4444', '#2563eb', '#16a34a', '#f59e0b', '#9333ea', '#ec4899', '#0d9488', '#ea580c', '#475569', '#65a30d'];
@@ -110,6 +111,14 @@ export default function UbicacionLocal({ onVolver, onExit }) {
   const [resultado, setResultado] = useState(null);
   const [enfoque, setEnfoque] = useState(null);
 
+  // NUEVO: Estado y ref para el temporizador de turno
+  const [tiempoTurno, setTiempoTurno] = useState(SEGUNDOS_TURNO);
+  const colocadosRef = useRef(colocados);
+  
+  useEffect(() => {
+    colocadosRef.current = colocados;
+  }, [colocados]);
+
   const totalRondas = Math.min(RONDAS, lugares.length);
   const lugarActual = lugares[ronda - 1];
   const jugadorActual = jugadores[orden[turnoIdx]];
@@ -118,6 +127,28 @@ export default function UbicacionLocal({ onVolver, onExit }) {
 
   const esUltimoTurno = turnoIdx === orden.length - 1;
   const slotsActivos = esUltimoTurno ? SLOTS.filter((s) => s.id === 'real') : SLOTS;
+
+  // Temporizador para la fase 'turno'
+  useEffect(() => {
+    if (fase !== 'turno') return;
+    setTiempoTurno(SEGUNDOS_TURNO);
+
+    const fin = Date.now() + SEGUNDOS_TURNO * 1000;
+    const id = setInterval(() => {
+      const rest = (fin - Date.now()) / 1000;
+      if (rest <= 0) {
+        clearInterval(id);
+        setTiempoTurno(0);
+        // Forzar confirmación usando ref actual
+        confirmar(colocadosRef.current);
+      } else {
+        setTiempoTurno(rest);
+      }
+    }, 100);
+
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fase, turnoIdx]);
 
   useEffect(() => {
     const siguiente = lugares[ronda];
@@ -186,12 +217,15 @@ export default function UbicacionLocal({ onVolver, onExit }) {
     if (id in colocados) setColocados((c) => ({ ...c, [id]: { lat, lng } }));
   };
 
-  const confirmar = () => {
+  const confirmar = (datosColocados = colocados) => {
+    // Si agotó el tiempo y no puso el real, se manda null (0 pt)
     const entrada = {
       jugadorId: jugadorActual.id,
-      real: colocados.real,
-      senuelos: esUltimoTurno ? [] : [colocados.s1, colocados.s2],
-      visibles: esUltimoTurno ? [colocados.real] : barajar([colocados.real, colocados.s1, colocados.s2])
+      real: datosColocados.real || null,
+      senuelos: esUltimoTurno ? [] : [datosColocados.s1, datosColocados.s2].filter(Boolean),
+      visibles: esUltimoTurno 
+        ? [datosColocados.real].filter(Boolean) 
+        : barajar([datosColocados.real, datosColocados.s1, datosColocados.s2].filter(Boolean))
     };
     const marcas = [...marcasRonda, entrada];
     setMarcasRonda(marcas);
@@ -209,8 +243,13 @@ export default function UbicacionLocal({ onVolver, onExit }) {
     const lugar = lugarActual;
     const filas = marcas
       .map((m) => {
-        const km = distanciaKm(m.real, lugar);
-        return { jugador: jugadores.find((j) => j.id === m.jugadorId), real: m.real, km, puntos: puntosPorDistancia(km) };
+        let km = Infinity;
+        let puntos = 0;
+        if (m.real) {
+          km = distanciaKm(m.real, lugar);
+          puntos = puntosPorDistancia(km);
+        }
+        return { jugador: jugadores.find((j) => j.id === m.jugadorId), real: m.real, km, puntos };
       })
       .sort((a, b) => a.km - b.km);
     setPuntos((p) => {
@@ -244,13 +283,13 @@ export default function UbicacionLocal({ onVolver, onExit }) {
   const marcadoresResultado = resultado
     ? [
         { id: 'correcto', lat: resultado.lugar.lat, lng: resultado.lugar.lng, color: '#111827', glifo: '✓', grande: true, z: 1000, etiqueta: resultado.lugar.nombre },
-        ...resultado.filas.map((f) => ({
+        ...resultado.filas.filter((f) => f.real).map((f) => ({
           id: `jugador-${f.jugador.id}`, lat: f.real.lat, lng: f.real.lng, color: f.jugador.color, glifo: inicial(f.jugador.nombre), etiqueta: f.jugador.nombre
         }))
       ]
     : [];
   const lineasResultado = resultado
-    ? resultado.filas.map((f) => ({ desde: f.real, hasta: resultado.lugar, color: f.jugador.color }))
+    ? resultado.filas.filter((f) => f.real).map((f) => ({ desde: f.real, hasta: resultado.lugar, color: f.jugador.color }))
     : [];
 
   const clasificacion = [...jugadores].sort((a, b) => (puntos[b.id] ?? 0) - (puntos[a.id] ?? 0));
@@ -285,7 +324,7 @@ export default function UbicacionLocal({ onVolver, onExit }) {
                   <p><strong>1. Dinámica de la ronda:</strong></p>
                   <ul>
                     <li>Se muestra la fotografía de un lugar emblemático durante {SEGUNDOS_IMAGEN} segundos.</li>
-                    <li>Un jugador al azar abre la ronda y coloca <strong>3 marcadores</strong>: uno <strong>real</strong> (★) y <strong>dos señuelos</strong> (1 y 2).</li>
+                    <li>Un jugador al azar abre la ronda y coloca <strong>3 marcadores</strong> (en 90s): uno <strong>real</strong> (★) y <strong>dos señuelos</strong> (1 y 2).</li>
                     <li>El siguiente jugador verá esos 3 marcadores anteriores con una «?» (sin saber cuál es el real) y colocará los suyos.</li>
                     <li><strong>Último jugador:</strong> solo coloca su marcador <strong>★ Real</strong>.</li>
                   </ul>
@@ -416,7 +455,15 @@ export default function UbicacionLocal({ onVolver, onExit }) {
 
       {/* TURNO */}
       {fase === 'turno' && jugadorActual && (
-        <section className="game">
+        <section className="game" style={{ paddingTop: '0' }}>
+          {/* NUEVO TEMPORIZADOR TURNO LOCAL */}
+          <div className="timer" style={{ marginTop: '0', marginBottom: '1rem' }}>
+            <div className={`timer-bar${tiempoTurno <= 15 ? ' low' : ''}`} style={{ width: `${(tiempoTurno / SEGUNDOS_TURNO) * 100}%` }} />
+          </div>
+          <p className="timer-text" style={{ marginTop: '-0.5rem', marginBottom: '1rem' }}>
+            <Icon name="clock" size={16} /> {Math.ceil(tiempoTurno)} s
+          </p>
+
           <div className="ub-turno" style={{ '--c': jugadorActual.color }}>
             <p className="ub-turno-titulo">
               <span className="ub-punto" style={{ background: jugadorActual.color }} />
@@ -450,7 +497,7 @@ export default function UbicacionLocal({ onVolver, onExit }) {
             ))}
           </div>
 
-          <button className="big full" disabled={colocadosN < slotsActivos.length} onClick={confirmar}>
+          <button className="big full" disabled={colocadosN < slotsActivos.length} onClick={() => confirmar()}>
             <Icon name="check" size={22} /> Confirmar {esUltimoTurno ? 'marcador real' : `marcadores (${colocadosN}/${slotsActivos.length})`}
           </button>
         </section>
@@ -479,8 +526,9 @@ export default function UbicacionLocal({ onVolver, onExit }) {
                 <button
                   key={f.jugador.id}
                   className="ub-rank-fila"
-                  onClick={() => setEnfoque({ lat: f.real.lat, lng: f.real.lng })}
+                  onClick={() => f.real && setEnfoque({ lat: f.real.lat, lng: f.real.lng })}
                   title="Ver su marcador en el mapa"
+                  disabled={!f.real}
                 >
                   <span className="score-name">
                     <span className="pos">{i + 1}</span>
@@ -488,7 +536,7 @@ export default function UbicacionLocal({ onVolver, onExit }) {
                     {f.jugador.nombre}
                   </span>
                   <span className="ub-rank-datos">
-                    <span className="ub-rank-km">{formatearKm(f.km)}</span>
+                    <span className="ub-rank-km">{f.real ? formatearKm(f.km) : 'No colocado'}</span>
                     <span className={`ub-rank-pts${f.puntos > 0 ? ' suma' : ''}`}>+{f.puntos}</span>
                   </span>
                 </button>

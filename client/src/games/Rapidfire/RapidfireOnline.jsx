@@ -14,7 +14,8 @@ export default function RapidfireOnline({ onLocal, onSalir }) {
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
-  const [modalSalir, setModalSalir] = useState(false); // <--- NUEVO ESTADO
+  const [modalSalir, setModalSalir] = useState(false);
+  const [modalAyuda, setModalAyuda] = useState(false);
 
   const [sesion, setSesion] = useState(() => {
     try {
@@ -197,8 +198,60 @@ export default function RapidfireOnline({ onLocal, onSalir }) {
   const maximo = ranking.length ? ranking[0].puntos : 0;
   const ganadores = maximo > 0 ? ranking.filter((j) => j.puntos === maximo) : [];
 
+  // Mostrar ayuda solo en menús y en el lobby
+  const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
+
   return (
     <div className="rf-contenedor">
+      {/* ---------------- BOTÓN Y MODAL DE AYUDA ---------------- */}
+      {mostrarAyuda && (
+        <button
+          type="button"
+          className="btn-ayuda-flotante"
+          onClick={() => setModalAyuda(true)}
+          title="Reglas y puntuación"
+        >
+          <span className="btn-ayuda-flotante-signo">?</span>
+        </button>
+      )}
+
+      {modalAyuda && (
+        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
+          <div className="rg-modal modal-ayuda-juego" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-ayuda-header">
+              <span className="modal-ayuda-signo-title">?</span>
+              <h3>¿Cómo se juega a Rapidfire?</h3>
+            </div>
+            <div className="modal-ayuda-cuerpo">
+              <p><strong>1. Dinámica del juego:</strong></p>
+              <ul>
+                <li>Se mostrará un reto de enumerar varios elementos de una categoría.</li>
+                <li>Dispones de un cronómetro de <strong>60 segundos</strong>.</li>
+                <li>Debes decir en voz alta los elementos. <strong>El anfitrión actúa como juez</strong> para marcarlos como correctos.</li>
+                <li>Si no sabes más, el anfitrión puede marcar "Rebote" para que pase al siguiente jugador.</li>
+              </ul>
+              <p><strong>2. Puntuación:</strong></p>
+              <div className="tabla-ayuda-puntos">
+                <div className="fila-ayuda-puntos verde">
+                  <span>⏱️ Acierto Completo</span>
+                  <strong>X puntos según el reto</strong>
+                </div>
+                <div className="fila-ayuda-puntos amarillo">
+                  <span>🔄 Rebote</span>
+                  <strong>Mismos puntos para quien lo robe</strong>
+                </div>
+              </div>
+            </div>
+            <div className="rg-modal-acciones">
+              <button className="big full" onClick={() => setModalAyuda(false)}>
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ---------------- FIN AYUDA ---------------- */}
+
       {/* 1. MENÚ ONLINE */}
       {vista === 'menu' && (
         <section className="game">
@@ -303,12 +356,20 @@ export default function RapidfireOnline({ onLocal, onSalir }) {
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
         <section className="game">
           <div className="panel center">
-            <p className="categoria">Código de la partida</p>
-            <button type="button" className="qq-codigo-btn" onClick={copiarCodigo}>
+            <p className="categoria" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.6rem' }}>
+              <Icon name="lock" size={16} /> Sala de espera
+            </p>
+            <p className="hint">Código de la partida</p>
+            <button
+              type="button"
+              className="qq-codigo-btn"
+              onClick={copiarCodigo}
+              title="Copiar código"
+            >
               {sala.code}
             </button>
             <p className="hint small">
-              {codigoCopiado ? '¡Copiado!' : 'Comparte este código para que se unan (mínimo 2 jugadores).'}
+              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Pulsa el código para copiarlo y compártelo con los demás.'}
             </p>
           </div>
 

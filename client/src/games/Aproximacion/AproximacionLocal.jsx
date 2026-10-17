@@ -1,5 +1,5 @@
 // client/src/games/Aproximacion/AproximacionLocal.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import GameIntro from '../../components/GameIntro.jsx';
@@ -8,6 +8,7 @@ import './Aproximacion.css';
 const MAX_RONDAS = 15;
 const MIN_JUGADORES = 4;
 const MAX_JUGADORES = 20;
+const TIEMPO_TURNO = 30; // 30 segundos por turno
 
 export default function AproximacionLocal({ onVolver, onExit }) {
   const navigate = useNavigate();
@@ -38,6 +39,19 @@ export default function AproximacionLocal({ onVolver, onExit }) {
   const [errorInput, setErrorInput] = useState('');
 
   const [resultadoRonda, setResultadoRonda] = useState(null);
+  
+  const [tiempoRestante, setTiempoRestante] = useState(TIEMPO_TURNO);
+  
+  // Referencias para acceder al estado actual dentro del timer
+  const inputNumeroRef = useRef(inputNumero);
+  const confianzaElegidaRef = useRef(confianzaElegida);
+  const faseRef = useRef(fase);
+  
+  useEffect(() => {
+    inputNumeroRef.current = inputNumero;
+    confianzaElegidaRef.current = confianzaElegida;
+    faseRef.current = fase;
+  }, [inputNumero, confianzaElegida, fase]);
 
   useEffect(() => {
     fetch('/api/aproximacion/preguntas')
@@ -103,6 +117,7 @@ export default function AproximacionLocal({ onVolver, onExit }) {
     setInputRealManual('');
     setErrorInput('');
     setFase('turno');
+    setTiempoRestante(TIEMPO_TURNO);
   };
 
   const jugadorActual = jugadores[ordenTurnos[subTurnoIndex]];
@@ -115,9 +130,77 @@ export default function AproximacionLocal({ onVolver, onExit }) {
       jugadorNombre: jugadores.find((j) => j.id === Number(jId))?.nombre,
       valor: d.valor
     }));
+    
+  // Temporizador para turnos y segunda vuelta
+  useEffect(() => {
+    if (fase !== 'turno' && fase !== 'segunda_vuelta_inicial') return;
+    
+    setTiempoRestante(TIEMPO_TURNO);
+    
+    const id = setInterval(() => {
+      setTiempoRestante((prev) => {
+        if (prev <= 1) {
+          clearInterval(id);
+          forzarEnvioTurno();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    
+    return () => clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subTurnoIndex, fase]);
+  
+  const forzarEnvioTurno = () => {
+    if (faseRef.current === 'turno') {
+      let nuevaDecision = null;
+      if (confianzaElegidaRef.current !== null) {
+        const jugadorReferencia = respuestasDadas.find((r) => r.jugadorId === confianzaElegidaRef.current);
+        if (jugadorReferencia) {
+          nuevaDecision = {
+            tipo: 'confia',
+            valor: jugadorReferencia.valor,
+            confiaEnId: jugadorReferencia.jugadorId
+          };
+        }
+      } 
+      
+      if (!nuevaDecision) {
+        let numVal = 0;
+        if (inputNumeroRef.current !== '' && !isNaN(Number(inputNumeroRef.current))) {
+            numVal = Math.round(Number(inputNumeroRef.current));
+        }
+        
+        // Evitar duplicados si se acaba el tiempo
+        let valorFinal = numVal;
+        while (respuestasDadas.some((r) => r.valor === valorFinal)) {
+            valorFinal++;
+        }
+        
+        nuevaDecision = {
+          tipo: 'propia',
+          valor: valorFinal,
+          confiaEnId: null
+        };
+      }
+      
+      setDecisiones(prev => {
+        const nuevasDecisiones = {
+          ...prev,
+          [jugadorActual.id]: nuevaDecision
+        };
+        setTimeout(() => avanzarSiguienteTurno(nuevasDecisiones), 0);
+        return nuevasDecisiones;
+      });
+      
+    } else if (faseRef.current === 'segunda_vuelta_inicial') {
+        confirmarSegundaVuelta(null);
+    }
+  };
 
   const confirmarTurno = (e) => {
-    e.preventDefault();
+    if(e) e.preventDefault();
     setErrorInput('');
 
     let nuevaDecision = null;
@@ -348,9 +431,9 @@ export default function AproximacionLocal({ onVolver, onExit }) {
                   <p><strong>1. Dinámica de la ronda:</strong></p>
                   <ul>
                     <li>Sale una pregunta numérica (geografía, récords, deportes o sobre vosotros mismos).</li>
-                    <li>Un jugador al azar empieza respondiendo con una cifra.</li>
+                    <li>Un jugador al azar empieza respondiendo con una cifra. Dispone de <strong>30 segundos</strong>.</li>
                     <li>Los siguientes jugadores ven las respuestas anteriores y pueden <strong>poner su propio número</strong> o <strong>confiar en el de otro</strong>.</li>
-                    <li>Al final de la ronda, el primer jugador tiene una <strong>segunda oportunidad</strong> para mantener su cifra o cambiar y confiar en la de otro.</li>
+                    <li>Al final de la ronda, el primer jugador tiene una <strong>segunda oportunidad</strong> (otros 30s) para mantener su cifra o cambiar y confiar en la de otro.</li>
                   </ul>
 
                   <p><strong>2. Sistema de puntuación:</strong></p>
@@ -531,6 +614,9 @@ export default function AproximacionLocal({ onVolver, onExit }) {
               <Icon name="check" size={22} strokeWidth={2.5} />
               {confianzaElegida !== null ? 'Confirmar confianza' : 'Confirmar mi número'}
             </button>
+            <div style={{ textAlign: 'center', marginTop: '1rem', color: '#b91c1c', fontWeight: 'bold' }}>
+              ⏱️ {tiempoRestante} s
+            </div>
           </form>
         </section>
       )}
@@ -578,6 +664,9 @@ export default function AproximacionLocal({ onVolver, onExit }) {
           <button className="big full" onClick={() => confirmarSegundaVuelta(null)}>
             <Icon name="check" size={22} /> Mantener mi respuesta ({decisiones[jugadores[ordenTurnos[0]].id]?.valor})
           </button>
+          <div style={{ textAlign: 'center', marginTop: '1rem', color: '#b91c1c', fontWeight: 'bold' }}>
+              ⏱️ {tiempoRestante} s
+          </div>
         </section>
       )}
 

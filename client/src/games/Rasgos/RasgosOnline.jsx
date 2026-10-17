@@ -12,6 +12,7 @@ export default function RasgosOnline({ onLocal, onSalir }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modalSalir, setModalSalir] = useState(false);
+  const [modalAyuda, setModalAyuda] = useState(false);
 
   const [sesion, setSesion] = useState(() => {
     try {
@@ -220,8 +221,59 @@ export default function RasgosOnline({ onLocal, onSalir }) {
   const alguienHaPulsado = Boolean(ronda?.pulsado);
   const estoyBloqueado = Boolean(sala?.jugadores?.find((j) => j.id === yoId)?.bloqueado);
 
+  const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
+
   return (
     <div className="aprox-contenedor">
+      
+      {/* ---------------- BOTÓN Y MODAL DE AYUDA ---------------- */}
+      {mostrarAyuda && (
+        <button
+          type="button"
+          className="btn-ayuda-flotante"
+          onClick={() => setModalAyuda(true)}
+          title="Reglas y puntuación"
+        >
+          <span className="btn-ayuda-flotante-signo">?</span>
+        </button>
+      )}
+
+      {modalAyuda && (
+        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
+          <div className="rg-modal modal-ayuda-juego" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-ayuda-header">
+              <span className="modal-ayuda-signo-title">?</span>
+              <h3>¿Cómo se juega a Rasgos de Famosos?</h3>
+            </div>
+            <div className="modal-ayuda-cuerpo">
+              <p><strong>1. Dinámica del juego:</strong></p>
+              <ul>
+                <li>Se muestra un detalle físico recortado del rostro de un famoso.</li>
+                <li>Dispones de un cronómetro de <strong>60 segundos</strong>.</li>
+                <li><strong>Pulsa el botón rojo</strong> para parar el tiempo e introducir el nombre del famoso.</li>
+              </ul>
+              <p><strong>2. Puntuación:</strong></p>
+              <div className="tabla-ayuda-puntos">
+                <div className="fila-ayuda-puntos verde">
+                  <span>⏱️ Acierto</span>
+                  <strong>Suma los segundos restantes (+segundos)</strong>
+                </div>
+                <div className="fila-ayuda-puntos rojo">
+                  <span>❌ Fallo</span>
+                  <strong>Resta los segundos restantes (-segundos) y quedas fuera</strong>
+                </div>
+              </div>
+            </div>
+            <div className="rg-modal-acciones">
+              <button className="big full" onClick={() => setModalAyuda(false)}>
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ---------------- FIN AYUDA ---------------- */}
+
       {/* 1. MENÚ PRINCIPAL */}
       {vista === 'menu' && (
         <section className="game">
@@ -353,7 +405,9 @@ export default function RasgosOnline({ onLocal, onSalir }) {
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
         <section className="game">
           <div className="panel center">
-            <p className="categoria"><Icon name="lock" size={16} />Sala de espera</p>
+            <p className="categoria" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem', fontWeight: 700, color: '#0f172a', marginBottom: '0.6rem' }}>
+              <Icon name="lock" size={16} /> Sala de espera
+            </p>
             <p className="hint">Código de la partida</p>
             <button
               type="button"
@@ -369,7 +423,7 @@ export default function RasgosOnline({ onLocal, onSalir }) {
           </div>
 
           <div className="panel" style={{ marginTop: '1rem' }}>
-            <h3 className="panel-title"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length})</h3>
+            <h3 className="panel-title"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length}/15)</h3>
             <div className="lb-lista">
               {sala.jugadores.map((j) => (
                 <div key={j.id} className={`lb-jug ${j.id === yoId ? 'yo' : ''}`}>
@@ -386,17 +440,18 @@ export default function RasgosOnline({ onLocal, onSalir }) {
             )}
           </div>
 
+          {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
+
           {esAdmin ? (
-            <div style={{ marginTop: '1.2rem' }}>
-              <button
-                className="big full"
-                disabled={sala.jugadores.length < 2}
-                onClick={handleIniciarJuego}
-              >
-                <Icon name="play" size={22} />
-                {sala.jugadores.length < 2 ? 'Esperando jugadores...' : '¡Empezar Partida!'}
-              </button>
-            </div>
+            <button
+              className="big full"
+              style={{ marginTop: '1.2rem' }}
+              disabled={sala.jugadores.length < 2}
+              onClick={handleIniciarJuego}
+            >
+              <Icon name="play" size={22} />
+              {sala.jugadores.length < 2 ? 'Esperando rivales (mínimo 2)...' : '¡Empezar Partida!'}
+            </button>
           ) : (
             <div className="panel center" style={{ padding: '2rem 1.5rem', marginTop: '1rem' }}>
               <span className="lb-luna chica"><Icon name="hourglass" size={40} /></span>
@@ -452,7 +507,6 @@ export default function RasgosOnline({ onLocal, onSalir }) {
         <section className="game">
           <div className="hud">
             <span className="chip"><Icon name="flagFinish" size={18} />Ronda {sala.rondaIdx + 1} de {sala.totalRondas}</span>
-            {ronda.rasgo && <span className="chip alt"><Icon name="eye" size={18} />{ronda.rasgo}</span>}
           </div>
 
           <div className="scoreboard-container" style={{ justifyContent: 'center' }}>

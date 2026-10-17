@@ -5,56 +5,56 @@
 // - etiquetas: palabras extra para el buscador (sin tildes, en minúsculas)
 export const META = {
   'quien-es-quien': {
-    titulo: '¿Quién Anda Ahí?',
+    titulo: '¿Sabes quién soy?',
     icono: 'whois',
     colores: ['#3b82f6', '#1d4ed8'],
     etiquetas: 'personajes adivinar descartar rasgos clasico tablero preguntas',
     descripcion: 'Adivina el personaje secreto descartando rasgos antes que tus rivales.'
   },
   'rasgos': {
-    titulo: 'Zoom a la Fama',
+    titulo: 'El paparazzi',
     icono: 'zoomface',
     colores: ['#f97316', '#9a3412'],
     etiquetas: 'famosos cara facciones zoom foto celebridades',
     descripcion: 'Reconoce al famoso descubriendo sus facciones paso a paso.'
   },
   'rankings': {
-    titulo: 'Ponte en Orden',
+    titulo: 'Ranking oculto',
     icono: 'podium',
     colores: ['#eab308', '#a16207'],
     etiquetas: 'ranking ordenar puestos clasificacion mayor menor top',
     descripcion: 'Ordena de mayor a menor elementos de cultura, ciencia, cine y deportes.'
   },
   'aproximacion': {
-    titulo: 'A Ojo de Buen Cubero',
+    titulo: 'Aproxímate',
     icono: 'target',
     colores: ['#8b5cf6', '#5b21b6'],
     etiquetas: 'numeros cifras calcular estimar aproximar cantidad',
     descripcion: 'Atrévete a calcular cifras astronómicas y llévate los puntos por ser el más cercano.'
   },
   'ubicacion': {
-    titulo: '¿Dónde Diablos Está?',
+    titulo: 'Test del viajero',
     icono: 'pin',
     colores: ['#10b981', '#047857'],
     etiquetas: 'mapa lugares monumentos geografia mundo foto',
     descripcion: 'Ubica monumentos y lugares en el mapa mundial esquivando los señuelos de los demás.'
   },
   'siglas': {
-    titulo: 'Descifra el Código',
+    titulo: 'D.E.S.C.I.F.R.A',
     icono: 'letters',
     colores: ['#6366f1', '#3730a3'],
     etiquetas: 'siglas acronimos significado palabras cultura general',
     descripcion: 'Averigua el significado real de las siglas más conocidas.'
   },
   'rapidfire': {
-    titulo: 'A Quemarropa',
+    titulo: 'Rápido y certero',
     icono: 'zap',
     colores: ['#ef4444', '#b91c1c'],
     etiquetas: 'retos categorias cronometro rebote rapido 60 segundos',
-    descripcion: 'Responde preguntas a toda velocidad sin dudar ni un segundo.'
+    descripcion: 'Retos de 60 segundos por categoría: di todos los elementos antes de que se acabe el tiempo o pasa el rebote.'
   },
   'trayectoria': {
-    titulo: 'El Currículum Oculto',
+    titulo: 'Modo carrera',
     icono: 'soccer',
     colores: ['#22c55e', '#15803d'],
     etiquetas: 'futbol futbolista clubes deportes equipos jugador',
@@ -68,7 +68,7 @@ export const META = {
     descripcion: 'Identifica la película o la canción con frases, fragmentos de audio de 20s y actores.'
   },
   'pistas': {
-    titulo: 'Seis Bajo Sospecha',
+    titulo: 'No seas des(pista)do',
     icono: 'sleuth',
     colores: ['#64748b', '#1e293b'],
     etiquetas: 'detective enigma misterio pistas vidas adivinar',
@@ -159,7 +159,7 @@ export const META = {
     descripcion: 'Escucha la canción subiendo gradualmente de volumen. Pulsa el botón antes de los 30 segundos para adivinar el tema y sumar tantos puntos como segundos queden.'
   },
   'ciegas': {
-    titulo: 'Ranking a Ciegas',
+    titulo: 'Top a Ciegas',
     icono: 'eyeoff',
     colores: ['#f59e0b', '#b45309'],
     etiquetas: 'ranking ordenar ciegas votar puntuar orden',

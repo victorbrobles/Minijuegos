@@ -2,12 +2,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
 import MapaMundi from './MapaMundi.jsx';
-import { formatearKm, resolverImagenes } from './geo.js';
+import { formatearKm, resolverImagenes, RANGOS_PUNTOS } from './geo.js';
 import './Ubicacion.css';
 import '../Adivina/Adivina.css';
 
 const CLAVE_SESION_UBICACION = 'ubicacion_online_session';
 const CANDIDATOS = 16;
+const SEGUNDOS_IMAGEN = 10;
+const SEGUNDOS_TURNO = 90; 
 
 export default function UbicacionOnline({ onLocal, onSalir }) {
   const [vista, setVista] = useState('menu'); // 'menu' | 'crear' | 'unirse' | 'sala'
@@ -16,6 +18,7 @@ export default function UbicacionOnline({ onLocal, onSalir }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modalSalir, setModalSalir] = useState(false);
+  const [modalAyuda, setModalAyuda] = useState(false); 
 
   const [sesion, setSesion] = useState(() => {
     try {
@@ -30,7 +33,6 @@ export default function UbicacionOnline({ onLocal, onSalir }) {
   const [verImagen, setVerImagen] = useState(false);
   const [enfoque, setEnfoque] = useState(null);
 
-  // Marcador provisional propio antes de confirmarlo en el backend
   const [miPosicionLocal, setMiPosicionLocal] = useState(null);
 
   const intervalRef = useRef(null);
@@ -278,8 +280,55 @@ export default function UbicacionOnline({ onLocal, onSalir }) {
   const maximo = ranking.length ? ranking[0].puntos : 0;
   const ganadores = maximo > 0 ? ranking.filter((j) => j.puntos === maximo) : [];
 
+  const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
+
   return (
     <div className="ub-contenedor">
+      {/* ---------------- BOTÓN Y MODAL DE AYUDA ---------------- */}
+      {mostrarAyuda && (
+        <button
+          type="button"
+          className="btn-ayuda-flotante"
+          onClick={() => setModalAyuda(true)}
+          title="Reglas y sistema de puntuación"
+        >
+          <span className="btn-ayuda-flotante-signo">?</span>
+        </button>
+      )}
+
+      {modalAyuda && (
+        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
+          <div className="rg-modal modal-ayuda-juego" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-ayuda-header">
+              <span className="modal-ayuda-signo-title">?</span>
+              <h3>¿Cómo se juega a Ubica el lugar?</h3>
+            </div>
+            <div className="modal-ayuda-cuerpo">
+              <p><strong>1. Dinámica de la ronda:</strong></p>
+              <ul>
+                <li>Se muestra la fotografía de un lugar emblemático durante {SEGUNDOS_IMAGEN} segundos.</li>
+                <li>Todos los jugadores tienen <strong>{SEGUNDOS_TURNO} segundos</strong> simultáneos para poner su marcador.</li>
+                <li><strong>¡Radar cada 15s!</strong> Los marcadores no confirmados destellan para los demás durante 1 segundo. ¡Despista a tus rivales antes de confirmar!</li>
+              </ul>
+
+              <p><strong>2. Puntuación:</strong></p>
+              <div className="tabla-ayuda-puntos">
+                {RANGOS_PUNTOS.map((r) => (
+                  <div key={r.hasta} className="fila-ayuda-puntos verde">
+                    <span>A {r.hasta.toLocaleString('es-ES')} km o menos</span>
+                    <strong>+{r.puntos} {r.puntos === 1 ? 'punto' : 'puntos'}</strong>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="rg-modal-acciones">
+              <button className="big full" onClick={() => setModalAyuda(false)}>Entendido</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ---------------- FIN AYUDA ---------------- */}
+
       {/* 1. MENÚ ONLINE */}
       {vista === 'menu' && (
         <section className="game">
@@ -384,12 +433,18 @@ export default function UbicacionOnline({ onLocal, onSalir }) {
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
         <section className="game">
           <div className="panel center">
-            <p className="categoria">Código de la partida</p>
-            <button type="button" className="qq-codigo-btn" onClick={copiarCodigo}>
+            <p className="categoria"><Icon name="lock" size={16} />Sala de espera</p>
+            <p className="hint">Código de la partida</p>
+            <button
+              type="button"
+              className="qq-codigo-btn"
+              onClick={copiarCodigo}
+              title="Copiar código"
+            >
               {sala.code}
             </button>
             <p className="hint small">
-              {codigoCopiado ? '¡Copiado!' : 'Comparte este código para que se unan (mínimo 2 jugadores).'}
+              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Pulsa el código para copiarlo y compártelo con los demás.'}
             </p>
           </div>
 
@@ -469,11 +524,18 @@ export default function UbicacionOnline({ onLocal, onSalir }) {
           )}
 
           <div className="ub-barra">
-            <span className="chip">Ronda {sala.rondaNum} · ⏱️ {ronda.segundosRestantesMapa}s</span>
+            <span className="chip">Ronda {sala.rondaNum}</span>
             <button className="secondary ub-mini" onClick={() => setVerImagen(true)}>
               <Icon name="eye" size={18} /> Ver imagen
             </button>
           </div>
+
+          <div className="timer" style={{ marginTop: '0', marginBottom: '1rem' }}>
+            <div className={`timer-bar${ronda.segundosRestantesMapa <= 15 ? ' low' : ''}`} style={{ width: `${(ronda.segundosRestantesMapa / SEGUNDOS_TURNO) * 100}%` }} />
+          </div>
+          <p className="timer-text" style={{ marginTop: '-0.5rem', marginBottom: '1rem' }}>
+            <Icon name="clock" size={16} /> {ronda.segundosRestantesMapa} s
+          </p>
 
           <div className="scoreboard-container" style={{ justifyContent: 'center', marginBottom: '0.8rem' }}>
             {sala.jugadores.map((j) => {
@@ -504,7 +566,7 @@ export default function UbicacionOnline({ onLocal, onSalir }) {
             </p>
             <p className="ub-turno-texto">
               {yaConfirmado
-                ? 'Esperando a que el resto de jugadores confirmen o se agote el tiempo de 90 segundos.'
+                ? 'Esperando a que el resto de jugadores confirmen o se agote el tiempo.'
                 : 'Mientras no confirmes, tu marcador parpadeará durante 1 segundo para los demás cada 15 segundos.'}
             </p>
           </div>
@@ -562,6 +624,7 @@ export default function UbicacionOnline({ onLocal, onSalir }) {
                   className="ub-rank-fila"
                   onClick={() => f.real && setEnfoque(f.real)}
                   title="Ver su marcador en el mapa"
+                  disabled={!f.real}
                 >
                   <span className="score-name">
                     <span className="pos">{i + 1}</span>

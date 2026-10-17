@@ -5,6 +5,7 @@ import './Aproximacion.css';
 import '../Adivina/Adivina.css';
 
 const CLAVE_SESION_APROX = 'aprox_online_session';
+const TIEMPO_TURNO = 30; // 30 segundos por turno
 
 export default function AproximacionOnline({ onLocal, onSalir }) {
   const [vista, setVista] = useState('menu'); // 'menu' | 'crear' | 'unirse' | 'sala'
@@ -13,6 +14,7 @@ export default function AproximacionOnline({ onLocal, onSalir }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modalSalir, setModalSalir] = useState(false);
+  const [modalAyuda, setModalAyuda] = useState(false);
 
   const [sesion, setSesion] = useState(() => {
     try {
@@ -30,8 +32,19 @@ export default function AproximacionOnline({ onLocal, onSalir }) {
   const [confianzaElegida, setConfianzaElegida] = useState(null);
   const [inputRealManual, setInputRealManual] = useState('');
   const [errorTurno, setErrorTurno] = useState('');
+  
+  const [tiempoRestante, setTiempoRestante] = useState(TIEMPO_TURNO);
 
   const intervalRef = useRef(null);
+  const timerTurnoRef = useRef(null);
+  
+  const inputNumeroRef = useRef(inputNumero);
+  const confianzaElegidaRef = useRef(confianzaElegida);
+  
+  useEffect(() => {
+    inputNumeroRef.current = inputNumero;
+    confianzaElegidaRef.current = confianzaElegida;
+  }, [inputNumero, confianzaElegida]);
 
   useEffect(() => {
     if (!sesion) {
@@ -68,6 +81,92 @@ export default function AproximacionOnline({ onLocal, onSalir }) {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [sesion]);
+  
+  const ronda = sala?.ronda;
+  const esAdmin = sala?.esAdmin;
+  const yoId = sala?.yoId;
+  const infoTurno = ronda?.infoTurno;
+  const esMiTurno = infoTurno?.jugadorId === yoId;
+  const esPrimerJugador = ronda?.primerJugadorId === yoId;
+
+  const respuestasDadas = ronda?.decisiones
+    ? Object.entries(ronda.decisiones)
+        .filter(([, d]) => d.tipo === 'propia')
+        .map(([jId, d]) => ({
+          jugadorId: Number(jId),
+          jugadorNombre: sala.jugadores.find((j) => j.id === Number(jId))?.nombre,
+          valor: d.valor
+        }))
+    : [];
+
+  // Temporizador visual reactivo al cambio de turno
+  useEffect(() => {
+    if (!ronda || (ronda.faseRonda !== 'turno' && ronda.faseRonda !== 'segunda_vuelta')) {
+      if (timerTurnoRef.current) clearInterval(timerTurnoRef.current);
+      return;
+    }
+
+    setTiempoRestante(TIEMPO_TURNO);
+
+    if (timerTurnoRef.current) clearInterval(timerTurnoRef.current);
+    timerTurnoRef.current = setInterval(() => {
+      setTiempoRestante((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerTurnoRef.current);
+          if (esMiTurno) {
+             forzarEnvioTurnoOnline();
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      if (timerTurnoRef.current) clearInterval(timerTurnoRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [infoTurno?.subTurnoIndex, ronda?.faseRonda, esMiTurno]);
+
+  const forzarEnvioTurnoOnline = async () => {
+      let payload = {};
+      
+      if (ronda.faseRonda === 'turno') {
+          if (confianzaElegidaRef.current !== null) {
+              const respRef = respuestasDadas.find((r) => r.jugadorId === confianzaElegidaRef.current);
+              if (respRef) {
+                payload = { tipo: 'confia', valor: respRef.valor, confiaEnId: respRef.jugadorId };
+              }
+          }
+          
+          if (!payload.tipo) {
+              let numVal = 0;
+              if (inputNumeroRef.current !== '' && !isNaN(Number(inputNumeroRef.current))) {
+                  numVal = Math.round(Number(inputNumeroRef.current));
+              }
+              
+              let valorFinal = numVal;
+              while (respuestasDadas.some((r) => r.valor === valorFinal)) {
+                  valorFinal++;
+              }
+              payload = { tipo: 'propia', valor: valorFinal };
+          }
+          
+          try {
+              await fetch(`/api/aproximacion/online/sala/${sesion.code}/responder`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: sesion.token, ...payload })
+              });
+              setInputNumero('');
+              setConfianzaElegida(null);
+          } catch (err) {
+              console.error(err);
+          }
+      } else if (ronda.faseRonda === 'segunda_vuelta') {
+          handleSegundaVuelta(null);
+      }
+  };
 
   const handleCrear = async () => {
     if (!nombre.trim()) return;
@@ -128,7 +227,7 @@ export default function AproximacionOnline({ onLocal, onSalir }) {
   };
 
   const handleConfirmarRespuesta = async (e) => {
-    e.preventDefault();
+    if(e) e.preventDefault();
     setErrorTurno('');
 
     let payload = {};
@@ -234,29 +333,78 @@ export default function AproximacionOnline({ onLocal, onSalir }) {
     setTimeout(() => setCodigoCopiado(false), 2000);
   };
 
-  const ronda = sala?.ronda;
-  const esAdmin = sala?.esAdmin;
-  const yoId = sala?.yoId;
-  const infoTurno = ronda?.infoTurno;
-  const esMiTurno = infoTurno?.jugadorId === yoId;
-  const esPrimerJugador = ronda?.primerJugadorId === yoId;
-
-  const respuestasDadas = ronda?.decisiones
-    ? Object.entries(ronda.decisiones)
-        .filter(([, d]) => d.tipo === 'propia')
-        .map(([jId, d]) => ({
-          jugadorId: Number(jId),
-          jugadorNombre: sala.jugadores.find((j) => j.id === Number(jId))?.nombre,
-          valor: d.valor
-        }))
-    : [];
-
   const ranking = sala?.jugadores ? [...sala.jugadores].sort((a, b) => b.puntos - a.puntos) : [];
   const maximo = ranking.length ? ranking[0].puntos : 0;
   const ganadores = maximo > 0 ? ranking.filter((j) => j.puntos === maximo) : [];
 
+  const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
+
   return (
     <div className="aprox-contenedor">
+      {/* ---------------- BOTÓN Y MODAL DE AYUDA ---------------- */}
+      {mostrarAyuda && (
+        <button
+          type="button"
+          className="aprox-btn-ayuda"
+          onClick={() => setModalAyuda(true)}
+          title="Reglas y sistema de puntuación"
+        >
+          <span className="aprox-btn-ayuda-signo">?</span>
+        </button>
+      )}
+
+      {modalAyuda && (
+        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
+          <div className="rg-modal aprox-modal-ayuda" onClick={(e) => e.stopPropagation()}>
+            <div className="aprox-modal-header">
+              <span className="aprox-modal-signo-title">?</span>
+              <h3>¿Cómo se juega a Aproximación?</h3>
+            </div>
+
+            <div className="aprox-modal-cuerpo">
+              <p><strong>1. Dinámica de la ronda:</strong></p>
+              <ul>
+                <li>Sale una pregunta numérica (geografía, récords, deportes o sobre vosotros mismos).</li>
+                <li>Un jugador al azar empieza respondiendo con una cifra. Dispone de <strong>30 segundos</strong>.</li>
+                <li>Los siguientes jugadores ven las respuestas anteriores y pueden <strong>poner su propio número</strong> o <strong>confiar en el de otro</strong>.</li>
+                <li>Al final de la ronda, el primer jugador tiene una <strong>segunda oportunidad</strong> (otros 30s) para mantener su cifra o cambiar y confiar en la de otro.</li>
+              </ul>
+
+              <p><strong>2. Sistema de puntuación:</strong></p>
+              <div className="aprox-tabla-puntos">
+                <div className="aprox-puntos-fila acierto">
+                  <span>🎯 Respuesta exacta</span>
+                  <strong>+15 pts (autor) / +8 pts (confianza)</strong>
+                </div>
+                <div className="aprox-puntos-fila cercana">
+                  <span>🥇 Más cercana</span>
+                  <strong>+6 pts (autor) / +3 pts (confianza)</strong>
+                </div>
+                <div className="aprox-puntos-fila lejana">
+                  <span>❌ Más lejana</span>
+                  <strong>-5 pts (autor) / 0 pts (confianza)</strong>
+                </div>
+                <div className="aprox-puntos-fila intermedio">
+                  <span>⚖️ Mitad superior de intermedias</span>
+                  <strong>+1 pt (autor) / 0 pts (confianza)</strong>
+                </div>
+                <div className="aprox-puntos-fila intermedio-mala">
+                  <span>⚠️ Mitad inferior de intermedias</span>
+                  <strong>-1 pt (autor) / 0 pts (confianza)</strong>
+                </div>
+              </div>
+            </div>
+
+            <div className="rg-modal-acciones">
+              <button className="big full" onClick={() => setModalAyuda(false)}>
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ---------------- FIN AYUDA ---------------- */}
+
       {/* 1. MENÚ ONLINE */}
       {vista === 'menu' && (
         <section className="game">
@@ -361,12 +509,18 @@ export default function AproximacionOnline({ onLocal, onSalir }) {
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
         <section className="game">
           <div className="panel center">
-            <p className="categoria">Código de la partida</p>
-            <button type="button" className="qq-codigo-btn" onClick={copiarCodigo}>
+            <p className="categoria"><Icon name="lock" size={16} />Sala de espera</p>
+            <p className="hint">Código de la partida</p>
+            <button
+              type="button"
+              className="qq-codigo-btn"
+              onClick={copiarCodigo}
+              title="Copiar código"
+            >
               {sala.code}
             </button>
             <p className="hint small">
-              {codigoCopiado ? '¡Copiado!' : 'Comparte este código para que se unan (mínimo 4 jugadores).'}
+              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Pulsa el código para copiarlo y compártelo con los demás.'}
             </p>
           </div>
 
@@ -508,6 +662,9 @@ export default function AproximacionOnline({ onLocal, onSalir }) {
                   <Icon name="check" size={22} strokeWidth={2.5} />
                   {confianzaElegida !== null ? 'Confirmar confianza' : 'Confirmar mi número'}
                 </button>
+                <div style={{ textAlign: 'center', marginTop: '1rem', color: '#b91c1c', fontWeight: 'bold' }}>
+                  ⏱️ {tiempoRestante} s
+                </div>
               </form>
             </>
           ) : (
@@ -520,6 +677,9 @@ export default function AproximacionOnline({ onLocal, onSalir }) {
               <p className="hint">
                 Espera tu turno mientras <strong>{infoTurno?.jugadorNombre}</strong> decide su cifra o elige en quién confiar...
               </p>
+              <div style={{ textAlign: 'center', marginTop: '1rem', color: '#b91c1c', fontWeight: 'bold' }}>
+                  ⏱️ {tiempoRestante} s
+              </div>
 
               {respuestasDadas.length > 0 && (
                 <div style={{ marginTop: '1.5rem', textAlign: 'left' }}>
@@ -589,6 +749,9 @@ export default function AproximacionOnline({ onLocal, onSalir }) {
               <button className="big full" onClick={() => handleSegundaVuelta(null)}>
                 <Icon name="check" size={22} /> Mantener mi respuesta ({ronda.decisiones[yoId]?.valor})
               </button>
+              <div style={{ textAlign: 'center', marginTop: '1rem', color: '#b91c1c', fontWeight: 'bold' }}>
+                  ⏱️ {tiempoRestante} s
+              </div>
             </>
           ) : (
             <div className="panel center" style={{ padding: '2rem 1.2rem' }}>
@@ -599,6 +762,9 @@ export default function AproximacionOnline({ onLocal, onSalir }) {
               <p className="hint">
                 Esperando a que <strong>{ronda.primerJugadorNombre}</strong> decida si mantiene su cifra o cambia de opinión para confiar en otro rival...
               </p>
+              <div style={{ textAlign: 'center', marginTop: '1rem', color: '#b91c1c', fontWeight: 'bold' }}>
+                  ⏱️ {tiempoRestante} s
+              </div>
             </div>
           )}
 
@@ -768,7 +934,7 @@ export default function AproximacionOnline({ onLocal, onSalir }) {
             <h1 className="title">Clasificación Final</h1>
             <p className="final-score">
               {ganadores.length === 0
-                ? 'Nadie ha conseguido puntos'
+                ? 'Nadie ha sumado puntos'
                 : ganadores.length === 1
                 ? <>¡Victoria para {ganadores[0].nombre} con {maximo} puntos!</>
                 : <>Empate entre {ganadores.map((g) => g.nombre).join(', ')} con {maximo} puntos</>}

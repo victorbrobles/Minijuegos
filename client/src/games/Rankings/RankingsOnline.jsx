@@ -15,6 +15,7 @@ export default function RankingsOnline({ onLocal, onSalir }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modalSalir, setModalSalir] = useState(false);
+  const [modalAyuda, setModalAyuda] = useState(false);
 
   const [categoriasDatos, setCategoriasDatos] = useState(null);
   const [sesion, setSesion] = useState(() => {
@@ -31,6 +32,9 @@ export default function RankingsOnline({ onLocal, onSalir }) {
   const [inputRespuesta, setInputRespuesta] = useState('');
   const [modalPista, setModalPista] = useState(null);
   const [segundosRestantes, setSegundosRestantes] = useState(TIEMPO_TURNO);
+  
+  // Estado local para remarcar los huecos en rojo cuando el servidor notifica un fallo
+  const [elementosRojos, setElementosRojos] = useState(false);
 
   const intervalRef = useRef(null);
   const timerTurnoRef = useRef(null);
@@ -116,6 +120,15 @@ export default function RankingsOnline({ onLocal, onSalir }) {
       if (timerTurnoRef.current) clearInterval(timerTurnoRef.current);
     };
   }, [ronda?.jugadorTurnoId, ronda?.faseRonda, esMiTurno]);
+
+  // Efecto para destello rojo si ocurre un fallo o rebote
+  useEffect(() => {
+    if (ronda?.motivo === 'fallo' || ronda?.motivo === 'rebote') {
+      setElementosRojos(true);
+      const timer = setTimeout(() => setElementosRojos(false), 1200);
+      return () => clearTimeout(timer);
+    }
+  }, [ronda?.motivo, ronda?.jugadorTurnoId]);
 
   const handleCrear = async () => {
     if (!nombre.trim()) return;
@@ -291,8 +304,85 @@ export default function RankingsOnline({ onLocal, onSalir }) {
   const maximoPuntos = ranking.length ? ranking[0].puntos : 0;
   const ganadores = maximoPuntos > 0 ? ranking.filter((j) => j.puntos === maximoPuntos) : [];
 
+  const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
+
   return (
     <div className="rk-contenedor">
+      <style>{`
+        .rk-flash-red {
+          background-color: #fee2e2 !important;
+          border-color: #ef4444 !important;
+          color: #b91c1c !important;
+          transition: background-color 0.2s, border-color 0.2s;
+        }
+        .rk-flash-red .rk-slot-oculto-texto {
+          color: #b91c1c !important;
+        }
+      `}</style>
+
+      {/* ---------------- BOTÓN Y MODAL DE AYUDA ---------------- */}
+      {mostrarAyuda && (
+        <button
+          type="button"
+          className="rk-btn-ayuda"
+          onClick={() => setModalAyuda(true)}
+          title="Reglas y sistema de puntuación"
+        >
+          <span className="rk-btn-ayuda-signo">?</span>
+        </button>
+      )}
+
+      {modalAyuda && (
+        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
+          <div className="rg-modal rk-modal-ayuda" onClick={(e) => e.stopPropagation()}>
+            <div className="rk-modal-header">
+              <span className="rk-modal-signo-title">?</span>
+              <h3>¿Cómo se juega a Completar Rankings?</h3>
+            </div>
+
+            <div className="rk-modal-cuerpo">
+              <p><strong>1. Dinámica del juego:</strong></p>
+              <ul>
+                <li>Elige categoría y aparecerá un ranking real con varios puestos ocultos.</li>
+                <li>Un jugador al azar empieza la ronda con <strong>90 segundos</strong> de tiempo.</li>
+                <li><strong>No hace falta indicar el puesto:</strong> escribe cualquier elemento que creas que falta; si es correcto, se colocará en su posición automáticamente.</li>
+                <li>Si fallas o se agota el tiempo, el turno pasa por <strong>rebote</strong> a otro jugador aleatorio que aún no haya jugado.</li>
+                <li>Si nadie completa el ranking tras probar todos, se revela la <strong>solución completa</strong> antes de mostrar las puntuaciones.</li>
+              </ul>
+
+              <p><strong>2. Pistas y bloqueo en rebote:</strong></p>
+              <ul>
+                <li>Puedes solicitar una pista para un puesto concreto antes de responder.</li>
+                <li><strong>Regla de rebote:</strong> Si un jugador falla o pasa su turno sin haber pedido la pista de un puesto, dicha pista queda <strong>bloqueada</strong> para los jugadores que reciban el rebote.</li>
+              </ul>
+
+              <p><strong>3. Sistema de puntuación:</strong></p>
+              <div className="rk-tabla-puntos">
+                <div className="rk-puntos-fila acierto-sin-pista">
+                  <span>🎯 Acierto sin pista</span>
+                  <strong>+3 puntos</strong>
+                </div>
+                <div className="rk-puntos-fila acierto-con-pista">
+                  <span>💡 Acierto con pista</span>
+                  <strong>+1 punto</strong>
+                </div>
+                <div className="rk-puntos-fila fallo">
+                  <span>❌ Fallo o tiempo agotado</span>
+                  <strong>0 puntos (Rebote)</strong>
+                </div>
+              </div>
+            </div>
+
+            <div className="rg-modal-acciones">
+              <button className="big full" onClick={() => setModalAyuda(false)}>
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ---------------- FIN AYUDA ---------------- */}
+
       {/* 1. MENÚ ONLINE */}
       {vista === 'menu' && (
         <section className="game">
@@ -397,12 +487,18 @@ export default function RankingsOnline({ onLocal, onSalir }) {
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
         <section className="game">
           <div className="panel center">
-            <p className="categoria">Código de la partida</p>
-            <button type="button" className="qq-codigo-btn" onClick={copiarCodigo}>
+            <p className="categoria"><Icon name="lock" size={16} />Sala de espera</p>
+            <p className="hint">Código de la partida</p>
+            <button
+              type="button"
+              className="qq-codigo-btn"
+              onClick={copiarCodigo}
+              title="Copiar código"
+            >
               {sala.code}
             </button>
             <p className="hint small">
-              {codigoCopiado ? '¡Copiado!' : 'Comparte este código para que se unan (mínimo 2 jugadores).'}
+              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Pulsa el código para copiarlo y compártelo con los demás.'}
             </p>
           </div>
 
@@ -483,9 +579,9 @@ export default function RankingsOnline({ onLocal, onSalir }) {
       {vista === 'sala' && sala && sala.estado === 'jugando' && ronda && ronda.faseRonda === 'jugando' && (
         <section className="game">
           {ronda.motivo && (
-            <p className="rf-aviso" role="status">
+            <p className="rf-aviso" role="status" style={{ background: '#fee2e2', color: '#b91c1c', border: '1.5px solid #fca5a5' }}>
               <Icon name={ronda.motivo === 'tiempo' ? 'hourglass' : 'refresh'} size={22} />
-              {ronda.motivo === 'tiempo' ? '¡Se acabó el tiempo!' : '¡Rebote!'} Le toca a <strong>{ronda.jugadorTurnoNombre}</strong>
+              {ronda.motivo === 'tiempo' ? '¡Se acabó el tiempo!' : '¡Respuesta incorrecta (Rebote)!'} Le toca a <strong>{ronda.jugadorTurnoNombre}</strong>
             </p>
           )}
 
@@ -494,7 +590,7 @@ export default function RankingsOnline({ onLocal, onSalir }) {
               <Icon name="users" size={18} />
               {esMiTurno ? <strong>¡Es tu turno!</strong> : <>Turno: <strong>{ronda.jugadorTurnoNombre}</strong></>}
             </span>
-            <span className="chip alt">{ronda.esRebote ? 'Rebote' : `Ronda ${sala.rondaNum} de${sala.maxRondas}`}</span>
+            <span className="chip alt">{ronda.esRebote ? 'Rebote' : `Ronda ${sala.rondaNum} de ${sala.maxRondas}`}</span>
           </div>
 
           {/* Marcador superior */}
@@ -536,7 +632,7 @@ export default function RankingsOnline({ onLocal, onSalir }) {
               {ronda.puestos.map((p) => (
                 <div
                   key={p.posicion}
-                  className={`rk-fila-puesto ${p.oculto ? 'rk-oculto' : 'rk-resuelto'}`}
+                  className={`rk-fila-puesto ${p.oculto ? 'rk-oculto' : 'rk-resuelto'} ${p.oculto && elementosRojos ? 'rk-flash-red' : ''}`}
                 >
                   <span className="rk-pos">#{p.posicion}</span>
 
@@ -551,7 +647,7 @@ export default function RankingsOnline({ onLocal, onSalir }) {
 
                       <button
                         type="button"
-                        disabled={!esMiTurno || ronda.pistasBloqueadas?.[p.posicion]}
+                        disabled={!esMiTurno || elementosRojos || ronda.pistasBloqueadas?.[p.posicion]}
                         className={`rk-btn-pista ${ronda.pistasUsadas?.[p.posicion] ? 'usada' : ''}`}
                         onClick={() => esMiTurno && handlePedirPista(p)}
                         title={
@@ -583,13 +679,13 @@ export default function RankingsOnline({ onLocal, onSalir }) {
                   type="text"
                   autoFocus={esMiTurno}
                   autoComplete="off"
-                  disabled={!esMiTurno}
+                  disabled={!esMiTurno || elementosRojos}
                   placeholder={esMiTurno ? 'Escribe el nombre o elemento…' : 'No es tu turno'}
                   value={inputRespuesta}
                   onChange={(e) => setInputRespuesta(e.target.value)}
                   required
                 />
-                <button type="submit" disabled={!esMiTurno || !inputRespuesta.trim()} className="ok">
+                <button type="submit" disabled={!esMiTurno || !inputRespuesta.trim() || elementosRojos} className="ok">
                   <Icon name="check" size={18} strokeWidth={2.5} /> Enviar
                 </button>
               </div>
@@ -599,6 +695,7 @@ export default function RankingsOnline({ onLocal, onSalir }) {
           {esMiTurno && (
             <button
               type="button"
+              disabled={elementosRojos}
               className="secondary danger full"
               onClick={handlePasarTurno}
             >

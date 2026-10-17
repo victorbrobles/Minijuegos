@@ -1,49 +1,49 @@
 [
   {
     "id": "siglas",
-    "name": "Descifra el Código",
+    "name": "D.E.S.C.I.F.R.A",
     "description": "Adivina qué significan. Elige categoría, 20 segundos por sigla y sin fallar.",
     "isNew": true
   },
   {
     "id": "quien-es-quien",
-    "name": "¿Quién Anda Ahí?",
+    "name": "¿Sabes quién soy?",
     "description": "El clásico juego de adivinar el personaje o elemento oculto. Elige jugadores, categoría y anota los aciertos.",
     "isNew": true
   },
   {
     "id": "rapidfire",
-    "name": "A Quemarropa",
+    "name": "Rápido y certero",
     "description": "Retos de 60 segundos por categoría: di todos los elementos antes de que se acabe el tiempo o pasa el rebote.",
     "isNew": true
   },
   {
     "id": "trayectoria",
-    "name": "El Currículum Oculto",
+    "name": "Modo carrera",
     "description": "Adivina el futbolista por los clubes en los que jugó",
     "isNew": true
   },
   {
     "id": "rasgos",
-    "name": "Zoom a la Fama",
+    "name": "El paparazzi",
     "description": "Adivina qué famoso es por un detalle de su cara. ¡Cuanto antes aciertes, más puntos!",
     "isNew": true
   },
   {
     "id": "rankings",
-    "name": "Ponte en Orden",
+    "name": "Ranking oculto",
     "description": "Adivina los puestos ocultos de rankings reales con pistas, rebotes y contrarreloj.",
     "isNew": true
   },
   {
     "id": "aproximacion",
-    "name": "A Ojo de Buen Cubero",
+    "name": "Aproxímate",
     "description": "Aproxímate a la cantidad numérica real. Confía en las respuestas de los demás o arriésgate con la tuya.",
     "isNew": true
   },
   {
     "id": "ubicacion",
-    "name": "¿Dónde Diablos Está?",
+    "name": "Test del viajero",
     "description": "Memoriza la foto de un lugar famoso y colócalo en el mapa con un marcador real y dos señuelos.",
     "isNew": true
   },
@@ -55,7 +55,7 @@
   },
   {
     "id": "pistas",
-    "name": "Seis Bajo Sospecha",
+    "name": "No seas des(pista)do",
     "description": "Adivina cualquier enigma a través de 10 pistas progresivas. Enfréntate al modo Estándar o sobrevive con 3 vidas.",
     "isNew": true
   },
@@ -133,7 +133,7 @@
   },
   {
     "id": "ciegas",
-    "name": "Ranking a Ciegas",
+    "name": "Top a Ciegas",
     "description": "Ordena de 1 a 5 cada elemento sin saber qué saldrá después. Los rivales votan cuántos has acertado.",
     "isNew": true
   }

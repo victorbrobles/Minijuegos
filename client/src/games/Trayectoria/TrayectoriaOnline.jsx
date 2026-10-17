@@ -12,6 +12,7 @@ export default function TrayectoriaOnline({ onLocal, onSalir }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modalSalir, setModalSalir] = useState(false);
+  const [modalAyuda, setModalAyuda] = useState(false);
 
   const [sesion, setSesion] = useState(() => {
     try {
@@ -248,8 +249,67 @@ export default function TrayectoriaOnline({ onLocal, onSalir }) {
   const alguienHaPulsado = Boolean(ronda?.pulsado);
   const estoyBloqueado = Boolean(sala?.jugadores?.find((j) => j.id === yoId)?.bloqueado);
 
+  const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
+
   return (
     <div className="aprox-contenedor">
+      {/* ---------------- NUEVO: BOTÓN Y MODAL DE AYUDA ---------------- */}
+      {mostrarAyuda && (
+        <button
+          type="button"
+          className="btn-ayuda-flotante"
+          onClick={() => setModalAyuda(true)}
+          title="Reglas"
+        >
+          <span className="btn-ayuda-flotante-signo">?</span>
+        </button>
+      )}
+
+      {modalAyuda && (
+        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
+          <div className="rg-modal modal-ayuda-juego" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-ayuda-header">
+              <span className="modal-ayuda-signo-title">?</span>
+              <h3>¿Cómo se juega a Trayectoria?</h3>
+            </div>
+            <div className="modal-ayuda-cuerpo">
+              <p><strong>1. Dinámica del juego:</strong></p>
+              <ul>
+                <li>Se revelan uno a uno los clubes de fútbol de la carrera de un futbolista.</li>
+                <li>Cada 5 segundos aparece un nuevo club cronológico.</li>
+                <li><strong>Pulsa el botón rojo</strong> para parar el tiempo e introducir el futbolista.</li>
+                <li>Si fallas, pierdes 1 punto y quedas bloqueado el resto de la ronda.</li>
+              </ul>
+              <p><strong>2. Puntuación:</strong></p>
+              <div className="tabla-ayuda-puntos">
+                <div className="fila-ayuda-puntos verde">
+                  <span>⚡ Acierto antes del último club</span>
+                  <strong>+4 puntos</strong>
+                </div>
+                <div className="fila-ayuda-puntos azul">
+                  <span>⚽ Acierto con todos los clubes</span>
+                  <strong>+2 puntos</strong>
+                </div>
+                <div className="fila-ayuda-puntos amarillo">
+                  <span>💡 Acierto tras ver la pista</span>
+                  <strong>+1 punto</strong>
+                </div>
+                <div className="fila-ayuda-puntos rojo">
+                  <span>❌ Respuesta incorrecta</span>
+                  <strong>-1 punto</strong>
+                </div>
+              </div>
+            </div>
+            <div className="rg-modal-acciones">
+              <button className="btn-start" style={{ width: '100%' }} onClick={() => setModalAyuda(false)}>
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ---------------- FIN AYUDA ---------------- */} 
+      
       {/* 1. MENÚ PRINCIPAL */}
       {vista === 'menu' && (
         <section className="game">

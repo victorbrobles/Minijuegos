@@ -27,7 +27,8 @@ function TurnoRanking({
   onEnviarRespuesta,
   onPasarTurno,
   onTiempoAgotado,
-  mensajeFeedback
+  mensajeFeedback,
+  elementosRojos // <-- NUEVO ESTADO PARA EL DESTELLO ROJO
 }) {
   const [prep, setPrep] = useState(PREPARACION_S);
   const [restante, setRestante] = useState(TIEMPO_TURNO);
@@ -66,10 +67,22 @@ function TurnoRanking({
 
   return (
     <section className="game">
+      <style>{`
+        .rk-flash-red {
+          background-color: #fee2e2 !important;
+          border-color: #ef4444 !important;
+          color: #b91c1c !important;
+          transition: background-color 0.2s, border-color 0.2s;
+        }
+        .rk-flash-red .rk-slot-oculto-texto {
+          color: #b91c1c !important;
+        }
+      `}</style>
+
       {motivo && (
-        <p className="rf-aviso" role="status">
+        <p className="rf-aviso" role="status" style={{ background: '#fee2e2', color: '#b91c1c', border: '1.5px solid #fca5a5' }}>
           <Icon name={motivo === 'tiempo' ? 'hourglass' : 'refresh'} size={22} />
-          {motivo === 'tiempo' ? '¡Se acabó el tiempo!' : '¡Rebote!'} Le toca a <strong>{jugador.nombre}</strong>
+          {motivo === 'tiempo' ? '¡Se acabó el tiempo!' : '¡Respuesta incorrecta (Rebote)!'} Le toca a <strong>{jugador.nombre}</strong>
         </p>
       )}
 
@@ -118,7 +131,7 @@ function TurnoRanking({
           {puestos.map((p) => (
             <div
               key={p.posicion}
-              className={`rk-fila-puesto ${p.oculto ? 'rk-oculto' : 'rk-resuelto'}`}
+              className={`rk-fila-puesto ${p.oculto ? 'rk-oculto' : 'rk-resuelto'} ${p.oculto && elementosRojos ? 'rk-flash-red' : ''}`}
             >
               <span className="rk-pos">#{p.posicion}</span>
 
@@ -135,7 +148,7 @@ function TurnoRanking({
 
                   <button
                     type="button"
-                    disabled={preparando || pistasBloqueadas[p.posicion]}
+                    disabled={preparando || elementosRojos || pistasBloqueadas[p.posicion]}
                     className={`rk-btn-pista ${pistasUsadas[p.posicion] ? 'usada' : ''}`}
                     onClick={() => !preparando && onAbrirPista(p)}
                     title={
@@ -167,13 +180,13 @@ function TurnoRanking({
               type="text"
               autoFocus
               autoComplete="off"
-              disabled={preparando}
+              disabled={preparando || elementosRojos}
               placeholder="Escribe el nombre o elemento…"
               value={inputRespuesta}
               onChange={(e) => setInputRespuesta(e.target.value)}
               required
             />
-            <button type="submit" disabled={preparando || !inputRespuesta.trim()} className="ok">
+            <button type="submit" disabled={preparando || elementosRojos || !inputRespuesta.trim()} className="ok">
               <Icon name="check" size={18} strokeWidth={2.5} />Enviar
             </button>
           </div>
@@ -182,7 +195,7 @@ function TurnoRanking({
 
       <button
         type="button"
-        disabled={preparando}
+        disabled={preparando || elementosRojos}
         className="secondary danger full"
         onClick={() => onPasarTurno('rebote')}
       >
@@ -225,6 +238,7 @@ export default function RankingsLocal({ onVolver, onExit }) {
   const [inputRespuesta, setInputRespuesta] = useState('');
   const [modalPista, setModalPista] = useState(null);
   const [mensajeFeedback, setMensajeFeedback] = useState(null);
+  const [elementosRojos, setElementosRojos] = useState(false);
 
   useEffect(() => {
     fetch('/api/rankings/categorias')
@@ -268,6 +282,7 @@ export default function RankingsLocal({ onVolver, onExit }) {
       setSolucionFinal(null);
       setInputRespuesta('');
       setMensajeFeedback(null);
+      setElementosRojos(false);
       setPaso('jugando');
     } catch {
       alert('Error al conectar con la base de datos de rankings.');
@@ -303,7 +318,7 @@ export default function RankingsLocal({ onVolver, onExit }) {
 
   const enviarRespuesta = async (e) => {
     e.preventDefault();
-    if (!inputRespuesta.trim()) return;
+    if (!inputRespuesta.trim() || elementosRojos) return;
 
     try {
       const posicionesOcultas = puestos.filter((p) => p.oculto).map((p) => p.posicion);
@@ -353,7 +368,13 @@ export default function RankingsLocal({ onVolver, onExit }) {
           setTimeout(() => finalizarRonda(true), 1200);
         }
       } else {
-        manejarFalloOTiempoAgotado('fallo');
+        // LÓGICA DE FALLO: DESTELLO ROJO Y MENSAJE ANTES DE REBOTAR
+        setElementosRojos(true);
+        setMensajeFeedback({ tipo: 'alerta', texto: `¡Fallo! "${inputRespuesta}" no está en el ranking.` });
+        setTimeout(() => {
+          setElementosRojos(false);
+          manejarFalloOTiempoAgotado('fallo');
+        }, 1500);
       }
     } catch {
       alert('Error al validar respuesta.');
@@ -612,6 +633,7 @@ export default function RankingsLocal({ onVolver, onExit }) {
           onPasarTurno={() => manejarFalloOTiempoAgotado('rebote')}
           onTiempoAgotado={() => manejarFalloOTiempoAgotado('tiempo')}
           mensajeFeedback={mensajeFeedback}
+          elementosRojos={elementosRojos}
         />
       )}
 
