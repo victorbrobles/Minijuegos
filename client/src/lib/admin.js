@@ -21,23 +21,34 @@ function guardar(nuevo) {
 
 export const adminHeaders = () => (token ? { 'X-Admin-Token': token } : {});
 
-// Devuelve true si el código era correcto. Lanza Error con mensaje si hay bloqueo o fallo de red.
+// Devuelve true si el código era correcto, false si es incorrecto.
+// Lanza Error con un mensaje claro si hay bloqueo, el servidor no tiene el MFA configurado o falla la red.
 export async function activarAdmin(codigo) {
   let res;
   try {
     res = await fetch('/api/admin/login', {
       method: 'POST',
+      credentials: 'same-origin',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ codigo })
     });
   } catch {
     throw new Error('No se pudo conectar con el servidor.');
   }
-  if (res.status === 429) throw new Error('Demasiados intentos. Espera unos minutos.');
-  if (res.status === 503) throw new Error('El modo administrador no está configurado en el servidor.');
-  if (!res.ok) return false;
-  guardar((await res.json()).token);
-  return true;
+  let datos = null;
+  try { datos = await res.json(); } catch { /* la respuesta no era JSON (p. ej. una página de error del hosting) */ }
+
+  if (res.ok && datos?.token) {
+    guardar(datos.token);
+    return true;
+  }
+  // 401 con el JSON del servidor = código mal escrito. Un 401 sin JSON es la contraseña de acceso al sitio.
+  if (res.status === 401 && datos?.error) return false;
+  if (res.status === 401) throw new Error('El sitio ha pedido de nuevo la contraseña de acceso. Recarga la página.');
+  if (res.status === 429) throw new Error(datos?.error ?? 'Demasiados intentos. Espera unos minutos.');
+  if (res.status === 503) throw new Error('El modo administrador no está configurado en el servidor (falta ADMIN_TOTP_SECRET).');
+  if (res.status === 404) throw new Error('El servidor no tiene el modo administrador: despliega la versión actual del servidor.');
+  throw new Error(datos?.error ?? `Error del servidor (${res.status}).`);
 }
 
 export const salirAdmin = () => guardar(null);

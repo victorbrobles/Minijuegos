@@ -11,6 +11,7 @@ export default function ConfianzaCiegaOnline({ onLocal, onSalir }) {
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
+  const [modalSalir, setModalSalir] = useState(false);
 
   const [sesion, setSesion] = useState(() => {
     try {
@@ -447,7 +448,6 @@ export default function ConfianzaCiegaOnline({ onLocal, onSalir }) {
             <div className="lb-lista">
               {sala.jugadores.map((j) => (
                 <div key={j.id} className={`lb-jug ${j.id === sala.yoId ? 'yo' : ''}`}>
-                  <span className="lb-punto on" />
                   <span className="lb-jug-nombre">
                     {j.nombre}{j.id === sala.yoId ? ' (tú)' : ''}{j.id === 1 ? ' 👑' : ''}
                   </span>
@@ -481,7 +481,7 @@ export default function ConfianzaCiegaOnline({ onLocal, onSalir }) {
           )}
 
           <div className="actions" style={{ marginTop: '1rem' }}>
-            <button className="secondary danger full" onClick={handleSalir}>
+            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
               <Icon name="door" size={20} /> Salir de la sala
             </button>
           </div>
@@ -497,7 +497,6 @@ export default function ConfianzaCiegaOnline({ onLocal, onSalir }) {
           </div>
 
           {esActivo ? (
-            /* EL JUGADOR ACTIVO ELIGE EN SECRETO */
             <div className="panel">
               <h3 className="panel-title"><Icon name="eye" size={20} /> Elige tu consigna en secreto</h3>
               <p className="field-label">Los demás verán las dos opciones, pero solo tú sabrás cuál has elegido:</p>
@@ -519,7 +518,6 @@ export default function ConfianzaCiegaOnline({ onLocal, onSalir }) {
               </div>
             </div>
           ) : (
-            /* LOS DEMÁS ESPERAN A QUE ELIJA */
             <div className="panel center" style={{ padding: '2.5rem 1.5rem' }}>
               <span className="lb-luna chica"><Icon name="hourglass" size={40} /></span>
               <h2>{sala.jugadorActivoNombre} está eligiendo...</h2>
@@ -530,7 +528,7 @@ export default function ConfianzaCiegaOnline({ onLocal, onSalir }) {
           )}
 
           <div className="actions" style={{ marginTop: '1rem' }}>
-            <button className="secondary danger full" onClick={handleSalir}>
+            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
               <Icon name="door" size={20} /> Salir de la sala
             </button>
           </div>
@@ -548,7 +546,6 @@ export default function ConfianzaCiegaOnline({ onLocal, onSalir }) {
           </div>
 
           {esActivo ? (
-            /* EL JUGADOR ACTIVO ESPERA LAS APUESTAS */
             <div className="panel center" style={{ padding: '2.5rem 1.5rem' }}>
               <span className="lb-luna chica"><Icon name="users" size={40} /></span>
               <h2>Los demás están apostando sobre ti...</h2>
@@ -566,7 +563,6 @@ export default function ConfianzaCiegaOnline({ onLocal, onSalir }) {
               </div>
             </div>
           ) : (
-            /* LOS DEMÁS APOSTAMOS EN SECRETO */
             <>
               <div className="panel aprox-pregunta-card">
                 <span className="aprox-badge-pregunta">Opciones de consigna</span>
@@ -643,14 +639,14 @@ export default function ConfianzaCiegaOnline({ onLocal, onSalir }) {
           )}
 
           <div className="actions" style={{ marginTop: '1rem' }}>
-            <button className="secondary danger full" onClick={handleSalir}>
+            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
               <Icon name="door" size={20} /> Salir de la sala
             </button>
           </div>
         </section>
       )}
 
-      {/* 7. SALA: TURNO DE ACCIÓN (10s PREP + 120s ACCIÓN) */}
+      {/* 7. SALA: TURNO DE ACCIÓN */}
       {vista === 'sala' && sala && sala.estado === 'turno_accion' && (
         <section className="game">
           <div className="hud">
@@ -682,7 +678,6 @@ export default function ConfianzaCiegaOnline({ onLocal, onSalir }) {
             {sala.prepRestante > 0 ? `Preparados… ${sala.prepRestante} s` : `${sala.accionRestante} s`}
           </p>
 
-          {/* Marcador de palabras en tiempo real */}
           <div className="panel" style={{ textAlign: 'center', marginTop: '1rem' }}>
             <span className="field-label">Palabras válidas aprobadas:</span>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1.5rem', margin: '0.8rem 0' }}>
@@ -728,6 +723,12 @@ export default function ConfianzaCiegaOnline({ onLocal, onSalir }) {
               </button>
             </div>
           )}
+
+          <div className="actions" style={{ marginTop: '1rem' }}>
+            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
+              <Icon name="door" size={20} /> Salir de la sala
+            </button>
+          </div>
         </section>
       )}
 
@@ -779,6 +780,12 @@ export default function ConfianzaCiegaOnline({ onLocal, onSalir }) {
           ) : (
             <p className="hint center">El anfitrión está confirmando el recuento final...</p>
           )}
+
+          <div className="actions" style={{ marginTop: '1rem' }}>
+            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
+              <Icon name="door" size={20} /> Salir de la sala
+            </button>
+          </div>
         </section>
       )}
 
@@ -857,7 +864,7 @@ export default function ConfianzaCiegaOnline({ onLocal, onSalir }) {
               <p className="hint center">Esperando a que el anfitrión avance a la siguiente ronda...</p>
             )}
 
-            <button className="secondary danger full" onClick={handleSalir}>
+            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
               <Icon name="door" size={20} /> Salir de la sala
             </button>
           </div>
@@ -901,11 +908,51 @@ export default function ConfianzaCiegaOnline({ onLocal, onSalir }) {
                 <Icon name="refresh" size={20} /> Otra Partida (mismos jugadores)
               </button>
             )}
-            <button className="secondary danger full" onClick={handleSalir}>
+            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
               <Icon name="door" size={20} /> Salir al menú principal
             </button>
           </div>
         </section>
+      )}
+
+      {/* MODAL DE CONFIRMACIÓN PARA SALIR */}
+      {modalSalir && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalir(false)}>
+          <div 
+            className="rg-modal" 
+            onClick={(e) => e.stopPropagation()} 
+            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
+          >
+            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
+            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
+              ¿Abandonar la partida?
+            </h3>
+            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
+              Si sales de la sala perderás tu progreso actual en la partida. ¿Estás seguro de que deseas salir?
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+              <button 
+                type="button" 
+                className="secondary full" 
+                onClick={() => setModalSalir(false)}
+              >
+                No, quedarme
+              </button>
+              <button 
+                type="button" 
+                className="secondary danger full" 
+                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
+                onClick={() => {
+                  setModalSalir(false);
+                  handleSalir();
+                }}
+              >
+                Sí, salir
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

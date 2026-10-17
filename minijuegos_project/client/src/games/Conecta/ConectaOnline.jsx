@@ -25,6 +25,7 @@ export default function ConectaOnline({ onLocal, onSalir }) {
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
+  const [modalSalir, setModalSalir] = useState(false);
 
   const [sesion, setSesion] = useState(() => {
     try {
@@ -485,7 +486,6 @@ export default function ConectaOnline({ onLocal, onSalir }) {
             <div className="lb-lista">
               {sala.jugadores.map((j) => (
                 <div key={j.id} className={`lb-jug ${j.id === yoId ? 'yo' : ''}`}>
-                  <span className="lb-punto on" />
                   <span className="lb-jug-nombre">
                     {j.nombre}{j.id === yoId ? ' (tú)' : ''}{j.id === 1 ? ' 👑' : ''}
                   </span>
@@ -519,14 +519,14 @@ export default function ConectaOnline({ onLocal, onSalir }) {
           )}
 
           <div className="actions" style={{ marginTop: '1rem' }}>
-            <button className="secondary danger full" onClick={handleSalir}>
+            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
               <Icon name="door" size={20} /> Salir de la sala
             </button>
           </div>
         </section>
       )}
 
-      {/* 5. SALA: SELECTOR DE CATEGORÍA (SOLO ANFITRIÓN) */}
+      {/* 5. SALA: SELECTOR DE CATEGORÍA */}
       {vista === 'sala' && sala && sala.estado === 'categoria' && (
         <section className="game">
           <div className="hud">
@@ -560,7 +560,7 @@ export default function ConectaOnline({ onLocal, onSalir }) {
           )}
 
           <div className="actions" style={{ marginTop: '1.2rem' }}>
-            <button className="secondary danger full" onClick={handleSalir}>
+            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
               <Icon name="door" size={20} /> Salir de la sala
             </button>
           </div>
@@ -575,7 +575,6 @@ export default function ConectaOnline({ onLocal, onSalir }) {
             <span className="chip alt">{sala.conexionesResueltas.length} de 4 conexiones</span>
           </div>
 
-          {/* Marcador de vidas */}
           <div className="scoreboard-container" style={{ justifyContent: 'center', marginBottom: '0.8rem' }}>
             {sala.jugadores.map((j) => (
               <div key={j.id} className={`score-pill ${j.vidas <= 0 ? 'locked' : ''}`}>
@@ -584,7 +583,6 @@ export default function ConectaOnline({ onLocal, onSalir }) {
             ))}
           </div>
 
-          {/* Conexiones ya resueltas */}
           {sala.conexionesResueltas.length > 0 && (
             <div className="conecta-resueltos-lista">
               {sala.conexionesResueltas.map((r, idx) => (
@@ -599,7 +597,6 @@ export default function ConectaOnline({ onLocal, onSalir }) {
             </div>
           )}
 
-          {/* Tablero 4x4 */}
           {sala.tablero.length > 0 && (
             <div className="panel conecta-tablero-panel">
               <div className="conecta-grid-16">
@@ -625,7 +622,6 @@ export default function ConectaOnline({ onLocal, onSalir }) {
             </div>
           )}
 
-          {/* ZONA DE PULSADOR ROJO ONLINE */}
           <div className="interactive-controls" style={{ marginTop: '0.8rem' }}>
             {!alguienHaPulsado && (
               <div className="pulsador-container">
@@ -691,10 +687,16 @@ export default function ConectaOnline({ onLocal, onSalir }) {
               </button>
             </div>
           )}
+
+          <div className="actions" style={{ marginTop: '1rem' }}>
+            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
+              <Icon name="door" size={20} /> Salir de la sala
+            </button>
+          </div>
         </section>
       )}
 
-      {/* 7. SALA: ADIVINAR LA CONEXIÓN (1, 2 y 3) */}
+      {/* 7. SALA: ADIVINAR LA CONEXIÓN */}
       {vista === 'sala' && sala && sala.estado === 'resolucion_grupo' && sala.grupoParaTema && (
         <section className="game">
           <div className="starter">
@@ -792,6 +794,12 @@ export default function ConectaOnline({ onLocal, onSalir }) {
               )}
             </div>
           )}
+
+          <div className="actions" style={{ marginTop: '1rem' }}>
+            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
+              <Icon name="door" size={20} /> Salir de la sala
+            </button>
+          </div>
         </section>
       )}
 
@@ -915,6 +923,12 @@ export default function ConectaOnline({ onLocal, onSalir }) {
               </button>
             </div>
           )}
+
+          <div className="actions" style={{ marginTop: '1rem' }}>
+            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
+              <Icon name="door" size={20} /> Salir de la sala
+            </button>
+          </div>
         </section>
       )}
 
@@ -969,7 +983,7 @@ export default function ConectaOnline({ onLocal, onSalir }) {
               <p className="hint center">Esperando a que el anfitrión avance a la siguiente ronda...</p>
             )}
 
-            <button className="secondary danger full" onClick={handleSalir}>
+            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
               <Icon name="door" size={20} /> Salir de la sala
             </button>
           </div>
@@ -1013,11 +1027,51 @@ export default function ConectaOnline({ onLocal, onSalir }) {
                 <Icon name="refresh" size={20} /> Otra Partida (mismos jugadores)
               </button>
             )}
-            <button className="secondary danger full" onClick={handleSalir}>
+            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
               <Icon name="door" size={20} /> Salir al menú principal
             </button>
           </div>
         </section>
+      )}
+
+      {/* MODAL DE CONFIRMACIÓN PARA SALIR */}
+      {modalSalir && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalir(false)}>
+          <div 
+            className="rg-modal" 
+            onClick={(e) => e.stopPropagation()} 
+            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
+          >
+            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
+            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
+              ¿Abandonar la partida?
+            </h3>
+            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
+              Si sales de la sala perderás tu progreso actual en la partida. ¿Estás seguro de que deseas salir?
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+              <button 
+                type="button" 
+                className="secondary full" 
+                onClick={() => setModalSalir(false)}
+              >
+                No, quedarme
+              </button>
+              <button 
+                type="button" 
+                className="secondary danger full" 
+                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
+                onClick={() => {
+                  setModalSalir(false);
+                  handleSalir();
+                }}
+              >
+                Sí, salir
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

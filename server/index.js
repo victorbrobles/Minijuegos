@@ -40,6 +40,12 @@ import rapidfireRouter from './routes/rapidfire.js';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Detrás de un proxy/túnel (ngrok, Render, Railway, Nginx...) la IP real del visitante llega en
+// X-Forwarded-For. Sin esto todos compartirían la IP del proxy y el límite de intentos del login de
+// administrador bloquearía a todo el mundo a la vez. TRUST_PROXY=<nº de proxies> lo ajusta (0 = desactivar).
+const trustProxy = process.env.TRUST_PROXY;
+app.set('trust proxy', trustProxy === undefined ? 1 : Number.isNaN(Number(trustProxy)) ? trustProxy : Number(trustProxy));
+
 app.use(cors());
 app.use(express.json());
 

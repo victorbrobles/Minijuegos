@@ -131,7 +131,21 @@ const NUEVOS = {
   zap: <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
 };
 
-const ICONOS = { ...P, ...NUEVOS };
+// Iconos específicos de cada minijuego y de la portada (cada juego tiene el suyo, sin repetir)
+const EXTRA = {
+  search: <><circle cx="11" cy="11" r="7" /><path d="m20 20-3.500-3.500" /></>,
+  x: <path d="M6 6l12 12M18 6 6 18" />,
+  sleuth: <><path d="M3 10h18" /><path d="M6 10l1.600-5.500h8.800L18 10" /><path d="M7 10v1.500a5 5 0 0 0 7 4.500" /><path d="M10 12.500h.01M14 12.500h.01" /><circle cx="17.500" cy="17.500" r="3" /><path d="M19.700 19.700 22 22" /></>,
+  stopwatch: <><circle cx="12" cy="14" r="8" /><path d="M12 14l3-3M10 2h4M12 2v4M19 6l1.500-1.500" /></>,
+  podium: <><path d="m12 2 1.100 2.200 2.400.4-1.700 1.700.4 2.400L12 7.500 9.800 8.700l.4-2.400-1.700-1.700 2.400-.4z" /><path d="M9 21V11h6v10M3 21v-6h6M15 21v-4h6M2 21h20" /></>,
+  eyeoff: <><path d="M9.900 9.900a3 3 0 1 0 4.200 4.200" /><path d="M10.700 5.100A10.400 10.400 0 0 1 12 5c7 0 10 7 10 7a13.200 13.200 0 0 1-1.700 2.700" /><path d="M6.600 6.600A13.500 13.500 0 0 0 2 12s3 7 10 7a9.700 9.700 0 0 0 5.400-1.600" /><path d="m2 2 20 20" /></>,
+  connect: <><circle cx="6" cy="6" r="2.500" /><circle cx="18" cy="6" r="2.500" /><circle cx="6" cy="18" r="2.500" /><circle cx="18" cy="18" r="2.500" /><path d="M8.500 6h7M8.500 18h7M6 8.500v7M18 8.500v7M7.800 7.800l8.400 8.400" /></>,
+  quote: <><path d="M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z" /><path d="M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z" /></>,
+  palette: <><circle cx="13.500" cy="6.500" r=".8" /><circle cx="17.500" cy="10.500" r=".8" /><circle cx="8.500" cy="7.500" r=".8" /><circle cx="6.500" cy="12.500" r=".8" /><path d="M12 2C6.500 2 2 6.500 2 12s4.500 10 10 10c.9 0 1.600-.7 1.600-1.700 0-.4-.2-.8-.4-1.100-.3-.3-.4-.7-.4-1.100a1.600 1.600 0 0 1 1.700-1.700H16.500c3 0 5.500-2.500 5.500-5.500C22 6 17.500 2 12 2z" /></>,
+  zoomface: <><circle cx="10.500" cy="10.500" r="7.500" /><path d="m21 21-5.200-5.200" /><path d="M8 9h.01M13 9h.01M8 12.500a3 3 0 0 0 5 0" /></>
+};
+
+const ICONOS = { ...P, ...NUEVOS, ...EXTRA };
 
 export default function Icon({ name, size = 24, strokeWidth = 2, className = '', style = {} }) {
   const contenido = ICONOS[name] ?? ICONOS.star;

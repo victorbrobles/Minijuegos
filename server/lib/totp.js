@@ -1,4 +1,4 @@
-import { createHmac, timingSafeEqual } from 'node:crypto';
+import { createHmac, timingSafeEqual, randomBytes } from 'node:crypto';
 
 // TOTP (RFC 6238): HMAC-SHA1, 6 dígitos, pasos de 30 s. Compatible con Google Authenticator, Authy, etc.
 const ALFABETO = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
@@ -47,3 +47,25 @@ export function verificarCodigo(secretoBase32, codigo, { ultimoPaso = -1, ahoraM
   }
   return acertado;
 }
+
+// --- Alta de un secreto nuevo (lo usa scripts/mfa-nuevo.js) ---
+export function base32Codificar(buffer) {
+  let bits = 0, valor = 0, salida = '';
+  for (const byte of buffer) {
+    valor = (valor << 8) | byte;
+    bits += 8;
+    while (bits >= 5) {
+      salida += ALFABETO[(valor >>> (bits - 5)) & 31];
+      bits -= 5;
+    }
+  }
+  if (bits > 0) salida += ALFABETO[(valor << (5 - bits)) & 31];
+  return salida;
+}
+
+export const nuevoSecreto = () => base32Codificar(randomBytes(20)); // 160 bits, como pide la RFC 4226
+
+// URL otpauth:// para convertir en QR o pegar en la app de autenticación
+export const urlOtpauth = (secreto, cuenta = 'admin', emisor = 'Minigames Hub') =>
+  `otpauth://totp/${encodeURIComponent(emisor)}:${encodeURIComponent(cuenta)}` +
+  `?secret=${secreto}&issuer=${encodeURIComponent(emisor)}&algorithm=SHA1&digits=${DIGITOS}&period=${PERIODO}`;

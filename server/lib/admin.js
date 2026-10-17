@@ -1,20 +1,40 @@
-import { createHmac, timingSafeEqual, randomBytes } from 'node:crypto';
-import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { createHmac, timingSafeEqual } from 'node:crypto';
+import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { dirname } from 'node:path';
-import { verificarCodigo } from './totp.js';
+import { verificarCodigo, base32Decodificar } from './totp.js';
 
 const ruta = (nombre) => fileURLToPath(new URL(`../data/${nombre}`, import.meta.url));
 
 // --- Secreto TOTP (el que está sincronizado en tu app de autenticación) ---
-// Se lee de la variable ADMIN_TOTP_SECRET o del fichero server/data/.admin-totp (fuera del repositorio).
-// Si no existe, el modo administrador queda DESACTIVADO (nadie puede darlo de alta desde la web).
+// Prioridad: variable de entorno ADMIN_TOTP_SECRET (la forma correcta en un servidor online) y,
+// si no existe, el fichero server/data/.admin-totp (cómodo en local; está en .gitignore, así que
+// NO llega a un despliegue hecho con git: ahí hay que usar la variable de entorno).
 function cargarTotp() {
-  if (process.env.ADMIN_TOTP_SECRET) return process.env.ADMIN_TOTP_SECRET.trim();
-  const f = ruta('.admin-totp');
-  return existsSync(f) ? readFileSync(f, 'utf8').trim() : null;
+  const deEntorno = process.env.ADMIN_TOTP_SECRET?.trim();
+  if (deEntorno) return { secreto: deEntorno, origen: 'variable de entorno ADMIN_TOTP_SECRET' };
+  try {
+    const f = ruta('.admin-totp');
+    if (existsSync(f)) {
+      const deFichero = readFileSync(f, 'utf8').trim();
+      if (deFichero) return { secreto: deFichero, origen: 'fichero server/data/.admin-totp' };
+    }
+  } catch { /* sin permisos de lectura: se trata como no configurado */ }
+  return null;
 }
-const secretoTotp = cargarTotp();
+
+let secretoTotp = null;
+const cargado = cargarTotp();
+if (cargado) {
+  try {
+    if (base32Decodificar(cargado.secreto).length === 0) throw new Error('vacío');
+    secretoTotp = cargado.secreto;
+    console.log(`[admin] Modo administrador ACTIVO (secreto leído de ${cargado.origen}).`);
+  } catch {
+    console.error(`[admin] El secreto de ${cargado.origen} no es base32 válido: modo administrador DESACTIVADO.`);
+  }
+} else {
+  console.warn('[admin] Modo administrador DESACTIVADO: define ADMIN_TOTP_SECRET (o crea server/data/.admin-totp).');
+}
 export const mfaConfigurado = secretoTotp !== null;
 
 let ultimoPaso = -1; // un código ya usado no se puede reutilizar
@@ -28,17 +48,14 @@ export function codigoCorrecto(codigo) {
   return true;
 }
 
-// --- Secreto para firmar los tokens de sesión: se crea solo y no va al repositorio ---
-const rutaSecreto = ruta('.admin-secret');
-function cargarSecreto() {
-  if (process.env.ADMIN_TOKEN_SECRET) return Buffer.from(process.env.ADMIN_TOKEN_SECRET);
-  if (existsSync(rutaSecreto)) return Buffer.from(readFileSync(rutaSecreto, 'utf8').trim(), 'hex');
-  const nuevo = randomBytes(32);
-  mkdirSync(dirname(rutaSecreto), { recursive: true });
-  writeFileSync(rutaSecreto, nuevo.toString('hex'), { mode: 0o600 });
-  return nuevo;
-}
-const secreto = cargarSecreto();
+// --- Clave para firmar los tokens de sesión ---
+// Antes se generaba al azar y se guardaba en un fichero: en un servidor con disco efímero o de solo
+// lectura (Render, Railway, Fly, contenedores...) fallaba o cerraba la sesión en cada reinicio.
+// Ahora se deriva del secreto TOTP (o de ADMIN_TOKEN_SECRET si se define): es estable entre reinicios
+// y despliegues, no escribe nada en disco, y regenerar el MFA invalida todas las sesiones abiertas.
+const secreto = process.env.ADMIN_TOKEN_SECRET
+  ? Buffer.from(process.env.ADMIN_TOKEN_SECRET)
+  : createHmac('sha256', secretoTotp ?? 'admin-desactivado').update('minigames-admin-token-v1').digest();
 
 const DURACION_MS = 12 * 60 * 60 * 1000; // la sesión de administrador dura 12 horas
 
@@ -50,7 +67,7 @@ export function crearToken() {
 }
 
 export function tokenValido(token) {
-  if (typeof token !== 'string') return false;
+  if (!mfaConfigurado || typeof token !== 'string') return false;
   const [datos, firma] = token.split('.');
   if (!datos || !firma) return false;
   const esperada = Buffer.from(firmar(datos));

@@ -1,3 +1,4 @@
+// client/src/games/Lobos/LobosOnline.jsx
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import './Lobos.css';
 import Icon from '../../components/Icon.jsx';
@@ -22,12 +23,9 @@ async function llamar(ruta, metodo = 'GET', cuerpo, signal) {
   return datos;
 }
 
-// sessionStorage: cada pestaña es un jugador distinto (útil para probar con varias pestañas); al recargar se conserva.
-// Si se pierde la sesión, basta con volver a «Unirse» con el mismo código y nombre.
 const leerSesion = () => { try { return JSON.parse(sessionStorage.getItem(CLAVE_SESION)); } catch { return null; } };
 const guardarSesion = (s) => { try { if (s) sessionStorage.setItem(CLAVE_SESION, JSON.stringify(s)); else sessionStorage.removeItem(CLAVE_SESION); } catch { /* sin almacenamiento */ } };
 
-/* ───────── Adaptación: la vista privada → un «estado» con la forma que esperan TurnoNoche y TarjetaRol ───────── */
 export function vistaAE(v) {
   const m = v?.mi || {};
   const yoNum = Number(v?.yo);
@@ -52,7 +50,6 @@ export function vistaAE(v) {
   };
 }
 
-/* ───────── Conexión con la sala (long-polling) ───────── */
 function useSala(sesion, alInvalidarse) {
   const [vista, setVista] = useState(null);
   const [errorRed, setErrorRed] = useState(false);
@@ -81,7 +78,7 @@ function useSala(sesion, alInvalidarse) {
       }
     })();
     return () => { activo = false; ctl.abort(); };
-  }, [sesion?.code, sesion?.token]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [sesion?.code, sesion?.token]);
 
   const [aviso, setAviso] = useState(null);
   const enviar = useCallback(async (msg) => {
@@ -100,7 +97,6 @@ function useSala(sesion, alInvalidarse) {
   return { vista, enviar, errorRed, aviso, offset };
 }
 
-/* ───────── Piezas pequeñas ───────── */
 function Cuenta({ finTs, offset }) {
   const [, tic] = useState(0);
   useEffect(() => { const h = setInterval(() => tic((x) => x + 1), 500); return () => clearInterval(h); }, []);
@@ -127,7 +123,6 @@ function ListaJugadores({ v }) {
       <div className="lb-lista">
         {v.jugadores.map((p) => (
           <div key={p.id} className={`lb-jug ${p.vivo === false ? 'muerto' : ''} ${p.id === v.yo ? 'yo' : ''}`}>
-            <span className={`lb-punto ${p.conectado ? 'on' : ''}`} title={p.conectado ? 'Conectado' : 'Desconectado'} />
             <span className="lb-jug-nombre">{p.nombre}{p.id === v.yo ? ' (tú)' : ''}{p.id === 0 ? ' 👑' : ''}{p.bot ? ' 🤖' : ''}</span>
             {p.vivo === false && p.rolRevelado && <span className="lb-jug-rol">✝ {ROLES[p.rolRevelado].nombre}</span>}
           </div>
@@ -137,7 +132,6 @@ function ListaJugadores({ v }) {
   );
 }
 
-/* ───────── Entrada: crear / unirse ───────── */
 function Entrada({ onEntrar, onLocal }) {
   const [modo, setModo] = useState(null);
   const [nombre, setNombre] = useState('');
@@ -191,8 +185,7 @@ function Entrada({ onEntrar, onLocal }) {
   );
 }
 
-/* ───────── Sala de espera ───────── */
-export function Lobby({ v, enviar, salir }) {
+export function Lobby({ v, enviar, onAbrirModalSalir }) {
   const n = v.jugadores.length;
   const nEf = Math.min(v.limites.max, Math.max(v.limites.min, n));
   const [sel, setSel] = useState(() => selInicial(nEf));
@@ -200,7 +193,6 @@ export function Lobby({ v, enviar, salir }) {
   const [copiado, setCopiado] = useState(false);
   const primera = useRef(true);
 
-  // El anfitrión sincroniza su elección con el servidor
   useEffect(() => {
     if (!v.esAdmin) return undefined;
     if (primera.current) { primera.current = false; return undefined; }
@@ -208,7 +200,7 @@ export function Lobby({ v, enviar, salir }) {
       enviar({ tipo: 'config', config: { seleccion: { modo: sel.tab === 'recomendadas' ? 'recomendada' : 'personalizada', tipo: sel.tipoSel, custom: sel.custom }, mec } });
     }, 350);
     return () => clearTimeout(h);
-  }, [sel.tab, sel.tipoSel, sel.custom, mec]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [sel.tab, sel.tipoSel, sel.custom, mec]);
 
   const copiar = async () => {
     try { await navigator.clipboard.writeText(v.code); setCopiado(true); setTimeout(() => setCopiado(false), 1800); } catch { /* sin portapapeles */ }
@@ -230,7 +222,6 @@ export function Lobby({ v, enviar, salir }) {
         <div className="lb-lista">
           {v.jugadores.map((p) => (
             <div key={p.id} className={`lb-jug ${p.id === v.yo ? 'yo' : ''}`}>
-              <span className={`lb-punto ${p.conectado ? 'on' : ''}`} />
               <span className="lb-jug-nombre">{p.nombre}{p.id === v.yo ? ' (tú)' : ''}{p.id === 0 ? ' 👑' : ''}{p.bot ? ' 🤖' : ''}</span>
               {v.esAdmin && p.id !== 0 && <button type="button" className="secondary lb-quitar" onClick={() => enviar({ tipo: 'expulsar', id: p.id })}>Quitar</button>}
             </div>
@@ -271,7 +262,7 @@ export function Lobby({ v, enviar, salir }) {
             <button className="big full" disabled={!v.puedeEmpezar || v.validacion.errores.length > 0} onClick={() => enviar({ tipo: 'empezar' })}>
               <Icon name="moon" size={22} /> ¡Empezar partida!
             </button>
-            <button className="secondary" onClick={salir}>Cerrar sala</button>
+            <button className="secondary danger full" onClick={onAbrirModalSalir}>Cerrar sala</button>
           </div>
         </>
       ) : (
@@ -282,14 +273,13 @@ export function Lobby({ v, enviar, salir }) {
             <ChipsRoles roles={v.roles} />
             {Object.entries(v.config.mec).some(([, on]) => on) && <p className="hint small">Mecánicas activadas: {Object.entries(v.config.mec).filter(([, on]) => on).map(([k]) => ({ eventos: 'eventos nocturnos', objetos: 'objetos', rumores: 'rumores', modif: 'votos especiales' }[k])).join(', ')}.</p>}
           </div>
-          <div className="actions"><button className="secondary" onClick={salir}>Salir de la partida</button></div>
+          <div className="actions"><button className="secondary danger full" onClick={onAbrirModalSalir}>Salir de la partida</button></div>
         </>
       )}
     </section>
   );
 }
 
-/* ───────── Votación (cada jugador, en su móvil) ───────── */
 function VotoRemoto({ v, e, enviar, offset }) {
   const [paso, setPaso] = useState('propio');
   const [propio, setPropio] = useState(null);
@@ -321,7 +311,6 @@ function VotoRemoto({ v, e, enviar, offset }) {
   );
 }
 
-/* ───────── Resultados de la noche para quien ya ha terminado su turno ───────── */
 function InfoNoche({ info }) {
   if (!info?.length) return null;
   const txtBando = { lobos: '🐺 es un LOBO', pueblo: '🏡 es del PUEBLO', solitario: '🔥 es un SOLITARIO' };
@@ -340,14 +329,12 @@ function InfoNoche({ info }) {
   );
 }
 
-/* ───────── Pantalla de partida (todas las fases) ───────── */
-export function VistaJuego({ v, enviar, offset, salir }) {
+export function VistaJuego({ v, enviar, offset, onAbrirModalSalir }) {
   const e = useMemo(() => vistaAE(v), [v]);
   const [verRol, setVerRol] = useState(false);
   const [textoEco, setTextoEco] = useState('');
   const m = v.mi;
   const vivo = m.vivo;
-  const eventoNoche = v.noche?.evento ?? v.nocheEvento;
 
   const avisoTexto = (a) => {
     if (a.tipo === 'amor') return `💘 Cupido os ha unido: estás enamorado/a de ${e.jugadores[a.con].nombre}. Si uno muere, el otro también. Si sois de bandos distintos y sobrevivís los dos hasta el final, ganáis juntos.`;
@@ -588,7 +575,7 @@ export function VistaJuego({ v, enviar, offset, salir }) {
             {v.esAdmin
               ? <button className="big full" onClick={() => enviar({ tipo: 'reiniciar' })}><Icon name="refresh" size={22} /> Otra partida (volver a la sala)</button>
               : <p className="hint center">El anfitrión puede iniciar otra partida desde la sala.</p>}
-            <button className="secondary" onClick={salir}>Salir</button>
+            <button className="secondary danger full" onClick={onAbrirModalSalir}>Salir</button>
           </div>
         </>
       );
@@ -602,7 +589,7 @@ export function VistaJuego({ v, enviar, offset, salir }) {
       {cabecera}
       {cuerpo}
       {v.fase !== 'fin' && <ListaJugadores v={v} />}
-      {v.fase !== 'fin' && <div className="actions"><button className="secondary" onClick={salir}>Salir de la partida</button></div>}
+      {v.fase !== 'fin' && <div className="actions"><button className="secondary danger full" onClick={onAbrirModalSalir}>Salir de la partida</button></div>}
 
       {verRol && (
         <div className="rg-modal-fondo" onClick={() => setVerRol(false)}>
@@ -626,10 +613,10 @@ export function VistaJuego({ v, enviar, offset, salir }) {
   );
 }
 
-/* ───────── Componente raíz del modo en red ───────── */
 export default function LobosOnline({ onLocal }) {
   const [sesion, setSesion] = useState(() => leerSesion());
   const [mensaje, setMensaje] = useState('');
+  const [modalSalir, setModalSalir] = useState(false);
 
   const invalidar = useCallback((txt) => { guardarSesion(null); setSesion(null); setMensaje(txt || 'La partida ya no existe.'); }, []);
   const { vista, enviar, errorRed, aviso, offset } = useSala(sesion, invalidar);
@@ -655,8 +642,48 @@ export default function LobosOnline({ onLocal }) {
       {errorRed && <p className="lb-sinred">⚠ Sin conexión con el servidor. Reintentando…</p>}
       {aviso && <p className="lb-toast">{aviso}</p>}
       {vista.fase === 'lobby'
-        ? <Lobby v={vista} enviar={enviar} salir={salir} />
-        : <VistaJuego v={vista} enviar={enviar} offset={offset} salir={salir} />}
+        ? <Lobby v={vista} enviar={enviar} onAbrirModalSalir={() => setModalSalir(true)} />
+        : <VistaJuego v={vista} enviar={enviar} offset={offset} onAbrirModalSalir={() => setModalSalir(true)} />}
+
+      {/* MODAL DE CONFIRMACIÓN PARA SALIR */}
+      {modalSalir && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalir(false)}>
+          <div 
+            className="rg-modal" 
+            onClick={(e) => e.stopPropagation()} 
+            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
+          >
+            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
+            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
+              ¿Abandonar la partida?
+            </h3>
+            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
+              Si sales de la sala perderás tu progreso actual en la partida. ¿Estás seguro de que deseas salir?
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+              <button 
+                type="button" 
+                className="secondary full" 
+                onClick={() => setModalSalir(false)}
+              >
+                No, quedarme
+              </button>
+              <button 
+                type="button" 
+                className="secondary danger full" 
+                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
+                onClick={() => {
+                  setModalSalir(false);
+                  salir();
+                }}
+              >
+                Sí, salir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

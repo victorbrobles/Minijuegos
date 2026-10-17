@@ -4,7 +4,6 @@ import RapidfireLocal from './RapidfireLocal.jsx';
 import RapidfireOnline from './RapidfireOnline.jsx';
 
 export default function Rapidfire({ onExit }) {
-  // Debe estar en 'online' para mostrar el menú de Crear / Unirse
   const [modo, setModo] = useState('online');
 
   if (modo === 'local') {

@@ -17,6 +17,46 @@ function barajarArray(array) {
   return copia;
 }
 
+// ==========================================
+// RUTAS MODO LOCAL
+// ==========================================
+
+// GET /api/rapidfire/categorias
+// Devuelve las categorías con sus metadatos sin cargar todos los retos de golpe
+router.get('/categorias', (req, res) => {
+  const lista = CATEGORIAS.map((c) => ({
+    id: c.id,
+    nombre: c.nombre,
+    icono: c.icono
+  }));
+  res.json({ success: true, categorias: lista });
+});
+
+// POST /api/rapidfire/reto-local
+// Devuelve un reto al azar de la categoría elegida
+router.post('/reto-local', (req, res) => {
+  const { categoriaId, usados = [] } = req.body || {};
+  const catObj = CATEGORIAS.find((c) => c.id === categoriaId);
+  if (!catObj) return res.status(404).json({ error: 'Categoría no encontrada.' });
+
+  let libres = catObj.retos.map((_, i) => i).filter((i) => !usados.includes(`${catObj.id}:${i}`));
+  if (libres.length === 0) {
+    libres = catObj.retos.map((_, i) => i);
+  }
+
+  const indiceElegido = libres[Math.floor(Math.random() * libres.length)];
+  const [n, texto] = catObj.retos[indiceElegido];
+
+  res.json({
+    success: true,
+    retoClave: `${catObj.id}:${indiceElegido}`,
+    reto: { n, texto }
+  });
+});
+
+// ==========================================
+// GESTIÓN Y RUTAS MODO ONLINE
+// ==========================================
 const salasOnline = new Map();
 
 function generarCodigo() {
@@ -89,7 +129,7 @@ router.post('/online/unirse', (req, res) => {
 
   if (!sala) return res.status(404).json({ error: 'Sala no encontrada.' });
   if (sala.estado !== 'lobby') return res.status(400).json({ error: 'La partida ya ha comenzado.' });
-  if (sala.jugadores.length >= 10) return res.status(400).json({ error: 'Sala llena (máx 10).' });
+  if (sala.jugadores.length >= 10) return res.status(400).json({ error: 'Sala llena (máximo 10 jugadores).' });
 
   const token = 'tok_' + Math.random().toString(36).substring(2);
   const nuevoId = sala.jugadores.length + 1;
@@ -128,7 +168,6 @@ router.get('/online/sala/:code', (req, res) => {
         segsPrep = 0;
         segsTurno = Math.max(0, Math.ceil((sala.ronda.finTurno - ahora) / 1000));
         if (segsTurno === 0 && !sala.ronda.tiempoAgotadoProcesado) {
-          // El tiempo expiró automáticamente
           sala.ronda.tiempoAgotadoProcesado = true;
           const siguienteId = elegirSiguienteRebote(sala, sala.ronda.jugadorTurnoId);
           sala.ronda.jugadorTurnoId = siguienteId;
@@ -173,7 +212,7 @@ router.get('/online/sala/:code', (req, res) => {
 router.post('/online/sala/:code/iniciar', (req, res) => {
   const sala = salasOnline.get(req.params.code?.toUpperCase());
   if (!sala || sala.adminToken !== req.body?.token) return res.status(403).json({ error: 'No autorizado.' });
-  if (sala.jugadores.length < 2) return res.status(400).json({ error: 'Mínimo 2 jugadores.' });
+  if (sala.jugadores.length < 2) return res.status(400).json({ error: 'Mínimo 2 jugadores para iniciar.' });
 
   sala.estado = 'categorias';
   sala.rondaNum = 1;
@@ -207,12 +246,12 @@ router.post('/online/sala/:code/elegir-categoria', (req, res) => {
 
   const jugador = sala.jugadores.find((j) => j.token === req.body?.token);
   if (!jugador || jugador.id !== sala.ronda.jugadorTurnoId) {
-    return res.status(403).json({ error: 'Solo el jugador de turno puede elegir categoría.' });
+    return res.status(403).json({ error: 'Solo el jugador con el turno actual puede elegir la categoría.' });
   }
 
   const { categoriaId } = req.body || {};
   const catObj = CATEGORIAS.find((c) => c.id === categoriaId);
-  if (!catObj) return res.status(400).json({ error: 'Categoría inválida.' });
+  if (!catObj) return res.status(400).json({ error: 'Categoría no válida.' });
 
   let libres = catObj.retos.map((_, i) => i).filter((i) => !sala.usados.includes(`${catObj.id}:${i}`));
   if (libres.length === 0) {
@@ -239,7 +278,7 @@ router.post('/online/sala/:code/elegir-categoria', (req, res) => {
 });
 
 // POST /api/rapidfire/online/sala/:code/accion-admin
-// Solo el anfitrión decide si es 'acierto', 'rebote' o 'rendirse'
+// Exclusivo del anfitrión: decide si fue acierto, rebote o rendición
 router.post('/online/sala/:code/accion-admin', (req, res) => {
   const sala = salasOnline.get(req.params.code?.toUpperCase());
   if (!sala || sala.adminToken !== req.body?.token) {
