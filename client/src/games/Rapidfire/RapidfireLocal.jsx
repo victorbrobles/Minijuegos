@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import GameIntro from '../../components/GameIntro.jsx';
 import CategoryCard from '../../components/CategoryCard.jsx';
-import { CATEGORIAS } from './retos.js';
 import './Rapidfire.css';
 
 const TIEMPO_S = 60;
@@ -110,6 +109,7 @@ export default function RapidfireLocal({ onVolver, onExit }) {
 
   const [paso, setPaso] = useState('config');
   const [modalAyuda, setModalAyuda] = useState(false);
+  const [categoriasTodas, setCategoriasTodas] = useState([]);
   const [jugadores, setJugadores] = useState([
     { id: 1, nombre: 'Jugador 1' },
     { id: 2, nombre: 'Jugador 2' }
@@ -123,10 +123,20 @@ export default function RapidfireLocal({ onVolver, onExit }) {
   const [categoria, setCategoria] = useState(null);
   const [reto, setReto] = useState(null);
   const [ultimo, setUltimo] = useState(null);
-  const usados = useRef(new Set());
+  const usados = useRef([]);
   const bolsa = useRef([]);
   const ultimoAbre = useRef(-1);
   const intentados = useRef(new Set());
+
+  // Carga de categorías desde el backend al montar el componente
+  useEffect(() => {
+    fetch('/api/rapidfire/categorias')
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.success) setCategoriasTodas(d.categorias);
+      })
+      .catch((err) => console.error('Error al cargar categorías de rapidfire:', err));
+  }, []);
 
   const handleNumJugadores = (e) => {
     const num = parseInt(e.target.value, 10);
@@ -161,37 +171,46 @@ export default function RapidfireLocal({ onVolver, onExit }) {
     return elegido;
   };
 
-  const sortearOpciones = () => setOpciones(barajar(CATEGORIAS).slice(0, NUM_OPCIONES));
+  const sortearOpciones = (cats = categoriasTodas) => {
+    if (!cats.length) return;
+    setOpciones(barajar(cats).slice(0, NUM_OPCIONES));
+  };
 
   const empezar = () => {
     const lista = jugadores.map((j) => ({ ...j, nombre: j.nombre.trim() || `Jugador ${j.id}` }));
     setJugadores(lista);
     setPuntos(Object.fromEntries(lista.map((j) => [j.id, 0])));
-    usados.current = new Set();
+    usados.current = [];
     setRonda(1);
     bolsa.current = [];
     ultimoAbre.current = -1;
     setTurno(siguienteApertura());
     setUltimo(null);
-    sortearOpciones();
+    sortearOpciones(categoriasTodas);
     setPaso('categorias');
   };
 
-  const elegirCategoria = (cat) => {
-    let libres = cat.retos.map((_, i) => i).filter((i) => !usados.current.has(`${cat.id}:${i}`));
-    if (libres.length === 0) {
-      cat.retos.forEach((_, i) => usados.current.delete(`${cat.id}:${i}`));
-      libres = cat.retos.map((_, i) => i);
+  const elegirCategoria = async (cat) => {
+    try {
+      const res = await fetch('/api/rapidfire/reto-local', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ categoriaId: cat.id, usados: usados.current })
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        usados.current.push(data.retoClave);
+        intentados.current = new Set([turno]);
+        setCategoria(cat);
+        setReto(data.reto);
+        setIntento(0);
+        setMotivo(null);
+        setPaso('turno');
+      }
+    } catch (e) {
+      console.error('Error al pedir reto:', e);
     }
-    const i = libres[aleatorio(libres.length)];
-    usados.current.add(`${cat.id}:${i}`);
-    const [n, texto] = cat.retos[i];
-    intentados.current = new Set([turno]);
-    setCategoria(cat);
-    setReto({ n, texto });
-    setIntento(0);
-    setMotivo(null);
-    setPaso('turno');
   };
 
   const pasarTurno = (porque) => {
@@ -217,7 +236,7 @@ export default function RapidfireLocal({ onVolver, onExit }) {
 
   const continuar = () => {
     setRonda((r) => r + 1);
-    sortearOpciones();
+    sortearOpciones(categoriasTodas);
     setPaso('categorias');
   };
 
@@ -353,12 +372,12 @@ export default function RapidfireLocal({ onVolver, onExit }) {
         </div>
         <h3 className="section-title">{jugador.nombre}, elige una categoría</h3>
         <div className="rf-opciones">
-          {opciones.map((c) => (
+          {opciones.map((c, idx) => (
             <CategoryCard
               key={c.id}
               nombre={c.nombre}
               icono={c.icono}
-              indice={CATEGORIAS.indexOf(c)}
+              indice={idx}
               onClick={() => elegirCategoria(c)}
             />
           ))}
@@ -367,7 +386,7 @@ export default function RapidfireLocal({ onVolver, onExit }) {
     );
   }
 
-  if (paso === 'turno') {
+  if (paso === 'turno' && categoria && reto) {
     return (
       <Turno
         key={intento}
