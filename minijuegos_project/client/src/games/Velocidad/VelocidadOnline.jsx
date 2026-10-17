@@ -486,7 +486,7 @@ export default function VelocidadOnline({ onLocal, onSalir }) {
                 <div key={j.id} className={`lb-jug ${j.id === sala.yoId ? 'yo' : ''}`}>
                   <span className="lb-punto on" />
                   <span className="lb-jug-nombre">
-                    {j.nombre}{j.id === sala.yoId ? ' (tú)' : ''}{j.id === 1 ? ' 👑 anfitrión' : ''}
+                    {j.nombre}{j.id === sala.yoId ? ' (tú)' : ''}{j.id === 1 ? ' 👑' : ''}
                   </span>
                 </div>
               ))}

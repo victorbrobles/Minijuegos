@@ -337,7 +337,7 @@ export default function QuienEsQuienOnline({ onLocal, onSalir }) {
                 <div key={j.id} className={`lb-jug ${j.esTu ? 'yo' : ''}`}>
                   <span className="lb-punto on" />
                   <span className="lb-jug-nombre">
-                    {j.nombre}{j.esTu ? ' (tú)' : ''}{j.id === 1 ? ' 👑 anfitrión' : ''}
+                    {j.nombre}{j.esTu ? ' (tú)' : ''}{j.id === 1 ? ' 👑' : ''}
                   </span>
                 </div>
               ))}

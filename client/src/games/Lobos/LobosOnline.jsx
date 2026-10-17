@@ -231,7 +231,7 @@ export function Lobby({ v, enviar, salir }) {
           {v.jugadores.map((p) => (
             <div key={p.id} className={`lb-jug ${p.id === v.yo ? 'yo' : ''}`}>
               <span className={`lb-punto ${p.conectado ? 'on' : ''}`} />
-              <span className="lb-jug-nombre">{p.nombre}{p.id === v.yo ? ' (tú)' : ''}{p.id === 0 ? ' 👑 anfitrión' : ''}{p.bot ? ' 🤖' : ''}</span>
+              <span className="lb-jug-nombre">{p.nombre}{p.id === v.yo ? ' (tú)' : ''}{p.id === 0 ? ' 👑' : ''}{p.bot ? ' 🤖' : ''}</span>
               {v.esAdmin && p.id !== 0 && <button type="button" className="secondary lb-quitar" onClick={() => enviar({ tipo: 'expulsar', id: p.id })}>Quitar</button>}
             </div>
           ))}
