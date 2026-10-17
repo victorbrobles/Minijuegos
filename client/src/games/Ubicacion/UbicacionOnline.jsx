@@ -15,6 +15,7 @@ export default function UbicacionOnline({ onLocal, onSalir }) {
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
+  const [modalSalir, setModalSalir] = useState(false);
 
   const [sesion, setSesion] = useState(() => {
     try {
@@ -34,7 +35,6 @@ export default function UbicacionOnline({ onLocal, onSalir }) {
 
   const intervalRef = useRef(null);
 
-  // Polling regular a 500ms para capturar los destellos de 1 segundo de forma nítida
   useEffect(() => {
     if (!sesion) {
       if (intervalRef.current) clearInterval(intervalRef.current);
@@ -76,14 +76,12 @@ export default function UbicacionOnline({ onLocal, onSalir }) {
     setCargando(true);
     setErrorMsg('');
     try {
-      // 1. Descargamos y resolvemos las fotos antes de crear la sala
       const rLote = await fetch(`/api/ubicacion/lote?n=${CANDIDATOS}`);
       if (!rLote.ok) throw new Error('Error al conectar con la base de datos de lugares.');
       const candidatos = await rLote.json();
       const lugaresConFoto = await resolverImagenes(candidatos);
       if (!lugaresConFoto.length) throw new Error('No se pudieron descargar las fotos de los monumentos.');
 
-      // 2. Creamos la sala en el backend
       const res = await fetch('/api/ubicacion/online/crear', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -143,7 +141,6 @@ export default function UbicacionOnline({ onLocal, onSalir }) {
     if (ronda?.miMarcador?.confirmado) return;
     setMiPosicionLocal({ lat, lng });
 
-    // Enviamos la posición provisional al servidor para que entre en el ciclo de destellos
     fetch(`/api/ubicacion/online/sala/${sesion.code}/posicionar`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -210,10 +207,8 @@ export default function UbicacionOnline({ onLocal, onSalir }) {
   const miColor = miJugador?.color || '#2563eb';
   const yaConfirmado = Boolean(ronda?.miMarcador?.confirmado);
 
-  // Marcadores mostrados durante la fase de mapa (mi marcador + destellos de 1 segundo de rivales)
   const marcadoresMapa = [];
 
-  // 1. Mi propio marcador
   const miPos = miPosicionLocal || (ronda?.miMarcador?.lat ? { lat: ronda.miMarcador.lat, lng: ronda.miMarcador.lng } : null);
   if (miPos) {
     marcadoresMapa.push({
@@ -228,7 +223,6 @@ export default function UbicacionOnline({ onLocal, onSalir }) {
     });
   }
 
-  // 2. Destellos temporales de 1 segundo de otros jugadores
   if (ronda?.destellosVisibles?.length) {
     ronda.destellosVisibles.forEach((d) => {
       marcadoresMapa.push({
@@ -245,7 +239,6 @@ export default function UbicacionOnline({ onLocal, onSalir }) {
     });
   }
 
-  // Marcadores de resultados finales de ronda
   const marcadoresResultado = ronda?.resultado
     ? [
         {
@@ -429,13 +422,13 @@ export default function UbicacionOnline({ onLocal, onSalir }) {
             </div>
           )}
 
-          <button className="secondary danger full" style={{ marginTop: '1rem' }} onClick={handleSalir}>
+          <button className="secondary danger full" style={{ marginTop: '1rem' }} onClick={() => setModalSalir(true)}>
             Salir de la sala
           </button>
         </section>
       )}
 
-      {/* 5. JUGANDO: FASE FOTO (10 SEGUNDOS SIMULTÁNEOS) */}
+      {/* 5. JUGANDO: FASE FOTO */}
       {vista === 'sala' && sala && sala.estado === 'jugando' && ronda && ronda.faseRonda === 'foto' && (
         <section className="game">
           <div className="hud">
@@ -463,10 +456,9 @@ export default function UbicacionOnline({ onLocal, onSalir }) {
         </section>
       )}
 
-      {/* 6. JUGANDO: FASE MAPA (90S SIMULTÁNEOS CON DESTELLOS CADA 15S) */}
+      {/* 6. JUGANDO: FASE MAPA */}
       {vista === 'sala' && sala && sala.estado === 'jugando' && ronda && ronda.faseRonda === 'mapa' && (
         <section className="game">
-          {/* Modal flotante para revisar la foto si se desea */}
           {verImagen && (
             <div className="ub-modal-fondo" onClick={() => setVerImagen(false)}>
               <div className="ub-modal ub-modal-foto" onClick={(e) => e.stopPropagation()}>
@@ -483,7 +475,6 @@ export default function UbicacionOnline({ onLocal, onSalir }) {
             </button>
           </div>
 
-          {/* Marcador superior con badges de quién ha confirmado */}
           <div className="scoreboard-container" style={{ justifyContent: 'center', marginBottom: '0.8rem' }}>
             {sala.jugadores.map((j) => {
               const listo = ronda.jugadoresConfirmados.includes(j.id);
@@ -496,7 +487,6 @@ export default function UbicacionOnline({ onLocal, onSalir }) {
             })}
           </div>
 
-          {/* Aviso especial de radar si hay destellos en pantalla */}
           {ronda.destellosVisibles.length > 0 && (
             <div className="status-alert acierto" style={{ textAlign: 'center', marginBottom: '0.8rem' }}>
               📡 ¡RADAR ACTIVO (1s)! Vislumbrando marcadores provisionales de rivales no confirmados...
@@ -541,7 +531,7 @@ export default function UbicacionOnline({ onLocal, onSalir }) {
             </div>
           )}
 
-          <button className="secondary danger full" style={{ marginTop: '1.2rem' }} onClick={handleSalir}>
+          <button className="secondary danger full" style={{ marginTop: '1.2rem' }} onClick={() => setModalSalir(true)}>
             Salir de la sala
           </button>
         </section>
@@ -606,7 +596,7 @@ export default function UbicacionOnline({ onLocal, onSalir }) {
             ) : (
               <div className="panel center" style={{ width: '100%', padding: '1rem' }}>
                 <p className="hint">Esperando a que el anfitrión avance a la siguiente ronda...</p>
-                <button className="secondary danger full" style={{ marginTop: '0.8rem' }} onClick={handleSalir}>
+                <button className="secondary danger full" style={{ marginTop: '0.8rem' }} onClick={() => setModalSalir(true)}>
                   Salir de la sala
                 </button>
               </div>
@@ -623,7 +613,7 @@ export default function UbicacionOnline({ onLocal, onSalir }) {
             <h1 className="title">Clasificación Final</h1>
             <p className="final-score">
               {ganadores.length === 0
-                ? 'Nadie ha conseguido puntos'
+                ? 'Nadie ha sumado puntos'
                 : ganadores.length === 1
                 ? <>¡Victoria para {ganadores[0].nombre} con {maximo} puntos!</>
                 : <>Empate entre {ganadores.map((g) => g.nombre).join(', ')} con {maximo} puntos</>}
@@ -647,11 +637,51 @@ export default function UbicacionOnline({ onLocal, onSalir }) {
           </div>
 
           <div className="actions" style={{ marginTop: '1.5rem' }}>
-            <button className="secondary danger full" onClick={handleSalir}>
+            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
               <Icon name="door" size={20} /> Salir al menú
             </button>
           </div>
         </section>
+      )}
+
+      {/* MODAL DE CONFIRMACIÓN PARA SALIR */}
+      {modalSalir && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalir(false)}>
+          <div 
+            className="rg-modal" 
+            onClick={(e) => e.stopPropagation()} 
+            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
+          >
+            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
+            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
+              ¿Abandonar la partida?
+            </h3>
+            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
+              Si sales de la sala perderás tu progreso actual en la partida. ¿Estás seguro de que deseas salir?
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+              <button 
+                type="button" 
+                className="secondary full" 
+                onClick={() => setModalSalir(false)}
+              >
+                No, quedarme
+              </button>
+              <button 
+                type="button" 
+                className="secondary danger full" 
+                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
+                onClick={() => {
+                  setModalSalir(false);
+                  handleSalir();
+                }}
+              >
+                Sí, salir
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

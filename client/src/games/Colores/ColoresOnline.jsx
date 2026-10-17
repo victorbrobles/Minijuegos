@@ -25,6 +25,7 @@ export default function ColoresOnline({ onLocal, onSalir }) {
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
+  const [modalSalir, setModalSalir] = useState(false);
 
   const [sesion, setSesion] = useState(() => {
     try {
@@ -400,7 +401,6 @@ export default function ColoresOnline({ onLocal, onSalir }) {
             <div className="lb-lista">
               {sala.jugadores.map((j) => (
                 <div key={j.id} className={`lb-jug ${j.id === sala.yoId ? 'yo' : ''}`}>
-                  <span className="lb-punto on" />
                   <span className="lb-jug-nombre">
                     {j.nombre}{j.id === sala.yoId ? ' (tú)' : ''}{j.id === 1 ? ' 👑' : ''}
                   </span>
@@ -434,7 +434,7 @@ export default function ColoresOnline({ onLocal, onSalir }) {
           )}
 
           <div className="actions" style={{ marginTop: '1rem' }}>
-            <button className="secondary danger full" onClick={handleSalir}>
+            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
               <Icon name="door" size={20} /> Salir de la sala
             </button>
           </div>
@@ -453,7 +453,6 @@ export default function ColoresOnline({ onLocal, onSalir }) {
 
           {ronda.estadoRonda === 'votando' ? (
             <>
-              {/* Tarjeta del elemento y cuántos colores seleccionar */}
               <div className="panel aprox-pregunta-card">
                 <span className="aprox-badge-pregunta">
                   Selecciona exactamente {ronda.numColores} {ronda.numColores === 1 ? 'color' : 'colores'}
@@ -468,7 +467,6 @@ export default function ColoresOnline({ onLocal, onSalir }) {
 
               {!ronda.yaRespondio ? (
                 <>
-                  {/* Paleta de 11 colores */}
                   <div className="panel">
                     <div className="colores-grid">
                       {PALETA_COLORES.map((col) => {
@@ -527,7 +525,6 @@ export default function ColoresOnline({ onLocal, onSalir }) {
                 </div>
               )}
 
-              {/* Botón de cierre para el anfitrión si alguien se demora */}
               {esAdmin && (
                 <div style={{ marginTop: '1rem' }}>
                   <button className="secondary full" onClick={handleCerrarRonda}>
@@ -537,7 +534,6 @@ export default function ColoresOnline({ onLocal, onSalir }) {
               )}
             </>
           ) : (
-            /* RESOLUCIÓN DE LA RONDA */
             resultadoRonda && (
               <div className="end-card aprox-resolucion-card">
                 <span className="end-icon"><Icon name="trophy" size={44} /></span>
@@ -559,7 +555,6 @@ export default function ColoresOnline({ onLocal, onSalir }) {
                   })}
                 </div>
 
-                {/* Desglose de cada jugador */}
                 <div className="aprox-resolucion-lista" style={{ marginTop: '1.2rem', width: '100%' }}>
                   {resultadoRonda.desglose.map((d) => (
                     <div key={d.id} className="aprox-fila-resultado intermedia" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', alignItems: 'stretch' }}>
@@ -588,7 +583,6 @@ export default function ColoresOnline({ onLocal, onSalir }) {
                   ))}
                 </div>
 
-                {/* Marcador general */}
                 <div className="scoreboard" style={{ width: '100%', marginTop: '1.5rem' }}>
                   <h3 className="section-title" style={{ margin: '0 0 0.8rem', textAlign: 'center' }}>
                     Marcador general
@@ -633,7 +627,7 @@ export default function ColoresOnline({ onLocal, onSalir }) {
           )}
 
           <div className="actions" style={{ marginTop: '1.2rem' }}>
-            <button className="secondary danger full" onClick={handleSalir}>
+            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
               <Icon name="door" size={20} /> Salir de la sala
             </button>
           </div>
@@ -677,11 +671,51 @@ export default function ColoresOnline({ onLocal, onSalir }) {
                 <Icon name="refresh" size={20} /> Otra Partida (mismos jugadores)
               </button>
             )}
-            <button className="secondary danger full" onClick={handleSalir}>
+            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
               <Icon name="door" size={20} /> Salir al menú principal
             </button>
           </div>
         </section>
+      )}
+
+      {/* MODAL DE CONFIRMACIÓN PARA SALIR */}
+      {modalSalir && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalir(false)}>
+          <div 
+            className="rg-modal" 
+            onClick={(e) => e.stopPropagation()} 
+            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
+          >
+            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
+            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
+              ¿Abandonar la partida?
+            </h3>
+            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
+              Si sales de la sala perderás tu progreso actual en la partida. ¿Estás seguro de que deseas salir?
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+              <button 
+                type="button" 
+                className="secondary full" 
+                onClick={() => setModalSalir(false)}
+              >
+                No, quedarme
+              </button>
+              <button 
+                type="button" 
+                className="secondary danger full" 
+                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
+                onClick={() => {
+                  setModalSalir(false);
+                  handleSalir();
+                }}
+              >
+                Sí, salir
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

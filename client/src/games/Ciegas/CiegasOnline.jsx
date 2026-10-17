@@ -19,6 +19,7 @@ export default function CiegasOnline({ onLocal, onSalir }) {
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
+  const [modalSalir, setModalSalir] = useState(false);
 
   const [sesion, setSesion] = useState(() => {
     try {
@@ -33,7 +34,6 @@ export default function CiegasOnline({ onLocal, onSalir }) {
 
   const intervalRef = useRef(null);
 
-  // Polling de sincronización
   useEffect(() => {
     if (!sesion) {
       if (intervalRef.current) clearInterval(intervalRef.current);
@@ -306,7 +306,6 @@ export default function CiegasOnline({ onLocal, onSalir }) {
             <div className="lb-lista">
               {sala.jugadores.map((j) => (
                 <div key={j.id} className={`lb-jug ${j.id === yoId ? 'yo' : ''}`}>
-                  <span className="lb-punto on" />
                   <span className="lb-jug-nombre">{j.nombre}{j.id === yoId ? ' (Tú)' : ''}{j.id === 1 ? ' 👑' : ''}</span>
                 </div>
               ))}
@@ -347,7 +346,7 @@ export default function CiegasOnline({ onLocal, onSalir }) {
             </div>
           )}
 
-          <button className="secondary danger full" style={{ marginTop: '1rem' }} onClick={handleSalir}>
+          <button className="secondary danger full" style={{ marginTop: '1rem' }} onClick={() => setModalSalir(true)}>
             Salir de la sala
           </button>
         </section>
@@ -415,7 +414,7 @@ export default function CiegasOnline({ onLocal, onSalir }) {
             )}
           </div>
 
-          <button className="secondary danger full" style={{ marginTop: '1.2rem' }} onClick={handleSalir}>
+          <button className="secondary danger full" style={{ marginTop: '1.2rem' }} onClick={() => setModalSalir(true)}>
             Salir de la sala
           </button>
         </section>
@@ -478,7 +477,7 @@ export default function CiegasOnline({ onLocal, onSalir }) {
             )}
           </div>
 
-          <button className="secondary danger full" style={{ marginTop: '1.2rem' }} onClick={handleSalir}>
+          <button className="secondary danger full" style={{ marginTop: '1.2rem' }} onClick={() => setModalSalir(true)}>
             Salir de la sala
           </button>
         </section>
@@ -552,19 +551,59 @@ export default function CiegasOnline({ onLocal, onSalir }) {
               <button onClick={handleIniciarRonda}>
                 <Icon name="play" size={20} /> Siguiente ronda
               </button>
-              <button className="secondary danger" onClick={handleSalir}>
+              <button className="secondary danger" onClick={() => setModalSalir(true)}>
                 <Icon name="door" size={20} /> Salir al menú
               </button>
             </div>
           ) : (
             <div className="panel center" style={{ marginTop: '1rem' }}>
               <p className="hint">Esperando a que el anfitrión lance la siguiente ronda...</p>
-              <button className="secondary danger full" style={{ marginTop: '0.8rem' }} onClick={handleSalir}>
+              <button className="secondary danger full" style={{ marginTop: '0.8rem' }} onClick={() => setModalSalir(true)}>
                 Salir de la sala
               </button>
             </div>
           )}
         </section>
+      )}
+
+      {/* MODAL DE CONFIRMACIÓN PARA SALIR */}
+      {modalSalir && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalir(false)}>
+          <div 
+            className="rg-modal" 
+            onClick={(e) => e.stopPropagation()} 
+            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
+          >
+            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
+            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
+              ¿Abandonar la partida?
+            </h3>
+            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
+              Si sales de la sala perderás tu progreso actual en la partida. ¿Estás seguro de que deseas salir?
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+              <button 
+                type="button" 
+                className="secondary full" 
+                onClick={() => setModalSalir(false)}
+              >
+                No, quedarme
+              </button>
+              <button 
+                type="button" 
+                className="secondary danger full" 
+                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
+                onClick={() => {
+                  setModalSalir(false);
+                  handleSalir();
+                }}
+              >
+                Sí, salir
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

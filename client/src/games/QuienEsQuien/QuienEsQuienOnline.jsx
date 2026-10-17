@@ -12,6 +12,7 @@ export default function QuienEsQuienOnline({ onLocal, onSalir }) {
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
+  const [modalSalir, setModalSalir] = useState(false);
 
   const [sesion, setSesion] = useState(() => {
     try {
@@ -26,7 +27,6 @@ export default function QuienEsQuienOnline({ onLocal, onSalir }) {
   const [categorias, setCategorias] = useState([]);
   const [cubiertaLevantada, setCubiertaLevantada] = useState(false);
 
-  // Cargar categorías disponibles
   useEffect(() => {
     fetch('/api/quienesquien/categorias')
       .then((r) => r.json())
@@ -36,7 +36,6 @@ export default function QuienEsQuienOnline({ onLocal, onSalir }) {
       .catch((err) => console.error(err));
   }, []);
 
-  // Polling de sincronización
   const intervalRef = useRef(null);
 
   useEffect(() => {
@@ -117,7 +116,6 @@ export default function QuienEsQuienOnline({ onLocal, onSalir }) {
     }
   };
 
-  // PULSAR CUALQUIER CATEGORÍA INICIA LA PARTIDA DIRECTAMENTE
   const handleSeleccionarYIniciar = async (categoriaId) => {
     if (!categoriaId || !sesion) return;
     setErrorMsg('');
@@ -131,7 +129,6 @@ export default function QuienEsQuienOnline({ onLocal, onSalir }) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'No se pudo iniciar.');
 
-      // Cambio instantáneo de pantalla sin esperar al siguiente tick de polling
       setSala(data);
       setCubiertaLevantada(false);
     } catch (err) {
@@ -335,7 +332,6 @@ export default function QuienEsQuienOnline({ onLocal, onSalir }) {
             <div className="lb-lista">
               {sala.jugadores.map((j) => (
                 <div key={j.id} className={`lb-jug ${j.esTu ? 'yo' : ''}`}>
-                  <span className="lb-punto on" />
                   <span className="lb-jug-nombre">
                     {j.nombre}{j.esTu ? ' (tú)' : ''}{j.id === 1 ? ' 👑' : ''}
                   </span>
@@ -382,7 +378,7 @@ export default function QuienEsQuienOnline({ onLocal, onSalir }) {
           )}
 
           <div className="actions" style={{ marginTop: '1rem' }}>
-            <button className="secondary danger full" onClick={handleSalir}>
+            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
               <Icon name="door" size={20} /> Salir de la sala
             </button>
           </div>
@@ -397,7 +393,6 @@ export default function QuienEsQuienOnline({ onLocal, onSalir }) {
             <span className="chip alt">Sala: {sala.code}</span>
           </div>
 
-          {/* TARJETA CON CUBIERTA DESLIZABLE */}
           <div className="qq-cubierta-wrapper">
             <div
               className={`qq-cubierta-cortina ${cubiertaLevantada ? 'levantada' : ''}`}
@@ -447,7 +442,6 @@ export default function QuienEsQuienOnline({ onLocal, onSalir }) {
             </div>
           </div>
 
-          {/* BOTÓN AUXILIAR PARA PRESIONAR */}
           <button
             type="button"
             className="big full qq-btn-pulsador-mirar"
@@ -467,7 +461,6 @@ export default function QuienEsQuienOnline({ onLocal, onSalir }) {
             Tu personaje está oculto para ti. Averígualo haciendo preguntas al grupo.
           </p>
 
-          {/* CONTROLES PARA EL ANFITRIÓN */}
           {sala.esAdmin && (
             <div className="panel" style={{ marginTop: '1.2rem' }}>
               <h3 className="panel-title"><Icon name="crown" size={20} /> Controles del Anfitrión</h3>
@@ -483,11 +476,51 @@ export default function QuienEsQuienOnline({ onLocal, onSalir }) {
           )}
 
           <div className="actions" style={{ marginTop: '1rem' }}>
-            <button className="secondary danger full" onClick={handleSalir}>
+            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
               <Icon name="door" size={20} /> Salir de la partida
             </button>
           </div>
         </section>
+      )}
+
+      {/* MODAL DE CONFIRMACIÓN PARA SALIR */}
+      {modalSalir && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalir(false)}>
+          <div 
+            className="rg-modal" 
+            onClick={(e) => e.stopPropagation()} 
+            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
+          >
+            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
+            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
+              ¿Abandonar la partida?
+            </h3>
+            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
+              Si sales de la sala perderás tu progreso actual en la partida. ¿Estás seguro de que deseas salir?
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+              <button 
+                type="button" 
+                className="secondary full" 
+                onClick={() => setModalSalir(false)}
+              >
+                No, quedarme
+              </button>
+              <button 
+                type="button" 
+                className="secondary danger full" 
+                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
+                onClick={() => {
+                  setModalSalir(false);
+                  handleSalir();
+                }}
+              >
+                Sí, salir
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
