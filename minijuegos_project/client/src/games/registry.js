@@ -16,6 +16,11 @@ import FrasesCelebres from './FrasesCelebres/FrasesCelebres.jsx';
 import Conecta from './Conecta/Conecta.jsx';
 import Impostor from './Impostor/Impostor.jsx';
 import Colores from './Colores/Colores.jsx';
+import Buscaminas from './Buscaminas/Buscaminas.jsx';
+import Popular from './Popular/Popular.jsx';
+import MasMenos from './MasMenos/MasMenos.jsx';
+import Cancion from './Cancion/Cancion.jsx';
+import Ciegas from './Ciegas/Ciegas.jsx';
 
 // id del juego (el mismo que en server/data/games.json) -> componente React
 const registry = {
@@ -36,7 +41,12 @@ const registry = {
   'frasescelebres': FrasesCelebres,
   'conecta': Conecta,
   'impostor': Impostor,
-  'colores': Colores
+  'colores': Colores,
+  'buscaminas': Buscaminas,
+  'popular': Popular,
+  'masmenos': MasMenos,
+  'cancion': Cancion,
+  'ciegas': Ciegas
 };
 
 export default registry;

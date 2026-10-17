@@ -104,9 +104,39 @@ export const META = {
   },
   'colores': {
     titulo: 'La vida en colores',
-    icono: 'star',
+    icono: 'brush',
     colores: ['#f43f5e', '#8b5cf6'],
     descripcion: 'Adivina la combinación exacta de colores de personajes, marcas y cosas míticas que todo el mundo ha visto.'
+  },
+  'buscaminas': {
+    titulo: 'Cuidado que explota',
+    icono: 'bomb',
+    colores: ['#3b82f6', '#2563eb'],
+    descripcion: 'Un tablero de 15 casillas con 10 aciertos y 5 bombas ocultas. Elige por turnos, suma puntos según la dificultad y evita pisar la mina para no quedar eliminado de la ronda.'
+  },
+  'popular': {
+    titulo: 'Sigue la moda',
+    icono: 'fashion',
+    colores: ['#f43f5e', '#8b5cf6'],
+    descripcion: '¿Qué es lo que respondería la mayoría? Adivina los 5 elementos más populares de cada categoría y suma desde 1 hasta 5 puntos por acierto.'
+  },
+  'masmenos': {
+    titulo: 'Entre dos aguas',
+    icono: 'scale',
+    colores: ['#4338ca', '#7e22ce'],
+    descripcion: 'Compara dos datos numéricos frente a frente y elige el más grande para encadenar la racha de aciertos más larga.'
+  },
+  'cancion': {
+    titulo: 'Afina ese oído',
+    icono: 'music',
+    colores: ['#10b981', '#059669'],
+    descripcion: 'Escucha la canción subiendo gradualmente de volumen. Pulsa el botón antes de los 30 segundos para adivinar el tema y sumar tantos puntos como segundos queden.'
+  },
+  'ciegas': {
+    titulo: 'Ranking a Ciegas',
+    icono: 'trophy',
+    colores: ['#f59e0b', '#d97706'],
+    descripcion: 'Ordena de 1 a 5 cada elemento sin saber qué saldrá después. Los rivales votan cuántos has acertado.'
   }
 };
 export const META_POR_DEFECTO = { icono: 'star', colores: ['#8b5cf6', '#6366f1'], descripcion: '' };

@@ -106,5 +106,35 @@
     "name": "La vida en colores",
     "description": "Adivina la combinación exacta de colores de personajes, marcas y cosas míticas que todo el mundo ha visto.",
     "isNew": true
+  },
+  {
+    "id": "buscaminas",
+    "name": "Cuidado que explota",
+    "description": "Un tablero de 15 casillas con 10 aciertos y 5 bombas ocultas. Elige por turnos, suma puntos según la dificultad y evita pisar la mina para no quedar eliminado de la ronda.",
+    "isNew": true
+  },
+  {
+    "id": "popular",
+    "name": "Sigue la Moda",
+    "description": "¿Qué es lo que respondería la mayoría? Adivina los 5 elementos más populares de cada categoría y suma desde 1 hasta 5 puntos por acierto.",
+    "isNew": true
+  },
+  {
+    "id": "masmenos",
+    "name": "Entre dos aguas",
+    "description": "Compara dos datos numéricos frente a frente y elige el más grande para encadenar la racha de aciertos más larga.",
+    "isNew": true
+  },
+  {
+    "id": "cancion",
+    "name": "Afina ese oído",
+    "description": "Escucha la canción subiendo gradualmente de volumen. Pulsa el botón antes de los 30 segundos para adivinar el tema y sumar tantos puntos como segundos queden.",
+    "isNew": true
+  },
+  {
+    "id": "ciegas",
+    "name": "Ranking a Ciegas",
+    "description": "Ordena de 1 a 5 cada elemento sin saber qué saldrá después. Los rivales votan cuántos has acertado.",
+    "isNew": true
   }
 ]

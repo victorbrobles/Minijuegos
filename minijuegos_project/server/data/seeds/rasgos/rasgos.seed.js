@@ -528,5 +528,300 @@ export const FAMOSOS = [
       licencia: 'CC BY-SA 2.0',
       licenciaUrl: 'https://creativecommons.org/licenses/by-sa/2.0'
     }
+  },
+  {
+    id: 'eduSoto',
+    nombre: 'Edu Soto',
+    alias: [
+      'eduSoto',
+      'edu Soto',
+      'Soto',
+      'neng'
+    ],
+    imagen: 'https://upload.wikimedia.org/wikipedia/commons/7/73/Edu_Soto_La_risa_cuando_est%C3%A1_prohibida_te_lleva_a_un_terreno_bastante_peligroso2.png?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original',
+    rasgo: 'ojos',
+    recorte: { x: 0.08, y: 0.30, ancho: 0.80, alto: 0.10 },
+    attribution: {
+      autor: 'infoLibre',
+      fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Edu_Soto_La_risa_cuando_est%C3%A1_prohibida_te_lleva_a_un_terreno_bastante_peligroso2.png',
+      licencia: 'CC BY 3.0',
+      licenciaUrl: 'https://creativecommons.org/licenses/by/3.0'
+    }
+  },
+  {
+    id: 'marianoRajoy',
+    nombre: 'Mariano Rajoy',
+    alias: [
+      'marianoRajoy',
+      'mariano Rajoy',
+      'Rajoy'
+    ],
+    imagen: 'https://commons.wikimedia.org/wiki/Special:FilePath/Mariano_Rajoy_2006_(cropped).jpg',
+    rasgo: 'boca',
+    recorte: { x: 0.08, y: 0.50, ancho: 0.80, alto: 0.25 },
+    attribution: {
+      autor: 'European People\'s Party',
+      fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Mariano_Rajoy_2006_(cropped).jpg',
+      licencia: 'CC BY 2.0',
+      licenciaUrl: 'https://creativecommons.org/licenses/by/2.0'
+    }
+  },
+  {
+    id: 'anaPeleteiro',
+    nombre: 'Ana Peleteiro',
+    alias: [
+      'anaPeleteiro',
+      'ana Peleteiro',
+      'Peleteiro'
+    ],
+    imagen: 'https://commons.wikimedia.org/wiki/Special:FilePath/Ana_Peleteiro_-_Triple_saut_Femmes_(48614755616).jpg',
+    rasgo: 'hombros',
+    recorte: { x: 0.25, y: 0.35, ancho: 0.80, alto: 0.25 },
+    attribution: {
+      autor: 'Yann Caradec from Paris, France',
+      fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Ana_Peleteiro_-_Triple_saut_Femmes_(48614755616).jpg',
+      licencia: 'CC BY-SA 2.0',
+      licenciaUrl: 'https://creativecommons.org/licenses/by-sa/2.0'
+    }
+  },
+  {
+    id: 'pauCubarsi',
+    nombre: 'Pau Cubarsi',
+    alias: [
+      'pauCubarsi',
+      'pau Cubarsi',
+      'Cubarsi'
+    ],
+    imagen: 'https://commons.wikimedia.org/wiki/Special:FilePath/Pau_Cubarsi_Argentina_v_Spain_19_July_2026-181_(cropped).jpg',
+    rasgo: 'boca',
+    recorte: { x: 0.10, y: 0.28, ancho: 0.80, alto: 0.10 },
+    attribution: {
+      autor: 'Bryan Berlin',
+      fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Pau_Cubarsi_Argentina_v_Spain_19_July_2026-181_(cropped).jpg',
+      licencia: 'CC BY-SA 4.0',
+      licenciaUrl: 'https://creativecommons.org/licenses/by-sa/4.0'
+    }
+  },
+  {
+    id: 'justinBieber',
+    nombre: 'Justin Bieber',
+    alias: [
+      'justinBieber',
+      'justin Bieber',
+      'justin'
+    ],
+    imagen: 'https://commons.wikimedia.org/wiki/Special:FilePath/Justin_Bieber_Q_%26_A_(26511724391)_(cropped).jpg',
+    rasgo: 'cuerpo',
+    recorte: { x: 0.10, y: 0.30, ancho: 0.80, alto: 0.60 },
+    attribution: {
+      autor: 'Lou Stejskal',
+      fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Justin_Bieber_Q_%26_A_(26511724391)_(cropped).jpg',
+      licencia: 'CC BY 2.0',
+      licenciaUrl: 'https://creativecommons.org/licenses/by/2.0'
+    }
+  },
+  {
+    id: 'gabrielRufian',
+    nombre: 'Gabriel Rufian',
+    alias: [
+      'gabrielRufian',
+      'gabriel Rufian',
+      'Rufian'
+    ],
+    imagen: 'https://commons.wikimedia.org/wiki/Special:FilePath/Gabriel_Rufi%C3%A1n_2022_(cropped).jpg',
+    rasgo: 'ojos',
+    recorte: { x: 0.10, y: 0.35, ancho: 0.80, alto: 0.20 },
+    attribution: {
+      autor: 'Marcpuigperez',
+      fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Gabriel_Rufi%C3%A1n_2022_(cropped).jpg',
+      licencia: 'CC BY-SA 4.0',
+      licenciaUrl: 'https://creativecommons.org/licenses/by-sa/4.0'
+    }
+  },
+  {
+    id: 'jennaOrtega',
+    nombre: 'Jenna Ortega',
+    alias: [
+      'jennaOrtega',
+      'jenna Ortega',
+      'miercoles'
+    ],
+    imagen: 'https://commons.wikimedia.org/wiki/Special:FilePath/Jenna_Ortega-63792.jpg',
+    rasgo: 'pelo',
+    recorte: { x: 0.05, y: 0.10, ancho: 0.80, alto: 0.20 },
+    attribution: {
+      autor: 'Harald Krichel',
+      fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Jenna_Ortega-63792.jpg',
+      licencia: 'CC BY-SA 4.0',
+      licenciaUrl: 'https://creativecommons.org/licenses/by-sa/4.0'
+    }
+  },
+  {
+    id: 'vinDiesel',
+    nombre: 'Vin Diesel',
+    alias: [
+      'vinDiesel',
+      'vin Diesel',
+      'Toreto'
+    ],
+    imagen: 'https://commons.wikimedia.org/wiki/Special:FilePath/VinDieselMarch09.jpg',
+    rasgo: 'pelo',
+    recorte: { x: 0.05, y: 0.02, ancho: 0.80, alto: 0.20 },
+    attribution: {
+      autor: 'Andre Luis',
+      fuenteUrl: 'https://commons.wikimedia.org/wiki/File:VinDieselMarch09.jpg',
+      licencia: 'CC BY-SA 3.0',
+      licenciaUrl: 'https://creativecommons.org/licenses/by-sa/3.0'
+    }
+  },
+  {
+    id: 'johnnyDepp',
+    nombre: 'Johnny Depp',
+    alias: [
+      'johnnyDepp',
+      'johnny Depp'
+    ],
+    imagen: 'https://commons.wikimedia.org/wiki/Special:FilePath/Johnny_Depp_(July_2009)_2_cropped.jpg',
+    rasgo: 'boca',
+    recorte: { x: 0.18, y: 0.47, ancho: 0.80, alto: 0.30 },
+    attribution: {
+      autor: 'nicogenin',
+      fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Johnny_Depp_(July_2009)_2_cropped.jpg',
+      licencia: 'CC BY-SA 2.0',
+      licenciaUrl: 'https://creativecommons.org/licenses/by-sa/2.0'
+    }
+  },
+  {
+    id: 'tomHardy',
+    nombre: 'Tom Hardy',
+    alias: [
+      'tomHardy',
+      'tom Hardy'
+    ],
+    imagen: 'https://commons.wikimedia.org/wiki/Special:FilePath/Tom_Hardy_(42774738485).jpg',
+    rasgo: 'boca',
+    recorte: { x: 0.10, y: 0.38, ancho: 0.80, alto: 0.30 },
+    attribution: {
+      autor: 'Gage Skidmore from Peoria, AZ, United States of America',
+      fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Tom_Hardy_(42774738485).jpg',
+      licencia: 'CC BY-SA 2.0',
+      licenciaUrl: 'https://creativecommons.org/licenses/by-sa/2.0'
+    }
+  },
+  {
+    id: 'margotRobbie',
+    nombre: 'margotRobbie',
+    alias: [
+      'margotRobbie',
+      'margot Robbie',
+      'barbie'
+    ],
+    imagen: 'https://commons.wikimedia.org/wiki/Special:FilePath/Robbie_at_2019_Cannes_(cropped).jpg',
+    rasgo: 'ojos',
+    recorte: { x: 0.05, y: 0.25, ancho: 0.80, alto: 0.20 },
+    attribution: {
+      autor: 'https://www.flickr.com/photos/146461623@N05',
+      fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Robbie_at_2019_Cannes_(cropped).jpg',
+      licencia: 'CC BY 2.0',
+      licenciaUrl: 'https://creativecommons.org/licenses/by/2.0'
+    }
+  },
+  {
+    id: 'anaDeArmas',
+    nombre: 'Ana De rmas',
+    alias: [
+      'anaDeArmas',
+      'ana De Armas',
+      'ana DeArmas'
+    ],
+    imagen: 'https://commons.wikimedia.org/wiki/Special:FilePath/Ana_de_Armas_by_Gage_Skidmore.jpg',
+    rasgo: 'ojos',
+    recorte: { x: 0.10, y: 0.18, ancho: 0.80, alto: 0.10 },
+    attribution: {
+      autor: 'Gage Skidmore',
+      fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Ana_de_Armas_by_Gage_Skidmore.jpg',
+      licencia: 'CC BY-SA 3.0',
+      licenciaUrl: 'https://creativecommons.org/licenses/by-sa/3.0'
+    }
+  },
+  {
+    id: 'anuelAA',
+    nombre: 'Anuel AA',
+    alias: [
+      'anuelAA',
+      'anuel aa',
+      'anuel'
+    ],
+    imagen: 'https://commons.wikimedia.org/wiki/Special:FilePath/Anuel_AA_in_2022_2.jpg',
+    rasgo: 'barbilla',
+    recorte: { x: 0.10, y: 0.40, ancho: 0.80, alto: 0.20 },
+    attribution: {
+      autor: 'Tony Dandrades',
+      fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Anuel_AA_in_2022_2.jpg',
+      licencia: 'CC BY 3.0',
+      licenciaUrl: 'https://creativecommons.org/licenses/by/3.0'
+    }
+  },
+  {
+    id: 'johnLennon',
+    nombre: 'John Lennon',
+    alias: [
+      'JohnLennon',
+      'John Lennon',
+      'Lennon'
+    ],
+    imagen: 'https://commons.wikimedia.org/wiki/Special:FilePath/File:John_Lennon_1969_(cropped).jpg',
+    rasgo: 'ojos',
+    recorte: { x: 0.10, y: 0.30, ancho: 0.80, alto: 0.15 }
+  },
+  {
+    id: 'macklemore',
+    nombre: 'Macklemore',
+    alias: [
+      'macklemore'
+    ],
+    imagen: 'https://commons.wikimedia.org/wiki/Special:FilePath/Macklemore_Ryan_Lewis_Live_2016_(cropped)_(cropped).jpg',
+    rasgo: 'pelo',
+    recorte: { x: 0.10, y: 0.05, ancho: 0.80, alto: 0.20 },
+    attribution: {
+      autor: 'pitpony.photography',
+      fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Macklemore_Ryan_Lewis_Live_2016_(cropped)_(cropped).jpg',
+      licencia: 'CC BY-SA 3.0',
+      licenciaUrl: 'https://creativecommons.org/licenses/by-sa/3.0'
+    }
+  },
+  {
+    id: 'tyga',
+    nombre: 'Tyga',
+    alias: [
+      'tyga'
+    ],
+    imagen: 'https://commons.wikimedia.org/wiki/Special:FilePath/Tyga_-_Openair_Frauenfeld_2019_23.jpg',
+    rasgo: 'cuerpo',
+    recorte: { x: 0.00, y: 0.32, ancho: 0.80, alto: 0.60 },
+    attribution: {
+      autor: 'Frank Schwichtenberg',
+      fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Tyga_-_Openair_Frauenfeld_2019_23.jpg',
+      licencia: 'CC BY-SA 4.0',
+      licenciaUrl: 'https://creativecommons.org/licenses/by-sa/4.0'
+    }
+  },
+  {
+    id: 'erlingHaaland',
+    nombre: 'Erling Haaland',
+    alias: [
+      'erlingHaaland',
+      'erling Haaland',
+      'Haaland'
+    ],
+    imagen: 'https://commons.wikimedia.org/wiki/Special:FilePath/Erling_Haaland_Morocco_v_Norway_7_June_2026-51.jpg',
+    rasgo: 'cuerpo',
+    recorte: { x: 0.00, y: 0.32, ancho: 1.00, alto: 0.35 },
+    attribution: {
+      autor: 'Bryan Berlin',
+      fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Erling_Haaland_Morocco_v_Norway_7_June_2026-51.jpg',
+      licencia: 'CC BY-SA 4.0',
+      licenciaUrl: 'https://creativecommons.org/licenses/by-sa/4.0'
+    }
   }
 ];

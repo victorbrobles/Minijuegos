@@ -1,6 +1,14 @@
 // server/index.js
+
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import basicAuth from 'express-basic-auth';
+
+// Definición de __dirname para ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Rutas de juegos
 import gamesRouter from './routes/games.js';
@@ -21,7 +29,12 @@ import frasesCelebresRouter from './routes/frasescelebres.js';
 import conectaRouter from './routes/conecta.js';
 import impostorRouter from './routes/impostor.js';
 import coloresRouter from './routes/colores.js';
-import lobosRouter from './routes/lobos.js'; // Tu API de salas para los lobos
+import lobosRouter from './routes/lobos.js';
+import buscaminasRouter from './routes/buscaminas.js';
+import popularRouter from './routes/popular.js';
+import masmenosRouter from './routes/masmenos.js';
+import cancionRouter from './routes/cancion.js';
+import ciegasRouter from './routes/ciegas.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -29,7 +42,31 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-// Endpoints
+// 2. Permitir peticiones OPTIONS (CORS preflight) antes de autenticar
+app.use((req, res, next) => {
+  if (req.method === 'OPTIONS') {
+    return next();
+  }
+  next();
+});
+
+// 3. Autenticación tolerante con ngrok y proxys
+const USUARIO = process.env.AUTH_USER || 'admin';
+const PASSWORD = process.env.AUTH_PASSWORD || 'miniJuegos123'; // Evita el '#' si da problemas en el túnel
+
+app.use(basicAuth({
+  authorizer: (username, password) => {
+    const userMatches = basicAuth.safeCompare(username, USUARIO);
+    const passwordMatches = basicAuth.safeCompare(password, PASSWORD);
+    return userMatches && passwordMatches;
+  },
+  challenge: true,
+  realm: 'Acceso privado'
+}));
+
+// 3. Servir frontend compilado
+app.use(express.static(path.join(__dirname, '../client/dist')));
+
 app.use('/api/admin', adminRouter);
 app.use('/api/games', gamesRouter);
 app.use('/api/siglas', siglasRouter);
@@ -49,5 +86,17 @@ app.use('/api/conecta', conectaRouter);
 app.use('/api/impostor', impostorRouter);
 app.use('/api/colores', coloresRouter);
 app.use('/api/lobos', lobosRouter);
+app.use('/api/buscaminas', buscaminasRouter);
+app.use('/api/popular', popularRouter);
+app.use('/api/masmenos', masmenosRouter);
+app.use('/api/cancion', cancionRouter);
+app.use('/api/ciegas', ciegasRouter);
 
-app.listen(PORT, '0.0.0.0', () => console.log(`API lista en http://localhost:${PORT}`));
+// 5. Redirección para React Router (Single Page Application)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+});
+
+app.listen(PORT, () => {
+  console.log(`Servidor activo en el puerto ${PORT}`);
+});
