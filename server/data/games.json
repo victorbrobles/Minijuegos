@@ -148,5 +148,11 @@
     "name": "Colecciona con cabeza",
     "description": "Consigue 5 cartas del mismo tipo antes que el resto. ¡Pero cuidado! Si acumulas 5 tipos distintos, quedarás eliminado.",
     "isNew": true
+  },
+  {
+    "id": "unoadiez",
+    "name": "Del 1 al 10...",
+    "description": "Adivina el número secreto del 1 al 10 guiándote por las pistas y opiniones de tus amigos. ¡El que menos puntos sume gana!",
+    "isNew": true
   }
 ]

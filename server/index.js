@@ -38,6 +38,7 @@ import ciegasRouter from './routes/ciegas.js';
 import rapidfireRouter from './routes/rapidfire.js';
 import traicionesRouter from './routes/traiciones.js';
 import coleccionRouter from './routes/coleccion.js';
+import unoadiezRouter from './routes/unoadiez.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -103,6 +104,7 @@ app.use('/api/ciegas', ciegasRouter);
 app.use('/api/rapidfire', rapidfireRouter);
 app.use('/api/traiciones', traicionesRouter);
 app.use('/api/coleccion', coleccionRouter);
+app.use('/api/unoadiez', unoadiezRouter);
 
 // 5. Redirección para React Router (Single Page Application)
 app.get('*', (req, res) => {

@@ -178,6 +178,13 @@ export const META = {
     colores: ['#06b6d4', '#1d4ed8'],
     etiquetas: 'cartas azar coleccion estrategia numeros baraja',
     descripcion: 'Consigue 5 cartas del mismo tipo antes que el resto. ¡Pero cuidado! Si acumulas 5 tipos distintos, quedarás eliminado.'
+  },
+  'unoadiez': {
+    titulo: 'Del 1 al 10...',
+    icono: 'target',
+    colores: ['#8b5cf6', '#b91c1c'],
+    etiquetas: 'numero conocer amigos pareja ranking',
+    descripcion: 'Adivina el número secreto del 1 al 10 guiándote por las pistas y opiniones de tus amigos. ¡El que menos puntos sume gana!'
   }
 };
 export const META_POR_DEFECTO = { icono: 'star', colores: ['#8b5cf6', '#6366f1'], etiquetas: '', descripcion: '' };

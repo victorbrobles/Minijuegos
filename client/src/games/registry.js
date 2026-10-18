@@ -23,6 +23,7 @@ import Cancion from './Cancion/Cancion.jsx';
 import Ciegas from './Ciegas/Ciegas.jsx';
 import Traiciones from './Traiciones/Traiciones.jsx';
 import Coleccion from './Coleccion/Coleccion.jsx';
+import UnoADiez from './UnoADiez/UnoADiez.jsx';
 
 // id del juego (el mismo que en server/data/games.json) -> componente React
 const registry = {
@@ -50,7 +51,8 @@ const registry = {
   'cancion': Cancion,
   'ciegas': Ciegas,
   'traiciones': Traiciones,
-  'coleccion': Coleccion
+  'coleccion': Coleccion,
+  'unoadiez': UnoADiez
 };
 
 export default registry;
