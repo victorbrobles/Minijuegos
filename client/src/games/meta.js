@@ -165,15 +165,8 @@ export const META = {
     etiquetas: 'ranking ordenar ciegas votar puntuar orden',
     descripcion: 'Ordena de 1 a 5 cada elemento sin saber qué saldrá después. Los rivales votan cuántos has acertado.'
   },
-  'traicion': {
-    titulo: 'Traiciones',
-    icono: 'lock',
-    colores: ['#f59e0b', '#0f172a'],
-    etiquetas: 'traicion impostor roles votar matar mentir',
-    descripcion: 'Estación ártica aislada. Reparad la base o sabotead y eliminad a los investigadores sin ser descubiertos.',
-  },
   'traiciones': {
-    titulo: 'Traiciones 2',
+    titulo: 'Traiciones',
     icono: 'dagger',
     colores: ['#d97706', '#7c2d12'],
     etiquetas: 'traidores caravana desierto sabotaje mafia deduccion engano coartada votar roles online',

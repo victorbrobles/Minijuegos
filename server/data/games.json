@@ -138,14 +138,8 @@
     "isNew": true
   },
   {
-    "id": "traicion",
-    "name": "Traiciones",
-    "description": "Estación ártica aislada. Reparad la base o sabotead y eliminad a los investigadores sin ser descubiertos.",
-    "isNew": true
-  },
-  {
     "id": "traiciones",
-    "name": "Traiciones 2",
+    "name": "Traiciones",
     "description": "Una caravana cruza el desierto hacia el Oasis, pero hay traidores entre vosotros. Cumple tus tareas, sobrevive y descubre quién miente.",
     "isNew": true
   },

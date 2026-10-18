@@ -21,7 +21,6 @@ import Popular from './Popular/Popular.jsx';
 import MasMenos from './MasMenos/MasMenos.jsx';
 import Cancion from './Cancion/Cancion.jsx';
 import Ciegas from './Ciegas/Ciegas.jsx';
-import Traicion from './Traicion/Traicion.jsx';
 import Traiciones from './Traiciones/Traiciones.jsx';
 import Coleccion from './Coleccion/Coleccion.jsx';
 
@@ -50,7 +49,6 @@ const registry = {
   'masmenos': MasMenos,
   'cancion': Cancion,
   'ciegas': Ciegas,
-  'traicion': Traicion,
   'traiciones': Traiciones,
   'coleccion': Coleccion
 };
