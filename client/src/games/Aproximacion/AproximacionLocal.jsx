@@ -614,9 +614,12 @@ export default function AproximacionLocal({ onVolver, onExit }) {
               <Icon name="check" size={22} strokeWidth={2.5} />
               {confianzaElegida !== null ? 'Confirmar confianza' : 'Confirmar mi número'}
             </button>
-            <div style={{ textAlign: 'center', marginTop: '1rem', color: '#b91c1c', fontWeight: 'bold' }}>
-              ⏱️ {tiempoRestante} s
+            <div className="timer" style={{ marginTop: '1.2rem', marginBottom: '1rem' }}>
+               <div className={`timer-bar${tiempoRestante <= 10 ? ' low' : ''}`} style={{ width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%` }} />
             </div>
+            <p className="timer-text" style={{ marginTop: '-0.5rem', marginBottom: '0.8rem' }}>
+                <Icon name="clock" size={16} /> {tiempoRestante} s
+            </p>
           </form>
         </section>
       )}
@@ -664,9 +667,12 @@ export default function AproximacionLocal({ onVolver, onExit }) {
           <button className="big full" onClick={() => confirmarSegundaVuelta(null)}>
             <Icon name="check" size={22} /> Mantener mi respuesta ({decisiones[jugadores[ordenTurnos[0]].id]?.valor})
           </button>
-          <div style={{ textAlign: 'center', marginTop: '1rem', color: '#b91c1c', fontWeight: 'bold' }}>
-              ⏱️ {tiempoRestante} s
-          </div>
+          <div className="timer" style={{ marginTop: '1.2rem', marginBottom: '1rem' }}>
+               <div className={`timer-bar${tiempoRestante <= 10 ? ' low' : ''}`} style={{ width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%` }} />
+            </div>
+            <p className="timer-text" style={{ marginTop: '-0.5rem', marginBottom: '0.8rem' }}>
+                <Icon name="clock" size={16} /> {tiempoRestante} s
+            </p>
         </section>
       )}
 

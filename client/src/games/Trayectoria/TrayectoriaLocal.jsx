@@ -39,9 +39,21 @@ export default function TrayectoriaLocal({ onVolver, onExit }) {
   const [solucionFinal, setSolucionFinal] = useState(null);
   const [mensaje, setMensaje] = useState(null);
 
-  // NUEVO: Pulsador rojo offline
+  // Pulsador rojo offline y temporizador de respuesta (15s)
   const [pulsadorActivo, setPulsadorActivo] = useState(false);
   const [respuestaTexto, setRespuestaTexto] = useState('');
+  const [jugadorSeleccionadoId, setJugadorSeleccionadoId] = useState(null);
+  const [segundosRespuesta, setSegundosRespuesta] = useState(15);
+
+  const respuestaTextoRef = useRef(respuestaTexto);
+  useEffect(() => {
+    respuestaTextoRef.current = respuestaTexto;
+  }, [respuestaTexto]);
+
+  const jugadorSeleccionadoRef = useRef(jugadorSeleccionadoId);
+  useEffect(() => {
+    jugadorSeleccionadoRef.current = jugadorSeleccionadoId;
+  }, [jugadorSeleccionadoId]);
 
   const pidiendoClub = useRef(false);
   const rondaRef = useRef(0);
@@ -83,9 +95,11 @@ export default function TrayectoriaLocal({ onVolver, onExit }) {
     setClubes([]);
     setPista(null);
     setPulsadorActivo(false);
+    setRespuestaTexto('');
+    setJugadorSeleccionadoId(null);
+    setSegundosRespuesta(15);
     setSegundosRestantes(5);
     setBloqueadosEnRonda(new Set());
-    setRespuestaTexto('');
     setMensaje(null);
     setSolucionFinal(null);
     setEstadoRonda('activa');
@@ -133,10 +147,85 @@ export default function TrayectoriaLocal({ onVolver, onExit }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fase, estadoRonda, retoActual, partidaId, clubes.length, pulsadorActivo, segundosRestantes, reintento]);
 
-  // Al pulsar el botón rojo se detiene el tiempo y se habilita la respuesta
+  // Al pulsar el botón rojo se detiene el tiempo y se habilita la respuesta con 15s de límite
   const handlePulsarRojo = () => {
     if (estadoRonda !== 'activa' || jugadoresDisponibles.length === 0) return;
+    setRespuestaTexto('');
+    setJugadorSeleccionadoId(null);
+    setSegundosRespuesta(15);
     setPulsadorActivo(true);
+  };
+
+  // Temporizador de 15 segundos para la respuesta
+  useEffect(() => {
+    if (!pulsadorActivo) {
+      setSegundosRespuesta(15);
+      return;
+    }
+
+    setSegundosRespuesta(15);
+    const t = setInterval(() => {
+      setSegundosRespuesta((prev) => {
+        if (prev <= 0.1) {
+          clearInterval(t);
+          handleTiempoAgotadoLocal();
+          return 0;
+        }
+        return Math.max(0, prev - 0.1);
+      });
+    }, 100);
+
+    return () => clearInterval(t);
+  }, [pulsadorActivo]);
+
+  const aplicarFalloJugador = async (jugadorId, textoAviso) => {
+    setJugadores((prev) =>
+      prev.map((j) => (j.id === jugadorId ? { ...j, puntos: j.puntos - 1 } : j))
+    );
+    const nuevosBloqueados = new Set(bloqueadosEnRonda).add(jugadorId);
+    setBloqueadosEnRonda(nuevosBloqueados);
+    setRespuestaTexto('');
+    setJugadorSeleccionadoId(null);
+    setPulsadorActivo(false);
+
+    if (nuevosBloqueados.size >= jugadores.length) {
+      await rendirse();
+    } else {
+      setMensaje({
+        tipo: 'error',
+        texto: textoAviso || 'Incorrecto (-1 punto). Quedas fuera por esta ronda.'
+      });
+      setTimeout(() => setMensaje(null), 2000);
+    }
+  };
+
+  const handleTiempoAgotadoLocal = () => {
+    const jugadorId = jugadorSeleccionadoRef.current;
+    const texto = respuestaTextoRef.current.trim();
+
+    // Si no se ha elegido jugador, simplemente se cierra el modal
+    if (!jugadorId) {
+      setPulsadorActivo(false);
+      setRespuestaTexto('');
+      setJugadorSeleccionadoId(null);
+      setMensaje({
+        tipo: 'error',
+        texto: 'Tiempo de respuesta agotado (15 s) sin seleccionar jugador.'
+      });
+      setTimeout(() => setMensaje(null), 2000);
+      return;
+    }
+
+    // Si hay jugador seleccionado:
+    if (texto) {
+      // Si hay algo escrito, se envía como respuesta
+      confirmarRespuestaJugador(jugadorId, texto);
+    } else {
+      // Si no ha escrito nada, cuenta como fallo
+      const jObj = jugadores.find((j) => j.id === jugadorId);
+      const nombreJ = jObj ? jObj.nombre : `Jugador ${jugadorId}`;
+      aplicarFalloJugador(jugadorId, `Tiempo agotado sin responder (-1 punto para ${nombreJ}). Quedas fuera por esta ronda.`);
+    }
   };
 
   const abrirPista = async () => {
@@ -153,15 +242,16 @@ export default function TrayectoriaLocal({ onVolver, onExit }) {
     setModalPistaAbierto(true);
   };
 
-  const confirmarRespuestaJugador = async (jugadorId) => {
-    if (!respuestaTexto.trim()) return;
+  const confirmarRespuestaJugador = async (jugadorId, textoOpcional) => {
+    const texto = (textoOpcional !== undefined ? textoOpcional : respuestaTexto).trim();
+    if (!texto) return;
 
     try {
       const data = await llamar('/validar', {
         partidaId,
         retoId: retoActual.id,
         jugadorId,
-        respuesta: respuestaTexto
+        respuesta: texto
       });
 
       if (data.correcto) {
@@ -187,28 +277,14 @@ export default function TrayectoriaLocal({ onVolver, onExit }) {
         });
         setPulsadorActivo(false);
         setRespuestaTexto('');
+        setJugadorSeleccionadoId(null);
       } else {
-        setJugadores((prev) =>
-          prev.map((j) => (j.id === jugadorId ? { ...j, puntos: j.puntos - 1 } : j))
-        );
-        const nuevosBloqueados = new Set(bloqueadosEnRonda).add(jugadorId);
-        setBloqueadosEnRonda(nuevosBloqueados);
-        setRespuestaTexto('');
-        setPulsadorActivo(false);
-
-        if (nuevosBloqueados.size >= jugadores.length) {
-          await rendirse();
-        } else {
-          setMensaje({
-            tipo: 'error',
-            texto: `Incorrecto (-1 punto). Quedas fuera por esta ronda.`
-          });
-          setTimeout(() => setMensaje(null), 1800);
-        }
+        aplicarFalloJugador(jugadorId, 'Incorrecto (-1 punto). Quedas fuera por esta ronda.');
       }
     } catch (err) {
       setMensaje({ tipo: 'error', texto: err.message });
       setPulsadorActivo(false);
+      setJugadorSeleccionadoId(null);
     }
   };
 
@@ -219,6 +295,7 @@ export default function TrayectoriaLocal({ onVolver, onExit }) {
       setEstadoRonda('resuelta');
       setMensaje({ tipo: 'error', texto: `Fin de la ronda. El futbolista era: ${data.nombre}` });
       setPulsadorActivo(false);
+      setJugadorSeleccionadoId(null);
     } catch (e) {
       setMensaje({ tipo: 'error', texto: e.message });
     }
@@ -290,7 +367,15 @@ export default function TrayectoriaLocal({ onVolver, onExit }) {
                 </div>
               </div>
               <div className="rg-modal-acciones">
-                <button className="btn-start" style={{ width: '100%' }} onClick={() => setModalAyuda(false)}>
+                <button
+                  className="btn-start"
+                  style={{
+                    width: '100%',
+                    background: 'linear-gradient(135deg, #16a34a, #15803d)',
+                    boxShadow: '0 4px 14px rgba(22, 163, 74, 0.4)'
+                  }}
+                  onClick={() => setModalAyuda(false)}
+                >
                   Entendido
                 </button>
               </div>
@@ -298,8 +383,21 @@ export default function TrayectoriaLocal({ onVolver, onExit }) {
           </div>
         )}
 
-        <div className="game-intro-banner">
-          <div className="game-intro-icon-box">
+        {/* Banner superior con el degradado verde de Trayectoria */}
+        <div
+          className="game-intro-banner"
+          style={{
+            background: 'linear-gradient(135deg, #16a34a, #059669)',
+            boxShadow: '0 8px 24px rgba(22, 163, 74, 0.28)'
+          }}
+        >
+          <div
+            className="game-intro-icon-box"
+            style={{
+              background: 'rgba(255, 255, 255, 0.2)',
+              border: '1px solid rgba(255, 255, 255, 0.3)'
+            }}
+          >
             <span style={{ fontSize: '2rem' }}>⚽</span>
           </div>
           <div className="game-intro-text">
@@ -315,7 +413,7 @@ export default function TrayectoriaLocal({ onVolver, onExit }) {
             </button>
           </div>
 
-          <div className="section-title">
+          <div className="section-title" style={{ color: '#16a34a' }}>
             <Icon name="users" size={22} />
             <span>Participantes</span>
           </div>
@@ -354,7 +452,14 @@ export default function TrayectoriaLocal({ onVolver, onExit }) {
           </div>
 
           <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
-            <button className="btn-start" onClick={iniciarPartida}>
+            <button
+              className="btn-start"
+              style={{
+                background: 'linear-gradient(135deg, #16a34a, #15803d)',
+                boxShadow: '0 4px 14px rgba(22, 163, 74, 0.4)'
+              }}
+              onClick={iniciarPartida}
+            >
               Comenzar Partida
             </button>
           </div>
@@ -401,7 +506,14 @@ export default function TrayectoriaLocal({ onVolver, onExit }) {
           </table>
 
           <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'center' }}>
-            <button className="btn-start" onClick={() => setFase('config')}>
+            <button
+              className="btn-start"
+              style={{
+                background: 'linear-gradient(135deg, #16a34a, #15803d)',
+                boxShadow: '0 4px 14px rgba(22, 163, 74, 0.4)'
+              }}
+              onClick={() => setFase('config')}
+            >
               Nueva Partida
             </button>
           </div>
@@ -512,50 +624,123 @@ export default function TrayectoriaLocal({ onVolver, onExit }) {
               <div className="respuesta-pulsada-box">
                 <div className="respuesta-pulsada-header">
                   <span className="pulsado-badge">🔴 Tiempo detenido para responder</span>
-                  <p className="hint small" style={{ margin: '0.3rem 0 0.8rem' }}>
-                    Escribe el futbolista y selecciona el jugador que ha contestado:
+                  <p className="hint small" style={{ margin: '0.3rem 0 0.4rem' }}>
+                    Escribe el futbolista y selecciona el jugador que responde:
+                  </p>
+
+                  {/* Temporizador de 15 segundos estilo RasgosOnline */}
+                  <div
+                    className="timer"
+                    role="timer"
+                    style={{
+                      margin: '0.6rem 0 0.3rem',
+                      background: '#e2e8f0',
+                      borderRadius: '9999px',
+                      height: '8px',
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <div
+                      className={`timer-bar ${segundosRespuesta <= 4 ? 'low' : ''}`}
+                      style={{
+                        width: `${(segundosRespuesta / 15) * 100}%`,
+                        height: '100%',
+                        backgroundColor: segundosRespuesta <= 4 ? '#ef4444' : '#16a34a',
+                        borderRadius: '9999px',
+                        transition: 'width 0.1s linear, background-color 0.3s ease'
+                      }}
+                    />
+                  </div>
+                  <p
+                    className="timer-text"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.35rem',
+                      color: segundosRespuesta <= 4 ? '#dc2626' : '#64748b',
+                      fontSize: '0.9rem',
+                      fontWeight: 700,
+                      margin: '0 0 0.8rem'
+                    }}
+                  >
+                    <Icon name="clock" size={16} />
+                    {Math.ceil(segundosRespuesta)} s
                   </p>
                 </div>
 
-                <input
-                  autoFocus
-                  type="text"
-                  className="player-text-input respuesta-input-grande"
-                  placeholder="Nombre del futbolista..."
-                  value={respuestaTexto}
-                  onChange={(e) => setRespuestaTexto(e.target.value)}
-                />
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (jugadorSeleccionadoId && respuestaTexto.trim()) {
+                      confirmarRespuestaJugador(jugadorSeleccionadoId);
+                    }
+                  }}
+                >
+                  <input
+                    autoFocus
+                    type="text"
+                    className="player-text-input respuesta-input-grande"
+                    placeholder="Nombre del futbolista..."
+                    value={respuestaTexto}
+                    onChange={(e) => setRespuestaTexto(e.target.value)}
+                  />
 
-                <p className="form-label" style={{ marginTop: '0.8rem', textAlign: 'center' }}>
-                  ¿Quién ha pulsado y responde?
-                </p>
+                  <p className="form-label" style={{ marginTop: '0.8rem', textAlign: 'center' }}>
+                    ¿Quién ha pulsado y responde?
+                  </p>
 
-                <div className="modal-players-grid">
-                  {jugadoresDisponibles.map((j) => (
+                  <div className="modal-players-grid">
+                    {jugadoresDisponibles.map((j) => (
+                      <button
+                        key={j.id}
+                        type="button"
+                        className={`btn-modal-player ${jugadorSeleccionadoId === j.id ? 'active' : ''}`}
+                        style={
+                          jugadorSeleccionadoId === j.id
+                            ? {
+                                background: '#16a34a',
+                                color: '#ffffff',
+                                borderColor: '#15803d',
+                                fontWeight: 700,
+                                boxShadow: '0 2px 8px rgba(22, 163, 74, 0.3)'
+                              }
+                            : {}
+                        }
+                        onClick={() => {
+                          setJugadorSeleccionadoId(j.id);
+                        }}
+                      >
+                        {j.nombre} {jugadorSeleccionadoId === j.id ? '✓' : ''}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '0.8rem', justifyContent: 'center', marginTop: '1.2rem' }}>
                     <button
-                      key={j.id}
                       type="button"
-                      className="btn-modal-player"
-                      disabled={!respuestaTexto.trim()}
-                      onClick={() => confirmarRespuestaJugador(j.id)}
+                      className="btn-modal-cancel"
+                      onClick={() => {
+                        setPulsadorActivo(false);
+                        setRespuestaTexto('');
+                        setJugadorSeleccionadoId(null);
+                      }}
                     >
-                      {j.nombre}
+                      Cancelar
                     </button>
-                  ))}
-                </div>
-
-                <div style={{ textAlign: 'center', marginTop: '0.8rem' }}>
-                  <button
-                    type="button"
-                    className="btn-modal-cancel"
-                    onClick={() => {
-                      setPulsadorActivo(false);
-                      setRespuestaTexto('');
-                    }}
-                  >
-                    Cancelar y reanudar tiempo
-                  </button>
-                </div>
+                    <button
+                      type="submit"
+                      className="btn-start"
+                      style={{
+                        background: 'linear-gradient(135deg, #16a34a, #15803d)',
+                        boxShadow: '0 4px 14px rgba(22, 163, 74, 0.4)'
+                      }}
+                      disabled={!jugadorSeleccionadoId || !respuestaTexto.trim()}
+                    >
+                      Enviar respuesta
+                    </button>
+                  </div>
+                </form>
               </div>
             )}
 
@@ -573,11 +758,25 @@ export default function TrayectoriaLocal({ onVolver, onExit }) {
 
             <div className="round-finished-actions">
               {retoActualIdx + 1 < retos.length ? (
-                <button className="btn-start" onClick={siguienteRonda}>
+                <button
+                  className="btn-start"
+                  style={{
+                    background: 'linear-gradient(135deg, #16a34a, #15803d)',
+                    boxShadow: '0 4px 14px rgba(22, 163, 74, 0.4)'
+                  }}
+                  onClick={siguienteRonda}
+                >
                   Siguiente Ronda ➔
                 </button>
               ) : (
-                <button className="btn-start" onClick={finalizarPartida}>
+                <button
+                  className="btn-start"
+                  style={{
+                    background: 'linear-gradient(135deg, #16a34a, #15803d)',
+                    boxShadow: '0 4px 14px rgba(22, 163, 74, 0.4)'
+                  }}
+                  onClick={finalizarPartida}
+                >
                   Ver Puntuaciones Finales 🏆
                 </button>
               )}
@@ -600,7 +799,14 @@ export default function TrayectoriaLocal({ onVolver, onExit }) {
               * Al haber revelado la pista, acertar otorgará 1 punto.
             </small>
             <div style={{ marginTop: '1.5rem', textAlign: 'center' }}>
-              <button className="btn-start" onClick={() => setModalPistaAbierto(false)}>
+              <button
+                className="btn-start"
+                style={{
+                  background: 'linear-gradient(135deg, #16a34a, #15803d)',
+                  boxShadow: '0 4px 14px rgba(22, 163, 74, 0.4)'
+                }}
+                onClick={() => setModalPistaAbierto(false)}
+              >
                 Entendido
               </button>
             </div>

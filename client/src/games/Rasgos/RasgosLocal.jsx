@@ -27,6 +27,8 @@ function Ronda({ partidaId, indice, total, rasgo, jugadores, puntos, onPuntos, o
   const [bloqueados, setBloqueados] = useState([]);
   const [pulsadorActivo, setPulsadorActivo] = useState(false);
   const [respuestaTexto, setRespuestaTexto] = useState('');
+  const [jugadorSeleccionadoId, setJugadorSeleccionadoId] = useState(null);
+  const [segundosRespuesta, setSegundosRespuesta] = useState(15);
   const [errorModal, setErrorModal] = useState(null);
   const [aviso, setAviso] = useState(null);
   const [cerrando, setCerrando] = useState(false);
@@ -34,6 +36,15 @@ function Ronda({ partidaId, indice, total, rasgo, jugadores, puntos, onPuntos, o
 
   const empezada = useRef(false);
   const cerrandoRef = useRef(false);
+  const respuestaTextoRef = useRef(respuestaTexto);
+  useEffect(() => {
+    respuestaTextoRef.current = respuestaTexto;
+  }, [respuestaTexto]);
+
+  const jugadorSeleccionadoRef = useRef(jugadorSeleccionadoId);
+  useEffect(() => {
+    jugadorSeleccionadoRef.current = jugadorSeleccionadoId;
+  }, [jugadorSeleccionadoId]);
 
   const activo = imagenLista && !pulsadorActivo && !cerrando;
 
@@ -84,6 +95,8 @@ function Ronda({ partidaId, indice, total, rasgo, jugadores, puntos, onPuntos, o
     if (!activo) return;
     setPulsadorActivo(true);
     setRespuestaTexto('');
+    setJugadorSeleccionadoId(null);
+    setSegundosRespuesta(15);
     setErrorModal(null);
     setAviso(null);
   };
@@ -91,10 +104,29 @@ function Ronda({ partidaId, indice, total, rasgo, jugadores, puntos, onPuntos, o
   const cancelarRespuesta = () => {
     setPulsadorActivo(false);
     setRespuestaTexto('');
+    setJugadorSeleccionadoId(null);
   };
 
-  const confirmarRespuestaJugador = async (jugador) => {
-    if (!respuestaTexto.trim() || !pulsadorActivo) return;
+  const aplicarFallo = async (jugador, avisoTexto) => {
+    const segundos = Math.max(1, Math.ceil(restante));
+    setPulsadorActivo(false);
+    setRespuestaTexto('');
+    setJugadorSeleccionadoId(null);
+
+    onPuntos(jugador.id, -segundos);
+    const nuevos = [...bloqueados, jugador.id];
+    setBloqueados(nuevos);
+
+    if (nuevos.length >= jugadores.length) {
+      await cerrarRonda('todos');
+    } else {
+      setAviso(avisoTexto || `${jugador.nombre} ha fallado (-${segundos} pts). Queda fuera de esta ronda.`);
+    }
+  };
+
+  const confirmarRespuesta = async (jugador, textoOpcional) => {
+    const texto = (textoOpcional !== undefined ? textoOpcional : respuestaTexto).trim();
+    if (!texto || !pulsadorActivo) return;
     const segundos = Math.max(1, Math.ceil(restante));
     setErrorModal(null);
 
@@ -103,11 +135,12 @@ function Ronda({ partidaId, indice, total, rasgo, jugadores, puntos, onPuntos, o
         partidaId,
         ronda: indice,
         jugadorId: jugador.id,
-        respuesta: respuestaTexto
+        respuesta: texto
       });
 
       setPulsadorActivo(false);
       setRespuestaTexto('');
+      setJugadorSeleccionadoId(null);
 
       if (data.correcto) {
         onPuntos(jugador.id, segundos);
@@ -119,18 +152,59 @@ function Ronda({ partidaId, indice, total, rasgo, jugadores, puntos, onPuntos, o
           attribution: data.attribution
         });
       } else {
-        onPuntos(jugador.id, -segundos);
-        const nuevos = [...bloqueados, jugador.id];
-        setBloqueados(nuevos);
-
-        if (nuevos.length >= jugadores.length) {
-          await cerrarRonda('todos');
-        } else {
-          setAviso(`${jugador.nombre} ha fallado (-${segundos} pts). Queda fuera de esta ronda.`);
-        }
+        await aplicarFallo(jugador, `${jugador.nombre} ha fallado (-${segundos} pts). Queda fuera de esta ronda.`);
       }
     } catch (err) {
       setErrorModal(err.message);
+    }
+  };
+
+  // Temporizador de 15 segundos para responder
+  useEffect(() => {
+    if (!pulsadorActivo) {
+      setSegundosRespuesta(15);
+      return;
+    }
+
+    setSegundosRespuesta(15);
+    const t = setInterval(() => {
+      setSegundosRespuesta((prev) => {
+        if (prev <= 0.1) {
+          clearInterval(t);
+          handleTiempoAgotadoLocal();
+          return 0;
+        }
+        return Math.max(0, prev - 0.1);
+      });
+    }, 100);
+
+    return () => clearInterval(t);
+  }, [pulsadorActivo]);
+
+  const handleTiempoAgotadoLocal = () => {
+    const jId = jugadorSeleccionadoRef.current;
+    const texto = respuestaTextoRef.current.trim();
+
+    // Si no se ha elegido jugador, simplemente se cierra el modal sin penalizar
+    if (!jId) {
+      setPulsadorActivo(false);
+      setRespuestaTexto('');
+      setJugadorSeleccionadoId(null);
+      setAviso('Tiempo de respuesta agotado (15 s) sin seleccionar jugador.');
+      setTimeout(() => setAviso(null), 2500);
+      return;
+    }
+
+    const jugador = jugadores.find((j) => j.id === jId);
+    if (!jugador) return;
+
+    if (texto) {
+      // Si hay algo escrito y no se ha enviado, se envía como respuesta
+      confirmarRespuesta(jugador, texto);
+    } else {
+      // Si no ha escrito nada, cuenta como fallo
+      const segundos = Math.max(1, Math.ceil(restante));
+      aplicarFallo(jugador, `Tiempo agotado sin responder (-${segundos} pts para ${jugador.nombre}). Queda fuera de esta ronda.`);
     }
   };
 
@@ -220,50 +294,121 @@ function Ronda({ partidaId, indice, total, rasgo, jugadores, puntos, onPuntos, o
           <div className="respuesta-pulsada-box">
             <div className="respuesta-pulsada-header">
               <span className="pulsado-badge">🔴 Tiempo detenido para responder (+{Math.max(1, Math.ceil(restante))} pts)</span>
-              <p className="hint small" style={{ margin: '0.4rem 0 0.8rem' }}>
-                Escribe el nombre del famoso y selecciona el jugador que ha contestado:
+              <p className="hint small" style={{ margin: '0.3rem 0 0.4rem' }}>
+                Escribe el nombre del famoso y selecciona el jugador que responde:
+              </p>
+
+              {/* Temporizador de 15 segundos estilo barra horizontal */}
+              <div
+                className="timer"
+                role="timer"
+                style={{
+                  margin: '0.6rem 0 0.3rem',
+                  background: '#e2e8f0',
+                  borderRadius: '9999px',
+                  height: '8px',
+                  overflow: 'hidden'
+                }}
+              >
+                <div
+                  className={`timer-bar ${segundosRespuesta <= 4 ? 'low' : ''}`}
+                  style={{
+                    width: `${(segundosRespuesta / 15) * 100}%`,
+                    height: '100%',
+                    backgroundColor: segundosRespuesta <= 4 ? '#ef4444' : '#16a34a',
+                    borderRadius: '9999px',
+                    transition: 'width 0.1s linear, background-color 0.3s ease'
+                  }}
+                />
+              </div>
+              <p
+                className="timer-text"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '0.35rem',
+                  color: segundosRespuesta <= 4 ? '#dc2626' : '#64748b',
+                  fontSize: '0.9rem',
+                  fontWeight: 700,
+                  margin: '0 0 0.8rem'
+                }}
+              >
+                <Icon name="clock" size={16} />
+                {Math.ceil(segundosRespuesta)} s
               </p>
             </div>
 
-            <input
-              autoFocus
-              type="text"
-              className="player-text-input respuesta-input-grande"
-              placeholder="Nombre del famoso..."
-              value={respuestaTexto}
-              onChange={(e) => setRespuestaTexto(e.target.value)}
-              maxLength={100}
-            />
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (jugadorSeleccionadoId && respuestaTexto.trim()) {
+                  const jugador = jugadores.find((j) => j.id === jugadorSeleccionadoId);
+                  if (jugador) confirmarRespuesta(jugador);
+                }
+              }}
+            >
+              <input
+                autoFocus
+                type="text"
+                className="player-text-input respuesta-input-grande"
+                placeholder="Nombre del famoso..."
+                value={respuestaTexto}
+                onChange={(e) => setRespuestaTexto(e.target.value)}
+                maxLength={100}
+              />
 
-            {errorModal && <p className="error" style={{ marginTop: '0.6rem' }}>{errorModal}</p>}
+              {errorModal && <p className="error" style={{ marginTop: '0.6rem' }}>{errorModal}</p>}
 
-            <p className="form-label" style={{ marginTop: '0.8rem', textAlign: 'center' }}>
-              ¿Quién responde?
-            </p>
+              <p className="form-label" style={{ marginTop: '0.8rem', textAlign: 'center' }}>
+                ¿Quién responde?
+              </p>
 
-            <div className="modal-players-grid">
-              {jugadoresDisponibles.map((j) => (
+              <div className="modal-players-grid">
+                {jugadoresDisponibles.map((j) => (
+                  <button
+                    key={j.id}
+                    type="button"
+                    className={`btn-modal-player ${jugadorSeleccionadoId === j.id ? 'active' : ''}`}
+                    style={
+                      jugadorSeleccionadoId === j.id
+                        ? {
+                            background: '#16a34a',
+                            color: '#ffffff',
+                            borderColor: '#15803d',
+                            fontWeight: 700,
+                            boxShadow: '0 2px 8px rgba(22, 163, 74, 0.3)'
+                          }
+                        : {}
+                    }
+                    onClick={() => setJugadorSeleccionadoId(j.id)}
+                  >
+                    {j.nombre} {jugadorSeleccionadoId === j.id ? '✓' : ''}
+                  </button>
+                ))}
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.8rem', justifyContent: 'center', marginTop: '1.2rem' }}>
                 <button
-                  key={j.id}
                   type="button"
-                  className="btn-modal-player"
-                  disabled={!respuestaTexto.trim()}
-                  onClick={() => confirmarRespuestaJugador(j)}
+                  className="btn-modal-cancel"
+                  onClick={cancelarRespuesta}
                 >
-                  {j.nombre}
+                  Cancelar
                 </button>
-              ))}
-            </div>
-
-            <div style={{ textAlign: 'center', marginTop: '0.8rem' }}>
-              <button
-                type="button"
-                className="btn-modal-cancel"
-                onClick={cancelarRespuesta}
-              >
-                Cancelar y reanudar tiempo
-              </button>
-            </div>
+                <button
+                  type="submit"
+                  className="btn-start"
+                  style={{
+                    background: 'linear-gradient(135deg, #16a34a, #15803d)',
+                    boxShadow: '0 4px 14px rgba(22, 163, 74, 0.4)'
+                  }}
+                  disabled={!jugadorSeleccionadoId || !respuestaTexto.trim()}
+                >
+                  Responder
+                </button>
+              </div>
+            </form>
           </div>
         )}
       </div>
@@ -379,6 +524,7 @@ export default function RasgosLocal({ onVolver, onExit }) {
                   <li>Se muestra un detalle físico recortado del rostro de un famoso.</li>
                   <li>Dispones de un cronómetro de <strong>60 segundos</strong>.</li>
                   <li><strong>Pulsa el botón rojo</strong> para parar el tiempo e introducir el nombre del famoso.</li>
+                  <li>Dispones de <strong>15 segundos</strong> para responder. Si no escribes nada, contará como fallo.</li>
                 </ul>
                 <p><strong>2. Puntuación:</strong></p>
                 <div className="tabla-ayuda-puntos">

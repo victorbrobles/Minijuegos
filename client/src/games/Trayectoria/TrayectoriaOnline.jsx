@@ -25,9 +25,14 @@ export default function TrayectoriaOnline({ onLocal, onSalir }) {
   const [sala, setSala] = useState(null);
   const [codigoCopiado, setCodigoCopiado] = useState(false);
   const [miTexto, setMiTexto] = useState('');
+  const [segundosRespuesta, setSegundosRespuesta] = useState(15);
   const [modalPistaAbierto, setModalPistaAbierto] = useState(false);
 
   const intervalRef = useRef(null);
+  const miTextoRef = useRef(miTexto);
+  useEffect(() => {
+    miTextoRef.current = miTexto;
+  }, [miTexto]);
 
   useEffect(() => {
     if (!sesion) {
@@ -64,6 +69,53 @@ export default function TrayectoriaOnline({ onLocal, onSalir }) {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [sesion]);
+
+  const ronda = sala?.ronda;
+  const esAdmin = sala?.esAdmin;
+  const yoId = sala?.yoId;
+  const soyElQueHaPulsado = Boolean(ronda?.pulsado && ronda.pulsado.jugadorId === yoId);
+  const alguienHaPulsado = Boolean(ronda?.pulsado);
+  const estoyBloqueado = Boolean(sala?.jugadores?.find((j) => j.id === yoId)?.bloqueado);
+
+  const handleTiempoAgotadoOnline = async () => {
+    if (!sesion) return;
+    const texto = miTextoRef.current.trim();
+    try {
+      // Si hay algo escrito se envía; si no ha escrito nada, se envía '-' para que cuente como fallo
+      await fetch(`/api/trayectoria/online/sala/${sesion.code}/responder`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: sesion.token, respuesta: texto || '-' })
+      });
+      setMiTexto('');
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Temporizador de 15 segundos cuando alguien pulsa para responder
+  useEffect(() => {
+    if (!alguienHaPulsado) {
+      setSegundosRespuesta(15);
+      return;
+    }
+
+    setSegundosRespuesta(15);
+    const t = setInterval(() => {
+      setSegundosRespuesta((prev) => {
+        if (prev <= 0.1) {
+          clearInterval(t);
+          if (soyElQueHaPulsado) {
+            handleTiempoAgotadoOnline();
+          }
+          return 0;
+        }
+        return Math.max(0, prev - 0.1);
+      });
+    }, 100);
+
+    return () => clearInterval(t);
+  }, [alguienHaPulsado, soyElQueHaPulsado]);
 
   const handleCrear = async () => {
     if (!nombre.trim()) return;
@@ -128,6 +180,7 @@ export default function TrayectoriaOnline({ onLocal, onSalir }) {
     if (!sesion) return;
     try {
       setMiTexto('');
+      setSegundosRespuesta(15);
       await fetch(`/api/trayectoria/online/sala/${sesion.code}/pulsar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -149,7 +202,7 @@ export default function TrayectoriaOnline({ onLocal, onSalir }) {
   };
 
   const handleEnviarRespuesta = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (!miTexto.trim() || !sesion) return;
     try {
       await fetch(`/api/trayectoria/online/sala/${sesion.code}/responder`, {
@@ -242,13 +295,6 @@ export default function TrayectoriaOnline({ onLocal, onSalir }) {
     setTimeout(() => setCodigoCopiado(false), 2000);
   };
 
-  const ronda = sala?.ronda;
-  const esAdmin = sala?.esAdmin;
-  const yoId = sala?.yoId;
-  const soyElQueHaPulsado = Boolean(ronda?.pulsado && ronda.pulsado.jugadorId === yoId);
-  const alguienHaPulsado = Boolean(ronda?.pulsado);
-  const estoyBloqueado = Boolean(sala?.jugadores?.find((j) => j.id === yoId)?.bloqueado);
-
   const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
 
   return (
@@ -278,6 +324,7 @@ export default function TrayectoriaOnline({ onLocal, onSalir }) {
                 <li>Se revelan uno a uno los clubes de fútbol de la carrera de un futbolista.</li>
                 <li>Cada 5 segundos aparece un nuevo club cronológico.</li>
                 <li><strong>Pulsa el botón rojo</strong> para parar el tiempo e introducir el futbolista.</li>
+                <li>Dispones de <strong>15 segundos</strong> para responder. Si no escribes nada, contará como fallo.</li>
                 <li>Si fallas, pierdes 1 punto y quedas bloqueado el resto de la ronda.</li>
               </ul>
               <p><strong>2. Puntuación:</strong></p>
@@ -295,7 +342,7 @@ export default function TrayectoriaOnline({ onLocal, onSalir }) {
                   <strong>+1 punto</strong>
                 </div>
                 <div className="fila-ayuda-puntos rojo">
-                  <span>❌ Respuesta incorrecta</span>
+                  <span>❌ Respuesta incorrecta o tiempo agotado</span>
                   <strong>-1 punto</strong>
                 </div>
               </div>
@@ -441,7 +488,26 @@ export default function TrayectoriaOnline({ onLocal, onSalir }) {
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
         <section className="game">
           <div className="panel center">
-            <p className="categoria"><Icon name="lock" size={16} />Sala de espera</p>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  padding: '0.35rem 1.1rem',
+                  borderRadius: '9999px',
+                  border: '1.5px solid #22c55e',
+                  backgroundColor: '#f0fdf4',
+                  color: '#16a34a',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  lineHeight: 1
+                }}
+              >
+                <Icon name="lock" size={15} />
+                Sala de espera
+              </span>
+            </div>
             <p className="hint">Código de la partida</p>
             <button
               type="button"
@@ -648,8 +714,48 @@ export default function TrayectoriaOnline({ onLocal, onSalir }) {
                   <form onSubmit={handleEnviarRespuesta} className="respuesta-pulsada-box">
                     <div className="respuesta-pulsada-header">
                       <span className="pulsado-badge">🔴 ¡Has pulsado! Tiempo detenido</span>
-                      <p className="hint small" style={{ margin: '0.3rem 0 0.8rem' }}>
+                      <p className="hint small" style={{ margin: '0.3rem 0 0.4rem' }}>
                         Escribe el nombre del futbolista. Los demás están viendo lo que escribes en directo:
+                      </p>
+
+                      {/* Temporizador de 15 segundos estilo RasgosOnline */}
+                      <div
+                        className="timer"
+                        role="timer"
+                        style={{
+                          margin: '0.6rem 0 0.3rem',
+                          background: '#e2e8f0',
+                          borderRadius: '9999px',
+                          height: '8px',
+                          overflow: 'hidden'
+                        }}
+                      >
+                        <div
+                          className={`timer-bar ${segundosRespuesta <= 4 ? 'low' : ''}`}
+                          style={{
+                            width: `${(segundosRespuesta / 15) * 100}%`,
+                            height: '100%',
+                            backgroundColor: segundosRespuesta <= 4 ? '#ef4444' : '#16a34a',
+                            borderRadius: '9999px',
+                            transition: 'width 0.1s linear, background-color 0.3s ease'
+                          }}
+                        />
+                      </div>
+                      <p
+                        className="timer-text"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '0.35rem',
+                          color: segundosRespuesta <= 4 ? '#dc2626' : '#64748b',
+                          fontSize: '0.9rem',
+                          fontWeight: 700,
+                          margin: '0 0 0.8rem'
+                        }}
+                      >
+                        <Icon name="clock" size={16} />
+                        {Math.ceil(segundosRespuesta)} s
                       </p>
                     </div>
 
@@ -679,9 +785,50 @@ export default function TrayectoriaOnline({ onLocal, onSalir }) {
                       <span className="pulsador-icono">🔴</span>
                       <strong>¡{ronda.pulsado.nombre} ha pulsado el botón!</strong>
                     </div>
-                    <p className="hint small" style={{ margin: '0.4rem 0 0.8rem' }}>
+                    <p className="hint small" style={{ margin: '0.4rem 0 0.4rem' }}>
                       Tiempo detenido. Está escribiendo su respuesta en directo:
                     </p>
+
+                    {/* Temporizador de 15 segundos visible para los rivales */}
+                    <div
+                      className="timer"
+                      role="timer"
+                      style={{
+                        margin: '0.6rem 0 0.3rem',
+                        background: '#e2e8f0',
+                        borderRadius: '9999px',
+                        height: '8px',
+                        overflow: 'hidden'
+                      }}
+                    >
+                      <div
+                        className={`timer-bar ${segundosRespuesta <= 4 ? 'low' : ''}`}
+                        style={{
+                          width: `${(segundosRespuesta / 15) * 100}%`,
+                          height: '100%',
+                          backgroundColor: segundosRespuesta <= 4 ? '#ef4444' : '#16a34a',
+                          borderRadius: '9999px',
+                          transition: 'width 0.1s linear, background-color 0.3s ease'
+                        }}
+                      />
+                    </div>
+                    <p
+                      className="timer-text"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.35rem',
+                        color: segundosRespuesta <= 4 ? '#dc2626' : '#64748b',
+                        fontSize: '0.9rem',
+                        fontWeight: 700,
+                        margin: '0 0 0.8rem'
+                      }}
+                    >
+                      <Icon name="clock" size={16} />
+                      {Math.ceil(segundosRespuesta)} s
+                    </p>
+
                     <div className="online-tecleo-box">
                       {ronda.pulsado.texto ? (
                         <span className="online-tecleo-texto">{ronda.pulsado.texto}</span>
