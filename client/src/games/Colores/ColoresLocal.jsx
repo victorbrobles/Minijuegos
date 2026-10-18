@@ -9,17 +9,17 @@ const MAX_JUGADORES = 15;
 const MAX_RONDAS = 25;
 
 const PALETA_COLORES = [
-  { id: 'rojo', nombre: 'Rojo', hex: '#ef4444' },
-  { id: 'azul', nombre: 'Azul', hex: '#3b82f6' },
-  { id: 'amarillo', nombre: 'Amarillo', hex: '#eab308' },
-  { id: 'verde', nombre: 'Verde', hex: '#10b981' },
-  { id: 'naranja', nombre: 'Naranja', hex: '#f97316' },
-  { id: 'morado', nombre: 'Morado', hex: '#a855f7' },
-  { id: 'marron', nombre: 'Marrón', hex: '#854d0e' },
-  { id: 'blanco', nombre: 'Blanco', hex: '#f8fafc', borde: '#cbd5e1' },
-  { id: 'negro', nombre: 'Negro', hex: '#0f172a' },
-  { id: 'gris', nombre: 'Gris', hex: '#94a3b8' },
-  { id: 'rosa', nombre: 'Rosa', hex: '#ec4899' }
+  { id: 'rojo', nombre: 'Rojo', hex: '#ef4444', textoHex: '#ffffff' },
+  { id: 'azul', nombre: 'Azul', hex: '#2563eb', textoHex: '#ffffff' },
+  { id: 'amarillo', nombre: 'Amarillo', hex: '#eab308', textoHex: '#0f172a' },
+  { id: 'verde', nombre: 'Verde', hex: '#16a34a', textoHex: '#ffffff' },
+  { id: 'naranja', nombre: 'Naranja', hex: '#ea580c', textoHex: '#ffffff' },
+  { id: 'morado', nombre: 'Morado', hex: '#9333ea', textoHex: '#ffffff' },
+  { id: 'marron', nombre: 'Marrón', hex: '#78350f', textoHex: '#ffffff' },
+  { id: 'blanco', nombre: 'Blanco', hex: '#ffffff', textoHex: '#0f172a', borde: '#cbd5e1' },
+  { id: 'negro', nombre: 'Negro', hex: '#0f172a', textoHex: '#ffffff' },
+  { id: 'gris', nombre: 'Gris', hex: '#64748b', textoHex: '#ffffff' },
+  { id: 'rosa', nombre: 'Rosa', hex: '#ec4899', textoHex: '#ffffff' }
 ];
 
 export default function ColoresLocal({ onVolver, onExit }) {
@@ -336,10 +336,26 @@ export default function ColoresLocal({ onVolver, onExit }) {
             <p>Turno de: <strong>{jugadorEnTurno.nombre}</strong></p>
           </div>
 
-          <div className="panel aprox-pregunta-card">
-            <span className="aprox-badge-pregunta">
-              Selecciona exactamente {preguntaActual.numColores} {preguntaActual.numColores === 1 ? 'color' : 'colores'}
-            </span>
+          <div className="panel aprox-pregunta-card" style={{ textAlign: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.6rem' }}>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  padding: '0.45rem 1.3rem',
+                  borderRadius: '9999px',
+                  backgroundColor: '#fef3c7',
+                  border: '2px solid #f59e0b',
+                  color: '#b45309',
+                  fontSize: '1rem',
+                  fontWeight: 800,
+                  boxShadow: '0 2px 6px rgba(245, 158, 11, 0.2)'
+                }}
+              >
+                🎨 Debes elegir exactamente {preguntaActual.numColores} {preguntaActual.numColores === 1 ? 'color' : 'colores'}
+              </span>
+            </div>
             <h2 className="aprox-pregunta-texto" style={{ fontSize: '1.65rem', margin: '0.6rem 0' }}>
               {preguntaActual.item}
             </h2>
@@ -349,6 +365,39 @@ export default function ColoresLocal({ onVolver, onExit }) {
           </div>
 
           <div className="panel">
+            <style>{`
+              .colores-grid button.colores-tarjeta-solida {
+                background-image: none !important;
+                padding: 0.9rem 0.5rem !important;
+                border-radius: 14px !important;
+                min-height: 56px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                font-weight: 800 !important;
+                font-size: 1.05rem !important;
+                cursor: pointer !important;
+                position: relative !important;
+                letter-spacing: 0.3px !important;
+                transition: transform 0.15s ease, box-shadow 0.15s ease !important;
+              }
+              .colores-grid button.color-btn-rojo { background-color: #ef4444 !important; background: #ef4444 !important; color: #ffffff !important; border: 2.5px solid #dc2626 !important; }
+              .colores-grid button.color-btn-azul { background-color: #2563eb !important; background: #2563eb !important; color: #ffffff !important; border: 2.5px solid #1d4ed8 !important; }
+              .colores-grid button.color-btn-amarillo { background-color: #eab308 !important; background: #eab308 !important; color: #0f172a !important; border: 2.5px solid #ca8a04 !important; }
+              .colores-grid button.color-btn-verde { background-color: #16a34a !important; background: #16a34a !important; color: #ffffff !important; border: 2.5px solid #15803d !important; }
+              .colores-grid button.color-btn-naranja { background-color: #ea580c !important; background: #ea580c !important; color: #ffffff !important; border: 2.5px solid #c2410c !important; }
+              .colores-grid button.color-btn-morado { background-color: #9333ea !important; background: #9333ea !important; color: #ffffff !important; border: 2.5px solid #7e22ce !important; }
+              .colores-grid button.color-btn-marron { background-color: #78350f !important; background: #78350f !important; color: #ffffff !important; border: 2.5px solid #451a03 !important; }
+              .colores-grid button.color-btn-blanco { background-color: #ffffff !important; background: #ffffff !important; color: #0f172a !important; border: 2.5px solid #94a3b8 !important; }
+              .colores-grid button.color-btn-negro { background-color: #0f172a !important; background: #0f172a !important; color: #ffffff !important; border: 2.5px solid #000000 !important; }
+              .colores-grid button.color-btn-gris { background-color: #64748b !important; background: #64748b !important; color: #ffffff !important; border: 2.5px solid #475569 !important; }
+              .colores-grid button.color-btn-rosa { background-color: #ec4899 !important; background: #ec4899 !important; color: #ffffff !important; border: 2.5px solid #db2777 !important; }
+
+              .colores-grid button.colores-tarjeta-solida.seleccionado {
+                transform: scale(1.05) !important;
+                box-shadow: 0 0 0 3px #ffffff, 0 0 0 6px #2563eb, 0 6px 16px rgba(0, 0, 0, 0.35) !important;
+              }
+            `}</style>
             <div className="colores-grid">
               {PALETA_COLORES.map((col) => {
                 const activo = coloresSeleccionados.includes(col.id);
@@ -356,18 +405,32 @@ export default function ColoresLocal({ onVolver, onExit }) {
                   <button
                     key={col.id}
                     type="button"
-                    className={`colores-tarjeta ${activo ? 'activa' : ''}`}
+                    className={`colores-tarjeta-solida color-btn-${col.id} ${activo ? 'seleccionado' : ''}`}
                     onClick={() => toggleColor(col.id)}
                   >
-                    <span
-                      className="colores-muestra"
-                      style={{
-                        backgroundColor: col.hex,
-                        border: col.borde ? `2px solid ${col.borde}` : 'none'
-                      }}
-                    />
-                    <span className="colores-nombre">{col.nombre}</span>
-                    {activo && <span className="colores-check">✓</span>}
+                    <span>{col.nombre}</span>
+                    {activo && (
+                      <span
+                        style={{
+                          position: 'absolute',
+                          top: '4px',
+                          right: '6px',
+                          backgroundColor: col.id === 'blanco' || col.id === 'amarillo' ? '#0f172a' : '#ffffff',
+                          color: col.id === 'blanco' || col.id === 'amarillo' ? '#ffffff' : '#0f172a',
+                          borderRadius: '9999px',
+                          width: '22px',
+                          height: '22px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          fontSize: '0.8rem',
+                          fontWeight: 900,
+                          boxShadow: '0 2px 5px rgba(0,0,0,0.35)'
+                        }}
+                      >
+                        ✓
+                      </span>
+                    )}
                   </button>
                 );
               })}
