@@ -1,0 +1,307 @@
+.col-contenedor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.col-tablero {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.col-zonas-comunes {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin: 1rem 0;
+}
+
+.col-mazo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.col-carta {
+  width: 80px;
+  height: 110px;
+  border-radius: 12px;
+  background: white;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid #cbd5e1;
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: #334155;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
+  user-select: none;
+}
+
+.col-carta span {
+  font-size: 2.2rem;
+  margin-bottom: 0.3rem;
+}
+
+.col-carta.reverso {
+  background: repeating-linear-gradient(45deg, #1e293b, #1e293b 10px, #334155 10px, #334155 20px);
+  border-color: #0f172a;
+  color: white;
+}
+
+.col-carta:hover:not(.disabled) {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 12px rgba(0,0,0,0.15);
+}
+
+.col-carta.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.col-carta.accion {
+  background: #fef08a;
+  border-color: #eab308;
+  color: #854d0e;
+}
+
+.col-mano {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.8rem;
+  padding: 1.5rem;
+  background: #f8fafc;
+  border-radius: 20px;
+  border: 2px dashed #cbd5e1;
+}
+
+.col-mano.activa {
+  background: #f0fdf4;
+  border-color: #22c55e;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.2);
+}
+
+.col-jugadores-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.col-jug-chip {
+  padding: 0.5rem 1rem;
+  background: #e2e8f0;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.col-jug-chip.activo {
+  background: #3b82f6;
+  color: white;
+}
+
+.col-jug-chip.muerto {
+  background: #f1f5f9;
+  color: #94a3b8;
+  text-decoration: line-through;
+}
+
+.col-target-btn {
+  padding: 0.8rem;
+  background: #f8fafc;
+  border: 2px solid #cbd5e1;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+}
+.col-target-btn.selected {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #1d4ed8;
+}
+
+.col-contenedor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.col-tablero {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.col-zonas-comunes {
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem;
+  margin: 0.8rem 0;
+}
+
+.col-mazo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Diseño avanzado de las cartas */
+.col-carta {
+  width: 76px;
+  height: 106px;
+  border-radius: 10px;
+  background: #ffffff;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 4px;
+  border: 2px solid #cbd5e1;
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: #1e293b;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s;
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+}
+
+.col-carta .card-icon {
+  font-size: 2rem;
+  margin-top: 4px;
+}
+
+.col-carta .card-name {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #64748b;
+  font-weight: 800;
+}
+
+.col-carta.reverso {
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  border-color: #334155;
+  color: white;
+  justify-content: center;
+}
+
+.col-carta.reverso .card-icon {
+  font-size: 1.8rem;
+  margin: 0;
+}
+
+.col-carta:hover:not(.disabled) {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.18);
+  border-color: #3b82f6;
+  z-index: 2;
+}
+
+.col-carta.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.col-carta.accion {
+  background: linear-gradient(135deg, #fef08a, #fde047);
+  border-color: #ca8a04;
+  color: #713f12;
+}
+
+.col-carta.accion .card-name {
+  color: #854d0e;
+}
+
+.col-mano {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.7rem;
+  padding: 1.2rem;
+  background: #f8fafc;
+  border-radius: 16px;
+  border: 2px dashed #cbd5e1;
+  min-height: 130px;
+  align-items: center;
+}
+
+.col-mano.activa {
+  background: #f0fdf4;
+  border-color: #22c55e;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.15);
+}
+
+.col-jugadores-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: center;
+  margin-bottom: 0.8rem;
+}
+
+.col-jug-chip {
+  padding: 0.4rem 0.9rem;
+  background: #e2e8f0;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #475569;
+}
+
+.col-jug-chip.activo {
+  background: #3b82f6;
+  color: white;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+}
+
+.col-jug-chip.muerto {
+  background: #f1f5f9;
+  color: #94a3b8;
+  text-decoration: line-through;
+}
+
+/* Leyenda de cartas */
+.col-leyenda {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 0.8rem 1rem;
+  margin-top: 1rem;
+  border: 1px solid #e2e8f0;
+  text-align: left;
+}
+
+.col-leyenda-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.col-leyenda-item {
+  font-size: 0.75rem;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #f8fafc;
+  padding: 0.3rem 0.5rem;
+  border-radius: 6px;
+}

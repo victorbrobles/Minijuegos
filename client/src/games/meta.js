@@ -164,6 +164,27 @@ export const META = {
     colores: ['#f59e0b', '#b45309'],
     etiquetas: 'ranking ordenar ciegas votar puntuar orden',
     descripcion: 'Ordena de 1 a 5 cada elemento sin saber qué saldrá después. Los rivales votan cuántos has acertado.'
+  },
+  'traicion': {
+    titulo: 'Traiciones',
+    icono: 'lock',
+    colores: ['#f59e0b', '#0f172a'],
+    etiquetas: 'traicion impostor roles votar matar mentir',
+    descripcion: 'Estación ártica aislada. Reparad la base o sabotead y eliminad a los investigadores sin ser descubiertos.',
+  },
+  'traiciones': {
+    titulo: 'Traiciones 2',
+    icono: 'dagger',
+    colores: ['#d97706', '#7c2d12'],
+    etiquetas: 'traidores caravana desierto sabotaje mafia deduccion engano coartada votar roles online',
+    descripcion: 'Una caravana cruza el desierto hacia el Oasis, pero hay traidores entre vosotros. Cumple tus tareas, vigila tus espaldas y descubre quién miente antes de que sea tarde.'
+  },
+  'coleccion': {
+    titulo: 'Colecciona con cabeza',
+    icono: 'cards', 
+    colores: ['#06b6d4', '#1d4ed8'],
+    etiquetas: 'cartas azar coleccion estrategia numeros baraja',
+    descripcion: 'Consigue 5 cartas del mismo tipo antes que el resto. ¡Pero cuidado! Si acumulas 5 tipos distintos, quedarás eliminado.'
   }
 };
 export const META_POR_DEFECTO = { icono: 'star', colores: ['#8b5cf6', '#6366f1'], etiquetas: '', descripcion: '' };

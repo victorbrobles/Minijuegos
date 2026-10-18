@@ -62,7 +62,9 @@ const P = {
   bomb: <><circle cx="11" cy="13" r="8" /><path d="m17 7 2-2M19 5l2-1M19 5l1 2M16 8l1.5-1.5" /><path d="M8 11a3.5 3.5 0 0 1 3.5-3.5" /></>,
   brush: <><path d="m9 11-6 6v3h3l6-6" /><path d="m22 2-7.5 7.5a2.121 2.121 0 0 1-3 0l-1-1a2.121 2.121 0 0 1 0-3L18 2h4z" /></>,
   fashion: <><path d="M6 3h12l3 6-9 12L3 9z" /><path d="M11 3 8 9l4 12 4-12-3-6" /></>,
-  scale: <><path d="M12 3v18M6 8l6-2 6 2M6 8l-3 7h6L6 8zm12 0-3 7h6l-3-7z" /></>
+  scale: <><path d="M12 3v18M6 8l6-2 6 2M6 8l-3 7h6L6 8zm12 0-3 7h6l-3-7z" /></>,
+  dagger: <><path d="M20.500 3.500 10 14" /><path d="M8 12l4 4" /><path d="M10 14 5 19" /><path d="M3.500 20.500l1.500-1.500" /><path d="M20.500 3.500 21 3" /></>,
+  cards: <><rect x="4" y="6" width="12" height="15" rx="2" /><path d="M8 2h12v15" /></>
 };
 
 // Icono por nombre de categoría (Siglas y Quién es Quién)

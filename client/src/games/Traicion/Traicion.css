@@ -1,0 +1,277 @@
+.traicion-contenedor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.traicion-rooms-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin: 1.5rem 0;
+}
+
+.traicion-room-btn {
+  background: #1e293b;
+  color: white;
+  border: 2px solid #334155;
+  border-radius: 8px;
+  padding: 1.5rem 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.traicion-room-btn.selected {
+  background: #3b82f6;
+  border-color: #60a5fa;
+  transform: scale(1.05);
+}
+
+.traicion-action-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 1rem;
+}
+
+.traicion-reporte-list {
+  background: #f1f5f9;
+  border-left: 4px solid #3b82f6;
+  padding: 1rem;
+  border-radius: 4px;
+  margin: 1rem 0;
+  text-align: left;
+}
+
+.traicion-reporte-list p {
+  margin: 0.5rem 0;
+  font-weight: 500;
+}
+
+.traicion-reporte-list p.danger {
+  color: #dc2626;
+}
+
+.traicion-rol-card {
+  padding: 2rem;
+  border-radius: 12px;
+  margin: 1.5rem 0;
+  color: white;
+}
+
+.traicion-rol-card.investigador {
+  background: #0284c7;
+}
+
+.traicion-rol-card.infectado {
+  background: #dc2626;
+}
+
+.traicion-progress-bar {
+  height: 20px;
+  background: #e2e8f0;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 1rem 0;
+}
+
+.traicion-progress-fill {
+  height: 100%;
+  background: #22c55e;
+  transition: width 0.5s ease;
+}
+
+.tr-contenedor {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.tr-rooms-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.tr-room-btn {
+  background: #f8fafc;
+  border: 2px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 1.2rem 0.5rem;
+  font-weight: 700;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.tr-room-btn:active {
+  transform: scale(0.96);
+  background: #e2e8f0;
+}
+
+.tr-room-btn.selected {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #1d4ed8;
+}
+
+.tr-rol-card {
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1.2rem;
+  color: white;
+  text-align: center;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.tr-rol-card.investigador {
+  background: linear-gradient(135deg, #0284c7, #2563eb);
+}
+
+.tr-rol-card.infectado {
+  background: linear-gradient(135deg, #dc2626, #991b1b);
+}
+
+.tr-rol-title {
+  font-size: 1.4rem;
+  font-weight: 900;
+  margin: 0 0 0.4rem 0;
+}
+
+.tr-reporte-box {
+  background: #f1f5f9;
+  border-left: 4px solid #3b82f6;
+  padding: 1rem;
+  border-radius: 6px;
+  text-align: left;
+  margin: 1rem 0;
+}
+
+.tr-reporte-box p {
+  margin: 0.4rem 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.tr-reporte-box p.danger {
+  color: #dc2626;
+}
+
+.tr-progress-bar {
+  height: 14px;
+  background: #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 0.5rem 0 1.2rem;
+}
+
+.tr-progress-fill {
+  height: 100%;
+  background: #22c55e;
+  transition: width 0.4s ease;
+}
+
+/* Heredamos estilos compartidos de styles.css; aquí solo lo propio del juego Traiciones */
+.tr-contenedor { position: relative; width: 100%; }
+
+/* Pantalla oscura para las fases de acción / secreto (heredado de luna de sangre) */
+.tr-escena-noche { 
+  padding: 1rem; 
+  border-radius: 32px; 
+  background: linear-gradient(160deg, #0f172a, #1e293b 60%, #334155); 
+  box-shadow: var(--shadow); 
+}
+.tr-escena-noche > .game.center, .tr-escena-noche .title { color: #fff; }
+.tr-escena-noche .hint { color: #cbd5e1; }
+.tr-escena-noche .hl { color: #38bdf8; }
+.tr-escena-noche .categoria { color: #60a5fa; }
+
+/* Habitaciones Grid */
+.tr-rooms-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.tr-room-btn {
+  background: #f8fafc;
+  border: 2px solid #cbd5e1;
+  border-radius: 16px;
+  padding: 1.2rem 0.5rem;
+  font-weight: 700;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.tr-room-btn:active {
+  transform: scale(0.96);
+  background: #e2e8f0;
+}
+
+.tr-escena-noche .tr-room-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+.tr-escena-noche .tr-room-btn:active {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Tarjeta de Rol */
+.tr-rol-card {
+  padding: 1.5rem;
+  border-radius: 20px;
+  margin-bottom: 1.2rem;
+  color: white;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.tr-rol-card.investigador { background: linear-gradient(135deg, #0284c7, #2563eb); }
+.tr-rol-card.infectado { background: linear-gradient(135deg, #dc2626, #991b1b); }
+.tr-rol-title { font-size: 1.4rem; font-weight: 900; margin: 0 0 0.4rem 0; }
+
+/* Barra de progreso */
+.tr-progress-bar {
+  height: 16px;
+  background: #e2e8f0;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 0.5rem 0 1.2rem;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+.tr-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #22c55e);
+  transition: width 0.5s ease-out;
+}
+
+/* Reportes */
+.tr-reporte-box {
+  background: #f8f7ff;
+  border-left: 5px solid #3b82f6;
+  padding: 1rem;
+  border-radius: 16px;
+  text-align: left;
+  margin: 1rem 0;
+}
+.tr-reporte-box p {
+  margin: 0.4rem 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+.tr-reporte-box p.danger { color: #dc2626; }

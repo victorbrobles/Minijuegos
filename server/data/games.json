@@ -136,5 +136,23 @@
     "name": "Top a Ciegas",
     "description": "Ordena de 1 a 5 cada elemento sin saber qué saldrá después. Los rivales votan cuántos has acertado.",
     "isNew": true
+  },
+  {
+    "id": "traicion",
+    "name": "Traiciones",
+    "description": "Estación ártica aislada. Reparad la base o sabotead y eliminad a los investigadores sin ser descubiertos.",
+    "isNew": true
+  },
+  {
+    "id": "traiciones",
+    "name": "Traiciones 2",
+    "description": "Una caravana cruza el desierto hacia el Oasis, pero hay traidores entre vosotros. Cumple tus tareas, sobrevive y descubre quién miente.",
+    "isNew": true
+  },
+  {
+    "id": "coleccion",
+    "name": "Colecciona con cabeza",
+    "description": "Consigue 5 cartas del mismo tipo antes que el resto. ¡Pero cuidado! Si acumulas 5 tipos distintos, quedarás eliminado.",
+    "isNew": true
   }
 ]

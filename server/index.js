@@ -36,6 +36,9 @@ import masmenosRouter from './routes/masmenos.js';
 import cancionRouter from './routes/cancion.js';
 import ciegasRouter from './routes/ciegas.js';
 import rapidfireRouter from './routes/rapidfire.js';
+import traicionRouter from './routes/traicion.js';
+import traicionesRouter from './routes/traiciones.js';
+import coleccionRouter from './routes/coleccion.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -99,6 +102,9 @@ app.use('/api/masmenos', masmenosRouter);
 app.use('/api/cancion', cancionRouter);
 app.use('/api/ciegas', ciegasRouter);
 app.use('/api/rapidfire', rapidfireRouter);
+app.use('/api/traicion', traicionRouter);
+app.use('/api/traiciones', traicionesRouter);
+app.use('/api/coleccion', coleccionRouter);
 
 // 5. Redirección para React Router (Single Page Application)
 app.get('*', (req, res) => {
