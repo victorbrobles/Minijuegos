@@ -12,6 +12,7 @@ export default function VelocidadOnline({ onLocal, onSalir }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modalSalir, setModalSalir] = useState(false);
+  const [modalAyuda, setModalAyuda] = useState(false);
 
   const [sesion, setSesion] = useState(() => {
     try {
@@ -332,8 +333,55 @@ export default function VelocidadOnline({ onLocal, onSalir }) {
   const maximoAciertos = ranking.length ? ranking[0].aciertos : 0;
   const ganadores = maximoAciertos > 0 ? ranking.filter((j) => j.aciertos === maximoAciertos) : [];
 
+  // Mostrar ayuda en los menús y en la sala de espera (lobby), desaparece al iniciar la partida
+  const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
+
   return (
     <div className="vel-contenedor">
+      {/* ---------------- BOTÓN Y MODAL DE AYUDA ---------------- */}
+      {mostrarAyuda && (
+        <button
+          type="button"
+          className="btn-ayuda-flotante"
+          onClick={() => setModalAyuda(true)}
+          title="Reglas y funcionamiento"
+        >
+          <span className="btn-ayuda-flotante-signo">?</span>
+        </button>
+      )}
+
+      {modalAyuda && (
+        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
+          <div className="rg-modal modal-ayuda-juego" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-ayuda-header">
+              <span className="modal-ayuda-signo-title">?</span>
+              <h3>¿Cómo se juega al Test de Velocidad?</h3>
+            </div>
+
+            <div className="modal-ayuda-cuerpo">
+              <p><strong>1. Dinámica del reto:</strong></p>
+              <ul>
+                <li>El juego sortea quién empieza con una cuenta atrás de 10 segundos.</li>
+                <li>Dispones de <strong>60 segundos</strong> en tu turno. Cada acierto suma <strong>+1 punto</strong>.</li>
+                <li>Cada pregunta tiene 4 opciones. Si fallas, pasa de inmediato a la siguiente.</li>
+              </ul>
+              <p><strong>2. ¡Pregunta Especial en el segundo 30!</strong></p>
+              <ul>
+                <li>A los 30 segundos el cronómetro se detiene y aparece una pregunta abierta.</li>
+                <li>Si aciertas, ¡ganas <strong>+30 segundos extra</strong> al cronómetro!</li>
+              </ul>
+            </div>
+
+            <div className="rg-modal-acciones">
+              <button className="big full" onClick={() => setModalAyuda(false)}>
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ---------------- FIN AYUDA ---------------- */}
+
       {/* 1. MENÚ PRINCIPAL */}
       {vista === 'menu' && (
         <section className="game">
@@ -465,7 +513,26 @@ export default function VelocidadOnline({ onLocal, onSalir }) {
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
         <section className="game">
           <div className="panel center">
-            <p className="categoria"><Icon name="lock" size={16} />Sala de espera</p>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  padding: '0.35rem 1.1rem',
+                  borderRadius: '9999px',
+                  border: '1.5px solid #22c55e',
+                  backgroundColor: '#f0fdf4',
+                  color: '#16a34a',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  lineHeight: 1
+                }}
+              >
+                <Icon name="lock" size={15} />
+                Sala de espera
+              </span>
+            </div>
             <p className="hint">Código de la partida</p>
             <button
               type="button"

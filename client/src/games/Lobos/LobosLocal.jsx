@@ -296,10 +296,11 @@ export default function LobosLocal({ onSalir }) {
   if (fase === 'setup') {
     return (
       <div className="lb-contenedor">
-        <button type="button" className="btn-ayuda-flotante" onClick={() => setModalAyuda(true)} title="Reglas y funcionamiento"><span className="btn-ayuda-flotante-signo">?</span></button>
-        {ayuda}
-        <section className="game">
-          {onSalir && <button type="button" className="secondary" onClick={onSalir}><Icon name="arrowLeft" size={18} /> Volver al menú</button>}
+        <section className="game" style={{ position: 'relative' }}>
+          <button type="button" className="btn-ayuda-flotante" onClick={() => setModalAyuda(true)} title="Reglas y funcionamiento">
+            <span className="btn-ayuda-flotante-signo">?</span>
+          </button>
+          {ayuda}
           <GameIntro gameId="lobos" titulo="Luna de Sangre (un solo dispositivo)" />
           <div className="panel">
             <h3 className="panel-title"><Icon name="users" size={22} /> Jugadores</h3>

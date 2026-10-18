@@ -32,9 +32,26 @@ export default function FrasesCelebresLocal({ onVolver, onExit }) {
   const [bloqueados, setBloqueados] = useState([]);
   const [pulsadorActivo, setPulsadorActivo] = useState(false);
   const [jugadorSeleccionado, setJugadorSeleccionado] = useState(null);
+  const [segundosRespuesta, setSegundosRespuesta] = useState(15);
   const [ultimoResultado, setUltimoResultado] = useState(null);
 
   const timerRef = useRef(null);
+  const timerRespuestaRef = useRef(null);
+
+  const jugadorSeleccionadoRef = useRef(jugadorSeleccionado);
+  useEffect(() => {
+    jugadorSeleccionadoRef.current = jugadorSeleccionado;
+  }, [jugadorSeleccionado]);
+
+  const bloqueadosRef = useRef(bloqueados);
+  useEffect(() => {
+    bloqueadosRef.current = bloqueados;
+  }, [bloqueados]);
+
+  const jugadoresRef = useRef(jugadores);
+  useEffect(() => {
+    jugadoresRef.current = jugadores;
+  }, [jugadores]);
 
   useEffect(() => {
     fetch('/api/frasescelebres/preguntas')
@@ -87,11 +104,12 @@ export default function FrasesCelebresLocal({ onVolver, onExit }) {
     setBloqueados([]);
     setPulsadorActivo(false);
     setJugadorSeleccionado(null);
+    setSegundosRespuesta(15);
     setUltimoResultado(null);
     setFase('jugando');
   };
 
-  // Temporizador de 30s
+  // Temporizador general de 30s de la ronda
   useEffect(() => {
     if (fase !== 'jugando' || pulsadorActivo) {
       clearInterval(timerRef.current);
@@ -119,15 +137,74 @@ export default function FrasesCelebresLocal({ onVolver, onExit }) {
     opciones: ["Platón", "Aristóteles", "Sócrates", "Séneca"]
   };
 
+  const preguntaActualRef = useRef(preguntaActual);
+  useEffect(() => {
+    preguntaActualRef.current = preguntaActual;
+  }, [preguntaActual]);
+
   const handlePulsarBotonRojo = () => {
     if (jugadoresDisponibles.length === 0) return;
     setPulsadorActivo(true);
-    setJugadorSeleccionado(null); // Espera a elegir jugador primero
+    setJugadorSeleccionado(null);
+    setSegundosRespuesta(15);
   };
 
   const cancelarRespuesta = () => {
     setPulsadorActivo(false);
     setJugadorSeleccionado(null);
+  };
+
+  // Temporizador de 15s al pulsar el botón rojo
+  useEffect(() => {
+    if (!pulsadorActivo) {
+      setSegundosRespuesta(15);
+      return;
+    }
+
+    setSegundosRespuesta(15);
+    timerRespuestaRef.current = setInterval(() => {
+      setSegundosRespuesta((prev) => {
+        if (prev <= 0.1) {
+          clearInterval(timerRespuestaRef.current);
+          handleTiempoAgotadoPulsador();
+          return 0;
+        }
+        return Math.max(0, prev - 0.1);
+      });
+    }, 100);
+
+    return () => clearInterval(timerRespuestaRef.current);
+  }, [pulsadorActivo]);
+
+  const aplicarFallo = (jugadorId) => {
+    setPuntos((prev) => ({
+      ...prev,
+      [jugadorId]: (prev[jugadorId] ?? 0) - 1
+    }));
+
+    const nuevosBloqueados = [...bloqueadosRef.current, jugadorId];
+    setBloqueados(nuevosBloqueados);
+    setPulsadorActivo(false);
+    setJugadorSeleccionado(null);
+
+    if (nuevosBloqueados.length >= jugadoresRef.current.length) {
+      setUltimoResultado({
+        tipo: 'todos_fallaron',
+        autorCorrecto: preguntaActualRef.current.autor
+      });
+      setFase('resolucion');
+    }
+  };
+
+  const handleTiempoAgotadoPulsador = () => {
+    const jId = jugadorSeleccionadoRef.current;
+    if (!jId) {
+      // Si no se eligió jugador, simplemente se cierra el modal
+      cancelarRespuesta();
+    } else {
+      // Si hay jugador seleccionado y se agotó el tiempo, cuenta como fallo
+      aplicarFallo(jId);
+    }
   };
 
   const responderOpcion = (opcionElegida) => {
@@ -149,25 +226,10 @@ export default function FrasesCelebresLocal({ onVolver, onExit }) {
         puntosGanados: 3
       });
       setPulsadorActivo(false);
+      setJugadorSeleccionado(null);
       setFase('resolucion');
     } else {
-      setPuntos((prev) => ({
-        ...prev,
-        [jugador.id]: (prev[jugador.id] ?? 0) - 1
-      }));
-
-      const nuevosBloqueados = [...bloqueados, jugador.id];
-      setBloqueados(nuevosBloqueados);
-      setPulsadorActivo(false);
-      setJugadorSeleccionado(null);
-
-      if (nuevosBloqueados.length >= jugadores.length) {
-        setUltimoResultado({
-          tipo: 'todos_fallaron',
-          autorCorrecto: preguntaActual.autor
-        });
-        setFase('resolucion');
-      }
+      aplicarFallo(jugador.id);
     }
   };
 
@@ -221,7 +283,7 @@ export default function FrasesCelebresLocal({ onVolver, onExit }) {
                   <ul>
                     <li>Aparece la frase con las 4 opciones de autor (A, B, C y D).</li>
                     <li>Disponéis de <strong>30 segundos</strong> de tiempo común.</li>
-                    <li><strong>Pulsa el botón rojo</strong> para parar el tiempo, selecciona quién ha pulsado y toca la opción correcta.</li>
+                    <li><strong>Pulsa el botón rojo</strong> para parar el tiempo. Dispondrás de <strong>15 segundos</strong> para seleccionar quién ha pulsado y tocar la opción correcta.</li>
                   </ul>
                   <p><strong>2. Puntuación:</strong></p>
                   <div className="aprox-tabla-puntos">
@@ -230,7 +292,7 @@ export default function FrasesCelebresLocal({ onVolver, onExit }) {
                       <strong>+3 puntos</strong>
                     </div>
                     <div className="aprox-puntos-fila lejana">
-                      <span>❌ Fallo</span>
+                      <span>❌ Fallo o tiempo agotado</span>
                       <strong>-1 punto (quedando fuera de la frase)</strong>
                     </div>
                   </div>
@@ -249,7 +311,7 @@ export default function FrasesCelebresLocal({ onVolver, onExit }) {
 
       {/* 1. SETUP DE JUGADORES */}
       {fase === 'setup' && (
-        <section className="game">
+        <section className="game" style={{ position: 'relative' }}>
           <GameIntro gameId="frasescelebres" titulo="Frases Célebres (Un solo dispositivo)" />
 
           {errorCarga && <p className="error" role="alert">{errorCarga}</p>}
@@ -320,7 +382,7 @@ export default function FrasesCelebresLocal({ onVolver, onExit }) {
             })}
           </div>
 
-          {/* Temporizador */}
+          {/* Temporizador general de la frase */}
           <div className="timer" role="timer">
             <div
               className={`timer-bar ${restante <= 7 ? 'low' : ''}`}
@@ -376,36 +438,91 @@ export default function FrasesCelebresLocal({ onVolver, onExit }) {
               </div>
             ) : (
               <div className="respuesta-pulsada-box">
-                {!jugadorSeleccionado ? (
-                  <>
-                    <div className="respuesta-pulsada-header">
-                      <span className="pulsado-badge">🔴 Tiempo detenido (+3 pts / -1 pt)</span>
-                      <p className="hint small" style={{ margin: '0.4rem 0 0.8rem' }}>
-                        ¿Quién ha pulsado el botón? Selecciona el jugador que va a responder:
-                      </p>
-                    </div>
+                <div className="respuesta-pulsada-header">
+                  <span className="pulsado-badge">🔴 Tiempo detenido (+3 pts / -1 pt)</span>
+                  <p className="hint small" style={{ margin: '0.3rem 0 0.4rem' }}>
+                    {!jugadorSeleccionado
+                      ? 'Selecciona quién va a responder:'
+                      : `Turno de ${jugadorEnTurno?.nombre}. ¡Toca una de las 4 opciones de arriba!`}
+                  </p>
 
-                    <div className="modal-players-grid">
-                      {jugadoresDisponibles.map((j) => (
-                        <button
-                          key={j.id}
-                          type="button"
-                          className="btn-modal-player"
-                          onClick={() => setJugadorSeleccionado(j.id)}
-                        >
-                          {j.nombre}
-                        </button>
-                      ))}
-                    </div>
-                  </>
+                  {/* Temporizador de 15 segundos */}
+                  <div
+                    className="timer"
+                    role="timer"
+                    style={{
+                      margin: '0.6rem 0 0.3rem',
+                      background: '#e2e8f0',
+                      borderRadius: '9999px',
+                      height: '8px',
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <div
+                      className={`timer-bar ${segundosRespuesta <= 4 ? 'low' : ''}`}
+                      style={{
+                        width: `${(segundosRespuesta / 15) * 100}%`,
+                        height: '100%',
+                        backgroundColor: segundosRespuesta <= 4 ? '#ef4444' : '#16a34a',
+                        borderRadius: '9999px',
+                        transition: 'width 0.1s linear, background-color 0.3s ease'
+                      }}
+                    />
+                  </div>
+                  <p
+                    className="timer-text"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.35rem',
+                      color: segundosRespuesta <= 4 ? '#dc2626' : '#64748b',
+                      fontSize: '0.9rem',
+                      fontWeight: 700,
+                      margin: '0 0 0.8rem'
+                    }}
+                  >
+                    <Icon name="clock" size={16} />
+                    {Math.ceil(segundosRespuesta)} s
+                  </p>
+                </div>
+
+                {!jugadorSeleccionado ? (
+                  <div className="modal-players-grid">
+                    {jugadoresDisponibles.map((j) => (
+                      <button
+                        key={j.id}
+                        type="button"
+                        className="btn-modal-player"
+                        onClick={() => setJugadorSeleccionado(j.id)}
+                      >
+                        {j.nombre}
+                      </button>
+                    ))}
+                  </div>
                 ) : (
-                  <div className="respuesta-pulsada-header">
-                    <span className="pulsado-badge" style={{ background: '#dcfce7', color: '#166534' }}>
-                      👤 Turno de {jugadorEnTurno?.nombre}
-                    </span>
-                    <p className="hint" style={{ marginTop: '0.6rem', fontWeight: 700, color: '#1e1b4b' }}>
-                      ¡Toca una de las 4 opciones de arriba para responder!
-                    </p>
+                  <div className="modal-players-grid" style={{ marginBottom: '0.5rem' }}>
+                    {jugadoresDisponibles.map((j) => (
+                      <button
+                        key={j.id}
+                        type="button"
+                        className={`btn-modal-player ${jugadorSeleccionado === j.id ? 'active' : ''}`}
+                        style={
+                          jugadorSeleccionado === j.id
+                            ? {
+                                background: '#16a34a',
+                                color: '#ffffff',
+                                borderColor: '#15803d',
+                                fontWeight: 700,
+                                boxShadow: '0 2px 8px rgba(22, 163, 74, 0.3)'
+                              }
+                            : {}
+                        }
+                        onClick={() => setJugadorSeleccionado(j.id)}
+                      >
+                        {j.nombre} {jugadorSeleccionado === j.id ? '✓' : ''}
+                      </button>
+                    ))}
                   </div>
                 )}
 

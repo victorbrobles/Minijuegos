@@ -12,6 +12,7 @@ export default function PistasOnline({ onLocal, onSalir }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modalSalir, setModalSalir] = useState(false);
+  const [modalAyuda, setModalAyuda] = useState(false);
 
   const [sesion, setSesion] = useState(() => {
     try {
@@ -24,8 +25,14 @@ export default function PistasOnline({ onLocal, onSalir }) {
   const [sala, setSala] = useState(null);
   const [codigoCopiado, setCodigoCopiado] = useState(false);
   const [miTexto, setMiTexto] = useState('');
+  const [segundosRespuesta, setSegundosRespuesta] = useState(15);
 
   const intervalRef = useRef(null);
+  const miTextoRef = useRef(miTexto);
+
+  useEffect(() => {
+    miTextoRef.current = miTexto;
+  }, [miTexto]);
 
   useEffect(() => {
     if (!sesion) {
@@ -62,6 +69,55 @@ export default function PistasOnline({ onLocal, onSalir }) {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [sesion]);
+
+  const ronda = sala?.ronda;
+  const esAdmin = sala?.esAdmin;
+  const yoId = sala?.yoId;
+  const soyElQueHaPulsado = Boolean(ronda?.pulsado && ronda.pulsado.jugadorId === yoId);
+  const alguienHaPulsado = Boolean(ronda?.pulsado);
+  const miJugador = sala?.jugadores?.find((j) => j.id === yoId);
+  const estoyBloqueado = Boolean(miJugador?.bloqueado);
+  const yaHeAcertado = Boolean(miJugador?.acerto);
+  const sinVidas = sala?.modo === 'supervivencia' && (miJugador?.vidas ?? 0) <= 0;
+
+  const handleTiempoAgotadoOnline = async () => {
+    if (!sesion) return;
+    const texto = miTextoRef.current.trim();
+    try {
+      await fetch(`/api/pistas/online/sala/${sesion.code}/responder`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: sesion.token, respuesta: texto || ' ' })
+      });
+      setMiTexto('');
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Temporizador de 15 segundos para responder online
+  useEffect(() => {
+    if (!alguienHaPulsado) {
+      setSegundosRespuesta(15);
+      return;
+    }
+
+    setSegundosRespuesta(15);
+    const t = setInterval(() => {
+      setSegundosRespuesta((prev) => {
+        if (prev <= 0.1) {
+          clearInterval(t);
+          if (soyElQueHaPulsado) {
+            handleTiempoAgotadoOnline();
+          }
+          return 0;
+        }
+        return Math.max(0, prev - 0.1);
+      });
+    }, 100);
+
+    return () => clearInterval(t);
+  }, [alguienHaPulsado, soyElQueHaPulsado]);
 
   const handleCrear = async () => {
     if (!nombre.trim()) return;
@@ -139,6 +195,7 @@ export default function PistasOnline({ onLocal, onSalir }) {
     if (!sesion) return;
     try {
       setMiTexto('');
+      setSegundosRespuesta(15);
       await fetch(`/api/pistas/online/sala/${sesion.code}/pulsar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -160,7 +217,7 @@ export default function PistasOnline({ onLocal, onSalir }) {
   };
 
   const handleEnviarRespuesta = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (!miTexto.trim() || !sesion) return;
     try {
       await fetch(`/api/pistas/online/sala/${sesion.code}/responder`, {
@@ -252,18 +309,56 @@ export default function PistasOnline({ onLocal, onSalir }) {
     setTimeout(() => setCodigoCopiado(false), 2000);
   };
 
-  const ronda = sala?.ronda;
-  const esAdmin = sala?.esAdmin;
-  const yoId = sala?.yoId;
-  const soyElQueHaPulsado = Boolean(ronda?.pulsado && ronda.pulsado.jugadorId === yoId);
-  const alguienHaPulsado = Boolean(ronda?.pulsado);
-  const miJugador = sala?.jugadores?.find((j) => j.id === yoId);
-  const estoyBloqueado = Boolean(miJugador?.bloqueado);
-  const yaHeAcertado = Boolean(miJugador?.acerto);
-  const sinVidas = sala?.modo === 'supervivencia' && (miJugador?.vidas ?? 0) <= 0;
+  // Mostrar ayuda solo en menús y en la sala de espera (lobby)
+  const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
 
   return (
     <div className="aprox-contenedor">
+      {/* ---------------- BOTÓN Y MODAL DE AYUDA ---------------- */}
+      {mostrarAyuda && (
+        <button
+          type="button"
+          className="btn-ayuda-flotante"
+          onClick={() => setModalAyuda(true)}
+          title="Reglas y puntuación"
+        >
+          <span className="btn-ayuda-flotante-signo">?</span>
+        </button>
+      )}
+
+      {modalAyuda && (
+        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
+          <div className="rg-modal modal-ayuda-juego" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-ayuda-header">
+              <span className="modal-ayuda-signo-title">?</span>
+              <h3>¿Cómo se juega a 6 Pistas?</h3>
+            </div>
+
+            <div className="modal-ayuda-cuerpo">
+              <p><strong>1. Dinámica del juego:</strong></p>
+              <ul>
+                <li>Se van descubriendo hasta 6 pistas de un enigma (canción, película, personaje, etc.).</li>
+                <li>Hay <strong>10 segundos</strong> por pista.</li>
+                <li><strong>Pulsa el botón rojo</strong> para parar el tiempo e introducir tu respuesta. Dispones de <strong>15 segundos</strong> para responder.</li>
+              </ul>
+              <p><strong>2. Puntuación (Estándar):</strong></p>
+              <ul>
+                <li>Pista 1: <strong>+6 pts</strong> | Pista 2: <strong>+5 pts</strong></li>
+                <li>Pistas 3 y 4: <strong>4 y 3 pts</strong> | Pistas 5 y 6: <strong>2 y 1 pt</strong></li>
+                <li>Si fallas o se te acaba el tiempo, quedas eliminado exclusivamente durante esa ronda.</li>
+              </ul>
+            </div>
+
+            <div className="rg-modal-acciones">
+              <button className="big full" onClick={() => setModalAyuda(false)}>
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ---------------- FIN AYUDA ---------------- */}
+
       {/* 1. MENÚ PRINCIPAL */}
       {vista === 'menu' && (
         <section className="game">
@@ -395,7 +490,26 @@ export default function PistasOnline({ onLocal, onSalir }) {
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
         <section className="game">
           <div className="panel center">
-            <p className="categoria"><Icon name="lock" size={16} />Sala de espera</p>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  padding: '0.35rem 1.1rem',
+                  borderRadius: '9999px',
+                  border: '1.5px solid #22c55e',
+                  backgroundColor: '#f0fdf4',
+                  color: '#16a34a',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  lineHeight: 1
+                }}
+              >
+                <Icon name="lock" size={15} />
+                Sala de espera
+              </span>
+            </div>
             <p className="hint">Código de la partida</p>
             <button
               type="button"
@@ -610,8 +724,48 @@ export default function PistasOnline({ onLocal, onSalir }) {
                 <form onSubmit={handleEnviarRespuesta} className="respuesta-pulsada-box">
                   <div className="respuesta-pulsada-header">
                     <span className="pulsado-badge">🔴 ¡Has pulsado! Tiempo detenido</span>
-                    <p className="hint small" style={{ margin: '0.3rem 0 0.8rem' }}>
+                    <p className="hint small" style={{ margin: '0.3rem 0 0.4rem' }}>
                       Escribe la respuesta. Los demás están viendo lo que escribes en directo:
+                    </p>
+
+                    {/* Temporizador de 15 segundos */}
+                    <div
+                      className="timer"
+                      role="timer"
+                      style={{
+                        margin: '0.6rem 0 0.3rem',
+                        background: '#e2e8f0',
+                        borderRadius: '9999px',
+                        height: '8px',
+                        overflow: 'hidden'
+                      }}
+                    >
+                      <div
+                        className={`timer-bar ${segundosRespuesta <= 4 ? 'low' : ''}`}
+                        style={{
+                          width: `${(segundosRespuesta / 15) * 100}%`,
+                          height: '100%',
+                          backgroundColor: segundosRespuesta <= 4 ? '#ef4444' : '#16a34a',
+                          borderRadius: '9999px',
+                          transition: 'width 0.1s linear, background-color 0.3s ease'
+                        }}
+                      />
+                    </div>
+                    <p
+                      className="timer-text"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.35rem',
+                        color: segundosRespuesta <= 4 ? '#dc2626' : '#64748b',
+                        fontSize: '0.9rem',
+                        fontWeight: 700,
+                        margin: '0 0 0.8rem'
+                      }}
+                    >
+                      <Icon name="clock" size={16} />
+                      {Math.ceil(segundosRespuesta)} s
                     </p>
                   </div>
 
@@ -641,9 +795,50 @@ export default function PistasOnline({ onLocal, onSalir }) {
                     <span className="pulsador-icono">🔴</span>
                     <strong>¡{ronda.pulsado.nombre} ha pulsado el botón!</strong>
                   </div>
-                  <p className="hint small" style={{ margin: '0.4rem 0 0.8rem' }}>
+                  <p className="hint small" style={{ margin: '0.4rem 0 0.4rem' }}>
                     Tiempo detenido. Está escribiendo su respuesta en directo:
                   </p>
+
+                  {/* Temporizador de 15 segundos visible para los rivales */}
+                  <div
+                    className="timer"
+                    role="timer"
+                    style={{
+                      margin: '0.6rem 0 0.3rem',
+                      background: '#e2e8f0',
+                      borderRadius: '9999px',
+                      height: '8px',
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <div
+                      className={`timer-bar ${segundosRespuesta <= 4 ? 'low' : ''}`}
+                      style={{
+                        width: `${(segundosRespuesta / 15) * 100}%`,
+                        height: '100%',
+                        backgroundColor: segundosRespuesta <= 4 ? '#ef4444' : '#16a34a',
+                        borderRadius: '9999px',
+                        transition: 'width 0.1s linear, background-color 0.3s ease'
+                      }}
+                    />
+                  </div>
+                  <p
+                    className="timer-text"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.35rem',
+                      color: segundosRespuesta <= 4 ? '#dc2626' : '#64748b',
+                      fontSize: '0.9rem',
+                      fontWeight: 700,
+                      margin: '0 0 0.8rem'
+                    }}
+                  >
+                    <Icon name="clock" size={16} />
+                    {Math.ceil(segundosRespuesta)} s
+                  </p>
+
                   <div className="online-tecleo-box">
                     {ronda.pulsado.texto ? (
                       <span className="online-tecleo-texto">{ronda.pulsado.texto}</span>

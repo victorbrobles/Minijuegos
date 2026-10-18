@@ -5,6 +5,7 @@ import CategoryCard from '../../components/CategoryCard.jsx';
 import './Conecta.css';
 
 const CLAVE_SESION_CONECTA = 'conecta_online_session';
+const TIEMPO_RESPUESTA_S = 30;
 
 const CATEGORIAS_METADATA = [
   { id: 'futbolistas', nombre: 'Futbolistas', icono: 'trophy' },
@@ -26,6 +27,7 @@ export default function ConectaOnline({ onLocal, onSalir }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modalSalir, setModalSalir] = useState(false);
+  const [modalAyuda, setModalAyuda] = useState(false);
 
   const [sesion, setSesion] = useState(() => {
     try {
@@ -38,12 +40,21 @@ export default function ConectaOnline({ onLocal, onSalir }) {
   const [sala, setSala] = useState(null);
   const [codigoCopiado, setCodigoCopiado] = useState(false);
 
-  // Estados locales durante la selección de casillas
+  // Estados locales durante la selección de casillas y temporizador
   const [seleccionados, setSeleccionados] = useState([]);
   const [inputTema, setInputTema] = useState('');
   const [mensajeFeedback, setMensajeFeedback] = useState(null);
+  const [segundosRespuesta, setSegundosRespuesta] = useState(TIEMPO_RESPUESTA_S);
+
+  // Seguimiento de turnos por ciclo
+  const [jugadoresRespondieronTurno, setJugadoresRespondieronTurno] = useState([]);
+  const prevPulsadoRef = useRef(null);
 
   const intervalRef = useRef(null);
+  const seleccionadosRef = useRef(seleccionados);
+  useEffect(() => {
+    seleccionadosRef.current = seleccionados;
+  }, [seleccionados]);
 
   useEffect(() => {
     if (!sesion) {
@@ -80,6 +91,78 @@ export default function ConectaOnline({ onLocal, onSalir }) {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [sesion]);
+
+  const esAdmin = Boolean(sala?.esAdmin);
+  const yoId = sala?.yoId;
+  const soyElQueHaPulsado = Boolean(sala?.jugadorPulsado && sala.jugadorPulsado.jugadorId === yoId);
+  const alguienHaPulsado = Boolean(sala?.jugadorPulsado);
+  const miJugador = sala?.jugadores?.find((j) => j.id === yoId);
+  const sinVidas = (miJugador?.vidas ?? 3) <= 0;
+
+  // Seguimiento del ciclo de turnos: reiniciar en nueva ronda o categoría
+  useEffect(() => {
+    setJugadoresRespondieronTurno([]);
+  }, [sala?.rondaActual, sala?.estado === 'categoria']);
+
+  useEffect(() => {
+    const jugadorAnterior = prevPulsadoRef.current;
+    const jugadorActual = sala?.jugadorPulsado;
+
+    // Cuando un jugador termina de responder (acertó, falló o canceló)
+    if (jugadorAnterior && (!jugadorActual || jugadorActual.jugadorId !== jugadorAnterior.jugadorId)) {
+      const pId = jugadorAnterior.jugadorId;
+      setJugadoresRespondieronTurno((prev) => {
+        const nuevo = prev.includes(pId) ? prev : [...prev, pId];
+        const vivos = (sala?.jugadores || []).filter((j) => (j.vidas ?? 3) > 0);
+        const todosRespondieron = vivos.length === 0 || vivos.every((j) => nuevo.includes(j.id));
+        return todosRespondieron ? [] : nuevo;
+      });
+    }
+
+    prevPulsadoRef.current = jugadorActual;
+  }, [sala?.jugadorPulsado, sala?.jugadores]);
+
+  const jugadoresVivos = (sala?.jugadores || []).filter((j) => (j.vidas ?? 3) > 0);
+  const respondieronLista = (sala?.respondieronIds && Array.isArray(sala.respondieronIds))
+    ? sala.respondieronIds
+    : jugadoresRespondieronTurno;
+
+  const cicloCompleto = jugadoresVivos.length === 0 || jugadoresVivos.every((j) => respondieronLista.includes(j.id));
+  const respondieronEfectivos = cicloCompleto ? [] : respondieronLista;
+  const yaRespondioEnCiclo = respondieronEfectivos.includes(yoId);
+
+  // Temporizador de 30 segundos mientras alguien tiene el pulsador activo
+  useEffect(() => {
+    if (!alguienHaPulsado) {
+      setSegundosRespuesta(TIEMPO_RESPUESTA_S);
+      return;
+    }
+
+    setSegundosRespuesta(TIEMPO_RESPUESTA_S);
+    const t = setInterval(() => {
+      setSegundosRespuesta((prev) => {
+        if (prev <= 0.1) {
+          clearInterval(t);
+          if (soyElQueHaPulsado) {
+            handleTiempoAgotadoOnline();
+          }
+          return 0;
+        }
+        return Math.max(0, prev - 0.1);
+      });
+    }, 100);
+
+    return () => clearInterval(t);
+  }, [alguienHaPulsado, soyElQueHaPulsado]);
+
+  const handleTiempoAgotadoOnline = async () => {
+    if (!sesion) return;
+    if (seleccionadosRef.current && seleccionadosRef.current.length === 4) {
+      handleConfirmarSeleccionOnline();
+    } else {
+      handleCancelarTurno();
+    }
+  };
 
   const handleCrear = async () => {
     if (!nombre.trim()) return;
@@ -156,9 +239,10 @@ export default function ConectaOnline({ onLocal, onSalir }) {
   };
 
   const handlePulsarRojo = async () => {
-    if (!sesion) return;
+    if (!sesion || yaRespondioEnCiclo) return;
     setSeleccionados([]);
     setMensajeFeedback(null);
+    setSegundosRespuesta(TIEMPO_RESPUESTA_S);
     try {
       await fetch(`/api/conecta/online/sala/${sesion.code}/pulsar`, {
         method: 'POST',
@@ -322,19 +406,71 @@ export default function ConectaOnline({ onLocal, onSalir }) {
     setTimeout(() => setCodigoCopiado(false), 2000);
   };
 
-  const esAdmin = Boolean(sala?.esAdmin);
-  const yoId = sala?.yoId;
-  const soyElQueHaPulsado = Boolean(sala?.jugadorPulsado && sala.jugadorPulsado.jugadorId === yoId);
-  const alguienHaPulsado = Boolean(sala?.jugadorPulsado);
-  const miJugador = sala?.jugadores?.find((j) => j.id === yoId);
-  const sinVidas = (miJugador?.vidas ?? 3) <= 0;
-
   const ranking = [...(sala?.jugadores || [])].sort((a, b) => b.puntos - a.puntos);
   const maximoPuntos = ranking.length ? ranking[0].puntos : 0;
   const ganadores = maximoPuntos > 0 ? ranking.filter((j) => j.puntos === maximoPuntos) : [];
 
+  // Mostrar ayuda en menús y en el lobby, desaparece al empezar a jugar
+  const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
+
   return (
     <div className="aprox-contenedor">
+      {/* ---------------- BOTÓN Y MODAL DE AYUDA ---------------- */}
+      {mostrarAyuda && (
+        <button
+          type="button"
+          className="btn-ayuda-flotante"
+          onClick={() => setModalAyuda(true)}
+          title="Reglas de Conecta 4"
+        >
+          <span className="btn-ayuda-flotante-signo">?</span>
+        </button>
+      )}
+
+      {modalAyuda && (
+        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
+          <div className="rg-modal aprox-modal-ayuda" onClick={(e) => e.stopPropagation()}>
+            <div className="aprox-modal-header">
+              <span className="aprox-modal-signo-title">?</span>
+              <h3>¿Cómo se juega a Conecta 4?</h3>
+            </div>
+
+            <div className="aprox-modal-cuerpo">
+              <p><strong>1. Dinámica del juego:</strong></p>
+              <ul>
+                <li>El tablero tiene <strong>16 elementos</strong> distribuidos en 4 conexiones secretas.</li>
+                <li><strong>Pulsa el botón rojo</strong> cuando sepas una conexión y marca 4 casillas. Dispondrás de <strong>30 segundos</strong> para responder.</li>
+                <li><strong>Ciclo de turnos:</strong> Tras responder (aciertes o falles), debes esperar a que respondan los demás jugadores vivos antes de poder volver a pulsar. Al responder todos, el turno se reinicia para cualquiera.</li>
+                <li>Si fallas, pierdes 1 vida (3 vidas por ronda). Si aciertas 3 de 4, el juego te avisará.</li>
+                <li>Al acertar una conexión, puedes adivinar su temática para ganar <strong>+1 punto extra</strong>.</li>
+              </ul>
+              <p><strong>2. Puntuación:</strong></p>
+              <div className="aprox-tabla-puntos">
+                <div className="aprox-puntos-fila acierto">
+                  <span>🥇 1ª conexión descubierta</span>
+                  <strong>+5 puntos</strong>
+                </div>
+                <div className="aprox-puntos-fila intermedia" style={{ background: '#e0e7ff', color: '#4338ca' }}>
+                  <span>🥈 2ª conexión descubierta</span>
+                  <strong>+3 puntos</strong>
+                </div>
+                <div className="aprox-puntos-fila cercana">
+                  <span>🥉 3ª conexión descubierta</span>
+                  <strong>+1 punto</strong>
+                </div>
+              </div>
+            </div>
+
+            <div className="rg-modal-acciones">
+              <button className="big full" onClick={() => setModalAyuda(false)}>
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ---------------- FIN AYUDA ---------------- */}
+
       {/* 1. MENÚ PRINCIPAL */}
       {vista === 'menu' && (
         <section className="game">
@@ -466,7 +602,26 @@ export default function ConectaOnline({ onLocal, onSalir }) {
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
         <section className="game">
           <div className="panel center">
-            <p className="categoria"><Icon name="lock" size={16} />Sala de espera</p>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  padding: '0.35rem 1.1rem',
+                  borderRadius: '9999px',
+                  border: '1.5px solid #22c55e',
+                  backgroundColor: '#f0fdf4',
+                  color: '#16a34a',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  lineHeight: 1
+                }}
+              >
+                <Icon name="lock" size={15} />
+                Sala de espera
+              </span>
+            </div>
             <p className="hint">Código de la partida</p>
             <button
               type="button"
@@ -576,11 +731,16 @@ export default function ConectaOnline({ onLocal, onSalir }) {
           </div>
 
           <div className="scoreboard-container" style={{ justifyContent: 'center', marginBottom: '0.8rem' }}>
-            {sala.jugadores.map((j) => (
-              <div key={j.id} className={`score-pill ${j.vidas <= 0 ? 'locked' : ''}`}>
-                <span>{j.nombre}: {j.vidas > 0 ? '❤️'.repeat(j.vidas) : '💀 Fuera'}</span>
-              </div>
-            ))}
+            {sala.jugadores.map((j) => {
+              const yaRespondio = respondieronEfectivos.includes(j.id);
+              return (
+                <div key={j.id} className={`score-pill ${j.vidas <= 0 ? 'locked' : ''}`}>
+                  <span>
+                    {j.nombre}: {j.vidas > 0 ? '❤️'.repeat(j.vidas) : '💀 Fuera'} {yaRespondio && j.vidas > 0 ? '· ⏳' : ''}
+                  </span>
+                </div>
+              );
+            })}
           </div>
 
           {sala.conexionesResueltas.length > 0 && (
@@ -629,13 +789,22 @@ export default function ConectaOnline({ onLocal, onSalir }) {
                   type="button"
                   className="btn-pulsador-rojo"
                   onClick={handlePulsarRojo}
-                  disabled={sinVidas}
+                  disabled={sinVidas || yaRespondioEnCiclo}
                 >
                   <span className="pulsador-icono">🔴</span>
                   <span className="pulsador-texto">
-                    {sinVidas ? 'SIN VIDAS EN ESTA RONDA' : '¡PULSAR PARA RESPONDER!'}
+                    {sinVidas
+                      ? 'SIN VIDAS EN ESTA RONDA'
+                      : yaRespondioEnCiclo
+                      ? 'ESPERANDO A LOS DEMÁS JUGADORES...'
+                      : '¡PULSAR PARA RESPONDER!'}
                   </span>
                 </button>
+                {yaRespondioEnCiclo && (
+                  <p className="hint small center" style={{ marginTop: '0.5rem' }}>
+                    Ya has respondido en esta ronda ({respondieronEfectivos.length}/{jugadoresVivos.length}). Podrás volver a pulsar cuando todos hayan participado.
+                  </p>
+                )}
               </div>
             )}
 
@@ -645,6 +814,46 @@ export default function ConectaOnline({ onLocal, onSalir }) {
                   <span className="pulsado-badge" style={{ background: '#dcfce7', color: '#166534' }}>
                     🔴 ¡Has pulsado! Selecciona 4 casillas ({seleccionados.length}/4)
                   </span>
+
+                  {/* Temporizador de 30 segundos */}
+                  <div
+                    className="timer"
+                    role="timer"
+                    style={{
+                      margin: '0.6rem 0 0.3rem',
+                      background: '#e2e8f0',
+                      borderRadius: '9999px',
+                      height: '8px',
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <div
+                      className={`timer-bar ${segundosRespuesta <= 7 ? 'low' : ''}`}
+                      style={{
+                        width: `${(segundosRespuesta / TIEMPO_RESPUESTA_S) * 100}%`,
+                        height: '100%',
+                        backgroundColor: segundosRespuesta <= 7 ? '#ef4444' : '#16a34a',
+                        borderRadius: '9999px',
+                        transition: 'width 0.1s linear, background-color 0.3s ease'
+                      }}
+                    />
+                  </div>
+                  <p
+                    className="timer-text"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.35rem',
+                      color: segundosRespuesta <= 7 ? '#dc2626' : '#64748b',
+                      fontSize: '0.9rem',
+                      fontWeight: 700,
+                      margin: '0 0 0.8rem'
+                    }}
+                  >
+                    <Icon name="clock" size={16} />
+                    {Math.ceil(segundosRespuesta)} s
+                  </p>
                 </div>
 
                 <div style={{ display: 'flex', gap: '0.8rem', marginTop: '0.8rem' }}>
@@ -673,8 +882,48 @@ export default function ConectaOnline({ onLocal, onSalir }) {
                   <span className="pulsador-icono">🔴</span>
                   <strong>¡{sala.jugadorPulsado.nombre} ha pulsado el botón!</strong>
                 </div>
-                <p className="hint small" style={{ margin: '0.4rem 0 0' }}>
+                <p className="hint small" style={{ margin: '0.4rem 0 0.4rem' }}>
                   Está seleccionando las 4 casillas en su pantalla...
+                </p>
+
+                {/* Temporizador de 30 segundos visible para los rivales */}
+                <div
+                  className="timer"
+                  role="timer"
+                  style={{
+                    margin: '0.6rem 0 0.3rem',
+                    background: '#e2e8f0',
+                    borderRadius: '9999px',
+                    height: '8px',
+                    overflow: 'hidden'
+                  }}
+                >
+                  <div
+                    className={`timer-bar ${segundosRespuesta <= 7 ? 'low' : ''}`}
+                    style={{
+                      width: `${(segundosRespuesta / TIEMPO_RESPUESTA_S) * 100}%`,
+                      height: '100%',
+                      backgroundColor: segundosRespuesta <= 7 ? '#ef4444' : '#16a34a',
+                      borderRadius: '9999px',
+                      transition: 'width 0.1s linear, background-color 0.3s ease'
+                    }}
+                  />
+                </div>
+                <p
+                  className="timer-text"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.35rem',
+                    color: segundosRespuesta <= 7 ? '#dc2626' : '#64748b',
+                    fontSize: '0.9rem',
+                    fontWeight: 700,
+                    margin: '0'
+                  }}
+                >
+                  <Icon name="clock" size={16} />
+                  {Math.ceil(segundosRespuesta)} s
                 </p>
               </div>
             )}
@@ -863,10 +1112,16 @@ export default function ConectaOnline({ onLocal, onSalir }) {
                     type="button"
                     className="btn-pulsador-rojo"
                     onClick={handlePulsarRojo}
-                    disabled={sinVidas}
+                    disabled={sinVidas || yaRespondioEnCiclo}
                   >
                     <span className="pulsador-icono">🔴</span>
-                    <span className="pulsador-texto">¡PULSAR PARA ADIVINAR!</span>
+                    <span className="pulsador-texto">
+                      {sinVidas
+                        ? 'SIN VIDAS EN ESTA RONDA'
+                        : yaRespondioEnCiclo
+                        ? 'ESPERANDO A LOS DEMÁS...'
+                        : '¡PULSAR PARA ADIVINAR!'}
+                    </span>
                   </button>
                 </div>
               )}
@@ -891,6 +1146,47 @@ export default function ConectaOnline({ onLocal, onSalir }) {
                     onChange={(e) => setInputTema(e.target.value)}
                     required
                   />
+
+                  {/* Temporizador de 30 segundos */}
+                  <div
+                    className="timer"
+                    role="timer"
+                    style={{
+                      margin: '0.6rem 0 0.3rem',
+                      background: '#e2e8f0',
+                      borderRadius: '9999px',
+                      height: '8px',
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <div
+                      className={`timer-bar ${segundosRespuesta <= 7 ? 'low' : ''}`}
+                      style={{
+                        width: `${(segundosRespuesta / TIEMPO_RESPUESTA_S) * 100}%`,
+                        height: '100%',
+                        backgroundColor: segundosRespuesta <= 7 ? '#ef4444' : '#16a34a',
+                        borderRadius: '9999px',
+                        transition: 'width 0.1s linear, background-color 0.3s ease'
+                      }}
+                    />
+                  </div>
+                  <p
+                    className="timer-text"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.35rem',
+                      color: segundosRespuesta <= 7 ? '#dc2626' : '#64748b',
+                      fontSize: '0.9rem',
+                      fontWeight: 700,
+                      margin: '0 0 0.8rem'
+                    }}
+                  >
+                    <Icon name="clock" size={16} />
+                    {Math.ceil(segundosRespuesta)} s
+                  </p>
+
                   <div style={{ display: 'flex', gap: '0.8rem', marginTop: '0.8rem' }}>
                     <button type="submit" className="big full" style={{ flex: 2 }}>
                       <Icon name="check" size={20} /> Validar (+1 pt)
@@ -908,8 +1204,48 @@ export default function ConectaOnline({ onLocal, onSalir }) {
                     <span className="pulsador-icono">🔴</span>
                     <strong>¡{sala.jugadorPulsado.nombre} ha pulsado el botón!</strong>
                   </div>
-                  <p className="hint small" style={{ margin: '0.4rem 0 0' }}>
+                  <p className="hint small" style={{ margin: '0.4rem 0 0.4rem' }}>
                     Está respondiendo en su pantalla...
+                  </p>
+
+                  {/* Temporizador de 30 segundos visible para los rivales */}
+                  <div
+                    className="timer"
+                    role="timer"
+                    style={{
+                      margin: '0.6rem 0 0.3rem',
+                      background: '#e2e8f0',
+                      borderRadius: '9999px',
+                      height: '8px',
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <div
+                      className={`timer-bar ${segundosRespuesta <= 7 ? 'low' : ''}`}
+                      style={{
+                        width: `${(segundosRespuesta / TIEMPO_RESPUESTA_S) * 100}%`,
+                        height: '100%',
+                        backgroundColor: segundosRespuesta <= 7 ? '#ef4444' : '#16a34a',
+                        borderRadius: '9999px',
+                        transition: 'width 0.1s linear, background-color 0.3s ease'
+                      }}
+                    />
+                  </div>
+                  <p
+                    className="timer-text"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.35rem',
+                      color: segundosRespuesta <= 7 ? '#dc2626' : '#64748b',
+                      fontSize: '0.9rem',
+                      fontWeight: 700,
+                      margin: '0'
+                    }}
+                  >
+                    <Icon name="clock" size={16} />
+                    {Math.ceil(segundosRespuesta)} s
                   </p>
                 </div>
               )}

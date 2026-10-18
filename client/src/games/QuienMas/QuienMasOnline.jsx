@@ -5,6 +5,7 @@ import Icon from '../../components/Icon.jsx';
 import './QuienMas.css';
 
 const CLAVE_SESION_QM = 'quienmas_online_session';
+const TIEMPO_VOTO = 30;
 
 export default function QuienMasOnline({ onLocal, onSalir }) {
   const esAdminGlobal = useAdmin();
@@ -15,6 +16,7 @@ export default function QuienMasOnline({ onLocal, onSalir }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modalSalir, setModalSalir] = useState(false);
+  const [modalAyuda, setModalAyuda] = useState(false);
 
   const [sesion, setSesion] = useState(() => {
     try {
@@ -26,8 +28,15 @@ export default function QuienMasOnline({ onLocal, onSalir }) {
 
   const [sala, setSala] = useState(null);
   const [codigoCopiado, setCodigoCopiado] = useState(false);
+  const [tiempoRestante, setTiempoRestante] = useState(TIEMPO_VOTO);
 
   const intervalRef = useRef(null);
+  const timerVotoRef = useRef(null);
+
+  const salaRef = useRef(sala);
+  useEffect(() => {
+    salaRef.current = sala;
+  }, [sala]);
 
   useEffect(() => {
     if (!sesion) {
@@ -138,6 +147,7 @@ export default function QuienMasOnline({ onLocal, onSalir }) {
   };
 
   const handleVotar = async (candidato) => {
+    if (timerVotoRef.current) clearInterval(timerVotoRef.current);
     if (!sesion) return;
     try {
       await fetch(`/api/quienmas/online/sala/${sesion.code}/votar`, {
@@ -149,6 +159,42 @@ export default function QuienMasOnline({ onLocal, onSalir }) {
       console.error(err);
     }
   };
+
+  const handleVotarRef = useRef(handleVotar);
+  useEffect(() => {
+    handleVotarRef.current = handleVotar;
+  });
+
+  // Temporizador de 30 segundos durante la votación online
+  useEffect(() => {
+    if (sala?.estado !== 'votando' || sala?.yaVoto) {
+      if (timerVotoRef.current) clearInterval(timerVotoRef.current);
+      return;
+    }
+
+    setTiempoRestante(TIEMPO_VOTO);
+
+    if (timerVotoRef.current) clearInterval(timerVotoRef.current);
+    timerVotoRef.current = setInterval(() => {
+      setTiempoRestante((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerVotoRef.current);
+          const s = salaRef.current;
+          if (s && s.jugadores && s.jugadores.length > 0 && !s.yaVoto) {
+            const candidatos = s.jugadores.map((j) => j.nombre);
+            const elegido = candidatos[Math.floor(Math.random() * candidatos.length)];
+            handleVotarRef.current(elegido);
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      if (timerVotoRef.current) clearInterval(timerVotoRef.current);
+    };
+  }, [sala?.estado, sala?.rondaNum, sala?.preguntaActual, sala?.yaVoto]);
 
   const handleCerrarVotacion = async () => {
     if (!sesion) return;
@@ -233,8 +279,55 @@ export default function QuienMasOnline({ onLocal, onSalir }) {
   const maximoPuntos = ranking.length ? ranking[0].puntos : 0;
   const ganadores = maximoPuntos > 0 ? ranking.filter((j) => j.puntos === maximoPuntos) : [];
 
+  // Mostrar ayuda en menús y en el lobby, desaparece al empezar a jugar
+  const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
+
   return (
     <div className="qm-contenedor">
+      {/* ---------------- BOTÓN Y MODAL DE AYUDA ---------------- */}
+      {mostrarAyuda && (
+        <button
+          type="button"
+          className="btn-ayuda-flotante"
+          onClick={() => setModalAyuda(true)}
+          title="Reglas y funcionamiento"
+        >
+          <span className="btn-ayuda-flotante-signo">?</span>
+        </button>
+      )}
+
+      {modalAyuda && (
+        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
+          <div className="rg-modal modal-ayuda-juego" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-ayuda-header">
+              <span className="modal-ayuda-signo-title">?</span>
+              <h3>Cómo se juega a «¿De verdad os conocéis?»</h3>
+            </div>
+
+            <div className="modal-ayuda-cuerpo">
+              <p><strong>1. Votación secreta:</strong></p>
+              <ul>
+                <li>Aparece una pregunta sobre la personalidad del grupo.</li>
+                <li>Cada jugador vota <strong>en secreto</strong> al jugador que mejor encaja.</li>
+                <li>Dispones de <strong>30 segundos</strong> para emitir tu voto. Si se agota el tiempo, se seleccionará un jugador al azar.</li>
+              </ul>
+              <p><strong>2. Puntuación:</strong></p>
+              <ul>
+                <li>Si votas al jugador <strong>más votado</strong>, sumas <strong>+1 punto</strong>.</li>
+                <li>Si hay <strong>empate</strong> en la primera posición, <strong>nadie suma puntos</strong>.</li>
+              </ul>
+            </div>
+
+            <div className="rg-modal-acciones">
+              <button className="big full" onClick={() => setModalAyuda(false)}>
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ---------------- FIN AYUDA ---------------- */}
+
       {/* 1. MENÚ PRINCIPAL */}
       {vista === 'menu' && (
         <section className="game">
@@ -366,7 +459,26 @@ export default function QuienMasOnline({ onLocal, onSalir }) {
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
         <section className="game">
           <div className="panel center">
-            <p className="categoria"><Icon name="lock" size={16} />Sala de espera</p>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  padding: '0.35rem 1.1rem',
+                  borderRadius: '9999px',
+                  border: '1.5px solid #22c55e',
+                  backgroundColor: '#f0fdf4',
+                  color: '#16a34a',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  lineHeight: 1
+                }}
+              >
+                <Icon name="lock" size={15} />
+                Sala de espera
+              </span>
+            </div>
             <p className="hint">Código de la partida</p>
             <button
               type="button"
@@ -381,10 +493,10 @@ export default function QuienMasOnline({ onLocal, onSalir }) {
             </p>
           </div>
 
-          {/* Selector de categoría */}
-          <div className="panel" style={{ marginTop: '1rem' }}>
-            <h3 className="panel-title"><Icon name="dice" size={20} /> Categoría de preguntas</h3>
-            {esAdmin ? (
+          {/* Selector de categoría (solo disponible si el modo admin global está activado y el usuario es anfitrión) */}
+          {esAdminGlobal && esAdmin && (
+            <div className="panel" style={{ marginTop: '1rem' }}>
+              <h3 className="panel-title"><Icon name="dice" size={20} /> Categoría de preguntas (Admin)</h3>
               <div>
                 <label className="field-label">Elige la temática para el grupo:</label>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem', marginTop: '0.5rem' }}>
@@ -395,28 +507,17 @@ export default function QuienMasOnline({ onLocal, onSalir }) {
                   >
                     😊 Normal (Todos los públicos)
                   </button>
-
-                  {esAdminGlobal ? (
-                    <button
-                      type="button"
-                      className={`pts-btn-modo ${sala.categoria === 'picante' ? 'activo' : ''}`}
-                      onClick={() => handleCambiarCategoria('picante')}
-                    >
-                      🌶️ Picante (Comprometidas)
-                    </button>
-                  ) : (
-                    <button type="button" className="pts-btn-modo" disabled title="Requiere modo administrador">
-                      🔒 Picante (Solo Admin)
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    className={`pts-btn-modo ${sala.categoria === 'picante' ? 'activo' : ''}`}
+                    onClick={() => handleCambiarCategoria('picante')}
+                  >
+                    🌶️ Picante (Comprometidas)
+                  </button>
                 </div>
               </div>
-            ) : (
-              <p className="hint" style={{ fontWeight: 700 }}>
-                Categoría seleccionada: {sala.categoria === 'picante' ? '🌶️ Picante' : '😊 Normal'}
-              </p>
-            )}
-          </div>
+            </div>
+          )}
 
           <div className="panel" style={{ marginTop: '1rem' }}>
             <h3 className="panel-title"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length})</h3>
@@ -478,8 +579,48 @@ export default function QuienMasOnline({ onLocal, onSalir }) {
 
             {!sala.yaVoto ? (
               <>
-                <p className="hint" style={{ margin: '0.5rem 0 1rem' }}>
+                <p className="hint" style={{ margin: '0.5rem 0 0.4rem' }}>
                   Elige en secreto al jugador que más encaja con la pregunta:
+                </p>
+
+                {/* Temporizador de 30 segundos */}
+                <div
+                  className="timer"
+                  role="timer"
+                  style={{
+                    margin: '0.6rem 0 0.3rem',
+                    background: '#e2e8f0',
+                    borderRadius: '9999px',
+                    height: '8px',
+                    overflow: 'hidden'
+                  }}
+                >
+                  <div
+                    className={`timer-bar ${tiempoRestante <= 10 ? 'low' : ''}`}
+                    style={{
+                      width: `${(tiempoRestante / TIEMPO_VOTO) * 100}%`,
+                      height: '100%',
+                      backgroundColor: tiempoRestante <= 10 ? '#ef4444' : '#16a34a',
+                      borderRadius: '9999px',
+                      transition: 'width 0.1s linear, background-color 0.3s ease'
+                    }}
+                  />
+                </div>
+                <p
+                  className="timer-text"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.35rem',
+                    color: tiempoRestante <= 10 ? '#dc2626' : '#64748b',
+                    fontSize: '0.9rem',
+                    fontWeight: 700,
+                    margin: '0 0 1rem'
+                  }}
+                >
+                  <Icon name="clock" size={16} />
+                  {tiempoRestante} s
                 </p>
 
                 <div className="names-grid">

@@ -12,6 +12,7 @@ export default function FrasesCelebresOnline({ onLocal, onSalir }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modalSalir, setModalSalir] = useState(false);
+  const [modalAyuda, setModalAyuda] = useState(false);
 
   const [sesion, setSesion] = useState(() => {
     try {
@@ -23,8 +24,10 @@ export default function FrasesCelebresOnline({ onLocal, onSalir }) {
 
   const [sala, setSala] = useState(null);
   const [codigoCopiado, setCodigoCopiado] = useState(false);
+  const [segundosRespuesta, setSegundosRespuesta] = useState(15);
 
   const intervalRef = useRef(null);
+  const timerRespuestaRef = useRef(null);
 
   useEffect(() => {
     if (!sesion) {
@@ -61,6 +64,52 @@ export default function FrasesCelebresOnline({ onLocal, onSalir }) {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [sesion]);
+
+  const ronda = sala?.ronda;
+  const esAdmin = sala?.esAdmin;
+  const yoId = sala?.yoId;
+  const soyElQueHaPulsado = Boolean(ronda?.pulsado && ronda.pulsado.jugadorId === yoId);
+  const alguienHaPulsado = Boolean(ronda?.pulsado);
+  const miJugador = sala?.jugadores?.find((j) => j.id === yoId);
+  const estoyBloqueado = Boolean(miJugador?.bloqueado);
+
+  const handleTiempoAgotadoOnline = async () => {
+    if (!sesion) return;
+    try {
+      // Enviar respuesta no coincidente para computar fallo por tiempo agotado
+      await fetch(`/api/frasescelebres/online/sala/${sesion.code}/responder`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: sesion.token, opcion: '__TIEMPO_AGOTADO__' })
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  // Temporizador de 15 segundos al responder online
+  useEffect(() => {
+    if (!alguienHaPulsado) {
+      setSegundosRespuesta(15);
+      return;
+    }
+
+    setSegundosRespuesta(15);
+    const t = setInterval(() => {
+      setSegundosRespuesta((prev) => {
+        if (prev <= 0.1) {
+          clearInterval(t);
+          if (soyElQueHaPulsado) {
+            handleTiempoAgotadoOnline();
+          }
+          return 0;
+        }
+        return Math.max(0, prev - 0.1);
+      });
+    }, 100);
+
+    return () => clearInterval(t);
+  }, [alguienHaPulsado, soyElQueHaPulsado]);
 
   const handleCrear = async () => {
     if (!nombre.trim()) return;
@@ -124,6 +173,7 @@ export default function FrasesCelebresOnline({ onLocal, onSalir }) {
   const handlePulsarRojo = async () => {
     if (!sesion) return;
     try {
+      setSegundosRespuesta(15);
       await fetch(`/api/frasescelebres/online/sala/${sesion.code}/pulsar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -211,20 +261,65 @@ export default function FrasesCelebresOnline({ onLocal, onSalir }) {
     setTimeout(() => setCodigoCopiado(false), 2000);
   };
 
-  const ronda = sala?.ronda;
-  const esAdmin = sala?.esAdmin;
-  const yoId = sala?.yoId;
-  const soyElQueHaPulsado = Boolean(ronda?.pulsado && ronda.pulsado.jugadorId === yoId);
-  const alguienHaPulsado = Boolean(ronda?.pulsado);
-  const miJugador = sala?.jugadores?.find((j) => j.id === yoId);
-  const estoyBloqueado = Boolean(miJugador?.bloqueado);
-
   const ranking = [...(sala?.jugadores || [])].sort((a, b) => b.puntos - a.puntos);
   const maximoPuntos = ranking.length ? ranking[0].puntos : 0;
   const ganadores = maximoPuntos > 0 ? ranking.filter((j) => j.puntos === maximoPuntos) : [];
 
+  // Mostrar ayuda en menús y en la sala de espera (lobby), desaparece al empezar a jugar
+  const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
+
   return (
     <div className="aprox-contenedor">
+      {/* ---------------- BOTÓN Y MODAL DE AYUDA ---------------- */}
+      {mostrarAyuda && (
+        <button
+          type="button"
+          className="btn-ayuda-flotante"
+          onClick={() => setModalAyuda(true)}
+          title="Reglas y puntuación"
+        >
+          <span className="btn-ayuda-flotante-signo">?</span>
+        </button>
+      )}
+
+      {modalAyuda && (
+        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
+          <div className="rg-modal modal-ayuda-juego" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-ayuda-header">
+              <span className="modal-ayuda-signo-title">?</span>
+              <h3>¿Cómo se juega a Frases Célebres?</h3>
+            </div>
+
+            <div className="modal-ayuda-cuerpo">
+              <p><strong>1. Dinámica del juego:</strong></p>
+              <ul>
+                <li>Aparece la frase con las 4 opciones de autor (A, B, C y D).</li>
+                <li>Disponéis de <strong>30 segundos</strong> de tiempo común.</li>
+                <li><strong>Pulsa el botón rojo</strong> para parar el tiempo. Dispondrás de <strong>15 segundos</strong> para pulsar la opción correcta.</li>
+              </ul>
+              <p><strong>2. Puntuación:</strong></p>
+              <div className="tabla-ayuda-puntos">
+                <div className="fila-ayuda-puntos verde">
+                  <span>🎯 Acierto</span>
+                  <strong>+3 puntos</strong>
+                </div>
+                <div className="fila-ayuda-puntos rojo">
+                  <span>❌ Fallo o tiempo agotado</span>
+                  <strong>-1 punto (quedando fuera de la frase)</strong>
+                </div>
+              </div>
+            </div>
+
+            <div className="rg-modal-acciones">
+              <button className="big full" onClick={() => setModalAyuda(false)}>
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ---------------- FIN AYUDA ---------------- */}
+
       {/* 1. MENÚ PRINCIPAL */}
       {vista === 'menu' && (
         <section className="game">
@@ -356,7 +451,26 @@ export default function FrasesCelebresOnline({ onLocal, onSalir }) {
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
         <section className="game">
           <div className="panel center">
-            <p className="categoria"><Icon name="lock" size={16} />Sala de espera</p>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  padding: '0.35rem 1.1rem',
+                  borderRadius: '9999px',
+                  border: '1.5px solid #22c55e',
+                  backgroundColor: '#f0fdf4',
+                  color: '#16a34a',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  lineHeight: 1
+                }}
+              >
+                <Icon name="lock" size={15} />
+                Sala de espera
+              </span>
+            </div>
             <p className="hint">Código de la partida</p>
             <button
               type="button"
@@ -434,7 +548,7 @@ export default function FrasesCelebresOnline({ onLocal, onSalir }) {
             ))}
           </div>
 
-          {/* Temporizador */}
+          {/* Temporizador general de la frase */}
           <div className="timer" role="timer">
             <div
               className={`timer-bar ${ronda.segundosRestantes <= 7 ? 'low' : ''}`}
@@ -497,12 +611,54 @@ export default function FrasesCelebresOnline({ onLocal, onSalir }) {
 
               {soyElQueHaPulsado && (
                 <div className="respuesta-pulsada-box" style={{ textAlign: 'center' }}>
-                  <span className="pulsado-badge" style={{ background: '#dcfce7', color: '#166534' }}>
-                    🔴 ¡Has pulsado! Tiempo detenido
-                  </span>
-                  <p className="hint" style={{ marginTop: '0.6rem', fontWeight: 700, color: '#1e1b4b' }}>
-                    ¡Toca directamente una de las 4 opciones de arriba para responder!
-                  </p>
+                  <div className="respuesta-pulsada-header">
+                    <span className="pulsado-badge" style={{ background: '#dcfce7', color: '#166534' }}>
+                      🔴 ¡Has pulsado! Tiempo detenido
+                    </span>
+                    <p className="hint small" style={{ margin: '0.3rem 0 0.4rem' }}>
+                      ¡Toca directamente una de las 4 opciones de arriba para responder!
+                    </p>
+
+                    {/* Temporizador de 15 segundos */}
+                    <div
+                      className="timer"
+                      role="timer"
+                      style={{
+                        margin: '0.6rem 0 0.3rem',
+                        background: '#e2e8f0',
+                        borderRadius: '9999px',
+                        height: '8px',
+                        overflow: 'hidden'
+                      }}
+                    >
+                      <div
+                        className={`timer-bar ${segundosRespuesta <= 4 ? 'low' : ''}`}
+                        style={{
+                          width: `${(segundosRespuesta / 15) * 100}%`,
+                          height: '100%',
+                          backgroundColor: segundosRespuesta <= 4 ? '#ef4444' : '#16a34a',
+                          borderRadius: '9999px',
+                          transition: 'width 0.1s linear, background-color 0.3s ease'
+                        }}
+                      />
+                    </div>
+                    <p
+                      className="timer-text"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.35rem',
+                        color: segundosRespuesta <= 4 ? '#dc2626' : '#64748b',
+                        fontSize: '0.9rem',
+                        fontWeight: 700,
+                        margin: '0 0 0.8rem'
+                      }}
+                    >
+                      <Icon name="clock" size={16} />
+                      {Math.ceil(segundosRespuesta)} s
+                    </p>
+                  </div>
                 </div>
               )}
 
@@ -512,8 +668,48 @@ export default function FrasesCelebresOnline({ onLocal, onSalir }) {
                     <span className="pulsador-icono">🔴</span>
                     <strong>¡{ronda.pulsado.nombre} ha pulsado el botón!</strong>
                   </div>
-                  <p className="hint small" style={{ margin: '0.4rem 0 0' }}>
+                  <p className="hint small" style={{ margin: '0.4rem 0 0.4rem' }}>
                     Tiempo detenido. Está seleccionando una opción en su pantalla...
+                  </p>
+
+                  {/* Temporizador de 15 segundos visible para los rivales */}
+                  <div
+                    className="timer"
+                    role="timer"
+                    style={{
+                      margin: '0.6rem 0 0.3rem',
+                      background: '#e2e8f0',
+                      borderRadius: '9999px',
+                      height: '8px',
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <div
+                      className={`timer-bar ${segundosRespuesta <= 4 ? 'low' : ''}`}
+                      style={{
+                        width: `${(segundosRespuesta / 15) * 100}%`,
+                        height: '100%',
+                        backgroundColor: segundosRespuesta <= 4 ? '#ef4444' : '#16a34a',
+                        borderRadius: '9999px',
+                        transition: 'width 0.1s linear, background-color 0.3s ease'
+                      }}
+                    />
+                  </div>
+                  <p
+                    className="timer-text"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.35rem',
+                      color: segundosRespuesta <= 4 ? '#dc2626' : '#64748b',
+                      fontSize: '0.9rem',
+                      fontWeight: 700,
+                      margin: '0 0 0.8rem'
+                    }}
+                  >
+                    <Icon name="clock" size={16} />
+                    {Math.ceil(segundosRespuesta)} s
                   </p>
                 </div>
               )}

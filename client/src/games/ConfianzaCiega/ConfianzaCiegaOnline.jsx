@@ -1,17 +1,21 @@
 // client/src/games/ConfianzaCiega/ConfianzaCiegaOnline.jsx
 import React, { useState, useEffect, useRef } from 'react';
+import { useAdmin, adminHeaders } from '../../lib/admin.js';
 import Icon from '../../components/Icon.jsx';
 import './ConfianzaCiega.css';
 
 const CLAVE_SESION_CC = 'confianzaciega_online_session';
 
 export default function ConfianzaCiegaOnline({ onLocal, onSalir }) {
+  const esAdminGlobal = useAdmin();
+
   const [vista, setVista] = useState('menu'); // 'menu' | 'crear' | 'unirse' | 'sala'
   const [nombre, setNombre] = useState('');
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modalSalir, setModalSalir] = useState(false);
+  const [modalAyuda, setModalAyuda] = useState(false);
 
   const [sesion, setSesion] = useState(() => {
     try {
@@ -117,7 +121,7 @@ export default function ConfianzaCiegaOnline({ onLocal, onSalir }) {
     try {
       await fetch(`/api/confianzaciega/online/sala/${sesion.code}/picantes`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...adminHeaders() },
         body: JSON.stringify({ token: sesion.token, usarPicantes: nuevoValor })
       });
     } catch (err) {
@@ -130,7 +134,7 @@ export default function ConfianzaCiegaOnline({ onLocal, onSalir }) {
     try {
       await fetch(`/api/confianzaciega/online/sala/${sesion.code}/iniciar`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...adminHeaders() },
         body: JSON.stringify({ token: sesion.token })
       });
     } catch (err) {
@@ -277,8 +281,67 @@ export default function ConfianzaCiegaOnline({ onLocal, onSalir }) {
   const maximoPuntos = ranking.length ? ranking[0].puntos : 0;
   const ganadores = maximoPuntos > 0 ? ranking.filter((j) => j.puntos === maximoPuntos) : [];
 
+  // Mostrar ayuda en los menús y en el lobby, desaparece al empezar a jugar
+  const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
+
   return (
     <div className="aprox-contenedor">
+      {/* ---------------- BOTÓN Y MODAL DE AYUDA ---------------- */}
+      {mostrarAyuda && (
+        <button
+          type="button"
+          className="aprox-btn-ayuda"
+          onClick={() => setModalAyuda(true)}
+          title="Reglas y puntuación"
+        >
+          <span className="aprox-btn-ayuda-signo">?</span>
+        </button>
+      )}
+
+      {modalAyuda && (
+        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
+          <div className="rg-modal aprox-modal-ayuda" onClick={(e) => e.stopPropagation()}>
+            <div className="aprox-modal-header">
+              <span className="aprox-modal-signo-title">?</span>
+              <h3>¿Cómo se juega a Confianza Ciega?</h3>
+            </div>
+
+            <div className="aprox-modal-cuerpo">
+              <p><strong>1. Dinámica de la ronda:</strong></p>
+              <ul>
+                <li>El jugador activo ve dos consignas y elige una en secreto.</li>
+                <li>Los demás jugadores apuestan un número y si dirá <em>más de</em> o <em>menos de</em> esa cantidad.</li>
+                <li>Hay <strong>10 segundos de preparación</strong> antes de que empiece a correr el tiempo (2 minutos).</li>
+                <li>El jugador que responde no suma puntos en su turno (solo cuando apuesta en el de otros).</li>
+              </ul>
+
+              <p><strong>2. Sistema de puntuación:</strong></p>
+              <div className="aprox-tabla-puntos">
+                <div className="aprox-puntos-fila acierto" style={{ background: '#dbeafe', color: '#1d4ed8' }}>
+                  <span>🎯 Número exacto</span>
+                  <strong>+{(sala?.jugadores?.length || 4) + 5} pts</strong>
+                </div>
+                <div className="aprox-puntos-fila acierto">
+                  <span>✓ Apuesta acertada</span>
+                  <strong>+{(sala?.jugadores?.length || 4) - 1} pts decreciendo</strong>
+                </div>
+                <div className="aprox-puntos-fila lejana">
+                  <span>❌ Apuesta fallada</span>
+                  <strong>-{(sala?.jugadores?.length || 4) - 1} pts</strong>
+                </div>
+              </div>
+            </div>
+
+            <div className="rg-modal-acciones">
+              <button className="big full" onClick={() => setModalAyuda(false)}>
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ---------------- FIN AYUDA ---------------- */}
+
       {/* 1. MENÚ PRINCIPAL */}
       {vista === 'menu' && (
         <section className="game">
@@ -410,7 +473,26 @@ export default function ConfianzaCiegaOnline({ onLocal, onSalir }) {
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
         <section className="game">
           <div className="panel center">
-            <p className="categoria"><Icon name="lock" size={16} />Sala de espera</p>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  padding: '0.35rem 1.1rem',
+                  borderRadius: '9999px',
+                  border: '1.5px solid #22c55e',
+                  backgroundColor: '#f0fdf4',
+                  color: '#16a34a',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  lineHeight: 1
+                }}
+              >
+                <Icon name="lock" size={15} />
+                Sala de espera
+              </span>
+            </div>
             <p className="hint">Código de la partida</p>
             <button
               type="button"
@@ -425,23 +507,31 @@ export default function ConfianzaCiegaOnline({ onLocal, onSalir }) {
             </p>
           </div>
 
-          <div className="panel" style={{ marginTop: '1rem' }}>
-            <h3 className="panel-title"><Icon name="target" size={20} /> Categorías picantes</h3>
-            {esAdmin ? (
-              <label style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#db2777', fontWeight: '700', fontSize: '0.95rem', cursor: 'pointer', marginTop: '0.4rem' }}>
-                <input
-                  type="checkbox"
-                  checked={Boolean(sala.usarPicantes)}
-                  onChange={(e) => handleCambiarPicantes(e.target.checked)}
-                />
-                <span>Incluir consignas picantes y comprometidas</span>
-              </label>
-            ) : (
-              <p className="hint" style={{ fontWeight: 700 }}>
-                {sala.usarPicantes ? '🌶️ Consignas picantes activadas' : '😊 Modo estándar'}
-              </p>
-            )}
-          </div>
+          {/* Selector de categoría (solo si el modo admin global está activado y el usuario es anfitrión) */}
+          {esAdminGlobal && esAdmin && (
+            <div className="panel" style={{ marginTop: '1rem' }}>
+              <h3 className="panel-title"><Icon name="dice" size={20} /> Categoría de consignas (Admin)</h3>
+              <div>
+                <label className="field-label">Elige la temática para el grupo:</label>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem', marginTop: '0.5rem' }}>
+                  <button
+                    type="button"
+                    className={`pts-btn-modo ${!sala.usarPicantes ? 'activo' : ''}`}
+                    onClick={() => handleCambiarPicantes(false)}
+                  >
+                    😊 Normal (Todos los públicos)
+                  </button>
+                  <button
+                    type="button"
+                    className={`pts-btn-modo ${sala.usarPicantes ? 'activo' : ''}`}
+                    onClick={() => handleCambiarPicantes(true)}
+                  >
+                    🌶️ Picante (Comprometidas)
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="panel" style={{ marginTop: '1rem' }}>
             <h3 className="panel-title"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length})</h3>

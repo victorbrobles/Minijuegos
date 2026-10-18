@@ -39,15 +39,47 @@ export default function PistasLocal({ onVolver, onExit }) {
   const [acertadosRonda, setAcertadosRonda] = useState([]);
   const [bloqueadosRonda, setBloqueadosRonda] = useState([]);
 
-  // NUEVO: Pulsador rojo offline
+  // Pulsador rojo offline y temporizador de 15s para responder
   const [pulsadorActivo, setPulsadorActivo] = useState(false);
   const [inputRespuesta, setInputRespuesta] = useState('');
+  const [jugadorSeleccionadoId, setJugadorSeleccionadoId] = useState(null);
+  const [segundosRespuesta, setSegundosRespuesta] = useState(15);
   const [feedbackError, setFeedbackError] = useState('');
 
   // Resultado de la ronda
   const [resultadoRonda, setResultadoRonda] = useState(null);
 
   const timerRef = useRef(null);
+
+  const inputRespuestaRef = useRef(inputRespuesta);
+  useEffect(() => {
+    inputRespuestaRef.current = inputRespuesta;
+  }, [inputRespuesta]);
+
+  const jugadorSeleccionadoRef = useRef(jugadorSeleccionadoId);
+  useEffect(() => {
+    jugadorSeleccionadoRef.current = jugadorSeleccionadoId;
+  }, [jugadorSeleccionadoId]);
+
+  const acertadosRondaRef = useRef(acertadosRonda);
+  useEffect(() => {
+    acertadosRondaRef.current = acertadosRonda;
+  }, [acertadosRonda]);
+
+  const bloqueadosRondaRef = useRef(bloqueadosRonda);
+  useEffect(() => {
+    bloqueadosRondaRef.current = bloqueadosRonda;
+  }, [bloqueadosRonda]);
+
+  const vidasRef = useRef(vidas);
+  useEffect(() => {
+    vidasRef.current = vidas;
+  }, [vidas]);
+
+  const jugadoresRef = useRef(jugadores);
+  useEffect(() => {
+    jugadoresRef.current = jugadores;
+  }, [jugadores]);
 
   // Temporizador de 10s por pista
   useEffect(() => {
@@ -127,6 +159,8 @@ export default function PistasLocal({ onVolver, onExit }) {
       setBloqueadosRonda([]);
       setPulsadorActivo(false);
       setInputRespuesta('');
+      setJugadorSeleccionadoId(null);
+      setSegundosRespuesta(15);
       setFeedbackError('');
       setResultadoRonda(null);
       setFase('jugando');
@@ -149,17 +183,104 @@ export default function PistasLocal({ onVolver, onExit }) {
     if (jugadoresDisponibles.length === 0) return;
     setPulsadorActivo(true);
     setInputRespuesta('');
+    setJugadorSeleccionadoId(null);
+    setSegundosRespuesta(15);
     setFeedbackError('');
   };
 
   const cancelarRespuesta = () => {
     setPulsadorActivo(false);
     setInputRespuesta('');
+    setJugadorSeleccionadoId(null);
     setFeedbackError('');
   };
 
-  const confirmarRespuestaJugador = async (jugador) => {
-    if (!inputRespuesta.trim() || !pulsadorActivo) return;
+  // Temporizador de 15 segundos para responder
+  useEffect(() => {
+    if (!pulsadorActivo) {
+      setSegundosRespuesta(15);
+      return;
+    }
+
+    setSegundosRespuesta(15);
+    const t = setInterval(() => {
+      setSegundosRespuesta((prev) => {
+        if (prev <= 0.1) {
+          clearInterval(t);
+          handleTiempoAgotadoLocal();
+          return 0;
+        }
+        return Math.max(0, prev - 0.1);
+      });
+    }, 100);
+
+    return () => clearInterval(t);
+  }, [pulsadorActivo]);
+
+  const aplicarFallo = (jugador, avisoTexto) => {
+    setPulsadorActivo(false);
+    setInputRespuesta('');
+    setJugadorSeleccionadoId(null);
+
+    if (modo === 'estandar') {
+      const nuevosBloqueados = [...bloqueadosRondaRef.current, jugador.id];
+      setBloqueadosRonda(nuevosBloqueados);
+
+      const activos = obtenerJugadoresActivos(acertadosRondaRef.current, nuevosBloqueados, vidasRef.current);
+      if (activos.length === 0) {
+        finalizarRonda('todos_eliminados', acertadosRondaRef.current, nuevosBloqueados);
+      } else {
+        setFeedbackError(avisoTexto || `¡${jugador.nombre} ha fallado!`);
+        setTimeout(() => setFeedbackError(''), 2000);
+      }
+    } else {
+      const nuevasVidas = { ...vidasRef.current, [jugador.id]: 0 };
+      setVidas(nuevasVidas);
+      setOrdenEliminacionSupervivencia((prev) => [...prev, jugador.id]);
+
+      const vivos = jugadoresRef.current.filter((j) => nuevasVidas[j.id] > 0);
+      if (vivos.length <= 1) {
+        finalizarPartidaSupervivencia(nuevasVidas);
+      } else {
+        const activos = obtenerJugadoresActivos(acertadosRondaRef.current, bloqueadosRondaRef.current, nuevasVidas);
+        if (activos.length === 0) {
+          finalizarRonda('todos_eliminados', acertadosRondaRef.current, bloqueadosRondaRef.current);
+        } else {
+          setFeedbackError(avisoTexto || `¡${jugador.nombre} ha fallado y pierde todas sus vidas!`);
+          setTimeout(() => setFeedbackError(''), 2000);
+        }
+      }
+    }
+  };
+
+  const handleTiempoAgotadoLocal = () => {
+    const jId = jugadorSeleccionadoRef.current;
+    const texto = inputRespuestaRef.current.trim();
+
+    // Si no se ha elegido jugador, simplemente se cierra el modal sin penalizar
+    if (!jId) {
+      cancelarRespuesta();
+      return;
+    }
+
+    const jugador = jugadoresRef.current.find((j) => j.id === jId);
+    if (!jugador) {
+      cancelarRespuesta();
+      return;
+    }
+
+    if (texto) {
+      // Si hay algo escrito y no se ha enviado, se envía como respuesta
+      confirmarRespuestaJugador(jugador, texto);
+    } else {
+      // Si no ha escrito nada, cuenta como fallo
+      aplicarFallo(jugador, `¡${jugador.nombre} ha agotado el tiempo de respuesta!`);
+    }
+  };
+
+  const confirmarRespuestaJugador = async (jugador, textoOpcional) => {
+    const texto = (textoOpcional !== undefined ? textoOpcional : inputRespuesta).trim();
+    if (!texto || !pulsadorActivo) return;
 
     try {
       const res = await fetch('/api/pistas/validar', {
@@ -167,13 +288,14 @@ export default function PistasLocal({ onVolver, onExit }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           id: rondaData.id,
-          respuesta: inputRespuesta
+          respuesta: texto
         })
       });
       const data = await res.json();
 
       setPulsadorActivo(false);
       setInputRespuesta('');
+      setJugadorSeleccionadoId(null);
 
       if (data.acierto) {
         let ptsGanados = 0;
@@ -213,29 +335,7 @@ export default function PistasLocal({ onVolver, onExit }) {
           finalizarRonda('todos_completados', nuevosAcertados, bloqueadosRonda);
         }
       } else {
-        if (modo === 'estandar') {
-          const nuevosBloqueados = [...bloqueadosRonda, jugador.id];
-          setBloqueadosRonda(nuevosBloqueados);
-
-          const activos = obtenerJugadoresActivos(acertadosRonda, nuevosBloqueados, vidas);
-          if (activos.length === 0) {
-            finalizarRonda('todos_eliminados', acertadosRonda, nuevosBloqueados);
-          }
-        } else {
-          const nuevasVidas = { ...vidas, [jugador.id]: 0 };
-          setVidas(nuevasVidas);
-          setOrdenEliminacionSupervivencia((prev) => [...prev, jugador.id]);
-
-          const vivos = jugadores.filter((j) => nuevasVidas[j.id] > 0);
-          if (vivos.length <= 1) {
-            finalizarPartidaSupervivencia(nuevasVidas);
-          } else {
-            const activos = obtenerJugadoresActivos(acertadosRonda, bloqueadosRonda, nuevasVidas);
-            if (activos.length === 0) {
-              finalizarRonda('todos_eliminados', acertadosRonda, bloqueadosRonda);
-            }
-          }
-        }
+        aplicarFallo(jugador, `¡${jugador.nombre} ha fallado!`);
       }
     } catch {
       setFeedbackError('Error validando respuesta.');
@@ -263,6 +363,7 @@ export default function PistasLocal({ onVolver, onExit }) {
         bloqueados
       });
       setPulsadorActivo(false);
+      setJugadorSeleccionadoId(null);
       setFase('resolucion');
     } catch {
       setFase('setup');
@@ -340,13 +441,13 @@ export default function PistasLocal({ onVolver, onExit }) {
                   <ul>
                     <li>Se van descubriendo hasta 6 pistas de un enigma (canción, película, personaje, etc.).</li>
                     <li>Hay <strong>10 segundos</strong> por pista.</li>
-                    <li><strong>Pulsa el botón rojo</strong> para parar el tiempo e introducir tu respuesta.</li>
+                    <li><strong>Pulsa el botón rojo</strong> para parar el tiempo e introducir tu respuesta. Dispones de <strong>15 segundos</strong> para responder.</li>
                   </ul>
                   <p><strong>2. Puntuación (Estándar):</strong></p>
                   <ul>
                     <li>Pista 1: <strong>+6 pts</strong> | Pista 2: <strong>+5 pts</strong></li>
                     <li>Pistas 3 y 4: <strong>4 y 3 pts</strong> | Pistas 5 y 6: <strong>2 y 1 pt</strong></li>
-                    <li>Si fallas, quedas eliminado exclusivamente durante esa ronda.</li>
+                    <li>Si fallas o se te acaba el tiempo, quedas eliminado exclusivamente durante esa ronda.</li>
                   </ul>
                 </div>
 
@@ -516,49 +617,120 @@ export default function PistasLocal({ onVolver, onExit }) {
               <div className="respuesta-pulsada-box">
                 <div className="respuesta-pulsada-header">
                   <span className="pulsado-badge">🔴 Tiempo detenido para responder</span>
-                  <p className="hint small" style={{ margin: '0.4rem 0 0.8rem' }}>
-                    Escribe tu respuesta y pulsa en el botón del jugador que responde:
+                  <p className="hint small" style={{ margin: '0.3rem 0 0.4rem' }}>
+                    Escribe tu respuesta y selecciona el jugador que responde:
+                  </p>
+
+                  {/* Temporizador de 15 segundos */}
+                  <div
+                    className="timer"
+                    role="timer"
+                    style={{
+                      margin: '0.6rem 0 0.3rem',
+                      background: '#e2e8f0',
+                      borderRadius: '9999px',
+                      height: '8px',
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <div
+                      className={`timer-bar ${segundosRespuesta <= 4 ? 'low' : ''}`}
+                      style={{
+                        width: `${(segundosRespuesta / 15) * 100}%`,
+                        height: '100%',
+                        backgroundColor: segundosRespuesta <= 4 ? '#ef4444' : '#16a34a',
+                        borderRadius: '9999px',
+                        transition: 'width 0.1s linear, background-color 0.3s ease'
+                      }}
+                    />
+                  </div>
+                  <p
+                    className="timer-text"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.35rem',
+                      color: segundosRespuesta <= 4 ? '#dc2626' : '#64748b',
+                      fontSize: '0.9rem',
+                      fontWeight: 700,
+                      margin: '0 0 0.8rem'
+                    }}
+                  >
+                    <Icon name="clock" size={16} />
+                    {Math.ceil(segundosRespuesta)} s
                   </p>
                 </div>
 
-                <input
-                  autoFocus
-                  type="text"
-                  className="player-text-input respuesta-input-grande"
-                  placeholder="Película, canción, famoso, etc..."
-                  value={inputRespuesta}
-                  onChange={(e) => setInputRespuesta(e.target.value)}
-                />
+                <form
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    if (jugadorSeleccionadoId && inputRespuesta.trim()) {
+                      const jugador = jugadores.find((j) => j.id === jugadorSeleccionadoId);
+                      if (jugador) confirmarRespuestaJugador(jugador);
+                    }
+                  }}
+                >
+                  <input
+                    autoFocus
+                    type="text"
+                    className="player-text-input respuesta-input-grande"
+                    placeholder="Película, canción, famoso, etc..."
+                    value={inputRespuesta}
+                    onChange={(e) => setInputRespuesta(e.target.value)}
+                  />
 
-                {feedbackError && <p className="error" style={{ marginTop: '0.5rem' }}>{feedbackError}</p>}
+                  {feedbackError && <p className="error" style={{ marginTop: '0.5rem' }}>{feedbackError}</p>}
 
-                <p className="form-label" style={{ marginTop: '0.8rem', textAlign: 'center' }}>
-                  ¿Quién responde?
-                </p>
+                  <p className="form-label" style={{ marginTop: '0.8rem', textAlign: 'center' }}>
+                    ¿Quién responde?
+                  </p>
 
-                <div className="modal-players-grid">
-                  {jugadoresDisponibles.map((j) => (
+                  <div className="modal-players-grid">
+                    {jugadoresDisponibles.map((j) => (
+                      <button
+                        key={j.id}
+                        type="button"
+                        className={`btn-modal-player ${jugadorSeleccionadoId === j.id ? 'active' : ''}`}
+                        style={
+                          jugadorSeleccionadoId === j.id
+                            ? {
+                                background: '#16a34a',
+                                color: '#ffffff',
+                                borderColor: '#15803d',
+                                fontWeight: 700,
+                                boxShadow: '0 2px 8px rgba(22, 163, 74, 0.3)'
+                              }
+                            : {}
+                        }
+                        onClick={() => setJugadorSeleccionadoId(j.id)}
+                      >
+                        {j.nombre} {jugadorSeleccionadoId === j.id ? '✓' : ''}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '0.8rem', justifyContent: 'center', marginTop: '1.2rem' }}>
                     <button
-                      key={j.id}
                       type="button"
-                      className="btn-modal-player"
-                      disabled={!inputRespuesta.trim()}
-                      onClick={() => confirmarRespuestaJugador(j)}
+                      className="btn-modal-cancel"
+                      onClick={cancelarRespuesta}
                     >
-                      {j.nombre}
+                      Cancelar
                     </button>
-                  ))}
-                </div>
-
-                <div style={{ textAlign: 'center', marginTop: '0.8rem' }}>
-                  <button
-                    type="button"
-                    className="btn-modal-cancel"
-                    onClick={cancelarRespuesta}
-                  >
-                    Cancelar y reanudar tiempo
-                  </button>
-                </div>
+                    <button
+                      type="submit"
+                      className="btn-start"
+                      style={{
+                        background: 'linear-gradient(135deg, #16a34a, #15803d)',
+                        boxShadow: '0 4px 14px rgba(22, 163, 74, 0.4)'
+                      }}
+                      disabled={!jugadorSeleccionadoId || !inputRespuesta.trim()}
+                    >
+                      Responder
+                    </button>
+                  </div>
+                </form>
               </div>
             )}
           </div>

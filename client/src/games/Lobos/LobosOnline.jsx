@@ -209,12 +209,35 @@ export function Lobby({ v, enviar, onAbrirModalSalir }) {
   const faltan = v.limites.min - n;
 
   return (
-    <section className="game">
+    <section className="game" style={{ position: 'relative' }}>
       <div className="panel center">
-        <p className="categoria"><Icon name="lock" size={16} />Sala de espera</p>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.45rem',
+              padding: '0.35rem 1.1rem',
+              borderRadius: '9999px',
+              border: '1.5px solid #22c55e',
+              backgroundColor: '#f0fdf4',
+              color: '#16a34a',
+              fontSize: '0.85rem',
+              fontWeight: 600,
+              lineHeight: 1
+            }}
+          >
+            <Icon name="lock" size={15} />
+            Sala de espera
+          </span>
+        </div>
         <p className="hint">Código de la partida</p>
-        <button type="button" className="lb-codigo" onClick={copiar} title="Copiar código">{v.code}</button>
-        <p className="hint small">{copiado ? '¡Copiado!' : 'Pulsa el código para copiarlo y compártelo con los demás.'}</p>
+        <button type="button" className="qq-codigo-btn" onClick={copiar} title="Copiar código">
+          {v.code}
+        </button>
+        <p className="hint small">
+          {copiado ? '¡Copiado al portapapeles!' : 'Pulsa el código para copiarlo y compártelo con los demás.'}
+        </p>
       </div>
 
       <div className="panel" style={{ marginTop: '1rem' }}>
@@ -335,6 +358,17 @@ export function VistaJuego({ v, enviar, offset, onAbrirModalSalir }) {
   const [textoEco, setTextoEco] = useState('');
   const m = v.mi;
   const vivo = m.vivo;
+
+  // Clave representativa de los avisos actuales recibidos del servidor
+  const avisosKey = JSON.stringify(m?.avisos || []);
+  const [avisosVistosKey, setAvisosVistosKey] = useState('');
+
+  const mostrarAvisosModal = Boolean(m?.avisos?.length > 0 && avisosVistosKey !== avisosKey);
+
+  const handleCerrarAvisos = () => {
+    setAvisosVistosKey(avisosKey);
+    enviar({ tipo: 'ackAvisos' });
+  };
 
   const avisoTexto = (a) => {
     if (a.tipo === 'amor') return `💘 Cupido os ha unido: estás enamorado/a de ${e.jugadores[a.con].nombre}. Si uno muere, el otro también. Si sois de bandos distintos y sobrevivís los dos hasta el final, ganáis juntos.`;
@@ -600,12 +634,12 @@ export function VistaJuego({ v, enviar, offset, onAbrirModalSalir }) {
         </div>
       )}
 
-      {m.avisos.length > 0 && (
-        <div className="rg-modal-fondo">
-          <div className="rg-modal lb-modal">
+      {mostrarAvisosModal && (
+        <div className="rg-modal-fondo" onClick={handleCerrarAvisos}>
+          <div className="rg-modal lb-modal" onClick={(ev) => ev.stopPropagation()}>
             <h3 className="panel-title"><Icon name="bell" size={22} /> Noticias para ti</h3>
             {m.avisos.map((a, i) => <p key={i} className="lb-aviso">{avisoTexto(a)}</p>)}
-            <button type="button" className="big full" onClick={() => enviar({ tipo: 'ackAvisos' })}>Entendido</button>
+            <button type="button" className="big full" onClick={handleCerrarAvisos}>Entendido</button>
           </div>
         </div>
       )}
@@ -617,6 +651,7 @@ export default function LobosOnline({ onLocal }) {
   const [sesion, setSesion] = useState(() => leerSesion());
   const [mensaje, setMensaje] = useState('');
   const [modalSalir, setModalSalir] = useState(false);
+  const [modalAyuda, setModalAyuda] = useState(false);
 
   const invalidar = useCallback((txt) => { guardarSesion(null); setSesion(null); setMensaje(txt || 'La partida ya no existe.'); }, []);
   const { vista, enviar, errorRed, aviso, offset } = useSala(sesion, invalidar);
@@ -627,9 +662,61 @@ export default function LobosOnline({ onLocal }) {
     guardarSesion(null); setSesion(null);
   };
 
+  const mostrarAyuda = !sesion || vista?.fase === 'lobby';
+
   if (!sesion) {
     return (
       <div className="lb-contenedor">
+        {mostrarAyuda && (
+          <button
+            type="button"
+            className="btn-ayuda-flotante"
+            onClick={() => setModalAyuda(true)}
+            title="Reglas y funcionamiento"
+          >
+            <span className="btn-ayuda-flotante-signo">?</span>
+          </button>
+        )}
+
+        {modalAyuda && (
+          <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
+            <div className="rg-modal modal-ayuda-juego" onClick={(ev) => ev.stopPropagation()}>
+              <div className="modal-ayuda-header">
+                <span className="modal-ayuda-signo-title">?</span>
+                <h3>Cómo se juega a «Luna de Sangre»</h3>
+              </div>
+              <div className="modal-ayuda-cuerpo">
+                <p><strong>1. Reparto:</strong></p>
+                <ul>
+                  <li>Cada jugador descubre su rol secreto en su propio móvil.</li>
+                  <li>Hay tres bandos: <strong>Lobos</strong>, <strong>Pueblo</strong> y <strong>Solitarios</strong>.</li>
+                </ul>
+                <p><strong>2. Noche:</strong></p>
+                <ul>
+                  <li>Todos los jugadores vivos realizan su turno en secreto desde su dispositivo.</li>
+                  <li>En tu turno verás <strong>qué debes hacer</strong> y puedes pulsar <em>Mi rol</em> para recordar tu ficha.</li>
+                </ul>
+                <p><strong>3. Día:</strong></p>
+                <ul>
+                  <li>Se anuncian las muertes. Debatís juntos y luego se vota en secreto a quién linchar.</li>
+                  <li>Con empate en el primer puesto, nadie es linchado.</li>
+                </ul>
+                <p><strong>4. Victoria:</strong></p>
+                <ul>
+                  <li><strong>Pueblo:</strong> elimina a todos los lobos (y al Pirómano, si lo hay).</li>
+                  <li><strong>Lobos:</strong> igualan en número al resto de vivos.</li>
+                  <li>Los solitarios y los enamorados de bandos distintos tienen sus propias condiciones.</li>
+                </ul>
+              </div>
+              <div className="rg-modal-acciones">
+                <button className="big full" onClick={() => setModalAyuda(false)}>
+                  Entendido
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {mensaje && <p className="error center">{mensaje}</p>}
         <Entrada onEntrar={entrar} onLocal={onLocal} />
       </div>
@@ -639,6 +726,58 @@ export default function LobosOnline({ onLocal }) {
 
   return (
     <div className="lb-contenedor">
+      {/* ---------------- BOTÓN Y MODAL DE AYUDA ---------------- */}
+      {mostrarAyuda && (
+        <button
+          type="button"
+          className="btn-ayuda-flotante"
+          onClick={() => setModalAyuda(true)}
+          title="Reglas y funcionamiento"
+        >
+          <span className="btn-ayuda-flotante-signo">?</span>
+        </button>
+      )}
+
+      {modalAyuda && (
+        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
+          <div className="rg-modal modal-ayuda-juego" onClick={(ev) => ev.stopPropagation()}>
+            <div className="modal-ayuda-header">
+              <span className="modal-ayuda-signo-title">?</span>
+              <h3>Cómo se juega a «Luna de Sangre»</h3>
+            </div>
+            <div className="modal-ayuda-cuerpo">
+              <p><strong>1. Reparto:</strong></p>
+              <ul>
+                <li>Cada jugador descubre su rol secreto en su propio móvil.</li>
+                <li>Hay tres bandos: <strong>Lobos</strong>, <strong>Pueblo</strong> y <strong>Solitarios</strong>.</li>
+              </ul>
+              <p><strong>2. Noche:</strong></p>
+              <ul>
+                <li>Todos los jugadores vivos realizan su turno en secreto desde su dispositivo.</li>
+                <li>En tu turno verás <strong>qué debes hacer</strong> y puedes pulsar <em>Mi rol</em> para recordar tu ficha.</li>
+              </ul>
+              <p><strong>3. Día:</strong></p>
+              <ul>
+                <li>Se anuncian las muertes. Debatís juntos y luego se vota en secreto a quién linchar.</li>
+                <li>Con empate en el primer puesto, nadie es linchado.</li>
+              </ul>
+              <p><strong>4. Victoria:</strong></p>
+              <ul>
+                <li><strong>Pueblo:</strong> elimina a todos los lobos (y al Pirómano, si lo hay).</li>
+                <li><strong>Lobos:</strong> igualan en número al resto de vivos.</li>
+                <li>Los solitarios y los enamorados de bandos distintos tienen sus propias condiciones.</li>
+              </ul>
+            </div>
+            <div className="rg-modal-acciones">
+              <button className="big full" onClick={() => setModalAyuda(false)}>
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ---------------- FIN AYUDA ---------------- */}
+
       {errorRed && <p className="lb-sinred">⚠ Sin conexión con el servidor. Reintentando…</p>}
       {aviso && <p className="lb-toast">{aviso}</p>}
       {vista.fase === 'lobby'

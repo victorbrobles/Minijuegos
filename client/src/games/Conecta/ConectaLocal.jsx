@@ -1,5 +1,5 @@
 // client/src/games/Conecta/ConectaLocal.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
 import GameIntro from '../../components/GameIntro.jsx';
 import CategoryCard from '../../components/CategoryCard.jsx';
@@ -7,6 +7,7 @@ import './Conecta.css';
 
 const MIN_JUGADORES = 3;
 const MAX_JUGADORES = 15;
+const TIEMPO_RESPUESTA_S = 30;
 
 const CATEGORIAS_METADATA = [
   { id: 'futbolistas', nombre: 'Futbolistas', icono: 'trophy' },
@@ -42,9 +43,13 @@ export default function ConectaLocal({ onVolver, onExit }) {
   const [grupos, setGrupos] = useState([]);
   const [conexionesResueltas, setConexionesResueltas] = useState([]);
 
-  // NUEVO: Pulsador rojo único en local
+  // Control de turnos por ciclo: nadie repite hasta que todos los vivos hayan respondido
+  const [jugadoresRespondieronTurno, setJugadoresRespondieronTurno] = useState([]);
+
+  // Pulsador rojo, temporizador de 30s y selección
   const [pulsadorActivo, setPulsadorActivo] = useState(false);
   const [jugadorPulsado, setJugadorPulsado] = useState(null);
+  const [segundosRespuesta, setSegundosRespuesta] = useState(TIEMPO_RESPUESTA_S);
   const [seleccionados, setSeleccionados] = useState([]);
   const [mensajeFeedback, setMensajeFeedback] = useState(null);
 
@@ -56,6 +61,18 @@ export default function ConectaLocal({ onVolver, onExit }) {
   const [jugadorPulsadoUltima, setJugadorPulsadoUltima] = useState(null);
   const [inputTemaUltima, setInputTemaUltima] = useState('');
   const [feedbackUltima, setFeedbackUltima] = useState(null);
+
+  const timerRespuestaRef = useRef(null);
+
+  const jugadorPulsadoRef = useRef(jugadorPulsado);
+  useEffect(() => {
+    jugadorPulsadoRef.current = jugadorPulsado;
+  }, [jugadorPulsado]);
+
+  const vidasRef = useRef(vidas);
+  useEffect(() => {
+    vidasRef.current = vidas;
+  }, [vidas]);
 
   const handleNumJugadoresChange = (e) => {
     const num = parseInt(e.target.value, 10);
@@ -96,8 +113,10 @@ export default function ConectaLocal({ onVolver, onExit }) {
     setVidas(v);
 
     setConexionesResueltas([]);
+    setJugadoresRespondieronTurno([]);
     setPulsadorActivo(false);
     setJugadorPulsado(null);
+    setSegundosRespuesta(TIEMPO_RESPUESTA_S);
     setSeleccionados([]);
     setMensajeFeedback(null);
     setFeedbackTema(null);
@@ -117,19 +136,77 @@ export default function ConectaLocal({ onVolver, onExit }) {
       .catch((err) => console.error('Error al obtener tablero:', err));
   };
 
-  // Manejador del pulsador rojo offline
+  // Registra que un jugador ha respondido y reinicia el ciclo si todos han participado
+  const registrarRespuestaJugador = (jugadorId, vidasActuales = vidas) => {
+    setJugadoresRespondieronTurno((prev) => {
+      const nuevo = prev.includes(jugadorId) ? prev : [...prev, jugadorId];
+      const vivos = jugadores.filter((j) => (vidasActuales[j.id] ?? 3) > 0);
+      const todosRespondieron = vivos.length === 0 || vivos.every((j) => nuevo.includes(j.id));
+      return todosRespondieron ? [] : nuevo;
+    });
+  };
+
+  // Manejador del pulsador rojo
   const handlePulsarBotonRojo = () => {
     if (jugadoresDisponibles.length === 0) return;
     setPulsadorActivo(true);
     setJugadorPulsado(null);
     setSeleccionados([]);
     setMensajeFeedback(null);
+    setSegundosRespuesta(TIEMPO_RESPUESTA_S);
   };
 
   const cancelarPulsacion = () => {
     setPulsadorActivo(false);
     setJugadorPulsado(null);
     setSeleccionados([]);
+  };
+
+  // Temporizador de 30s al estar activo el pulsador
+  useEffect(() => {
+    if (!pulsadorActivo) {
+      setSegundosRespuesta(TIEMPO_RESPUESTA_S);
+      return;
+    }
+
+    setSegundosRespuesta(TIEMPO_RESPUESTA_S);
+    timerRespuestaRef.current = setInterval(() => {
+      setSegundosRespuesta((prev) => {
+        if (prev <= 0.1) {
+          clearInterval(timerRespuestaRef.current);
+          handleTiempoAgotadoLocal();
+          return 0;
+        }
+        return Math.max(0, prev - 0.1);
+      });
+    }, 100);
+
+    return () => clearInterval(timerRespuestaRef.current);
+  }, [pulsadorActivo]);
+
+  const handleTiempoAgotadoLocal = () => {
+    const jugador = jugadorPulsadoRef.current;
+    if (!jugador) {
+      cancelarPulsacion();
+    } else {
+      const vidasRestantes = (vidasRef.current[jugador.id] ?? 3) - 1;
+      const nuevasVidas = { ...vidasRef.current, [jugador.id]: vidasRestantes };
+      setVidas(nuevasVidas);
+      setMensajeFeedback(`¡Tiempo agotado para responder! (${jugador.nombre} pierde 1 ❤️)`);
+      registrarRespuestaJugador(jugador.id, nuevasVidas);
+
+      setTimeout(() => {
+        setPulsadorActivo(false);
+        setJugadorPulsado(null);
+        setSeleccionados([]);
+        setMensajeFeedback(null);
+
+        const quedanVivos = Object.values(nuevasVidas).some((v) => v > 0);
+        if (!quedanVivos) {
+          rendirseRonda();
+        }
+      }, 1800);
+    }
   };
 
   const toggleSeleccion = (item) => {
@@ -179,6 +256,9 @@ export default function ConectaLocal({ onVolver, onExit }) {
 
       setConexionesResueltas((prev) => [...prev, nuevaResuelta]);
 
+      // Registramos que este jugador ya respondió en este ciclo
+      registrarRespuestaJugador(jugadorPulsado.id, vidas);
+
       setGrupoParaTema(nuevaResuelta);
       setInputTema('');
       setFeedbackTema(null);
@@ -186,15 +266,19 @@ export default function ConectaLocal({ onVolver, onExit }) {
       setFase('resolucion_grupo');
     } else {
       const vidasRestantes = vidas[jugadorPulsado.id] - 1;
-      setVidas((prev) => ({
-        ...prev,
+      const nuevasVidas = {
+        ...vidas,
         [jugadorPulsado.id]: vidasRestantes
-      }));
+      };
+      setVidas(nuevasVidas);
+
+      // Registramos que este jugador ya respondió en este ciclo
+      registrarRespuestaJugador(jugadorPulsado.id, nuevasVidas);
 
       if (tresCorrectos) {
-        setMensajeFeedback('¡Tienes 3 correctos de una misma conexión!');
+        setMensajeFeedback('¡Tienes 3 correctos de una misma conexión! (-1 ❤️)');
       } else {
-        setMensajeFeedback('¡No forman una conexión!');
+        setMensajeFeedback('¡No forman una conexión! (-1 ❤️)');
       }
 
       setTimeout(() => {
@@ -203,7 +287,7 @@ export default function ConectaLocal({ onVolver, onExit }) {
         setSeleccionados([]);
         setMensajeFeedback(null);
 
-        const quedanVivos = Object.entries(vidas).some(
+        const quedanVivos = Object.entries(nuevasVidas).some(
           ([jId, v]) => parseInt(jId, 10) !== jugadorPulsado.id && v > 0
         );
         if (!quedanVivos && vidasRestantes <= 0) {
@@ -277,10 +361,12 @@ export default function ConectaLocal({ onVolver, onExit }) {
       });
     } else {
       const vidasRestantes = vidas[jugadorPulsadoUltima.id] - 1;
-      setVidas((prev) => ({
-        ...prev,
+      const nuevasVidas = {
+        ...vidas,
         [jugadorPulsadoUltima.id]: vidasRestantes
-      }));
+      };
+      setVidas(nuevasVidas);
+      registrarRespuestaJugador(jugadorPulsadoUltima.id, nuevasVidas);
 
       setFeedbackUltima({
         esCorrecto: false,
@@ -337,7 +423,14 @@ export default function ConectaLocal({ onVolver, onExit }) {
   const ranking = [...jugadores].sort((a, b) => (puntos[b.id] ?? 0) - (puntos[a.id] ?? 0));
   const maximo = ranking.length ? (puntos[ranking[0].id] ?? 0) : 0;
   const ganadores = maximo > 0 ? ranking.filter((j) => (puntos[j.id] ?? 0) === maximo) : [];
-  const jugadoresDisponibles = jugadores.filter((j) => (vidas[j.id] ?? 3) > 0);
+
+  // Jugadores vivos en la ronda
+  const jugadoresVivos = jugadores.filter((j) => (vidas[j.id] ?? 3) > 0);
+  // Ciclo completo si todos los vivos ya respondieron
+  const cicloCompleto = jugadoresVivos.length === 0 || jugadoresVivos.every((j) => jugadoresRespondieronTurno.includes(j.id));
+  const respondieronEfectivos = cicloCompleto ? [] : jugadoresRespondieronTurno;
+  // Jugadores habilitados para elegir en esta pulsación
+  const jugadoresDisponibles = jugadoresVivos.filter((j) => !respondieronEfectivos.includes(j.id));
 
   return (
     <div className="aprox-contenedor">
@@ -364,7 +457,8 @@ export default function ConectaLocal({ onVolver, onExit }) {
                   <p><strong>1. Dinámica del juego:</strong></p>
                   <ul>
                     <li>El tablero tiene <strong>16 elementos</strong> distribuidos en 4 conexiones secretas.</li>
-                    <li><strong>Pulsa el botón rojo</strong> cuando sepas una conexión, elige tu nombre y marca 4 casillas.</li>
+                    <li><strong>Pulsa el botón rojo</strong> cuando sepas una conexión y marca 4 casillas. Dispondrás de <strong>30 segundos</strong> para responder.</li>
+                    <li><strong>Ciclo de turnos:</strong> Tras responder (aciertes o falles), debes esperar a que respondan los demás jugadores vivos antes de poder volver a pulsar. Al responder todos, el turno se reinicia para cualquiera.</li>
                     <li>Si fallas, pierdes 1 vida (3 vidas por ronda). Si aciertas 3 de 4, el juego te avisará.</li>
                     <li>Al acertar una conexión, puedes adivinar su temática para ganar <strong>+1 punto extra</strong>.</li>
                   </ul>
@@ -484,9 +578,12 @@ export default function ConectaLocal({ onVolver, onExit }) {
           <div className="scoreboard-container" style={{ justifyContent: 'center', marginBottom: '0.8rem' }}>
             {jugadores.map((j) => {
               const v = vidas[j.id] ?? 3;
+              const yaRespondio = respondieronEfectivos.includes(j.id);
               return (
                 <div key={j.id} className={`score-pill ${v <= 0 ? 'locked' : ''}`}>
-                  <span>{j.nombre}: {v > 0 ? '❤️'.repeat(v) : '💀 Fuera'}</span>
+                  <span>
+                    {j.nombre}: {v > 0 ? '❤️'.repeat(v) : '💀 Fuera'} {yaRespondio && v > 0 ? '· ⏳' : ''}
+                  </span>
                 </div>
               );
             })}
@@ -541,62 +638,109 @@ export default function ConectaLocal({ onVolver, onExit }) {
                   type="button"
                   className="btn-pulsador-rojo"
                   onClick={handlePulsarBotonRojo}
-                  disabled={jugadoresDisponibles.length === 0}
+                  disabled={jugadoresVivos.length === 0}
                 >
                   <span className="pulsador-icono">🔴</span>
                   <span className="pulsador-texto">¡PULSAR PARA RESPONDER!</span>
                 </button>
+                {respondieronEfectivos.length > 0 && (
+                  <p className="hint small center" style={{ marginTop: '0.4rem' }}>
+                    Turno en curso: {respondieronEfectivos.length}/{jugadoresVivos.length} ya han respondido en este ciclo.
+                  </p>
+                )}
               </div>
             ) : (
               <div className="respuesta-pulsada-box">
+                <div className="respuesta-pulsada-header">
+                  <span className="pulsado-badge">🔴 Tiempo detenido para responder</span>
+                  <p className="hint small" style={{ margin: '0.4rem 0 0.4rem' }}>
+                    {!jugadorPulsado
+                      ? 'Selecciona el jugador que va a responder:'
+                      : `Turno de ${jugadorPulsado.nombre} (${seleccionados.length}/4 casillas). Selecciona 4 casillas del tablero:`}
+                  </p>
+
+                  {/* Temporizador de 30 segundos */}
+                  <div
+                    className="timer"
+                    role="timer"
+                    style={{
+                      margin: '0.6rem 0 0.3rem',
+                      background: '#e2e8f0',
+                      borderRadius: '9999px',
+                      height: '8px',
+                      overflow: 'hidden'
+                    }}
+                  >
+                    <div
+                      className={`timer-bar ${segundosRespuesta <= 7 ? 'low' : ''}`}
+                      style={{
+                        width: `${(segundosRespuesta / TIEMPO_RESPUESTA_S) * 100}%`,
+                        height: '100%',
+                        backgroundColor: segundosRespuesta <= 7 ? '#ef4444' : '#16a34a',
+                        borderRadius: '9999px',
+                        transition: 'width 0.1s linear, background-color 0.3s ease'
+                      }}
+                    />
+                  </div>
+                  <p
+                    className="timer-text"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.35rem',
+                      color: segundosRespuesta <= 7 ? '#dc2626' : '#64748b',
+                      fontSize: '0.9rem',
+                      fontWeight: 700,
+                      margin: '0 0 0.8rem'
+                    }}
+                  >
+                    <Icon name="clock" size={16} />
+                    {Math.ceil(segundosRespuesta)} s
+                  </p>
+                </div>
+
                 {!jugadorPulsado ? (
                   <>
-                    <div className="respuesta-pulsada-header">
-                      <span className="pulsado-badge">🔴 Tiempo detenido para responder</span>
-                      <p className="hint small" style={{ margin: '0.4rem 0 0.8rem' }}>
-                        ¿Quién ha pulsado el botón? Selecciona el jugador que va a responder:
-                      </p>
-                    </div>
-
                     <div className="modal-players-grid">
-                      {jugadoresDisponibles.map((j) => (
-                        <button
-                          key={j.id}
-                          type="button"
-                          className="btn-modal-player"
-                          onClick={() => setJugadorPulsado(j)}
-                        >
-                          {j.nombre} ({vidas[j.id]} ❤️)
-                        </button>
-                      ))}
+                      {jugadoresVivos.map((j) => {
+                        const yaRespondio = respondieronEfectivos.includes(j.id);
+                        return (
+                          <button
+                            key={j.id}
+                            type="button"
+                            className={`btn-modal-player ${yaRespondio ? 'locked' : ''}`}
+                            disabled={yaRespondio}
+                            onClick={() => setJugadorPulsado(j)}
+                          >
+                            {j.nombre} ({vidas[j.id]} ❤️) {yaRespondio ? '⏳' : ''}
+                          </button>
+                        );
+                      })}
                     </div>
+                    {respondieronEfectivos.length > 0 && (
+                      <p className="hint small center" style={{ marginTop: '0.5rem' }}>
+                        Los jugadores con ⏳ deben esperar a que responda el resto para reiniciar turno.
+                      </p>
+                    )}
                   </>
                 ) : (
-                  <div className="respuesta-pulsada-header">
-                    <span className="pulsado-badge" style={{ background: '#dcfce7', color: '#166534' }}>
-                      👤 Turno de {jugadorPulsado.nombre} ({seleccionados.length}/4 casillas)
-                    </span>
-                    <p className="hint" style={{ marginTop: '0.6rem', fontWeight: 700, color: '#1e1b4b' }}>
-                      Selecciona 4 casillas del tablero de arriba y confirma:
-                    </p>
-
-                    <div style={{ display: 'flex', gap: '0.8rem', marginTop: '0.8rem' }}>
-                      <button
-                        type="button"
-                        className="big full"
-                        disabled={seleccionados.length !== 4}
-                        onClick={confirmarSeleccion}
-                      >
-                        <Icon name="check" size={20} /> Confirmar conexión
-                      </button>
-                      <button
-                        type="button"
-                        className="secondary full"
-                        onClick={cancelarPulsacion}
-                      >
-                        Cancelar
-                      </button>
-                    </div>
+                  <div style={{ display: 'flex', gap: '0.8rem', marginTop: '0.8rem' }}>
+                    <button
+                      type="button"
+                      className="big full"
+                      disabled={seleccionados.length !== 4}
+                      onClick={confirmarSeleccion}
+                    >
+                      <Icon name="check" size={20} /> Confirmar conexión
+                    </button>
+                    <button
+                      type="button"
+                      className="secondary full"
+                      onClick={cancelarPulsacion}
+                    >
+                      Cancelar
+                    </button>
                   </div>
                 )}
 

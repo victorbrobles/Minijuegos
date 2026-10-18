@@ -1,5 +1,5 @@
 // client/src/games/QuienMas/QuienMasLocal.jsx
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import './QuienMas.css';
 import { useAdmin, adminHeaders } from '../../lib/admin.js';
 import Icon from '../../components/Icon.jsx';
@@ -7,6 +7,7 @@ import GameIntro from '../../components/GameIntro.jsx';
 
 const MIN_JUGADORES = 3;
 const MAX_JUGADORES = 20;
+const TIEMPO_VOTO = 30;
 
 const nombresPorDefecto = (n) => Array.from({ length: n }, (_, i) => `Jugador ${i + 1}`);
 
@@ -43,6 +44,15 @@ export default function QuienMasLocal({ onVolver, onExit }) {
   const [resultado, setResultado] = useState(null);
   const [ronda, setRonda] = useState(0);
   const [reserva, setReserva] = useState([]);
+
+  // Temporizador de 30s para votar
+  const [tiempoRestante, setTiempoRestante] = useState(TIEMPO_VOTO);
+  const timerRef = useRef(null);
+
+  const jugadoresRef = useRef(jugadores);
+  useEffect(() => {
+    jugadoresRef.current = jugadores;
+  }, [jugadores]);
 
   const categoriaActiva = esAdmin ? categoria : 'normal';
 
@@ -94,7 +104,9 @@ export default function QuienMasLocal({ onVolver, onExit }) {
   };
 
   const votar = (candidato) => {
-    const nuevos = { ...votos, [jugadores[turno]]: candidato };
+    if (timerRef.current) clearInterval(timerRef.current);
+    const jugadorActual = jugadores[turno];
+    const nuevos = { ...votos, [jugadorActual]: candidato };
     setVotos(nuevos);
     if (Object.keys(nuevos).length >= jugadores.length) {
       calcularRonda(nuevos);
@@ -103,6 +115,41 @@ export default function QuienMasLocal({ onVolver, onExit }) {
       setFase('pasar');
     }
   };
+
+  const votarRef = useRef(votar);
+  useEffect(() => {
+    votarRef.current = votar;
+  });
+
+  // Temporizador de 30 segundos durante la votación
+  useEffect(() => {
+    if (fase !== 'votando') {
+      if (timerRef.current) clearInterval(timerRef.current);
+      return;
+    }
+
+    setTiempoRestante(TIEMPO_VOTO);
+
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = setInterval(() => {
+      setTiempoRestante((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          const jActuales = jugadoresRef.current;
+          if (jActuales && jActuales.length > 0) {
+            const candidatoAleatorio = jActuales[Math.floor(Math.random() * jActuales.length)];
+            votarRef.current(candidatoAleatorio);
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [fase, turno]);
 
   const calcularRonda = (finales) => {
     const recuento = Object.fromEntries(jugadores.map((n) => [n, 0]));
@@ -156,6 +203,7 @@ export default function QuienMasLocal({ onVolver, onExit }) {
                   <ul>
                     <li>Aparece una pregunta sobre la personalidad del grupo.</li>
                     <li>Cada jugador, por turnos y pasándose el dispositivo, vota <strong>en secreto</strong> al jugador que mejor encaja.</li>
+                    <li>Dispones de <strong>30 segundos</strong> para emitir tu voto. Si se agota el tiempo, se seleccionará un jugador al azar.</li>
                   </ul>
                   <p><strong>2. Puntuación:</strong></p>
                   <ul>
@@ -177,7 +225,7 @@ export default function QuienMasLocal({ onVolver, onExit }) {
 
       {/* 1. SETUP */}
       {fase === 'setup' && (
-        <section className="game">
+        <section className="game" style={{ position: 'relative' }}>
           <GameIntro gameId="quienmas" titulo="¿De verdad os conocéis? (Un solo dispositivo)" />
 
           <div className="panel">
@@ -267,6 +315,47 @@ export default function QuienMasLocal({ onVolver, onExit }) {
           <div className="panel qm-pregunta">
             <h2 className="title">{pregunta}</h2>
             <p className="hint">Elige al jugador que más encaja con la pregunta:</p>
+
+            {/* Temporizador de 30 segundos */}
+            <div
+              className="timer"
+              role="timer"
+              style={{
+                margin: '0.8rem 0 0.3rem',
+                background: '#e2e8f0',
+                borderRadius: '9999px',
+                height: '8px',
+                overflow: 'hidden'
+              }}
+            >
+              <div
+                className={`timer-bar ${tiempoRestante <= 10 ? 'low' : ''}`}
+                style={{
+                  width: `${(tiempoRestante / TIEMPO_VOTO) * 100}%`,
+                  height: '100%',
+                  backgroundColor: tiempoRestante <= 10 ? '#ef4444' : '#16a34a',
+                  borderRadius: '9999px',
+                  transition: 'width 0.1s linear, background-color 0.3s ease'
+                }}
+              />
+            </div>
+            <p
+              className="timer-text"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.35rem',
+                color: tiempoRestante <= 10 ? '#dc2626' : '#64748b',
+                fontSize: '0.9rem',
+                fontWeight: 700,
+                margin: '0 0 1rem'
+              }}
+            >
+              <Icon name="clock" size={16} />
+              {tiempoRestante} s
+            </p>
+
             <div className="names-grid">
               {jugadores.map((nombre) => (
                 <button key={nombre} type="button" className="secondary" onClick={() => votar(nombre)}>
