@@ -8,6 +8,7 @@ import '../Adivina/Adivina.css';
 const CLAVE_SESION_BM = 'buscaminas_online_session';
 const TOTAL_CORRECTOS = 10;
 const TOTAL_MINAS = 5;
+const TIEMPO_TURNO = 30;
 
 export default function BuscaminasOnline({ onLocal, onSalir }) {
   const [vista, setVista] = useState('menu'); // 'menu' | 'crear' | 'unirse' | 'sala'
@@ -16,6 +17,7 @@ export default function BuscaminasOnline({ onLocal, onSalir }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modalSalir, setModalSalir] = useState(false);
+  const [modalAyuda, setModalAyuda] = useState(false);
 
   const [categorias, setCategorias] = useState([]);
   const [sesion, setSesion] = useState(() => {
@@ -28,8 +30,10 @@ export default function BuscaminasOnline({ onLocal, onSalir }) {
 
   const [sala, setSala] = useState(null);
   const [codigoCopiado, setCodigoCopiado] = useState(false);
+  const [tiempoRestante, setTiempoRestante] = useState(TIEMPO_TURNO);
 
   const intervalRef = useRef(null);
+  const timerRef = useRef(null);
 
   // Cargar categorías
   useEffect(() => {
@@ -164,6 +168,59 @@ export default function BuscaminasOnline({ onLocal, onSalir }) {
     }
   };
 
+  const handlePerderTurno = async () => {
+    if (!sesion) return;
+    try {
+      await fetch(`/api/buscaminas/online/sala/${sesion.code}/perder-turno`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: sesion.token })
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const perderTurnoRef = useRef();
+  useEffect(() => {
+    perderTurnoRef.current = handlePerderTurno;
+  });
+
+  const ronda = sala?.ronda;
+  const esAdmin = sala?.esAdmin;
+  const yoId = sala?.yoId;
+  const esMiTurno = ronda?.jugadorActivoId === yoId;
+  const yoEliminado = ronda?.eliminadosRonda?.includes(yoId);
+
+  // Temporizador sincronizado para todos durante el turno
+  useEffect(() => {
+    const isJugando = sala?.estado === 'jugando' && ronda?.faseRonda === 'jugando';
+    if (!isJugando) {
+      if (timerRef.current) clearInterval(timerRef.current);
+      return;
+    }
+
+    setTiempoRestante(TIEMPO_TURNO);
+    if (timerRef.current) clearInterval(timerRef.current);
+
+    timerRef.current = setInterval(() => {
+      setTiempoRestante((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          if (esMiTurno && !yoEliminado && perderTurnoRef.current) {
+            perderTurnoRef.current(); // Envía la señal al backend si somos nosotros
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [sala?.estado, ronda?.faseRonda, ronda?.jugadorActivoId, esMiTurno, yoEliminado]);
+
   const handleCerrarExplosion = async () => {
     try {
       await fetch(`/api/buscaminas/online/sala/${sesion.code}/cerrar-explosion`, {
@@ -214,12 +271,6 @@ export default function BuscaminasOnline({ onLocal, onSalir }) {
     setTimeout(() => setCodigoCopiado(false), 2000);
   };
 
-  const ronda = sala?.ronda;
-  const esAdmin = sala?.esAdmin;
-  const yoId = sala?.yoId;
-  const esMiTurno = ronda?.jugadorActivoId === yoId;
-  const yoEliminado = ronda?.eliminadosRonda?.includes(yoId);
-
   const ranking = sala?.jugadores ? [...sala.jugadores].sort((a, b) => b.puntos - a.puntos) : [];
   const maximoPuntos = ranking.length ? ranking[0].puntos : 0;
   const ganadores = maximoPuntos > 0 ? ranking.filter((j) => j.puntos === maximoPuntos) : [];
@@ -227,8 +278,67 @@ export default function BuscaminasOnline({ onLocal, onSalir }) {
   const correctasDescubiertas = ronda?.casillas ? ronda.casillas.filter((c) => c.descubierta && c.correcto).length : 0;
   const minasExplotadas = ronda?.casillas ? ronda.casillas.filter((c) => c.descubierta && !c.correcto).length : 0;
 
+  const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
+
   return (
     <div className="bm-contenedor">
+      {/* ---------------- BOTÓN Y MODAL DE AYUDA ---------------- */}
+      {mostrarAyuda && (
+        <button
+          type="button"
+          className="btn-ayuda-flotante"
+          onClick={() => setModalAyuda(true)}
+          title="Reglas del juego"
+        >
+          <span className="btn-ayuda-flotante-signo">?</span>
+        </button>
+      )}
+
+      {modalAyuda && (
+        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
+          <div className="rg-modal aprox-modal-ayuda" onClick={(e) => e.stopPropagation()}>
+            <div className="aprox-modal-header">
+              <span className="aprox-modal-signo-title">?</span>
+              <h3>¿Cómo se juega a Cuidado que explota?</h3>
+            </div>
+
+            <div className="aprox-modal-cuerpo">
+              <p><strong>1. Dinámica del tablero (15 casillas):</strong></p>
+              <ul>
+                <li>Se muestra una consigna y un tablero de 15 elementos (3 filas x 5 columnas).</li>
+                <li>Exactamente <strong>10 casillas son correctas</strong> y <strong>5 son bombas</strong>.</li>
+                <li>Por turnos, cada jugador selecciona una casilla en menos de <strong>30 segundos</strong> o perderá su turno.</li>
+                <li>Si aciertas, ganas puntos y la casilla queda inhabilitada para los demás.</li>
+                <li>Si fallas, <strong>¡la bomba explota!</strong> y quedas eliminado por el resto de la ronda.</li>
+              </ul>
+
+              <p><strong>2. Puntuación según dificultad:</strong></p>
+              <div className="aprox-tabla-puntos">
+                <div className="aprox-puntos-fila acierto">
+                  <span>🟢 Elemento Fácil</span>
+                  <strong>+1 punto</strong>
+                </div>
+                <div className="aprox-puntos-fila intermedia" style={{ background: '#fef3c7', color: '#92400e' }}>
+                  <span>🟡 Elemento Medio</span>
+                  <strong>+2 puntos</strong>
+                </div>
+                <div className="aprox-puntos-fila acierto" style={{ background: '#ede9fe', color: '#5b21b6' }}>
+                  <span>🟣 Elemento Difícil</span>
+                  <strong>+3 puntos</strong>
+                </div>
+              </div>
+            </div>
+
+            <div className="rg-modal-acciones">
+              <button className="big full" onClick={() => setModalAyuda(false)}>
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ---------------- FIN AYUDA ---------------- */}
+
       {/* 1. MENÚ ONLINE */}
       {vista === 'menu' && (
         <section className="game">
@@ -333,12 +443,37 @@ export default function BuscaminasOnline({ onLocal, onSalir }) {
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
         <section className="game">
           <div className="panel center">
-            <p className="categoria">Código de la partida</p>
-            <button type="button" className="qq-codigo-btn" onClick={copiarCodigo}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  padding: '0.35rem 1.1rem',
+                  borderRadius: '9999px',
+                  border: '1.5px solid #22c55e',
+                  backgroundColor: '#f0fdf4',
+                  color: '#16a34a',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  lineHeight: 1
+                }}
+              >
+                <Icon name="lock" size={15} />
+                Sala de espera
+              </span>
+            </div>
+            <p className="hint">Código de la partida</p>
+            <button
+              type="button"
+              className="qq-codigo-btn"
+              onClick={copiarCodigo}
+              title="Copiar código"
+            >
               {sala.code}
             </button>
             <p className="hint small">
-              {codigoCopiado ? '¡Copiado!' : 'Comparte este código para que se unan (mínimo 3 jugadores).'}
+              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Comparte este código para que se unan (mínimo 3 jugadores).'}
             </p>
           </div>
 
@@ -464,6 +599,36 @@ export default function BuscaminasOnline({ onLocal, onSalir }) {
               <span>⏳ Esperando a: <strong>{ronda.jugadorActivoNombre}</strong></span>
             </div>
           )}
+
+          {/* Temporizador de 30 segundos */}
+          <div style={{ padding: '0 1rem', marginTop: '0.5rem' }}>
+            <div
+              className="timer"
+              role="timer"
+              style={{ margin: '0.4rem 0', background: '#e2e8f0', borderRadius: '9999px', height: '8px', overflow: 'hidden' }}
+            >
+              <div
+                className={`timer-bar ${tiempoRestante <= 10 ? 'low' : ''}`}
+                style={{
+                  width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%`,
+                  height: '100%',
+                  backgroundColor: tiempoRestante <= 10 ? '#ef4444' : '#16a34a',
+                  borderRadius: '9999px',
+                  transition: 'width 0.1s linear, background-color 0.3s ease'
+                }}
+              />
+            </div>
+            <p
+              className="timer-text"
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem',
+                color: tiempoRestante <= 10 ? '#dc2626' : '#64748b', fontSize: '0.9rem', fontWeight: 700, margin: '0 0 1rem'
+              }}
+            >
+              <Icon name="clock" size={16} />
+              {tiempoRestante} s
+            </p>
+          </div>
 
           <div className="bm-grid-15">
             {ronda.casillas.map((c) => {

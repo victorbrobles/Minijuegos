@@ -1,5 +1,5 @@
 // client/src/games/Popular/PopularLocal.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import GameIntro from '../../components/GameIntro.jsx';
@@ -8,6 +8,7 @@ import './Popular.css';
 const MIN_JUGADORES = 2;
 const MAX_JUGADORES = 12;
 const MAX_RONDAS = 15;
+const TIEMPO_TURNO = 45;
 
 const PUNTOS_POR_PUESTO = {
   1: 2,
@@ -46,6 +47,9 @@ export default function PopularLocal({ onVolver, onExit }) {
   const [inputTexto, setInputTexto] = useState('');
   const [feedback, setFeedback] = useState(null);
   const [solucionFinal, setSolucionFinal] = useState(null);
+
+  const [tiempoRestante, setTiempoRestante] = useState(TIEMPO_TURNO);
+  const timerRef = useRef(null);
 
   const handleNumJugadoresChange = (e) => {
     const num = parseInt(e.target.value, 10);
@@ -122,6 +126,37 @@ export default function PopularLocal({ onVolver, onExit }) {
     setIndiceTurno((prev) => (prev + 1) % ordenTurnos.length);
     setFase('pasar_turno');
   };
+
+  const avanzarTurnoRef = useRef();
+  useEffect(() => {
+    avanzarTurnoRef.current = avanzarTurno;
+  });
+
+  // Temporizador de 45 segundos
+  useEffect(() => {
+    if (fase !== 'jugando' || feedback !== null) {
+      if (timerRef.current) clearInterval(timerRef.current);
+      return;
+    }
+
+    setTiempoRestante(TIEMPO_TURNO);
+    if (timerRef.current) clearInterval(timerRef.current);
+
+    timerRef.current = setInterval(() => {
+      setTiempoRestante((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          if (avanzarTurnoRef.current) avanzarTurnoRef.current(); // Pasa turno automáticamente
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [fase, indiceTurno, feedback]);
 
   const pedirPista = async (puesto, tipo) => {
     if (!jugadorActivo || !preguntaData) return;
@@ -290,8 +325,8 @@ export default function PopularLocal({ onVolver, onExit }) {
                   <p><strong>1. Dinámica del juego:</strong></p>
                   <ul>
                     <li>Adivina <strong>las 5 respuestas más populares</strong> de la categoría propuesta.</li>
-                    <li>Por turnos y pasándose el teléfono, cada jugador escribe una respuesta.</li>
-                    <li>Puedes <strong>pasar turno</strong> en cualquier momento si no sabes qué responder.</li>
+                    <li>Por turnos y pasándose el teléfono, cada jugador escribe una respuesta antes de <strong>45 segundos</strong>.</li>
+                    <li>Puedes <strong>pasar turno</strong> en cualquier momento si no sabes qué responder o agotar el tiempo.</li>
                     <li>Si aciertas, sumas los puntos de ese puesto. Si fallas, pierdes el turno.</li>
                   </ul>
 
@@ -433,6 +468,36 @@ export default function PopularLocal({ onVolver, onExit }) {
               Lo más popular
             </span>
             <h2 className="pop-pregunta-titulo">«{preguntaData.pregunta}»</h2>
+          </div>
+
+          {/* Temporizador de 45 segundos */}
+          <div style={{ padding: '0 1rem', marginTop: '0.5rem' }}>
+            <div
+              className="timer"
+              role="timer"
+              style={{ margin: '0.4rem 0', background: '#e2e8f0', borderRadius: '9999px', height: '8px', overflow: 'hidden' }}
+            >
+              <div
+                className={`timer-bar ${tiempoRestante <= 10 ? 'low' : ''}`}
+                style={{
+                  width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%`,
+                  height: '100%',
+                  backgroundColor: tiempoRestante <= 10 ? '#ef4444' : '#16a34a',
+                  borderRadius: '9999px',
+                  transition: 'width 0.1s linear, background-color 0.3s ease'
+                }}
+              />
+            </div>
+            <p
+              className="timer-text"
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem',
+                color: tiempoRestante <= 10 ? '#dc2626' : '#64748b', fontSize: '0.9rem', fontWeight: 700, margin: '0 0 1rem'
+              }}
+            >
+              <Icon name="clock" size={16} />
+              {tiempoRestante} s
+            </p>
           </div>
 
           <div className="pop-slots-lista">

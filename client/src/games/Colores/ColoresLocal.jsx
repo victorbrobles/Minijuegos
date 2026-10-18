@@ -1,5 +1,5 @@
 // client/src/games/Colores/ColoresLocal.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
 import GameIntro from '../../components/GameIntro.jsx';
 import './Colores.css';
@@ -7,6 +7,7 @@ import './Colores.css';
 const MIN_JUGADORES = 3;
 const MAX_JUGADORES = 15;
 const MAX_RONDAS = 25;
+const TIEMPO_TURNO = 45;
 
 const PALETA_COLORES = [
   { id: 'rojo', nombre: 'Rojo', hex: '#ef4444', textoHex: '#ffffff' },
@@ -44,6 +45,9 @@ export default function ColoresLocal({ onVolver, onExit }) {
   const [coloresSeleccionados, setColoresSeleccionados] = useState([]);
 
   const [resultadoRonda, setResultadoRonda] = useState(null);
+
+  const [tiempoRestante, setTiempoRestante] = useState(TIEMPO_TURNO);
+  const timerRef = useRef(null);
 
   useEffect(() => {
     fetch('/api/colores/preguntas')
@@ -116,8 +120,10 @@ export default function ColoresLocal({ onVolver, onExit }) {
     }
   };
 
-  const confirmarRespuesta = () => {
-    if (coloresSeleccionados.length !== preguntaActual.numColores) return;
+  const confirmarRespuesta = (forzado = false) => {
+    if (!forzado && coloresSeleccionados.length !== preguntaActual.numColores) return;
+
+    if (timerRef.current) clearInterval(timerRef.current);
 
     const nuevasRespuestas = {
       ...respuestasRonda,
@@ -133,6 +139,36 @@ export default function ColoresLocal({ onVolver, onExit }) {
       calcularPuntosRonda(nuevasRespuestas);
     }
   };
+
+  const confirmarRespuestaRef = useRef();
+  useEffect(() => {
+    confirmarRespuestaRef.current = confirmarRespuesta;
+  });
+
+  useEffect(() => {
+    if (fase !== 'turno') {
+      if (timerRef.current) clearInterval(timerRef.current);
+      return;
+    }
+
+    setTiempoRestante(TIEMPO_TURNO);
+    if (timerRef.current) clearInterval(timerRef.current);
+
+    timerRef.current = setInterval(() => {
+      setTiempoRestante((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          if (confirmarRespuestaRef.current) confirmarRespuestaRef.current(true); // Envío forzado
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [fase, subTurno, rondaActual]);
 
   const calcularPuntosRonda = (respuestas) => {
     const correctosSet = new Set(preguntaActual.colores);
@@ -217,6 +253,7 @@ export default function ColoresLocal({ onVolver, onExit }) {
                     <li>Participan de <strong>3 a 15 jugadores</strong>. La partida dura un máximo de <strong>25 rondas</strong>.</li>
                     <li>Cada ronda muestra un elemento mítico y el <strong>número exacto de colores</strong> que debes adivinar.</li>
                     <li>Todos los jugadores responden por turnos de forma privada en el mismo dispositivo.</li>
+                    <li>Tienes <strong>45 segundos</strong> para responder por turno.</li>
                   </ul>
                   <p><strong>2. Puntuación:</strong></p>
                   <div className="aprox-tabla-puntos">
@@ -362,6 +399,34 @@ export default function ColoresLocal({ onVolver, onExit }) {
             <p className="field-label">
               Marca los {preguntaActual.numColores} colores característicos de este elemento:
             </p>
+
+            {/* Temporizador de 45 segundos */}
+            <div
+              className="timer"
+              role="timer"
+              style={{ margin: '0.6rem 0 0.3rem', background: '#e2e8f0', borderRadius: '9999px', height: '8px', overflow: 'hidden' }}
+            >
+              <div
+                className={`timer-bar ${tiempoRestante <= 10 ? 'low' : ''}`}
+                style={{
+                  width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%`,
+                  height: '100%',
+                  backgroundColor: tiempoRestante <= 10 ? '#ef4444' : '#16a34a',
+                  borderRadius: '9999px',
+                  transition: 'width 0.1s linear, background-color 0.3s ease'
+                }}
+              />
+            </div>
+            <p
+              className="timer-text"
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem',
+                color: tiempoRestante <= 10 ? '#dc2626' : '#64748b', fontSize: '0.9rem', fontWeight: 700, margin: '0 0 1rem'
+              }}
+            >
+              <Icon name="clock" size={16} />
+              {tiempoRestante} s
+            </p>
           </div>
 
           <div className="panel">
@@ -440,7 +505,7 @@ export default function ColoresLocal({ onVolver, onExit }) {
           <button
             className="big full"
             disabled={coloresSeleccionados.length !== preguntaActual.numColores}
-            onClick={confirmarRespuesta}
+            onClick={() => confirmarRespuesta(false)}
           >
             <Icon name="check" size={22} />
             {coloresSeleccionados.length === preguntaActual.numColores

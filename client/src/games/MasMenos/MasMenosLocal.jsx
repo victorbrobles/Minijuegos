@@ -1,5 +1,5 @@
 // client/src/games/MasMenos/MasMenosLocal.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import GameIntro from '../../components/GameIntro.jsx';
@@ -8,6 +8,7 @@ import './MasMenos.css';
 
 const MIN_JUGADORES = 1;
 const MAX_JUGADORES = 10;
+const TIEMPO_TURNO = 30;
 
 export default function MasMenosLocal({ onVolver, onExit }) {
   const navigate = useNavigate();
@@ -35,6 +36,9 @@ export default function MasMenosLocal({ onVolver, onExit }) {
   const [indicePool, setIndicePool] = useState(0);
 
   const [estadoEleccion, setEstadoEleccion] = useState(null);
+
+  const [tiempoRestante, setTiempoRestante] = useState(TIEMPO_TURNO);
+  const timerRef = useRef(null);
 
   useEffect(() => {
     fetch('/api/masmenos/categorias')
@@ -125,6 +129,8 @@ export default function MasMenosLocal({ onVolver, onExit }) {
   const elegirTarjeta = (opcionElegida) => {
     if (estadoEleccion !== null) return;
 
+    if (timerRef.current) clearInterval(timerRef.current);
+
     const valA = tarjetaA.item.valor;
     const valB = tarjetaB.item.valor;
     const esMayorA = valA >= valB;
@@ -177,6 +183,49 @@ export default function MasMenosLocal({ onVolver, onExit }) {
     }
   };
 
+  const handleTimeOut = () => {
+    if (estadoEleccion !== null) return;
+    setEstadoEleccion({ eleccion: 'TIMEOUT', esAcierto: false });
+    setTimeout(() => {
+      setJugadores((prev) =>
+        prev.map((j) =>
+          j.id === jugadorActivo.id ? { ...j, puntos: puntosTurno, jugo: true } : j
+        )
+      );
+      setFase('turno_fin');
+    }, 2000);
+  };
+
+  const handleTimeOutRef = useRef();
+  useEffect(() => {
+    handleTimeOutRef.current = handleTimeOut;
+  });
+
+  useEffect(() => {
+    if (fase !== 'jugando' || estadoEleccion !== null) {
+      if (timerRef.current) clearInterval(timerRef.current);
+      return;
+    }
+
+    setTiempoRestante(TIEMPO_TURNO);
+    if (timerRef.current) clearInterval(timerRef.current);
+
+    timerRef.current = setInterval(() => {
+      setTiempoRestante((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          if (handleTimeOutRef.current) handleTimeOutRef.current(); // Agota el tiempo y falla
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [fase, indicePool, estadoEleccion]);
+
   const continuarTrasFallo = () => {
     const siguientes = ordenTurnos.slice(indiceTurno + 1);
     if (siguientes.length > 0) {
@@ -216,9 +265,9 @@ export default function MasMenosLocal({ onVolver, onExit }) {
                   <p><strong>1. Dinámica del reto:</strong></p>
                   <ul>
                     <li>Eliges una categoría y se sortea quién empieza la partida.</li>
-                    <li>Aparecen dos datos frente a frente. Tu objetivo es <strong>elegir la cifra más alta</strong>.</li>
+                    <li>Aparecen dos datos frente a frente. Tienes <strong>30 segundos</strong> para <strong>elegir la cifra más alta</strong>.</li>
                     <li>Si aciertas, sumas <strong>+1 punto</strong>, se desvelan las cifras reales y la tarjeta perdedora o más antigua se sustituye por una nueva.</li>
-                    <li>¡Encadena tantos aciertos consecutivos como puedas hasta fallar!</li>
+                    <li>¡Encadena tantos aciertos consecutivos como puedas hasta fallar (o quedarte sin tiempo)!</li>
                   </ul>
                 </div>
 
@@ -339,6 +388,36 @@ export default function MasMenosLocal({ onVolver, onExit }) {
           <h2 className="title center" style={{ margin: '0.5rem 0 1rem', fontSize: '1.45rem' }}>
             ¿Cuál tiene la cifra más grande?
           </h2>
+
+          {/* Temporizador de 30 segundos */}
+          <div style={{ padding: '0 1rem', marginTop: '0.5rem', marginBottom: '1rem' }}>
+            <div
+              className="timer"
+              role="timer"
+              style={{ margin: '0.4rem 0', background: '#e2e8f0', borderRadius: '9999px', height: '8px', overflow: 'hidden' }}
+            >
+              <div
+                className={`timer-bar ${tiempoRestante <= 10 ? 'low' : ''}`}
+                style={{
+                  width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%`,
+                  height: '100%',
+                  backgroundColor: tiempoRestante <= 10 ? '#ef4444' : '#16a34a',
+                  borderRadius: '9999px',
+                  transition: 'width 0.1s linear, background-color 0.3s ease'
+                }}
+              />
+            </div>
+            <p
+              className="timer-text"
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem',
+                color: tiempoRestante <= 10 ? '#dc2626' : '#64748b', fontSize: '0.9rem', fontWeight: 700, margin: '0'
+              }}
+            >
+              <Icon name="clock" size={16} />
+              {tiempoRestante} s
+            </p>
+          </div>
 
           <div className="mm-versus-wrapper">
             <button

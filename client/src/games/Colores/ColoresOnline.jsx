@@ -4,6 +4,7 @@ import Icon from '../../components/Icon.jsx';
 import './Colores.css';
 
 const CLAVE_SESION_COLORES = 'colores_online_session';
+const TIEMPO_TURNO = 45;
 
 const PALETA_COLORES = [
   { id: 'rojo', nombre: 'Rojo', hex: '#ef4444', textoHex: '#ffffff' },
@@ -39,6 +40,9 @@ export default function ColoresOnline({ onLocal, onSalir }) {
   const [sala, setSala] = useState(null);
   const [codigoCopiado, setCodigoCopiado] = useState(false);
   const [misColoresSeleccionados, setMisColoresSeleccionados] = useState([]);
+
+  const [tiempoRestante, setTiempoRestante] = useState(TIEMPO_TURNO);
+  const timerRef = useRef(null);
 
   const intervalRef = useRef(null);
 
@@ -156,8 +160,12 @@ export default function ColoresOnline({ onLocal, onSalir }) {
     }
   };
 
-  const handleEnviarRespuesta = async () => {
-    if (!sesion || misColoresSeleccionados.length !== sala?.ronda?.numColores) return;
+  const handleEnviarRespuesta = async (forzado = false) => {
+    if (!sesion) return;
+    if (!forzado && misColoresSeleccionados.length !== sala?.ronda?.numColores) return;
+
+    if (timerRef.current) clearInterval(timerRef.current);
+
     try {
       await fetch(`/api/colores/online/sala/${sesion.code}/responder`, {
         method: 'POST',
@@ -168,6 +176,37 @@ export default function ColoresOnline({ onLocal, onSalir }) {
       console.error(err);
     }
   };
+
+  const handleEnviarRespuestaRef = useRef();
+  useEffect(() => {
+    handleEnviarRespuestaRef.current = handleEnviarRespuesta;
+  });
+
+  useEffect(() => {
+    const isVotando = sala?.estado === 'jugando' && sala?.ronda?.estadoRonda === 'votando';
+    if (!isVotando || sala?.ronda?.yaRespondio) {
+      if (timerRef.current) clearInterval(timerRef.current);
+      return;
+    }
+
+    setTiempoRestante(TIEMPO_TURNO);
+    if (timerRef.current) clearInterval(timerRef.current);
+
+    timerRef.current = setInterval(() => {
+      setTiempoRestante((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          if (handleEnviarRespuestaRef.current) handleEnviarRespuestaRef.current(true); // Forzar envío
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [sala?.estado, sala?.ronda?.estadoRonda, sala?.ronda?.yaRespondio, sala?.rondaActualIdx]);
 
   const handleCerrarRonda = async () => {
     if (!sesion) return;
@@ -284,6 +323,7 @@ export default function ColoresOnline({ onLocal, onSalir }) {
                 <li>Participan de <strong>3 a 15 jugadores</strong>. La partida dura un máximo de <strong>25 rondas</strong>.</li>
                 <li>Cada ronda muestra un elemento mítico y el <strong>número exacto de colores</strong> que debes adivinar.</li>
                 <li>Todos los jugadores responden simultáneamente en sus propios dispositivos en secreto.</li>
+                <li>Tienes <strong>45 segundos</strong> para responder por turno.</li>
               </ul>
               <p><strong>2. Puntuación:</strong></p>
               <div className="aprox-tabla-puntos">
@@ -556,6 +596,34 @@ export default function ColoresOnline({ onLocal, onSalir }) {
 
               {!ronda.yaRespondio ? (
                 <>
+                  {/* Temporizador de 45 segundos */}
+                  <div
+                    className="timer"
+                    role="timer"
+                    style={{ margin: '0.6rem 0 0.3rem', background: '#e2e8f0', borderRadius: '9999px', height: '8px', overflow: 'hidden' }}
+                  >
+                    <div
+                      className={`timer-bar ${tiempoRestante <= 10 ? 'low' : ''}`}
+                      style={{
+                        width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%`,
+                        height: '100%',
+                        backgroundColor: tiempoRestante <= 10 ? '#ef4444' : '#16a34a',
+                        borderRadius: '9999px',
+                        transition: 'width 0.1s linear, background-color 0.3s ease'
+                      }}
+                    />
+                  </div>
+                  <p
+                    className="timer-text"
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem',
+                      color: tiempoRestante <= 10 ? '#dc2626' : '#64748b', fontSize: '0.9rem', fontWeight: 700, margin: '0 0 1rem'
+                    }}
+                  >
+                    <Icon name="clock" size={16} />
+                    {tiempoRestante} s
+                  </p>
+
                   <div className="panel">
                     <style>{`
                       .colores-grid button.colores-tarjeta-solida {
@@ -632,7 +700,7 @@ export default function ColoresOnline({ onLocal, onSalir }) {
                   <button
                     className="big full"
                     disabled={misColoresSeleccionados.length !== ronda.numColores}
-                    onClick={handleEnviarRespuesta}
+                    onClick={() => handleEnviarRespuesta(false)}
                   >
                     <Icon name="check" size={22} />
                     {misColoresSeleccionados.length === ronda.numColores

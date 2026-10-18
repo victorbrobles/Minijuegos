@@ -5,6 +5,7 @@ import './Popular.css';
 import '../Adivina/Adivina.css';
 
 const CLAVE_SESION_POPULAR = 'popular_online_session';
+const TIEMPO_TURNO = 45;
 
 const PUNTOS_POR_PUESTO = {
   1: 2,
@@ -21,6 +22,7 @@ export default function PopularOnline({ onLocal, onSalir }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modalSalir, setModalSalir] = useState(false);
+  const [modalAyuda, setModalAyuda] = useState(false);
 
   const [sesion, setSesion] = useState(() => {
     try {
@@ -35,8 +37,10 @@ export default function PopularOnline({ onLocal, onSalir }) {
 
   const [inputTexto, setInputTexto] = useState('');
   const [modalPistas, setModalPistas] = useState(false);
+  const [tiempoRestante, setTiempoRestante] = useState(TIEMPO_TURNO);
 
   const intervalRef = useRef(null);
+  const timerRef = useRef(null);
 
   // Polling continuo
   useEffect(() => {
@@ -164,6 +168,46 @@ export default function PopularOnline({ onLocal, onSalir }) {
     }
   };
 
+  const handlePasarTurnoRef = useRef();
+  useEffect(() => {
+    handlePasarTurnoRef.current = handlePasarTurno;
+  });
+
+  const ronda = sala?.ronda;
+  const esAdmin = sala?.esAdmin;
+  const yoId = sala?.yoId;
+  const esMiTurno = ronda?.jugadorActivoId === yoId;
+  const misPistas = ronda?.misPistas || {};
+
+  // Temporizador sincronizado para todos durante el turno
+  useEffect(() => {
+    const isJugando = sala?.estado === 'jugando' && ronda?.faseRonda === 'jugando';
+    if (!isJugando || ronda?.feedback !== null) {
+      if (timerRef.current) clearInterval(timerRef.current);
+      return;
+    }
+
+    setTiempoRestante(TIEMPO_TURNO);
+    if (timerRef.current) clearInterval(timerRef.current);
+
+    timerRef.current = setInterval(() => {
+      setTiempoRestante((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          if (esMiTurno && handlePasarTurnoRef.current) {
+            handlePasarTurnoRef.current(); // Pasa turno automáticamente si somos nosotros
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [sala?.estado, ronda?.faseRonda, ronda?.jugadorActivoId, esMiTurno, ronda?.feedback]);
+
   const handlePedirPista = async (puesto, tipo) => {
     try {
       const res = await fetch(`/api/popular/online/sala/${sesion.code}/pista`, {
@@ -229,18 +273,84 @@ export default function PopularOnline({ onLocal, onSalir }) {
     setTimeout(() => setCodigoCopiado(false), 2000);
   };
 
-  const ronda = sala?.ronda;
-  const esAdmin = sala?.esAdmin;
-  const yoId = sala?.yoId;
-  const esMiTurno = ronda?.jugadorActivoId === yoId;
-  const misPistas = ronda?.misPistas || {};
-
   const ranking = sala?.jugadores ? [...sala.jugadores].sort((a, b) => b.puntos - a.puntos) : [];
   const maximo = ranking.length ? ranking[0].puntos : 0;
   const ganadores = maximo > 0 ? ranking.filter((j) => j.puntos === maximo) : [];
 
+  const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
+
   return (
     <div className="pop-contenedor">
+      {/* ---------------- BOTÓN Y MODAL DE AYUDA ---------------- */}
+      {mostrarAyuda && (
+        <button
+          type="button"
+          className="btn-ayuda-flotante"
+          onClick={() => setModalAyuda(true)}
+          title="Reglas del juego"
+        >
+          <span className="btn-ayuda-flotante-signo">?</span>
+        </button>
+      )}
+
+      {modalAyuda && (
+        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
+          <div className="rg-modal aprox-modal-ayuda" onClick={(e) => e.stopPropagation()}>
+            <div className="aprox-modal-header">
+              <span className="aprox-modal-signo-title">?</span>
+              <h3>¿Cómo se juega a Sigue la moda?</h3>
+            </div>
+
+            <div className="aprox-modal-cuerpo">
+              <p><strong>1. Dinámica del juego:</strong></p>
+              <ul>
+                <li>Adivina <strong>las 5 respuestas más populares</strong> de la categoría propuesta.</li>
+                <li>Por turnos, cada jugador escribe una respuesta antes de <strong>45 segundos</strong>.</li>
+                <li>Puedes <strong>pasar turno</strong> en cualquier momento si no sabes qué responder o agotar el tiempo.</li>
+                <li>Si aciertas, sumas los puntos de ese puesto. Si fallas, pierdes el turno.</li>
+              </ul>
+
+              <p><strong>2. Puntuación de los puestos:</strong></p>
+              <div className="aprox-tabla-puntos">
+                <div className="aprox-puntos-fila acierto">
+                  <span>🥇 Top 1</span>
+                  <strong>+2 puntos</strong>
+                </div>
+                <div className="aprox-puntos-fila acierto" style={{ background: '#eff6ff', color: '#1d4ed8' }}>
+                  <span>🥈 Top 2</span>
+                  <strong>+4 puntos</strong>
+                </div>
+                <div className="aprox-puntos-fila intermedia" style={{ background: '#fef3c7', color: '#92400e' }}>
+                  <span>🥉 Top 3</span>
+                  <strong>+6 puntos</strong>
+                </div>
+                <div className="aprox-puntos-fila acierto" style={{ background: '#ede9fe', color: '#5b21b6' }}>
+                  <span>🏅 Top 4</span>
+                  <strong>+8 puntos</strong>
+                </div>
+                <div className="aprox-puntos-fila acierto" style={{ background: '#fdf2f8', color: '#be185d' }}>
+                  <span>🏆 Top 5 (El más difícil)</span>
+                  <strong>+10 puntos</strong>
+                </div>
+              </div>
+
+              <p><strong>3. Sistema de pistas (-1 punto cada una):</strong></p>
+              <ul>
+                <li><strong>1.ª Pista: Estructura de letras</strong> (-1 pt).</li>
+                <li><strong>2.ª Pista: Revelar 20% de letras</strong> (-1 pt).</li>
+              </ul>
+            </div>
+
+            <div className="rg-modal-acciones">
+              <button className="big full" onClick={() => setModalAyuda(false)}>
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ---------------- FIN AYUDA ---------------- */}
+
       {/* 1. MENÚ ONLINE */}
       {vista === 'menu' && (
         <section className="game">
@@ -345,12 +455,37 @@ export default function PopularOnline({ onLocal, onSalir }) {
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
         <section className="game">
           <div className="panel center">
-            <p className="categoria">Código de la partida</p>
-            <button type="button" className="qq-codigo-btn" onClick={copiarCodigo}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  padding: '0.35rem 1.1rem',
+                  borderRadius: '9999px',
+                  border: '1.5px solid #22c55e',
+                  backgroundColor: '#f0fdf4',
+                  color: '#16a34a',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  lineHeight: 1
+                }}
+              >
+                <Icon name="lock" size={15} />
+                Sala de espera
+              </span>
+            </div>
+            <p className="hint">Código de la partida</p>
+            <button
+              type="button"
+              className="qq-codigo-btn"
+              onClick={copiarCodigo}
+              title="Copiar código"
+            >
               {sala.code}
             </button>
             <p className="hint small">
-              {codigoCopiado ? '¡Copiado!' : 'Comparte este código para que se unan (mínimo 2 jugadores).'}
+              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Comparte este código para que se unan (mínimo 2 jugadores).'}
             </p>
           </div>
 
@@ -430,6 +565,36 @@ export default function PopularOnline({ onLocal, onSalir }) {
               ⏳ Turno de <strong>{ronda.jugadorActivoNombre}</strong>. Espera tu turno...
             </div>
           )}
+
+          {/* Temporizador de 45 segundos */}
+          <div style={{ padding: '0 1rem', marginTop: '0.5rem' }}>
+            <div
+              className="timer"
+              role="timer"
+              style={{ margin: '0.4rem 0', background: '#e2e8f0', borderRadius: '9999px', height: '8px', overflow: 'hidden' }}
+            >
+              <div
+                className={`timer-bar ${tiempoRestante <= 10 ? 'low' : ''}`}
+                style={{
+                  width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%`,
+                  height: '100%',
+                  backgroundColor: tiempoRestante <= 10 ? '#ef4444' : '#16a34a',
+                  borderRadius: '9999px',
+                  transition: 'width 0.1s linear, background-color 0.3s ease'
+                }}
+              />
+            </div>
+            <p
+              className="timer-text"
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem',
+                color: tiempoRestante <= 10 ? '#dc2626' : '#64748b', fontSize: '0.9rem', fontWeight: 700, margin: '0 0 1rem'
+              }}
+            >
+              <Icon name="clock" size={16} />
+              {tiempoRestante} s
+            </p>
+          </div>
 
           {/* Los 5 puestos en vivo */}
           <div className="pop-slots-lista">

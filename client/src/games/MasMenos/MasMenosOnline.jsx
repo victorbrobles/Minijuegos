@@ -6,6 +6,7 @@ import './MasMenos.css';
 import '../Adivina/Adivina.css';
 
 const CLAVE_SESION_MM = 'masmenos_online_session';
+const TIEMPO_TURNO = 30;
 
 export default function MasMenosOnline({ onLocal, onSalir }) {
   const [vista, setVista] = useState('menu'); // 'menu' | 'crear' | 'unirse' | 'sala'
@@ -14,6 +15,7 @@ export default function MasMenosOnline({ onLocal, onSalir }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modalSalir, setModalSalir] = useState(false);
+  const [modalAyuda, setModalAyuda] = useState(false);
 
   const [categorias, setCategorias] = useState([]);
   const [sesion, setSesion] = useState(() => {
@@ -26,8 +28,10 @@ export default function MasMenosOnline({ onLocal, onSalir }) {
 
   const [sala, setSala] = useState(null);
   const [codigoCopiado, setCodigoCopiado] = useState(false);
+  const [tiempoRestante, setTiempoRestante] = useState(TIEMPO_TURNO);
 
   const intervalRef = useRef(null);
+  const timerRef = useRef(null);
 
   useEffect(() => {
     fetch('/api/masmenos/categorias')
@@ -160,6 +164,45 @@ export default function MasMenosOnline({ onLocal, onSalir }) {
     }
   };
 
+  const handleTimeOutRef = useRef();
+  useEffect(() => {
+    handleTimeOutRef.current = () => handleElegirTarjeta('TIMEOUT'); // Forzamos respuesta incorrecta
+  });
+
+  const ronda = sala?.ronda;
+  const esAdmin = sala?.esAdmin;
+  const yoId = sala?.yoId;
+  const esMiTurno = ronda?.jugadorActivoId === yoId;
+
+  // Temporizador sincronizado
+  useEffect(() => {
+    const isJugando = sala?.estado === 'jugando' && ronda?.faseRonda === 'jugando';
+    if (!isJugando || ronda?.estadoEleccion !== null) {
+      if (timerRef.current) clearInterval(timerRef.current);
+      return;
+    }
+
+    setTiempoRestante(TIEMPO_TURNO);
+    if (timerRef.current) clearInterval(timerRef.current);
+
+    timerRef.current = setInterval(() => {
+      setTiempoRestante((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          if (esMiTurno && handleTimeOutRef.current) {
+            handleTimeOutRef.current();
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [sala?.estado, ronda?.faseRonda, ronda?.estadoEleccion, ronda?.puntosTurno, esMiTurno]);
+
   const handleSiguienteJugador = async () => {
     try {
       await fetch(`/api/masmenos/online/sala/${sesion.code}/siguiente-jugador`, {
@@ -203,16 +246,54 @@ export default function MasMenosOnline({ onLocal, onSalir }) {
     return new Intl.NumberFormat('es-ES').format(num);
   };
 
-  const ronda = sala?.ronda;
-  const esAdmin = sala?.esAdmin;
-  const yoId = sala?.yoId;
-  const esMiTurno = ronda?.jugadorActivoId === yoId;
   const ranking = sala?.jugadores ? [...sala.jugadores].sort((a, b) => b.puntos - a.puntos) : [];
   const maximo = ranking.length ? ranking[0].puntos : 0;
   const ganadores = maximo > 0 ? ranking.filter((j) => j.puntos === maximo) : [];
 
+  const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
+
   return (
     <div className="mm-contenedor">
+      {/* ---------------- BOTÓN Y MODAL DE AYUDA ---------------- */}
+      {mostrarAyuda && (
+        <button
+          type="button"
+          className="btn-ayuda-flotante"
+          onClick={() => setModalAyuda(true)}
+          title="Reglas del juego"
+        >
+          <span className="btn-ayuda-flotante-signo">?</span>
+        </button>
+      )}
+
+      {modalAyuda && (
+        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
+          <div className="rg-modal aprox-modal-ayuda" onClick={(e) => e.stopPropagation()}>
+            <div className="aprox-modal-header">
+              <span className="aprox-modal-signo-title">?</span>
+              <h3>¿Cómo se juega a Entre dos aguas?</h3>
+            </div>
+
+            <div className="aprox-modal-cuerpo">
+              <p><strong>1. Dinámica del reto:</strong></p>
+              <ul>
+                <li>Eliges una categoría y se sortea quién empieza la partida.</li>
+                <li>Aparecen dos datos frente a frente. Tienes <strong>30 segundos</strong> para <strong>elegir la cifra más alta</strong>.</li>
+                <li>Si aciertas, sumas <strong>+1 punto</strong>, se desvelan las cifras reales y la tarjeta perdedora o más antigua se sustituye por una nueva.</li>
+                <li>¡Encadena tantos aciertos consecutivos como puedas hasta fallar (o quedarte sin tiempo)!</li>
+              </ul>
+            </div>
+
+            <div className="rg-modal-acciones">
+              <button className="big full" onClick={() => setModalAyuda(false)}>
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ---------------- FIN AYUDA ---------------- */}
+
       {/* 1. MENÚ ONLINE */}
       {vista === 'menu' && (
         <section className="game">
@@ -317,12 +398,37 @@ export default function MasMenosOnline({ onLocal, onSalir }) {
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
         <section className="game">
           <div className="panel center">
-            <p className="categoria">Código de la partida</p>
-            <button type="button" className="qq-codigo-btn" onClick={copiarCodigo}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  padding: '0.35rem 1.1rem',
+                  borderRadius: '9999px',
+                  border: '1.5px solid #22c55e',
+                  backgroundColor: '#f0fdf4',
+                  color: '#16a34a',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  lineHeight: 1
+                }}
+              >
+                <Icon name="lock" size={15} />
+                Sala de espera
+              </span>
+            </div>
+            <p className="hint">Código de la partida</p>
+            <button
+              type="button"
+              className="qq-codigo-btn"
+              onClick={copiarCodigo}
+              title="Copiar código"
+            >
               {sala.code}
             </button>
             <p className="hint small">
-              {codigoCopiado ? '¡Copiado!' : 'Comparte este código para que se unan (mínimo 2 jugadores).'}
+              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Comparte este código para que se unan (mínimo 2 jugadores).'}
             </p>
           </div>
 
@@ -423,6 +529,36 @@ export default function MasMenosOnline({ onLocal, onSalir }) {
               ? 'Pulsa sobre la tarjeta que consideres mayor'
               : `Observando en directo las elecciones de ${ronda.jugadorActivoNombre}...`}
           </p>
+
+          {/* Temporizador de 30 segundos */}
+          <div style={{ padding: '0 1rem', marginTop: '0.5rem', marginBottom: '1rem' }}>
+            <div
+              className="timer"
+              role="timer"
+              style={{ margin: '0.4rem 0', background: '#e2e8f0', borderRadius: '9999px', height: '8px', overflow: 'hidden' }}
+            >
+              <div
+                className={`timer-bar ${tiempoRestante <= 10 ? 'low' : ''}`}
+                style={{
+                  width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%`,
+                  height: '100%',
+                  backgroundColor: tiempoRestante <= 10 ? '#ef4444' : '#16a34a',
+                  borderRadius: '9999px',
+                  transition: 'width 0.1s linear, background-color 0.3s ease'
+                }}
+              />
+            </div>
+            <p
+              className="timer-text"
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem',
+                color: tiempoRestante <= 10 ? '#dc2626' : '#64748b', fontSize: '0.9rem', fontWeight: 700, margin: '0'
+              }}
+            >
+              <Icon name="clock" size={16} />
+              {tiempoRestante} s
+            </p>
+          </div>
 
           <div className="mm-versus-wrapper">
             <button

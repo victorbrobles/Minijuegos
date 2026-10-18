@@ -1,5 +1,5 @@
 // client/src/games/Buscaminas/BuscaminasLocal.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import GameIntro from '../../components/GameIntro.jsx';
@@ -11,6 +11,7 @@ const MAX_JUGADORES = 8;
 const MAX_RONDAS = 10;
 const TOTAL_CORRECTOS = 10;
 const TOTAL_MINAS = 5;
+const TIEMPO_TURNO = 30;
 
 export default function BuscaminasLocal({ onVolver, onExit }) {
   const navigate = useNavigate();
@@ -40,6 +41,9 @@ export default function BuscaminasLocal({ onVolver, onExit }) {
 
   const [explosionModal, setExplosionModal] = useState(null);
   const [motivoFinRonda, setMotivoFinRonda] = useState('');
+
+  const [tiempoRestante, setTiempoRestante] = useState(TIEMPO_TURNO);
+  const timerRef = useRef(null);
 
   useEffect(() => {
     fetch('/api/buscaminas/categorias')
@@ -130,8 +134,41 @@ export default function BuscaminasLocal({ onVolver, onExit }) {
     setFase('pasar_turno');
   };
 
+  const avanzarTurnoRef = useRef();
+  useEffect(() => {
+    avanzarTurnoRef.current = avanzarTurno;
+  });
+
+  // Temporizador de turno
+  useEffect(() => {
+    if (fase !== 'jugando') {
+      if (timerRef.current) clearInterval(timerRef.current);
+      return;
+    }
+
+    setTiempoRestante(TIEMPO_TURNO);
+    if (timerRef.current) clearInterval(timerRef.current);
+
+    timerRef.current = setInterval(() => {
+      setTiempoRestante((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          if (avanzarTurnoRef.current) avanzarTurnoRef.current(); // Pierde el turno
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [fase, indiceTurno]);
+
   const seleccionarCasilla = (casilla) => {
     if (casilla.descubierta || !jugadorActivo) return;
+
+    if (timerRef.current) clearInterval(timerRef.current);
 
     const nuevasCasillas = casillas.map((c) =>
       c.id === casilla.id ? { ...c, descubierta: true } : c
@@ -221,7 +258,7 @@ export default function BuscaminasLocal({ onVolver, onExit }) {
                   <ul>
                     <li>Se muestra una consigna y un tablero de 15 elementos (3 filas x 5 columnas).</li>
                     <li>Exactamente <strong>10 casillas son correctas</strong> y <strong>5 son bombas</strong>.</li>
-                    <li>Por turnos y pasándose el dispositivo, cada jugador selecciona una casilla.</li>
+                    <li>Por turnos y pasándose el dispositivo, cada jugador selecciona una casilla en menos de <strong>30 segundos</strong> o perderá el turno.</li>
                     <li>Si aciertas, ganas puntos y la casilla queda inhabilitada para los demás.</li>
                     <li>Si fallas, <strong>¡la bomba explota!</strong> y quedas eliminado por el resto de la ronda.</li>
                   </ul>
@@ -388,6 +425,36 @@ export default function BuscaminasLocal({ onVolver, onExit }) {
 
           <div className="bm-starter-banner">
             <span>👤 Turno de: <strong>{jugadorActivo?.nombre}</strong></span>
+          </div>
+
+          {/* Temporizador de 30 segundos */}
+          <div style={{ padding: '0 1rem', marginTop: '0.5rem' }}>
+            <div
+              className="timer"
+              role="timer"
+              style={{ margin: '0.4rem 0', background: '#e2e8f0', borderRadius: '9999px', height: '8px', overflow: 'hidden' }}
+            >
+              <div
+                className={`timer-bar ${tiempoRestante <= 10 ? 'low' : ''}`}
+                style={{
+                  width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%`,
+                  height: '100%',
+                  backgroundColor: tiempoRestante <= 10 ? '#ef4444' : '#16a34a',
+                  borderRadius: '9999px',
+                  transition: 'width 0.1s linear, background-color 0.3s ease'
+                }}
+              />
+            </div>
+            <p
+              className="timer-text"
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem',
+                color: tiempoRestante <= 10 ? '#dc2626' : '#64748b', fontSize: '0.9rem', fontWeight: 700, margin: '0 0 1rem'
+              }}
+            >
+              <Icon name="clock" size={16} />
+              {tiempoRestante} s
+            </p>
           </div>
 
           <div className="bm-grid-15">

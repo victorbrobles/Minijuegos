@@ -6,6 +6,7 @@ import './Cancion.css';
 import '../Adivina/Adivina.css';
 
 const CLAVE_SESION_CANCION = 'cancion_online_session';
+const TIEMPO_RESPUESTA = 30;
 
 export default function CancionOnline({ onLocal, onSalir }) {
   const [vista, setVista] = useState('menu'); // 'menu' | 'crear' | 'unirse' | 'sala'
@@ -14,6 +15,7 @@ export default function CancionOnline({ onLocal, onSalir }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modalSalir, setModalSalir] = useState(false);
+  const [modalAyuda, setModalAyuda] = useState(false);
 
   const [sesion, setSesion] = useState(() => {
     try {
@@ -28,7 +30,11 @@ export default function CancionOnline({ onLocal, onSalir }) {
   const [miTexto, setMiTexto] = useState('');
   const [sonandoLocal, setSonandoLocal] = useState(false);
 
+  // Temporizador para responder una vez pulsado
+  const [tiempoRespuesta, setTiempoRespuesta] = useState(TIEMPO_RESPUESTA);
+
   const intervalRef = useRef(null);
+  const timerRespuestaRef = useRef(null);
 
   useEffect(() => {
     return () => detenerReproduccion();
@@ -104,7 +110,7 @@ export default function CancionOnline({ onLocal, onSalir }) {
       pausarAudio();
       setSonandoLocal(false);
     }
-  }, [sala?.ronda?.reproduciendo, sala?.ronda?.estadoRonda]);
+  }, [sala?.ronda?.reproduciendo, sala?.ronda?.estadoRonda, sonandoLocal, sala?.esAdmin, sala?.code, sesion?.token]);
 
   const handleCrear = async () => {
     if (!nombre.trim()) return;
@@ -197,9 +203,31 @@ export default function CancionOnline({ onLocal, onSalir }) {
     }).catch(() => {});
   };
 
+  const enviarFalloTimeout = async () => {
+    if (!sesion) return;
+    try {
+      await fetch(`/api/cancion/online/sala/${sesion.code}/responder`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: sesion.token, respuesta: '' }) // Envío vacío equivale a fallo
+      });
+      setMiTexto('');
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const enviarFalloTimeoutRef = useRef();
+  useEffect(() => {
+    enviarFalloTimeoutRef.current = enviarFalloTimeout;
+  });
+
   const handleEnviarRespuesta = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
     if (!miTexto.trim()) return;
+
+    if (timerRespuestaRef.current) clearInterval(timerRespuestaRef.current);
+
     try {
       await fetch(`/api/cancion/online/sala/${sesion.code}/responder`, {
         method: 'POST',
@@ -261,8 +289,81 @@ export default function CancionOnline({ onLocal, onSalir }) {
   const miJugador = sala?.jugadores?.find((j) => j.id === yoId);
   const estoyBloqueado = Boolean(miJugador?.bloqueado);
 
+  // Efecto para el temporizador sincronizado cuando alguien pulsa
+  useEffect(() => {
+    if (!alguienHaPulsado || ronda?.estadoRonda !== 'activa') {
+      if (timerRespuestaRef.current) clearInterval(timerRespuestaRef.current);
+      return;
+    }
+
+    setTiempoRespuesta(TIEMPO_RESPUESTA);
+    if (timerRespuestaRef.current) clearInterval(timerRespuestaRef.current);
+
+    timerRespuestaRef.current = setInterval(() => {
+      setTiempoRespuesta((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerRespuestaRef.current);
+          if (soyElQueHaPulsado && enviarFalloTimeoutRef.current) {
+            enviarFalloTimeoutRef.current(); // Envía el error si somos nosotros
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      if (timerRespuestaRef.current) clearInterval(timerRespuestaRef.current);
+    };
+  }, [alguienHaPulsado, ronda?.estadoRonda, soyElQueHaPulsado]);
+
+  const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
+
   return (
     <div className="cancion-contenedor">
+      {/* ---------------- BOTÓN Y MODAL DE AYUDA ---------------- */}
+      {mostrarAyuda && (
+        <button
+          type="button"
+          className="btn-ayuda-flotante"
+          onClick={() => setModalAyuda(true)}
+          title="Reglas del juego"
+        >
+          <span className="btn-ayuda-flotante-signo">?</span>
+        </button>
+      )}
+
+      {modalAyuda && (
+        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
+          <div className="rg-modal aprox-modal-ayuda" onClick={(e) => e.stopPropagation()}>
+            <div className="aprox-modal-header">
+              <span className="aprox-modal-signo-title">?</span>
+              <h3>¿Cómo se juega a Afina ese oído?</h3>
+            </div>
+
+            <div className="aprox-modal-cuerpo">
+              <p><strong>1. Dinámica musical:</strong></p>
+              <ul>
+                <li>El anfitrión iniciará la canción. Empezará casi inaudible e irá <strong>subiendo gradualmente de volumen</strong>.</li>
+                <li>En cuanto reconozcas el tema, <strong>pulsa el botón rojo</strong> en tu pantalla para detener la reproducción. Tienes <strong>30 segundos para responder</strong>.</li>
+              </ul>
+              <p><strong>2. Puntuación y rebote:</strong></p>
+              <ul>
+                <li>Si aciertas, sumas <strong>tantos puntos como segundos queden</strong> de la canción.</li>
+                <li>Si fallas o se te acaba el tiempo de respuesta, restas esa misma cantidad de puntos y quedas bloqueado, ¡habiendo rebote para el resto!</li>
+              </ul>
+            </div>
+
+            <div className="rg-modal-acciones">
+              <button className="big full" onClick={() => setModalAyuda(false)}>
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* ---------------- FIN AYUDA ---------------- */}
+
       {/* 1. MENÚ ONLINE */}
       {vista === 'menu' && (
         <section className="game">
@@ -270,7 +371,7 @@ export default function CancionOnline({ onLocal, onSalir }) {
             <span className="lb-luna chica">
               <Icon name="music" size={42} strokeWidth={1.6} />
             </span>
-            <h1 className="title">Afina ese oído</h1>
+            <h1 className="title">Afina ese oído Online</h1>
             <p className="hint">
               Adivina la canción antes de que alcance su volumen máximo. ¡El más rápido en pulsar suma los segundos que queden!
             </p>
@@ -367,12 +468,37 @@ export default function CancionOnline({ onLocal, onSalir }) {
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
         <section className="game">
           <div className="panel center">
-            <p className="categoria">Código de la partida</p>
-            <button type="button" className="qq-codigo-btn" onClick={copiarCodigo}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  padding: '0.35rem 1.1rem',
+                  borderRadius: '9999px',
+                  border: '1.5px solid #22c55e',
+                  backgroundColor: '#f0fdf4',
+                  color: '#16a34a',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  lineHeight: 1
+                }}
+              >
+                <Icon name="lock" size={15} />
+                Sala de espera
+              </span>
+            </div>
+            <p className="hint">Código de la partida</p>
+            <button
+              type="button"
+              className="qq-codigo-btn"
+              onClick={copiarCodigo}
+              title="Copiar código"
+            >
               {sala.code}
             </button>
             <p className="hint small">
-              {codigoCopiado ? '¡Copiado!' : 'Comparte este código para que se unan (2 a 20 jugadores).'}
+              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Comparte este código para que se unan (2 a 20 jugadores).'}
             </p>
           </div>
 
@@ -478,6 +604,38 @@ export default function CancionOnline({ onLocal, onSalir }) {
                       Rendirse y ver solución
                     </button>
                   )}
+                </div>
+              )}
+
+              {/* Si alguien ha pulsado, mostrar el temporizador para todos */}
+              {alguienHaPulsado && (
+                <div style={{ padding: '0', marginTop: '0.5rem', marginBottom: '0.8rem', width: '100%' }}>
+                  <div
+                    className="timer"
+                    role="timer"
+                    style={{ margin: '0.4rem 0', background: '#e2e8f0', borderRadius: '9999px', height: '8px', overflow: 'hidden' }}
+                  >
+                    <div
+                      className={`timer-bar ${tiempoRespuesta <= 10 ? 'low' : ''}`}
+                      style={{
+                        width: `${(tiempoRespuesta / TIEMPO_RESPUESTA) * 100}%`,
+                        height: '100%',
+                        backgroundColor: tiempoRespuesta <= 10 ? '#ef4444' : '#16a34a',
+                        borderRadius: '9999px',
+                        transition: 'width 0.1s linear, background-color 0.3s ease'
+                      }}
+                    />
+                  </div>
+                  <p
+                    className="timer-text"
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem',
+                      color: tiempoRespuesta <= 10 ? '#dc2626' : '#64748b', fontSize: '0.9rem', fontWeight: 700, margin: '0'
+                    }}
+                  >
+                    <Icon name="clock" size={16} />
+                    {tiempoRespuesta} s para responder
+                  </p>
                 </div>
               )}
 

@@ -1,5 +1,5 @@
 // client/src/games/Cancion/CancionLocal.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
 import GameIntro from '../../components/GameIntro.jsx';
 import { reproducirConRampa, pausarAudio, reanudarAudio, detenerReproduccion } from './audioPlayerCancion.js';
@@ -8,6 +8,7 @@ import '../Adivina/Adivina.css';
 
 const MIN_JUGADORES = 2;
 const MAX_JUGADORES = 20;
+const TIEMPO_RESPUESTA = 30;
 
 export default function CancionLocal({ onVolver, onExit }) {
   const [fase, setFase] = useState('setup'); // 'setup' | 'jugando' | 'resolucion' | 'final'
@@ -27,7 +28,7 @@ export default function CancionLocal({ onVolver, onExit }) {
   const [usados, setUsados] = useState([]);
   const [bloqueados, setBloqueados] = useState([]);
 
-  // Audio y cuenta atrás (30s)
+  // Audio y cuenta atrás (30s de la canción)
   const [sonando, setSonando] = useState(false);
   const [segundos, setSegundos] = useState(30);
 
@@ -36,6 +37,10 @@ export default function CancionLocal({ onVolver, onExit }) {
   const [inputTexto, setInputTexto] = useState('');
   const [mensajeFeedback, setMensajeFeedback] = useState(null);
   const [resultadoRonda, setResultadoRonda] = useState(null);
+
+  // Temporizador para responder una vez pulsado
+  const [tiempoRespuesta, setTiempoRespuesta] = useState(TIEMPO_RESPUESTA);
+  const timerRespuestaRef = useRef(null);
 
   useEffect(() => {
     return () => detenerReproduccion();
@@ -92,6 +97,7 @@ export default function CancionLocal({ onVolver, onExit }) {
       setInputTexto('');
       setMensajeFeedback(null);
       setResultadoRonda(null);
+      setTiempoRespuesta(TIEMPO_RESPUESTA);
       setFase('jugando');
     } catch {
       alert('Error cargando la canción.');
@@ -122,20 +128,55 @@ export default function CancionLocal({ onVolver, onExit }) {
     setSonando(false);
     setPulsado(true);
     setInputTexto('');
+    setTiempoRespuesta(TIEMPO_RESPUESTA);
   };
 
   const cancelarPulsado = () => {
     setPulsado(false);
     setInputTexto('');
-    // Reanudar música para el resto
+    setTiempoRespuesta(TIEMPO_RESPUESTA);
+    // Reanudar música para el resto si quedan segundos
     if (segundos > 0) {
       setSonando(true);
       reanudarAudio();
     }
   };
 
+  const cancelarPulsadoRef = useRef();
+  useEffect(() => {
+    cancelarPulsadoRef.current = cancelarPulsado;
+  });
+
+  // Efecto para el temporizador de 30 segundos al responder
+  useEffect(() => {
+    if (!pulsado) {
+      if (timerRespuestaRef.current) clearInterval(timerRespuestaRef.current);
+      return;
+    }
+
+    setTiempoRespuesta(TIEMPO_RESPUESTA);
+    if (timerRespuestaRef.current) clearInterval(timerRespuestaRef.current);
+
+    timerRespuestaRef.current = setInterval(() => {
+      setTiempoRespuesta((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerRespuestaRef.current);
+          if (cancelarPulsadoRef.current) cancelarPulsadoRef.current(); // Cierra el modal sin fallos
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      if (timerRespuestaRef.current) clearInterval(timerRespuestaRef.current);
+    };
+  }, [pulsado]);
+
   const confirmarRespuesta = async (jugador) => {
     if (!inputTexto.trim()) return;
+
+    if (timerRespuestaRef.current) clearInterval(timerRespuestaRef.current);
 
     try {
       const res = await fetch('/api/cancion/validar', {
@@ -161,7 +202,7 @@ export default function CancionLocal({ onVolver, onExit }) {
           tipo: 'acierto',
           ganador: jugador,
           puntos: data.puntos,
-          titulo: `${data.tituloReal} — ${data.artistaReal}`
+          titulo: `${data.tituloReal} —${data.artistaReal}`
         });
         setFase('resolucion');
       } else {
@@ -205,7 +246,7 @@ export default function CancionLocal({ onVolver, onExit }) {
 
       setResultadoRonda({
         tipo: motivo,
-        titulo: `${data.titulo} — ${data.artista}`
+        titulo: `${data.titulo} —${data.artista}`
       });
       setFase('resolucion');
     } catch {
@@ -251,11 +292,11 @@ export default function CancionLocal({ onVolver, onExit }) {
                   <ul>
                     <li>Pulsa el reproductor para iniciar la canción.</li>
                     <li>Empezará casi inaudible e irá <strong>subiendo gradualmente de volumen</strong> hasta alcanzar un nivel medio a los 30 segundos.</li>
-                    <li>En cuanto reconozcas el tema, <strong>pulsa el botón rojo</strong> para detener la reproducción.</li>
+                    <li>En cuanto reconozcas el tema, <strong>pulsa el botón rojo</strong> para detener la reproducción. Tienes <strong>30 segundos para responder</strong>.</li>
                   </ul>
                   <p><strong>2. Puntuación y rebote:</strong></p>
                   <ul>
-                    <li>Si aciertas, sumas <strong>tantos puntos como segundos queden</strong> de los 30.</li>
+                    <li>Si aciertas, sumas <strong>tantos puntos como segundos queden</strong> en el reproductor.</li>
                     <li>Si fallas, restas esa misma cantidad de puntos y quedas bloqueado en esa ronda, ¡habiendo rebote para el resto!</li>
                   </ul>
                 </div>
@@ -395,6 +436,36 @@ export default function CancionLocal({ onVolver, onExit }) {
                   <span className="pulsado-badge">🔴 Tiempo congelado a los {segundos}s</span>
                   <p className="hint small" style={{ margin: '0.4rem 0' }}>
                     Escribe el título de la canción y pulsa en el nombre del jugador:
+                  </p>
+                </div>
+
+                {/* Temporizador de respuesta */}
+                <div style={{ padding: '0', marginTop: '0.5rem', marginBottom: '0.8rem' }}>
+                  <div
+                    className="timer"
+                    role="timer"
+                    style={{ margin: '0.4rem 0', background: '#e2e8f0', borderRadius: '9999px', height: '8px', overflow: 'hidden' }}
+                  >
+                    <div
+                      className={`timer-bar ${tiempoRespuesta <= 10 ? 'low' : ''}`}
+                      style={{
+                        width: `${(tiempoRespuesta / TIEMPO_RESPUESTA) * 100}%`,
+                        height: '100%',
+                        backgroundColor: tiempoRespuesta <= 10 ? '#ef4444' : '#16a34a',
+                        borderRadius: '9999px',
+                        transition: 'width 0.1s linear, background-color 0.3s ease'
+                      }}
+                    />
+                  </div>
+                  <p
+                    className="timer-text"
+                    style={{
+                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem',
+                      color: tiempoRespuesta <= 10 ? '#dc2626' : '#64748b', fontSize: '0.9rem', fontWeight: 700, margin: '0'
+                    }}
+                  >
+                    <Icon name="clock" size={16} />
+                    {tiempoRespuesta} s para responder
                   </p>
                 </div>
 
