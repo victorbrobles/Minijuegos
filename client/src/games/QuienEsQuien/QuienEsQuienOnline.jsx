@@ -1,5 +1,6 @@
 // client/src/games/QuienEsQuien/QuienEsQuienOnline.jsx
 import React, { useState, useEffect, useRef } from 'react';
+import { useAdmin, adminHeaders } from '../../lib/admin.js';
 import Icon from '../../components/Icon.jsx';
 import CategoryCard from '../../components/CategoryCard.jsx';
 import './QuienEsQuien.css';
@@ -7,12 +8,20 @@ import './QuienEsQuien.css';
 const CLAVE_SESION_QQ = 'qq_online_session';
 
 export default function QuienEsQuienOnline({ onLocal, onSalir }) {
+  const esAdminGlobal = useAdmin();
+
   const [vista, setVista] = useState('menu');
   const [nombre, setNombre] = useState('');
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modalSalir, setModalSalir] = useState(false);
+
+  // Estados para la categoría personalizada (Admin)
+  const [mostrarModalCustom, setMostrarModalCustom] = useState(false);
+  const [customNombre, setCustomNombre] = useState('');
+  const [customDatos, setCustomDatos] = useState('');
+  const [errorCustom, setErrorCustom] = useState('');
 
   const [sesion, setSesion] = useState(() => {
     try {
@@ -31,7 +40,9 @@ export default function QuienEsQuienOnline({ onLocal, onSalir }) {
     fetch('/api/quienesquien/categorias')
       .then((r) => r.json())
       .then((d) => {
-        if (d.success) setCategorias(d.categorias);
+        if (d.success) {
+          setCategorias(d.categorias);
+        }
       })
       .catch((err) => console.error(err));
   }, []);
@@ -116,15 +127,21 @@ export default function QuienEsQuienOnline({ onLocal, onSalir }) {
     }
   };
 
-  const handleSeleccionarYIniciar = async (categoriaId) => {
+  const enviarInicioPartida = async (categoriaId, customParams = null) => {
     if (!categoriaId || !sesion) return;
     setErrorMsg('');
     setCargando(true);
     try {
+      const payload = { token: sesion.token, categoriaId };
+      if (customParams) {
+        payload.customName = customParams.nombre;
+        payload.customData = customParams.datos;
+      }
+
       const res = await fetch(`/api/quienesquien/sala/${sesion.code}/iniciar`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion.token, categoriaId })
+        headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+        body: JSON.stringify(payload)
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'No se pudo iniciar.');
@@ -138,12 +155,45 @@ export default function QuienEsQuienOnline({ onLocal, onSalir }) {
     }
   };
 
+  const handleSeleccionarCat = (cat) => {
+    if (cat.id === 'custom') {
+      setCustomNombre('');
+      setCustomDatos('');
+      setErrorCustom('');
+      setMostrarModalCustom(true);
+    } else {
+      enviarInicioPartida(cat.id);
+    }
+  };
+
+  const iniciarPartidaCustom = () => {
+    setErrorCustom('');
+    if (!customNombre.trim()) {
+      setErrorCustom('Debes introducir un nombre para la categoría.');
+      return;
+    }
+
+    let mazo;
+    try {
+      mazo = new Function("return " + customDatos)();
+      if (!Array.isArray(mazo) || mazo.length === 0) {
+        throw new Error();
+      }
+    } catch (err) {
+      setErrorCustom("Formato de datos inválido. Usa el formato: ['Dato 1', 'Dato 2']");
+      return;
+    }
+
+    setMostrarModalCustom(false);
+    enviarInicioPartida('custom', { nombre: customNombre.trim(), datos: mazo });
+  };
+
   const handleReiniciarPartida = async () => {
     if (!sesion) return;
     try {
       await fetch(`/api/quienesquien/sala/${sesion.code}/reiniciar`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...adminHeaders() },
         body: JSON.stringify({ token: sesion.token })
       });
       setCubiertaLevantada(false);
@@ -178,6 +228,11 @@ export default function QuienEsQuienOnline({ onLocal, onSalir }) {
   };
 
   const rivales = (sala?.jugadores || []).filter((j) => !j.esTu && j.tarjeta);
+
+  // Inyectamos la categoría custom dinámicamente si el usuario es host de la sala Y admin global
+  const categoriasAMostrar = (esAdminGlobal && sala?.esAdmin) 
+    ? [...categorias, { id: 'custom', nombre: 'Personalizada 🛠️', icono: 'edit' }]
+    : categorias;
 
   return (
     <div className="aprox-contenedor">
@@ -356,13 +411,13 @@ export default function QuienEsQuienOnline({ onLocal, onSalir }) {
               {errorMsg && <p className="error" style={{ marginBottom: '0.8rem' }}>{errorMsg}</p>}
 
               <div className="conecta-categories-grid">
-                {categorias.map((cat, idx) => (
+                {categoriasAMostrar.map((cat, idx) => (
                   <CategoryCard
                     key={cat.id}
                     nombre={cat.nombre}
                     icono={cat.icono}
                     indice={idx}
-                    onClick={() => handleSeleccionarYIniciar(cat.id)}
+                    onClick={() => handleSeleccionarCat(cat)}
                   />
                 ))}
               </div>
@@ -517,6 +572,59 @@ export default function QuienEsQuienOnline({ onLocal, onSalir }) {
                 }}
               >
                 Sí, salir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL CATEGORÍA PERSONALIZADA (ONLINE) */}
+      {mostrarModalCustom && (
+        <div className="rg-modal-fondo" onClick={() => setMostrarModalCustom(false)}>
+          <div 
+            className="rg-modal" 
+            onClick={(e) => e.stopPropagation()} 
+            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
+          >
+            <h3 style={{ margin: '0 0 1rem', color: '#1e1b4b', fontSize: '1.4rem' }}>
+              Categoría Personalizada 🛠️
+            </h3>
+            
+            <div style={{ textAlign: 'left', marginBottom: '1.2rem' }}>
+              <label className="field-label">Nombre de la categoría</label>
+              <input 
+                type="text" 
+                value={customNombre} 
+                onChange={(e) => setCustomNombre(e.target.value)} 
+                placeholder="Ej: Personajes de la oficina" 
+                style={{ width: '100%', marginBottom: '1rem', padding: '0.8rem', borderRadius: '8px', border: '1px solid #d1d5db' }} 
+              />
+              
+              <label className="field-label">Datos (Formato Array)</label>
+              <textarea
+                style={{ width: '100%', height: '100px', resize: 'none', padding: '0.8rem', borderRadius: '8px', border: '1px solid #d1d5db' }}
+                value={customDatos}
+                onChange={(e) => setCustomDatos(e.target.value)}
+                placeholder="['Dato 1', 'Dato 2', 'Dato 3', ...]"
+              />
+            </div>
+
+            {errorCustom && <p className="error" style={{ marginBottom: '1rem', fontSize: '0.9rem' }}>{errorCustom}</p>}
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+              <button 
+                type="button" 
+                className="secondary full" 
+                onClick={() => setMostrarModalCustom(false)}
+              >
+                Cancelar
+              </button>
+              <button 
+                type="button" 
+                className="big full" 
+                onClick={iniciarPartidaCustom}
+              >
+                Jugar
               </button>
             </div>
           </div>

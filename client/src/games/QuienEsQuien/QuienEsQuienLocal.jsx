@@ -1,5 +1,6 @@
 // client/src/games/QuienEsQuien/QuienEsQuienLocal.jsx
 import React, { useState, useEffect } from 'react';
+import { useAdmin } from '../../lib/admin.js';
 import Icon from '../../components/Icon.jsx';
 import CategoryCard from '../../components/CategoryCard.jsx';
 import './QuienEsQuien.css';
@@ -8,6 +9,8 @@ const MIN_JUGADORES = 2;
 const MAX_JUGADORES = 15;
 
 export default function QuienEsQuienLocal({ onVolver, onExit }) {
+  const esAdminGlobal = useAdmin();
+
   // 'config' | 'categorias' | 'interturno' | 'turno'
   const [paso, setPaso] = useState('config');
   const [numJugadores, setNumJugadores] = useState(4);
@@ -26,6 +29,12 @@ export default function QuienEsQuienLocal({ onVolver, onExit }) {
 
   // Estado de la cubierta: true mientras se mantiene pulsado el botón/cubierta
   const [cubiertaLevantada, setCubiertaLevantada] = useState(false);
+
+  // Estados para la categoría personalizada (Admin)
+  const [mostrarModalCustom, setMostrarModalCustom] = useState(false);
+  const [customNombre, setCustomNombre] = useState('');
+  const [customDatos, setCustomDatos] = useState('');
+  const [errorCustom, setErrorCustom] = useState('');
 
   useEffect(() => {
     fetch('/api/quienesquien/categorias')
@@ -62,6 +71,14 @@ export default function QuienEsQuienLocal({ onVolver, onExit }) {
   };
 
   const seleccionarCategoria = async (cat) => {
+    if (cat.id === 'custom') {
+      setCustomNombre('');
+      setCustomDatos('');
+      setErrorCustom('');
+      setMostrarModalCustom(true);
+      return;
+    }
+
     setCategoriaElegida(cat);
     try {
       const res = await fetch(`/api/quienesquien/personajes?categoria=${cat.id}`);
@@ -82,6 +99,40 @@ export default function QuienEsQuienLocal({ onVolver, onExit }) {
     }
   };
 
+  const iniciarPartidaCustom = () => {
+    setErrorCustom('');
+    if (!customNombre.trim()) {
+      setErrorCustom('Debes introducir un nombre para la categoría.');
+      return;
+    }
+
+    let mazo;
+    try {
+      // Usamos new Function para permitir comillas simples y sintaxis relajada
+      mazo = new Function("return " + customDatos)();
+      if (!Array.isArray(mazo) || mazo.length === 0) {
+        throw new Error();
+      }
+    } catch (err) {
+      setErrorCustom("Formato de datos inválido. Usa el formato: ['Dato 1', 'Dato 2']");
+      return;
+    }
+
+    const catCustom = { id: 'custom', nombre: customNombre.trim(), icono: 'edit' };
+    setCategoriaElegida(catCustom);
+
+    const asignados = jugadores.map((j, i) => ({
+      ...j,
+      tarjeta: mazo[i % mazo.length]
+    }));
+
+    setJugadores(asignados);
+    setTurnoIdx(0);
+    setCubiertaLevantada(false);
+    setMostrarModalCustom(false);
+    setPaso('interturno');
+  };
+
   const empezarTurnoJugador = () => {
     setCubiertaLevantada(false);
     setPaso('turno');
@@ -96,6 +147,11 @@ export default function QuienEsQuienLocal({ onVolver, onExit }) {
 
   const jugadorActual = jugadores[turnoIdx];
   const rivales = jugadores.filter((_, idx) => idx !== turnoIdx);
+
+  // Inyectamos la categoría custom dinámicamente si es administrador
+  const categoriasAMostrar = esAdminGlobal 
+    ? [...categorias, { id: 'custom', nombre: 'Personalizada 🛠️', icono: 'edit' }]
+    : categorias;
 
   return (
     <div className="aprox-contenedor">
@@ -156,7 +212,7 @@ export default function QuienEsQuienLocal({ onVolver, onExit }) {
           </h3>
 
           <div className="conecta-categories-grid">
-            {categorias.map((cat, idx) => (
+            {categoriasAMostrar.map((cat, idx) => (
               <CategoryCard
                 key={cat.id}
                 nombre={cat.nombre}
@@ -195,7 +251,7 @@ export default function QuienEsQuienLocal({ onVolver, onExit }) {
         </section>
       )}
 
-      {/* 4. TURNO ACTIVO: TARJETA ÚNICA CON TODOS LOS RIVALES Y CUBIERTA */}
+      {/* 4. TURNO ACTIVO */}
       {paso === 'turno' && jugadorActual && (
         <section className="game">
           <div className="hud">
@@ -203,9 +259,7 @@ export default function QuienEsQuienLocal({ onVolver, onExit }) {
             <span className="chip alt">{categoriaElegida?.nombre}</span>
           </div>
 
-          {/* TARJETA GLOBAL CON CUBIERTA DESLIZABLE */}
           <div className="qq-cubierta-wrapper">
-            {/* CUBIERTA QUE TAPA LOS PERSONAJES */}
             <div
               className={`qq-cubierta-cortina ${cubiertaLevantada ? 'levantada' : ''}`}
               onMouseDown={() => setCubiertaLevantada(true)}
@@ -229,7 +283,6 @@ export default function QuienEsQuienLocal({ onVolver, onExit }) {
               </p>
             </div>
 
-            {/* CONTENIDO INTERIOR: TODOS LOS RIVALES JUNTOS */}
             <div className="qq-tarjeta-grupal-interior">
               <div className="qq-grupal-header">
                 <span className="aprox-badge-pregunta">Personajes de tus rivales</span>
@@ -249,7 +302,6 @@ export default function QuienEsQuienLocal({ onVolver, onExit }) {
             </div>
           </div>
 
-          {/* BOTÓN INFORMATIVO ADICIONAL */}
           <button
             type="button"
             className="big full qq-btn-pulsador-mirar"
@@ -265,7 +317,6 @@ export default function QuienEsQuienLocal({ onVolver, onExit }) {
             {cubiertaLevantada ? 'Soltar para ocultar' : 'Mantén presionado aquí para ver los nombres'}
           </button>
 
-          {/* ACCIONES */}
           <div className="actions" style={{ marginTop: '1.2rem' }}>
             <button className="big full" onClick={pasarSiguienteTurno}>
               <Icon name="check" size={20} /> Pasar turno al siguiente jugador
@@ -275,6 +326,59 @@ export default function QuienEsQuienLocal({ onVolver, onExit }) {
             </button>
           </div>
         </section>
+      )}
+
+      {/* MODAL CATEGORÍA PERSONALIZADA */}
+      {mostrarModalCustom && (
+        <div className="rg-modal-fondo" onClick={() => setMostrarModalCustom(false)}>
+          <div 
+            className="rg-modal" 
+            onClick={(e) => e.stopPropagation()} 
+            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
+          >
+            <h3 style={{ margin: '0 0 1rem', color: '#1e1b4b', fontSize: '1.4rem' }}>
+              Categoría Personalizada 🛠️
+            </h3>
+            
+            <div style={{ textAlign: 'left', marginBottom: '1.2rem' }}>
+              <label className="field-label">Nombre de la categoría</label>
+              <input 
+                type="text" 
+                value={customNombre} 
+                onChange={(e) => setCustomNombre(e.target.value)} 
+                placeholder="Ej: Personajes de la oficina" 
+                style={{ width: '100%', marginBottom: '1rem', padding: '0.8rem', borderRadius: '8px', border: '1px solid #d1d5db' }} 
+              />
+              
+              <label className="field-label">Datos (Formato Array)</label>
+              <textarea
+                style={{ width: '100%', height: '100px', resize: 'none', padding: '0.8rem', borderRadius: '8px', border: '1px solid #d1d5db' }}
+                value={customDatos}
+                onChange={(e) => setCustomDatos(e.target.value)}
+                placeholder="['Dato 1', 'Dato 2', 'Dato 3', ...]"
+              />
+            </div>
+
+            {errorCustom && <p className="error" style={{ marginBottom: '1rem', fontSize: '0.9rem' }}>{errorCustom}</p>}
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+              <button 
+                type="button" 
+                className="secondary full" 
+                onClick={() => setMostrarModalCustom(false)}
+              >
+                Cancelar
+              </button>
+              <button 
+                type="button" 
+                className="big full" 
+                onClick={iniciarPartidaCustom}
+              >
+                Jugar
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
