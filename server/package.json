@@ -4,7 +4,9 @@
   "type": "module",
   "scripts": {
     "dev": "node --watch index.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "sync:fundadores": "node scripts/sync-fundadores.mjs",
+    "sim:fundadores": "node scripts/fundadores-sim.mjs"
   },
   "dependencies": {
     "better-sqlite3": "^13.0.3",

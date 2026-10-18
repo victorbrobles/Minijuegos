@@ -185,6 +185,27 @@ export const META = {
     colores: ['#8b5cf6', '#b91c1c'],
     etiquetas: 'numero conocer amigos pareja ranking',
     descripcion: 'Adivina el número secreto del 1 al 10 guiándote por las pistas y opiniones de tus amigos. ¡El que menos puntos sume gana!'
+  },
+  'fundadores': {
+    titulo: 'Fundadores',
+    icono: 'landmark',
+    colores: ['#ea580c', '#7c2d12'],
+    etiquetas: 'pueblo construir oficios roles ocultos estrategia cartas edificios eleccion secreta online',
+    descripcion: 'Levantad juntos un pueblo. Elige en secreto tu oficio cada ronda, adivina qué harán los demás y consigue el mejor barrio antes de que se inaugure.'
+  },
+  'telepatia': {
+    titulo: 'Telepatía',
+    icono: 'zap',
+    colores: ['#84cc16', '#4d7c0f'],
+    etiquetas: 'telepatia azar coincidir amigos conocerse',
+    descripcion: 'Pensad la misma palabra a la vez. ¡Conectad vuestras mentes y aumentad la racha de coincidencias consecutivas!'
+  },
+  'descarte': {
+    titulo: '¡Descarta y Elimina!',
+    icono: 'x',
+    colores: ['#06b6d4', '#0e7490'],
+    etiquetas: 'palabra ingenio velocidad letras categorias',
+    descripcion: 'Elige categoría, di una palabra que empiece por una letra libre antes de 30s y elimínala del abecedario. ¡Sobrevive a 5 tableros!'
   }
 };
 export const META_POR_DEFECTO = { icono: 'star', colores: ['#8b5cf6', '#6366f1'], etiquetas: '', descripcion: '' };

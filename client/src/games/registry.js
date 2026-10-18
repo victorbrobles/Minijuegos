@@ -24,6 +24,9 @@ import Ciegas from './Ciegas/Ciegas.jsx';
 import Traiciones from './Traiciones/Traiciones.jsx';
 import Coleccion from './Coleccion/Coleccion.jsx';
 import UnoADiez from './UnoADiez/UnoADiez.jsx';
+import Fundadores from './Fundadores/Fundadores.jsx';
+import Telepatia from './Telepatia/Telepatia.jsx';
+import Descarte from './Descarte/Descarte.jsx';
 
 // id del juego (el mismo que en server/data/games.json) -> componente React
 const registry = {
@@ -52,7 +55,10 @@ const registry = {
   'ciegas': Ciegas,
   'traiciones': Traiciones,
   'coleccion': Coleccion,
-  'unoadiez': UnoADiez
+  'unoadiez': UnoADiez,
+  'fundadores': Fundadores,
+  'telepatia': Telepatia,
+  'descarte': Descarte
 };
 
 export default registry;

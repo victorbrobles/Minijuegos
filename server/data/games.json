@@ -154,5 +154,23 @@
     "name": "Del 1 al 10...",
     "description": "Adivina el número secreto del 1 al 10 guiándote por las pistas y opiniones de tus amigos. ¡El que menos puntos sume gana!",
     "isNew": true
+  },
+  {
+    "id": "fundadores",
+    "name": "Fundadores",
+    "description": "Levantad juntos un pueblo. Elige en secreto tu oficio cada ronda, adivina qué harán los demás y consigue el mejor pueblo antes de que se inaugure.",
+    "isNew": true
+  },
+  {
+    "id": "telepatia",
+    "name": "Telepatía",
+    "description": "Pensad la misma palabra a la vez. ¡Conectad vuestras mentes y aumentad la racha de coincidencias consecutivas!",
+    "isNew": true
+  },
+  {
+    "id": "descarte",
+    "name": "¡Descarta y Elimina!",
+    "description": "Elige categoría, di una palabra que empiece por una letra libre antes de 30s y elimínala del abecedario. ¡Sobrevive a 5 tableros!",
+    "isNew": true
   }
 ]

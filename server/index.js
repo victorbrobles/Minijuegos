@@ -37,8 +37,11 @@ import cancionRouter from './routes/cancion.js';
 import ciegasRouter from './routes/ciegas.js';
 import rapidfireRouter from './routes/rapidfire.js';
 import traicionesRouter from './routes/traiciones.js';
+import fundadoresRouter from './routes/fundadores.js';
 import coleccionRouter from './routes/coleccion.js';
 import unoadiezRouter from './routes/unoadiez.js';
+import telepatiaRouter from './routes/telepatia.js';
+import descarteRouter from './routes/descarte.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -103,8 +106,11 @@ app.use('/api/cancion', cancionRouter);
 app.use('/api/ciegas', ciegasRouter);
 app.use('/api/rapidfire', rapidfireRouter);
 app.use('/api/traiciones', traicionesRouter);
+app.use('/api/fundadores', fundadoresRouter);
 app.use('/api/coleccion', coleccionRouter);
 app.use('/api/unoadiez', unoadiezRouter);
+app.use('/api/telepatia', telepatiaRouter);
+app.use('/api/descarte', descarteRouter);
 
 // 5. Redirección para React Router (Single Page Application)
 app.get('*', (req, res) => {
