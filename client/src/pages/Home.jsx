@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import GameCard from '../components/GameCard.jsx';
 import Icon from '../components/Icon.jsx';
 import AdminPanel from '../components/AdminPanel.jsx';
-import { metaDe } from '../games/meta.js';
+import { metaDe, CATEGORIAS_PORTADA } from '../games/meta.js';
 
 const normalizar = (t) =>
   String(t ?? '')
@@ -63,7 +63,8 @@ export default function Home() {
         return {
           game: g,
           nombre: normalizar(g.name),
-          resto: normalizar(`${g.description ?? ''} ${m.descripcion} ${m.etiquetas ?? ''}`)
+          resto: normalizar(`${g.description ?? ''} ${m.descripcion} ${m.etiquetas ?? ''}`),
+          categoria: m.categoria || 'chill'
         };
       }),
     [games]
@@ -84,6 +85,27 @@ export default function Home() {
   }, [busqueda, games, indice]);
 
   const hayBusqueda = busqueda.trim() !== '';
+
+  // Agrupación por categorías para la vista por defecto
+  const juegosPorCategoria = useMemo(() => {
+    const grupos = {};
+    CATEGORIAS_PORTADA.forEach((cat) => {
+      grupos[cat.id] = [];
+    });
+
+    games.forEach((g) => {
+      const m = metaDe(g.id);
+      const catId = m.categoria || 'chill';
+      if (grupos[catId]) {
+        grupos[catId].push(g);
+      } else {
+        grupos['chill'] = grupos['chill'] || [];
+        grupos['chill'].push(g);
+      }
+    });
+
+    return grupos;
+  }, [games]);
 
   function onKeyDown(e) {
     if (e.key === 'Escape') {
@@ -136,7 +158,7 @@ export default function Home() {
           <p className="search-count" aria-live="polite">
             {hayBusqueda
               ? `${resultados.length} de ${games.length} juegos`
-              : `${games.length} juegos`}
+              : `${games.length} juegos organizados por categorías`}
           </p>
         )}
       </div>
@@ -144,7 +166,8 @@ export default function Home() {
       {error && <p className="error">{error}</p>}
       {cargando && !error && <p className="loading">Cargando juegos…</p>}
 
-      {resultados.length > 0 && (
+      {/* VISTA 1: CUANDO HAY UNA BÚSQUEDA ACTIVA (Cuadrícula tradicional filtrada) */}
+      {!cargando && !error && hayBusqueda && resultados.length > 0 && (
         <ul className="game-grid">
           {resultados.map((g, i) => (
             <li key={g.id} style={{ '--i': Math.min(i, 14) }}><GameCard game={g} /></li>
@@ -152,11 +175,38 @@ export default function Home() {
         </ul>
       )}
 
+      {/* VISTA 2: PORTADA POR DEFECTO (Carruseles horizontales de 3 en 3 por categoría) */}
+      {!cargando && !error && !hayBusqueda && (
+        <div className="home-categorias-contenedor">
+          {CATEGORIAS_PORTADA.map((cat) => {
+            const juegosCat = juegosPorCategoria[cat.id] || [];
+            if (juegosCat.length === 0) return null;
+
+            return (
+              <section key={cat.id} className="home-categoria-bloque">
+                <div className="home-categoria-header">
+                  <h2 className="home-categoria-titulo">{cat.titulo}</h2>
+                  <p className="home-categoria-desc">{cat.desc}</p>
+                </div>
+
+                <ul className="home-carousel-track">
+                  {juegosCat.map((g, i) => (
+                    <li key={g.id} className="home-carousel-item" style={{ '--i': Math.min(i, 8) }}>
+                      <GameCard game={g} />
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            );
+          })}
+        </div>
+      )}
+
       {!cargando && !error && hayBusqueda && resultados.length === 0 && (
         <div className="empty">
           <span className="empty-icon"><Icon name="search" size={30} /></span>
           <p className="empty-title">Ningún juego coincide con «{busqueda.trim()}»</p>
-          <p className="empty-text">Prueba con otra palabra: «música», «fútbol», «mapa»…</p>
+          <p className="empty-text">Prueba con otra palabra: «música», «fútbol», «cartas»…</p>
           <button type="button" className="secondary" onClick={limpiar}>Borrar búsqueda</button>
         </div>
       )}

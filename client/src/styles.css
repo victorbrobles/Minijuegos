@@ -716,3 +716,80 @@ body:has(.home-head) .admin-text input {
 body:has(.home-head) .admin-text input:focus-visible {
   border-color: #a855f7;
 }
+
+/* ========================================================
+   CARRUSEL HORIZONTAL POR CATEGORÍAS (3 TARJETAS VISIBLES)
+   ======================================================== */
+
+.home-categoria-bloque {
+  margin-bottom: 2.4rem;
+}
+
+.home-categoria-header {
+  margin-bottom: 0.9rem;
+  padding: 0 0.2rem;
+}
+
+.home-categoria-titulo {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.45rem;
+  font-weight: 800;
+  margin: 0;
+  color: #f8fafc;
+  letter-spacing: -0.01em;
+}
+
+.home-categoria-desc {
+  margin: 0.2rem 0 0;
+  font-size: 0.9rem;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+/* Fila con scroll horizontal de 3 en 3 */
+.home-carousel-track {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0.8rem;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  overscroll-behavior-x: contain;
+}
+
+.home-carousel-track::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+}
+
+/* En pantallas de escritorio / tablet: exactamente 3 por fila */
+.home-carousel-item {
+  flex: 0 0 calc((100% - 2rem) / 3);
+  min-width: 220px;
+  scroll-snap-align: start;
+  list-style: none;
+  display: flex;
+}
+
+.home-carousel-item > * {
+  width: 100%;
+}
+
+/* En móviles estrechos se adaptan a 2 para no comprimir el contenido */
+@media (max-width: 680px) {
+  .home-carousel-item {
+    flex: 0 0 calc((100% - 0.9rem) / 2.15);
+    min-width: 155px;
+  }
+  .home-categoria-titulo {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .home-carousel-item {
+    flex: 0 0 calc((100% - 0.75rem) / 1.75);
+    min-width: 145px;
+  }
+}
