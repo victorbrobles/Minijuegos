@@ -258,3 +258,54 @@
 .tr-diario-item small { opacity: .7; font-weight: 600; }
 .tr-muerte button { margin-left: auto; padding: .4rem .8rem !important; font-size: .85rem !important; }
 .tr-opciones button { text-align: left; }
+
+/* ================= Mapa por alas, atajos y minijuegos ================= */
+.tr-mapa { aspect-ratio: 1 / 1.08; }
+.tr-nodo { width: 21%; min-width: 66px; font-size: .68rem !important; padding: .4rem .15rem !important; border-width: 3px !important; }
+.tr-nodo.ala-norte { border-color: #818cf8 !important; }
+.tr-nodo.ala-este { border-color: #34d399 !important; }
+.tr-nodo.ala-sur { border-color: #fb923c !important; }
+.tr-nodo.ala-oeste { border-color: #f472b6 !important; }
+.tr-nodo.ala-centro { border-color: #d97706 !important; }
+.tr-nodo.salto { opacity: 1; background: #f5f3ff !important; border-style: dashed !important; border-color: #7c3aed !important; color: #5b21b6 !important; cursor: pointer; }
+.tr-nodo-yo.salto { background: #7c3aed; }
+.tr-leyenda { display: flex; flex-wrap: wrap; gap: .4rem; justify-content: center; margin-top: -.4rem; }
+.tr-ley { padding: .15rem .6rem; border-radius: 99px; font-size: .74rem; font-weight: 800; background: #fff; border: 2px solid #e5e7eb; }
+.tr-ley.ala-norte { border-color: #818cf8; } .tr-ley.ala-este { border-color: #34d399; } .tr-ley.ala-sur { border-color: #fb923c; }
+.tr-ley.ala-oeste { border-color: #f472b6; } .tr-ley.ala-centro { border-color: #d97706; }
+.tr-ley.salto { background: #f5f3ff; border-color: #7c3aed; color: #5b21b6; }
+
+.tr-mj-card { border: 3px solid #16a34a; background: #f0fdf4; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+.tr-mj-cab { display: flex; justify-content: space-between; align-items: center; font-size: 1.05rem; }
+.tr-mj-cab span { padding: .1rem .6rem; border-radius: 99px; background: #dcfce7; color: #166534; font-weight: 800; font-size: .85rem; }
+.tr-mj-inst { margin: .3rem 0 .6rem !important; font-size: .9rem; font-weight: 600; color: var(--ink-soft); }
+.tr-mj-msg { margin-bottom: .6rem; padding: .4rem .7rem; border-radius: 12px; background: #fef3c7; color: #92400e; font-weight: 800; font-size: .88rem; }
+.tr-mj-area { position: relative; height: 240px; border-radius: 18px; overflow: hidden; background: #1f2937; }
+.tr-mj-area.monedas { background: #fef3c7; }
+.tr-mj-vidas { position: absolute; left: 10px; bottom: 8px; display: flex; gap: 5px; }
+.tr-mj-vidas span { width: 12px; height: 12px; border-radius: 50%; background: #4b5563; }
+.tr-mj-vidas span.on { background: #f97316; }
+.tr-chispa { position: absolute; transform: translate(-50%, -50%); width: 56px; height: 56px; padding: 0 !important; border-radius: 50% !important; display: grid !important; place-items: center; color: #fff !important; background: radial-gradient(circle, #fbbf24, #ea580c) !important; box-shadow: 0 0 18px #f97316 !important; animation: tr-chispa 1.25s linear forwards; }
+@keyframes tr-chispa { from { transform: translate(-50%, -50%) scale(1.15); } to { transform: translate(-50%, -50%) scale(.45); opacity: .5; } }
+.tr-barra-t { position: relative; height: 38px; margin: .8rem 0 1rem; border-radius: 12px; background: #e5e7eb; overflow: hidden; }
+.tr-zona { position: absolute; top: 0; bottom: 0; background: rgba(34, 197, 94, .55); border-left: 3px solid #16a34a; border-right: 3px solid #16a34a; }
+.tr-marca { position: absolute; top: 0; bottom: 0; width: 6px; margin-left: -3px; background: #1f2937; border-radius: 3px; }
+.tr-pads { display: grid; grid-template-columns: repeat(2, 1fr); gap: .6rem; }
+.tr-pad { height: 86px; border-radius: 20px !important; font-weight: 800; color: #fff !important; background: var(--c) !important; opacity: .45; box-shadow: none !important; }
+.tr-pad.luz { opacity: 1; box-shadow: 0 0 0 5px rgba(255, 255, 255, .8), 0 0 22px var(--c) !important; transform: scale(1.04); }
+.tr-tuercas { display: grid; grid-template-columns: repeat(3, 1fr); gap: .5rem; }
+.tr-tuercas button { height: 66px; font-size: 1.6rem !important; border-radius: 18px !important; color: #1f2937 !important; background: #e2e8f0 !important; border: 3px solid #94a3b8 !important; box-shadow: 0 3px 0 #94a3b8 !important; }
+.tr-tuercas button.hecha { background: #bbf7d0 !important; border-color: #16a34a !important; color: #166534 !important; box-shadow: none !important; opacity: .6; }
+.tr-cuenta { text-align: center; font-size: 2.1rem; font-weight: 900; color: #7c2d12; margin: .4rem 0 .8rem; }
+.tr-opciones-mj { display: grid; grid-template-columns: repeat(2, 1fr); gap: .6rem; }
+.tr-opciones-mj button { height: 62px; font-size: 1.5rem !important; border-radius: 18px !important; }
+.tr-opciones-mj.grande { position: absolute; inset: 12px; align-content: center; }
+.tr-moneda { position: absolute; transform: translate(-50%, -50%); color: #b45309; }
+.tr-pares { display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; }
+.tr-pares button { height: 74px; border-radius: 16px !important; color: #fff !important; background: #6366f1 !important; box-shadow: 0 3px 0 #4338ca !important; }
+.tr-pares button.abierta { background: #fff !important; color: #4338ca !important; border: 3px solid #6366f1 !important; box-shadow: none !important; }
+.tr-pares button.fija { background: #dcfce7 !important; color: #166534 !important; border-color: #16a34a !important; }
+.tr-bascula { position: relative; height: 190px; width: 90px; margin: .4rem auto 1rem; border-radius: 16px; background: #e5e7eb; overflow: hidden; border: 3px solid #94a3b8; }
+.tr-bascula-nivel { position: absolute; left: 0; right: 0; bottom: 0; background: linear-gradient(#fbbf24, #d97706); }
+.tr-bascula-meta { position: absolute; left: -4px; right: -4px; height: 4px; background: #dc2626; box-shadow: 0 0 0 2px rgba(220, 38, 38, .25); }
+.tr-mantener { touch-action: none; }

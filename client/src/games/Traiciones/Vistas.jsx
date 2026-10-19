@@ -3,7 +3,8 @@
 // `enviar(tipo, datos)`. `offset` = hora del servidor − hora del navegador, para temporizadores exactos.
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from './IconoT.jsx';
-import { SALAS, SALA, ROLES } from './engine.js';
+import { SALAS, SALA, ALAS, ROLES } from './engine.js';
+import Minijuego from './Minijuegos.jsx';
 import './Traiciones.css';
 
 export const ICONO_ROL = { viajero: 'flag', vigia: 'eye', protegido: 'shield', traidor: 'dagger', bufon: 'mask' };
@@ -124,28 +125,37 @@ function Mapa({ v, enviar }) {
   const vecinos = sala ? SALA[sala].vecinos : [];
   const destino = v.yo.mov?.destino;
   const fuegos = new Set((v.incendio?.salas || []).filter((s) => !s.apagado).map((s) => s.id));
+  const atajos = v.yo.rol === 'traidor' && v.yo.vivo ? (v.yo.atajos || 0) : 0;
   return (
-    <div className="tr-mapa">
-      <svg className="tr-mapa-lineas" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-        {SALAS.flatMap((s) => s.vecinos.filter((o) => o > s.id).map((o) => (
-          <line key={s.id + o} x1={s.pos[0]} y1={s.pos[1]} x2={SALA[o].pos[0]} y2={SALA[o].pos[1]} />
-        )))}
-      </svg>
-      {SALAS.map((s) => {
-        const actual = sala === s.id;
-        const puedoIr = !v.yo.mov && vecinos.includes(s.id);
-        const clases = ['tr-nodo', actual ? 'actual' : '', puedoIr ? 'ir' : '', destino === s.id ? 'destino' : '', fuegos.has(s.id) ? 'fuego' : '', v.ojeo?.sala === s.id ? 'ojeo' : ''].join(' ');
-        return (
-          <button key={s.id} type="button" className={clases} style={{ left: `${s.pos[0]}%`, top: `${s.pos[1]}%` }} disabled={!puedoIr}
-            onClick={() => enviar('mover', { sala: s.id })} title={s.nombre}>
-            <Icon name={fuegos.has(s.id) ? 'flame' : s.icono} size={22} />
-            <span>{s.nombre.replace(/^(El|La) /, '')}</span>
-            {v.radar && <b className="tr-nodo-n">{v.radar[s.id]}</b>}
-            {actual && <i className="tr-nodo-yo">tú</i>}
-          </button>
-        );
-      })}
-    </div>
+    <>
+      <div className="tr-mapa">
+        <svg className="tr-mapa-lineas" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          {SALAS.flatMap((s) => s.vecinos.filter((o) => o > s.id).map((o) => (
+            <line key={s.id + o} x1={s.pos[0]} y1={s.pos[1]} x2={SALA[o].pos[0]} y2={SALA[o].pos[1]} />
+          )))}
+        </svg>
+        {SALAS.map((s) => {
+          const actual = sala === s.id;
+          const puedoIr = !v.yo.mov && vecinos.includes(s.id);
+          const puedoSaltar = !v.yo.mov && !!sala && atajos > 0 && !actual && !vecinos.includes(s.id);
+          const clases = ['tr-nodo', `ala-${s.ala}`, actual ? 'actual' : '', puedoIr ? 'ir' : '', puedoSaltar ? 'salto' : '', destino === s.id ? 'destino' : '', fuegos.has(s.id) ? 'fuego' : '', v.ojeo?.sala === s.id ? 'ojeo' : ''].join(' ');
+          return (
+            <button key={s.id} type="button" className={clases} style={{ left: `${s.pos[0]}%`, top: `${s.pos[1]}%` }} disabled={!puedoIr && !puedoSaltar}
+              onClick={() => enviar('mover', { sala: s.id })} title={s.nombre}>
+              <Icon name={fuegos.has(s.id) ? 'flame' : s.icono} size={20} />
+              <span>{s.nombre.replace(/^(El|La) /, '')}</span>
+              {v.radar && <b className="tr-nodo-n">{v.radar[s.id]}</b>}
+              {actual && <i className="tr-nodo-yo">tú</i>}
+              {puedoSaltar && <i className="tr-nodo-yo salto">atajo</i>}
+            </button>
+          );
+        })}
+      </div>
+      <div className="tr-leyenda">
+        {Object.entries(ALAS).map(([k, n]) => <span key={k} className={`tr-ley ala-${k}`}>{n}</span>)}
+        {atajos > 0 && <span className="tr-ley salto">Atajos disponibles: {atajos}</span>}
+      </div>
+    </>
   );
 }
 
@@ -189,13 +199,20 @@ export function PantallaJuego({ v, enviar, offset }) {
       {!yo.vivo && <div className="tr-alerta espiritu"><Icon name="skull" size={26} /><div><strong>Eres un espíritu</strong><span>{yo.tareasFalsas ? 'Ya no puedes hacer nada, pero ves todo.' : 'Puedes seguir con tus tareas, pero no puedes hablar con los vivos.'}</span></div></div>}
       {v.avisos.slice(-2).map((a, i) => <div key={a.t + '-' + i} className={`tr-diario-item ${a.tipo}`}>{a.x}</div>)}
 
+      {trabajando?.tipo === 'tarea' && (
+        <div className="tr-card tr-mj-card">
+          <Minijuego id={trabajando.minijuego} clave={trabajando.inicio} onExito={() => enviar('tarea-hecha')} onCancelar={() => enviar('cancelar')} />
+          <p className="tr-muted" style={{ margin: '.6rem 0 0', fontSize: '.85rem' }}>Los demás ven que estás trabajando. Si te mueves, pierdes lo avanzado.</p>
+        </div>
+      )}
+
       <Mapa v={v} enviar={enviar} />
 
       {enCamino ? (
         <div className="tr-card tr-center">
           <h3><Icon name="forward" size={18} /> En camino a {SALA[enCamino.destino].nombre}</h3>
-          <Barra desde={enCamino.llegaEn - 5000} hasta={enCamino.llegaEn} etiqueta="Llegando" offset={offset} />
-          <p className="tr-muted">Mientras caminas nadie te ve y tú no ves a nadie.</p>
+          <Barra desde={enCamino.llegaEn - enCamino.ms} hasta={enCamino.llegaEn} etiqueta={enCamino.salto ? 'Por el atajo' : 'Llegando'} offset={offset} />
+          <p className="tr-muted">{enCamino.salto ? 'Atajo secreto: apareces en otro punto del campamento mucho antes de lo normal.' : 'Mientras caminas nadie te ve y tú no ves a nadie.'}</p>
         </div>
       ) : s && (
         <div className="tr-card">
@@ -213,14 +230,14 @@ export function PantallaJuego({ v, enviar, offset }) {
             </div>
           ))}
 
-          {trabajando && <Barra desde={trabajando.finEn - (trabajando.tipo === 'fuego' ? 4000 : 10000)} hasta={trabajando.finEn} etiqueta={trabajando.tipo === 'fuego' ? 'Apagando el fuego' : 'Trabajando'} offset={offset} />}
+          {trabajando?.tipo === 'fuego' && <Barra desde={trabajando.finEn - 4000} hasta={trabajando.finEn} etiqueta="Apagando el fuego" offset={offset} />}
 
           <div className="tr-acciones">
             {s.fuego && yo.vivo && !trabajando && <button type="button" className="big full tr-btn-sabotear" onClick={() => enviar('apagar')}><Icon name="flame" size={20} /> Apagar el fuego (4 s)</button>}
-            {s.tarea && !trabajando && !v.incendio && <button type="button" className="big full" onClick={() => enviar('trabajar')}><Icon name="check" size={20} /> {s.tarea} (10 s)</button>}
+            {s.tarea && !trabajando && !v.incendio && <button type="button" className="big full" onClick={() => enviar('trabajar')}><Icon name="check" size={20} /> Empezar tarea: {s.tarea}</button>}
             {s.tarea && v.incendio && <p className="tr-muted">No se puede trabajar mientras haya un incendio.</p>}
           </div>
-          {trabajando && <p className="tr-muted" style={{ margin: '.5rem 0 0' }}>Si te mueves, pierdes lo avanzado.</p>}
+          {trabajando?.tipo === 'fuego' && <p className="tr-muted" style={{ margin: '.5rem 0 0' }}>Si te mueves, pierdes lo avanzado.</p>}
         </div>
       )}
 
@@ -500,19 +517,21 @@ export function Ayuda({ onCerrar }) {
         <p>Una caravana acampa en el desierto. Entre los viajeros hay <strong>traidores</strong>. La partida es <strong>en tiempo real y no se detiene</strong> hasta que alguien reporta un cuerpo o toca la campana.</p>
         <h4>Moverse y ver</h4>
         <ul>
-          <li>El campamento tiene siete lugares conectados. Toca un lugar vecino para ir (tardas unos segundos; mientras caminas nadie te ve).</li>
+          <li>El campamento tiene nueve lugares: una plaza central (la hoguera) y cuatro alas —norte, este, sur y oeste— de dos salas cada una. Los fondos de alas vecinas se comunican entre sí formando un anillo.</li>
+          <li>Solo puedes ir a una <strong>sala contigua</strong> (tardas unos segundos; mientras caminas nadie te ve).</li>
           <li>Solo ves, en directo, a quien está <strong>en tu mismo lugar</strong>, y quién entra o sale. Nada queda anotado: tienes que fijarte y recordar.</li>
           <li>Nadie sabe si otro jugador sigue vivo hasta que aparece un cuerpo o se celebra una asamblea.</li>
         </ul>
         <h4>Viajeros</h4>
         <ul>
-          <li>Tienes muchas tareas repartidas por el campamento. Quédate quieto en el lugar de una tarea hasta terminarla (si te mueves, la pierdes).</li>
+          <li>Tienes varias tareas repartidas por el campamento. Cada sala tiene su propia prueba (puntería, memoria, cálculo, pulso…). Si te mueves o la dejas, pierdes lo avanzado.</li>
           <li>Si ves un cuerpo, <strong>repórtalo</strong>. Si sospechas que falta alguien, toca la <strong>campana</strong> (una vez por jugador).</li>
           <li>Ganáis si se completan todas las tareas o se expulsa a todos los traidores.</li>
         </ul>
         <h4>Traidores</h4>
         <ul>
           <li>Podéis eliminar a alguien <strong>solo si está a solas con vosotros</strong>, y debéis esperar un rato entre muerte y muerte.</li>
+          <li><strong>Atajo:</strong> cada vez que matáis ganáis un salto a cualquier sala lejana (rápido, y se pierde en la próxima asamblea). Los demás solo veréis que alguien «se ha ido» y que otro «ha llegado»: fijaos en los tiempos.</li>
           <li>Sabotajes: <strong>tormenta de arena</strong> (nadie distingue caras) e <strong>incendio</strong> (hay que apagarlo en dos lugares a la vez antes de 45 s o ganáis vosotros; mientras arde nadie puede hacer tareas).</li>
           <li>Ganáis al ser tantos como los demás, o si el campamento arde.</li>
         </ul>

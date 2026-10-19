@@ -36,6 +36,11 @@ while (pasos++ < 4000) {
     if (v.fase === 'asamblea' && v.yo.vivo && !v.listo) { await act(j, { tipo: 'chat', texto: 'hola' }); await act(j, { tipo: 'listo-votar' }); continue; }
     if (v.fase === 'votacion' && v.yo.vivo && v.miVoto === undefined) { await act(j, { tipo: 'votar', objetivo: null }); continue; }
     if (v.fase === 'veredicto' && v.yo.vivo && !v.listo) { await act(j, { tipo: 'continuar' }); continue; }
+    if (v.fase === 'juego' && v.yo.trabajo?.tipo === 'tarea') {
+      // la prueba la juega el cliente; el bot espera lo razonable y avisa de que la ha superado
+      if (v.ahora - v.yo.trabajo.inicio >= v.yo.trabajo.minMs + 3000) { const r = await act(j, { tipo: 'tarea-hecha' }); assert(r.status === 200, 'tarea-hecha: ' + JSON.stringify(r.data)); }
+      continue;
+    }
     if (v.fase !== 'juego' || v.yo.mov || v.yo.trabajo) continue;
     if (v.yo.rol === 'traidor' && v.opciones?.puedeMatar) { await act(j, { tipo: 'matar', objetivo: v.opciones.objetivo }); continue; }
     if (v.yo.vivo && v.sala?.cuerpos.length) { await act(j, { tipo: 'reportar' }); continue; }

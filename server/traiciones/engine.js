@@ -9,15 +9,22 @@
 // con ellos (con tiempo de espera entre muertes) y sabotean para dispersar a los viajeros.
 
 // ---------------------------------------------------------------- Datos
+// MAPA: una plaza central (la hoguera) conecta cuatro alas —norte, este, sur y oeste—. Cada ala tiene una sala
+// «puerta» (junto a la plaza) y una sala «final» (al fondo). Los finales de alas vecinas se unen entre sí formando
+// un anillo exterior. Los viajeros solo pueden pasar a salas contiguas; los traidores, tras matar, pueden saltar a una lejana.
+// minijuego: prueba de la tarea de esa sala (cada una es distinta); minMs: tiempo mínimo que el servidor exige para darla por buena.
 const SALAS_BASE = [
-  { id: 'hoguera', nombre: 'La Hoguera', icono: 'flame', tarea: 'Avivar el fuego', vecinos: ['pozo', 'establo', 'bazar', 'carreta'], pos: [50, 48] },
-  { id: 'pozo', nombre: 'El Pozo', icono: 'well', tarea: 'Sacar agua del pozo', vecinos: ['hoguera', 'atalaya'], pos: [17, 24] },
-  { id: 'atalaya', nombre: 'La Atalaya', icono: 'tower', tarea: null, vecinos: ['pozo', 'establo'], pos: [50, 8] },
-  { id: 'establo', nombre: 'El Establo', icono: 'stable', tarea: 'Dar de beber a los camellos', vecinos: ['hoguera', 'atalaya'], pos: [83, 24] },
-  { id: 'carreta', nombre: 'La Carreta', icono: 'cart', tarea: 'Reparar la carreta', vecinos: ['hoguera', 'tienda'], pos: [17, 74] },
-  { id: 'bazar', nombre: 'El Bazar', icono: 'box', tarea: 'Hacer trueque de provisiones', vecinos: ['hoguera', 'tienda'], pos: [83, 74] },
-  { id: 'tienda', nombre: 'La Tienda', icono: 'tag', tarea: 'Contar las provisiones', vecinos: ['carreta', 'bazar'], pos: [50, 92] }
+  { id: 'hoguera', nombre: 'La Hoguera', ala: 'centro', icono: 'flame', tarea: 'Avivar el fuego', minijuego: 'chispas', minMs: 5000, vecinos: ['atalaya', 'bazar', 'establo', 'pozo'], pos: [50, 50] },
+  { id: 'atalaya', nombre: 'La Atalaya', ala: 'norte', icono: 'tower', tarea: null, vecinos: ['hoguera', 'biblioteca'], pos: [50, 30] },
+  { id: 'biblioteca', nombre: 'La Biblioteca', ala: 'norte', icono: 'book', tarea: 'Ordenar los archivos', minijuego: 'pares', minMs: 6000, vecinos: ['atalaya', 'tienda', 'carreta'], pos: [50, 11] },
+  { id: 'bazar', nombre: 'El Bazar', ala: 'este', icono: 'box', tarea: 'Regatear con el mercader', minijuego: 'regateo', minMs: 4000, vecinos: ['hoguera', 'tienda'], pos: [70, 50] },
+  { id: 'tienda', nombre: 'La Tienda', ala: 'este', icono: 'tag', tarea: 'Contar la caja', minijuego: 'monedas', minMs: 5000, vecinos: ['bazar', 'biblioteca', 'granero'], pos: [89, 50] },
+  { id: 'establo', nombre: 'El Establo', ala: 'sur', icono: 'stable', tarea: 'Calmar a los camellos', minijuego: 'secuencia', minMs: 5000, vecinos: ['hoguera', 'granero'], pos: [50, 70] },
+  { id: 'granero', nombre: 'El Granero', ala: 'sur', icono: 'sack', tarea: 'Pesar el grano', minijuego: 'bascula', minMs: 4000, vecinos: ['establo', 'tienda', 'carreta'], pos: [50, 89] },
+  { id: 'pozo', nombre: 'El Pozo', ala: 'oeste', icono: 'well', tarea: 'Subir el cubo', minijuego: 'cubo', minMs: 4000, vecinos: ['hoguera', 'carreta'], pos: [30, 50] },
+  { id: 'carreta', nombre: 'La Carreta', ala: 'oeste', icono: 'cart', tarea: 'Apretar las tuercas', minijuego: 'tuercas', minMs: 4000, vecinos: ['pozo', 'granero', 'biblioteca'], pos: [11, 50] }
 ];
+export const ALAS = { centro: 'Plaza central', norte: 'Ala Norte', este: 'Ala Este', sur: 'Ala Sur', oeste: 'Ala Oeste' };
 // Conexiones simétricas
 export const SALAS = SALAS_BASE.map((s) => ({ ...s, vecinos: [...new Set([...s.vecinos, ...SALAS_BASE.filter((o) => o.vecinos.includes(s.id)).map((o) => o.id)])] }));
 export const SALA = Object.fromEntries(SALAS.map((s) => [s.id, s]));
@@ -37,10 +44,11 @@ export const OPCIONES_DEBATE = [0, 45, 90, 120, 180]; // 0 = hasta que todos est
 // Constantes de equilibrio (ms) — se calibran con scripts/traiciones-sim.mjs
 export const AJUSTES = {
   traidores: [[4, 1], [8, 2], [11, 3]],
-  tareasPorJugador: 14,
-  tareaMs: 10000,
+  tareasPorJugador: 7,
+  tareaMaxMs: 90000,   // tiempo máximo para completar una prueba antes de que se cancele sola
   apagarMs: 4000,
-  viajeMs: 5000,
+  viajeMs: 4000,
+  saltoMs: 2000,       // los traidores que saltan a una sala lejana tardan menos
   primerMatarMs: 25000,
   matarEnfriaMs: 22000,
   trasAsambleaMatarMs: 20000,
@@ -93,7 +101,7 @@ export function crearPartida(jugadores, config = {}, { rng = Math.random } = {})
       id: j.id, nombre: j.nombre, rol: roles[i], vivo: true, causa: null, abandono: false,
       sala: 'hoguera', mov: null, trabajo: null,
       tareas: salas.map((s) => ({ sala: s, hecha: false })),
-      campanas: 1, matarListo: 0, asesinatos: 0, ojeoUsado: false, ojeo: null,
+      campanas: 1, atajos: 0, matarListo: 0, asesinatos: 0, ojeoUsado: false, ojeo: null,
       feed: [], avisos: [], ultimoChat: 0
     };
   });
@@ -146,10 +154,16 @@ export function mover(est, id, destino, ahora) {
   if (est.fase !== 'juego') return err('Ahora no puedes moverte.');
   if (!p || p.abandono) return err('No puedes actuar.');
   if (p.mov) return err('Ya estás de camino.');
-  if (!SALA[p.sala].vecinos.includes(destino)) return err('Desde aquí no se llega directamente.');
+  if (!SALA[destino] || destino === p.sala) return err('Lugar no válido.');
+  let ms = AJUSTES.viajeMs; let salto = false;
+  if (!SALA[p.sala].vecinos.includes(destino)) {
+    // Atajo: solo traidores vivos, y solo después de haber matado (1 salto por cada muerte, hasta la próxima asamblea)
+    if (!(p.rol === 'traidor' && p.vivo && p.atajos > 0)) return err('Desde aquí solo puedes ir a salas contiguas.');
+    p.atajos -= 1; ms = AJUSTES.saltoMs; salto = true;
+  }
   cancelarTrabajo(p);
   if (p.vivo) avisarSala(est, p.sala, { t: ahora, tipo: 'sale', id: p.id, anon: tormentaActiva(est, ahora) });
-  p.mov = { destino, llegaEn: ahora + AJUSTES.viajeMs, origen: p.sala };
+  p.mov = { destino, llegaEn: ahora + ms, origen: p.sala, salto, ms };
   p.sala = null;
   return ok();
 }
@@ -171,7 +185,27 @@ export function trabajar(est, id, ahora) {
   if (est.incendio) return err('¡Hay un incendio! Hasta que se apague no se puede trabajar.');
   const idx = p.tareas.findIndex((t) => !t.hecha && t.sala === p.sala);
   if (idx === -1) return err('No tienes tareas pendientes aquí.');
-  p.trabajo = { tipo: 'tarea', ref: idx, sala: p.sala, finEn: ahora + AJUSTES.tareaMs };
+  const sala = SALA[p.sala];
+  p.trabajo = { tipo: 'tarea', ref: idx, sala: p.sala, inicio: ahora, minijuego: sala.minijuego, minMs: sala.minMs, finEn: ahora + AJUSTES.tareaMaxMs };
+  return ok();
+}
+
+// El cliente avisa de que ha superado la prueba. El servidor solo exige que haya pasado el tiempo mínimo razonable.
+export function tareaHecha(est, id, ahora) {
+  tick(est, ahora);
+  const p = jug(est, id);
+  if (est.fase !== 'juego') return err('Ahora no toca.');
+  if (!p || !p.trabajo || p.trabajo.tipo !== 'tarea') return err('No estás haciendo ninguna tarea.');
+  if (ahora - p.trabajo.inicio < p.trabajo.minMs) return err('Demasiado rápido: esa prueba lleva más tiempo.');
+  completarTrabajo(est, p, ahora);
+  return ok();
+}
+
+export function cancelarTarea(est, id, ahora) {
+  tick(est, ahora);
+  const p = jug(est, id);
+  if (!p || !p.trabajo) return err('No estás trabajando.');
+  cancelarTrabajo(p);
   return ok();
 }
 
@@ -186,9 +220,10 @@ export function apagar(est, id, ahora) {
   return ok();
 }
 
-function completarTrabajo(est, p, t) {
+function completarTrabajo(est, p, t, caducada = false) {
   const w = p.trabajo; p.trabajo = null;
   if (w.tipo === 'tarea') {
+    if (caducada) return;
     p.tareas[w.ref].hecha = true;
     aviso(p, t, 'ok', `Has completado: ${SALA[w.sala].tarea}.`);
     const fin = comprobarFin(est);
@@ -237,7 +272,8 @@ export function matar(est, id, objetivoId, ahora) {
     return ok();
   }
   v.vivo = false; v.causa = 'asesinado'; cancelarTrabajo(v);
-  p.asesinatos += 1;
+  p.asesinatos += 1; p.atajos += 1;
+  aviso(p, ahora, 'secreto', 'Ahora puedes usar un atajo: salta a una sala lejana (solo hasta la próxima asamblea).');
   est.cuerpos.push({ id: v.id, sala: v.sala });
   aviso(p, ahora, 'secreto', `Has eliminado a ${v.nombre}.`);
   aviso(v, ahora, 'alerta', 'Te han eliminado. Eres un espíritu: puedes seguir con tus tareas, pero no puedes hablar con los vivos.');
@@ -306,7 +342,7 @@ function setFase(est, fase, ahora, ms = 0) {
 }
 
 function iniciarAsamblea(est, { motivo, por, cuerpo }, ahora) {
-  est.jugadores.forEach((j) => { j.trabajo = null; j.mov = null; j.sala = 'hoguera'; j.ojeo = null; });
+  est.jugadores.forEach((j) => { j.trabajo = null; j.mov = null; j.sala = 'hoguera'; j.ojeo = null; j.atajos = 0; });
   est.incendio = null; est.tormentaHasta = 0;
   est.cuerpos = [];
   est.asamblea = { motivo, por, cuerpo, chat: [], contador: 0 };
@@ -463,7 +499,7 @@ export function tick(est, ahora) {
       if (est.incendio && est.incendio.hasta <= ahora && (!sig || est.incendio.hasta < sig.t)) sig = { t: est.incendio.hasta, tipo: 'incendio' };
       if (!sig) break;
       if (sig.tipo === 'llega') llegar(est, sig.p, sig.t);
-      else if (sig.tipo === 'trabajo') completarTrabajo(est, sig.p, sig.t);
+      else if (sig.tipo === 'trabajo') completarTrabajo(est, sig.p, sig.t, true);
       else terminar(est, { ganador: 'traidores', motivo: 'incendio' });
     }
     return;
@@ -528,8 +564,9 @@ export function vistaDe(est, id, ahora) {
   if (fase === 'juego') {
     const tormenta = tormentaActiva(est, ahora);
     v.yo.sala = yo.sala;
-    v.yo.mov = yo.mov ? { destino: yo.mov.destino, llegaEn: yo.mov.llegaEn } : null;
-    v.yo.trabajo = yo.trabajo ? { tipo: yo.trabajo.tipo, finEn: yo.trabajo.finEn, ref: yo.trabajo.ref } : null;
+    v.yo.mov = yo.mov ? { destino: yo.mov.destino, llegaEn: yo.mov.llegaEn, ms: yo.mov.ms, salto: !!yo.mov.salto } : null;
+    v.yo.trabajo = yo.trabajo ? { tipo: yo.trabajo.tipo, finEn: yo.trabajo.finEn, ref: yo.trabajo.ref, inicio: yo.trabajo.inicio, sala: yo.trabajo.sala, minijuego: yo.trabajo.minijuego, minMs: yo.trabajo.minMs } : null;
+    v.yo.atajos = yo.atajos;
     v.yo.tareas = yo.tareas.map((t) => ({ sala: t.sala, texto: SALA[t.sala].tarea, hecha: t.hecha }));
     v.yo.tareasFalsas = !rolInfo.tarea;
     v.yo.campanaEn = Math.max(0, est.campanaListaEn - ahora);

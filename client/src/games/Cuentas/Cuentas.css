@@ -1,0 +1,115 @@
+/* client/src/games/Cuentas/Cuentas.css */
+.cnt-contenedor {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 850px;
+  margin: 0 auto;
+}
+
+/* Área central de la carta de referencia en el tablero */
+.cnt-mesa-display {
+  background: linear-gradient(135deg, #0284c7, #0369a1);
+  border-radius: 24px;
+  padding: 1.6rem 1.2rem;
+  color: #ffffff;
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(2, 132, 199, 0.35);
+  margin-bottom: 1.2rem;
+  position: relative;
+}
+
+.cnt-mesa-subtitulo {
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  opacity: 0.85;
+  margin-bottom: 0.4rem;
+}
+
+.cnt-mesa-numero {
+  font-size: 4.8rem;
+  font-weight: 900;
+  line-height: 1;
+  text-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  margin: 0.2rem 0;
+}
+
+.cnt-mesa-alerta {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.35rem 0.9rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+/* Grid de cartas de la mano del jugador */
+.cnt-mano-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.65rem;
+  margin: 1.2rem 0;
+}
+
+.cnt-carta-btn {
+  width: 68px;
+  height: 98px;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 2.5px solid #cbd5e1;
+  color: #0f172a;
+  font-size: 1.6rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  user-select: none;
+}
+
+.cnt-carta-btn:hover:not(:disabled) {
+  border-color: #0284c7;
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 0 6px 16px rgba(2, 132, 199, 0.25);
+}
+
+.cnt-carta-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Botón de robar carta de acción */
+.cnt-btn-accion {
+  background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+  color: #ffffff;
+  border: none;
+  border-radius: 16px;
+  padding: 0.9rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 12px rgba(109, 40, 217, 0.3);
+  transition: transform 0.15s ease;
+  width: 100%;
+  margin-top: 0.8rem;
+}
+
+.cnt-btn-accion:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.cnt-btn-accion:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}

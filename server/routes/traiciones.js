@@ -146,7 +146,7 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
 });
 
 // ---------------------------------------------------------------- Acciones de juego (tiempo real)
-// tipo: rol | mover | trabajar | apagar | matar | sabotear | reportar | campana | ojear | chat | listo-votar | votar | continuar
+// tipo: rol | mover | trabajar | tarea-hecha | cancelar | apagar | matar | sabotear | reportar | campana | ojear | chat | listo-votar | votar | continuar
 router.post('/online/sala/:code/accion', (req, res) => {
   const c = sala_y_jugador(req, res);
   if (!c) return;
@@ -162,6 +162,8 @@ router.post('/online/sala/:code/accion', (req, res) => {
     case 'mover': r = E.mover(p, id, String(d.sala), t); break;
     case 'trabajar': r = E.trabajar(p, id, t); break;
     case 'apagar': r = E.apagar(p, id, t); break;
+    case 'tarea-hecha': r = E.tareaHecha(p, id, t); break;
+    case 'cancelar': r = E.cancelarTarea(p, id, t); break;
     case 'matar': r = E.matar(p, id, Number(d.objetivo), t); break;
     case 'sabotear': r = E.sabotear(p, id, String(d.sabotaje), t); break;
     case 'reportar': r = E.reportar(p, id, t); break;

@@ -178,5 +178,17 @@
     "name": "Bingoball",
     "description": "Rellena tu cartón de 4x5 relacionando futbolistas con categorías. Canta líneas y consigue el Bingo antes que nadie.",
     "isNew": true
+  },
+  {
+    "id": "cuentas",
+    "name": "Lleva la cuenta",
+    "description": "Colocad los números del 1 al 100 de menor a mayor sin conocer las cartas de los demás. Gestiona cartas de acción y sé el primero en vaciar tu mano.",
+    "isNew": true
+  },
+  {
+    "id": "conoce",
+    "name": "Conoce a tus amigos",
+    "description": "Responded a preguntas cotidianas y adivinad qué escribió cada compañero. ¡Descubre quién te conoce de verdad a 15 rondas!",
+    "isNew": true
   }
 ]

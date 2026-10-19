@@ -213,6 +213,20 @@ export const META = {
     colores: ['#1d4ed8', '#0f172a'],
     etiquetas: 'futbol bingo cartones jugadores categorias online',
     descripcion: 'Rellena tu cartón de 4x5 relacionando futbolistas con categorías. Canta líneas y consigue el Bingo antes que nadie.'
+  },
+  'cuentas': {
+    titulo: 'Lleva la cuenta',
+    icono: 'cards',
+    colores: ['#0284c7', '#0369a1'],
+    etiquetas: 'numeros orden cartas mayor menor cuenta deduccion cartas accion',
+    descripcion: 'Colocad los números del 1 al 100 de menor a mayor sin conocer las cartas de los demás. Gestiona cartas de acción y sé el primero en vaciar tu mano.'
+  },
+  'conoce': {
+    titulo: 'Conoce a tus amigos',
+    icono: 'users',
+    colores: ['#4f46e5', '#312e81'],
+    etiquetas: 'amigos conocer preguntas cotidiano sinceridad votar deducir parejas',
+    descripcion: 'Responded a preguntas cotidianas y adivinad qué escribió cada compañero. ¡Descubre quién te conoce de verdad a 15 rondas!'
   }
 };
 export const META_POR_DEFECTO = { icono: 'star', colores: ['#8b5cf6', '#6366f1'], etiquetas: '', descripcion: '' };

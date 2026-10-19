@@ -13,6 +13,8 @@ env('VIAJE', (x) => { E.AJUSTES.viajeMs = Number(x); });
 env('SABOTAJE', (x) => { E.AJUSTES.sabotajeEnfriaMs = Number(x); });
 env('TRAI', (x) => { E.AJUSTES.traidores = x.split(',').map((y) => y.split(':').map(Number)); });
 
+// tiempo que tarda un bot en superar la prueba de una tarea (una persona tardará algo más, entre 10 y 25 s)
+const TAREA_BOT_MS = Number(process.env.TAREABOT || 14000);
 function mulberry32(a) { return () => { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
 
 // camino más corto entre salas (BFS) → siguiente paso
@@ -34,7 +36,7 @@ function jugar(n, rng) {
   est.jugadores.forEach((j) => E.confirmarRol(est, j.id, t));
   const mem = {}; // bot -> { visto: {id: {t, sala}}, sospechosoCierto }
   est.jugadores.forEach((j) => { mem[j.id] = { visto: {}, cierto: null, esperaHasta: 0 }; });
-  let reuniones = 0, asesinatos = 0;
+  let reuniones = 0, asesinatos = 0, saltos = 0;
   const LIMITE = 3000 * 1000;
 
   while (est.fase !== 'fin' && t < LIMITE) {
@@ -47,12 +49,14 @@ function jugar(n, rng) {
         const m = mem[j.id];
         if (v.sala) v.sala.presentes.forEach((p) => { m.visto[p.id] = { t, sala: v.sala.id }; });
         v.avisos.forEach((a) => { const r = a.x.match(/amuleto brilla! (.+?) intentó/); if (r) m.cierto = Number(r[1].replace('J', '')); });
+        if (v.yo.trabajo?.tipo === 'tarea' && t - v.yo.trabajo.inicio >= TAREA_BOT_MS) { E.tareaHecha(est, j.id, t); continue; }
         if (v.yo.mov || v.yo.trabajo) continue;
         const traidor = j.rol === 'traidor';
         if (traidor && j.vivo) {
           const op = v.opciones;
           if (op.puedeMatar && rng() < 0.9) { E.matar(est, j.id, op.objetivo, t); asesinatos++; continue; }
           if (op.sabotaje && rng() < 0.03) { E.sabotear(est, j.id, rng() < 0.6 ? 'tormenta' : 'incendio', t); continue; }
+          if (v.yo.atajos > 0 && rng() < 0.7) { const lejos = E.SALAS.filter((x) => x.id !== v.sala.id && !E.SALA[v.sala.id].vecinos.includes(x.id)); E.mover(est, j.id, lejos[Math.floor(rng() * lejos.length)].id, t); saltos++; continue; }
           if (v.sala?.cuerpos.length && rng() < 0.1) { E.reportar(est, j.id, t); reuniones++; continue; }
           if (v.sala?.tarea && rng() < 0.3 && !v.incendio) { E.trabajar(est, j.id, t); continue; }
           if (rng() < 0.45) { const vec = E.SALA[v.sala.id].vecinos; E.mover(est, j.id, vec[Math.floor(rng() * vec.length)], t); }
@@ -104,13 +108,13 @@ function jugar(n, rng) {
     }
   }
   if (est.fase !== 'fin') throw new Error('la partida no terminó en el límite');
-  return { ganador: est.fin.ganador, motivo: est.fin.motivo, seg: Math.round(t / 1000), reuniones, asesinatos };
+  return { ganador: est.fin.ganador, motivo: est.fin.motivo, seg: Math.round(t / 1000), reuniones, asesinatos, saltos };
 }
 
 const [, , nPart = '300', ...tams] = process.argv;
 const tamanos = tams.length ? tams.map(Number) : [4, 5, 6, 7, 8, 10, 12];
 const rng = mulberry32(777);
-console.log('n  | leales | traid. | bufón | min medios | reuniones | asesinatos | motivos');
+console.log('n  | leales | traid. | bufón | min medios | reuniones | asesinatos | saltos | motivos');
 for (const n of tamanos) {
   const res = [];
   for (let i = 0; i < Number(nPart); i++) res.push(jugar(n, rng));
@@ -118,5 +122,5 @@ for (const n of tamanos) {
   const media = (k) => res.reduce((s, r) => s + r[k], 0) / res.length;
   const motivos = {}; res.forEach((r) => { motivos[r.motivo] = (motivos[r.motivo] || 0) + 1; });
   const pct = (x) => `${((x / res.length) * 100).toFixed(0)}%`.padStart(4);
-  console.log(`${String(n).padEnd(2)} |  ${pct(c((r) => r.ganador === 'leales'))}  |  ${pct(c((r) => r.ganador === 'traidores'))}  | ${pct(c((r) => r.ganador === 'bufon'))}  |    ${(media('seg') / 60).toFixed(1)}     |   ${media('reuniones').toFixed(1)}    |    ${media('asesinatos').toFixed(1)}    | ${JSON.stringify(motivos)}`);
+  console.log(`${String(n).padEnd(2)} |  ${pct(c((r) => r.ganador === 'leales'))}  |  ${pct(c((r) => r.ganador === 'traidores'))}  | ${pct(c((r) => r.ganador === 'bufon'))}  |    ${(media('seg') / 60).toFixed(1)}     |   ${media('reuniones').toFixed(1)}    |    ${media("asesinatos").toFixed(1)}    |   ${media("saltos").toFixed(1)}   | ${JSON.stringify(motivos)}`);
 }
