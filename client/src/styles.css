@@ -582,3 +582,137 @@ button.rebote { background: linear-gradient(135deg, #ff9f43, #ff4d6d); }
 }
 .qeq-textarea:focus-visible { outline: none; border-color: var(--g1); }
 .qeq-personalizada .rg-modal-acciones { display: flex; gap: .7rem; }
+
+/* ========================================================
+   TEMA OSCURO - PÁGINA PRINCIPAL (PORTADA)
+   ======================================================== */
+
+body:has(.home-head),
+body:has(.home-view) {
+  color: #f1f5f9;
+  background:
+    radial-gradient(circle at 18% 12%, rgba(124, 77, 255, 0.22) 0, transparent 46%),
+    radial-gradient(circle at 82% 16%, rgba(255, 77, 141, 0.18) 0, transparent 44%),
+    radial-gradient(circle at 50% 85%, rgba(6, 182, 212, 0.15) 0, transparent 52%),
+    linear-gradient(165deg, #0b0d19 0%, #0f1326 45%, #14132b 100%);
+  background-attachment: fixed;
+}
+
+/* Cabecera principal en fondo oscuro */
+body:has(.home-head) .home-head {
+  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.35), 0 20px 35px -12px rgba(124, 77, 255, 0.6);
+}
+
+/* Buscador flotante adaptado al fondo oscuro */
+body:has(.home-head) .search-wrap.fijo {
+  background: linear-gradient(rgba(11, 13, 25, 0.94) 75%, rgba(11, 13, 25, 0));
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+body:has(.home-head) .search {
+  background: rgba(26, 29, 53, 0.85);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.12), 0 8px 24px -6px rgba(0, 0, 0, 0.6);
+}
+
+body:has(.home-head) .search:focus-within {
+  box-shadow: 0 0 0 2.5px #a855f7, 0 12px 28px -6px rgba(168, 85, 247, 0.45);
+}
+
+body:has(.home-head) .search-icon {
+  color: #a5b4fc;
+}
+
+body:has(.home-head) .search-input {
+  color: #f8fafc;
+}
+
+body:has(.home-head) .search-input::placeholder {
+  color: #94a3b8;
+}
+
+body:has(.home-head) .search-clear {
+  background: rgba(255, 255, 255, 0.12);
+  color: #cbd5e1;
+}
+
+body:has(.home-head) .search-clear:hover {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+}
+
+body:has(.home-head) .search-count {
+  color: #94a3b8;
+}
+
+/* Sombra y relieve reforzado de las tarjetas de minijuegos */
+body:has(.home-head) .gc {
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.45), 0 18px 30px -12px var(--g2);
+}
+
+body:has(.home-head) .loading {
+  color: #a5b4fc;
+}
+
+/* Estado sin resultados */
+body:has(.home-head) .empty {
+  background: rgba(26, 29, 53, 0.8);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
+  color: #f1f5f9;
+}
+
+body:has(.home-head) .empty-icon {
+  background: rgba(124, 77, 255, 0.25);
+  color: #c4b5fd;
+}
+
+body:has(.home-head) .empty-title {
+  color: #ffffff;
+}
+
+body:has(.home-head) .empty-text {
+  color: #94a3b8;
+}
+
+body:has(.home-head) .empty button.secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.2);
+}
+
+body:has(.home-head) .empty button.secondary:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+/* Panel de administración en modo oscuro */
+body:has(.home-head) .admin-toggle {
+  color: #94a3b8;
+  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.15);
+}
+
+body:has(.home-head) .admin-toggle:hover {
+  color: #f1f5f9;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+body:has(.home-head) .admin-panel {
+  background: rgba(26, 29, 53, 0.92);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12), 0 12px 28px rgba(0, 0, 0, 0.5);
+  color: #f1f5f9;
+}
+
+body:has(.home-head) .admin-text span {
+  color: #94a3b8;
+}
+
+body:has(.home-head) .admin-text input {
+  background: #0f1224;
+  border: 2px solid rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+}
+
+body:has(.home-head) .admin-text input:focus-visible {
+  border-color: #a855f7;
+}

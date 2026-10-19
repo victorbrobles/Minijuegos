@@ -1,3 +1,4 @@
+// client/src/pages/Home.jsx
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GameCard from '../components/GameCard.jsx';
@@ -5,7 +6,6 @@ import Icon from '../components/Icon.jsx';
 import AdminPanel from '../components/AdminPanel.jsx';
 import { metaDe } from '../games/meta.js';
 
-// Minúsculas, sin tildes ni signos (¿Dónde Diablos Está? -> "donde diablos esta")
 const normalizar = (t) =>
   String(t ?? '')
     .toLowerCase()
@@ -20,7 +20,7 @@ export default function Home() {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
   const [busqueda, setBusqueda] = useState('');
-  const [fijo, setFijo] = useState(false); // el buscador está pegado arriba (scroll)
+  const [fijo, setFijo] = useState(false);
   const inputRef = useRef(null);
   const centinelaRef = useRef(null);
   const navigate = useNavigate();
@@ -36,7 +36,6 @@ export default function Home() {
       .finally(() => setCargando(false));
   }, []);
 
-  // Fondo del buscador solo cuando está fijo arriba (un centinela invisible sale de pantalla)
   useEffect(() => {
     const el = centinelaRef.current;
     if (!el || typeof IntersectionObserver === 'undefined') return;
@@ -45,7 +44,6 @@ export default function Home() {
     return () => obs.disconnect();
   }, []);
 
-  // Atajo: "/" enfoca el buscador (en ordenador)
   useEffect(() => {
     const onKey = (e) => {
       const enCampo = ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement?.tagName);
@@ -58,7 +56,6 @@ export default function Home() {
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
-  // Índice de búsqueda: nombre (pesa más) y, aparte, descripción + etiquetas del juego
   const indice = useMemo(
     () =>
       games.map((g) => {
@@ -82,7 +79,7 @@ export default function Home() {
         return { it, puntos: enNombre ? 0 : enTodo ? 1 : -1 };
       })
       .filter((r) => r.puntos >= 0)
-      .sort((a, b) => a.puntos - b.puntos) // primero los que coinciden por nombre; el orden del catálogo se respeta dentro de cada grupo
+      .sort((a, b) => a.puntos - b.puntos)
       .map((r) => r.it.game);
   }, [busqueda, games, indice]);
 
@@ -102,7 +99,7 @@ export default function Home() {
   };
 
   return (
-    <>
+    <div className="home-view">
       <header className="home-head">
         <span className="home-logo"><Icon name="gamepad" size={32} strokeWidth={1.9} /></span>
         <div>
@@ -165,6 +162,6 @@ export default function Home() {
       )}
 
       <AdminPanel />
-    </>
+    </div>
   );
 }
