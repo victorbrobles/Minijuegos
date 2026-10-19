@@ -172,5 +172,11 @@
     "name": "¡Descarta y Elimina!",
     "description": "Elige categoría, di una palabra que empiece por una letra libre antes de 30s y elimínala del abecedario. ¡Sobrevive a 5 tableros!",
     "isNew": true
+  },
+  {
+    "id": "bingoball",
+    "name": "Bingoball",
+    "description": "Rellena tu cartón de 4x5 relacionando futbolistas con categorías. Canta líneas y consigue el Bingo antes que nadie.",
+    "isNew": true
   }
 ]

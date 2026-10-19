@@ -42,6 +42,7 @@ import coleccionRouter from './routes/coleccion.js';
 import unoadiezRouter from './routes/unoadiez.js';
 import telepatiaRouter from './routes/telepatia.js';
 import descarteRouter from './routes/descarte.js';
+import bingoballRoutes from './routes/bingoball.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -111,6 +112,7 @@ app.use('/api/coleccion', coleccionRouter);
 app.use('/api/unoadiez', unoadiezRouter);
 app.use('/api/telepatia', telepatiaRouter);
 app.use('/api/descarte', descarteRouter);
+app.use('/api/bingoball', bingoballRoutes);
 
 // 5. Redirección para React Router (Single Page Application)
 app.get('*', (req, res) => {

@@ -1,0 +1,37 @@
+// server/data/seeds/bingoball/parte2.js
+export const BINGO_CHAMPIONS = {
+  id: 'champions',
+  titulo: 'UEFA Champions League',
+  categorias: [
+    { id: 'cinco_o_mas_champions', nombre: 'Ha ganado 5 o más Champions League', jugadores: ['Cristiano Ronaldo', 'Karim Benzema', 'Luka Modrić', 'Toni Kroos', 'Dani Carvajal', 'Casemiro', 'Marcelo', 'Gareth Bale', 'Nacho Fernández'] },
+    { id: 'maximo_goleador_ucl', nombre: 'Top 10 goleadores históricos de Champions', jugadores: ['Cristiano Ronaldo', 'Lionel Messi', 'Robert Lewandowski', 'Karim Benzema', 'Raúl González', 'Ruud van Nistelrooy', 'Thomas Müller', 'Thierry Henry', 'Kylian Mbappé'] },
+    { id: 'gol_en_final_ucl', nombre: 'Ha marcado gol en una final de Champions', jugadores: ['Vinícius Júnior', 'Rodri Hernández', 'Karim Benzema', 'Gareth Bale', 'Cristiano Ronaldo', 'Lionel Messi', 'Neymar', 'Sergio Ramos', 'Mario Mandžukić', 'Kingsley Coman'] },
+    { id: 'campeon_dos_clubes', nombre: 'Ganó la Champions con 2 o más clubes distintos', jugadores: ['Cristiano Ronaldo', 'Toni Kroos', 'Mateo Kovačić', 'Gerard Piqué', 'Samuel Eto\'o', 'Clarence Seedorf', 'David Alaba', 'Thiago Alcántara'] },
+    { id: 'triplete_europeo', nombre: 'Ha ganado un Triplete (Liga, Copa y Champions)', jugadores: ['Lionel Messi', 'Xavi Hernández', 'Andrés Iniesta', 'Gerard Piqué', 'Samuel Eto\'o', 'Erling Haaland', 'Kevin De Bruyne', 'Rodri Hernández', 'Bernardo Silva', 'Thomas Müller', 'Manuel Neuer', 'Joshua Kimmich'] },
+    { id: 'hat_trick_champions', nombre: 'Ha marcado un hat-trick en Champions', jugadores: ['Cristiano Ronaldo', 'Lionel Messi', 'Robert Lewandowski', 'Karim Benzema', 'Kylian Mbappé', 'Erling Haaland', 'Vinícius Júnior', 'Neymar'] },
+    { id: 'portero_campeon_ucl', nombre: 'Portero campeón de Champions', jugadores: ['Thibaut Courtois', 'Ederson Moraes', 'Manuel Neuer', 'Alisson Becker', 'Keylor Navas', 'Marc-André ter Stegen', 'Iker Casillas', 'Petr Čech'] },
+    { id: 'cinco_goles_un_partido', nombre: 'Ha marcado 5 goles en un solo partido de Champions', jugadores: ['Lionel Messi', 'Erling Haaland', 'Luiz Adriano'] },
+    { id: 'remontada_historica', nombre: 'Jugó la histórica remontada del 6-1 (Barça-PSG)', jugadores: ['Lionel Messi', 'Neymar', 'Luis Suárez', 'Gerard Piqué', 'Sergio Busquets', 'Andrés Iniesta', 'Marc-André ter Stegen', 'Marco Verratti', 'Marquinhos', 'Ángel Di María'] },
+    { id: 'finalista_con_dos_clubes', nombre: 'Ha jugado finales de Champions con clubes distintos', jugadores: ['Cristiano Ronaldo', 'Toni Kroos', 'Patrice Evra', 'Thiago Silva', 'David Alaba', 'Kingsley Coman'] },
+    { id: 'mvp_final_ucl', nombre: 'Elegido MVP oficial de una final de Champions', jugadores: ['Dani Carvajal', 'Rodri Hernández', 'Thibaut Courtois', 'N\'Golo Kanté', 'Kingsley Coman', 'Virgil van Dijk', 'Gareth Bale', 'Cristiano Ronaldo', 'Andrés Iniesta', 'Ángel Di María'] },
+    { id: 'asistente_historico', nombre: 'Entre los máximos asistentes de la Champions', jugadores: ['Cristiano Ronaldo', 'Lionel Messi', 'Ángel Di María', 'Neymar', 'Ryan Giggs', 'Kevin De Bruyne', 'Thomas Müller', 'Karim Benzema'] },
+    { id: 'campeon_con_el_chelsea', nombre: 'Ha ganado la Champions con el Chelsea', jugadores: ['N\'Golo Kanté', 'Mason Mount', 'Kai Havertz', 'Thiago Silva', 'Jorginho', 'César Azpilicueta', 'Didier Drogba', 'Frank Lampard', 'Petr Čech'] },
+    { id: 'campeon_con_el_bayern', nombre: 'Ha ganado la Champions con el Bayern Múnich', jugadores: ['Thomas Müller', 'Manuel Neuer', 'Joshua Kimmich', 'Kingsley Coman', 'Robert Lewandowski', 'Alphonso Davies', 'Arjen Robben', 'Franck Ribéry', 'Bastian Schweinsteiger'] },
+    { id: 'campeon_con_el_liverpool', nombre: 'Ha ganado la Champions con el Liverpool', jugadores: ['Mohamed Salah', 'Sadio Mané', 'Virgil van Dijk', 'Alisson Becker', 'Trent Alexander-Arnold', 'Jordan Henderson', 'Steven Gerrard', 'Xabi Alonso'] },
+    { id: 'campeon_con_el_city', nombre: 'Ha ganado la Champions con el Manchester City', jugadores: ['Erling Haaland', 'Kevin De Bruyne', 'Rodri Hernández', 'Bernardo Silva', 'İlkay Gündoğan', 'Jack Grealish', 'Rúben Dias', 'Kyle Walker'] },
+    { id: 'mas_de_100_partidos_ucl', nombre: 'Más de 100 partidos disputados en Champions', jugadores: ['Cristiano Ronaldo', 'Iker Casillas', 'Lionel Messi', 'Karim Benzema', 'Xavi Hernández', 'Thomas Müller', 'Sergio Ramos', 'Manuel Neuer', 'Toni Kroos', 'Luka Modrić'] },
+    { id: 'gol_chilenas_volea_final', nombre: 'Marcó golazo icónico en final de Champions', jugadores: ['Gareth Bale', 'Cristiano Ronaldo', 'Zinedine Zidane', 'Mario Mandžukić'] },
+    { id: 'campeon_sin_perder', nombre: 'Ganó la Champions invicto esa temporada', jugadores: ['Robert Lewandowski', 'Thomas Müller', 'Manuel Neuer', 'Joshua Kimmich', 'Kingsley Coman', 'Alphonso Davies'] },
+    { id: 'gol_en_minuto_90_final', nombre: 'Marcó en el minuto 90+ de una final', jugadores: ['Sergio Ramos', 'Didier Drogba', 'Ole Gunnar Solskjaer', 'Teddy Sheringham'] },
+    { id: 'pichichi_edicion_ucl', nombre: 'Máximo goleador de una edición de Champions', jugadores: ['Cristiano Ronaldo', 'Lionel Messi', 'Erling Haaland', 'Robert Lewandowski', 'Karim Benzema', 'Neymar', 'Kylian Mbappé'] },
+    { id: 'defensa_goleador_ucl', nombre: 'Defensa con más de 10 goles en Champions', jugadores: ['Sergio Ramos', 'Gerard Piqué', 'Roberto Carlos', 'Dani Alves', 'John Terry'] },
+    { id: 'campeon_tres_seguidas', nombre: 'Ganó tres Champions consecutivas (2016-2018)', jugadores: ['Cristiano Ronaldo', 'Karim Benzema', 'Luka Modrić', 'Toni Kroos', 'Sergio Ramos', 'Marcelo', 'Casemiro', 'Dani Carvajal', 'Keylor Navas'] },
+    { id: 'capitan_campeon_ucl', nombre: 'Capitán que levantó la Orejona', jugadores: ['Sergio Ramos', 'İlkay Gündoğan', 'Jordan Henderson', 'Manuel Neuer', 'Carles Puyol', 'Iker Casillas', 'Steven Gerrard', 'Nacho Fernández'] },
+    { id: 'gol_debut_champions', nombre: 'Marcó gol en su debut en Champions League', jugadores: ['Erling Haaland', 'Wayne Rooney', 'Karim Benzema', 'Kylian Mbappé', 'Jude Bellingham'] },
+    { id: 'campeon_italiano_ucl', nombre: 'Ha ganado la Champions con Milan o Inter', jugadores: ['Samuel Eto\'o', 'Diego Milito', 'Javier Zanetti', 'Esteban Cambiasso', 'Kaká', 'Paolo Maldini', 'Andrea Pirlo', 'Clarence Seedorf', 'Filippo Inzaghi'] },
+    { id: 'parada_penalti_final', nombre: 'Detuvo penalti en final o tanda de Champions', jugadores: ['Petr Čech', 'Iker Casillas', 'Keylor Navas', 'Manuel Neuer', 'Jerzy Dudek'] },
+    { id: 'gol_en_semis_y_final', nombre: 'Marcó en semifinales y en la final misma edición', jugadores: ['Vinícius Júnior', 'Karim Benzema', 'Cristiano Ronaldo', 'Lionel Messi', 'Gareth Bale', 'Diego Milito'] },
+    { id: 'subcampeon_tres_finales', nombre: 'Ha perdido finales de Champions', jugadores: ['Gianluigi Buffon', 'Antoine Griezmann', 'Kevin De Bruyne', 'Mohamed Salah', 'Sadio Mané', 'Patrice Evra', 'Arjen Robben'] },
+    { id: 'joven_goleador_ucl', nombre: 'Marcó en Champions siendo menor de 19 años', jugadores: ['Kylian Mbappé', 'Erling Haaland', 'Jude Bellingham', 'Lamine Yamal', 'Bojan Krkić', 'Raúl González'] }
+  ]
+};

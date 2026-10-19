@@ -1,0 +1,37 @@
+// server/data/seeds/bingoball/parte1.js
+export const BINGO_INTERNACIONAL = {
+  id: 'internacional',
+  titulo: 'Fútbol Internacional y Selecciones',
+  categorias: [
+    { id: 'campeon_mundo', nombre: 'Campeón de la Copa del Mundo', jugadores: ['Lionel Messi', 'Kylian Mbappé', 'Antoine Griezmann', 'Ángel Di María', 'Paul Pogba', 'Manuel Neuer', 'Thomas Müller', 'Toni Kroos', 'Andrés Iniesta', 'Xavi Hernández', 'Iker Casillas', 'Sergio Ramos', 'Gianluigi Buffon', 'Ronaldo Nazário', 'Ronaldinho', 'Zinedine Zidane'] },
+    { id: 'bota_oro_mundial', nombre: 'Bota de Oro en un Mundial', jugadores: ['Kylian Mbappé', 'Harry Kane', 'James Rodríguez', 'Thomas Müller', 'Miroslav Klose', 'Ronaldo Nazário', 'Davor Šuker', 'Gary Lineker'] },
+    { id: 'campeon_copa_america', nombre: 'Campeón de la Copa América', jugadores: ['Lionel Messi', 'Ángel Di María', 'Emiliano Martínez', 'Rodrigo De Paul', 'Lautaro Martínez', 'Neymar', 'Casemiro', 'Alisson Becker', 'Alexis Sánchez', 'Arturo Vidal', 'Luis Suárez', 'Edinson Cavani'] },
+    { id: 'campeon_eurocopa', nombre: 'Campeón de la Eurocopa', jugadores: ['Lamine Yamal', 'Rodri Hernández', 'Nico Williams', 'Dani Carvajal', 'Álvaro Morata', 'Cristiano Ronaldo', 'Pepe', 'Gianluigi Donnarumma', 'Giorgio Chiellini', 'Andrés Iniesta', 'Fernando Torres', 'Iker Casillas'] },
+    { id: 'sudamericano_100_caps', nombre: 'Más de 100 partidos con selección sudamericana', jugadores: ['Lionel Messi', 'Ángel Di María', 'Neymar', 'Dani Alves', 'Luis Suárez', 'Diego Godín', 'Alexis Sánchez', 'Arturo Vidal', 'Claudio Bravo'] },
+    { id: 'europeo_100_caps', nombre: 'Más de 100 partidos con selección europea', jugadores: ['Cristiano Ronaldo', 'Luka Modrić', 'Sergio Ramos', 'Iker Casillas', 'Manuel Neuer', 'Thomas Müller', 'Hugo Lloris', 'Olivier Giroud', 'Harry Kane', 'Kevin De Bruyne', 'Robert Lewandowski'] },
+    { id: 'africano_top', nombre: 'Ha jugado con una Selección Africana', jugadores: ['Mohamed Salah', 'Sadio Mané', 'Riyad Mahrez', 'Achraf Hakimi', 'Victor Osimhen', 'Samuel Eto\'o', 'Didier Drogba', 'Yaya Touré', 'Kalidou Koulibaly', 'Hakim Ziyech'] },
+    { id: 'asiatico_concacaf', nombre: 'Selección de Asia o CONCACAF', jugadores: ['Son Heung-min', 'Kaoru Mitoma', 'Takefusa Kubo', 'Alphonso Davies', 'Christian Pulisic', 'Keylor Navas', 'Chicharito Hernández', 'Guillermo Ochoa'] },
+    { id: 'finalista_mundial', nombre: 'Subcampeón de la Copa del Mundo', jugadores: ['Luka Modrić', 'Ivan Perišić', 'Kylian Mbappé', 'Antoine Griezmann', 'Lionel Messi', 'Arjen Robben', 'Wesley Sneijder', 'Zinedine Zidane', 'Oliver Kahn'] },
+    { id: 'gol_en_final_mundial', nombre: 'Ha marcado gol en una final de Mundial', jugadores: ['Kylian Mbappé', 'Lionel Messi', 'Ángel Di María', 'Antoine Griezmann', 'Paul Pogba', 'Mario Götze', 'Andrés Iniesta', 'Zinedine Zidane', 'Ronaldo Nazário'] },
+    { id: 'capitan_mundialista', nombre: 'Ha sido capitán de su país en un Mundial', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Hugo Lloris', 'Luka Modrić', 'Harry Kane', 'Manuel Neuer', 'Iker Casillas', 'Diego Godín'] },
+    { id: 'oro_olimpico', nombre: 'Medallista de Oro en Juegos Olímpicos', jugadores: ['Lionel Messi', 'Ángel Di María', 'Neymar', 'Gabriel Jesus', 'Richarlison', 'Samuel Eto\'o', 'Pep Guardiola', 'Fermín López'] },
+    { id: 'maximo_goleador_seleccion', nombre: 'Máximo goleador histórico de su selección', jugadores: ['Cristiano Ronaldo', 'Lionel Messi', 'Neymar', 'Harry Kane', 'Olivier Giroud', 'Romelu Lukaku', 'Robert Lewandowski', 'Luis Suárez', 'Alexis Sánchez'] },
+    { id: 'jugo_tres_mundiales', nombre: 'Ha disputado 3 o más Mundiales', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Luka Modrić', 'Guillermo Ochoa', 'Manuel Neuer', 'Hugo Lloris', 'Sergio Ramos', 'Edinson Cavani', 'Luis Suárez'] },
+    { id: 'doble_nacionalidad', nombre: 'Nació en un país distinto al que representa', jugadores: ['Achraf Hakimi', 'Riyad Mahrez', 'Pepe', 'Kalidou Koulibaly', 'Hakim Ziyech', 'Aymeric Laporte', 'Jorginho'] },
+    { id: 'hat_trick_seleccion', nombre: 'Ha marcado hat-trick en partido de selección', jugadores: ['Cristiano Ronaldo', 'Lionel Messi', 'Kylian Mbappé', 'Harry Kane', 'Erling Haaland', 'Romelu Lukaku', 'Neymar'] },
+    { id: 'portero_guante_oro', nombre: 'Guante de Oro o mejor portero en Mundial/Euro', jugadores: ['Emiliano Martínez', 'Thibaut Courtois', 'Manuel Neuer', 'Iker Casillas', 'Gianluigi Donnarumma', 'Gianluigi Buffon'] },
+    { id: 'debut_antes_18', nombre: 'Debutó con la absoluta antes de los 18 años', jugadores: ['Lamine Yamal', 'Kylian Mbappé', 'Eduardo Camavinga', 'Warren Zaïre-Emery', 'Gavi', 'Wayne Rooney', 'Pelé'] },
+    { id: 'defensa_goleador_sel', nombre: 'Defensa con más de 10 goles en su selección', jugadores: ['Sergio Ramos', 'Fernando Hierro', 'Ali Maâloul', 'Darijo Srna', 'Jan Vertonghen'] },
+    { id: 'campeon_nations_league', nombre: 'Campeón de la UEFA Nations League', jugadores: ['Cristiano Ronaldo', 'Bernardo Silva', 'Kylian Mbappé', 'Karim Benzema', 'Rodri Hernández', 'Álvaro Morata', 'Dani Carvajal'] },
+    { id: 'jugo_marruecos_semis', nombre: 'Parte de la Marruecos semifinalista en 2022', jugadores: ['Achraf Hakimi', 'Hakim Ziyech', 'Yassine Bounou', 'Sofyan Amrabat', 'Azzedine Ounahi', 'Youssef En-Nesyri'] },
+    { id: 'diez_mundialista', nombre: 'Ha llevado el dorsal 10 en una Copa del Mundo', jugadores: ['Lionel Messi', 'Kylian Mbappé', 'Luka Modrić', 'Neymar', 'Eden Hazard', 'James Rodríguez', 'Zinedine Zidane', 'Ronaldinho'] },
+    { id: 'gol_olimpico_o_falta', nombre: 'Especialista de falta directa con selección', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Neymar', 'James Rodríguez', 'Ronaldinho', 'David Beckham', 'Roberto Carlos'] },
+    { id: 'jugo_tres_confederaciones', nombre: 'Ha jugado torneos en más de una confederación', jugadores: ['Lionel Messi', 'Neymar', 'Alexis Sánchez', 'Alphonso Davies'] },
+    { id: 'campeon_sub20_sub21', nombre: 'Campeón de Mundial Sub-20 o Eurocopa Sub-21', jugadores: ['Lionel Messi', 'Sergio Agüero', 'Paul Pogba', 'Fabián Ruiz', 'Dani Ceballos', 'Thiago Alcántara'] },
+    { id: 'seleccion_balcanica', nombre: 'Ha representado a un país balcánico', jugadores: ['Luka Modrić', 'Ivan Perišić', 'Mateo Kovačić', 'Dušan Vlahović', 'Jan Oblak', 'Edin Džeko'] },
+    { id: 'penalti_decisivo_tanda', nombre: 'Marcó el penalti decisivo en una tanda de torneo', jugadores: ['Gonzalo Montiel', 'Lautaro Martínez', 'Dani Carvajal', 'Jorginho', 'Alexis Sánchez'] },
+    { id: 'mvp_euro_o_mundial', nombre: 'Balón de Oro de un Mundial o MVP de Eurocopa', jugadores: ['Lionel Messi', 'Luka Modrić', 'Diego Forlán', 'Zinedine Zidane', 'Gianluigi Donnarumma', 'Antoine Griezmann', 'Andrés Iniesta', 'Rodri Hernández'] },
+    { id: 'seleccion_sudamerica_no_arg_bra', nombre: 'Selección sudamericana que no sea Brasil ni Argentina', jugadores: ['Luis Suárez', 'Edinson Cavani', 'Alexis Sánchez', 'Arturo Vidal', 'James Rodríguez', 'Luis Díaz', 'Moisés Caicedo', 'Federico Valverde'] },
+    { id: 'capitan_campeon_torneo', nombre: 'Capitán que levantó un trofeo con su país', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Hugo Lloris', 'Iker Casillas', 'Álvaro Morata', 'Giorgio Chiellini'] }
+  ]
+};

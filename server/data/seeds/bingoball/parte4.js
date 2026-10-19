@@ -1,0 +1,37 @@
+// server/data/seeds/bingoball/parte4.js
+export const BINGO_GRANDES_LIGAS = {
+  id: 'grandes_ligas',
+  titulo: 'Grandes Ligas Europeas',
+  categorias: [
+    { id: 'campeon_premier_league', nombre: 'Ha ganado la Premier League', jugadores: ['Erling Haaland', 'Kevin De Bruyne', 'Mohamed Salah', 'Virgil van Dijk', 'Sadio Mané', 'Cristiano Ronaldo', 'N\'Golo Kanté', 'Riyad Mahrez', 'Sergio Agüero', 'Wayne Rooney', 'Eden Hazard'] },
+    { id: 'bota_oro_premier', nombre: 'Bota de Oro de la Premier League', jugadores: ['Erling Haaland', 'Mohamed Salah', 'Son Heung-min', 'Harry Kane', 'Sadio Mané', 'Sergio Agüero', 'Luis Suárez', 'Robin van Persie', 'Cristiano Ronaldo', 'Thierry Henry'] },
+    { id: 'campeon_serie_a', nombre: 'Ha ganado la Serie A italiana', jugadores: ['Lautaro Martínez', 'Nicolò Barella', 'Victor Osimhen', 'Khvicha Kvaratskhelia', 'Rafael Leão', 'Zlatan Ibrahimović', 'Cristiano Ronaldo', 'Paulo Dybala', 'Giorgio Chiellini', 'Gianluigi Buffon', 'Romelu Lukaku'] },
+    { id: 'capocannoniere_serie_a', nombre: 'Máximo goleador de la Serie A', jugadores: ['Lautaro Martínez', 'Victor Osimhen', 'Ciro Immobile', 'Cristiano Ronaldo', 'Mauro Icardi', 'Gonzalo Higuaín', 'Zlatan Ibrahimović'] },
+    { id: 'campeon_bundesliga', nombre: 'Ha ganado la Bundesliga alemana', jugadores: ['Florian Wirtz', 'Granit Xhaka', 'Jeremie Frimpong', 'Robert Lewandowski', 'Thomas Müller', 'Manuel Neuer', 'Joshua Kimmich', 'Kingsley Coman', 'Alphonso Davies', 'Marco Reus', 'Erling Haaland'] },
+    { id: 'torjagerkanone_bundesliga', nombre: 'Máximo goleador de la Bundesliga', jugadores: ['Harry Kane', 'Robert Lewandowski', 'Christopher Nkunku', 'Erling Haaland', 'Pierre-Emerick Aubameyang', 'Klaas-Jan Huntelaar'] },
+    { id: 'campeon_ligue_1', nombre: 'Ha ganado la Ligue 1 francesa', jugadores: ['Kylian Mbappé', 'Lionel Messi', 'Neymar', 'Marquinhos', 'Marco Verratti', 'Ángel Di María', 'Zlatan Ibrahimović', 'Edinson Cavani', 'Radamel Falcao', 'Bernardo Silva'] },
+    { id: 'campeon_tres_ligas_top', nombre: 'Ha ganado ligas en 3 países top distintos', jugadores: ['Cristiano Ronaldo', 'Zlatan Ibrahimović', 'Kingsley Coman', 'Arturo Vidal', 'Arjen Robben', 'Thiago Alcántara', 'David Alaba'] },
+    { id: 'jugo_manchester_united', nombre: 'Ha jugado en el Manchester United', jugadores: ['Cristiano Ronaldo', 'Wayne Rooney', 'Paul Pogba', 'Bruno Fernandes', 'Marcus Rashford', 'David de Gea', 'Casemiro', 'Zlatan Ibrahimović', 'Romelu Lukaku', 'Edinson Cavani'] },
+    { id: 'jugo_liverpool_fc', nombre: 'Ha jugado en el Liverpool FC', jugadores: ['Mohamed Salah', 'Sadio Mané', 'Virgil van Dijk', 'Alisson Becker', 'Luis Suárez', 'Fernando Torres', 'Philippe Coutinho', 'Trent Alexander-Arnold', 'Darwin Núñez'] },
+    { id: 'jugo_arsenal_fc', nombre: 'Ha jugado en el Arsenal FC', jugadores: ['Bukayo Saka', 'Martin Ødegaard', 'Declan Rice', 'Thierry Henry', 'Robin van Persie', 'Mesut Özil', 'Alexis Sánchez', 'Pierre-Emerick Aubameyang', 'Cesc Fàbregas'] },
+    { id: 'jugo_milan_o_inter', nombre: 'Ha jugado en AC Milan o Inter de Milán', jugadores: ['Zlatan Ibrahimović', 'Lautaro Martínez', 'Rafael Leão', 'Romelu Lukaku', 'Theo Hernández', 'Nicolò Barella', 'Hakan Çalhanoğlu', 'Olivier Giroud', 'Christian Pulisic'] },
+    { id: 'jugo_juventus', nombre: 'Ha jugado en la Juventus', jugadores: ['Cristiano Ronaldo', 'Paulo Dybala', 'Paul Pogba', 'Ángel Di María', 'Federico Chiesa', 'Dušan Vlahović', 'Giorgio Chiellini', 'Gianluigi Buffon', 'Gonzalo Higuaín', 'Andrea Pirlo'] },
+    { id: 'jugo_psg', nombre: 'Ha jugado en el Paris Saint-Germain', jugadores: ['Kylian Mbappé', 'Lionel Messi', 'Neymar', 'Zlatan Ibrahimović', 'Edinson Cavani', 'Ángel Di María', 'Marco Verratti', 'Marquinhos', 'Achraf Hakimi', 'Ousmane Dembélé'] },
+    { id: 'jugo_borussia_dortmund', nombre: 'Ha jugado en el Borussia Dortmund', jugadores: ['Erling Haaland', 'Jude Bellingham', 'Robert Lewandowski', 'Marco Reus', 'Pierre-Emerick Aubameyang', 'Ousmane Dembélé', 'Jadon Sancho', 'Mats Hummels'] },
+    { id: 'premier_mas_de_100_goles', nombre: 'Club de los 100 goles en Premier League', jugadores: ['Harry Kane', 'Wayne Rooney', 'Mohamed Salah', 'Sergio Agüero', 'Romelu Lukaku', 'Raheem Sterling', 'Sadio Mané', 'Thierry Henry', 'Cristiano Ronaldo'] },
+    { id: 'premier_invicto_arsenal', nombre: 'Los Invencibles del Arsenal (2003-04)', jugadores: ['Thierry Henry', 'Patrick Vieira', 'Robert Pirès', 'Dennis Bergkamp', 'Ashley Cole', 'Sol Campbell', 'Jens Lehmann'] },
+    { id: 'bundesliga_invicto_leverkusen', nombre: 'Campeón invicto con Bayer Leverkusen (2023-24)', jugadores: ['Florian Wirtz', 'Granit Xhaka', 'Jeremie Frimpong', 'Alejandro Grimaldo', 'Victor Boniface', 'Jonathan Tah', 'Exequiel Palacios'] },
+    { id: 'hat_trick_premier_league', nombre: 'Ha marcado hat-trick en Premier League', jugadores: ['Erling Haaland', 'Mohamed Salah', 'Son Heung-min', 'Harry Kane', 'Sergio Agüero', 'Cristiano Ronaldo', 'Phil Foden', 'Cole Palmer'] },
+    { id: 'portero_guante_oro_premier', nombre: 'Guante de Oro de la Premier League', jugadores: ['Alisson Becker', 'Ederson Moraes', 'David de Gea', 'Thibaut Courtois', 'Petr Čech', 'David Raya'] },
+    { id: 'mvp_premier_league', nombre: 'Jugador del Año de la Premier League (PFA/FWA)', jugadores: ['Phil Foden', 'Erling Haaland', 'Kevin De Bruyne', 'Mohamed Salah', 'Virgil van Dijk', 'N\'Golo Kanté', 'Riyad Mahrez', 'Eden Hazard', 'Luis Suárez'] },
+    { id: 'mas_de_20_asistencias_temporada', nombre: '20 asistencias en una sola temporada de liga', jugadores: ['Kevin De Bruyne', 'Thierry Henry', 'Thomas Müller', 'Lionel Messi'] },
+    { id: 'campeon_con_leicester_city', nombre: 'Ganó la milagrosa Premier con Leicester City (2016)', jugadores: ['Jamie Vardy', 'Riyad Mahrez', 'N\'Golo Kanté', 'Kasper Schmeichel', 'Wes Morgan'] },
+    { id: 'fichaje_mas_de_100m', nombre: 'Ha protagonizado un traspaso de más de 100M€', jugadores: ['Neymar', 'Kylian Mbappé', 'Philippe Coutinho', 'Jack Grealish', 'Declan Rice', 'Moisés Caicedo', 'Enzo Fernández', 'Jude Bellingham', 'Harry Kane', 'Eden Hazard'] },
+    { id: 'goleador_cinco_en_nueve_minutos', nombre: 'Marcó 5 goles en 9 minutos en Bundesliga', jugadores: ['Robert Lewandowski'] },
+    { id: 'jugador_revelacion_serie_a', nombre: 'MVP o revelación de Serie A italiana', jugadores: ['Khvicha Kvaratskhelia', 'Rafael Leão', 'Victor Osimhen', 'Lautaro Martínez', 'Paulo Dybala'] },
+    { id: 'jugador_ingles_en_extranjero', nombre: 'Futbolista inglés que triunfó fuera de la Premier', jugadores: ['Jude Bellingham', 'Harry Kane', 'Jadon Sancho', 'David Beckham', 'Fikayo Tomori'] },
+    { id: 'doblete_liga_copa_alemania', nombre: 'Ganó el Doblete alemán con el Bayern', jugadores: ['Robert Lewandowski', 'Thomas Müller', 'Manuel Neuer', 'Joshua Kimmich', 'Arjen Robben', 'Franck Ribéry'] },
+    { id: 'derbi_de_italia_inter_juve', nombre: 'Ha jugado el Derby d\'Italia (Inter vs Juventus)', jugadores: ['Lautaro Martínez', 'Nicolò Barella', 'Paulo Dybala', 'Giorgio Chiellini', 'Romelu Lukaku', 'Cristiano Ronaldo'] },
+    { id: 'derbi_del_norte_de_londres', nombre: 'Ha jugado Arsenal vs Tottenham', jugadores: ['Harry Kane', 'Son Heung-min', 'Bukayo Saka', 'Martin Ødegaard', 'Hugo Lloris', 'Gareth Bale', 'Thierry Henry'] }
+  ]
+};

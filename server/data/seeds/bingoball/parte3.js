@@ -1,0 +1,37 @@
+// server/data/seeds/bingoball/parte3.js
+export const BINGO_LALIGA = {
+  id: 'laliga',
+  titulo: 'La Liga Española',
+  categorias: [
+    { id: 'trofeo_pichichi', nombre: 'Ha ganado el Trofeo Pichichi', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Karim Benzema', 'Robert Lewandowski', 'Artem Dovbyk', 'Luis Suárez', 'Diego Forlán', 'Samuel Eto\'o', 'Ruud van Nistelrooy', 'Ronaldo Nazário', 'Raúl González'] },
+    { id: 'trofeo_zamora', nombre: 'Ha ganado el Trofeo Zamora', jugadores: ['Thibaut Courtois', 'Marc-André ter Stegen', 'Jan Oblak', 'Yassine Bounou', 'Unai Simón', 'Claudio Bravo', 'Iker Casillas', 'Víctor Valdés'] },
+    { id: 'clasico_goleador', nombre: 'Ha marcado gol en El Clásico (Madrid-Barça)', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Karim Benzema', 'Luis Suárez', 'Vinícius Júnior', 'Jude Bellingham', 'Robert Lewandowski', 'Lamine Yamal', 'Sergio Ramos', 'Gareth Bale', 'Neymar'] },
+    { id: 'campeon_con_el_madrid', nombre: 'Ha ganado La Liga con el Real Madrid', jugadores: ['Cristiano Ronaldo', 'Karim Benzema', 'Luka Modrić', 'Toni Kroos', 'Sergio Ramos', 'Vinícius Júnior', 'Jude Bellingham', 'Rodrygo', 'Casemiro', 'Marcelo', 'Dani Carvajal', 'Iker Casillas'] },
+    { id: 'campeon_con_el_barca', nombre: 'Ha ganado La Liga con el FC Barcelona', jugadores: ['Lionel Messi', 'Andrés Iniesta', 'Xavi Hernández', 'Gerard Piqué', 'Sergio Busquets', 'Luis Suárez', 'Neymar', 'Robert Lewandowski', 'Pedri', 'Gavi', 'Marc-André ter Stegen', 'Carles Puyol'] },
+    { id: 'campeon_con_el_atletico', nombre: 'Ha ganado La Liga con el Atlético de Madrid', jugadores: ['Antoine Griezmann', 'Luis Suárez', 'Koke Resurrección', 'Jan Oblak', 'Diego Godín', 'Ángel Correa', 'Stefan Savić', 'Marcos Llorente', 'Yannick Carrasco', 'Gabi', 'Filipe Luís'] },
+    { id: 'jugo_madrid_y_barca', nombre: 'Ha jugado en Real Madrid y FC Barcelona', jugadores: ['Ronaldo Nazário', 'Luis Figo', 'Luis Enrique', 'Michael Laudrup', 'Samuel Eto\'o', 'Javier Saviola', 'Albert Celades'] },
+    { id: 'mas_de_100_goles_laliga', nombre: 'Ha marcado más de 100 goles en Primera División', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Karim Benzema', 'Raúl González', 'Luis Suárez', 'Antoine Griezmann', 'Iago Aspas', 'Aritz Aduriz', 'David Villa', 'Diego Forlán'] },
+    { id: 'leyenda_athletic_club', nombre: 'Ha vestido la camiseta del Athletic Club', jugadores: ['Aritz Aduriz', 'Iker Muniain', 'Iñaki Williams', 'Nico Williams', 'Unai Simón', 'Aymeric Laporte', 'Fernando Llorente', 'Kepa Arrizabalaga'] },
+    { id: 'leyenda_sevilla_betis', nombre: 'Ha jugado en Sevilla FC o Real Betis', jugadores: ['Jesús Navas', 'Ivan Rakitić', 'Sergio Ramos', 'Joaquín Sánchez', 'Nabil Fekir', 'Isco Alarcón', 'Yassine Bounou', 'Youssef En-Nesyri', 'Luuk de Jong'] },
+    { id: 'leyenda_valencia_villarreal', nombre: 'Ha jugado en Valencia CF o Villarreal CF', jugadores: ['David Villa', 'David Silva', 'Dani Parejo', 'Gerard Moreno', 'Pau Torres', 'Diego Forlán', 'Santi Cazorla', 'Juan Román Riquelme', 'Gonçalo Guedes'] },
+    { id: 'trofeo_zarra', nombre: 'Ha ganado el Trofeo Zarra (máximo goleador español)', jugadores: ['Iago Aspas', 'Gerard Moreno', 'Borja Mayoral', 'Aritz Aduriz', 'David Villa', 'Álvaro Morata', 'Roberto Soldado'] },
+    { id: 'mas_de_400_partidos_laliga', nombre: 'Más de 400 partidos en La Liga', jugadores: ['Joaquín Sánchez', 'Lionel Messi', 'Sergio Ramos', 'Iker Casillas', 'Raúl González', 'Jesús Navas', 'Koke Resurrección', 'Antoine Griezmann', 'Iago Aspas', 'Sergio Busquets'] },
+    { id: 'gol_de_chilena_laliga', nombre: 'Marcó golazo de chilena en La Liga', jugadores: ['Cristiano Ronaldo', 'Lionel Messi', 'Antoine Griezmann', 'Luis Suárez', 'Aritz Aduriz', 'Gareth Bale', 'Karim Benzema'] },
+    { id: 'canterano_la_masia', nombre: 'Canterano formado en La Masia', jugadores: ['Lionel Messi', 'Andrés Iniesta', 'Xavi Hernández', 'Sergio Busquets', 'Gerard Piqué', 'Carles Puyol', 'Lamine Yamal', 'Gavi', 'Alejandro Balde', 'Pedrito'] },
+    { id: 'canterano_la_fabrica', nombre: 'Canterano formado en La Fábrica del Real Madrid', jugadores: ['Raúl González', 'Iker Casillas', 'Dani Carvajal', 'Nacho Fernández', 'Lucas Vázquez', 'Álvaro Morata', 'Borja Mayoral', 'Marcos Llorente'] },
+    { id: 'hat_trick_laliga', nombre: 'Ha marcado hat-trick en un partido de La Liga', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Luis Suárez', 'Karim Benzema', 'Robert Lewandowski', 'Antoine Griezmann', 'Vinícius Júnior', 'Iago Aspas'] },
+    { id: 'goleador_girona_revelacion', nombre: 'Jugó la histórica temporada del Girona 2023-24', jugadores: ['Artem Dovbyk', 'Sávio Moreira', 'Aleix García', 'Cristhian Stuani', 'Viktor Tsygankov', 'Miguel Gutiérrez', 'Yan Couto'] },
+    { id: 'rey_de_asistencias_laliga', nombre: 'Máximo asistente en alguna temporada de La Liga', jugadores: ['Lionel Messi', 'Luis Suárez', 'Xavi Hernández', 'Mesut Özil', 'Ángel Di María', 'Antoine Griezmann', 'Vinícius Júnior'] },
+    { id: 'expulsado_el_clasico', nombre: 'Ha sido expulsado en un Clásico', jugadores: ['Sergio Ramos', 'Gerard Piqué', 'Dani Carvajal', 'Pepe', 'Cristiano Ronaldo', 'Víctor Valdés'] },
+    { id: 'campeon_copa_del_rey', nombre: 'Ha ganado la Copa del Rey', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Karim Benzema', 'Antoine Griezmann', 'Iker Muniain', 'Nico Williams', 'Jesús Navas', 'Joaquín Sánchez', 'Vinícius Júnior'] },
+    { id: 'jugo_derbi_madrileno', nombre: 'Ha disputado el Derbi Madrileño', jugadores: ['Cristiano Ronaldo', 'Sergio Ramos', 'Karim Benzema', 'Antoine Griezmann', 'Koke Resurrección', 'Jan Oblak', 'Luka Modrić', 'Thibaut Courtois', 'Diego Godín'] },
+    { id: 'portero_penaltis_laliga', nombre: 'Famoso atajador de penaltis en La Liga', jugadores: ['Diego Alves', 'Jan Oblak', 'Thibaut Courtois', 'Sergio Asenjo', 'Marc-André ter Stegen', 'Unai Simón'] },
+    { id: 'extranjero_con_mas_partidos', nombre: 'Extranjero histórico con más partidos en La Liga', jugadores: ['Lionel Messi', 'Antoine Griezmann', 'Karim Benzema', 'Jan Oblak', 'Roberto Carlos', 'Dani Alves', 'Luka Modrić'] },
+    { id: 'gol_desde_fuera_del_area', nombre: 'Especialista en misiles lejanos en La Liga', jugadores: ['Cristiano Ronaldo', 'Lionel Messi', 'Luka Modrić', 'Federico Valverde', 'Antoine Griezmann', 'Memphis Depay'] },
+    { id: 'campeon_liga_100_puntos', nombre: 'Ganó una Liga de los 100 puntos (Madrid 2012 o Barça 2013)', jugadores: ['Cristiano Ronaldo', 'Karim Benzema', 'Sergio Ramos', 'Mesut Özil', 'Iker Casillas', 'Lionel Messi', 'Xavi Hernández', 'Andrés Iniesta', 'Gerard Piqué'] },
+    { id: 'capitan_equipo_laliga', nombre: 'Ha sido primer capitán de un equipo de La Liga', jugadores: ['Sergio Ramos', 'Iker Casillas', 'Lionel Messi', 'Carles Puyol', 'Koke Resurrección', 'Iker Muniain', 'Jesús Navas', 'Iago Aspas', 'Joaquín Sánchez'] },
+    { id: 'gol_en_su_debut_laliga', nombre: 'Marcó gol el día de su debut en La Liga', jugadores: ['Cristiano Ronaldo', 'Jude Bellingham', 'Robert Lewandowski', 'Radamel Falcao', 'Zlatan Ibrahimović'] },
+    { id: 'jugador_vasco', nombre: 'Futbolista nacido en el País Vasco o Navarra', jugadores: ['Iker Muniain', 'Nico Williams', 'Unai Simón', 'Mikel Oyarzabal', 'Mikel Merino', 'Martín Zubimendi', 'César Azpilicueta'] },
+    { id: 'jugador_andaluz', nombre: 'Futbolista nacido en Andalucía', jugadores: ['Sergio Ramos', 'Jesús Navas', 'Joaquín Sánchez', 'Isco Alarcón', 'Fabián Ruiz', 'Gavi', 'Brahim Díaz'] }
+  ]
+};

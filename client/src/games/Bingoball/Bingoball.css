@@ -1,0 +1,205 @@
+/* client/src/games/Bingoball/Bingoball.css */
+.bb-contenedor {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Área central del futbolista en pantalla */
+.bb-jugador-display {
+  background: linear-gradient(135deg, #1e3a8a, #1d4ed8);
+  border-radius: 20px;
+  padding: 1.2rem;
+  color: #ffffff;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(29, 78, 216, 0.35);
+  margin-bottom: 1.2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.bb-jugador-avatar {
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 0.6rem;
+  background: #ffffff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.bb-jugador-nombre {
+  font-size: 1.8rem;
+  font-weight: 900;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.bb-timer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.9rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.2);
+  font-weight: 800;
+  font-size: 0.9rem;
+  margin-top: 0.6rem;
+}
+
+.bb-timer-badge.peligro {
+  background: #ef4444;
+  color: #ffffff;
+  animation: pulsoTimer 0.6s infinite alternate;
+}
+
+@keyframes pulsoTimer {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.08); }
+}
+
+/* Cuenta atrás 3..2..1 central */
+.bb-overlay-countdown {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  color: #ffffff;
+}
+
+.bb-countdown-num {
+  font-size: 7.5rem;
+  font-weight: 900;
+  color: #facc15;
+  text-shadow: 0 0 40px rgba(250, 204, 21, 0.7);
+  animation: zoomCountdown 0.9s ease-out;
+}
+
+@keyframes zoomCountdown {
+  0% { transform: scale(0.4); opacity: 0; }
+  60% { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); }
+}
+
+/* Cartón del bingo: 4 filas x 5 columnas */
+.bb-carton-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 1rem 0;
+}
+
+.bb-fila-contenedor {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bb-fila-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.5rem;
+  flex: 1;
+}
+
+@media (max-width: 600px) {
+  .bb-fila-contenedor {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .bb-fila-grid {
+    gap: 0.35rem;
+  }
+}
+
+.bb-casilla-btn {
+  background: #ffffff;
+  border: 2px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 0.65rem 0.4rem;
+  min-height: 85px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.bb-casilla-btn:hover:not(:disabled) {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  transform: translateY(-2px);
+}
+
+.bb-casilla-cat {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: #1e293b;
+  line-height: 1.2;
+}
+
+.bb-casilla-btn.marcada {
+  background: #ecfdf5;
+  border-color: #10b981;
+  cursor: default;
+}
+
+.bb-casilla-marcada-badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: #059669;
+  background: #d1fae5;
+  padding: 0.15rem 0.4rem;
+  border-radius: 6px;
+  margin-top: 0.3rem;
+  max-width: 95%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Botón de Cantar Línea */
+.bb-btn-linea {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 900;
+  font-size: 0.8rem;
+  padding: 0.6rem 0.7rem;
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(217, 119, 6, 0.35);
+  animation: pulseLinea 1s infinite alternate;
+  white-space: nowrap;
+}
+
+@keyframes pulseLinea {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.06); }
+}
+
+/* Alerta de bloqueo y feedback */
+.bb-alerta-bloqueo {
+  background: #fee2e2;
+  border: 1.5px solid #ef4444;
+  color: #991b1b;
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin: 0.8rem 0;
+  text-align: center;
+}

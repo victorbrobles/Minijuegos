@@ -206,6 +206,13 @@ export const META = {
     colores: ['#06b6d4', '#0e7490'],
     etiquetas: 'palabra ingenio velocidad letras categorias',
     descripcion: 'Elige categoría, di una palabra que empiece por una letra libre antes de 30s y elimínala del abecedario. ¡Sobrevive a 5 tableros!'
+  },
+  'bingoball': {
+    titulo: 'Bingoball',
+    icono: 'soccer',
+    colores: ['#1d4ed8', '#0f172a'],
+    etiquetas: 'futbol bingo cartones jugadores categorias online',
+    descripcion: 'Rellena tu cartón de 4x5 relacionando futbolistas con categorías. Canta líneas y consigue el Bingo antes que nadie.'
   }
 };
 export const META_POR_DEFECTO = { icono: 'star', colores: ['#8b5cf6', '#6366f1'], etiquetas: '', descripcion: '' };

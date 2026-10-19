@@ -1,0 +1,37 @@
+// server/data/seeds/bingoball/parte5.js
+export const BINGO_LEYENDAS = {
+  id: 'leyendas',
+  titulo: 'Leyendas del Fútbol Histórico',
+  categorias: [
+    { id: 'ganador_balon_de_oro', nombre: 'Ha ganado al menos un Balón de Oro', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Luka Modrić', 'Karim Benzema', 'Kaká', 'Ronaldinho', 'Andriy Shevchenko', 'Ronaldo Nazário', 'Zinedine Zidane', 'Rivaldo', 'Luís Figo', 'Michael Owen', 'Marco van Basten', 'Michel Platini', 'Johan Cruyff'] },
+    { id: 'tres_o_mas_balones_oro', nombre: 'Ha ganado 3 o más Balones de Oro', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Michel Platini', 'Johan Cruyff', 'Marco van Basten'] },
+    { id: 'campeon_mundo_y_champions', nombre: 'Ha ganado la Copa del Mundo y la Champions League', jugadores: ['Zinedine Zidane', 'Rivaldo', 'Ronaldinho', 'Kaká', 'Thierry Henry', 'Andrés Iniesta', 'Xavi Hernández', 'Iker Casillas', 'Sergio Ramos', 'Gerard Piqué', 'Manuel Neuer', 'Thomas Müller', 'Toni Kroos', 'Lionel Messi', 'Ángel Di María'] },
+    { id: 'pelusa_o_rey', nombre: 'Maradona o Pelé (El 10 de Oro)', jugadores: ['Diego Maradona', 'Pelé'] },
+    { id: 'delantero_brasileno_historico', nombre: 'Mítico delantero de la Selección Brasileña', jugadores: ['Pelé', 'Ronaldo Nazário', 'Romário', 'Ronaldinho', 'Rivaldo', 'Kaká', 'Neymar', 'Bebeto', 'Adriano Leite'] },
+    { id: 'defensa_balon_de_oro', nombre: 'Defensa que ganó o rozó el Balón de Oro', jugadores: ['Fabio Cannavaro', 'Franz Beckenbauer', 'Paolo Maldini', 'Roberto Carlos', 'Virgil van Dijk'] },
+    { id: 'leyenda_milan_sacchi_ancelotti', nombre: 'Leyenda del gran AC Milan', jugadores: ['Paolo Maldini', 'Franco Baresi', 'Marco van Basten', 'Ruud Gullit', 'Andriy Shevchenko', 'Kaká', 'Andrea Pirlo', 'Clarence Seedorf', 'Filippo Inzaghi'] },
+    { id: 'leyenda_real_madrid_siglo_xx', nombre: 'Leyenda histórica del Real Madrid', jugadores: ['Alfredo Di Stéfano', 'Ferenc Puskás', 'Raúl González', 'Iker Casillas', 'Zinedine Zidane', 'Roberto Carlos', 'Fernando Hierro', 'Guti'] },
+    { id: 'leyenda_dream_team_barca', nombre: 'Miembro del Dream Team del Barça o era Cruyff', jugadores: ['Johan Cruyff', 'Ronald Koeman', 'Michael Laudrup', 'Hristo Stoichkov', 'Romário', 'Pep Guardiola'] },
+    { id: 'el_fenomeno_equipos', nombre: 'Clubes de Ronaldo Nazário (Cruzeiro, PSV, Barça, Inter, Madrid, Milan)', jugadores: ['Ronaldo Nazário'] },
+    { id: 'leyenda_premier_inicios', nombre: 'Leyenda de los primeros 20 años de la Premier League', jugadores: ['Thierry Henry', 'Ryan Giggs', 'Paul Scholes', 'Eric Cantona', 'Alan Shearer', 'Steven Gerrard', 'Frank Lampard', 'Wayne Rooney', 'David Beckham', 'Dennis Bergkamp'] },
+    { id: 'el_mago_de_la_sonrisa', nombre: 'Ronaldinho y sus trucos icónicos', jugadores: ['Ronaldinho'] },
+    { id: 'mitico_tiro_libre', nombre: 'Histórico lanzador de faltas mítico', jugadores: ['Juninho Pernambucano', 'David Beckham', 'Ronaldinho', 'Roberto Carlos', 'Andrea Pirlo', 'Diego Maradona', 'Zico', 'Lionel Messi', 'Cristiano Ronaldo'] },
+    { id: 'leyenda_francesa', nombre: 'Leyenda histórica de la Selección de Francia', jugadores: ['Zinedine Zidane', 'Michel Platini', 'Thierry Henry', 'Patrick Vieira', 'Didier Deschamps', 'Kylian Mbappé'] },
+    { id: 'leyenda_italiana', nombre: 'Leyenda histórica de la Nazionale Azzurra', jugadores: ['Paolo Maldini', 'Roberto Baggio', 'Gianluigi Buffon', 'Alessandro Del Piero', 'Francesco Totti', 'Andrea Pirlo', 'Fabio Cannavaro', 'Franco Baresi'] },
+    { id: 'leyenda_alemana', nombre: 'Leyenda de la Selección Alemana', jugadores: ['Franz Beckenbauer', 'Gerd Müller', 'Lothar Matthäus', 'Miroslav Klose', 'Oliver Kahn', 'Michael Ballack', 'Bastian Schweinsteiger', 'Philipp Lahm'] },
+    { id: 'leyenda_argentina_pre_messi', nombre: 'Leyenda argentina previa a la era Messi', jugadores: ['Diego Maradona', 'Mario Kempes', 'Gabriel Batistuta', 'Juan Román Riquelme', 'Javier Zanetti', 'Hernán Crespo', 'Diego Simeone'] },
+    { id: 'leyenda_one_club_man', nombre: 'One-Club Man (casi toda su carrera en un solo club)', jugadores: ['Paolo Maldini', 'Francesco Totti', 'Carles Puyol', 'Ryan Giggs', 'Paul Scholes', 'Franco Baresi'] },
+    { id: 'mitico_portero_siglo_xx_xxi', nombre: 'Portero de leyenda mundial', jugadores: ['Lev Yashin', 'Iker Casillas', 'Gianluigi Buffon', 'Oliver Kahn', 'Peter Schmeichel', 'Edwin van der Sar', 'Petr Čech', 'Dino Zoff'] },
+    { id: 'goleador_historico_mundiales', nombre: 'Máximos goleadores históricos de los Mundiales', jugadores: ['Miroslav Klose', 'Ronaldo Nazário', 'Gerd Müller', 'Just Fontaine', 'Pelé', 'Kylian Mbappé', 'Lionel Messi'] },
+    { id: 'balon_de_oro_africano', nombre: 'Único Balón de Oro africano de la historia', jugadores: ['George Weah'] },
+    { id: 'el_arquitecto_italiano', nombre: 'Andrea Pirlo y su clase en la medular', jugadores: ['Andrea Pirlo'] },
+    { id: 'il_capitano_roma', nombre: 'Francesco Totti: el eterno capitán de Roma', jugadores: ['Francesco Totti'] },
+    { id: 'puro_carisma_holandes', nombre: 'Leyenda de la Naranja Mecánica o Países Bajos', jugadores: ['Johan Cruyff', 'Marco van Basten', 'Ruud Gullit', 'Dennis Bergkamp', 'Clarence Seedorf', 'Edgar Davids', 'Arjen Robben', 'Robin van Persie'] },
+    { id: 'el_matador_espanol', nombre: 'Mítico 7 o 9 de España de los 90s/2000s', jugadores: ['Raúl González', 'David Villa', 'Fernando Torres', 'Fernando Morientes'] },
+    { id: 'campeon_libertadores_y_champions', nombre: 'Ha ganado Copa Libertadores y Champions League', jugadores: ['Ronaldinho', 'Neymar', 'Carlos Tévez', 'Cafú', 'Walter Samuel', 'Dida', 'Julián Álvarez'] },
+    { id: 'leyenda_europa_del_este', nombre: 'Gran figura de Europa del Este', jugadores: ['Andriy Shevchenko', 'Hristo Stoichkov', 'Pavel Nedvěd', 'Davor Šuker', 'Ferenc Puskás'] },
+    { id: 'la_volea_de_glasgow', nombre: 'Zinedine Zidane en Glasgow 2002', jugadores: ['Zinedine Zidane'] },
+    { id: 'los_galacticos_originales', nombre: 'Miembro de los Galácticos del Real Madrid (2000-2006)', jugadores: ['Zinedine Zidane', 'Ronaldo Nazário', 'Luís Figo', 'David Beckham', 'Roberto Carlos', 'Raúl González', 'Iker Casillas'] },
+    { id: 'capitan_campeon_del_mundo_historico', nombre: 'Capitanes legendarios que levantaron la Copa del Mundo', jugadores: ['Diego Maradona', 'Franz Beckenbauer', 'Cafú', 'Fabio Cannavaro', 'Iker Casillas', 'Philipp Lahm', 'Hugo Lloris', 'Lionel Messi'] }
+  ]
+};
