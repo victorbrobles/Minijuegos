@@ -1,8 +1,10 @@
+// client/src/games/Descarte/DescarteLocal.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
 import GameIntro from '../../components/GameIntro.jsx';
 import { TODAS_LAS_CATEGORIAS } from '../../../../server/data/seeds/descarte/descarte.js';
 import './Descarte.css';
+import '../Adivina/Adivina.css';
 
 const MIN_JUGADORES = 3;
 const MAX_JUGADORES = 12;
@@ -28,6 +30,7 @@ const getTresRandom = () => {
 
 export default function DescarteLocal({ onSalir }) {
   const [paso, setPaso] = useState('setup'); // setup | eligiendo_rival | eligiendo_cat | pasar_dispositivo | respondiendo | cambio_tablero | fin
+  const [modalAyuda, setModalAyuda] = useState(false);
   const [numJugadores, setNumJugadores] = useState(4);
   const [nombres, setNombres] = useState(nombresPorDefecto(4));
 
@@ -60,6 +63,7 @@ export default function DescarteLocal({ onSalir }) {
   };
 
   const iniciarPartida = () => {
+    setModalAyuda(false);
     const jugs = nombres.map((n, i) => ({ id: i + 1, nombre: n.trim() || `Jugador ${i + 1}`, puntos: 0 }));
     setJugadores(jugs);
     setTableroActual(1);
@@ -80,9 +84,7 @@ export default function DescarteLocal({ onSalir }) {
   // El retador elige al rival
   const seleccionarRival = (idRival) => {
     setJugadorActivoId(idRival);
-    // Añadimos al ciclo
     setJugadosEnCiclo(prev => [...prev, idRival]);
-    // Preparamos 3 categorías para que el retador elija cuál ponerle
     setTresCategorias(getTresRandom());
     setPaso('eligiendo_cat');
   };
@@ -154,12 +156,10 @@ export default function DescarteLocal({ onSalir }) {
   };
 
   const prepararSiguienteRetador = () => {
-    // El jugador que acaba de actuar se convierte en el nuevo Retador
     setJugadorRetadorId(jugadorActivoId);
 
-    // Si ya han jugado todos en este ciclo, se reinicia el ciclo
     if (jugadosEnCiclo.length >= jugadores.length) {
-      setJugadosEnCiclo([jugadorActivoId]); // El actual ya cuenta como que abrió el nuevo ciclo
+      setJugadosEnCiclo([jugadorActivoId]);
     }
 
     setPaso('eligiendo_rival');
@@ -177,7 +177,6 @@ export default function DescarteLocal({ onSalir }) {
   const retadorActual = jugadores.find(j => j.id === jugadorRetadorId);
   const activoActual = jugadores.find(j => j.id === jugadorActivoId);
 
-  // Rivales elegibles: los que aún NO han jugado en este ciclo (y no son el retador)
   const rivalesElegibles = jugadores.filter(j => 
     j.id !== jugadorRetadorId && !jugadosEnCiclo.includes(j.id)
   );
@@ -187,43 +186,98 @@ export default function DescarteLocal({ onSalir }) {
   const ganadores = maxPuntos > 0 ? ranking.filter(j => j.puntos === maxPuntos) : [];
 
   return (
-    <div className="dsc-contenedor">
+    <div className="dsc-contenedor" style={{ position: 'relative' }}>
       {/* 1. SETUP */}
       {paso === 'setup' && (
-        <section className="game">
-          <GameIntro gameId="descarte" titulo="Descarta y Elimina!" />
+        <>
+          <button
+            type="button"
+            className="btn-ayuda-flotante"
+            onClick={() => setModalAyuda(true)}
+            title="Reglas del juego"
+          >
+            <span className="btn-ayuda-flotante-signo">?</span>
+          </button>
 
-          <div className="panel">
-            <h3 className="panel-title"><Icon name="users" size={22} /> Jugadores (3 a 12)</h3>
-            <label className="field-label" htmlFor="dsc-num">Número de participantes</label>
-            <select id="dsc-num" value={numJugadores} onChange={cambiarNumJugadores}>
-              {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => i + MIN_JUGADORES).map(k => (
-                <option key={k} value={k}>{k} jugadores</option>
-              ))}
-            </select>
+          {modalAyuda && (
+            <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
+              <div
+                className="rg-modal aprox-modal-ayuda"
+                onClick={(e) => e.stopPropagation()}
+                style={{ maxWidth: '540px', maxHeight: '88vh', overflowY: 'auto', textAlign: 'left' }}
+              >
+                <div className="aprox-modal-header">
+                  <span className="aprox-modal-signo-title">?</span>
+                  <h3>¿Cómo se juega a Descarta y Elimina?</h3>
+                </div>
 
-            <span className="field-label" style={{ marginTop: '1rem' }}>Nombres</span>
-            <div className="names-grid">
-              {nombres.map((nombre, i) => (
-                <input
-                  key={i}
-                  type="text"
-                  value={nombre}
-                  maxLength={18}
-                  placeholder={`Jugador ${i + 1}`}
-                  onChange={(e) => handleNombre(i, e.target.value)}
-                />
-              ))}
+                <div className="aprox-modal-cuerpo">
+                  <p><strong>1. Dinámica del reto:</strong></p>
+                  <ul>
+                    <li>En cada turno, el <strong>Retador</strong> elige a un rival que aún no haya participado en la ronda actual y le asigna una <strong>categoría trampa</strong> de entre 3 opciones[cite: 17].</li>
+                    <li>El jugador desafiado tiene <strong>30 segundos</strong> para decir en voz alta una palabra válida de esa categoría que empiece por una de las letras disponibles en el tablero[cite: 17, 18].</li>
+                  </ul>
+
+                  <p><strong>2. Eliminación de letras y puntos:</strong></p>
+                  <ul>
+                    <li>Cada letra acertada <strong>queda eliminada del tablero</strong> y nadie más podrá usarla hasta el siguiente tablero[cite: 17, 18].</li>
+                    <li><strong>🔵 1 punto (fáciles):</strong> A, B, C, D, E, L, M, P, R, S, T[cite: 17].</li>
+                    <li><strong>🟡 2 puntos (medias):</strong> F, G, H, I, N, O, U, V[cite: 17].</li>
+                    <li><strong>🔴 3 puntos (difíciles):</strong> J, K, Ñ, Q, W, X, Y, Z[cite: 17].</li>
+                    <li>Si se agota el tiempo o no se da una palabra válida, se cuenta como fallo y no se suman puntos[cite: 17].</li>
+                  </ul>
+
+                  <p><strong>3. Cambio de tablero y Victoria:</strong></p>
+                  <ul>
+                    <li>El tablero actual finaliza cuando se <strong>eliminan todas las letras del abecedario</strong> o cuando <strong>todos los jugadores fallan consecutivamente</strong>[cite: 17].</li>
+                    <li>La partida se disputa a <strong>5 tableros</strong>[cite: 17]. ¡Gana quien acumule más puntos al final![cite: 17]</li>
+                  </ul>
+                </div>
+
+                <div className="rg-modal-acciones" style={{ marginTop: '1.2rem' }}>
+                  <button className="big full" onClick={() => setModalAyuda(false)}>
+                    Entendido
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
 
-          <div className="actions">
-            <button className="big full" onClick={iniciarPartida}>
-              <Icon name="play" size={22} /> Empezar Partida (5 Tableros)
-            </button>
-            <button className="secondary full" onClick={onSalir}>Volver</button>
-          </div>
-        </section>
+          <section className="game">
+            <GameIntro gameId="descarte" titulo="Descarta y Elimina!" />
+
+            <div className="panel">
+              <h3 className="panel-title"><Icon name="users" size={22} /> Jugadores (3 a 12)</h3>
+              <label className="field-label" htmlFor="dsc-num">Número de participantes</label>
+              <select id="dsc-num" value={numJugadores} onChange={cambiarNumJugadores}>
+                {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => i + MIN_JUGADORES).map(k => (
+                  <option key={k} value={k}>{k} jugadores</option>
+                ))}
+              </select>
+
+              <span className="field-label" style={{ marginTop: '1rem' }}>Nombres</span>
+              <div className="names-grid">
+                {nombres.map((nombre, i) => (
+                  <input
+                    key={i}
+                    type="text"
+                    value={nombre}
+                    maxLength={18}
+                    placeholder={`Jugador ${i + 1}`}
+                    onChange={(e) => handleNombre(i, e.target.value)}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="actions">
+              <button className="big full" onClick={iniciarPartida}>
+                <Icon name="play" size={22} /> Empezar Partida (5 Tableros)
+              </button>
+              <button className="secondary full" onClick={onSalir}>Volver</button>
+            </div>
+          </section>
+        </>
       )}
 
       {/* 2. NOMINAR RIVAL */}

@@ -1,7 +1,9 @@
+// client/src/games/Coleccion/ColeccionLocal.jsx
 import React, { useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import GameIntro from '../../components/GameIntro.jsx';
 import './Coleccion.css';
+import '../Adivina/Adivina.css';
 
 const PALOS = [
   { id: 'manzana', nombre: 'Manzana', icono: '🍎' },
@@ -49,6 +51,7 @@ const generarMazo = () => {
 
 export default function ColeccionLocal({ onSalir }) {
   const [paso, setPaso] = useState('setup');
+  const [modalAyuda, setModalAyuda] = useState(false);
   const [nombres, setNombres] = useState(['Jugador 1', 'Jugador 2', 'Jugador 3', 'Jugador 4']);
   const [e, setE] = useState(null);
 
@@ -173,7 +176,7 @@ export default function ColeccionLocal({ onSalir }) {
     if (st.robosSuministros > 0) {
       st.robosSuministros -= 1;
       if (st.robosSuministros > 0) {
-        // Aún le quedan robos de suministros: permanece en robar, sin poder jugar acciones intermedias
+        // Aún le quedan robos de suministros
         st.faseTurno = 'robar';
         setE(st);
       } else {
@@ -254,11 +257,10 @@ export default function ColeccionLocal({ onSalir }) {
     }
 
     if (carta.accion === 'robar_tres') {
-      // Activa los 3 robos individuales sin acciones intermedias
       const st = { ...e };
       const yo = st.jugadores[st.turnoIdx];
       yo.mano = yo.mano.filter(c => c.uid !== carta.uid);
-      (st.accionesGastadas = st.accionesGastadas || []).push(carta); // No va al descarte
+      (st.accionesGastadas = st.accionesGastadas || []).push(carta);
       st.robosSuministros = 3;
       st.faseTurno = 'robar';
       st.log.unshift(`📦 ${yo.nombre} activó Suministros: roba 3 cartas de una en una.`);
@@ -277,7 +279,70 @@ export default function ColeccionLocal({ onSalir }) {
 
   if (paso === 'setup') {
     return (
-      <div className="col-contenedor">
+      <div className="col-contenedor" style={{ position: 'relative' }}>
+        {/* Botón flotante de ayuda */}
+        <button
+          type="button"
+          className="btn-ayuda-flotante"
+          onClick={() => setModalAyuda(true)}
+          title="Reglas del juego"
+        >
+          <span className="btn-ayuda-flotante-signo">?</span>
+        </button>
+
+        {/* Modal de ayuda */}
+        {modalAyuda && (
+          <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
+            <div
+              className="rg-modal aprox-modal-ayuda"
+              onClick={(ev) => ev.stopPropagation()}
+              style={{ maxWidth: '540px', maxHeight: '88vh', overflowY: 'auto', textAlign: 'left' }}
+            >
+              <div className="aprox-modal-header">
+                <span className="aprox-modal-signo-title">?</span>
+                <h3>¿Cómo se juega a Colecciona con Cabeza?</h3>
+              </div>
+
+              <div className="aprox-modal-cuerpo">
+                <p><strong>1. Objetivo y Derrota:</strong></p>
+                <ul>
+                  <li><strong>¡Victoria!:</strong> Sé el primero en reunir <strong>5 cartas del mismo palo</strong> en tu mano[cite: 9].</li>
+                  <li><strong>💀 ¡Eliminación directa!:</strong> Si en algún momento juntas <strong>5 palos diferentes</strong> en tu mano, ¡pierdes y quedas eliminado de la partida![cite: 9]</li>
+                </ul>
+
+                <p><strong>2. Los 8 Palos del Juego:</strong></p>
+                <ul>
+                  <li>🍎 Manzana, 🍄 Seta, 💎 Diamante, 🗡️ Espada, 🧪 Poción, 👑 Corona, 🌙 Luna y ⚡ Rayo[cite: 9].</li>
+                </ul>
+
+                <p><strong>3. Dinámica del Turno (2 Pasos):</strong></p>
+                <ul>
+                  <li><strong>Paso 1 (Robar):</strong> Roba 1 carta del <strong>Mazo</strong> (boca abajo) o de la pila de <strong>Descarte</strong> (boca arriba)[cite: 9, 10].</li>
+                  <li><strong>Paso 2 (Jugar o Descartar):</strong> Descarta un palo al pozo común o activa una <strong>Carta de Acción</strong>[cite: 9, 10].</li>
+                </ul>
+
+                <p><strong>4. Cartas de Acción:</strong></p>
+                <ul>
+                  <li><strong>🔀 Ruleta:</strong> Intercambias 1 carta al azar con un rival[cite: 9, 10].</li>
+                  <li><strong>📦 Suministros:</strong> Robas 3 cartas de una en una. Al robar la 3ª termina tu turno[cite: 9, 10].</li>
+                  <li><strong>🗑️ Purga:</strong> Descarta hasta 3 cartas de tu mano[cite: 9, 10].</li>
+                  <li><strong>🎯 Robo Preciso:</strong> Miras la mano de un rival y le robas la que elijas[cite: 9, 10].</li>
+                  <li><strong>🎁 Regalo Envenenado:</strong> Le encasquetas una carta de tu mano a un rival[cite: 9, 10].</li>
+                  <li><strong>👁️‍🗨️ Espionaje:</strong> Miras todas las cartas de un rival[cite: 9, 10].</li>
+                  <li><strong>⚔️ Duelo:</strong> Pides un palo a un rival. Si lo tiene te lo da; si no, te roba él[cite: 9, 10].</li>
+                  <li><strong>🌪️ Torbellino:</strong> Intercambias tu mano entera con la de un rival[cite: 9, 10].</li>
+                </ul>
+              </div>
+
+              <div className="rg-modal-acciones" style={{ marginTop: '1.2rem' }}>
+                <button className="big full" onClick={() => setModalAyuda(false)}>
+                  Entendido
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
         <section className="game">
           <GameIntro gameId="coleccion" titulo="Colecciona con Cabeza" />
           <div className="panel">
@@ -789,7 +854,7 @@ export default function ColeccionLocal({ onSalir }) {
             <div style={{ fontSize: '3.5rem', marginBottom: '0.6rem' }}>💀</div>
             <h2 style={{ color: '#dc2626', margin: '0 0 0.6rem' }}>¡HAS SIDO ELIMINADO!</h2>
             <p className="hint" style={{ fontSize: '1rem', color: '#334155', lineHeight: '1.4', marginBottom: '1.5rem' }}>
-              <strong>{avisoDerrota.nombre}</strong>, has acumulado <strong>5 palos diferentes</strong> en tu mano. Has quedado fuera de la partida y tus cartas pasan al descarte.
+              <strong>{avisoDerrota.nombre}</strong>, has acumulado <strong>5 palos diferentes</strong> en tu mano. Has quedado fuera de la partida y tus cartas pasan al descarte[cite: 10].
             </p>
             <button className="big full" style={{ background: '#dc2626', borderColor: '#b91c1c' }} onClick={() => {
               setAvisoDerrota(null);

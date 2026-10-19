@@ -1,7 +1,9 @@
+// client/src/games/UnoADiez/UnoADiezLocal.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
 import GameIntro from '../../components/GameIntro.jsx';
 import './UnoADiez.css';
+import '../Adivina/Adivina.css';
 
 const CATEGORIAS_EJEMPLO = [
   "Nivel de dolor físico",
@@ -33,6 +35,7 @@ const getCatAleatoria = (lista) => {
 
 export default function UnoADiezLocal({ onSalir }) {
   const [paso, setPaso] = useState('setup'); // setup, pasar_pistador, ver_pista, adivinar, resolucion, fin
+  const [modalAyuda, setModalAyuda] = useState(false);
   const [numJugadores, setNumJugadores] = useState(4);
   const [nombres, setNombres] = useState(['Jugador 1', 'Jugador 2', 'Jugador 3', 'Jugador 4']);
   const [categoriasDB, setCategoriasDB] = useState([]);
@@ -71,6 +74,7 @@ export default function UnoADiezLocal({ onSalir }) {
   };
 
   const iniciarPartida = () => {
+    setModalAyuda(false);
     const jugs = nombres.map((n, i) => ({ id: i + 1, nombre: n.trim() || `Jugador ${i + 1}`, puntos: 0 }));
     const ordenAdivinadores = [...jugs.map(j => j.id)].sort(() => Math.random() - 0.5);
 
@@ -183,35 +187,89 @@ export default function UnoADiezLocal({ onSalir }) {
   const ganadores = ranking.filter(j => j.puntos === minPuntos);
 
   return (
-    <div className="uad-contenedor">
+    <div className="uad-contenedor" style={{ position: 'relative' }}>
       {/* 1. SETUP */}
       {paso === 'setup' && (
-        <section className="game">
-          <GameIntro gameId="unoadiez" titulo="Del 1 al 10... (Un dispositivo)" />
-          <div className="panel">
-            <h3 className="panel-title"><Icon name="users" size={22} /> Jugadores (2-10)</h3>
-            <label className="field-label" htmlFor="uad-num">Número de participantes</label>
-            <select id="uad-num" value={numJugadores} onChange={handleNumJugadores}>
-              {Array.from({ length: 9 }, (_, i) => i + 2).map(n => (
-                <option key={n} value={n}>{n} jugadores</option>
-              ))}
-            </select>
+        <>
+          <button
+            type="button"
+            className="btn-ayuda-flotante"
+            onClick={() => setModalAyuda(true)}
+            title="Reglas del juego"
+          >
+            <span className="btn-ayuda-flotante-signo">?</span>
+          </button>
 
-            <span className="field-label" style={{ marginTop: '1rem' }}>Nombres</span>
-            <div className="names-grid">
-              {nombres.map((n, i) => (
-                <input key={i} value={n} onChange={(e) => handleNombre(i, e.target.value)} maxLength={15} />
-              ))}
+          {modalAyuda && (
+            <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
+              <div
+                className="rg-modal aprox-modal-ayuda"
+                onClick={(e) => e.stopPropagation()}
+                style={{ maxWidth: '540px', maxHeight: '88vh', overflowY: 'auto', textAlign: 'left' }}
+              >
+                <div className="aprox-modal-header">
+                  <span className="aprox-modal-signo-title">?</span>
+                  <h3>¿Cómo se juega a Del 1 al 10...?</h3>
+                </div>
+
+                <div className="aprox-modal-cuerpo">
+                  <p><strong>1. Dinámica de la ronda:</strong></p>
+                  <ul>
+                    <li>En cada turno hay un <strong>Adivinador</strong> y un <strong>Pistador</strong>[cite: 11].</li>
+                    <li>El Pistador consulta en secreto un <strong>número del 1 al 10</strong> y una <strong>categoría aleatoria</strong>[cite: 11].</li>
+                    <li>Debe decir en voz alta una respuesta o ejemplo que encaje exactamente con esa puntuación[cite: 11]. <em>(Por ejemplo, si la categoría es "Comida picante" y el número es 10, dirá una salsa extrema; si es 1, dirá yogur)</em>.</li>
+                  </ul>
+
+                  <p><strong>2. Adivinar o Pasar:</strong></p>
+                  <ul>
+                    <li>El Adivinador tiene <strong>60 segundos</strong> para elegir un número del 1 al 10[cite: 11].</li>
+                    <li>Si no lo tiene claro, puede pulsar <strong>Pasar</strong> para que otro rival le dé una nueva pista con otra categoría (aumentando la pista de la ronda)[cite: 11].</li>
+                  </ul>
+
+                  <p><strong>3. Sistema de puntuación (¡Gana el que MENOS puntos sume!):</strong></p>
+                  <ul>
+                    <li><strong>🎯 Acierto exacto:</strong> Sumas únicamente el número de pistas necesitadas <em>(ej: a la 1ª pista = +1 punto)</em>[cite: 11].</li>
+                    <li><strong>🤏 A 1 de distancia:</strong> Sumas el número de pistas + 1 de penalización <em>(ej: a la 1ª pista = +2 puntos)</em>[cite: 11].</li>
+                    <li><strong>❌ Fallo (más de 1 de diferencia):</strong> Sumas el número de pistas + 10 de penalización <em>(ej: a la 1ª pista = +11 puntos)</em>[cite: 11].</li>
+                  </ul>
+                </div>
+
+                <div className="rg-modal-acciones" style={{ marginTop: '1.2rem' }}>
+                  <button className="big full" onClick={() => setModalAyuda(false)}>
+                    Entendido
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
 
-          <div className="actions">
-            <button className="big full" onClick={iniciarPartida}>
-              <Icon name="play" size={22} /> Empezar Partida
-            </button>
-            <button className="secondary full" onClick={onSalir}>Volver</button>
-          </div>
-        </section>
+          <section className="game">
+            <GameIntro gameId="unoadiez" titulo="Del 1 al 10... (Un dispositivo)" />
+            <div className="panel">
+              <h3 className="panel-title"><Icon name="users" size={22} /> Jugadores (2-10)</h3>
+              <label className="field-label" htmlFor="uad-num">Número de participantes</label>
+              <select id="uad-num" value={numJugadores} onChange={handleNumJugadores}>
+                {Array.from({ length: 9 }, (_, i) => i + 2).map(n => (
+                  <option key={n} value={n}>{n} jugadores</option>
+                ))}
+              </select>
+
+              <span className="field-label" style={{ marginTop: '1rem' }}>Nombres</span>
+              <div className="names-grid">
+                {nombres.map((n, i) => (
+                  <input key={i} value={n} onChange={(e) => handleNombre(i, e.target.value)} maxLength={15} />
+                ))}
+              </div>
+            </div>
+
+            <div className="actions">
+              <button className="big full" onClick={iniciarPartida}>
+                <Icon name="play" size={22} /> Empezar Partida
+              </button>
+              <button className="secondary full" onClick={onSalir}>Volver</button>
+            </div>
+          </section>
+        </>
       )}
 
       {/* 2. PASAR MÓVIL AL PISTADOR */}

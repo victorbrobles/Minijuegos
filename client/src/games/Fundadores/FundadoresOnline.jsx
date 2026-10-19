@@ -4,6 +4,7 @@ import Icon from './IconoF.jsx';
 import { PantallaDeFase, PantallaFin, Ayuda } from './Vistas.jsx';
 import { AJUSTES } from './engine.js';
 import './Fundadores.css';
+import '../Adivina/Adivina.css';
 
 const CLAVE_SESION = 'fundadores_online_session';
 const API = '/api/fundadores/online';
@@ -16,7 +17,7 @@ const post = async (url, body) => {
 };
 
 export default function FundadoresOnline({ onLocal }) {
-  const [vista, setVista] = useState('menu'); // menu | crear | unirse | sala
+  const [vista, setVista] = useState('menu'); // menu | crear | unirse | sala[cite: 14]
   const [nombre, setNombre] = useState('');
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -54,6 +55,13 @@ export default function FundadoresOnline({ onLocal }) {
     return () => clearInterval(i);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sesion]);
+
+  // Cerrar ayuda automáticamente si la partida comienza
+  useEffect(() => {
+    if (sala?.estado === 'jugando') {
+      setModalAyuda(false);
+    }
+  }, [sala?.estado]);
 
   const entrar = async (ruta, cuerpo) => {
     setErrorMsg(''); setCargando(true);
@@ -97,56 +105,115 @@ export default function FundadoresOnline({ onLocal }) {
     </div>
   );
 
+  const BotonAyudaCard = () => (
+    <button
+      type="button"
+      onClick={() => setModalAyuda(true)}
+      title="Reglas del juego"
+      style={{
+        position: 'absolute',
+        top: '1rem',
+        right: '1rem',
+        width: '38px',
+        height: '38px',
+        borderRadius: '50%',
+        border: '1.5px solid #c7d2fe',
+        backgroundColor: '#ffffff',
+        color: '#4338ca',
+        fontSize: '1.2rem',
+        fontWeight: '700',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: '0 2px 8px rgba(99, 102, 241, 0.12)',
+        padding: 0,
+        zIndex: 5
+      }}
+    >
+      ?
+    </button>
+  );
+
   return (
     <div className="fd-wrap">
-      {(vista !== 'sala' || sala?.estado === 'lobby') && (
-        <button type="button" className="btn-ayuda-flotante" onClick={() => setModalAyuda(true)} title="Reglas"><span className="btn-ayuda-flotante-signo">?</span></button>
-      )}
       {modalAyuda && <Ayuda onCerrar={() => setModalAyuda(false)} />}
       {errorMsg && vista !== 'crear' && vista !== 'unirse' && <p className="error">{errorMsg}</p>}
 
+      {/* ---------- 1. MENÚ ---------- */}
       {vista === 'menu' && (
-        <section className="game"><div className="panel fd-center">
-          <span className="fd-logo"><Icon name="landmark" size={44} strokeWidth={1.7} /></span>
-          <h1 className="title">Fundadores</h1>
-          <p className="hint">Levantad juntos un pueblo. Cada ronda eliges en secreto un oficio con poderes distintos: si adivinas qué harán los demás, el pueblo será tuyo. De 3 a 7 jugadores.</p>
-          <div className="actions">
-            <button className="big full" onClick={() => { setVista('crear'); setErrorMsg(''); }}><Icon name="crown" size={22} /> Crear partida</button>
-            <button className="big full" onClick={() => { setVista('unirse'); setErrorMsg(''); }}><Icon name="users" size={22} /> Unirse a partida</button>
-            <button className="secondary full" onClick={onLocal}><Icon name="home" size={20} /> Jugar en un solo dispositivo</button>
+        <section className="game">
+          <div className="panel fd-center" style={{ position: 'relative' }}>
+            <BotonAyudaCard />
+            <span className="fd-logo"><Icon name="landmark" size={44} strokeWidth={1.7} /></span>
+            <h1 className="title">Fundadores</h1>
+            <p className="hint">Levantad juntos un pueblo. Cada ronda eliges en secreto un oficio con poderes distintos: si adivinas qué harán los demás, el pueblo será tuyo. De 3 a 7 jugadores[cite: 14].</p>
+            <div className="actions">
+              <button className="big full" onClick={() => { setVista('crear'); setErrorMsg(''); }}><Icon name="crown" size={22} /> Crear partida</button>
+              <button className="big full" onClick={() => { setVista('unirse'); setErrorMsg(''); }}><Icon name="users" size={22} /> Unirse a partida</button>
+              <button className="secondary full" onClick={onLocal}><Icon name="home" size={20} /> Jugar en un solo dispositivo</button>
+            </div>
           </div>
-        </div></section>
+        </section>
       )}
 
+      {/* ---------- 2. CREAR / UNIRSE ---------- */}
       {(vista === 'crear' || vista === 'unirse') && (
-        <section className="game"><div className="panel fd-center">
-          <span className="fd-logo"><Icon name={vista === 'crear' ? 'crown' : 'users'} size={40} strokeWidth={1.7} /></span>
-          <h2 className="title">{vista === 'crear' ? 'Crear partida' : 'Unirse a partida'}</h2>
-          <div style={{ textAlign: 'left', marginTop: '1rem' }}>
-            {vista === 'unirse' && (<>
-              <label className="field-label" htmlFor="fd-code">Código de la sala</label>
-              <input id="fd-code" type="text" placeholder="ABCD" value={codigoInput} maxLength={4} autoFocus onChange={(e) => setCodigoInput(e.target.value.toUpperCase())}
-                style={{ textTransform: 'uppercase', letterSpacing: '4px', textAlign: 'center', fontWeight: 800 }} />
-            </>)}
-            <label className="field-label" htmlFor="fd-nombre">Tu nombre</label>
-            <input id="fd-nombre" type="text" placeholder="Tu nombre" value={nombre} maxLength={20} autoFocus={vista === 'crear'} onChange={(e) => setNombre(e.target.value)} />
-            {errorMsg && <p className="error" style={{ marginTop: '.8rem' }}>{errorMsg}</p>}
-            <button className="big full" style={{ marginTop: '1rem' }} disabled={cargando || !nombre.trim() || (vista === 'unirse' && codigoInput.trim().length < 4)}
-              onClick={() => (vista === 'crear' ? entrar('crear', { nombre: nombre.trim() }) : entrar('unirse', { code: codigoInput.trim().toUpperCase(), nombre: nombre.trim() }))}>
-              <Icon name="check" size={22} strokeWidth={2.5} /> {vista === 'crear' ? 'Crear sala' : 'Entrar en la partida'}
-            </button>
-            <button className="secondary full" style={{ marginTop: '.6rem' }} onClick={() => { setVista('menu'); setErrorMsg(''); }}>Volver</button>
-          </div>
-        </div></section>
-      )}
-
-      {vista === 'sala' && sala && sala.estado === 'lobby' && (
         <section className="game">
           <div className="panel fd-center">
-            <p className="hint" style={{ marginBottom: '.2rem' }}>Código de la partida</p>
-            <button type="button" className="fd-codigo" onClick={copiar}>{sala.code}</button>
-            <p className="hint small">{copiado ? '¡Copiado!' : 'Pulsa el código para copiarlo y compártelo.'}</p>
+            <span className="fd-logo"><Icon name={vista === 'crear' ? 'crown' : 'users'} size={40} strokeWidth={1.7} /></span>
+            <h2 className="title">{vista === 'crear' ? 'Crear partida' : 'Unirse a partida'}</h2>
+            <div style={{ textAlign: 'left', marginTop: '1rem' }}>
+              {vista === 'unirse' && (<>
+                <label className="field-label" htmlFor="fd-code">Código de la sala</label>
+                <input id="fd-code" type="text" placeholder="ABCD" value={codigoInput} maxLength={4} autoFocus onChange={(e) => setCodigoInput(e.target.value.toUpperCase())}
+                  style={{ textTransform: 'uppercase', letterSpacing: '4px', textAlign: 'center', fontWeight: 800 }} />
+              </>)}
+              <label className="field-label" htmlFor="fd-nombre">Tu nombre</label>
+              <input id="fd-nombre" type="text" placeholder="Tu nombre" value={nombre} maxLength={20} autoFocus={vista === 'crear'} onChange={(e) => setNombre(e.target.value)} />
+              {errorMsg && <p className="error" style={{ marginTop: '.8rem' }}>{errorMsg}</p>}
+              <button className="big full" style={{ marginTop: '1rem' }} disabled={cargando || !nombre.trim() || (vista === 'unirse' && codigoInput.trim().length < 4)}
+                onClick={() => (vista === 'crear' ? entrar('crear', { nombre: nombre.trim() }) : entrar('unirse', { code: codigoInput.trim().toUpperCase(), nombre: nombre.trim() }))}>
+                <Icon name="check" size={22} strokeWidth={2.5} /> {vista === 'crear' ? 'Crear sala' : 'Entrar en la partida'}
+              </button>
+              <button className="secondary full" style={{ marginTop: '.6rem' }} onClick={() => { setVista('menu'); setErrorMsg(''); }}>Volver</button>
+            </div>
           </div>
+        </section>
+      )}
+
+      {/* ---------- 3. LOBBY (SALA DE ESPERA) ---------- */}
+      {vista === 'sala' && sala && sala.estado === 'lobby' && (
+        <section className="game">
+          <div className="panel fd-center" style={{ position: 'relative' }}>
+            <BotonAyudaCard />
+
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  padding: '0.35rem 1.1rem',
+                  borderRadius: '9999px',
+                  border: '1.5px solid #22c55e',
+                  backgroundColor: '#f0fdf4',
+                  color: '#16a34a',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  lineHeight: 1
+                }}
+              >
+                <Icon name="lock" size={15} />
+                Sala de espera
+              </span>
+            </div>
+
+            <p className="hint" style={{ marginBottom: '.2rem' }}>Código de la partida</p>
+            <button type="button" className="fd-codigo" onClick={copiar} title="Copiar código">{sala.code}</button>
+            <p className="hint small">{copiado ? '¡Copiado al portapapeles!' : 'Pulsa el código para copiarlo y compártelo.'}</p>
+          </div>
+
           <div className="panel" style={{ marginTop: '1rem' }}>
             <h3 className="panel-title"><Icon name="users" size={20} /> Jugadores ({jugadores.length}/{AJUSTES.max})</h3>
             <div className="fd-lista">
@@ -156,17 +223,21 @@ export default function FundadoresOnline({ onLocal }) {
                 </div>
               ))}
             </div>
-            {jugadores.length < AJUSTES.min && <p className="hint" style={{ marginTop: '.8rem' }}>Faltan {AJUSTES.min - jugadores.length} jugadores (mínimo {AJUSTES.min}).</p>}
+            {jugadores.length < AJUSTES.min && <p className="hint" style={{ marginTop: '.8rem' }}>Faltan {AJUSTES.min - jugadores.length} jugadores (mínimo {AJUSTES.min})[cite: 14].</p>}
           </div>
+
           <div className="actions" style={{ marginTop: '1rem' }}>
             {esAdmin ? (
-              <button className="big full" disabled={jugadores.length < AJUSTES.min} onClick={() => llamar('iniciar')}><Icon name="play" size={22} /> {jugadores.length < AJUSTES.min ? 'Esperando jugadores…' : '¡A construir!'}</button>
+              <button className="big full" disabled={jugadores.length < AJUSTES.min} onClick={() => llamar('iniciar')}>
+                <Icon name="play" size={22} /> {jugadores.length < AJUSTES.min ? 'Esperando jugadores…' : '¡A construir!'}
+              </button>
             ) : <p className="hint fd-center">Esperando al anfitrión…</p>}
             <button className="secondary danger full" onClick={() => setModalSalir(true)}><Icon name="door" size={20} /> Salir de la sala</button>
           </div>
         </section>
       )}
 
+      {/* ---------- 4. EN JUEGO (La ayuda ya no se muestra) ---------- */}
       {vista === 'sala' && sala && sala.estado === 'jugando' && sala.vista && (
         sala.vista.fase !== 'fin' ? (
           <>
@@ -190,6 +261,7 @@ export default function FundadoresOnline({ onLocal }) {
         )
       )}
 
+      {/* ---------- 5. PODIO FINAL ---------- */}
       {vista === 'sala' && sala && sala.estado === 'final' && (
         <section className="game">
           <div className="end-card">
@@ -212,6 +284,7 @@ export default function FundadoresOnline({ onLocal }) {
         </section>
       )}
 
+      {/* MODAL SALIR */}
       {modalSalir && (
         <div className="fd-modal-fondo" onClick={() => setModalSalir(false)}>
           <div className="fd-modal" onClick={(e) => e.stopPropagation()}>

@@ -20,6 +20,7 @@ export default function CiegasOnline({ onLocal, onSalir }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modalSalir, setModalSalir] = useState(false);
+  const [modalAyuda, setModalAyuda] = useState(false);
 
   const [sesion, setSesion] = useState(() => {
     try {
@@ -69,6 +70,13 @@ export default function CiegasOnline({ onLocal, onSalir }) {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [sesion]);
+
+  // Cerrar ayuda si el anfitrión arranca la partida
+  useEffect(() => {
+    if (sala && sala.estado !== 'lobby') {
+      setModalAyuda(false);
+    }
+  }, [sala?.estado]);
 
   const handleCrear = async () => {
     if (!nombre.trim()) return;
@@ -186,8 +194,56 @@ export default function CiegasOnline({ onLocal, onSalir }) {
   const soyElActivo = sala?.jugadorActivoId === yoId;
   const miVoto = ronda?.votos ? ronda.votos[yoId] : undefined;
 
+  // Solo se muestra en menús o durante el lobby
+  const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
+
   return (
     <div className="cancion-contenedor">
+      {/* Botón flotante único idéntico al de CancionOnline */}
+      {mostrarAyuda && (
+        <button
+          type="button"
+          className="btn-ayuda-flotante"
+          onClick={() => setModalAyuda(true)}
+          title="Reglas del juego"
+        >
+          <span className="btn-ayuda-flotante-signo">?</span>
+        </button>
+      )}
+
+      {/* Modal con las reglas completas basadas en CiegasLocal */}
+      {modalAyuda && (
+        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
+          <div className="rg-modal aprox-modal-ayuda" onClick={(e) => e.stopPropagation()}>
+            <div className="aprox-modal-header">
+              <span className="aprox-modal-signo-title">?</span>
+              <h3>¿Cómo se juega a Ranking a Ciegas?</h3>
+            </div>
+
+            <div className="aprox-modal-cuerpo">
+              <p><strong>1. Ranking a Ciegas:</strong></p>
+              <ul>
+                <li>En cada ronda, un jugador activo debe posicionar 5 elementos en un ranking del 1º al 5º.</li>
+                <li>Los elementos van apareciendo secuencialmente uno a uno, sin conocer cuáles saldrán después.</li>
+                <li><strong>Una vez colocado un elemento en un puesto, no se puede reubicar.</strong></li>
+              </ul>
+              <p><strong>2. Votación y Puntos:</strong></p>
+              <ul>
+                <li>El resto de jugadores observan el top armado final sin saber el orden en el que fue saliendo.</li>
+                <li>Cada participante vota cuántos elementos cree que han quedado exactamente en su posición real (de 0 a 5).</li>
+                <li>¡El jugador activo suma los puntos asignados por las predicciones de sus compañeros!</li>
+              </ul>
+            </div>
+
+            <div className="rg-modal-acciones">
+              <button className="big full" onClick={() => setModalAyuda(false)}>
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 1. MENÚ ONLINE */}
       {vista === 'menu' && (
         <section className="game">
@@ -206,7 +262,7 @@ export default function CiegasOnline({ onLocal, onSalir }) {
               <button className="big full" onClick={() => { setVista('crear'); setErrorMsg(''); }}>
                 <Icon name="crown" size={22} /> Crear partida Online
               </button>
-              <button className="big full" onClick={() => { setVista('users'); setErrorMsg(''); setVista('unirse'); }}>
+              <button className="big full" onClick={() => { setVista('unirse'); setErrorMsg(''); }}>
                 <Icon name="users" size={22} /> Unirse con código
               </button>
               <button className="secondary full" onClick={onLocal}>
@@ -288,16 +344,42 @@ export default function CiegasOnline({ onLocal, onSalir }) {
         </section>
       )}
 
-      {/* 4. LOBBY */}
+      {/* 4. LOBBY (Alineado exactamente igual que CancionOnline) */}
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
         <section className="game">
           <div className="panel center">
-            <p className="categoria">Código de la partida</p>
-            <button type="button" className="qq-codigo-btn" onClick={copiarCodigo}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  padding: '0.35rem 1.1rem',
+                  borderRadius: '9999px',
+                  border: '1.5px solid #22c55e',
+                  backgroundColor: '#f0fdf4',
+                  color: '#16a34a',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  lineHeight: 1
+                }}
+              >
+                <Icon name="lock" size={15} />
+                Sala de espera
+              </span>
+            </div>
+
+            <p className="hint">Código de la partida</p>
+            <button
+              type="button"
+              className="qq-codigo-btn"
+              onClick={copiarCodigo}
+              title="Copiar código"
+            >
               {sala.code}
             </button>
             <p className="hint small">
-              {codigoCopiado ? '¡Copiado!' : 'Comparte este código para que se unan (mínimo 4 jugadores).'}
+              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Comparte este código para que se unan (mínimo 4 jugadores).'}
             </p>
           </div>
 
@@ -352,7 +434,7 @@ export default function CiegasOnline({ onLocal, onSalir }) {
         </section>
       )}
 
-      {/* 5. JUGANDO ONLINE - ARMANDO RANKING */}
+      {/* 5. JUGANDO ONLINE */}
       {vista === 'sala' && sala && sala.estado === 'armando_ranking' && ronda && (
         <section className="game">
           <div className="hud">

@@ -1,6 +1,8 @@
+// client/src/games/UnoADiez/UnoADiezOnline.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
 import './UnoADiez.css';
+import '../Adivina/Adivina.css';
 
 const CLAVE_SESION_UAD = 'unoadiez_online_session';
 
@@ -11,6 +13,7 @@ export default function UnoADiezOnline({ onLocal, onSalir }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modalSalir, setModalSalir] = useState(false);
+  const [modalAyuda, setModalAyuda] = useState(false);
   const [codigoCopiado, setCodigoCopiado] = useState(false);
 
   const [sala, setSala] = useState(null);
@@ -47,6 +50,13 @@ export default function UnoADiezOnline({ onLocal, onSalir }) {
     intervalRef.current = setInterval(consultarEstado, 1000);
     return () => clearInterval(intervalRef.current);
   }, [sesion]);
+
+  // Cierra automáticamente el modal al empezar la partida
+  useEffect(() => {
+    if (sala && sala.estado !== 'lobby') {
+      setModalAyuda(false);
+    }
+  }, [sala?.estado]);
 
   const peticionPost = async (endpoint, extraBody = {}) => {
     setCargando(true);
@@ -90,14 +100,72 @@ export default function UnoADiezOnline({ onLocal, onSalir }) {
     setTimeout(() => setCodigoCopiado(false), 2000);
   };
 
+  const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
+
+  const BotonAyuda = () => mostrarAyuda ? (
+    <button
+      type="button"
+      className="btn-ayuda-flotante"
+      onClick={() => setModalAyuda(true)}
+      title="Reglas del juego"
+    >
+      <span className="btn-ayuda-flotante-signo">?</span>
+    </button>
+  ) : null;
+
+  const ModalAyuda = () => modalAyuda ? (
+    <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
+      <div
+        className="rg-modal aprox-modal-ayuda"
+        onClick={(e) => e.stopPropagation()}
+        style={{ maxWidth: '540px', maxHeight: '88vh', overflowY: 'auto', textAlign: 'left' }}
+      >
+        <div className="aprox-modal-header">
+          <span className="aprox-modal-signo-title">?</span>
+          <h3>¿Cómo se juega a Del 1 al 10...?</h3>
+        </div>
+
+        <div className="aprox-modal-cuerpo">
+          <p><strong>1. Dinámica de la ronda:</strong></p>
+          <ul>
+            <li>En cada turno hay un <strong>Adivinador</strong> y un <strong>Pistador</strong>[cite: 12].</li>
+            <li>El Pistador consulta en la pantalla de su móvil un <strong>número del 1 al 10</strong> y una <strong>categoría aleatoria</strong>[cite: 12].</li>
+            <li>Debe dar una pista en voz alta que represente ese valor del 1 al 10[cite: 12]. <em>(Ejemplo: para "Nivel de miedo" con un 10, algo aterrador; con un 1, un cachorro)</em>.</li>
+          </ul>
+
+          <p><strong>2. Adivinar o Pasar:</strong></p>
+          <ul>
+            <li>El Adivinador tiene <strong>60 segundos</strong> para marcar su predicción en el teclado numérico[cite: 12].</li>
+            <li>Si duda, puede pulsar <strong>Pasar</strong> para que otro jugador le dé una nueva pista con otra categoría[cite: 12].</li>
+          </ul>
+
+          <p><strong>3. Puntuación (¡Gana el que MENOS puntos sume!):</strong></p>
+          <ul>
+            <li><strong>🎯 Acierto exacto:</strong> Sumas únicamente el número de pistas pedidas en la ronda <em>(+1 punto a la 1ª pista)</em>[cite: 12].</li>
+            <li><strong>🤏 A 1 de distancia:</strong> Sumas pistas + 1 de penalización <em>(+2 puntos a la 1ª pista)</em>[cite: 12].</li>
+            <li><strong>❌ Fallo (más de 1 de diferencia):</strong> Sumas pistas + 10 de penalización <em>(+11 puntos a la 1ª pista)</em>[cite: 12].</li>
+          </ul>
+        </div>
+
+        <div className="rg-modal-acciones" style={{ marginTop: '1.2rem' }}>
+          <button className="big full" onClick={() => setModalAyuda(false)}>
+            Entendido
+          </button>
+        </div>
+      </div>
+    </div>
+  ) : null;
+
   if (vista === 'menu') {
     return (
-      <div className="uad-contenedor">
+      <div className="uad-contenedor" style={{ position: 'relative' }}>
+        <BotonAyuda />
+        <ModalAyuda />
         <section className="game">
           <div className="panel center">
             <span className="lb-luna chica"><Icon name="target" size={42} strokeWidth={1.6} /></span>
             <h1 className="title">Del 1 al 10...</h1>
-            <p className="hint">Cada jugador en su propio móvil. Guiaros por opiniones para adivinar el número.</p>
+            <p className="hint">Cada jugador en su propio móvil. Guiaros por opiniones para adivinar el número[cite: 12].</p>
 
             {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
 
@@ -120,7 +188,9 @@ export default function UnoADiezOnline({ onLocal, onSalir }) {
 
   if (vista === 'crear' || vista === 'unirse') {
     return (
-      <div className="uad-contenedor">
+      <div className="uad-contenedor" style={{ position: 'relative' }}>
+        <BotonAyuda />
+        <ModalAyuda />
         <section className="game">
           <div className="panel center">
             <span className="lb-luna chica"><Icon name={vista === 'crear' ? 'crown' : 'users'} size={40} /></span>
@@ -184,13 +254,33 @@ export default function UnoADiezOnline({ onLocal, onSalir }) {
   const ganadores = ranking.filter(j => j.puntos === minPuntos);
 
   return (
-    <div className="uad-contenedor">
+    <div className="uad-contenedor" style={{ position: 'relative' }}>
+      <BotonAyuda />
+      <ModalAyuda />
+
       {/* 1. LOBBY */}
       {sala.estado === 'lobby' && (
         <section className="game">
           <div className="panel center">
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
-              <span className="chip alt"><Icon name="lock" size={15} /> Sala de espera</span>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  padding: '0.35rem 1.1rem',
+                  borderRadius: '9999px',
+                  border: '1.5px solid #22c55e',
+                  backgroundColor: '#f0fdf4',
+                  color: '#16a34a',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  lineHeight: 1
+                }}
+              >
+                <Icon name="lock" size={15} />
+                Sala de espera
+              </span>
             </div>
             <p className="hint">Código de la partida</p>
             <button type="button" className="qq-codigo-btn" onClick={copiarCodigo} title="Copiar código">
@@ -211,7 +301,7 @@ export default function UnoADiezOnline({ onLocal, onSalir }) {
               ))}
             </div>
             {sala.jugadores.length < 2 && (
-              <p className="hint" style={{ marginTop: '0.8rem' }}>Falta al menos 1 jugador para empezar (mínimo 2).</p>
+              <p className="hint" style={{ marginTop: '0.8rem' }}>Falta al menos 1 jugador para empezar (mínimo 2)[cite: 12].</p>
             )}
           </div>
 
@@ -232,7 +322,7 @@ export default function UnoADiezOnline({ onLocal, onSalir }) {
         </section>
       )}
 
-      {/* 2. JUGANDO (RONDA ACTIVA) */}
+      {/* 2. JUGANDO (RONDA ACTIVA) - La ayuda ya no aparece aquí */}
       {sala.estado === 'jugando' && (
         <section className="game">
           <div className="hud">
@@ -241,7 +331,6 @@ export default function UnoADiezOnline({ onLocal, onSalir }) {
           </div>
 
           <div className="panel center">
-            {/* Si NO eres el adivinador, ves el número secreto */}
             {!esElAdivinador && sala.numeroSecreto && (
               <div style={{ marginBottom: '1rem' }}>
                 <p className="field-label">El número que {nombreAdivinador} debe adivinar es:</p>
@@ -256,14 +345,13 @@ export default function UnoADiezOnline({ onLocal, onSalir }) {
               <p className="uad-categoria-texto">«{sala.categoriaActual}»</p>
             </div>
 
-            {/* VISTA SEGÚN EL ROL DEL JUGADOR */}
             {esElPistador ? (
               <div style={{ padding: '0.5rem 0' }}>
                 <span className="badge" style={{ background: '#fef9c3', color: '#854d0e', fontSize: '1rem', padding: '0.4rem 1rem' }}>
                   🗣️ ¡TE TOCA DAR LA PISTA!
                 </span>
                 <p className="hint" style={{ marginTop: '0.8rem', lineHeight: '1.4' }}>
-                  Di en voz alta una respuesta de esta categoría que represente un <strong>{sala.numeroSecreto} del 1 al 10</strong>.
+                  Di en voz alta una respuesta de esta categoría que represente un <strong>{sala.numeroSecreto} del 1 al 10</strong>[cite: 12].
                 </p>
               </div>
             ) : esElAdivinador ? (

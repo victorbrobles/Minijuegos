@@ -1,7 +1,9 @@
+// client/src/games/Telepatia/TelepatiaLocal.jsx
 import React, { useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import GameIntro from '../../components/GameIntro.jsx';
 import './Telepatia.css';
+import '../Adivina/Adivina.css';
 
 const PALABRAS_BASE = [
   'PLAYA', 'FÚTBOL', 'PIZZA', 'VERANO', 'VIAJE', 'NOCHE', 'CINE', 'MÚSICA',
@@ -17,6 +19,7 @@ const nombresPorDefecto = (n) => Array.from({ length: n }, (_, i) => `Jugador ${
 
 export default function TelepatiaLocal({ onSalir }) {
   const [paso, setPaso] = useState('setup'); // setup | ronda | registrar_coincidencia | registrar_no_coincidencia | resumen_ronda | fin
+  const [modalAyuda, setModalAyuda] = useState(false);
   const [numJugadores, setNumJugadores] = useState(6);
   const [nombres, setNombres] = useState(nombresPorDefecto(6));
 
@@ -38,6 +41,7 @@ export default function TelepatiaLocal({ onSalir }) {
   };
 
   const iniciarPartida = () => {
+    setModalAyuda(false);
     const jugs = nombres.map((n, i) => ({
       id: i + 1,
       nombre: n.trim() || `Jugador ${i + 1}`,
@@ -119,43 +123,96 @@ export default function TelepatiaLocal({ onSalir }) {
   const ganadores = maxPuntos > 0 ? ranking.filter(j => j.puntos === maxPuntos) : [];
 
   return (
-    <div className="tel-contenedor">
+    <div className="tel-contenedor" style={{ position: 'relative' }}>
       {/* 1. SETUP */}
       {paso === 'setup' && (
-        <section className="game">
-          <GameIntro gameId="telepatia" titulo="Telepatía (Un solo dispositivo)" />
+        <>
+          <button
+            type="button"
+            className="btn-ayuda-flotante"
+            onClick={() => setModalAyuda(true)}
+            title="Reglas del juego"
+          >
+            <span className="btn-ayuda-flotante-signo">?</span>
+          </button>
 
-          <div className="panel">
-            <h3 className="panel-title"><Icon name="users" size={22} /> Jugadores (4 a 20)</h3>
-            <label className="field-label" htmlFor="tel-num">Número de participantes</label>
-            <select id="tel-num" value={numJugadores} onChange={cambiarNumJugadores}>
-              {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => i + MIN_JUGADORES).map((k) => (
-                <option key={k} value={k}>{k} jugadores</option>
-              ))}
-            </select>
+          {modalAyuda && (
+            <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
+              <div
+                className="rg-modal aprox-modal-ayuda"
+                onClick={(e) => e.stopPropagation()}
+                style={{ maxWidth: '540px', maxHeight: '88vh', overflowY: 'auto', textAlign: 'left' }}
+              >
+                <div className="aprox-modal-header">
+                  <span className="aprox-modal-signo-title">?</span>
+                  <h3>¿Cómo se juega a Telepatía?</h3>
+                </div>
 
-            <span className="field-label" style={{ marginTop: '1rem' }}>Nombres</span>
-            <div className="names-grid">
-              {nombres.map((nombre, i) => (
-                <input
-                  key={i}
-                  type="text"
-                  value={nombre}
-                  maxLength={20}
-                  placeholder={`Jugador ${i + 1}`}
-                  onChange={(ev) => setNombres(p => p.map((x, k) => k === i ? ev.target.value : x))}
-                />
-              ))}
+                <div className="aprox-modal-cuerpo">
+                  <p><strong>1. Dinámica de la ronda:</strong></p>
+                  <ul>
+                    <li>Se muestra una <strong>Palabra Base</strong> en la pantalla[cite: 15].</li>
+                    <li>A la de tres, todos los participantes deben decir <strong>en voz alta y al mismo tiempo</strong> una palabra que asocien directamente con ella[cite: 15].</li>
+                  </ul>
+
+                  <p><strong>2. Conexión mental y puntuación:</strong></p>
+                  <ul>
+                    <li>Si <strong>2 o más jugadores dicen exactamente la misma palabra</strong>, ¡han conectado mentes y puntúan![cite: 15]</li>
+                    <li><strong>🔥 Sistema de Rachas:</strong> El primer acierto suma <strong>+1 punto</strong>. Si vuelves a coincidir en rondas consecutivas, tu racha sube (2º acierto seguido = +2 pts, 3º = +3 pts...)[cite: 15].</li>
+                    <li>Si una ronda no coincides con nadie, tu racha se resetea a 0[cite: 15].</li>
+                  </ul>
+
+                  <p><strong>3. Evolución del juego y Victoria:</strong></p>
+                  <ul>
+                    <li>La palabra que coincidió se convierte en la <strong>palabra base de la siguiente ronda</strong> (si nadie coincidió, se elige una de las dichas)[cite: 15].</li>
+                    <li>La partida consta de <strong>15 rondas</strong>[cite: 15]. ¡Gana el jugador con mayor puntuación acumulada![cite: 15]</li>
+                  </ul>
+                </div>
+
+                <div className="rg-modal-acciones" style={{ marginTop: '1.2rem' }}>
+                  <button className="big full" onClick={() => setModalAyuda(false)}>
+                    Entendido
+                  </button>
+                </div>
+              </div>
             </div>
-          </div>
+          )}
 
-          <div className="actions">
-            <button className="big full" onClick={iniciarPartida}>
-              <Icon name="play" size={22} /> Empezar Partida (15 rondas)
-            </button>
-            <button className="secondary full" onClick={onSalir}>Volver</button>
-          </div>
-        </section>
+          <section className="game">
+            <GameIntro gameId="telepatia" titulo="Telepatía (Un solo dispositivo)" />
+
+            <div className="panel">
+              <h3 className="panel-title"><Icon name="users" size={22} /> Jugadores (4 a 20)</h3>
+              <label className="field-label" htmlFor="tel-num">Número de participantes</label>
+              <select id="tel-num" value={numJugadores} onChange={cambiarNumJugadores}>
+                {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => i + MIN_JUGADORES).map((k) => (
+                  <option key={k} value={k}>{k} jugadores</option>
+                ))}
+              </select>
+
+              <span className="field-label" style={{ marginTop: '1rem' }}>Nombres</span>
+              <div className="names-grid">
+                {nombres.map((nombre, i) => (
+                  <input
+                    key={i}
+                    type="text"
+                    value={nombre}
+                    maxLength={20}
+                    placeholder={`Jugador ${i + 1}`}
+                    onChange={(ev) => setNombres(p => p.map((x, k) => k === i ? ev.target.value : x))}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="actions">
+              <button className="big full" onClick={iniciarPartida}>
+                <Icon name="play" size={22} /> Empezar Partida (15 rondas)
+              </button>
+              <button className="secondary full" onClick={onSalir}>Volver</button>
+            </div>
+          </section>
+        </>
       )}
 
       {/* 2. RONDA: MOSTRAR PALABRA */}
@@ -174,7 +231,7 @@ export default function TelepatiaLocal({ onSalir }) {
             </div>
 
             <p className="hint" style={{ fontSize: '1.05rem', lineHeight: '1.4', margin: '1rem 0' }}>
-              A la de tres, todos los jugadores deben decir <strong>en voz alta a la vez</strong> una palabra relacionada con <strong>{palabraActual}</strong>.
+              A la de tres, todos los jugadores deben decir <strong>en voz alta a la vez</strong> una palabra relacionada con <strong>{palabraActual}</strong>[cite: 15].
             </p>
 
             <div className="lb-form" style={{ marginTop: '1.5rem' }}>

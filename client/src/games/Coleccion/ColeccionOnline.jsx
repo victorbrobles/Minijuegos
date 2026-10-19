@@ -1,6 +1,8 @@
+// client/src/games/Coleccion/ColeccionOnline.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
 import './Coleccion.css';
+import '../Adivina/Adivina.css';
 
 const CLAVE_SESION_COL = 'coleccion_online_session';
 
@@ -33,6 +35,8 @@ export default function ColeccionOnline({ onLocal, onSalir }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modalSalir, setModalSalir] = useState(false);
+  const [modalAyuda, setModalAyuda] = useState(false);
+  const [codigoCopiado, setCodigoCopiado] = useState(false);
 
   const [modal, setModal] = useState(null);
   const [purgaSeleccionadas, setPurgaSeleccionadas] = useState([]);
@@ -75,6 +79,13 @@ export default function ColeccionOnline({ onLocal, onSalir }) {
     return () => clearInterval(intervalRef.current);
   }, [sesion]);
 
+  // Cierra automáticamente la ayuda al iniciarse la partida
+  useEffect(() => {
+    if (sala && sala.estado !== 'lobby') {
+      setModalAyuda(false);
+    }
+  }, [sala?.estado]);
+
   const peticionPost = async (endpoint, extraBody = {}) => {
     setCargando(true);
     setErrorMsg('');
@@ -114,9 +125,83 @@ export default function ColeccionOnline({ onLocal, onSalir }) {
     setModalSalir(false);
   };
 
+  const copiarCodigo = () => {
+    if (!sala?.code) return;
+    navigator.clipboard?.writeText(sala.code);
+    setCodigoCopiado(true);
+    setTimeout(() => setCodigoCopiado(false), 2000);
+  };
+
+  const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
+
+  const BotonAyuda = () => mostrarAyuda ? (
+    <button
+      type="button"
+      className="btn-ayuda-flotante"
+      onClick={() => setModalAyuda(true)}
+      title="Reglas del juego"
+    >
+      <span className="btn-ayuda-flotante-signo">?</span>
+    </button>
+  ) : null;
+
+  const ModalAyuda = () => modalAyuda ? (
+    <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
+      <div
+        className="rg-modal aprox-modal-ayuda"
+        onClick={(e) => e.stopPropagation()}
+        style={{ maxWidth: '540px', maxHeight: '88vh', overflowY: 'auto', textAlign: 'left' }}
+      >
+        <div className="aprox-modal-header">
+          <span className="aprox-modal-signo-title">?</span>
+          <h3>¿Cómo se juega a Colecciona con Cabeza?</h3>
+        </div>
+
+        <div className="aprox-modal-cuerpo">
+          <p><strong>1. Objetivo y Derrota:</strong></p>
+          <ul>
+            <li><strong>¡Victoria!:</strong> Sé el primero en reunir <strong>5 cartas del mismo palo</strong> en tu mano.</li>
+            <li><strong>💀 ¡Eliminación directa!:</strong> Si en algún momento acumulas <strong>5 palos diferentes</strong> en tu mano, ¡pierdes y quedas eliminado de la partida!</li>
+          </ul>
+
+          <p><strong>2. Los 8 Palos del Juego:</strong></p>
+          <ul>
+            <li>🍎 Manzana, 🍄 Seta, 💎 Diamante, 🗡️ Espada, 🧪 Poción, 👑 Corona, 🌙 Luna y ⚡ Rayo.</li>
+          </ul>
+
+          <p><strong>3. Dinámica del Turno (2 Pasos):</strong></p>
+          <ul>
+            <li><strong>Paso 1 (Robar):</strong> Roba 1 carta del <strong>Mazo</strong> (oculta) o de la pila de <strong>Descarte</strong> (visible).</li>
+            <li><strong>Paso 2 (Jugar o Descartar):</strong> Puedes descartar un palo al montón común o activar el efecto de una <strong>Carta de Acción</strong>.</li>
+          </ul>
+
+          <p><strong>4. Cartas de Acción:</strong></p>
+          <ul>
+            <li><strong>🔀 Ruleta:</strong> Intercambias 1 carta al azar con un rival.</li>
+            <li><strong>📦 Suministros:</strong> Robas 3 cartas de una en una (del mazo o descarte). Al robar la 3ª acaba tu turno.</li>
+            <li><strong>🗑️ Purga:</strong> Descarta hasta 3 cartas de tu mano.</li>
+            <li><strong>🎯 Robo Preciso:</strong> Miras la mano de un rival y le robas la carta que tú elijas.</li>
+            <li><strong>🎁 Regalo Envenenado:</strong> Le encasquetas una carta de tu mano a un rival (¡ideal para forzarle su 5º palo distinto!).</li>
+            <li><strong>👁️‍🗨️ Espionaje:</strong> Miras todas las cartas de la mano de un rival.</li>
+            <li><strong>⚔️ Duelo:</strong> Retas a un rival y pides un palo. Si lo tiene te lo da; si no, te roba él una carta a ti.</li>
+            <li><strong>🌪️ Torbellino:</strong> Intercambias tu mano entera con la de un rival.</li>
+          </ul>
+        </div>
+
+        <div className="rg-modal-acciones" style={{ marginTop: '1.2rem' }}>
+          <button className="big full" onClick={() => setModalAyuda(false)}>
+            Entendido
+          </button>
+        </div>
+      </div>
+    </div>
+  ) : null;
+
   if (vista === 'menu') {
     return (
-      <div className="col-contenedor">
+      <div className="col-contenedor" style={{ position: 'relative' }}>
+        <BotonAyuda />
+        <ModalAyuda />
         <section className="game">
           <div className="panel center">
             <span className="lb-luna chica"><Icon name="cards" size={42} strokeWidth={1.6} /></span>
@@ -136,7 +221,9 @@ export default function ColeccionOnline({ onLocal, onSalir }) {
 
   if (vista === 'crear' || vista === 'unirse') {
     return (
-      <div className="col-contenedor">
+      <div className="col-contenedor" style={{ position: 'relative' }}>
+        <BotonAyuda />
+        <ModalAyuda />
         <section className="game">
           <div className="panel center">
             <span className="lb-luna chica"><Icon name={vista === 'crear' ? 'crown' : 'users'} size={40} /></span>
@@ -170,12 +257,43 @@ export default function ColeccionOnline({ onLocal, onSalir }) {
 
   if (sala.estado === 'lobby') {
     return (
-      <div className="col-contenedor">
+      <div className="col-contenedor" style={{ position: 'relative' }}>
+        <BotonAyuda />
+        <ModalAyuda />
         <section className="game">
           <div className="panel center">
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}><span className="chip alt"><Icon name="lock" size={15} />Sala de espera</span></div>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  padding: '0.35rem 1.1rem',
+                  borderRadius: '9999px',
+                  border: '1.5px solid #22c55e',
+                  backgroundColor: '#f0fdf4',
+                  color: '#16a34a',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  lineHeight: 1
+                }}
+              >
+                <Icon name="lock" size={15} />
+                Sala de espera
+              </span>
+            </div>
             <p className="hint">Código de la partida</p>
-            <button type="button" className="qq-codigo-btn" onClick={() => { navigator.clipboard?.writeText(sala.code); }}>{sala.code}</button>
+            <button
+              type="button"
+              className="qq-codigo-btn"
+              onClick={copiarCodigo}
+              title="Copiar código"
+            >
+              {sala.code}
+            </button>
+            <p className="hint small">
+              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Comparte este código para que se unan (2 a 8 jugadores).'}
+            </p>
           </div>
           <div className="panel" style={{ marginTop: '1rem' }}>
             <h3 className="panel-title"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length}/8)</h3>
@@ -191,6 +309,22 @@ export default function ColeccionOnline({ onLocal, onSalir }) {
             <button className="secondary danger full" onClick={() => setModalSalir(true)}><Icon name="door" size={20} /> Salir</button>
           </div>
         </section>
+
+        {modalSalir && (
+          <div className="rg-modal-fondo" onClick={() => setModalSalir(false)}>
+            <div className="rg-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}>
+              <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
+              <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>¿Abandonar la partida?</h3>
+              <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem' }}>
+                Saldrás de la sala de espera. ¿Deseas salir?
+              </p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+                <button type="button" className="secondary full" onClick={() => setModalSalir(false)}>No, quedarme</button>
+                <button type="button" className="secondary danger full" style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }} onClick={handleSalir}>Sí, salir</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
@@ -586,6 +720,23 @@ export default function ColeccionOnline({ onLocal, onSalir }) {
             <button className="big full" onClick={() => setAvisoDerrotaVisto(true)}>
               Entendido
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Modal confirmación para salir en juego */}
+      {modalSalir && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalir(false)}>
+          <div className="rg-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}>
+            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
+            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>¿Abandonar la partida?</h3>
+            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem' }}>
+              Si sales de la sala perderás tu progreso en la partida. ¿Estás seguro de que deseas salir?
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+              <button type="button" className="secondary full" onClick={() => setModalSalir(false)}>No, quedarme</button>
+              <button type="button" className="secondary danger full" style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }} onClick={handleSalir}>Sí, salir</button>
+            </div>
           </div>
         </div>
       )}

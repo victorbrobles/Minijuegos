@@ -1,10 +1,11 @@
 // client/src/games/Fundadores/FundadoresLocal.jsx
-// Modo de un solo dispositivo: el móvil pasa de mano en mano (elección secreta de oficio y turnos).
+// Modo de un solo dispositivo: el móvil pasa de mano en mano (elección secreta de oficio y turnos)[cite: 13].
 import React, { useRef, useState } from 'react';
 import Icon from './IconoF.jsx';
 import * as E from './engine.js';
 import { PantallaDeFase, PantallaFin, Ayuda, Registro } from './Vistas.jsx';
 import './Fundadores.css';
+import '../Adivina/Adivina.css';
 
 export default function FundadoresLocal({ onVolver }) {
   const [paso, setPaso] = useState('config');
@@ -13,7 +14,7 @@ export default function FundadoresLocal({ onVolver }) {
   const [ayuda, setAyuda] = useState(false);
   const estRef = useRef(null);
   const [, setVer] = useState(0);
-  const [confirmado, setConfirmado] = useState(null); // clave del turno ya confirmado ("soy yo")
+  const [confirmado, setConfirmado] = useState(null); // clave del turno ya confirmado ("soy yo")[cite: 13]
   const refrescar = () => setVer((x) => x + 1);
 
   const empezar = () => {
@@ -29,12 +30,41 @@ export default function FundadoresLocal({ onVolver }) {
   if (paso === 'config') {
     return (
       <div className="fd-wrap">
-        <button type="button" className="btn-ayuda-flotante" onClick={() => setAyuda(true)}><span className="btn-ayuda-flotante-signo">?</span></button>
         {ayuda && <Ayuda onCerrar={() => setAyuda(false)} />}
-        <div className="panel fd-center">
+        
+        <div className="panel fd-center" style={{ position: 'relative' }}>
+          {/* Botón ? en la esquina superior derecha del panel */}
+          <button
+            type="button"
+            onClick={() => setAyuda(true)}
+            title="Reglas del juego"
+            style={{
+              position: 'absolute',
+              top: '1rem',
+              right: '1rem',
+              width: '38px',
+              height: '38px',
+              borderRadius: '50%',
+              border: '1.5px solid #c7d2fe',
+              backgroundColor: '#ffffff',
+              color: '#4338ca',
+              fontSize: '1.2rem',
+              fontWeight: '700',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 2px 8px rgba(99, 102, 241, 0.12)',
+              padding: 0,
+              zIndex: 5
+            }}
+          >
+            ?
+          </button>
+
           <span className="fd-logo"><Icon name="landmark" size={44} strokeWidth={1.7} /></span>
           <h1 className="title">Fundadores · un dispositivo</h1>
-          <p className="hint">Pasaos el móvil: cada uno elige su oficio en secreto y juega su turno cuando se le llame. De 3 a 7 jugadores.</p>
+          <p className="hint">Pasaos el móvil: cada uno elige su oficio en secreto y juega su turno cuando se le llame. De 3 a 7 jugadores[cite: 13].</p>
           <div className="fd-nombres" style={{ textAlign: 'left' }}>
             {nombres.map((n, i) => (
               <div key={i} className="fd-nombre-fila">

@@ -1,6 +1,8 @@
+// client/src/games/Telepatia/TelepatiaOnline.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
 import './Telepatia.css';
+import '../Adivina/Adivina.css';
 
 const CLAVE_SESION_TEL = 'telepatia_online_session';
 
@@ -11,6 +13,7 @@ export default function TelepatiaOnline({ onLocal, onSalir }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modalSalir, setModalSalir] = useState(false);
+  const [modalAyuda, setModalAyuda] = useState(false);
   const [codigoCopiado, setCodigoCopiado] = useState(false);
 
   // Input de palabra del jugador
@@ -52,6 +55,13 @@ export default function TelepatiaOnline({ onLocal, onSalir }) {
     intervalRef.current = setInterval(consultarEstado, 1000);
     return () => clearInterval(intervalRef.current);
   }, [sesion]);
+
+  // Cierra automáticamente el modal al empezar la partida
+  useEffect(() => {
+    if (sala && sala.estado !== 'lobby') {
+      setModalAyuda(false);
+    }
+  }, [sala?.estado]);
 
   const peticionPost = async (endpoint, extraBody = {}) => {
     setCargando(true);
@@ -97,7 +107,7 @@ export default function TelepatiaOnline({ onLocal, onSalir }) {
     setTimeout(() => setCodigoCopiado(false), 2000);
   };
 
-  // Al pasar a estado 'escribiendo', reiniciar el input y enfocar
+  // Al pasar a estado 'escribiendo', reiniciar el input y enfocar[cite: 16]
   useEffect(() => {
     if (sala?.estado === 'escribiendo') {
       setMiPalabra('');
@@ -112,14 +122,89 @@ export default function TelepatiaOnline({ onLocal, onSalir }) {
     peticionPost(`sala/${sesion.code}/enviar-palabra`, { palabra: miPalabra.trim() });
   };
 
+  const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
+
+  const BotonAyudaCard = () => (
+    <button
+      type="button"
+      onClick={() => setModalAyuda(true)}
+      title="Reglas del juego"
+      style={{
+        position: 'absolute',
+        top: '1rem',
+        right: '1rem',
+        width: '38px',
+        height: '38px',
+        borderRadius: '50%',
+        border: '1.5px solid #c7d2fe',
+        backgroundColor: '#ffffff',
+        color: '#4338ca',
+        fontSize: '1.2rem',
+        fontWeight: '700',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: '0 2px 8px rgba(99, 102, 241, 0.12)',
+        padding: 0,
+        zIndex: 5
+      }}
+    >
+      ?
+    </button>
+  );
+
+  const ModalAyuda = () => modalAyuda ? (
+    <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
+      <div
+        className="rg-modal aprox-modal-ayuda"
+        onClick={(e) => e.stopPropagation()}
+        style={{ maxWidth: '540px', maxHeight: '88vh', overflowY: 'auto', textAlign: 'left' }}
+      >
+        <div className="aprox-modal-header">
+          <span className="aprox-modal-signo-title">?</span>
+          <h3>¿Cómo se juega a Telepatía?</h3>
+        </div>
+
+        <div className="aprox-modal-cuerpo">
+          <p><strong>1. Dinámica de la ronda:</strong></p>
+          <ul>
+            <li>En cada ronda aparece una <strong>Palabra de Origen</strong> común para todos los móviles[cite: 16].</li>
+            <li>Tienes <strong>5 segundos</strong> para escribir una palabra que relaciones mentalmente con ella y pulsar Enviar[cite: 16].</li>
+          </ul>
+
+          <p><strong>2. Coincidencias y Rachas:</strong></p>
+          <ul>
+            <li>El sistema compara todas las palabras enviadas. Si <strong>2 o más jugadores escriben exactamente la misma</strong>, ¡conectan mentes y suman puntos![cite: 16]</li>
+            <li><strong>🔥 Racha multiplicadora:</strong> La 1ª coincidencia suma <strong>+1 punto</strong>. Si vuelves a coincidir en la ronda siguiente consecutiva, tu racha sube (+2 pts, +3 pts...)[cite: 16].</li>
+            <li>Si no coincides en una ronda, tu racha vuelve a empezar desde cero[cite: 16].</li>
+          </ul>
+
+          <p><strong>3. Fin de partida:</strong></p>
+          <ul>
+            <li>Se juegan <strong>15 rondas</strong> de máxima velocidad mental[cite: 16]. ¡El jugador que lidere la clasificación al final gana la partida![cite: 16]</li>
+          </ul>
+        </div>
+
+        <div className="rg-modal-acciones" style={{ marginTop: '1.2rem' }}>
+          <button className="big full" onClick={() => setModalAyuda(false)}>
+            Entendido
+          </button>
+        </div>
+      </div>
+    </div>
+  ) : null;
+
   if (vista === 'menu') {
     return (
-      <div className="tel-contenedor">
+      <div className="tel-contenedor" style={{ position: 'relative' }}>
+        <ModalAyuda />
         <section className="game">
-          <div className="panel center">
+          <div className="panel center" style={{ position: 'relative' }}>
+            <BotonAyudaCard />
             <span className="lb-luna chica"><Icon name="zap" size={42} strokeWidth={1.6} /></span>
             <h1 className="title">Telepatía</h1>
-            <p className="hint">Escribid la misma palabra en 5 segundos. ¡Conectad vuestras mentes! (4 a 20 jugadores).</p>
+            <p className="hint">Escribid la misma palabra en 5 segundos. ¡Conectad vuestras mentes! (4 a 20 jugadores)[cite: 16].</p>
             {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
             <div className="lb-menu">
               <button className="big full" onClick={() => { setVista('crear'); setErrorMsg(''); }}>
@@ -140,7 +225,8 @@ export default function TelepatiaOnline({ onLocal, onSalir }) {
 
   if (vista === 'crear' || vista === 'unirse') {
     return (
-      <div className="tel-contenedor">
+      <div className="tel-contenedor" style={{ position: 'relative' }}>
+        <ModalAyuda />
         <section className="game">
           <div className="panel center">
             <span className="lb-luna chica"><Icon name={vista === 'crear' ? 'crown' : 'users'} size={40} /></span>
@@ -197,20 +283,42 @@ export default function TelepatiaOnline({ onLocal, onSalir }) {
   const ganadores = maxPuntos > 0 ? ranking.filter(j => j.puntos === maxPuntos) : [];
 
   return (
-    <div className="tel-contenedor">
+    <div className="tel-contenedor" style={{ position: 'relative' }}>
+      <ModalAyuda />
+
       {/* 1. LOBBY ONLINE */}
       {sala.estado === 'lobby' && (
         <section className="game">
-          <div className="panel center">
+          <div className="panel center" style={{ position: 'relative' }}>
+            <BotonAyudaCard />
+
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
-              <span className="chip alt"><Icon name="lock" size={15} /> Sala de espera</span>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  padding: '0.35rem 1.1rem',
+                  borderRadius: '9999px',
+                  border: '1.5px solid #22c55e',
+                  backgroundColor: '#f0fdf4',
+                  color: '#16a34a',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  lineHeight: 1
+                }}
+              >
+                <Icon name="lock" size={15} />
+                Sala de espera
+              </span>
             </div>
+
             <p className="hint">Código de la partida</p>
             <button type="button" className="qq-codigo-btn" onClick={copiarCodigo} title="Copiar código">
               {sala.code}
             </button>
             <p className="hint small">
-              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Compártelo con los demás para que se unan.'}
+              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Compártelo con los demás para que se unan[cite: 16].'}
             </p>
           </div>
 
@@ -224,9 +332,9 @@ export default function TelepatiaOnline({ onLocal, onSalir }) {
               ))}
             </div>
             {faltan > 0 ? (
-              <p className="hint" style={{ marginTop: '0.8rem' }}>Faltan {faltan} jugador{faltan === 1 ? '' : 'es'} para poder empezar (mínimo 4).</p>
+              <p className="hint" style={{ marginTop: '0.8rem' }}>Faltan {faltan} jugador{faltan === 1 ? '' : 'es'} para poder empezar (mínimo 4)[cite: 16].</p>
             ) : (
-              <p className="hint ok" style={{ marginTop: '0.8rem' }}>¡Ya sois suficientes! El anfitrión puede empezar.</p>
+              <p className="hint ok" style={{ marginTop: '0.8rem' }}>¡Ya sois suficientes! El anfitrión puede empezar[cite: 16].</p>
             )}
           </div>
 
@@ -247,7 +355,7 @@ export default function TelepatiaOnline({ onLocal, onSalir }) {
         </section>
       )}
 
-      {/* 2. ESCRIBIENDO (5 SEGUNDOS) */}
+      {/* 2. ESCRIBIENDO (5 SEGUNDOS) - Ayuda oculta */}
       {sala.estado === 'escribiendo' && (
         <section className="game">
           <div className="hud">
@@ -266,7 +374,7 @@ export default function TelepatiaOnline({ onLocal, onSalir }) {
             </div>
 
             <p className="hint" style={{ marginBottom: '1rem' }}>
-              Escribe una palabra relacionada antes de que el contador llegue a 0:
+              Escribe una palabra relacionada antes de que el contador llegue a 0[cite: 16]:
             </p>
 
             <form onSubmit={(e) => { e.preventDefault(); enviarPalabra(); }}>
