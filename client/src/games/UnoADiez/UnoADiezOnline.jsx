@@ -128,22 +128,22 @@ export default function UnoADiezOnline({ onLocal, onSalir }) {
         <div className="aprox-modal-cuerpo">
           <p><strong>1. Dinámica de la ronda:</strong></p>
           <ul>
-            <li>En cada turno hay un <strong>Adivinador</strong> y un <strong>Pistador</strong>[cite: 12].</li>
-            <li>El Pistador consulta en la pantalla de su móvil un <strong>número del 1 al 10</strong> y una <strong>categoría aleatoria</strong>[cite: 12].</li>
-            <li>Debe dar una pista en voz alta que represente ese valor del 1 al 10[cite: 12]. <em>(Ejemplo: para "Nivel de miedo" con un 10, algo aterrador; con un 1, un cachorro)</em>.</li>
+            <li>En cada turno hay un <strong>Adivinador</strong> y un <strong>Pistador</strong>.</li>
+            <li>El Pistador consulta en la pantalla de su móvil un <strong>número del 1 al 10</strong> y una <strong>categoría aleatoria</strong>.</li>
+            <li>Debe dar una pista en voz alta que represente ese valor del 1 al 10. <em>(Ejemplo: para "Nivel de miedo" con un 10, algo aterrador; con un 1, un cachorro)</em>.</li>
           </ul>
 
           <p><strong>2. Adivinar o Pasar:</strong></p>
           <ul>
-            <li>El Adivinador tiene <strong>60 segundos</strong> para marcar su predicción en el teclado numérico[cite: 12].</li>
-            <li>Si duda, puede pulsar <strong>Pasar</strong> para que otro jugador le dé una nueva pista con otra categoría[cite: 12].</li>
+            <li>El Adivinador tiene <strong>60 segundos</strong> para marcar su predicción en el teclado numérico.</li>
+            <li>Si duda, puede pulsar <strong>Pasar</strong> para que otro jugador le dé una nueva pista con otra categoría.</li>
           </ul>
 
           <p><strong>3. Puntuación (¡Gana el que MENOS puntos sume!):</strong></p>
           <ul>
-            <li><strong>🎯 Acierto exacto:</strong> Sumas únicamente el número de pistas pedidas en la ronda <em>(+1 punto a la 1ª pista)</em>[cite: 12].</li>
-            <li><strong>🤏 A 1 de distancia:</strong> Sumas pistas + 1 de penalización <em>(+2 puntos a la 1ª pista)</em>[cite: 12].</li>
-            <li><strong>❌ Fallo (más de 1 de diferencia):</strong> Sumas pistas + 10 de penalización <em>(+11 puntos a la 1ª pista)</em>[cite: 12].</li>
+            <li><strong>🎯 Acierto exacto:</strong> Sumas únicamente el número de pistas pedidas en la ronda <em>(+1 punto a la 1ª pista)</em>.</li>
+            <li><strong>🤏 A 1 de distancia:</strong> Sumas pistas + 1 de penalización <em>(+2 puntos a la 1ª pista)</em>.</li>
+            <li><strong>❌ Fallo (más de 1 de diferencia):</strong> Sumas pistas + 10 de penalización <em>(+11 puntos a la 1ª pista)</em>.</li>
           </ul>
         </div>
 
@@ -165,7 +165,7 @@ export default function UnoADiezOnline({ onLocal, onSalir }) {
           <div className="panel center">
             <span className="lb-luna chica"><Icon name="target" size={42} strokeWidth={1.6} /></span>
             <h1 className="title">Del 1 al 10...</h1>
-            <p className="hint">Cada jugador en su propio móvil. Guiaros por opiniones para adivinar el número[cite: 12].</p>
+            <p className="hint">Cada jugador en su propio móvil. Guiaros por opiniones para adivinar el número.</p>
 
             {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
 
@@ -301,7 +301,7 @@ export default function UnoADiezOnline({ onLocal, onSalir }) {
               ))}
             </div>
             {sala.jugadores.length < 2 && (
-              <p className="hint" style={{ marginTop: '0.8rem' }}>Falta al menos 1 jugador para empezar (mínimo 2)[cite: 12].</p>
+              <p className="hint" style={{ marginTop: '0.8rem' }}>Falta al menos 1 jugador para empezar (mínimo 2).</p>
             )}
           </div>
 
@@ -351,7 +351,7 @@ export default function UnoADiezOnline({ onLocal, onSalir }) {
                   🗣️ ¡TE TOCA DAR LA PISTA!
                 </span>
                 <p className="hint" style={{ marginTop: '0.8rem', lineHeight: '1.4' }}>
-                  Di en voz alta una respuesta de esta categoría que represente un <strong>{sala.numeroSecreto} del 1 al 10</strong>[cite: 12].
+                  Di en voz alta una respuesta de esta categoría que represente un <strong>{sala.numeroSecreto} del 1 al 10</strong>.
                 </p>
               </div>
             ) : esElAdivinador ? (

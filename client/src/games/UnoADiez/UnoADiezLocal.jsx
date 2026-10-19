@@ -215,22 +215,22 @@ export default function UnoADiezLocal({ onSalir }) {
                 <div className="aprox-modal-cuerpo">
                   <p><strong>1. Dinámica de la ronda:</strong></p>
                   <ul>
-                    <li>En cada turno hay un <strong>Adivinador</strong> y un <strong>Pistador</strong>[cite: 11].</li>
-                    <li>El Pistador consulta en secreto un <strong>número del 1 al 10</strong> y una <strong>categoría aleatoria</strong>[cite: 11].</li>
-                    <li>Debe decir en voz alta una respuesta o ejemplo que encaje exactamente con esa puntuación[cite: 11]. <em>(Por ejemplo, si la categoría es "Comida picante" y el número es 10, dirá una salsa extrema; si es 1, dirá yogur)</em>.</li>
+                    <li>En cada turno hay un <strong>Adivinador</strong> y un <strong>Pistador</strong>.</li>
+                    <li>El Pistador consulta en secreto un <strong>número del 1 al 10</strong> y una <strong>categoría aleatoria</strong>.</li>
+                    <li>Debe decir en voz alta una respuesta o ejemplo que encaje exactamente con esa puntuación. <em>(Por ejemplo, si la categoría es "Comida picante" y el número es 10, dirá una salsa extrema; si es 1, dirá yogur)</em>.</li>
                   </ul>
 
                   <p><strong>2. Adivinar o Pasar:</strong></p>
                   <ul>
-                    <li>El Adivinador tiene <strong>60 segundos</strong> para elegir un número del 1 al 10[cite: 11].</li>
-                    <li>Si no lo tiene claro, puede pulsar <strong>Pasar</strong> para que otro rival le dé una nueva pista con otra categoría (aumentando la pista de la ronda)[cite: 11].</li>
+                    <li>El Adivinador tiene <strong>60 segundos</strong> para elegir un número del 1 al 10.</li>
+                    <li>Si no lo tiene claro, puede pulsar <strong>Pasar</strong> para que otro rival le dé una nueva pista con otra categoría (aumentando la pista de la ronda).</li>
                   </ul>
 
                   <p><strong>3. Sistema de puntuación (¡Gana el que MENOS puntos sume!):</strong></p>
                   <ul>
-                    <li><strong>🎯 Acierto exacto:</strong> Sumas únicamente el número de pistas necesitadas <em>(ej: a la 1ª pista = +1 punto)</em>[cite: 11].</li>
-                    <li><strong>🤏 A 1 de distancia:</strong> Sumas el número de pistas + 1 de penalización <em>(ej: a la 1ª pista = +2 puntos)</em>[cite: 11].</li>
-                    <li><strong>❌ Fallo (más de 1 de diferencia):</strong> Sumas el número de pistas + 10 de penalización <em>(ej: a la 1ª pista = +11 puntos)</em>[cite: 11].</li>
+                    <li><strong>🎯 Acierto exacto:</strong> Sumas únicamente el número de pistas necesitadas <em>(ej: a la 1ª pista = +1 punto)</em>.</li>
+                    <li><strong>🤏 A 1 de distancia:</strong> Sumas el número de pistas + 1 de penalización <em>(ej: a la 1ª pista = +2 puntos)</em>.</li>
+                    <li><strong>❌ Fallo (más de 1 de diferencia):</strong> Sumas el número de pistas + 10 de penalización <em>(ej: a la 1ª pista = +11 puntos)</em>.</li>
                   </ul>
                 </div>
 

@@ -306,31 +306,31 @@ export default function ColeccionLocal({ onSalir }) {
               <div className="aprox-modal-cuerpo">
                 <p><strong>1. Objetivo y Derrota:</strong></p>
                 <ul>
-                  <li><strong>¡Victoria!:</strong> Sé el primero en reunir <strong>5 cartas del mismo palo</strong> en tu mano[cite: 9].</li>
-                  <li><strong>💀 ¡Eliminación directa!:</strong> Si en algún momento juntas <strong>5 palos diferentes</strong> en tu mano, ¡pierdes y quedas eliminado de la partida![cite: 9]</li>
+                  <li><strong>¡Victoria!:</strong> Sé el primero en reunir <strong>5 cartas del mismo palo</strong> en tu mano.</li>
+                  <li><strong>💀 ¡Eliminación directa!:</strong> Si en algún momento juntas <strong>5 palos diferentes</strong> en tu mano, ¡pierdes y quedas eliminado de la partida!</li>
                 </ul>
 
                 <p><strong>2. Los 8 Palos del Juego:</strong></p>
                 <ul>
-                  <li>🍎 Manzana, 🍄 Seta, 💎 Diamante, 🗡️ Espada, 🧪 Poción, 👑 Corona, 🌙 Luna y ⚡ Rayo[cite: 9].</li>
+                  <li>🍎 Manzana, 🍄 Seta, 💎 Diamante, 🗡️ Espada, 🧪 Poción, 👑 Corona, 🌙 Luna y ⚡ Rayo.</li>
                 </ul>
 
                 <p><strong>3. Dinámica del Turno (2 Pasos):</strong></p>
                 <ul>
-                  <li><strong>Paso 1 (Robar):</strong> Roba 1 carta del <strong>Mazo</strong> (boca abajo) o de la pila de <strong>Descarte</strong> (boca arriba)[cite: 9, 10].</li>
-                  <li><strong>Paso 2 (Jugar o Descartar):</strong> Descarta un palo al pozo común o activa una <strong>Carta de Acción</strong>[cite: 9, 10].</li>
+                  <li><strong>Paso 1 (Robar):</strong> Roba 1 carta del <strong>Mazo</strong> (boca abajo) o de la pila de <strong>Descarte</strong> (boca arriba).</li>
+                  <li><strong>Paso 2 (Jugar o Descartar):</strong> Descarta un palo al pozo común o activa una <strong>Carta de Acción</strong>.</li>
                 </ul>
 
                 <p><strong>4. Cartas de Acción:</strong></p>
                 <ul>
-                  <li><strong>🔀 Ruleta:</strong> Intercambias 1 carta al azar con un rival[cite: 9, 10].</li>
-                  <li><strong>📦 Suministros:</strong> Robas 3 cartas de una en una. Al robar la 3ª termina tu turno[cite: 9, 10].</li>
-                  <li><strong>🗑️ Purga:</strong> Descarta hasta 3 cartas de tu mano[cite: 9, 10].</li>
-                  <li><strong>🎯 Robo Preciso:</strong> Miras la mano de un rival y le robas la que elijas[cite: 9, 10].</li>
-                  <li><strong>🎁 Regalo Envenenado:</strong> Le encasquetas una carta de tu mano a un rival[cite: 9, 10].</li>
-                  <li><strong>👁️‍🗨️ Espionaje:</strong> Miras todas las cartas de un rival[cite: 9, 10].</li>
-                  <li><strong>⚔️ Duelo:</strong> Pides un palo a un rival. Si lo tiene te lo da; si no, te roba él[cite: 9, 10].</li>
-                  <li><strong>🌪️ Torbellino:</strong> Intercambias tu mano entera con la de un rival[cite: 9, 10].</li>
+                  <li><strong>🔀 Ruleta:</strong> Intercambias 1 carta al azar con un rival.</li>
+                  <li><strong>📦 Suministros:</strong> Robas 3 cartas de una en una. Al robar la 3ª termina tu turno.</li>
+                  <li><strong>🗑️ Purga:</strong> Descarta hasta 3 cartas de tu mano.</li>
+                  <li><strong>🎯 Robo Preciso:</strong> Miras la mano de un rival y le robas la que elijas.</li>
+                  <li><strong>🎁 Regalo Envenenado:</strong> Le encasquetas una carta de tu mano a un rival.</li>
+                  <li><strong>👁️‍🗨️ Espionaje:</strong> Miras todas las cartas de un rival.</li>
+                  <li><strong>⚔️ Duelo:</strong> Pides un palo a un rival. Si lo tiene te lo da; si no, te roba él.</li>
+                  <li><strong>🌪️ Torbellino:</strong> Intercambias tu mano entera con la de un rival.</li>
                 </ul>
               </div>
 
@@ -854,7 +854,7 @@ export default function ColeccionLocal({ onSalir }) {
             <div style={{ fontSize: '3.5rem', marginBottom: '0.6rem' }}>💀</div>
             <h2 style={{ color: '#dc2626', margin: '0 0 0.6rem' }}>¡HAS SIDO ELIMINADO!</h2>
             <p className="hint" style={{ fontSize: '1rem', color: '#334155', lineHeight: '1.4', marginBottom: '1.5rem' }}>
-              <strong>{avisoDerrota.nombre}</strong>, has acumulado <strong>5 palos diferentes</strong> en tu mano. Has quedado fuera de la partida y tus cartas pasan al descarte[cite: 10].
+              <strong>{avisoDerrota.nombre}</strong>, has acumulado <strong>5 palos diferentes</strong> en tu mano. Has quedado fuera de la partida y tus cartas pasan al descarte.
             </p>
             <button className="big full" style={{ background: '#dc2626', borderColor: '#b91c1c' }} onClick={() => {
               setAvisoDerrota(null);

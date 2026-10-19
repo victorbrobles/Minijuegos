@@ -160,23 +160,23 @@ export default function DescarteOnline({ onLocal, onSalir }) {
         <div className="aprox-modal-cuerpo">
           <p><strong>1. Dinámica del reto:</strong></p>
           <ul>
-            <li>En cada turno, el <strong>Retador</strong> elige a un rival de la sala y le impone una <strong>categoría trampa</strong> de entre 3 opciones[cite: 18].</li>
-            <li>El jugador desafiado tiene <strong>30 segundos</strong> para decir en voz alta una palabra válida que comience por una letra aún disponible en el abecedario[cite: 17, 18].</li>
+            <li>En cada turno, el <strong>Retador</strong> elige a un rival de la sala y le impone una <strong>categoría trampa</strong> de entre 3 opciones.</li>
+            <li>El jugador desafiado tiene <strong>30 segundos</strong> para decir en voz alta una palabra válida que comience por una letra aún disponible en el abecedario.</li>
           </ul>
 
           <p><strong>2. Eliminación de letras y puntuación:</strong></p>
           <ul>
-            <li>Cada letra acertada <strong>queda tachada del abecedario</strong> y no se podrá volver a usar durante ese tablero[cite: 17, 18].</li>
-            <li><strong>🔵 1 punto (fáciles):</strong> A, B, C, D, E, L, M, P, R, S, T[cite: 17, 18].</li>
-            <li><strong>🟡 2 puntos (medias):</strong> F, G, H, I, N, O, U, V[cite: 17, 18].</li>
-            <li><strong>🔴 3 puntos (difíciles):</strong> J, K, Ñ, Q, W, X, Y, Z[cite: 17, 18].</li>
-            <li>El anfitrión valida la palabra tocando la letra correspondiente en el tablero de control[cite: 17, 18].</li>
+            <li>Cada letra acertada <strong>queda tachada del abecedario</strong> y no se podrá volver a usar durante ese tablero.</li>
+            <li><strong>🔵 1 punto (fáciles):</strong> A, B, C, D, E, L, M, P, R, S, T.</li>
+            <li><strong>🟡 2 puntos (medias):</strong> F, G, H, I, N, O, U, V.</li>
+            <li><strong>🔴 3 puntos (difíciles):</strong> J, K, Ñ, Q, W, X, Y, Z.</li>
+            <li>El anfitrión valida la palabra tocando la letra correspondiente en el tablero de control.</li>
           </ul>
 
           <p><strong>3. Fin de tablero y Partida:</strong></p>
           <ul>
-            <li>El tablero se renueva cuando se <strong>eliminan todas las letras</strong> o cuando <strong>todos los jugadores fallan consecutivamente</strong>[cite: 17].</li>
-            <li>La partida consta de <strong>5 tableros</strong>[cite: 17, 18]. ¡El jugador con más puntos acumulados se corona ganador![cite: 17, 18]</li>
+            <li>El tablero se renueva cuando se <strong>eliminan todas las letras</strong> o cuando <strong>todos los jugadores fallan consecutivamente</strong>.</li>
+            <li>La partida consta de <strong>5 tableros</strong>. ¡El jugador con más puntos acumulados se corona ganador!</li>
           </ul>
         </div>
 
@@ -198,7 +198,7 @@ export default function DescarteOnline({ onLocal, onSalir }) {
             <BotonAyudaCard />
             <span className="lb-luna chica"><Icon name="x" size={42} strokeWidth={1.6} /></span>
             <h1 className="title">Descarta y Elimina!</h1>
-            <p className="hint">Reta a tus amigos con categorías trampas y elimina letras del abecedario[cite: 18].</p>
+            <p className="hint">Reta a tus amigos con categorías trampas y elimina letras del abecedario.</p>
             {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
             <div className="lb-menu">
               <button className="big full" onClick={() => { setVista('crear'); setErrorMsg(''); }}>
@@ -322,7 +322,7 @@ export default function DescarteOnline({ onLocal, onSalir }) {
               {sala.code}
             </button>
             <p className="hint small">
-              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Compártelo con los demás para que se unan[cite: 18].'}
+              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Compártelo con los demás para que se unan.'}
             </p>
           </div>
 
@@ -336,7 +336,7 @@ export default function DescarteOnline({ onLocal, onSalir }) {
               ))}
             </div>
             {faltan > 0 && (
-              <p className="hint" style={{ marginTop: '0.8rem' }}>Faltan {faltan} jugador{faltan === 1 ? '' : 'es'} para poder empezar (mínimo 3)[cite: 18].</p>
+              <p className="hint" style={{ marginTop: '0.8rem' }}>Faltan {faltan} jugador{faltan === 1 ? '' : 'es'} para poder empezar (mínimo 3).</p>
             )}
           </div>
 
@@ -459,7 +459,7 @@ export default function DescarteOnline({ onLocal, onSalir }) {
             <p className="hint">
               {soyElActivo
                 ? '¡Di en voz alta una palabra válida de la categoría que empiece por una de las letras disponibles!'
-                : `${activo.nombre} debe decir en voz alta una palabra válida antes de que se acaben los 30s[cite: 18].`}
+                : `${activo.nombre} debe decir en voz alta una palabra válida antes de que se acaben los 30s.`}
             </p>
 
             {/* TABLERO A-Z CON PUNTOS */}
@@ -513,7 +513,7 @@ export default function DescarteOnline({ onLocal, onSalir }) {
               </div>
             ) : (
               <p className="hint small" style={{ marginTop: '0.8rem' }}>
-                El anfitrión validará la palabra dicha en voz alta[cite: 18].
+                El anfitrión validará la palabra dicha en voz alta.
               </p>
             )}
           </div>
@@ -568,7 +568,7 @@ export default function DescarteOnline({ onLocal, onSalir }) {
             <p className="final-score" style={{ color: '#be123c' }}>
               {ganadores.length === 0
                 ? 'Nadie consiguió puntos.'
-                : `🏆 Ganador: ${ganadores.map(g => g.nombre).join(', ')} con ${maxPuntos} ptos[cite: 18]`}
+                : `🏆 Ganador: ${ganadores.map(g => g.nombre).join(', ')} con ${maxPuntos} ptos`}
             </p>
           </div>
 
@@ -604,7 +604,7 @@ export default function DescarteOnline({ onLocal, onSalir }) {
             <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
             <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>¿Abandonar la partida?</h3>
             <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
-              Perderás tus puntos actuales. ¿Deseas salir?[cite: 18]
+              Perderás tus puntos actuales. ¿Deseas salir?
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
               <button type="button" className="secondary full" onClick={() => setModalSalir(false)}>Quedarme</button>

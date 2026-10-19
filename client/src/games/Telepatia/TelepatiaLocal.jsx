@@ -151,21 +151,21 @@ export default function TelepatiaLocal({ onSalir }) {
                 <div className="aprox-modal-cuerpo">
                   <p><strong>1. Dinámica de la ronda:</strong></p>
                   <ul>
-                    <li>Se muestra una <strong>Palabra Base</strong> en la pantalla[cite: 15].</li>
-                    <li>A la de tres, todos los participantes deben decir <strong>en voz alta y al mismo tiempo</strong> una palabra que asocien directamente con ella[cite: 15].</li>
+                    <li>Se muestra una <strong>Palabra Base</strong> en la pantalla.</li>
+                    <li>A la de tres, todos los participantes deben decir <strong>en voz alta y al mismo tiempo</strong> una palabra que asocien directamente con ella.</li>
                   </ul>
 
                   <p><strong>2. Conexión mental y puntuación:</strong></p>
                   <ul>
-                    <li>Si <strong>2 o más jugadores dicen exactamente la misma palabra</strong>, ¡han conectado mentes y puntúan![cite: 15]</li>
-                    <li><strong>🔥 Sistema de Rachas:</strong> El primer acierto suma <strong>+1 punto</strong>. Si vuelves a coincidir en rondas consecutivas, tu racha sube (2º acierto seguido = +2 pts, 3º = +3 pts...)[cite: 15].</li>
-                    <li>Si una ronda no coincides con nadie, tu racha se resetea a 0[cite: 15].</li>
+                    <li>Si <strong>2 o más jugadores dicen exactamente la misma palabra</strong>, ¡han conectado mentes y puntúan!</li>
+                    <li><strong>🔥 Sistema de Rachas:</strong> El primer acierto suma <strong>+1 punto</strong>. Si vuelves a coincidir en rondas consecutivas, tu racha sube (2º acierto seguido = +2 pts, 3º = +3 pts...).</li>
+                    <li>Si una ronda no coincides con nadie, tu racha se resetea a 0.</li>
                   </ul>
 
                   <p><strong>3. Evolución del juego y Victoria:</strong></p>
                   <ul>
-                    <li>La palabra que coincidió se convierte en la <strong>palabra base de la siguiente ronda</strong> (si nadie coincidió, se elige una de las dichas)[cite: 15].</li>
-                    <li>La partida consta de <strong>15 rondas</strong>[cite: 15]. ¡Gana el jugador con mayor puntuación acumulada![cite: 15]</li>
+                    <li>La palabra que coincidió se convierte en la <strong>palabra base de la siguiente ronda</strong> (si nadie coincidió, se elige una de las dichas).</li>
+                    <li>La partida consta de <strong>15 rondas</strong>. ¡Gana el jugador con mayor puntuación acumulada!</li>
                   </ul>
                 </div>
 
@@ -231,7 +231,7 @@ export default function TelepatiaLocal({ onSalir }) {
             </div>
 
             <p className="hint" style={{ fontSize: '1.05rem', lineHeight: '1.4', margin: '1rem 0' }}>
-              A la de tres, todos los jugadores deben decir <strong>en voz alta a la vez</strong> una palabra relacionada con <strong>{palabraActual}</strong>[cite: 15].
+              A la de tres, todos los jugadores deben decir <strong>en voz alta a la vez</strong> una palabra relacionada con <strong>{palabraActual}</strong>.
             </p>
 
             <div className="lb-form" style={{ marginTop: '1.5rem' }}>

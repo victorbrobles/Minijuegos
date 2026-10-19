@@ -107,7 +107,7 @@ export default function TelepatiaOnline({ onLocal, onSalir }) {
     setTimeout(() => setCodigoCopiado(false), 2000);
   };
 
-  // Al pasar a estado 'escribiendo', reiniciar el input y enfocar[cite: 16]
+  // Al pasar a estado 'escribiendo', reiniciar el input y enfocar
   useEffect(() => {
     if (sala?.estado === 'escribiendo') {
       setMiPalabra('');
@@ -169,20 +169,20 @@ export default function TelepatiaOnline({ onLocal, onSalir }) {
         <div className="aprox-modal-cuerpo">
           <p><strong>1. Dinámica de la ronda:</strong></p>
           <ul>
-            <li>En cada ronda aparece una <strong>Palabra de Origen</strong> común para todos los móviles[cite: 16].</li>
-            <li>Tienes <strong>5 segundos</strong> para escribir una palabra que relaciones mentalmente con ella y pulsar Enviar[cite: 16].</li>
+            <li>En cada ronda aparece una <strong>Palabra de Origen</strong> común para todos los móviles.</li>
+            <li>Tienes <strong>5 segundos</strong> para escribir una palabra que relaciones mentalmente con ella y pulsar Enviar.</li>
           </ul>
 
           <p><strong>2. Coincidencias y Rachas:</strong></p>
           <ul>
-            <li>El sistema compara todas las palabras enviadas. Si <strong>2 o más jugadores escriben exactamente la misma</strong>, ¡conectan mentes y suman puntos![cite: 16]</li>
-            <li><strong>🔥 Racha multiplicadora:</strong> La 1ª coincidencia suma <strong>+1 punto</strong>. Si vuelves a coincidir en la ronda siguiente consecutiva, tu racha sube (+2 pts, +3 pts...)[cite: 16].</li>
-            <li>Si no coincides en una ronda, tu racha vuelve a empezar desde cero[cite: 16].</li>
+            <li>El sistema compara todas las palabras enviadas. Si <strong>2 o más jugadores escriben exactamente la misma</strong>, ¡conectan mentes y suman puntos!</li>
+            <li><strong>🔥 Racha multiplicadora:</strong> La 1ª coincidencia suma <strong>+1 punto</strong>. Si vuelves a coincidir en la ronda siguiente consecutiva, tu racha sube (+2 pts, +3 pts...).</li>
+            <li>Si no coincides en una ronda, tu racha vuelve a empezar desde cero.</li>
           </ul>
 
           <p><strong>3. Fin de partida:</strong></p>
           <ul>
-            <li>Se juegan <strong>15 rondas</strong> de máxima velocidad mental[cite: 16]. ¡El jugador que lidere la clasificación al final gana la partida![cite: 16]</li>
+            <li>Se juegan <strong>15 rondas</strong> de máxima velocidad mental. ¡El jugador que lidere la clasificación al final gana la partida!</li>
           </ul>
         </div>
 
@@ -204,7 +204,7 @@ export default function TelepatiaOnline({ onLocal, onSalir }) {
             <BotonAyudaCard />
             <span className="lb-luna chica"><Icon name="zap" size={42} strokeWidth={1.6} /></span>
             <h1 className="title">Telepatía</h1>
-            <p className="hint">Escribid la misma palabra en 5 segundos. ¡Conectad vuestras mentes! (4 a 20 jugadores)[cite: 16].</p>
+            <p className="hint">Escribid la misma palabra en 5 segundos. ¡Conectad vuestras mentes! (4 a 20 jugadores).</p>
             {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
             <div className="lb-menu">
               <button className="big full" onClick={() => { setVista('crear'); setErrorMsg(''); }}>
@@ -318,7 +318,7 @@ export default function TelepatiaOnline({ onLocal, onSalir }) {
               {sala.code}
             </button>
             <p className="hint small">
-              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Compártelo con los demás para que se unan[cite: 16].'}
+              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Compártelo con los demás para que se unan.'}
             </p>
           </div>
 
@@ -332,9 +332,9 @@ export default function TelepatiaOnline({ onLocal, onSalir }) {
               ))}
             </div>
             {faltan > 0 ? (
-              <p className="hint" style={{ marginTop: '0.8rem' }}>Faltan {faltan} jugador{faltan === 1 ? '' : 'es'} para poder empezar (mínimo 4)[cite: 16].</p>
+              <p className="hint" style={{ marginTop: '0.8rem' }}>Faltan {faltan} jugador{faltan === 1 ? '' : 'es'} para poder empezar (mínimo 4).</p>
             ) : (
-              <p className="hint ok" style={{ marginTop: '0.8rem' }}>¡Ya sois suficientes! El anfitrión puede empezar[cite: 16].</p>
+              <p className="hint ok" style={{ marginTop: '0.8rem' }}>¡Ya sois suficientes! El anfitrión puede empezar.</p>
             )}
           </div>
 
@@ -374,7 +374,7 @@ export default function TelepatiaOnline({ onLocal, onSalir }) {
             </div>
 
             <p className="hint" style={{ marginBottom: '1rem' }}>
-              Escribe una palabra relacionada antes de que el contador llegue a 0[cite: 16]:
+              Escribe una palabra relacionada antes de que el contador llegue a 0:
             </p>
 
             <form onSubmit={(e) => { e.preventDefault(); enviarPalabra(); }}>

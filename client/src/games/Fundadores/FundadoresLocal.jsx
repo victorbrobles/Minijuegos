@@ -1,5 +1,5 @@
 // client/src/games/Fundadores/FundadoresLocal.jsx
-// Modo de un solo dispositivo: el móvil pasa de mano en mano (elección secreta de oficio y turnos)[cite: 13].
+// Modo de un solo dispositivo: el móvil pasa de mano en mano (elección secreta de oficio y turnos).
 import React, { useRef, useState } from 'react';
 import Icon from './IconoF.jsx';
 import * as E from './engine.js';
@@ -14,7 +14,7 @@ export default function FundadoresLocal({ onVolver }) {
   const [ayuda, setAyuda] = useState(false);
   const estRef = useRef(null);
   const [, setVer] = useState(0);
-  const [confirmado, setConfirmado] = useState(null); // clave del turno ya confirmado ("soy yo")[cite: 13]
+  const [confirmado, setConfirmado] = useState(null); // clave del turno ya confirmado ("soy yo")
   const refrescar = () => setVer((x) => x + 1);
 
   const empezar = () => {
@@ -64,7 +64,7 @@ export default function FundadoresLocal({ onVolver }) {
 
           <span className="fd-logo"><Icon name="landmark" size={44} strokeWidth={1.7} /></span>
           <h1 className="title">Fundadores · un dispositivo</h1>
-          <p className="hint">Pasaos el móvil: cada uno elige su oficio en secreto y juega su turno cuando se le llame. De 3 a 7 jugadores[cite: 13].</p>
+          <p className="hint">Pasaos el móvil: cada uno elige su oficio en secreto y juega su turno cuando se le llame. De 3 a 7 jugadores.</p>
           <div className="fd-nombres" style={{ textAlign: 'left' }}>
             {nombres.map((n, i) => (
               <div key={i} className="fd-nombre-fila">

@@ -214,23 +214,23 @@ export default function DescarteLocal({ onSalir }) {
                 <div className="aprox-modal-cuerpo">
                   <p><strong>1. Dinámica del reto:</strong></p>
                   <ul>
-                    <li>En cada turno, el <strong>Retador</strong> elige a un rival que aún no haya participado en la ronda actual y le asigna una <strong>categoría trampa</strong> de entre 3 opciones[cite: 17].</li>
-                    <li>El jugador desafiado tiene <strong>30 segundos</strong> para decir en voz alta una palabra válida de esa categoría que empiece por una de las letras disponibles en el tablero[cite: 17, 18].</li>
+                    <li>En cada turno, el <strong>Retador</strong> elige a un rival que aún no haya participado en la ronda actual y le asigna una <strong>categoría trampa</strong> de entre 3 opciones.</li>
+                    <li>El jugador desafiado tiene <strong>30 segundos</strong> para decir en voz alta una palabra válida de esa categoría que empiece por una de las letras disponibles en el tablero.</li>
                   </ul>
 
                   <p><strong>2. Eliminación de letras y puntos:</strong></p>
                   <ul>
-                    <li>Cada letra acertada <strong>queda eliminada del tablero</strong> y nadie más podrá usarla hasta el siguiente tablero[cite: 17, 18].</li>
-                    <li><strong>🔵 1 punto (fáciles):</strong> A, B, C, D, E, L, M, P, R, S, T[cite: 17].</li>
-                    <li><strong>🟡 2 puntos (medias):</strong> F, G, H, I, N, O, U, V[cite: 17].</li>
-                    <li><strong>🔴 3 puntos (difíciles):</strong> J, K, Ñ, Q, W, X, Y, Z[cite: 17].</li>
-                    <li>Si se agota el tiempo o no se da una palabra válida, se cuenta como fallo y no se suman puntos[cite: 17].</li>
+                    <li>Cada letra acertada <strong>queda eliminada del tablero</strong> y nadie más podrá usarla hasta el siguiente tablero.</li>
+                    <li><strong>🔵 1 punto (fáciles):</strong> A, B, C, D, E, L, M, P, R, S, T.</li>
+                    <li><strong>🟡 2 puntos (medias):</strong> F, G, H, I, N, O, U, V.</li>
+                    <li><strong>🔴 3 puntos (difíciles):</strong> J, K, Ñ, Q, W, X, Y, Z.</li>
+                    <li>Si se agota el tiempo o no se da una palabra válida, se cuenta como fallo y no se suman puntos.</li>
                   </ul>
 
                   <p><strong>3. Cambio de tablero y Victoria:</strong></p>
                   <ul>
-                    <li>El tablero actual finaliza cuando se <strong>eliminan todas las letras del abecedario</strong> o cuando <strong>todos los jugadores fallan consecutivamente</strong>[cite: 17].</li>
-                    <li>La partida se disputa a <strong>5 tableros</strong>[cite: 17]. ¡Gana quien acumule más puntos al final![cite: 17]</li>
+                    <li>El tablero actual finaliza cuando se <strong>eliminan todas las letras del abecedario</strong> o cuando <strong>todos los jugadores fallan consecutivamente</strong>.</li>
+                    <li>La partida se disputa a <strong>5 tableros</strong>. ¡Gana quien acumule más puntos al final!</li>
                   </ul>
                 </div>
 

@@ -17,7 +17,7 @@ const post = async (url, body) => {
 };
 
 export default function FundadoresOnline({ onLocal }) {
-  const [vista, setVista] = useState('menu'); // menu | crear | unirse | sala[cite: 14]
+  const [vista, setVista] = useState('menu'); // menu | crear | unirse | sala
   const [nombre, setNombre] = useState('');
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -147,7 +147,7 @@ export default function FundadoresOnline({ onLocal }) {
             <BotonAyudaCard />
             <span className="fd-logo"><Icon name="landmark" size={44} strokeWidth={1.7} /></span>
             <h1 className="title">Fundadores</h1>
-            <p className="hint">Levantad juntos un pueblo. Cada ronda eliges en secreto un oficio con poderes distintos: si adivinas qué harán los demás, el pueblo será tuyo. De 3 a 7 jugadores[cite: 14].</p>
+            <p className="hint">Levantad juntos un pueblo. Cada ronda eliges en secreto un oficio con poderes distintos: si adivinas qué harán los demás, el pueblo será tuyo. De 3 a 7 jugadores.</p>
             <div className="actions">
               <button className="big full" onClick={() => { setVista('crear'); setErrorMsg(''); }}><Icon name="crown" size={22} /> Crear partida</button>
               <button className="big full" onClick={() => { setVista('unirse'); setErrorMsg(''); }}><Icon name="users" size={22} /> Unirse a partida</button>
@@ -223,7 +223,7 @@ export default function FundadoresOnline({ onLocal }) {
                 </div>
               ))}
             </div>
-            {jugadores.length < AJUSTES.min && <p className="hint" style={{ marginTop: '.8rem' }}>Faltan {AJUSTES.min - jugadores.length} jugadores (mínimo {AJUSTES.min})[cite: 14].</p>}
+            {jugadores.length < AJUSTES.min && <p className="hint" style={{ marginTop: '.8rem' }}>Faltan {AJUSTES.min - jugadores.length} jugadores (mínimo {AJUSTES.min}).</p>}
           </div>
 
           <div className="actions" style={{ marginTop: '1rem' }}>
