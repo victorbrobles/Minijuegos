@@ -267,6 +267,14 @@ export const META = {
     etiquetas: 'popular mayoria top 5 tendencia moda categorias encuesta',
     descripcion: '¿Qué es lo que respondería la mayoría? Adivina los 5 elementos más populares de cada categoría y suma desde 1 hasta 5 puntos por acierto.',
     categorias: ['chill', 'dos_jugadores']
+  },
+  'logos': {
+    titulo: 'Logo Mania',
+    icono: 'cards',
+    colores: ['#06b6d4', '#0e7490'],
+    etiquetas: 'logos marcas empresas adivinar velocidad memoria simbolos',
+    descripcion: 'Identifica la marca que se oculta tras el logo antes de que el cronómetro llegue a cero. Suma segundos al acertar y evita arriesgar si no estás seguro.',
+    categorias: ['prueba', 'dos_jugadores']
   }
 };
 

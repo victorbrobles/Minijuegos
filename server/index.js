@@ -45,6 +45,7 @@ import descarteRouter from './routes/descarte.js';
 import bingoballRoutes from './routes/bingoball.js';
 import cuentasRoutes from './routes/cuentas.js';
 import conoceRoutes from './routes/conoce.js';
+import logosRoutes from './routes/logos.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -117,6 +118,7 @@ app.use('/api/descarte', descarteRouter);
 app.use('/api/bingoball', bingoballRoutes);
 app.use('/api/cuentas', cuentasRoutes);
 app.use('/api/conoce', conoceRoutes);
+app.use('/api/logos', logosRoutes);
 
 // 5. Redirección para React Router (Single Page Application)
 app.get('*', (req, res) => {

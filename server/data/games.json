@@ -190,5 +190,11 @@
     "name": "Conoce a tus amigos",
     "description": "Responded a preguntas cotidianas y adivinad qué escribió cada compañero. ¡Descubre quién te conoce de verdad a 15 rondas!",
     "isNew": true
+  },
+  {
+    "id": "logos",
+    "name": "Logo Mania",
+    "description": "Adivina a qué marca corresponde el logo antes de que termine el tiempo. Aciertos suman segundos, fallos restan.",
+    "isNew": true
   }
 ]
