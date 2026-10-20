@@ -1,5 +1,4 @@
 // client/src/games/Fundadores/FundadoresLocal.jsx
-// Modo de un solo dispositivo: el móvil pasa de mano en mano (elección secreta de oficio y turnos).
 import React, { useRef, useState } from 'react';
 import Icon from './IconoF.jsx';
 import * as E from './engine.js';
@@ -11,10 +10,10 @@ export default function FundadoresLocal({ onVolver }) {
   const [paso, setPaso] = useState('config');
   const [nombres, setNombres] = useState(['', '', '']);
   const [error, setError] = useState('');
-  const [ayuda, setAyuda] = useState(false);
+  const [modalAyuda, setModalAyuda] = useState(false);
   const estRef = useRef(null);
   const [, setVer] = useState(0);
-  const [confirmado, setConfirmado] = useState(null); // clave del turno ya confirmado ("soy yo")
+  const [confirmado, setConfirmado] = useState(null);
   const refrescar = () => setVer((x) => x + 1);
 
   const empezar = () => {
@@ -23,30 +22,32 @@ export default function FundadoresLocal({ onVolver }) {
     if (new Set(limpios.map((n) => n.toLowerCase())).size !== limpios.length) return setError('Hay nombres repetidos.');
     setError('');
     estRef.current = E.crearPartida(limpios.map((nombre, i) => ({ id: i + 1, nombre })));
-    setConfirmado(null); setPaso('juego');
+    setConfirmado(null);
+    setPaso('juego');
   };
   const est = estRef.current;
 
   if (paso === 'config') {
     return (
       <div className="fd-wrap">
-        {ayuda && <Ayuda onCerrar={() => setAyuda(false)} />}
+        {modalAyuda && <Ayuda onCerrar={() => setModalAyuda(false)} />}
         
-        <div className="panel fd-center" style={{ position: 'relative' }}>
-          {/* Botón ? en la esquina superior derecha del panel */}
+        <div className="panel fd-center" style={{ position: 'relative', padding: '2.4rem 1.6rem 2rem' }}>
+          {/* Botón ? blanco puro */}
           <button
             type="button"
-            onClick={() => setAyuda(true)}
+            onClick={() => setModalAyuda(true)}
             title="Reglas del juego"
             style={{
               position: 'absolute',
-              top: '1rem',
-              right: '1rem',
+              top: '1.1rem',
+              right: '1.1rem',
               width: '38px',
               height: '38px',
               borderRadius: '50%',
               border: '1.5px solid #c7d2fe',
-              backgroundColor: '#ffffff',
+              background: '#ffffff',
+              backgroundImage: 'none',
               color: '#4338ca',
               fontSize: '1.2rem',
               fontWeight: '700',
@@ -54,7 +55,7 @@ export default function FundadoresLocal({ onVolver }) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 2px 8px rgba(99, 102, 241, 0.12)',
+              boxShadow: '0 2px 8px rgba(99, 102, 241, 0.15)',
               padding: 0,
               zIndex: 5
             }}
@@ -62,10 +63,30 @@ export default function FundadoresLocal({ onVolver }) {
             ?
           </button>
 
-          <span className="fd-logo"><Icon name="landmark" size={44} strokeWidth={1.7} /></span>
-          <h1 className="title">Fundadores · un dispositivo</h1>
-          <p className="hint">Pasaos el móvil: cada uno elige su oficio en secreto y juega su turno cuando se le llame. De 3 a 7 jugadores.</p>
-          <div className="fd-nombres" style={{ textAlign: 'left' }}>
+          {/* Círculo suave con icono temático */}
+          <div
+            style={{
+              width: '76px',
+              height: '76px',
+              borderRadius: '50%',
+              backgroundColor: '#fff7ed',
+              color: 'var(--g1, #ea580c)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 1.1rem auto',
+              boxShadow: '0 4px 14px rgba(234, 88, 12, 0.12)'
+            }}
+          >
+            <Icon name="landmark" size={38} strokeWidth={2} />
+          </div>
+
+          <h1 className="title" style={{ margin: '0 0 0.6rem 0' }}>Fundadores</h1>
+          <p className="hint" style={{ maxWidth: '540px', margin: '0 auto 1.6rem auto', lineHeight: '1.45' }}>
+            Pasaos el móvil: cada uno elige su oficio en secreto y juega su turno cuando se le llame. De 3 a 7 jugadores.
+          </p>
+
+          <div className="fd-nombres" style={{ textAlign: 'left', maxWidth: '480px', margin: '0 auto' }}>
             {nombres.map((n, i) => (
               <div key={i} className="fd-nombre-fila">
                 <input type="text" placeholder={`Jugador ${i + 1}`} value={n} maxLength={20} onChange={(e) => setNombres((l) => l.map((x, k) => (k === i ? e.target.value : x)))} />
@@ -75,7 +96,7 @@ export default function FundadoresLocal({ onVolver }) {
             {nombres.length < E.AJUSTES.max && <button type="button" className="secondary" onClick={() => setNombres((l) => [...l, ''])}><Icon name="users" size={18} /> Añadir jugador</button>}
           </div>
           {error && <p className="error" style={{ marginTop: '.8rem' }}>{error}</p>}
-          <div className="actions">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', width: '100%', maxWidth: '480px', margin: '1.4rem auto 0 auto' }}>
             <button type="button" className="big full" onClick={empezar}><Icon name="play" size={22} /> ¡A construir!</button>
             <button type="button" className="secondary full" onClick={onVolver}>Volver</button>
           </div>
@@ -97,7 +118,6 @@ export default function FundadoresLocal({ onVolver }) {
     );
   }
 
-  // ---- quién tiene que jugar ahora
   const quien = est.fase === 'elegir'
     ? est.jugadores.find((j) => !j.fuera && !est.elecciones[j.id])
     : est.jugadores.find((j) => j.id === est.turno.jugadorId);

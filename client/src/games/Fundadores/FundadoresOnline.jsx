@@ -17,7 +17,7 @@ const post = async (url, body) => {
 };
 
 export default function FundadoresOnline({ onLocal }) {
-  const [vista, setVista] = useState('menu'); // menu | crear | unirse | sala
+  const [vista, setVista] = useState('menu');
   const [nombre, setNombre] = useState('');
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -53,12 +53,10 @@ export default function FundadoresOnline({ onLocal }) {
     consultar(sesion);
     const i = setInterval(() => consultar(sesion), 800);
     return () => clearInterval(i);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sesion]);
 
-  // Cerrar ayuda automáticamente si la partida comienza
   useEffect(() => {
-    if (sala?.estado === 'jugando') {
+    if (sala && sala.estado !== 'jugando') {
       setModalAyuda(false);
     }
   }, [sala?.estado]);
@@ -91,34 +89,21 @@ export default function FundadoresOnline({ onLocal }) {
   const ranking = [...jugadores].sort((a, b) => b.puntos - a.puntos);
   const puntosTotales = Object.fromEntries(jugadores.map((j) => [j.id, j.puntos]));
 
-  const Marcador = () => (
-    <div className="fd-card">
-      <h3><Icon name="trophy" size={18} /> Marcador de la sala</h3>
-      <div className="scoreboard">
-        {ranking.map((j, i) => (
-          <div key={j.id} className={`score-row${i === 0 && j.puntos > 0 ? ' first' : ''}`}>
-            <span className="score-name">{i === 0 && j.puntos > 0 ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>} {j.nombre}</span>
-            <span className="score-pts">{j.puntos} pts</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-
-  const BotonAyudaCard = () => (
+  const BotonAyudaPanel = () => (
     <button
       type="button"
       onClick={() => setModalAyuda(true)}
       title="Reglas del juego"
       style={{
         position: 'absolute',
-        top: '1rem',
-        right: '1rem',
+        top: '1.1rem',
+        right: '1.1rem',
         width: '38px',
         height: '38px',
         borderRadius: '50%',
         border: '1.5px solid #c7d2fe',
-        backgroundColor: '#ffffff',
+        background: '#ffffff',
+        backgroundImage: 'none',
         color: '#4338ca',
         fontSize: '1.2rem',
         fontWeight: '700',
@@ -126,7 +111,7 @@ export default function FundadoresOnline({ onLocal }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        boxShadow: '0 2px 8px rgba(99, 102, 241, 0.12)',
+        boxShadow: '0 2px 8px rgba(99, 102, 241, 0.15)',
         padding: 0,
         zIndex: 5
       }}
@@ -140,18 +125,46 @@ export default function FundadoresOnline({ onLocal }) {
       {modalAyuda && <Ayuda onCerrar={() => setModalAyuda(false)} />}
       {errorMsg && vista !== 'crear' && vista !== 'unirse' && <p className="error">{errorMsg}</p>}
 
-      {/* ---------- 1. MENÚ ---------- */}
+      {/* ---------- 1. MENÚ PRINCIPAL (ESTILO ADAPTADO) ---------- */}
       {vista === 'menu' && (
         <section className="game">
-          <div className="panel fd-center" style={{ position: 'relative' }}>
-            <BotonAyudaCard />
-            <span className="fd-logo"><Icon name="landmark" size={44} strokeWidth={1.7} /></span>
-            <h1 className="title">Fundadores</h1>
-            <p className="hint">Levantad juntos un pueblo. Cada ronda eliges en secreto un oficio con poderes distintos: si adivinas qué harán los demás, el pueblo será tuyo. De 3 a 7 jugadores.</p>
-            <div className="actions">
-              <button className="big full" onClick={() => { setVista('crear'); setErrorMsg(''); }}><Icon name="crown" size={22} /> Crear partida</button>
-              <button className="big full" onClick={() => { setVista('unirse'); setErrorMsg(''); }}><Icon name="users" size={22} /> Unirse a partida</button>
-              <button className="secondary full" onClick={onLocal}><Icon name="home" size={20} /> Jugar en un solo dispositivo</button>
+          <div className="panel fd-center" style={{ position: 'relative', padding: '2.4rem 1.6rem 2rem' }}>
+            <BotonAyudaPanel />
+
+            {/* Círculo suave con icono temático */}
+            <div
+              style={{
+                width: '76px',
+                height: '76px',
+                borderRadius: '50%',
+                backgroundColor: '#fff7ed',
+                color: 'var(--g1, #ea580c)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 1.1rem auto',
+                boxShadow: '0 4px 14px rgba(234, 88, 12, 0.12)'
+              }}
+            >
+              <Icon name="landmark" size={38} strokeWidth={2} />
+            </div>
+
+            <h1 className="title" style={{ margin: '0 0 0.6rem 0' }}>Fundadores</h1>
+            <p className="hint" style={{ maxWidth: '540px', margin: '0 auto 1.6rem auto', lineHeight: '1.45' }}>
+              Levantad juntos un pueblo. Cada ronda eliges en secreto un oficio con poderes distintos: si adivinas qué harán los demás, el pueblo será tuyo.
+            </p>
+
+            {/* Botones en columna vertical idénticos a la imagen 1 */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', width: '100%', maxWidth: '480px', margin: '0 auto' }}>
+              <button className="big full" onClick={() => { setVista('crear'); setErrorMsg(''); }}>
+                <Icon name="crown" size={20} /> Crear partida
+              </button>
+              <button className="big full" onClick={() => { setVista('unirse'); setErrorMsg(''); }}>
+                <Icon name="users" size={20} /> Unirse a partida
+              </button>
+              <button className="secondary full" onClick={onLocal}>
+                Modo en un dispositivo
+              </button>
             </div>
           </div>
         </section>
@@ -160,15 +173,32 @@ export default function FundadoresOnline({ onLocal }) {
       {/* ---------- 2. CREAR / UNIRSE ---------- */}
       {(vista === 'crear' || vista === 'unirse') && (
         <section className="game">
-          <div className="panel fd-center">
-            <span className="fd-logo"><Icon name={vista === 'crear' ? 'crown' : 'users'} size={40} strokeWidth={1.7} /></span>
+          <div className="panel fd-center" style={{ position: 'relative' }}>
+            <BotonAyudaPanel />
+            <div
+              style={{
+                width: '74px',
+                height: '74px',
+                borderRadius: '50%',
+                backgroundColor: '#fff7ed',
+                color: 'var(--g1, #ea580c)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 1rem auto'
+              }}
+            >
+              <Icon name={vista === 'crear' ? 'crown' : 'users'} size={36} strokeWidth={2} />
+            </div>
             <h2 className="title">{vista === 'crear' ? 'Crear partida' : 'Unirse a partida'}</h2>
             <div style={{ textAlign: 'left', marginTop: '1rem' }}>
-              {vista === 'unirse' && (<>
-                <label className="field-label" htmlFor="fd-code">Código de la sala</label>
-                <input id="fd-code" type="text" placeholder="ABCD" value={codigoInput} maxLength={4} autoFocus onChange={(e) => setCodigoInput(e.target.value.toUpperCase())}
-                  style={{ textTransform: 'uppercase', letterSpacing: '4px', textAlign: 'center', fontWeight: 800 }} />
-              </>)}
+              {vista === 'unirse' && (
+                <>
+                  <label className="field-label" htmlFor="fd-code">Código de la sala</label>
+                  <input id="fd-code" type="text" placeholder="ABCD" value={codigoInput} maxLength={4} autoFocus onChange={(e) => setCodigoInput(e.target.value.toUpperCase())}
+                    style={{ textTransform: 'uppercase', letterSpacing: '4px', textAlign: 'center', fontWeight: 800 }} />
+                </>
+              )}
               <label className="field-label" htmlFor="fd-nombre">Tu nombre</label>
               <input id="fd-nombre" type="text" placeholder="Tu nombre" value={nombre} maxLength={20} autoFocus={vista === 'crear'} onChange={(e) => setNombre(e.target.value)} />
               {errorMsg && <p className="error" style={{ marginTop: '.8rem' }}>{errorMsg}</p>}
@@ -182,11 +212,11 @@ export default function FundadoresOnline({ onLocal }) {
         </section>
       )}
 
-      {/* ---------- 3. LOBBY (SALA DE ESPERA) ---------- */}
+      {/* ---------- 3. SALA DE ESPERA (LOBBY) ---------- */}
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
         <section className="game">
           <div className="panel fd-center" style={{ position: 'relative' }}>
-            <BotonAyudaCard />
+            <BotonAyudaPanel />
 
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
               <span
@@ -237,7 +267,7 @@ export default function FundadoresOnline({ onLocal }) {
         </section>
       )}
 
-      {/* ---------- 4. EN JUEGO (La ayuda ya no se muestra) ---------- */}
+      {/* ---------- 4. EN JUEGO ---------- */}
       {vista === 'sala' && sala && sala.estado === 'jugando' && sala.vista && (
         sala.vista.fase !== 'fin' ? (
           <>
@@ -249,7 +279,6 @@ export default function FundadoresOnline({ onLocal }) {
           </>
         ) : (
           <PantallaFin v={sala.vista} puntosTotales={puntosTotales}>
-            <Marcador />
             <div className="actions">
               {esAdmin ? (<>
                 <button className="big full" disabled={jugadores.length < AJUSTES.min} onClick={() => llamar('siguiente-partida')}><Icon name="refresh" size={22} /> Otra partida</button>
@@ -284,7 +313,6 @@ export default function FundadoresOnline({ onLocal }) {
         </section>
       )}
 
-      {/* MODAL SALIR */}
       {modalSalir && (
         <div className="fd-modal-fondo" onClick={() => setModalSalir(false)}>
           <div className="fd-modal" onClick={(e) => e.stopPropagation()}>

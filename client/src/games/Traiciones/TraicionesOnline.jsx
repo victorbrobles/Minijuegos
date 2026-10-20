@@ -2,8 +2,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from './IconoT.jsx';
 import { OPCIONES_DEBATE } from './engine.js';
-import { PantallaDeFase, PantallaFin, Ayuda } from './Vistas.jsx';
+import { PantallaDeFase, PantallaFin } from './Vistas.jsx';
 import './Traiciones.css';
+import '../Adivina/Adivina.css';
 
 const CLAVE_SESION = 'traiciones_online_session';
 const MIN_JUGADORES = 4;
@@ -16,8 +17,85 @@ const post = async (url, body) => {
   return data;
 };
 
+function ModalAyudaTraiciones({ onCerrar }) {
+  return (
+    <div className="rg-modal-fondo" onClick={onCerrar}>
+      <div
+        className="rg-modal aprox-modal-ayuda"
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          maxWidth: '560px',
+          maxHeight: '88vh',
+          overflowY: 'auto',
+          textAlign: 'left',
+          padding: '1.4rem'
+        }}
+      >
+        <div className="aprox-modal-header" style={{ marginBottom: '1rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.6rem' }}>
+          <span className="aprox-modal-signo-title">?</span>
+          <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#1e1b4b' }}>¿Cómo se juega a Traiciones?</h3>
+        </div>
+
+        <div className="aprox-modal-cuerpo" style={{ fontSize: '0.92rem', lineHeight: '1.5', color: '#334155' }}>
+          <div style={{ marginBottom: '1.1rem' }}>
+            <h4 style={{ color: '#0f172a', margin: '0 0 0.3rem', fontSize: '1rem' }}>🎯 Objetivo</h4>
+            <p style={{ margin: 0 }}>
+              Una caravana viaja por el desierto rumbo al Oasis. La mayoría sois <strong>Leales</strong>, pero entre vosotros se ocultan <strong>Traidores</strong> que buscan sabotear y eliminar a la caravana sin ser descubiertos.
+            </p>
+          </div>
+
+          <div style={{ marginBottom: '1.1rem' }}>
+            <h4 style={{ color: '#0f172a', margin: '0 0 0.3rem', fontSize: '1rem' }}>👥 Bandos y Roles</h4>
+            <ul style={{ paddingLeft: '1.2rem', margin: '0.3rem 0' }}>
+              <li style={{ marginBottom: '0.35rem' }}>
+                <strong>Leal:</strong> Muévete por las salas del campamento completando tareas para llenar la barra común y desenmascara a los traidores.
+              </li>
+              <li style={{ marginBottom: '0.35rem' }}>
+                <strong>Traidor:</strong> Sabotea tareas, finge coartadas y elimina sigilosamente a quien se quede a solas contigo.
+              </li>
+              <li style={{ marginBottom: '0.35rem' }}>
+                <strong>Roles especiales:</strong> Vigía (ojea salas a distancia), Protegido (resiste un ataque) y Bufón (gana solo si lo expulsan).
+              </li>
+            </ul>
+          </div>
+
+          <div style={{ marginBottom: '1.1rem' }}>
+            <h4 style={{ color: '#0f172a', margin: '0 0 0.3rem', fontSize: '1rem' }}>⏳ Fases en tiempo real</h4>
+            <ol style={{ paddingLeft: '1.2rem', margin: '0.3rem 0' }}>
+              <li style={{ marginBottom: '0.35rem' }}>
+                <strong>Campamento en directo:</strong> Desplázate de sala en sala. Solo ves a quienes están contigo.
+              </li>
+              <li style={{ marginBottom: '0.35rem' }}>
+                <strong>Asamblea y Debate:</strong> Si alguien toca la campana o reporta un cuerpo, todos se reúnen en la hoguera.
+              </li>
+              <li style={{ marginBottom: '0.35rem' }}>
+                <strong>Votación y Veredicto:</strong> Se expulsa al más votado y se revela su rol.
+              </li>
+            </ol>
+          </div>
+
+          <div>
+            <h4 style={{ color: '#0f172a', margin: '0 0 0.3rem', fontSize: '1rem' }}>🏆 Condiciones de victoria</h4>
+            <ul style={{ paddingLeft: '1.2rem', margin: '0.3rem 0' }}>
+              <li><strong>Leales:</strong> Completando todas las tareas o expulsando a todos los traidores.</li>
+              <li><strong>Traidores:</strong> Igualando en número a los leales vivos o si el campamento arde.</li>
+              <li><strong>Bufón:</strong> Consiguiendo que la caravana lo expulse en votación.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="rg-modal-acciones" style={{ marginTop: '1.2rem' }}>
+          <button type="button" className="big full" onClick={onCerrar}>
+            Entendido
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function TraicionesOnline() {
-  const [vista, setVista] = useState('menu'); // 'menu' | 'crear' | 'unirse' | 'sala'
+  const [vista, setVista] = useState('menu');
   const [nombre, setNombre] = useState('');
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -61,8 +139,13 @@ export default function TraicionesOnline() {
     consultar(sesion);
     const i = setInterval(() => consultar(sesion), 500);
     return () => clearInterval(i);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sesion]);
+
+  useEffect(() => {
+    if (sala && sala.estado !== 'lobby') {
+      setModalAyuda(false);
+    }
+  }, [sala?.estado]);
 
   const entrar = async (ruta, cuerpo) => {
     setErrorMsg(''); setCargando(true);
@@ -83,7 +166,6 @@ export default function TraicionesOnline() {
     } catch (e) { setErrorMsg(e.message); }
   };
 
-  // Acciones de partida (las usan las pantallas compartidas)
   const enviar = (tipo, datos = {}) => llamar('accion', { tipo, ...datos });
 
   const salir = async () => {
@@ -102,53 +184,106 @@ export default function TraicionesOnline() {
   const jugadores = sala?.jugadores || [];
   const ranking = [...jugadores].sort((a, b) => b.puntos - a.puntos);
   const puntosTotales = Object.fromEntries(jugadores.map((j) => [j.id, j.puntos]));
-  const mostrarAyuda = vista !== 'sala' || sala?.estado === 'lobby';
 
-  const Marcador = () => (
-    <div className="tr-card">
-      <h3><Icon name="trophy" size={18} /> Marcador</h3>
-      <div className="scoreboard">
-        {ranking.map((j, i) => (
-          <div key={j.id} className={`score-row${i === 0 && j.puntos > 0 ? ' first' : ''}`}>
-            <span className="score-name">{i === 0 && j.puntos > 0 ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>} {j.nombre}</span>
-            <span className="score-pts">{j.puntos} pts</span>
-          </div>
-        ))}
-      </div>
-    </div>
+  // Botón circular blanco puro idéntico al de la portada
+  const BotonAyudaPanel = () => (
+    <button
+      type="button"
+      onClick={() => setModalAyuda(true)}
+      title="Reglas del juego"
+      style={{
+        position: 'absolute',
+        top: '1.1rem',
+        right: '1.1rem',
+        width: '38px',
+        height: '38px',
+        borderRadius: '50%',
+        border: '1.5px solid #c7d2fe',
+        background: '#ffffff',
+        backgroundImage: 'none',
+        color: '#4338ca',
+        fontSize: '1.2rem',
+        fontWeight: '700',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        boxShadow: '0 2px 8px rgba(99, 102, 241, 0.15)',
+        padding: 0,
+        zIndex: 5
+      }}
+    >
+      ?
+    </button>
   );
 
   return (
     <div className="tr-wrap">
-      {mostrarAyuda && (
-        <button type="button" className="btn-ayuda-flotante" onClick={() => setModalAyuda(true)} title="Reglas de Traiciones">
-          <span className="btn-ayuda-flotante-signo">?</span>
-        </button>
-      )}
-      {modalAyuda && <Ayuda onCerrar={() => setModalAyuda(false)} />}
-
+      {modalAyuda && <ModalAyudaTraiciones onCerrar={() => setModalAyuda(false)} />}
       {errorMsg && vista !== 'crear' && vista !== 'unirse' && <p className="error">{errorMsg}</p>}
 
-      {/* ---------- Menú ---------- */}
+      {/* ---------- 1. MENÚ PRINCIPAL (ESTILO ADAPTADO) ---------- */}
       {vista === 'menu' && (
         <section className="game">
-          <div className="panel tr-center">
-            <span className="tr-logo"><Icon name="dagger" size={44} strokeWidth={1.7} /></span>
-            <h1 className="title">Traiciones</h1>
-            <p className="hint">Una caravana cruza el desierto rumbo al Oasis. Algunos de vosotros son traidores. Moveos por el campamento, haced tareas, fijaos en quién veis y dónde, y descubrid quién miente antes de que sea tarde. Partida en tiempo real, de 4 a 12 jugadores, cada uno con su móvil.</p>
-            <div className="actions">
-              <button className="big full" onClick={() => { setVista('crear'); setErrorMsg(''); }}><Icon name="crown" size={22} /> Crear partida</button>
-              <button className="big full" onClick={() => { setVista('unirse'); setErrorMsg(''); }}><Icon name="users" size={22} /> Unirse a partida</button>
+          <div className="panel tr-center" style={{ position: 'relative', padding: '2.4rem 1.6rem 2rem' }}>
+            <BotonAyudaPanel />
+
+            {/* Círculo suave con icono temático */}
+            <div
+              style={{
+                width: '76px',
+                height: '76px',
+                borderRadius: '50%',
+                backgroundColor: '#fff7ed',
+                color: 'var(--g1, #d97706)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 1.1rem auto',
+                boxShadow: '0 4px 14px rgba(217, 119, 6, 0.12)'
+              }}
+            >
+              <Icon name="dagger" size={38} strokeWidth={2} />
+            </div>
+
+            <h1 className="title" style={{ margin: '0 0 0.6rem 0' }}>Traiciones</h1>
+            <p className="hint" style={{ maxWidth: '540px', margin: '0 auto 1.6rem auto', lineHeight: '1.45' }}>
+              Una caravana cruza el desierto rumbo al Oasis. Algunos sois traidores. Moveos por el campamento, haced tareas y descubrid quién miente.
+            </p>
+
+            {/* Botones en columna vertical de ancho completo */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', width: '100%', maxWidth: '480px', margin: '0 auto' }}>
+              <button className="big full" onClick={() => { setVista('crear'); setErrorMsg(''); }}>
+                <Icon name="crown" size={20} /> Crear partida
+              </button>
+              <button className="big full" onClick={() => { setVista('unirse'); setErrorMsg(''); }}>
+                <Icon name="users" size={20} /> Unirse a partida
+              </button>
             </div>
           </div>
         </section>
       )}
 
-      {/* ---------- Crear / unirse ---------- */}
+      {/* ---------- 2. CREAR / UNIRSE ---------- */}
       {(vista === 'crear' || vista === 'unirse') && (
         <section className="game">
-          <div className="panel tr-center">
-            <span className="tr-logo"><Icon name={vista === 'crear' ? 'crown' : 'users'} size={40} strokeWidth={1.7} /></span>
+          <div className="panel tr-center" style={{ position: 'relative' }}>
+            <BotonAyudaPanel />
+            <div
+              style={{
+                width: '74px',
+                height: '74px',
+                borderRadius: '50%',
+                backgroundColor: '#fff7ed',
+                color: 'var(--g1, #d97706)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 1rem auto'
+              }}
+            >
+              <Icon name={vista === 'crear' ? 'crown' : 'users'} size={36} strokeWidth={2} />
+            </div>
             <h2 className="title">{vista === 'crear' ? 'Crear partida' : 'Unirse a partida'}</h2>
             <p className="hint">{vista === 'crear' ? 'Pon tu nombre para crear la sala y ser el anfitrión.' : 'Introduce el código de 4 letras que te ha dado el anfitrión.'}</p>
             <div className="tr-form">
@@ -174,13 +309,40 @@ export default function TraicionesOnline() {
         </section>
       )}
 
-      {/* ---------- Lobby ---------- */}
+      {/* ---------- 3. SALA DE ESPERA (LOBBY) ---------- */}
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
         <section className="game">
-          <div className="panel tr-center">
+          <div className="panel tr-center" style={{ position: 'relative' }}>
+            <BotonAyudaPanel />
+
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.45rem',
+                  padding: '0.35rem 1.1rem',
+                  borderRadius: '9999px',
+                  border: '1.5px solid #22c55e',
+                  backgroundColor: '#f0fdf4',
+                  color: '#16a34a',
+                  fontSize: '0.85rem',
+                  fontWeight: 600,
+                  lineHeight: 1
+                }}
+              >
+                <Icon name="lock" size={15} />
+                Sala de espera
+              </span>
+            </div>
+
             <p className="hint" style={{ marginBottom: '.2rem' }}>Código de la partida</p>
-            <button type="button" className="tr-codigo" onClick={copiarCodigo} title="Copiar código">{sala.code}</button>
-            <p className="hint small">{codigoCopiado ? '¡Copiado al portapapeles!' : 'Pulsa el código para copiarlo y compártelo con los demás.'}</p>
+            <button type="button" className="tr-codigo" onClick={copiarCodigo} title="Copiar código">
+              {sala.code}
+            </button>
+            <p className="hint small">
+              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Pulsa el código para copiarlo y compártelo con los demás.'}
+            </p>
           </div>
 
           <div className="panel" style={{ marginTop: '1rem' }}>
@@ -192,7 +354,11 @@ export default function TraicionesOnline() {
                 </div>
               ))}
             </div>
-            {jugadores.length < MIN_JUGADORES && <p className="hint" style={{ marginTop: '.8rem' }}>Faltan {MIN_JUGADORES - jugadores.length} jugadores para empezar (mínimo {MIN_JUGADORES}).</p>}
+            {jugadores.length < MIN_JUGADORES && (
+              <p className="hint" style={{ marginTop: '.8rem' }}>
+                Faltan {MIN_JUGADORES - jugadores.length} jugadores para empezar (mínimo {MIN_JUGADORES}).
+              </p>
+            )}
           </div>
 
           {esAdmin && (
@@ -215,6 +381,7 @@ export default function TraicionesOnline() {
               </div>
             </div>
           )}
+
           {!esAdmin && (
             <div className="panel tr-center" style={{ marginTop: '1rem' }}>
               <h3>Esperando al anfitrión…</h3>
@@ -228,46 +395,63 @@ export default function TraicionesOnline() {
                 <Icon name="play" size={22} /> {jugadores.length < MIN_JUGADORES ? 'Esperando jugadores…' : '¡Repartir roles y empezar!'}
               </button>
             )}
-            <button className="secondary danger full" onClick={() => setModalSalir(true)}><Icon name="door" size={20} /> Salir de la sala</button>
+            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
+              <Icon name="door" size={20} /> Salir de la sala
+            </button>
           </div>
         </section>
       )}
 
-      {/* ---------- Partida ---------- */}
+      {/* ---------- 4. PARTIDA EN CURSO ---------- */}
       {vista === 'sala' && sala && sala.estado === 'jugando' && sala.vista && (
         <>
           {sala.vista.fase !== 'fin' ? (
             <>
               <PantallaDeFase v={sala.vista} enviar={enviar} offset={offset} />
               <div className="actions" style={{ marginTop: '.4rem' }}>
-                {esAdmin && ['asamblea', 'votacion', 'veredicto', 'roles'].includes(sala.vista.fase) && <button type="button" className="secondary full" onClick={() => llamar('forzar')}><Icon name="forward" size={18} /> Forzar avance (si alguien está ausente)</button>}
-                <button type="button" className="secondary danger full" onClick={() => setModalSalir(true)}><Icon name="door" size={20} /> Abandonar partida</button>
+                {esAdmin && ['asamblea', 'votacion', 'veredicto', 'roles'].includes(sala.vista.fase) && (
+                  <button type="button" className="secondary full" onClick={() => llamar('forzar')}>
+                    <Icon name="forward" size={18} /> Forzar avance (si alguien está ausente)
+                  </button>
+                )}
+                <button type="button" className="secondary danger full" onClick={() => setModalSalir(true)}>
+                  <Icon name="door" size={20} /> Abandonar partida
+                </button>
               </div>
             </>
           ) : (
             <PantallaFin v={sala.vista} puntosTotales={puntosTotales}>
-              <Marcador />
               <div className="actions">
                 {esAdmin ? (
                   <>
-                    <button className="big full" disabled={jugadores.length < MIN_JUGADORES} onClick={() => llamar('siguiente-partida')}><Icon name="refresh" size={22} /> Otra partida (mismos jugadores)</button>
-                    <button className="secondary danger full" onClick={() => llamar('finalizar')}><Icon name="trophy" size={20} /> Finalizar y ver podio</button>
+                    <button className="big full" disabled={jugadores.length < MIN_JUGADORES} onClick={() => llamar('siguiente-partida')}>
+                      <Icon name="refresh" size={22} /> Otra partida (mismos jugadores)
+                    </button>
+                    <button className="secondary danger full" onClick={() => llamar('finalizar')}>
+                      <Icon name="trophy" size={20} /> Finalizar y ver podio
+                    </button>
                   </>
-                ) : <p className="hint tr-center">Esperando a que el anfitrión decida qué hacer…</p>}
-                <button className="secondary danger full" onClick={() => setModalSalir(true)}><Icon name="door" size={20} /> Salir de la sala</button>
+                ) : (
+                  <p className="hint tr-center">Esperando a que el anfitrión decida qué hacer…</p>
+                )}
+                <button className="secondary danger full" onClick={() => setModalSalir(true)}>
+                  <Icon name="door" size={20} /> Salir de la sala
+                </button>
               </div>
             </PantallaFin>
           )}
         </>
       )}
 
-      {/* ---------- Podio final ---------- */}
+      {/* ---------- 5. PODIO FINAL ---------- */}
       {vista === 'sala' && sala && sala.estado === 'final' && (
         <section className="game">
           <div className="end-card">
             <span className="end-icon"><Icon name="crown" size={44} /></span>
             <h1 className="title">Puntuaciones finales</h1>
-            <p className="final-score">{ranking[0]?.puntos > 0 ? `Ganador: ${ranking.filter((j) => j.puntos === ranking[0].puntos).map((j) => j.nombre).join(' y ')}` : 'Sin ganador'}</p>
+            <p className="final-score">
+              {ranking[0]?.puntos > 0 ? `Ganador: ${ranking.filter((j) => j.puntos === ranking[0].puntos).map((j) => j.nombre).join(' y ')}` : 'Sin ganador'}
+            </p>
             <div className="scoreboard">
               {ranking.map((j, i) => (
                 <div key={j.id} className={`score-row${i === 0 && j.puntos > 0 ? ' first' : ''}`}>
@@ -278,8 +462,14 @@ export default function TraicionesOnline() {
             </div>
           </div>
           <div className="actions" style={{ marginTop: '1.2rem' }}>
-            {esAdmin && <button className="big full" onClick={() => llamar('reiniciar')}><Icon name="refresh" size={22} /> Volver a la sala de espera</button>}
-            <button className="secondary danger full" onClick={() => setModalSalir(true)}><Icon name="door" size={20} /> Salir de la sala</button>
+            {esAdmin && (
+              <button className="big full" onClick={() => llamar('reiniciar')}>
+                <Icon name="refresh" size={22} /> Volver a la sala de espera
+              </button>
+            )}
+            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
+              <Icon name="door" size={20} /> Salir de la sala
+            </button>
           </div>
         </section>
       )}
@@ -296,7 +486,6 @@ export default function TraicionesOnline() {
           </div>
         </div>
       )}
-
     </div>
   );
 }

@@ -1,14 +1,13 @@
 // client/src/games/Fundadores/Vistas.jsx
 // Pantallas de Fundadores compartidas por el modo online y el de un solo dispositivo.
-// Reciben `v` (vista del jugador, engine.vistaDe) y `enviar(tipo, datos)` (devuelve una promesa; puede mostrar errores fuera).
 import React, { useState } from 'react';
 import Icon from './IconoF.jsx';
 import { ROLES, ROL, PEON, TIPOS, TIPOS_BASE, nombreRol } from './engine.js';
 import './Fundadores.css';
+import '../Adivina/Adivina.css';
 
 const plural = (n, s, p) => (n === 1 ? s : p);
 
-// ---------------------------------------------------------------- Piezas pequeñas
 export function Moneda({ n }) { return <span className="fd-stat mon"><Icon name="coin" size={14} /> {n}</span>; }
 
 export function Edificio({ c }) {
@@ -93,7 +92,6 @@ function MiMano({ v, costes }) {
   );
 }
 
-// ---------------------------------------------------------------- Elegir oficio (secreto)
 export function FaseElegir({ v, enviar }) {
   const [sel, setSel] = useState(v.yo.eleccion);
   const hecho = !!v.yo.eleccion;
@@ -137,7 +135,6 @@ export function FaseElegir({ v, enviar }) {
   );
 }
 
-// ---------------------------------------------------------------- Parámetros de habilidad
 function ParamPanel({ rolEf, v, onUsar }) {
   const r = ROL[rolEf];
   const otros = v.jugadores.filter((j) => j.id !== v.yo.id && !j.fuera);
@@ -187,7 +184,6 @@ function PanelHabilidad({ v, enviar }) {
   return <ParamPanel rolEf={t.rol} v={v} onUsar={usar} />;
 }
 
-// ---------------------------------------------------------------- Mi turno
 function MiTurno({ v, enviar }) {
   const t = v.turno;
   const rolInfo = t.rol === 0 ? PEON : ROL[t.rol];
@@ -262,7 +258,6 @@ export function FaseTurnos({ v, enviar }) {
   );
 }
 
-// ---------------------------------------------------------------- Final
 export function PantallaFin({ v, puntosTotales, children }) {
   const f = v.fin;
   const nombres = f.ganadores.map((id) => v.jugadores.find((j) => j.id === id)?.nombre).join(' y ');
@@ -291,32 +286,85 @@ export function PantallaFin({ v, puntosTotales, children }) {
   );
 }
 
-// ---------------------------------------------------------------- Reglas
+// ---------------------------------------------------------------- Modal de Ayuda (Estilizado y legible)
 export function Ayuda({ onCerrar }) {
   return (
-    <div className="fd-modal-fondo" onClick={onCerrar}>
-      <div className="fd-modal" onClick={(e) => e.stopPropagation()}>
-        <h3>¿Cómo se juega a Fundadores?</h3>
-        <p>Todos levantáis <strong>un mismo pueblo</strong>, cada uno su barrio. Cuando entre todos se alcance la <strong>meta de obra común</strong>, el pueblo se inaugura y gana quien tenga más prestigio.</p>
-        <h4>Cada ronda</h4>
-        <ul>
-          <li><strong>1. Elegir oficio (en secreto, a la vez).</strong> Hay 8 oficios. Si dos eligen el mismo, se lo queda quien tenga prioridad (la prioridad rota cada ronda); el otro actúa de Peón y recibe 1 moneda de consuelo.</li>
-          <li><strong>2. Turnos.</strong> Se llama a los oficios del 1 al 8 y luego a los Peones. En tu turno: <em>acción básica</em> (cobrar jornal o proyectar), <em>habilidad</em> del oficio y <em>construir</em> (1 edificio, salvo que tu oficio diga otra cosa).</li>
-        </ul>
-        <h4>Edificios</h4>
-        <ul>
-          <li>Cada plano tiene <strong>coste</strong> (monedas) y <strong>prestigio</strong> (puntos). El coste de cada edificio que construyes suma a la obra común.</li>
-          <li>Tipos con ventaja pasiva: <strong>Comercio</strong> (+1 moneda por jornal, máx. 2), <strong>Taller</strong> (cada 2: edificios 1 más baratos), <strong>Saber</strong> (cada 2: ves 1 plano más al proyectar), <strong>Hogar</strong> (cada 3: +1 prestigio al final).</li>
-          <li><strong>Hitos</strong>: edificios únicos con efectos especiales. No puedes tener dos edificios iguales.</li>
-        </ul>
-        <h4>Final y puntos</h4>
-        <ul>
-          <li>Prestigio de tus edificios + <strong>3</strong> si tienes los 4 tipos + 1 por cada 3 Hogares + <strong>3</strong> si pusiste la última piedra.</li>
-          <li>Empate: gana quien tenga más monedas.</li>
-        </ul>
-        <h4>Los oficios</h4>
-        <ul>{ROLES.map((r) => <li key={r.id}><strong>{r.id}. {r.nombre}:</strong> {r.desc}</li>)}</ul>
-        <div className="fd-modal-acciones"><button type="button" className="big full" onClick={onCerrar}>Entendido</button></div>
+    <div className="rg-modal-fondo" onClick={onCerrar}>
+      <div
+        className="rg-modal aprox-modal-ayuda"
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          maxWidth: '560px',
+          maxHeight: '88vh',
+          overflowY: 'auto',
+          textAlign: 'left',
+          padding: '1.4rem'
+        }}
+      >
+        <div className="aprox-modal-header" style={{ marginBottom: '1rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.6rem' }}>
+          <span className="aprox-modal-signo-title">?</span>
+          <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#1e1b4b' }}>¿Cómo se juega a Fundadores?</h3>
+        </div>
+
+        <div className="aprox-modal-cuerpo" style={{ fontSize: '0.92rem', lineHeight: '1.5', color: '#334155' }}>
+          <div style={{ marginBottom: '1.1rem' }}>
+            <h4 style={{ color: '#0f172a', margin: '0 0 0.3rem', fontSize: '1rem' }}>🎯 Objetivo</h4>
+            <p style={{ margin: 0 }}>
+              Todos levantáis <strong>un mismo pueblo</strong>, cada uno su propio barrio. Cuando entre todos se alcance la <strong>meta de obra común</strong>, el pueblo se inaugura y gana quien haya acumulado más prestigio.
+            </p>
+          </div>
+
+          <div style={{ marginBottom: '1.1rem' }}>
+            <h4 style={{ color: '#0f172a', margin: '0 0 0.3rem', fontSize: '1rem' }}>⏳ En cada ronda</h4>
+            <ol style={{ paddingLeft: '1.2rem', margin: '0.3rem 0' }}>
+              <li style={{ marginBottom: '0.35rem' }}>
+                <strong>1. Elegir oficio (en secreto y a la vez):</strong> Hay 8 oficios. Si dos jugadores eligen el mismo, se lo queda quien tenga prioridad; el otro actúa de Peón y recibe 1 moneda de consuelo[cite: 50, 56].
+              </li>
+              <li style={{ marginBottom: '0.35rem' }}>
+                <strong>2. Turnos por orden (1 al 8):</strong> En tu turno realizas tu <em>acción básica</em> (cobrar jornal o proyectar planos), usas la <em>habilidad</em> del oficio y puedes <em>construir</em>[cite: 50, 56].
+              </li>
+            </ol>
+          </div>
+
+          <div style={{ marginBottom: '1.1rem' }}>
+            <h4 style={{ color: '#0f172a', margin: '0 0 0.3rem', fontSize: '1rem' }}>🏛️ Edificios y Ventajas pasivas</h4>
+            <ul style={{ paddingLeft: '1.2rem', margin: '0.3rem 0' }}>
+              <li style={{ marginBottom: '0.3rem' }}><strong>Comercio:</strong> +1 moneda por jornal (máx. 2)[cite: 50, 56].</li>
+              <li style={{ marginBottom: '0.3rem' }}><strong>Taller:</strong> Cada 2 talleres, tus edificios cuestan 1 moneda menos (mín. 1)[cite: 50, 56].</li>
+              <li style={{ marginBottom: '0.3rem' }}><strong>Saber:</strong> Cada 2 de saber, ves 1 plano más al proyectar[cite: 50, 56].</li>
+              <li style={{ marginBottom: '0.3rem' }}><strong>Hogar:</strong> Cada 3 hogares, sumas +1 de prestigio al final[cite: 50, 56].</li>
+              <li style={{ marginBottom: '0.3rem' }}><strong>Hitos:</strong> Edificios únicos con efectos especiales potentes. No puedes tener dos edificios iguales[cite: 50, 56].</li>
+            </ul>
+          </div>
+
+          <div style={{ marginBottom: '1.1rem' }}>
+            <h4 style={{ color: '#0f172a', margin: '0 0 0.3rem', fontSize: '1rem' }}>🏆 Puntuación y Final</h4>
+            <ul style={{ paddingLeft: '1.2rem', margin: '0.3rem 0' }}>
+              <li>Prestigio base de todos tus edificios[cite: 50, 56].</li>
+              <li><strong>+3 puntos de variedad:</strong> Si tienes los 4 tipos básicos de edificios en tu pueblo[cite: 50, 56].</li>
+              <li><strong>+1 punto:</strong> Por cada 3 hogares que hayas construido[cite: 50, 56].</li>
+              <li><strong>+3 puntos de inauguración:</strong> Si pusiste la última piedra de la obra común[cite: 50, 56].</li>
+              <li><em>En caso de empate a puntos, gana quien conserve más monedas[cite: 50, 56].</em></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 style={{ color: '#0f172a', margin: '0 0 0.3rem', fontSize: '1rem' }}>🎭 Los 8 Oficios</h4>
+            <ul style={{ paddingLeft: '1.2rem', margin: '0.3rem 0' }}>
+              {ROLES.map((r) => (
+                <li key={r.id} style={{ marginBottom: '0.35rem' }}>
+                  <strong>{r.id}. {r.nombre}:</strong> {r.desc}[cite: 50, 56]
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <div className="rg-modal-acciones" style={{ marginTop: '1.2rem' }}>
+          <button type="button" className="big full" onClick={onCerrar}>
+            Entendido
+          </button>
+        </div>
       </div>
     </div>
   );
