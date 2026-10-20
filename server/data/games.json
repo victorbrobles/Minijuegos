@@ -196,5 +196,11 @@
     "name": "Logo Mania",
     "description": "Adivina a qué marca corresponde el logo antes de que termine el tiempo. Aciertos suman segundos, fallos restan.",
     "isNew": true
+  },
+  {
+    "id": "hipotesis",
+    "name": "La Hipótesis Ganadora",
+    "description": "Cada ronda el laboratorio esconde una verdad y tú solo conoces un trocito. Formula una hipótesis (cierta o de farol), apuesta por las de los demás y descubre quién miente.",
+    "isNew": true
   }
 ]

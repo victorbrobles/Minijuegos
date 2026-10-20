@@ -31,6 +31,7 @@ import Bingoball from './Bingoball/Bingoball.jsx';
 import Cuentas from './Cuentas/Cuentas.jsx';
 import Conoce from './Conoce/Conoce.jsx';
 import Logos from './Logos/Logos.jsx';
+import Hipotesis from './Hipotesis/Hipotesis.jsx';
 
 // id del juego (el mismo que en server/data/games.json) -> componente React
 const registry = {
@@ -66,7 +67,8 @@ const registry = {
   'bingoball': Bingoball,
   'cuentas': Cuentas,
   'conoce': Conoce,
-  'logos': Logos
+  'logos': Logos,
+  'hipotesis': Hipotesis
 };
 
 export default registry;

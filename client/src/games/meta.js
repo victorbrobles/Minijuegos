@@ -275,7 +275,15 @@ export const META = {
     etiquetas: 'logos marcas empresas adivinar velocidad memoria simbolos',
     descripcion: 'Identifica la marca que se oculta tras el logo antes de que el cronómetro llegue a cero. Suma segundos al acertar y evita arriesgar si no estás seguro.',
     categorias: ['prueba', 'dos_jugadores']
-  }
+  },
+  'hipotesis': {
+    titulo: 'La Hipótesis Ganadora',
+    icono: 'bulb',
+    colores: ['#2563eb', '#1e3a8a'],
+    etiquetas: 'hipotesis farol engano deduccion apostar laboratorio ciencia muestras mentir online',
+    descripcion: 'Cada ronda el laboratorio esconde una verdad y tú solo conoces un trocito. Formula una hipótesis (cierta o de farol), apuesta por las de los demás y descubre quién miente.',
+    categorias: ['favoritos', 'estrategia']
+  },
 };
 
 export const META_POR_DEFECTO = {
