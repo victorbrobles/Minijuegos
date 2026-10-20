@@ -15,15 +15,16 @@
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 html { min-height: 100%; }
 body {
-  margin: 0; min-height: 100vh;
-  color: var(--ink);
+  margin: 0; 
+  min-height: 100vh;
+  color: #f1f5f9;
   font-family: 'Figtree', system-ui, sans-serif;
   line-height: 1.45;
   background:
-    radial-gradient(circle at 12% 8%, rgba(255, 122, 69, .22) 0, transparent 38%),
-    radial-gradient(circle at 92% 18%, rgba(34, 184, 207, .25) 0, transparent 40%),
-    radial-gradient(circle at 70% 95%, rgba(255, 77, 141, .20) 0, transparent 42%),
-    linear-gradient(160deg, var(--bg1), var(--bg2));
+    radial-gradient(circle at 18% 12%, rgba(124, 77, 255, 0.22) 0, transparent 46%),
+    radial-gradient(circle at 82% 16%, rgba(255, 77, 141, 0.18) 0, transparent 44%),
+    radial-gradient(circle at 50% 85%, rgba(6, 182, 212, 0.15) 0, transparent 52%),
+    linear-gradient(165deg, #0b0d19 0%, #0f1326 45%, #14132b 100%);
   background-attachment: fixed;
 }
 a { color: inherit; }
@@ -587,133 +588,131 @@ button.rebote { background: linear-gradient(135deg, #ff9f43, #ff4d6d); }
    TEMA OSCURO - PÁGINA PRINCIPAL (PORTADA)
    ======================================================== */
 
-body:has(.home-head),
-body:has(.home-view) {
-  color: #f1f5f9;
-  background:
-    radial-gradient(circle at 18% 12%, rgba(124, 77, 255, 0.22) 0, transparent 46%),
-    radial-gradient(circle at 82% 16%, rgba(255, 77, 141, 0.18) 0, transparent 44%),
-    radial-gradient(circle at 50% 85%, rgba(6, 182, 212, 0.15) 0, transparent 52%),
-    linear-gradient(165deg, #0b0d19 0%, #0f1326 45%, #14132b 100%);
-  background-attachment: fixed;
-}
+/* ========================================================
+   ESTILOS ADICIONALES PARA MODO OSCURO
+   ======================================================== */
 
-/* Cabecera principal en fondo oscuro */
-body:has(.home-head) .home-head {
+/* Cabecera principal */
+.home-head {
   box-shadow: 0 8px 0 rgba(0, 0, 0, 0.35), 0 20px 35px -12px rgba(124, 77, 255, 0.6);
 }
 
 /* Buscador flotante adaptado al fondo oscuro */
-body:has(.home-head) .search-wrap.fijo {
+.search-wrap.fijo {
   background: linear-gradient(rgba(11, 13, 25, 0.94) 75%, rgba(11, 13, 25, 0));
   -webkit-backdrop-filter: blur(12px);
   backdrop-filter: blur(12px);
 }
 
-body:has(.home-head) .search {
+.search {
   background: rgba(26, 29, 53, 0.85);
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
   box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.12), 0 8px 24px -6px rgba(0, 0, 0, 0.6);
 }
 
-body:has(.home-head) .search:focus-within {
+.search:focus-within {
   box-shadow: 0 0 0 2.5px #a855f7, 0 12px 28px -6px rgba(168, 85, 247, 0.45);
 }
 
-body:has(.home-head) .search-icon {
+.search-icon {
   color: #a5b4fc;
 }
 
-body:has(.home-head) .search-input {
+.search-input {
   color: #f8fafc;
 }
 
-body:has(.home-head) .search-input::placeholder {
+.search-input::placeholder {
   color: #94a3b8;
 }
 
-body:has(.home-head) .search-clear {
+.search-clear {
   background: rgba(255, 255, 255, 0.12);
   color: #cbd5e1;
 }
 
-body:has(.home-head) .search-clear:hover {
+.search-clear:hover {
   background: rgba(255, 255, 255, 0.22);
   color: #ffffff;
 }
 
-body:has(.home-head) .search-count {
+.search-count {
   color: #94a3b8;
 }
 
-/* Sombra y relieve reforzado de las tarjetas de minijuegos */
-body:has(.home-head) .gc {
+/* Tarjetas de juego en la portada */
+.gc {
   box-shadow: 0 6px 0 rgba(0, 0, 0, 0.45), 0 18px 30px -12px var(--g2);
 }
 
-body:has(.home-head) .loading {
+.loading {
   color: #a5b4fc;
 }
 
-/* Estado sin resultados */
-body:has(.home-head) .empty {
+/* Botón de volver a la portada */
+.back {
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.35), 0 10px 24px -8px rgba(0, 0, 0, 0.5);
+}
+
+/* Estado sin resultados en buscador */
+.empty {
   background: rgba(26, 29, 53, 0.8);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.1);
   color: #f1f5f9;
 }
 
-body:has(.home-head) .empty-icon {
+.empty-icon {
   background: rgba(124, 77, 255, 0.25);
   color: #c4b5fd;
 }
 
-body:has(.home-head) .empty-title {
+.empty-title {
   color: #ffffff;
 }
 
-body:has(.home-head) .empty-text {
+.empty-text {
   color: #94a3b8;
 }
 
-body:has(.home-head) .empty button.secondary {
+.empty button.secondary {
   background: rgba(255, 255, 255, 0.1);
   color: #ffffff;
   box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.2);
 }
 
-body:has(.home-head) .empty button.secondary:hover {
+.empty button.secondary:hover {
   background: rgba(255, 255, 255, 0.16);
 }
 
-/* Panel de administración en modo oscuro */
-body:has(.home-head) .admin-toggle {
+/* Panel de administración */
+.admin-toggle {
   color: #94a3b8;
   box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.15);
 }
 
-body:has(.home-head) .admin-toggle:hover {
+.admin-toggle:hover {
   color: #f1f5f9;
   background: rgba(255, 255, 255, 0.05);
 }
 
-body:has(.home-head) .admin-panel {
+.admin-panel {
   background: rgba(26, 29, 53, 0.92);
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12), 0 12px 28px rgba(0, 0, 0, 0.5);
   color: #f1f5f9;
 }
 
-body:has(.home-head) .admin-text span {
+.admin-text span {
   color: #94a3b8;
 }
 
-body:has(.home-head) .admin-text input {
+.admin-text input {
   background: #0f1224;
   border: 2px solid rgba(255, 255, 255, 0.16);
   color: #ffffff;
 }
 
-body:has(.home-head) .admin-text input:focus-visible {
+.admin-text input:focus-visible {
   border-color: #a855f7;
 }
 
@@ -792,4 +791,441 @@ body:has(.home-head) .admin-text input:focus-visible {
     flex: 0 0 calc((100% - 0.75rem) / 1.75);
     min-width: 145px;
   }
+}
+
+/* ========================================================
+   CARRUSEL HORIZONTAL CON NAVEGACIÓN EN ORDENADOR
+   ======================================================== */
+
+.home-categoria-bloque {
+  margin-bottom: 2.2rem;
+}
+
+.home-categoria-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.85rem;
+  padding: 0 0.2rem;
+}
+
+.home-categoria-titulo {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  margin: 0;
+  color: #f8fafc;
+  letter-spacing: -0.01em;
+}
+
+.home-categoria-desc {
+  margin: 0.2rem 0 0;
+  font-size: 0.88rem;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+/* Botones de flechas para avanzar/retroceder */
+.home-carousel-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-shrink: 0;
+}
+
+.carousel-nav-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.22);
+  background: rgba(30, 34, 60, 0.85);
+  color: #ffffff;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0 2px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.carousel-nav-btn:hover {
+  background: #7c4dff;
+  border-color: #a855f7;
+  transform: scale(1.08);
+}
+
+.carousel-nav-btn:active {
+  transform: scale(0.94);
+}
+
+/* Fila deslizable */
+.home-carousel-track {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 0.8rem;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  cursor: grab;
+  user-select: none; /* Elimina la necesidad de seleccionar texto */
+}
+
+.home-carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
+/* Estado mientras se arrastra con el ratón */
+.home-carousel-track.arrastrando {
+  cursor: grabbing;
+  scroll-behavior: auto !important;
+  scroll-snap-type: none !important;
+}
+
+.home-carousel-track.arrastrando * {
+  pointer-events: none;
+}
+
+/* 3 tarjetas exactas visibles en pantallas normales */
+.home-carousel-item {
+  flex: 0 0 calc((100% - 2rem) / 3);
+  min-width: 220px;
+  scroll-snap-align: start;
+  list-style: none;
+  display: flex;
+}
+
+.home-carousel-item > * {
+  width: 100%;
+}
+
+@media (max-width: 680px) {
+  .home-carousel-item {
+    flex: 0 0 calc((100% - 0.9rem) / 2.15);
+    min-width: 155px;
+  }
+  .home-categoria-titulo {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .home-carousel-item {
+    flex: 0 0 calc((100% - 0.75rem) / 1.75);
+    min-width: 145px;
+  }
+}
+
+/* Botón pequeño 'i' en la tarjeta */
+.gc-info-btn {
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  z-index: 4;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  border: 1.5px solid rgba(255, 255, 255, 0.45);
+  color: #ffffff;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition: all 0.15s ease;
+}
+
+.gc-info-btn:hover {
+  background: rgba(255, 255, 255, 0.45);
+  border-color: #ffffff;
+  transform: scale(1.12);
+}
+
+.gc-info-btn:active {
+  transform: scale(0.94);
+}
+
+.gc-info-btn-text {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-size: 0.85rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+/* Capa interior desplegable */
+.gc-desc-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: rgba(15, 23, 42, 0.94);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 0.85rem 0.85rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: left;
+  border-radius: 28px;
+  cursor: default;
+  animation: gcDescFade 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes gcDescFade {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.gc-desc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.gc-desc-badge {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #38bdf8;
+}
+
+.gc-desc-close {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: #cbd5e1;
+  font-size: 0.75rem;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  cursor: pointer;
+  box-shadow: none;
+  transition: all 0.15s ease;
+}
+
+.gc-desc-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+}
+
+.gc-desc-texto {
+  margin: 0;
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: #f1f5f9;
+  overflow-y: auto;
+  max-height: 85px;
+  padding-right: 0.2rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.25) transparent;
+}
+
+.gc-desc-texto::-webkit-scrollbar {
+  width: 4px;
+}
+
+.gc-desc-texto::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 4px;
+}
+
+.gc-desc-play {
+  margin-top: 0.45rem;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #ffffff;
+  background: linear-gradient(135deg, var(--g1), var(--g2));
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  width: 100%;
+}
+
+.gc-desc-play:hover {
+  filter: brightness(1.1);
+}
+
+/* Color del título con la tonalidad temática de cada minijuego */
+.title,
+.panel .title,
+.game-shell .title {
+  background: linear-gradient(135deg, var(--g1, #4f46e5), var(--g2, #1e1b4b));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Fallback o color directo para navegadores donde no aplique el clip */
+@supports not (-webkit-background-clip: text) {
+  .title,
+  .panel .title,
+  .game-shell .title {
+    color: var(--g1, #1e1b4b);
+  }
+}
+
+/* Asegurar que el texto dentro de los paneles blancos mantenga contraste óptimo */
+.panel,
+.end-card,
+.rg-modal {
+  color: var(--ink, #1f1a47);
+}
+
+/* ========================================================
+   PIE DE PÁGINA (FOOTER)
+   ======================================================== */
+
+.home-footer {
+  margin-top: 4rem;
+  padding: 2.2rem 1.4rem 1.6rem;
+  background: rgba(22, 26, 48, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 28px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 2.5rem;
+  align-items: flex-start;
+}
+
+@media (max-width: 768px) {
+  .footer-content {
+    grid-template-columns: 1fr;
+    gap: 1.8rem;
+  }
+}
+
+.footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.75rem;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, #7c4dff, #ff4d8d);
+  border-radius: 12px;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(124, 77, 255, 0.4);
+}
+
+.footer-brand h3 {
+  margin: 0;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+}
+
+.footer-text {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.footer-col h4 {
+  margin: 0 0 0.4rem;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #f8fafc;
+}
+
+.footer-subtext {
+  margin: 0 0 0.9rem;
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.footer-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.95rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  color: #f1f5f9;
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.18s ease;
+  user-select: none;
+}
+
+.footer-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.35);
+  transform: translateY(-2px);
+  color: #ffffff;
+}
+
+.footer-btn:active {
+  transform: scale(0.96);
+}
+
+.footer-btn-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.footer-bottom {
+  margin-top: 2rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: center;
+}
+
+.footer-bottom p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 600;
 }

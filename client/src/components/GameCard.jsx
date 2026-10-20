@@ -1,19 +1,116 @@
-import { Link } from 'react-router-dom';
+// client/src/components/GameCard.jsx
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Icon from './Icon.jsx';
 import { metaDe } from '../games/meta.js';
 
-// Tarjeta de la portada: degradado con el color del juego, icono grande y nombre
 export default function GameCard({ game }) {
+  const [mostrarDesc, setMostrarDesc] = useState(false);
   const m = metaDe(game.id);
+  const navigate = useNavigate();
+
+  const descripcion = m?.descripcion || game?.description || 'Sin descripción disponible.';
+
+  // Entrar al juego
+  const entrarAlJuego = () => {
+    navigate(`/juego/${game.id}`);
+  };
+
+  // Abrir o alternar la descripción
+  const toggleDesc = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setMostrarDesc((prev) => !prev);
+  };
+
+  // Cerrar la descripción
+  const cerrarDesc = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setMostrarDesc(false);
+  };
+
+  // Evitar que el clic o pulsación sobre los controles empiece el arrastre del carrusel
+  const detenerInteraccion = (e) => {
+    e.stopPropagation();
+  };
+
   return (
-    <Link
-      to={`/juego/${game.id}`}
+    <div
       className="gc"
-      style={{ '--g1': m.colores[0], '--g2': m.colores[1] }}
+      style={{ '--g1': m.colores[0], '--g2': m.colores[1], cursor: 'pointer' }}
+      onClick={entrarAlJuego}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          entrarAlJuego();
+        }
+      }}
     >
-      <Icon name={m.icono} size={120} strokeWidth={1.4} className="gc-bg" />
-      <span className="gc-icon"><Icon name={m.icono} size={40} strokeWidth={1.9} /></span>
-      <span className="gc-name">{game.name}</span>
-    </Link>
+      {/* Icono grande translúcido de fondo */}
+      <Icon name={m.icono} className="gc-bg" aria-hidden="true" />
+
+      {/* Botón 'i' para abrir la descripción */}
+      <button
+        type="button"
+        className="gc-info-btn"
+        onClick={toggleDesc}
+        onMouseDown={detenerInteraccion}
+        onTouchStart={detenerInteraccion}
+        aria-label="Ver descripción del juego"
+        title="Ver descripción"
+      >
+        <span className="gc-info-btn-text">i</span>
+      </button>
+
+      {/* Contenido principal de la tarjeta */}
+      <span className="gc-icon">
+        <Icon name={m.icono} size={44} />
+      </span>
+      <span className="gc-name">{m.titulo || game.name}</span>
+
+      {/* Capa desplegada con la descripción completa */}
+      {mostrarDesc && (
+        <div
+          className="gc-desc-overlay"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          onMouseDown={detenerInteraccion}
+          onTouchStart={detenerInteraccion}
+        >
+          <div className="gc-desc-header">
+            <span className="gc-desc-badge">¿De qué trata?</span>
+            <button
+              type="button"
+              className="gc-desc-close"
+              onClick={cerrarDesc}
+              onMouseDown={detenerInteraccion}
+              onTouchStart={detenerInteraccion}
+              aria-label="Cerrar descripción"
+              title="Cerrar"
+            >
+              ✕
+            </button>
+          </div>
+          <p className="gc-desc-texto">{descripcion}</p>
+          <button
+            type="button"
+            className="gc-desc-play"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              entrarAlJuego();
+            }}
+            onMouseDown={detenerInteraccion}
+            onTouchStart={detenerInteraccion}
+          >
+            Jugar
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
