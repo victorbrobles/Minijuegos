@@ -1,6 +1,6 @@
 // server/routes/quienesquien.js
 import { Router } from 'express';
-import SEED_DATA from '../data/seeds/quienesquien/quienesquien.seed.js';
+import SEED_DATA from '../data/seeds/quienesquien/quienesquien.js';
 
 const router = Router();
 

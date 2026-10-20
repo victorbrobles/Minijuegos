@@ -1,29 +1,38 @@
 // server/data/seeds/bingoball/bingoballData.js
-import { BINGO_INTERNACIONAL } from './parte1.js';
-import { BINGO_CHAMPIONS } from './parte2.js';
-import { BINGO_LALIGA } from './parte3.js';
-import { BINGO_GRANDES_LIGAS } from './parte4.js';
-import { BINGO_LEYENDAS } from './parte5.js';
+import { BINGOS_INTERNACIONAL } from './parte1.js';
+import { BINGOS_CHAMPIONS } from './parte2.js';
+import { BINGOS_LALIGA } from './parte3.js';
+import { BINGOS_GRANDES_LIGAS } from './parte4.js';
+import { BINGOS_LEYENDAS } from './parte5.js';
 
-export const BINGOS = {
-  internacional: BINGO_INTERNACIONAL,
-  champions: BINGO_CHAMPIONS,
-  laliga: BINGO_LALIGA,
-  grandes_ligas: BINGO_GRANDES_LIGAS,
-  leyendas: BINGO_LEYENDAS
-};
-
-export const LISTA_BINGOS = [
-  { id: 'internacional', titulo: BINGO_INTERNACIONAL.titulo },
-  { id: 'champions', titulo: BINGO_CHAMPIONS.titulo },
-  { id: 'laliga', titulo: BINGO_LALIGA.titulo },
-  { id: 'grandes_ligas', titulo: BINGO_GRANDES_LIGAS.titulo },
-  { id: 'leyendas', titulo: BINGO_LEYENDAS.titulo }
+// Grupos principales con sus 5 sub-bingos correspondientes
+export const GRUPOS_BINGOS = [
+  { id: 'internacional', nombre: 'Fútbol Internacional y Selecciones', bingos: BINGOS_INTERNACIONAL },
+  { id: 'champions', nombre: 'UEFA Champions League', bingos: BINGOS_CHAMPIONS },
+  { id: 'laliga', nombre: 'La Liga Española', bingos: BINGOS_LALIGA },
+  { id: 'grandes_ligas', nombre: 'Grandes Ligas Europeas', bingos: BINGOS_GRANDES_LIGAS },
+  { id: 'leyendas', nombre: 'Leyendas del Fútbol Histórico', bingos: BINGOS_LEYENDAS }
 ];
 
-export const getBingoPorId = (id) => BINGOS[id] || BINGOS.internacional;
+// Mapa indexado con los 25 bingos individuales
+export const BINGOS = {
+  ...Object.fromEntries(BINGOS_INTERNACIONAL.map(b => [b.id, b])),
+  ...Object.fromEntries(BINGOS_CHAMPIONS.map(b => [b.id, b])),
+  ...Object.fromEntries(BINGOS_LALIGA.map(b => [b.id, b])),
+  ...Object.fromEntries(BINGOS_GRANDES_LIGAS.map(b => [b.id, b])),
+  ...Object.fromEntries(BINGOS_LEYENDAS.map(b => [b.id, b]))
+};
 
-// Obtiene todos los jugadores únicos de un bingo específico
+// Lista plana para selectores o listados de partidas
+export const LISTA_BINGOS = Object.values(BINGOS).map(b => ({
+  id: b.id,
+  titulo: b.titulo,
+  grupo: b.grupo
+}));
+
+export const getBingoPorId = (id) => BINGOS[id] || BINGOS['internacional_1'];
+
+// Obtiene todos los jugadores únicos de cualquiera de los 25 bingos
 export const getTodosJugadoresBingo = (bingoId) => {
   const bingo = getBingoPorId(bingoId);
   const set = new Set();

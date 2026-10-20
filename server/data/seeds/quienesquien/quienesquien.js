@@ -11,10 +11,13 @@ export default {
     'Ecuador', 'Venezuela', 'Guatemala', 'Honduras', 'El Salvador', 'Nicaragua', 'Haiti', 'Puerto Rico', 'Serbia', 'Bulgaria',
     'Eslovaquia', 'Eslovenia', 'Lituania', 'Letonia', 'Estonia', 'Luxemburgo', 'Monaco', 'Andorra', 'Liechtenstein', 'San Marino',
     'Vaticano', 'Malta', 'Chipre', 'Albania', 'Macedonia del Norte', 'Bosnia y Herzegovina', 'Montenegro', 'Georgia', 'Armenia', 'Azerbaiyan',
-    'Kazajistan', 'Uzbekistan', 'Turkmenistan', 'Kirguistan', 'Tayikistan', 'Mongolia', 'Nepal', 'Butan', 'Sri Lanka', 'Maldivas',
-    'Laos', 'Camboya', 'Birmania', 'Brunei', 'Timor Oriental', 'Fiyi', 'Samoa', 'Tonga', 'Vanuatu', 'Islas Salomon',
-    'Papua Nueva Guinea', 'Zimbabue', 'Zambia', 'Botsuana', 'Namibia', 'Angola', 'Mozambique', 'Malaui', 'Ruanda', 'Burundi',
-    'Congo', 'Gabon', 'Gambia', 'Mali', 'Niguer', 'Chad', 'Sudan', 'Somalia', 'Yibuti',
+    'Kazajistan', 'Uzbekistan', 'Mongolia', 'Nepal', 'Sri Lanka', 'Maldivas', 'Laos', 'Camboya', 'Birmania', 'Brunei',
+    'Fiyi', 'Papua Nueva Guinea', 'Zimbabue', 'Zambia', 'Botsuana', 'Namibia', 'Angola', 'Mozambique', 'Ruanda', 'Congo',
+    'Republica Democratica del Congo', 'Gabon', 'Gambia', 'Mali', 'Chad', 'Sudan', 'Somalia', 'Guinea Ecuatorial', 'Siria', 'Afganistan',
+    'Taiwan', 'Palestina', 'Bielorrusia', 'Kuwait', 'Barein', 'Oman', 'Yemen', 'Moldavia', 'Kosovo', 'Bahamas',
+    'Barbados', 'Trinidad y Tobago', 'Belice', 'Guyana', 'Surinam', 'Cabo Verde', 'Mauricio', 'Seychelles', 'Sierra Leona', 'Liberia',
+    'Mauritania', 'Sudan del Sur', 'Burkina Faso', 'Guinea', 'Togo', 'Benin', 'Guinea-Bisau', 'Groenlandia', 'Bermudas', 'Curazao', 
+    'Gibraltar', 'Islas Feroe', 'Escocia', 'Gales', 'Irlanda del Norte', 'Turkmenistan', 'Samoa',
   ],
   'Futbolistas': [
     'Lionel Messi', 'Cristiano Ronaldo', 'Lamine Yamal', 'Jude Bellingham', 'Vinicius Jr', 'Kylian Mbappe', 'Pedri', 'Erling Haaland', 'Neymar Jr', 'Kevin De Bruyne',
@@ -34,18 +37,21 @@ export default {
     'Jeremie Frimpong', 'Ryan Gravenberch', 'Matthijs de Ligt', 'Denzel Dumfries', 'Mateo Kovacic', 'Jan Oblak', 'Antonio Rudiger', 'Nicolas Jackson', 'Joao Cancelo', 'Sergej Milinkovic-Savic',
   ],
   'Animales': [
-    'Ornitorrinco', 'Capibara', 'Axolote', 'Perezoso', 'Canguro', 'Pinguino', 'Mapache', 'Flamenco', 'Elefante', 'Jirafa',
+    'Ornitorrinco', 'Capibara', 'Ocelote', 'Perezoso', 'Canguro', 'Pinguino', 'Mapache', 'Flamenco', 'Elefante', 'Jirafa',
     'Leon', 'Tigre', 'Cebra', 'Hipopotamo', 'Rinoceronte', 'Oso Panda', 'Koala', 'Lemur', 'Camello', 'Delfin',
     'Ballena Azul', 'Tiburon Blanco', 'Pulpo', 'Medusa', 'Aguila Calva', 'Buho', 'Loro', 'Camaleon', 'Iguana', 'Serpiente Piton',
-    'Hamster', 'Erizo', 'Zorrillo', 'Nutria', 'Foca', 'Morsa', 'Oso Polar', 'Lobo', 'Zorro', 'Ardilla',
-    'Hiena', 'Guepardo', 'Pantera Negra', 'Leopardo', 'Babuino', 'Chimpance', 'Gorila', 'Orangutan', 'Cangrejo', 'Langosta',
-    'Estrella de Mar', 'Caballito de Mar', 'Erizo de Mar', 'Foca Monje', 'Manati', 'Narval', 'Orca', 'Cachalote', 'Albatros', 'Pelicano',
-    'Cisne', 'Pato', 'Ganso', 'Pavo Real', 'Avestruz', 'Emu', 'Casuario', 'Halcon', 'Halcon Peregrino', 'Condor',
-    'Buitre', 'Murcielago', 'Topo', 'Castor', 'Comadreja', 'Vison', 'Armadillo', 'Puercoespin', 'Tejon', 'Lince',
-    'Bisonte', 'Alce', 'Reno', 'Ciervo', 'Gacela', 'Antilope', 'Jabalí', 'Jabali', 'Tlacuache', 'Zorrino',
-    'Marmota', 'Nutria Marina', 'Castor Americano', 'Topo de Nariz Estrellada', 'Rata Topo', 'Cunaguaro', 'Oso Hormiguero', 'Pangolin', 'Tarsio', 'Loris',
-    'Meerkat', 'Suricata', 'Dromedario', 'Alpaca', 'Llama', 'Vicuña', 'Guanaco', 'Yacare', 'Caiman', 'Cocodrilo del Nilo',
-    'Galapago', 'Tortuga Marina', 'Tortuga Caguama', 'Rana Dorada', 'Sapo Comun',
+    'Hamster', 'Erizo', 'Zorro', 'Nutria', 'Foca', 'Morsa', 'Oso Polar', 'Lobo', 'Ardilla', 'Hiena',
+    'Guepardo', 'Pantera Negra', 'Leopardo', 'Babuino', 'Chimpance', 'Gorila', 'Orangutan', 'Cangrejo', 'Langosta', 'Estrella de Mar',
+    'Caballito de Mar', 'Erizo de Mar', 'Manati', 'Narval', 'Orca', 'Cachalote', 'Albatros', 'Pelicano', 'Cisne', 'Pato',
+    'Ganso', 'Pavo Real', 'Avestruz', 'Emu', 'Casuario', 'Halcon', 'Condor', 'Buitre', 'Murcielago', 'Topo',
+    'Castor', 'Comadreja', 'Armadillo', 'Puercoespin', 'Tejon', 'Lince', 'Bisonte', 'Alce', 'Reno', 'Ciervo',
+    'Gacela', 'Antilope', 'Jabalí', 'Oso Hormiguero', 'Suricata', 'Dromedario', 'Alpaca', 'Llama', 'Caiman', 'Cocodrilo',
+    'Tortuga', 'Perro', 'Gato', 'Caballo', 'Vaca', 'Toro', 'Cerdo', 'Oveja', 'Cabra', 'Burro',
+    'Conejo', 'Liebre', 'Raton', 'Rata', 'Huron', 'Mofeta', 'Coyote', 'Jaguar', 'Oso Pardo', 'Panda Rojo',
+    'Cobra', 'Vibora', 'Rana', 'Sapo', 'Salamandra', 'Gecko', 'Calamar', 'Raya', 'Pez Payaso', 'Pez Espada',
+    'Piraña', 'Salmon', 'Atun', 'Gamba', 'Caracol', 'Abeja', 'Avispa', 'Hormiga', 'Mariposa', 'Escarabajo',
+    'Grillo', 'Saltamontes', 'Araña', 'Escorpion', 'Mosca', 'Gallina', 'Gallo', 'Pavo', 'Paloma', 'Gaviota',
+    'Cuervo', 'Gorrion', 'Canario', 'Cigueña', 'Golondrina', 'Tucan', 'Colibri', 'Pajaro Carpintero', 'Lechuza', 'Periquito'
   ],
   'Marcas': [
     'Nike', 'Apple', 'McDonalds', 'Netflix', 'Nintendo', 'Ikea', 'Spotify', 'PlayStation', 'Adidas', 'Coca-Cola',
@@ -58,7 +64,11 @@ export default {
     'Lidl', 'Aldi', 'Dia', 'Peugeot', 'Renault', 'Citroen', 'Audi', 'Volkswagen', 'Porsche', 'Maserati',
     'Alfa Romeo', 'Toyota', 'Honda', 'Hyundai', 'Kia', 'Nissan', 'Mazda', 'Subaru', 'Lexus', 'Mastercard',
     'Visa', 'PayPal', 'Santander', 'BBVA', 'CaixaBank', 'Banco Sabadell', 'Inditex', 'Nespresso', 'Nestle', 'Danone',
-    'Bimbo', 'Heineken', 'Mahou', 'Cruzcampo', 'Estrella Damm',
+    'Bimbo', 'Heineken', 'Mahou', 'Cruzcampo', 'Estrella Damm', 'Seat', 'Ford', 'Fiat', 'Cupra', 'Jeep',
+    'Xiaomi', 'Huawei', 'LG', 'HP', 'Lenovo', 'Asus', 'KFC', 'Telepizza', 'Dominos Pizza', 'Subway',
+    'Nutella', 'Oreo', 'KitKat', 'Kinder', 'Fanta', 'Sprite', 'Aquarius', 'Nestea', 'Monster Energy', 'Colacao',
+    'Nesquik', 'Pringles', 'Lay\'s', 'Doritos', 'Chupa Chups', 'Haribo', 'H&M', 'Primark', 'Converse', 'Vans',
+    'Reebok', 'Lacoste', 'Tommy Hilfiger', 'Calvin Klein', 'Louis Vuitton', 'Chanel', 'Ray-Ban', 'Nivea', 'L\'Oreal', 'Playmobil'
   ],
   'Películas y series': [
     'Stranger Things', 'Breaking Bad', 'El Senor de los Anillos', 'Titanic', 'Harry Potter', 'La Casa de Papel', 'Interstellar', 'Juego de Tronos', 'The Office', 'Friends',
@@ -71,7 +81,7 @@ export default {
     'Física o química', 'Los hombres de Paco', 'La que se avecina', 'Los serrano', 'Aída', 'Muertos SL', 'Machos Alfa', 'Los Juegos del Hambre', 'Crepusculo', 'Entrevías',
     'Rebelde way', 'High School Musical', 'Hannah Montana', 'Sky rojo', 'A3MSC', 'Mision Imposible', 'Fast and Furious', 'Transformers', 'Los Increibles', 'Ratatouille',
     'Cars', 'El diario de Noa', 'Todos los días de mi vida', 'Paranormal Activity', 'Expediente Warren', 'Insidious', 'Saw', 'Tiburón', 'Chucky: el muñeco diabólico', 'Viernes 13',
-    'Pesadilla en Elm Street', 'Ninos grandes', 'Resacón en Las Vegas', 'Borat', 'Scary Movie', 'American Pie', 'Jumanji',
+    'Pesadilla en Elm Street', 'Ninos grandes', 'Resacón en Las Vegas', 'Borat', 'Scary Movie', 'American Pie', 'Jumanji'
   ],
   'Cantantes': [
     'Rosalia', 'Bad Bunny', 'Shakira', 'Taylor Swift', 'Quevedo', 'Aitana', 'David Bisbal', 'Dua Lipa', 'Justin Bieber', 'Ariana Grande',
@@ -85,7 +95,7 @@ export default {
     'Led Zeppelin', 'Duki', 'Nicki Nicole', 'María Becerra', 'Raphael', 'Julio Iglesias', 'Ana Mena', 'Manuel Turizo', 'Sebastián Yatra', 'Pitbull',
     'Delaossa', 'The Kid Laroy', 'Skrillex', 'Marshmellow', 'Martin Garrix', 'David Guetta', 'Mora', 'Eladio Carrión', 'Bizarrap', 'Barry B',
     'Carolina Durante', 'Judeline', 'Morat', 'Farruko', 'PSY', 'BTS', 'Young beef', 'Kaidy Cain', 'Cruz Cafuné', 'Sticky MA',
-    'Britney Spears', 'Madonna', 'Michael Jackson',
+    'Britney Spears', 'Madonna', 'Michael Jackson', 'Maria Becerra'
   ],
   'Canciones míticas': [
     'Despacito', 'Macarena', 'Asereje', 'Bohemian Rhapsody', 'Waka Waka', 'La Gasolina', 'Baby Shark', 'Gangnam Style', 'Thriller', 'Billie Jean',
@@ -97,7 +107,7 @@ export default {
     'Camisa negra', 'Nada que perder', 'Caminando por la vida', 'The nights', 'Cant hold us', 'Quédate', 'Despechá', 'Rayos de sol', 'China Remix', 'Labios Compartidos',
     'La bachata', 'Ayer la vi', 'Guantanamera', 'La rubia', 'Conmigo', 'Todo de mi', 'Hablamos mañana', 'Otra noche en Miami', 'Ya me acostumbré', 'Soy peor',
     'Tu no vive así', 'International love', 'Que no pare la fiesta', 'Infinity', 'El Merengue', 'Dj got us fallin in love', 'Black and yellow', 'Hold you down', 'Give me everything', 'Locked out of heaven',
-    'Yeah 3x', 'Lucid dreams', 'Goosebumps', 'El limbo', 'Ella quiere beber', 'Los del espacio',
+    'Yeah 3x', 'Lucid dreams', 'Goosebumps', 'El limbo', 'Ella quiere beber', 'Los del espacio'
   ],
   'Historia y política': [
     'Julio Cesar', 'Napoleón Bonaparte', 'Cleopatra', 'Albert Einstein', 'Abraham Lincoln', 'Cristobal Colon', 'Juana de Arco', 'Leonardo da Vinci', 'Isaac Newton', 'Winston Churchill',
@@ -107,7 +117,7 @@ export default {
     'Charles Darwin', 'Sigmund Freud', 'Papa Benedicto XIX', 'Elon Musk', 'Barack Obama', 'Neil Armstrong', 'Benito Mussolini', 'Vladimir Putin', 'Salvador Dali', 'Federico Garcia Lorca',
     'Antonio Gaudi', 'Diego Velázquez', 'Francisco de Goya', 'Miguel Ángel', 'José María Aznar', 'Albert Rivera', 'Espartaco', 'El cid campeador', 'Donald Trump', 'George Bush',
     'Marco Aurelio', 'Jesús de Nazaret', 'Lenin', 'Tutankamon', 'Bill Gates', 'Jeff Bezos', 'Alexander Fleming', 'Galileo Galilei', 'Teresa de Calcuta', 'Atila',
-    'Gengis Kan', 'Marco Polo', 'Vasco da Gama', 'Fernando de Magallanes', 'Juan Sebastian Elcano', 'Americo Vespucio',
+    'Gengis Kan', 'Marco Polo', 'Vasco da Gama', 'Fernando de Magallanes', 'Juan Sebastian Elcano', 'Americo Vespucio'
   ],
   'Atletas y otros deportes': [
     'Rafa Nadal', 'LeBron James', 'Simone Biles', 'Michael Jordan', 'Usain Bolt', 'Marc Márquez', 'Novak Djokovic', 'Roger Federer', 'Serena Williams', 'Lewis Hamilton',
@@ -119,14 +129,14 @@ export default {
     'Garbine Muguruza', 'Carolina Marin', 'Alberto Contador', 'Lydia Valentín', 'Ruth Beitia', 'David Meca', 'Alberto Entrerríos', 'Ale Galán', 'Juan Lebrón', 'Agustín Tapia',
     'Arturo Coello', 'Paquito Navarro', 'David Ferrer', 'Andy Murray', 'Juan Martín Del Potro', 'Juan Carlos Navarro', 'Serge Ibaka', 'Magic Johnson', 'Larry Bird', 'Kareem Abdul Jabbar',
     'Wilt Chamberlain', 'Bill Russell', 'Feliciano López', 'Allen Iverson', 'Rudy Fernández', 'Tim Duncan', 'Dirk Nowitzki', 'Chris Paul', 'Russell Westbrook', 'James Harden',
-    'Anthony Davis', 'Joel Embiid',
+    'Anthony Davis', 'Joel Embiid'
   ],
   'Monumentos históricos': [
     'Torre Eiffel', 'Coliseo Romano', 'Pirámides de Giza', 'Estatua de la Libertad', 'Taj Mahal', 'Gran Muralla China', 'Machu Picchu', 'Chichen Itza', 'Petra', 'Cristo Redentor',
     'Sagrada Familia', 'Big Ben', 'Puerta de Alcalá', 'La Alhambra', 'Catedral de Notre Dame', 'Arco del Triunfo', 'Museo del Louvre', 'Torre de Pisa', 'Stonehenge', 'Ópera de Sidney',
     'Burj Khalifa', 'Empire State Building', 'Golden Gate', 'Acrópolis de Atenas', 'Palacio de Versalles', 'Monte Rushmore', 'Partenón', 'Panteón de Roma', 'Catedral de Santiago de Compostela', 'Mezquita de Córdoba',
     'La Giralda', 'Capilla Sixtina', 'Palacio Real de Madrid', 'Torre de Hércules', 'Acueducto de Segovia', 'Murallas de Ávila', 'Catedral de Milán', 'Canales de Venecia', 'Fontana di Trevi', 'Monte Fuji',
-    'Kremlin de Moscú', 'Palacio de Buckingham', 'Castillo de Edimburgo', 'Capitolio de los Estados Unidos', 'Casa Blanca', 'Prisión de Alcatraz', 'Muro de Berlín', 'Reichstag de Berlín', 'Toro de Wall Street', 'Parque Nacional de Yellowstone',
+    'Kremlin de Moscú', 'Palacio de Buckingham', 'Castillo de Edimburgo', 'Capitolio de los Estados Unidos', 'Casa Blanca', 'Prisión de Alcatraz', 'Muro de Berlín', 'Reichstag de Berlín', 'Toro de Wall Street', 'Parque Nacional de Yellowstone'
   ],
   'Profesiones': [
     'Fontanero', 'Astronauta', 'Psicologo', 'Bombero', 'Profesor de autoescuela', 'Cirujano plastico', 'Abogado', 'Medico de cabecera', 'Enfermero', 'Arquitecto',
@@ -137,7 +147,7 @@ export default {
     'Optico', 'Biologo', 'Quimico', 'Fisico', 'Meteorologo', 'Arqueologo', 'Antropologo', 'Filosofo', 'Guia turistico', 'Barman',
     'Sumiller', 'Pastelero', 'Carnicero', 'Pescadero', 'Frutero', 'Mecanico', 'Cerrajero', 'Pintor', 'Escultor', 'Musico',
     'Actor', 'Director de cine', 'Guionista', 'Fotografo', 'Modelo', 'Diseñador grafico', 'Programador', 'Diseñador de moda', 'Joyero', 'Paleontologo',
-    'Forense', 'Criminologo', 'Bibliotecario', 'Anticuario', 'Tasador', 'Community Manager', 'Data Scientist', 'Desarrollador Web',
+    'Forense', 'Criminologo', 'Bibliotecario', 'Anticuario', 'Tasador', 'Community Manager', 'Data Scientist', 'Desarrollador Web'
   ],
   'YouTube y ese mundo': [
     'Ibai Llanos', 'El Rubius', 'AuronPlay', 'Vegetta777', 'TheGrefg', 'Llados Fitness', 'Wismichu', 'Jordi Wild', 'IlloJuan', 'DjMaRiiO',
@@ -145,14 +155,14 @@ export default {
     'Speed', 'La Rivers', 'Ari Gameplays', 'JuanSGuarnizo', 'Cacho01', 'Mixwell', 'David Broncano', 'Pablo Motos', 'Jordi Evole', 'Dario Eme Hache',
     'Spursito', 'Nil Ojeda', 'Papi Gavi', 'Guanyar', 'Werlyb', 'Misho Amoli', 'Perxitaa', 'Plex', 'Komanche', 'AlphaSniper',
     'Luzu', 'Staxx', 'Alexby11', 'Mangel', 'Orslok', 'Lolito', 'DaniRep', 'byCalitos', 'La Cobra', 'Davo Xeneize',
-    'Adri Contreras', 'XBuyer', 'ByViruZz', 'ByTarifa', 'Kolderiu',
+    'Adri Contreras', 'XBuyer', 'ByViruZz', 'ByTarifa', 'Kolderiu'
   ],
   'Videojuegos': [
     'Minecraft', 'Fortnite', 'GTA V', 'Super Mario', 'League of Legends', 'Zelda', 'Among Us', 'Call of Duty', 'Valorant', 'Counter Strike',
     'FIFA / EA Sports FC', 'Roblox', 'Pokemon GO', 'Animal Crossing', 'Dark Souls', 'Rainbow Six Siege', 'Red Dead Redemption 2', 'Brawl Stars', 'Clash Royale', 'Clash of Clans',
     'Pac Man', 'Tetris', 'Sonic the Hedgehog', 'Tekken', 'Resident Evil', 'Halo', 'Final Fantasy', 'World of Warcraft', 'Overwatch', 'Apex Legends',
     'Rocket League', 'Fall Guys', 'NBA 2K', 'F1', 'Gran Turismo', 'Rust', 'Assassins Creed', 'Far Cry', 'Battlefield', 'PUBG Battlegrounds',
-    'Teamfight Tactics', 'Dota 2', 'Los Sims', 'Pro Evolution Soccer', 'Forza Motorsport', 'Golf it',
+    'Teamfight Tactics', 'Dota 2', 'Los Sims', 'Pro Evolution Soccer', 'Forza Motorsport', 'Golf it'
   ],
   'Personajes de dibujos': [
     'Goku', 'Homer Simpson', 'Bob Esponja', 'Bugs Bunny', 'Shin Chan', 'Pikachu', 'Doraemon', 'Bart Simpson', 'Peter Griffin', 'Bender',
@@ -161,14 +171,14 @@ export default {
     'Lisa Simpson', 'Maggie Simpson', 'Stewie Griffin', 'Calamardo', 'Patricio', 'Don Cangrejo', 'Los Padrinos Magicos', 'Jimmy Neutron', 'Óliver Atom', 'Benji Price',
     'Bochan', 'Nobita', 'Charmander', 'Squirtle', 'Bulbasur', 'Pedro Picapiedra', 'Popeye', 'La pantera rosa', 'Oso Yogi', 'Dora la exploradora',
     'Caillou', 'Hello Kitty', 'Naruto', 'Rick y Morty', 'Dumbo', 'Aladdin', 'Rapunzel', 'Nemo', 'Dori', 'Mowgli',
-    'Minion', 'Rafiki', 'Simba', 'Stich', 'Bambi', 'Scrat (Ice Age)',
+    'Minion', 'Rafiki', 'Simba', 'Stich', 'Bambi', 'Scrat (Ice Age)'
   ],
   'Personajes de películas': [
     'Darth Vader', 'Jack Sparrow', 'Iron Man', 'Batman', 'Superman', 'Wonder Woman', 'Thor', 'Capitan America', 'Hulk', 'Thanos',
     'Indiana Jones', 'James Bond', 'Rocky Balboa', 'Terminator', 'Luke Skywalker', 'Yoda', 'Frodo Bolson', 'Legolas', 'Gollum', 'Voldemort',
     'Hermione Granger', 'Ron Weasley', 'John Wick', 'El Joker', 'Deadpool', 'Wolverine', 'Black Panther', 'Walter White', 'Jesse Pinkman', 'Thomas Shelby',
     'Don Vito Corleone', 'Tony Montana', 'Sherlock Holmes', 'Michael Myers', 'Freddy Krueger', 'Pennywise', 'Jigsaw', 'Chucky', 'Edward Cullen', 'Jason Bourne',
-    'Michael Scofield', 'King Kong', 'Drácula', 'Sheldon Cooper', 'Steve Urkel', 'El príncipe de Bel Air', 'Mr Bean', 'Eleven', 'MacGyver', 'Dr House',
+    'Michael Scofield', 'King Kong', 'Drácula', 'Sheldon Cooper', 'Steve Urkel', 'El príncipe de Bel Air', 'Mr Bean', 'Eleven', 'MacGyver', 'Dr House'
   ],
   'Comida': [
     'Tortilla de patatas', 'Pizza barbacoa', 'Sushi', 'Hamburguesa de ternera', 'Paella', 'Croquetas de jamón', 'Tacos al pastor', 'Macarrones con tomate', 'Lentejas', 'Cocido madrileño',
@@ -177,7 +187,7 @@ export default {
     'Pad Thai', 'Curry de pollo', 'Kebab turco', 'Falafel', 'Hummus', 'Lasana bolonesa', 'Spaghetti carbonara', 'Risotto de setas', 'Carpaccio de ternera', 'Carpaccio de salmon',
     'Huevos rotos con jamon', 'Solomillo al whisky', 'Rabo de toro', 'Pisto manchego', 'Fabada asturiana', 'Calamares a la romana', 'Gambas al ajillo', 'Arroz a la cubana', 'Albondigas en salsa', 'Pollo al ajillo',
     'Lomo al ajillo', 'Bocadillo de calamares', 'Pincho de tortilla', 'Bravas con alioli', 'Pan con tomate y jamon', 'Crema catalana', 'Arroz con leche', 'Natillas caseras', 'Flan de huevo', 'Tarta de la abuela',
-    'Ensaimada mallorquina', 'Chorizo a la sidra', 'Migas extremeñas', 'Arroz negro', 'Fideua', 'Bacalao a la Vizcaina', 'Bacalao al Pil Pil',
+    'Ensaimada mallorquina', 'Chorizo a la sidra', 'Migas extremeñas', 'Arroz negro', 'Fideua', 'Bacalao a la Vizcaina', 'Bacalao al Pil Pil'
   ],
   'Leyendas del futbol': [
     'Johan Cruyff', 'Alfredo di Stefano', 'Franz Beckenbauer', 'Michel Platini', 'Gabriel Batistuta', 'Roberto Baggio', 'Marco van Basten', 'Frank Rijkaard', 'Lothar Matthaus',

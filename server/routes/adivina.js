@@ -1,6 +1,6 @@
 // server/routes/adivina.js
 import { Router } from 'express';
-import { CANCIONES, PELICULAS } from '../data/seeds/adivina/adivina.seed.js';
+import { CANCIONES, PELICULAS } from '../data/seeds/adivina/adivina.js';
 import { barajar } from '../lib/barajar.js';
 
 const router = Router();

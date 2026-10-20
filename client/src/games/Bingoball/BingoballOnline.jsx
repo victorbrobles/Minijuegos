@@ -1,21 +1,14 @@
 // client/src/games/Bingoball/BingoballOnline.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
+import { LISTA_BINGOS } from '../../../../server/data/seeds/bingoball/bingoballData.js';
 import './Bingoball.css';
 import '../Adivina/Adivina.css';
 
 const CLAVE_SESION_BB = 'bingoball_online_session';
 
-const TEMAS_INFO = {
-  internacional: 'Fútbol Internacional y Selecciones',
-  champions: 'UEFA Champions League',
-  laliga: 'La Liga Española',
-  grandes_ligas: 'Grandes Ligas Europeas',
-  leyendas: 'Leyendas del Fútbol Histórico'
-};
-
 export default function BingoballOnline({ onSalir }) {
-  const [vista, setVista] = useState('menu'); // menu | crear | unirse | sala
+  const [vista, setVista] = useState('menu');
   const [nombre, setNombre] = useState('');
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -25,6 +18,7 @@ export default function BingoballOnline({ onSalir }) {
   const [codigoCopiado, setCodigoCopiado] = useState(false);
 
   const [feedbackTurno, setFeedbackTurno] = useState('');
+  const [siguienteBingoId, setSiguienteBingoId] = useState('');
 
   const [sala, setSala] = useState(null);
   const [sesion, setSesion] = useState(() => {
@@ -47,6 +41,9 @@ export default function BingoballOnline({ onSalir }) {
           if (d.success) {
             setSala(d);
             setVista('sala');
+            if (!siguienteBingoId && d.bingoId) {
+              setSiguienteBingoId(d.bingoId);
+            }
           }
         }).catch(() => {
           sessionStorage.removeItem(CLAVE_SESION_BB);
@@ -61,7 +58,6 @@ export default function BingoballOnline({ onSalir }) {
     return () => clearInterval(intervalRef.current);
   }, [sesion]);
 
-  // Cierra automáticamente el modal al iniciar el juego
   useEffect(() => {
     if (sala && sala.estado !== 'lobby') {
       setModalAyuda(false);
@@ -116,9 +112,7 @@ export default function BingoballOnline({ onSalir }) {
     if (casilla.marcada || sala.bloqueado) return;
     setFeedbackTurno('');
     const d = await peticionPost(`sala/${sesion.code}/marcar`, { casillaId: casilla.id });
-    if (d?.mensaje) {
-      setFeedbackTurno(d.mensaje);
-    }
+    if (d?.mensaje) setFeedbackTurno(d.mensaje);
   };
 
   const handleCantarLinea = (filaIndex) => {
@@ -132,8 +126,6 @@ export default function BingoballOnline({ onSalir }) {
   const ranking = [...(sala?.jugadores || [])].sort((a, b) => b.puntos - a.puntos);
   const maxPuntos = ranking.length > 0 ? ranking[0].puntos : 0;
   const ganadores = maxPuntos > 0 ? ranking.filter(j => j.puntos === maxPuntos) : [];
-
-  const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
 
   const BotonAyudaCard = () => (
     <button
@@ -176,32 +168,25 @@ export default function BingoballOnline({ onSalir }) {
           <span className="aprox-modal-signo-title">?</span>
           <h3>¿Cómo se juega a Bingoball?</h3>
         </div>
-
         <div className="aprox-modal-cuerpo">
           <p><strong>1. El Cartón (4x5):</strong></p>
           <ul>
-            <li>Cada participante recibe un cartón con <strong>20 categorías futboleras aleatorias</strong> sin repetir.</li>
-            <li>Al comenzar, tendrás <strong>10 segundos</strong> para memorizar la disposición de tu cartón.</li>
+            <li>Cada participante recibe un cartón con <strong>20 categorías futboleras</strong>.</li>
+            <li>Tendrás <strong>10 segundos</strong> al inicio para memorizar la disposición de tu cartón.</li>
           </ul>
-
-          <p><strong>2. Jugadores en pantalla (10 segundos):</strong></p>
+          <p><strong>2. Jugadores en pantalla (10s):</strong></p>
           <ul>
-            <li>Tras la cuenta atrás <strong>3..2..1</strong>, aparecerán futbolistas en pantalla de uno en uno durante 10 segundos.</li>
-            <li>Toca una casilla de tu cartón en la que encaje el futbolista. Si aciertas, se asigna y quedas en espera del siguiente.</li>
-            <li><strong>⚠️ Cuidado con fallar:</strong> Si intentas meter un futbolista en una casilla errónea, ¡fallarás y <strong>quedarás bloqueado</strong> sin poder marcar nada con el siguiente futbolista!</li>
+            <li>Aparecerán futbolistas en pantalla de uno en uno durante 10 segundos. Toca una casilla válida de tu cartón para marcarlo.</li>
+            <li><strong>¡Cuidado al fallar!</strong> Si te equivocas, quedarás bloqueado durante el siguiente futbolista.</li>
           </ul>
-
-          <p><strong>3. Línea (+5 pts) y Bingo (+10 pts):</strong></p>
+          <p><strong>3. Líneas y Bingo:</strong></p>
           <ul>
-            <li><strong>Línea (+5 pts):</strong> Cuando completes las 5 casillas de una fila, podrás pulsar el botón <em>¡Línea!</em>. Cobrarás 5 puntos y esa fila se sustituirá por 5 nuevas categorías vacías.</li>
-            <li><strong>Bingo (+10 pts y Fin):</strong> El primer jugador en rellenar todas las casillas de su cartón consigue el Bingo (+10 pts) y gana la partida.</li>
+            <li><strong>Línea (+5 pts):</strong> Al completar una fila entera puedes cantar línea.</li>
+            <li><strong>Bingo (+10 pts):</strong> El primer jugador en rellenar todas las casillas consigue el Bingo.</li>
           </ul>
         </div>
-
         <div className="rg-modal-acciones" style={{ marginTop: '1.2rem' }}>
-          <button className="big full" onClick={() => setModalAyuda(false)}>
-            Entendido
-          </button>
+          <button className="big full" onClick={() => setModalAyuda(false)}>Entendido</button>
         </div>
       </div>
     </div>
@@ -292,7 +277,6 @@ export default function BingoballOnline({ onSalir }) {
         <section className="game">
           <div className="panel center" style={{ position: 'relative' }}>
             <BotonAyudaCard />
-
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
               <span
                 style={{
@@ -309,11 +293,9 @@ export default function BingoballOnline({ onSalir }) {
                   lineHeight: 1
                 }}
               >
-                <Icon name="lock" size={15} />
-                Sala de espera
+                <Icon name="lock" size={15} /> Sala de espera
               </span>
             </div>
-
             <p className="hint">Código de la partida</p>
             <button type="button" className="qq-codigo-btn" onClick={copiarCodigo} title="Copiar código">
               {sala.code}
@@ -343,16 +325,14 @@ export default function BingoballOnline({ onSalir }) {
                   value={sala.bingoId}
                   onChange={(e) => peticionPost(`sala/${sesion.code}/configurar`, { bingoId: e.target.value })}
                 >
-                  <option value="internacional">🌍 Fútbol Internacional y Selecciones</option>
-                  <option value="champions">🏆 UEFA Champions League</option>
-                  <option value="laliga">🇪🇸 La Liga Española</option>
-                  <option value="grandes_ligas">⭐ Grandes Ligas Europeas</option>
-                  <option value="leyendas">👑 Leyendas del Fútbol</option>
+                  {LISTA_BINGOS.map(b => (
+                    <option key={b.id} value={b.id}>{b.titulo}</option>
+                  ))}
                 </select>
               </div>
             ) : (
               <div style={{ marginTop: '0.8rem', padding: '0.6rem', background: '#f8fafc', borderRadius: '10px', textAlign: 'center' }}>
-                <span className="hint small">Temática: <strong>{TEMAS_INFO[sala.bingoId]}</strong></span>
+                <span className="hint small">Temática: <strong>{LISTA_BINGOS.find(b => b.id === sala.bingoId)?.titulo || sala.bingoId}</strong></span>
               </div>
             )}
 
@@ -378,7 +358,7 @@ export default function BingoballOnline({ onSalir }) {
         </section>
       )}
 
-      {/* 2. FASE PREPARACIÓN (10s VER CARTÓN) */}
+      {/* 2. PREPARACIÓN */}
       {sala.estado === 'preparacion' && (
         <section className="game">
           <div className="hud">
@@ -407,7 +387,7 @@ export default function BingoballOnline({ onSalir }) {
         </section>
       )}
 
-      {/* 3. OVERLAY CUENTA ATRÁS 3..2..1 */}
+      {/* 3. CUENTA ATRÁS 3..2..1 */}
       {sala.estado === 'cuenta_atras' && (
         <div className="bb-overlay-countdown">
           <p style={{ fontSize: '1.4rem', fontWeight: 800, margin: '0 0 1rem' }}>¡ATENTOS AL CARTÓN!</p>
@@ -415,7 +395,7 @@ export default function BingoballOnline({ onSalir }) {
         </div>
       )}
 
-      {/* 4. EN JUEGO (RONDA DE 10s POR FUTBOLISTA) */}
+      {/* 4. EN JUEGO */}
       {sala.estado === 'jugando' && (
         <section className="game">
           <div className="hud">
@@ -423,7 +403,6 @@ export default function BingoballOnline({ onSalir }) {
             <span className="chip alt">Puntos: {sala.puntos || 0} pts</span>
           </div>
 
-          {/* Tarjeta del jugador actual */}
           <div className="bb-jugador-display">
             <div className="bb-jugador-avatar">⚽</div>
             <h2 className="bb-jugador-nombre">{sala.jugadorActual}</h2>
@@ -444,7 +423,6 @@ export default function BingoballOnline({ onSalir }) {
             </div>
           )}
 
-          {/* Cartón interactivo de 4x5 */}
           <div className="panel" style={{ padding: '1rem' }}>
             <h3 className="panel-title" style={{ textAlign: 'center', marginBottom: '0.8rem' }}>
               Tu Cartón (4x5)
@@ -476,7 +454,6 @@ export default function BingoballOnline({ onSalir }) {
                       ))}
                     </div>
 
-                    {/* Botón de Línea si la fila está completa */}
                     {filaCompleta && (
                       <button
                         type="button"
@@ -492,7 +469,6 @@ export default function BingoballOnline({ onSalir }) {
             </div>
           </div>
 
-          {/* Marcador en vivo */}
           <div className="scoreboard-container" style={{ justifyContent: 'center', marginTop: '0.8rem' }}>
             {sala.jugadores?.map(j => (
               <div key={j.id} className="score-pill">
@@ -507,19 +483,86 @@ export default function BingoballOnline({ onSalir }) {
         </section>
       )}
 
-      {/* 5. FIN / PODIO */}
-      {sala.estado === 'fin' && (
+      {/* 5. FIN DEL BINGO (CARTÓN RESUELTO) -> DECISIÓN DE NUEVO BINGO O FINALIZAR */}
+      {sala.estado === 'bingo_cantado' && (
         <section className="game">
           <div className="end-card">
-            <span className="end-icon"><Icon name="trophy" size={44} /></span>
-            <h1 className="title">¡BINGO Y FINAL!</h1>
+            <span className="end-icon">🎉</span>
+            <h1 className="title">¡BINGO COMPLETADO!</h1>
             <p className="final-score" style={{ color: '#16a34a' }}>
+              ¡{sala.ganadorBingo || 'Un jugador'} ha cantado BINGO (+10 pts)!
+            </p>
+          </div>
+
+          <div className="panel" style={{ marginTop: '1rem' }}>
+            <h3 className="panel-title"><Icon name="trophy" size={20} /> Marcador Acumulado</h3>
+            <div className="scoreboard">
+              {ranking.map((j, i) => (
+                <div key={j.id} className={`score-row ${i === 0 && j.puntos > 0 ? 'first' : ''}`}>
+                  <span className="score-name">{i + 1}. {j.nombre} {j.esTu && '(Tú)'}</span>
+                  <span className="score-pts">{j.puntos} pts</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {esAdmin ? (
+            <div className="panel" style={{ marginTop: '1rem' }}>
+              <h3 className="panel-title"><Icon name="cards" size={20} /> Siguiente Bingo</h3>
+              <p className="hint small">Elige la temática para el siguiente cartón o continúa con la actual:</p>
+              
+              <select
+                value={siguienteBingoId}
+                onChange={(e) => setSiguienteBingoId(e.target.value)}
+                style={{ marginBottom: '1rem' }}
+              >
+                {LISTA_BINGOS.map(b => (
+                  <option key={b.id} value={b.id}>{b.titulo}</option>
+                ))}
+              </select>
+
+              <div className="actions">
+                <button
+                  className="big full"
+                  onClick={() => peticionPost(`sala/${sesion.code}/siguiente-bingo`, { bingoId: siguienteBingoId })}
+                >
+                  <Icon name="play" size={20} /> Jugar Siguiente Bingo (+Puntos)
+                </button>
+                <button
+                  className="secondary danger full"
+                  onClick={() => peticionPost(`sala/${sesion.code}/finalizar`)}
+                >
+                  <Icon name="trophy" size={20} /> Finalizar Partida y Ver Podio
+                </button>
+              </div>
+            </div>
+          ) : (
+            <p className="hint center" style={{ marginTop: '1rem' }}>
+              Esperando a que el anfitrión inicie el siguiente bingo o finalice la partida...
+            </p>
+          )}
+
+          <div className="actions" style={{ marginTop: '1rem' }}>
+            <button className="secondary full" onClick={() => setModalSalir(true)}>
+              <Icon name="door" size={20} /> Salir de la sala
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* 6. PODIO DEFINITIVO (FINAL DEL TORNEO) */}
+      {sala.estado === 'final' && (
+        <section className="game">
+          <div className="end-card">
+            <span className="end-icon"><Icon name="crown" size={44} /></span>
+            <h1 className="title">¡FIN DEL TORNEO!</h1>
+            <p className="final-score" style={{ color: '#eab308' }}>
               🏆 Ganador: {ganadores.map(g => g.nombre).join(', ')} con {maxPuntos} pts
             </p>
           </div>
 
           <div className="panel reveal-panel" style={{ marginTop: '1rem' }}>
-            <h3 className="reveal-title"><Icon name="podium" size={20} /> Clasificación Final</h3>
+            <h3 className="reveal-title"><Icon name="podium" size={20} /> Clasificación Final Definitiva</h3>
             <div className="scoreboard">
               {ranking.map((j, i) => (
                 <div key={j.id} className={`score-row ${j.puntos === maxPuntos && maxPuntos > 0 ? 'first' : ''}`}>
@@ -533,7 +576,7 @@ export default function BingoballOnline({ onSalir }) {
           <div className="actions" style={{ marginTop: '1.2rem' }}>
             {esAdmin && (
               <button className="big full" onClick={() => peticionPost(`sala/${sesion.code}/iniciar`)}>
-                <Icon name="refresh" size={20} /> Jugar otra vez
+                <Icon name="refresh" size={20} /> Reiniciar Torneo desde cero
               </button>
             )}
             <button className="secondary danger full" onClick={handleSalir}>
@@ -550,7 +593,7 @@ export default function BingoballOnline({ onSalir }) {
             <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
             <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>¿Abandonar la partida?</h3>
             <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
-              Perderás tu cartón y tus puntos. ¿Deseas salir?
+              Perderás tu cartón y tus puntos acumulados. ¿Deseas salir?
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
               <button type="button" className="secondary full" onClick={() => setModalSalir(false)}>Quedarme</button>

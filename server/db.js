@@ -3,7 +3,7 @@ import { fileURLToPath } from 'node:url';
 import { mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import seedSiglas from './data/seeds/siglas/siglas.seed.js';
-import seedQuienEsQuien from './data/seeds/quienesquien/quienesquien.seed.js';
+import seedQuienEsQuien from './data/seeds/quienesquien/quienesquien.js';
 
 // El archivo de la base de datos se crea solo la primera vez que arranca el servidor.
 const dbPath = process.env.DB_PATH

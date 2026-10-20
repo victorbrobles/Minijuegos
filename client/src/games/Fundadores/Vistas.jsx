@@ -318,10 +318,10 @@ export function Ayuda({ onCerrar }) {
             <h4 style={{ color: '#0f172a', margin: '0 0 0.3rem', fontSize: '1rem' }}>⏳ En cada ronda</h4>
             <ol style={{ paddingLeft: '1.2rem', margin: '0.3rem 0' }}>
               <li style={{ marginBottom: '0.35rem' }}>
-                <strong>1. Elegir oficio (en secreto y a la vez):</strong> Hay 8 oficios. Si dos jugadores eligen el mismo, se lo queda quien tenga prioridad; el otro actúa de Peón y recibe 1 moneda de consuelo[cite: 50, 56].
+                <strong>1. Elegir oficio (en secreto y a la vez):</strong> Hay 8 oficios. Si dos jugadores eligen el mismo, se lo queda quien tenga prioridad; el otro actúa de Peón y recibe 1 moneda de consuelo.
               </li>
               <li style={{ marginBottom: '0.35rem' }}>
-                <strong>2. Turnos por orden (1 al 8):</strong> En tu turno realizas tu <em>acción básica</em> (cobrar jornal o proyectar planos), usas la <em>habilidad</em> del oficio y puedes <em>construir</em>[cite: 50, 56].
+                <strong>2. Turnos por orden (1 al 8):</strong> En tu turno realizas tu <em>acción básica</em> (cobrar jornal o proyectar planos), usas la <em>habilidad</em> del oficio y puedes <em>construir</em>.
               </li>
             </ol>
           </div>
@@ -329,22 +329,22 @@ export function Ayuda({ onCerrar }) {
           <div style={{ marginBottom: '1.1rem' }}>
             <h4 style={{ color: '#0f172a', margin: '0 0 0.3rem', fontSize: '1rem' }}>🏛️ Edificios y Ventajas pasivas</h4>
             <ul style={{ paddingLeft: '1.2rem', margin: '0.3rem 0' }}>
-              <li style={{ marginBottom: '0.3rem' }}><strong>Comercio:</strong> +1 moneda por jornal (máx. 2)[cite: 50, 56].</li>
-              <li style={{ marginBottom: '0.3rem' }}><strong>Taller:</strong> Cada 2 talleres, tus edificios cuestan 1 moneda menos (mín. 1)[cite: 50, 56].</li>
-              <li style={{ marginBottom: '0.3rem' }}><strong>Saber:</strong> Cada 2 de saber, ves 1 plano más al proyectar[cite: 50, 56].</li>
-              <li style={{ marginBottom: '0.3rem' }}><strong>Hogar:</strong> Cada 3 hogares, sumas +1 de prestigio al final[cite: 50, 56].</li>
-              <li style={{ marginBottom: '0.3rem' }}><strong>Hitos:</strong> Edificios únicos con efectos especiales potentes. No puedes tener dos edificios iguales[cite: 50, 56].</li>
+              <li style={{ marginBottom: '0.3rem' }}><strong>Comercio:</strong> +1 moneda por jornal (máx. 2).</li>
+              <li style={{ marginBottom: '0.3rem' }}><strong>Taller:</strong> Cada 2 talleres, tus edificios cuestan 1 moneda menos (mín. 1).</li>
+              <li style={{ marginBottom: '0.3rem' }}><strong>Saber:</strong> Cada 2 de saber, ves 1 plano más al proyectar.</li>
+              <li style={{ marginBottom: '0.3rem' }}><strong>Hogar:</strong> Cada 3 hogares, sumas +1 de prestigio al final.</li>
+              <li style={{ marginBottom: '0.3rem' }}><strong>Hitos:</strong> Edificios únicos con efectos especiales potentes. No puedes tener dos edificios iguales.</li>
             </ul>
           </div>
 
           <div style={{ marginBottom: '1.1rem' }}>
             <h4 style={{ color: '#0f172a', margin: '0 0 0.3rem', fontSize: '1rem' }}>🏆 Puntuación y Final</h4>
             <ul style={{ paddingLeft: '1.2rem', margin: '0.3rem 0' }}>
-              <li>Prestigio base de todos tus edificios[cite: 50, 56].</li>
-              <li><strong>+3 puntos de variedad:</strong> Si tienes los 4 tipos básicos de edificios en tu pueblo[cite: 50, 56].</li>
-              <li><strong>+1 punto:</strong> Por cada 3 hogares que hayas construido[cite: 50, 56].</li>
-              <li><strong>+3 puntos de inauguración:</strong> Si pusiste la última piedra de la obra común[cite: 50, 56].</li>
-              <li><em>En caso de empate a puntos, gana quien conserve más monedas[cite: 50, 56].</em></li>
+              <li>Prestigio base de todos tus edificios.</li>
+              <li><strong>+3 puntos de variedad:</strong> Si tienes los 4 tipos básicos de edificios en tu pueblo.</li>
+              <li><strong>+1 punto:</strong> Por cada 3 hogares que hayas construido.</li>
+              <li><strong>+3 puntos de inauguración:</strong> Si pusiste la última piedra de la obra común.</li>
+              <li><em>En caso de empate a puntos, gana quien conserve más monedas.</em></li>
             </ul>
           </div>
 
@@ -353,7 +353,7 @@ export function Ayuda({ onCerrar }) {
             <ul style={{ paddingLeft: '1.2rem', margin: '0.3rem 0' }}>
               {ROLES.map((r) => (
                 <li key={r.id} style={{ marginBottom: '0.35rem' }}>
-                  <strong>{r.id}. {r.nombre}:</strong> {r.desc}[cite: 50, 56]
+                  <strong>{r.id}. {r.nombre}:</strong> {r.desc}
                 </li>
               ))}
             </ul>
