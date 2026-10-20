@@ -4,7 +4,19 @@ import { useNavigate } from 'react-router-dom';
 import GameCard from '../components/GameCard.jsx';
 import Icon from '../components/Icon.jsx';
 import AdminPanel from '../components/AdminPanel.jsx';
-import { metaDe, CATEGORIAS_PORTADA } from '../games/meta.js';
+import { metaDe, CATEGORIAS_PORTADA as CATEGORIAS_EXPORTADAS } from '../games/meta.js';
+
+// Lista de categorías segura por si no estuviese exportada en meta.js
+const CATEGORIAS_DEFAULT = [
+  { id: 'favoritos', titulo: '⭐ Favoritos del Creador', desc: 'Los juegos más adictivos y jugados' },
+  { id: 'prueba', titulo: '🧠 Para ponerte a prueba', desc: 'Retos de ingenio, cultura y velocidad mental' },
+  { id: 'chill', titulo: '🌴 Para jugar de chill', desc: 'Risas, amigos, preguntas y pura diversión' },
+  { id: 'estrategia', titulo: '♟️ Juegos de estrategia y deducción', desc: 'Roles ocultos, engaños y cartas tácticas' }
+];
+
+const CATEGORIAS_PORTADA = (Array.isArray(CATEGORIAS_EXPORTADAS) && CATEGORIAS_EXPORTADAS.length > 0)
+  ? CATEGORIAS_EXPORTADAS
+  : CATEGORIAS_DEFAULT;
 
 const normalizar = (t) =>
   String(t ?? '')
@@ -14,6 +26,45 @@ const normalizar = (t) =>
     .replace(/[^a-z0-9ñ\s]/g, ' ')
     .replace(/\s+/g, ' ')
     .trim();
+
+// Extrae todas las categorías asignadas, admitiendo arrays, strings con comas y singular/plural
+const obtenerCategorias = (g, m) => {
+  const fuentes = [
+    m?.categorias,
+    m?.categoria,
+    g?.categorias,
+    g?.categoria
+  ].filter(Boolean);
+
+  const lista = [];
+  fuentes.forEach((val) => {
+    if (Array.isArray(val)) {
+      val.flat(Infinity).forEach((v) => {
+        if (typeof v === 'string') {
+          v.split(',').forEach((s) => lista.push(s.trim()));
+        }
+      });
+    } else if (typeof val === 'string') {
+      val.split(',').forEach((s) => lista.push(s.trim()));
+    }
+  });
+
+  return lista.filter(Boolean);
+};
+
+// Compara de forma flexible tanto por ID corto ('favoritos') como por título ('favoritos del creador')
+const coincideCategoria = (catDeseada, catPortada) => {
+  const cNorm = normalizar(catDeseada);
+  const idNorm = normalizar(catPortada.id);
+  const titNorm = normalizar(catPortada.titulo);
+
+  if (!cNorm) return false;
+  if (cNorm === idNorm || cNorm === titNorm) return true;
+  if (titNorm.includes(cNorm) || cNorm.includes(titNorm)) return true;
+  if (cNorm.includes(idNorm)) return true;
+
+  return false;
+};
 
 export default function Home() {
   const [games, setGames] = useState([]);
@@ -63,8 +114,7 @@ export default function Home() {
         return {
           game: g,
           nombre: normalizar(g.name),
-          resto: normalizar(`${g.description ?? ''} ${m.descripcion} ${m.etiquetas ?? ''}`),
-          categoria: m.categoria || 'chill'
+          resto: normalizar(`${g.description ?? ''} ${m.descripcion} ${m.etiquetas ?? ''}`)
         };
       }),
     [games]
@@ -86,7 +136,7 @@ export default function Home() {
 
   const hayBusqueda = busqueda.trim() !== '';
 
-  // Agrupación por categorías para la vista por defecto
+  // Distribución en múltiples categorías simultáneamente
   const juegosPorCategoria = useMemo(() => {
     const grupos = {};
     CATEGORIAS_PORTADA.forEach((cat) => {
@@ -95,13 +145,21 @@ export default function Home() {
 
     games.forEach((g) => {
       const m = metaDe(g.id);
-      const catId = m.categoria || 'chill';
-      if (grupos[catId]) {
-        grupos[catId].push(g);
-      } else {
-        grupos['chill'] = grupos['chill'] || [];
-        grupos['chill'].push(g);
+      const categoriasDelJuego = obtenerCategorias(g, m);
+
+      // Si no tiene ninguna categoría declarada, se asigna a 'chill'
+      if (categoriasDelJuego.length === 0) {
+        if (grupos['chill']) grupos['chill'].push(g);
+        return;
       }
+
+      // Si tiene categorías asignadas, se agrega a cada fila coincidente
+      CATEGORIAS_PORTADA.forEach((cat) => {
+        const pertenece = categoriasDelJuego.some((c) => coincideCategoria(c, cat));
+        if (pertenece) {
+          grupos[cat.id].push(g);
+        }
+      });
     });
 
     return grupos;
@@ -166,7 +224,7 @@ export default function Home() {
       {error && <p className="error">{error}</p>}
       {cargando && !error && <p className="loading">Cargando juegos…</p>}
 
-      {/* VISTA 1: CUANDO HAY UNA BÚSQUEDA ACTIVA (Cuadrícula tradicional filtrada) */}
+      {/* Resultados filtrados si hay texto en el buscador */}
       {!cargando && !error && hayBusqueda && resultados.length > 0 && (
         <ul className="game-grid">
           {resultados.map((g, i) => (
@@ -175,7 +233,7 @@ export default function Home() {
         </ul>
       )}
 
-      {/* VISTA 2: PORTADA POR DEFECTO (Carruseles horizontales de 3 en 3 por categoría) */}
+      {/* Vista por categorías con carrusel horizontal de 3 en 3 */}
       {!cargando && !error && !hayBusqueda && (
         <div className="home-categorias-contenedor">
           {CATEGORIAS_PORTADA.map((cat) => {
@@ -191,7 +249,11 @@ export default function Home() {
 
                 <ul className="home-carousel-track">
                   {juegosCat.map((g, i) => (
-                    <li key={g.id} className="home-carousel-item" style={{ '--i': Math.min(i, 8) }}>
+                    <li
+                      key={`${cat.id}-${g.id}`}
+                      className="home-carousel-item"
+                      style={{ '--i': Math.min(i, 8) }}
+                    >
                       <GameCard game={g} />
                     </li>
                   ))}
