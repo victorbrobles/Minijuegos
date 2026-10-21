@@ -1,12 +1,51 @@
 // client/src/games/Cancion/audioPlayerCancion.js
+
 let reproductorActual = null;
 let temporizadorCorte = null;
 let intervaloProgreso = null;
 
-// Arranque en 0.1% (apenas un susurro) y tope medio cómodo al final (45%)
+// Contexto y nodos de la Web Audio API para compatibilidad móvil
+let audioContext = null;
+let gainNode = null;
+let sourceNode = null;
+
+// Rango de volumen interno (desde un 0.1% casi inaudible hasta el 45% máximo)
 const VOL_INICIAL = 0.001;
 const VOL_MAX_MEDIO = 0.45;
 const DURACION_TOTAL = 30;
+
+function obtenerAudioContext() {
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  if (!AudioCtx) return null;
+  if (!audioContext) {
+    audioContext = new AudioCtx();
+  }
+  if (audioContext.state === 'suspended') {
+    audioContext.resume().catch(() => {});
+  }
+  return audioContext;
+}
+
+function aplicarGanancia(volumen) {
+  const clampedVol = Math.min(VOL_MAX_MEDIO, Math.max(VOL_INICIAL, volumen));
+
+  // 1. Modulación por Web Audio API (imprescindible en móviles iOS y Android)
+  if (gainNode && gainNode.gain) {
+    if (audioContext && audioContext.currentTime) {
+      gainNode.gain.cancelScheduledValues(audioContext.currentTime);
+      gainNode.gain.setValueAtTime(clampedVol, audioContext.currentTime);
+    } else {
+      gainNode.gain.value = clampedVol;
+    }
+  }
+
+  // 2. Modulación clásica como fallback para navegadores de escritorio
+  if (reproductorActual) {
+    try {
+      reproductorActual.volume = clampedVol;
+    } catch (_) {}
+  }
+}
 
 export function reproducirConRampa(urlAudio, onTickSegundos, onTerminar) {
   detenerReproduccion();
@@ -16,18 +55,38 @@ export function reproducirConRampa(urlAudio, onTickSegundos, onTerminar) {
     return;
   }
 
-  const audio = new Audio(urlAudio);
+  const audio = new Audio();
+  // Permite que Web Audio API procese el audio sin restricciones de origen
+  audio.crossOrigin = 'anonymous';
+  audio.src = urlAudio;
+  audio.preload = 'auto';
   reproductorActual = audio;
 
-  // Fijar el volumen al mínimo antes de dar play
-  audio.volume = VOL_INICIAL;
+  // Configuración de la cadena Web Audio API
+  const ctx = obtenerAudioContext();
+  if (ctx) {
+    try {
+      sourceNode = ctx.createMediaElementSource(audio);
+      gainNode = ctx.createGain();
+      gainNode.gain.value = VOL_INICIAL;
+      sourceNode.connect(gainNode);
+      gainNode.connect(ctx.destination);
+    } catch (e) {
+      console.warn('Fallback a audio estándar:', e);
+    }
+  }
+
+  aplicarGanancia(VOL_INICIAL);
 
   let segundosRestantes = DURACION_TOTAL;
   if (onTickSegundos) onTickSegundos(segundosRestantes);
 
   audio.play()
     .then(() => {
-      // Ajuste ultra-fino cada 100 ms (10 veces por segundo) para evitar cualquier salto
+      if (ctx && ctx.state === 'suspended') {
+        ctx.resume().catch(() => {});
+      }
+
       const intervaloMs = 100;
       let tickActual = 0;
 
@@ -37,16 +96,12 @@ export function reproducirConRampa(urlAudio, onTickSegundos, onTerminar) {
         const segundosEnterosRestantes = Math.max(0, Math.ceil(DURACION_TOTAL - tiempoTranscurrido));
 
         const progreso = Math.min(1, tiempoTranscurrido / DURACION_TOTAL);
-        
-        // Curva cúbica (t^3): retraso drástico del volumen; los primeros 15s casi no se percibe
+        // Curva cúbica (t^3) para una subida suave y progresiva
         const factorCurva = Math.pow(progreso, 3);
         const nuevoVolumen = VOL_INICIAL + (VOL_MAX_MEDIO - VOL_INICIAL) * factorCurva;
 
-        if (reproductorActual) {
-          reproductorActual.volume = Math.min(VOL_MAX_MEDIO, Math.max(VOL_INICIAL, nuevoVolumen));
-        }
+        aplicarGanancia(nuevoVolumen);
 
-        // Notificar cada segundo cumplido al contador en pantalla
         if (tickActual % (1000 / intervaloMs) === 0) {
           if (onTickSegundos) onTickSegundos(segundosEnterosRestantes);
         }
@@ -63,7 +118,7 @@ export function reproducirConRampa(urlAudio, onTickSegundos, onTerminar) {
       }, DURACION_TOTAL * 1000);
     })
     .catch((error) => {
-      console.error('Error al reproducir audio real:', error);
+      console.error('Error al reproducir audio:', error);
     });
 }
 
@@ -80,6 +135,10 @@ export function pausarAudio() {
 }
 
 export function reanudarAudio() {
+  const ctx = obtenerAudioContext();
+  if (ctx && ctx.state === 'suspended') {
+    ctx.resume().catch(() => {});
+  }
   if (reproductorActual) {
     try {
       reproductorActual.play().catch(() => {});
@@ -102,5 +161,17 @@ export function detenerReproduccion() {
       reproductorActual.currentTime = 0;
     } catch (_) {}
     reproductorActual = null;
+  }
+  if (sourceNode) {
+    try {
+      sourceNode.disconnect();
+    } catch (_) {}
+    sourceNode = null;
+  }
+  if (gainNode) {
+    try {
+      gainNode.disconnect();
+    } catch (_) {}
+    gainNode = null;
   }
 }
