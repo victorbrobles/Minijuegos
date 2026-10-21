@@ -2,9 +2,12 @@
 import express from 'express';
 import parte1 from '../data/seeds/cancion/parte1.js';
 import parte2 from '../data/seeds/cancion/parte2.js';
+import parte3 from '../data/seeds/cancion/parte3.js';
+import parte4 from '../data/seeds/cancion/parte4.js';
+import parte5 from '../data/seeds/cancion/parte5.js';
 
 const router = express.Router();
-const TODAS_LAS_CANCIONES = [...parte1, ...parte2];
+const TODAS_LAS_CANCIONES = [...parte1, ...parte2, ...parte3, ...parte4, ...parte5];
 
 // Normalización de texto sin tildes, caracteres especiales ni mayúsculas
 function normalizar(texto) {

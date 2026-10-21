@@ -8,6 +8,7 @@ const CLAVE_SESION_CIEGAS = 'ciegas_online_session';
 const CATEGORIAS = [
   { id: 'comida', label: 'Comida' },
   { id: 'deporte', label: 'Deporte' },
+  { id: 'deportistas', label: 'Deportistas' },
   { id: 'famosos', label: 'Famosos' },
   { id: 'culturapop', label: 'Cultura Pop' },
   { id: 'geografia', label: 'Geografía' }

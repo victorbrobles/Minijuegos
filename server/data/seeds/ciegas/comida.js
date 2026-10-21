@@ -1,103 +1,103 @@
 // server/data/seeds/ciegas/comida.seed.js
 export default [
-  {
-    id: 'com_1',
-    tema: '¿Qué comida rápida te salva más una noche de resaca o pereza máxima? (De mejor salvavidas a peor)',
-    items: ['Pizza cuatro quesos', 'Hamburguesa doble con queso y patatas', 'Dürüm kebab completo con salsa picante', 'Bandeja variada de sushi', 'Cubo de pollo frito crujiente']
-  },
-  {
-    id: 'com_2',
-    tema: 'El ingrediente más indispensable en cualquier tortilla o revuelto casero (De imprescindible a prescindible)',
-    items: ['Cebolla bien pochada', 'Taquitos de jamón ibérico', 'Queso fundente suave', 'Champiñones salteados al ajillo', 'Chorizo frito en dados']
-  },
-  {
-    id: 'com_3',
-    tema: '¿Cuál es el aperitivo que nunca puede faltar en un picoteo con amigos? (De rey del tapeo al más soso)',
-    items: ['Bravas bien crujientes con salsa picante', 'Croquetas cremosas de jamón', 'Ensaladilla rusa con picos', 'Calamares a la romana recién hechos', 'Aceitunas rellenas de anchoa']
-  },
-  {
-    id: 'com_4',
-    tema: 'El peor crimen gastronómico que te pueden servir en un plato (De imperdonable a pasable)',
-    items: ['Paella con chorizo y guisantes', 'Pizza con piña y salsa barbacoa', 'Pasta carbonara con nata en vez de huevo', 'Café solo con leche condensada caliente', 'Filete de carne de calidad pasado de cocción']
-  },
-  {
-    id: 'com_5',
-    tema: '¿Qué postre tradicional elegirías para cerrar una comida familiar? (Del más irresistible al que dejas)',
-    items: ['Tarta de queso fluida horneada', 'Tiramisú clásico al café', 'Coulant de chocolate caliente con helado', 'Flan de huevo casero con caramelo', 'Arroz con leche y canela']
-  },
-  {
-    id: 'com_6',
-    tema: '¿Qué plato de cuchara de invierno te reconforta más el alma? (De número 1 indiscutible al más pesado)',
-    items: ['Cocido completo con sopa y pringá', 'Lentejas caseras con chorizo y verdura', 'Fabada asturiana contundente', 'Crema de calabaza asada suave', 'Sopa de fideos con caldo de pollo casero']
-  },
-  {
-    id: 'com_7',
-    tema: 'El bocado dulce para acompañar el café a media mañana (Del favorito al que coges por descarte)',
-    items: ['Croissant artesano de mantequilla', 'Palmera de hojaldre bañada en chocolate', 'Donut glaseado tradicional', 'Napolitana recién horneada de crema', 'Bizcocho casero de limón']
-  },
-  {
-    id: 'com_8',
-    tema: 'Salsas universales para sumergir patatas fritas (De la mejor a la más aburrida)',
-    items: ['Mayonesa casera con ajo (alioli)', 'Salsa brava picante tradicional', 'Salsa de queso cheddar caliente fundido', 'Barbacoa ahumada dulce', 'Ketchup de tomate clásico']
-  },
-  {
-    id: 'com_9',
-    tema: '¿Qué cocina internacional te llevarías si solo pudieras comer de un país? (De la favorita a la prescindible)',
-    items: ['Comida italiana (pasta, pizza y risottos)', 'Comida japonesa (sushi, ramen y tempura)', 'Comida mexicana (tacos, quesadillas y guacamole)', 'Comida china tradicional (dim sum y arroces)', 'Comida india (curris aromáticos y panes naan)']
-  },
-  {
-    id: 'com_10',
-    tema: '¿Qué verdura se te hace más pesada o poco apetecible en la cena? (De la más odiada a la más fácil de comer)',
-    items: ['Brócoli hervido al vapor', 'Coles de Bruselas cocidas', 'Espinacas hervidas sin acompañamiento', 'Coliflor cocida con aceite', 'Berenjena al horno simple']
-  },
-  {
-    id: 'com_11',
-    tema: 'Ingredientes de pizza que más dividen a la mesa (Del más aceptable al más fuera de lugar)',
-    items: ['Champiñones laminados', 'Anchoas saladas en conserva', 'Rúcula fresca añadida al final', 'Maíz dulce en grano', 'Trozos de piña en almíbar']
-  },
-  {
-    id: 'com_12',
-    tema: 'El tipo de queso más placentero para comer en tabla o picoteo (Del rey al más flojo)',
-    items: ['Queso curado de oveja bien potente', 'Queso azul o roquefort intenso', 'Brie o camembert fundente y cremoso', 'Parmesano envejecido en lascas', 'Queso de cabra rulo tostado']
-  },
-  {
-    id: 'com_13',
-    tema: 'Snack crujiente de bolsa para ver una película (Del que no puedes parar al más soso)',
-    items: ['Patatas fritas al punto de sal clásicas', 'Nachos con sabor a queso especiado', 'Patatas con sabor a jamón serrano', 'Conos de maíz crujientes', 'Gusanitos de maíz inflado']
-  },
-  {
-    id: 'com_14',
-    tema: 'La bebida no alcohólica más refrescante para un día de calor sofocante (De la gloria al descarte)',
-    items: ['Agua con gas, hielo y rodaja de limón', 'Limonada natural fría sin exceso de azúcar', 'Té helado al limón bien frío', 'Refresco de cola con hielo', 'Zumo de naranja recién exprimido']
-  },
-  {
-    id: 'com_15',
-    tema: '¿Qué tipo de pasta corta o larga te parece superior? (De la textura perfecta a la más insípida)',
-    items: ['Tagliatelle frescos al huevo', 'Rigatoni gruesos que atrapan salsa', 'Espaguetis tradicionales al dente', 'Penne rigate clásicos', 'Farfalle o lacitos de pasta']
-  },
-  {
-    id: 'com_16',
-    tema: 'Bocadillo clásico de bar para almorzar a media mañana (Del más mítico al más soso)',
-    items: ['Tortilla de patatas jugosa con pan crujiente', 'Lomo adobado a la plancha con queso fundido', 'Jamón serrano con tomate restregado y aceite', 'Calamares fritos con mayonesa ligera', 'Pechuga de pollo empanada con lechuga']
-  },
-  {
-    id: 'com_17',
-    tema: 'El sabor de helado que define a una buena heladería artesanal (Del imprescindible al prescindible)',
-    items: ['Pistacho puro tostado', 'Chocolate negro amargo con trocitos', 'Vainilla natural con semillas', 'Dulce de leche cremoso', 'Limón fresco al agua o sorbete']
-  },
-  {
-    id: 'com_18',
-    tema: '¿Qué plato frío de verano te apetece más al mediodía? (Del más revitalizante al más pesado)',
-    items: ['Gazpacho andaluz bien frío', 'Salmorejo cordobés espeso con huevo y jamón', 'Ensalada de pasta fresca con atún y maíz', 'Melón dulce con lonchas de jamón ibérico', 'Ensalada campera de patata cocida']
-  },
-  {
-    id: 'com_19',
-    tema: 'Fruta que da más pereza pelar o preparar pero que luego está rica (De mayor pereza a menor)',
-    items: ['Granada fresca grano a grano', 'Piña entera natural', 'Mango maduro con su hueso plano', 'Kiwi pelado fino', 'Naranja con piel gruesa']
-  },
-  {
-    id: 'com_20',
-    tema: 'El desayuno de buffet de hotel más tentador (Del primero que te sirves al que ignoras)',
-    items: ['Huevos revueltos jugosos con bacon crujiente', 'Tortitas recién hechas con sirope o miel', 'Tostada de pan de pueblo con jamón y tomate', 'Bollería surtida caliente recién sacada', 'Yogur con frutos rojos y granola']
-  }
+  { id: 'com_1', tema: 'Comidas rápidas', items: ['Pizza', 'Hamburguesa', 'Kebab', 'Tacos', 'Perrito caliente'] },
+  { id: 'com_2', tema: 'Postres de restaurante', items: ['Tarta de queso', 'Coulant de chocolate', 'Tiramisú', 'Flan de huevo', 'Fruta del tiempo'] },
+  { id: 'com_3', tema: 'Tapas de bar español', items: ['Croquetas', 'Patatas bravas', 'Jamón ibérico', 'Tortilla de patata', 'Aceitunas'] },
+  { id: 'com_4', tema: 'Platos de cuchara de invierno', items: ['Cocido', 'Lentejas', 'Fabada', 'Sopa de fideos', 'Puré de verduras'] },
+  { id: 'com_5', tema: 'Sabores de helado clásicos', items: ['Chocolate', 'Pistacho', 'Vainilla', 'Fresa', 'Limón'] },
+  { id: 'com_6', tema: 'Bocadillos populares', items: ['Jamón con tomate', 'Lomo con queso', 'Calamares', 'Tortilla de patatas', 'Pechuga de pollo'] },
+  { id: 'com_7', tema: 'Bebidas para una comida con amigos', items: ['Cerveza', 'Coca-Cola', 'Vino tinto', 'Tinto de verano', 'Agua'] },
+  { id: 'com_8', tema: 'Frutas de verano', items: ['Sandía', 'Melón', 'Melocotón', 'Cerezas', 'Ciruelas'] },
+  { id: 'com_9', tema: 'Ingredientes de pizza', items: ['Queso mozzarella', 'Jamón', 'Bacon', 'Champiñones', 'Piña'] },
+  { id: 'com_10', tema: 'Bollería del desayuno', items: ['Croissant', 'Napolitana de chocolate', 'Donut', 'Palmera de hojaldre', 'Magdalena'] },
+  { id: 'com_11', tema: 'Formatos de pasta italiana', items: ['Espaguetis', 'Macarrones', 'Tagliatelle', 'Raviolis', 'Espirales'] },
+  { id: 'com_12', tema: 'Salsas para mojar patatas', items: ['Alioli', 'Salsa brava', 'Mayonesa', 'Barbacoa', 'Kétchup'] },
+  { id: 'com_13', tema: 'Desayunos de hotel buffet', items: ['Huevos revueltos con bacon', 'Tostada con jamón', 'Tortitas con sirope', 'Bollería surtida', 'Cereales con leche'] },
+  { id: 'com_14', tema: 'Platos de pasta tradicionales', items: ['Carbonara', 'Boloñesa', 'Lasaña', 'Pesto', 'Pasta con tomate'] },
+  { id: 'com_15', tema: 'Carnes para una barbacoa', items: ['Chuletón', 'Costillas', 'Secreto ibérico', 'Chorizo criollo', 'Pechuga de pollo'] },
+  { id: 'com_16', tema: 'Pescados para comer a la plancha', items: ['Salmón', 'Lubina', 'Dorada', 'Merluza', 'Panga'] },
+  { id: 'com_17', tema: 'Tipos de queso de tabla', items: ['Manchego curado', 'Brie cremoso', 'Parmesano', 'Queso azul', 'Queso de cabra'] },
+  { id: 'com_18', tema: 'Snacks de bolsa', items: ['Patatas al punto de sal', 'Doritos', 'Ruffles de jamón', 'Cheetos', 'Palomitas'] },
+  { id: 'com_19', tema: 'Platos de comida mexicana', items: ['Tacos', 'Guacamole', 'Quesadillas', 'Enchiladas', 'Nachos'] },
+  { id: 'com_20', tema: 'Platos de cocina asiática', items: ['Ramen', 'Sushi', 'Arroz tres delicias', 'Rollitos de primavera', 'Fideos salteados'] },
+  { id: 'com_21', tema: 'Formas de cocinar el huevo', items: ['Huevo frito', 'Tortilla de patata', 'Huevo poché', 'Huevos revueltos', 'Huevo cocido'] },
+  { id: 'com_22', tema: 'Verduras para una guarnición', items: ['Patatas asadas', 'Pimientos fritos', 'Espárragos trigueros', 'Champiñones', 'Brócoli'] },
+  { id: 'com_23', tema: 'Chucherías o gominolas', items: ['Regaliz rojo', 'Botellas de cola', 'Huevos fritos', 'Ositos de goma', 'Nubes de azúcar'] },
+  { id: 'com_24', tema: 'Frutos secos para el aperitivo', items: ['Pistachos', 'Anacardos', 'Almendras', 'Nueces', 'Cacahuetes'] },
+  { id: 'com_25', tema: 'Platos fríos de verano', items: ['Salmorejo', 'Gazpacho', 'Ensalada de pasta', 'Melón con jamón', 'Ensaladilla rusa'] },
+  { id: 'com_26', tema: 'Cafés calientes', items: ['Café con leche', 'Capuchino', 'Café cortado', 'Café bombón', 'Café solo'] },
+  { id: 'com_27', tema: 'Platos típicos de marisco', items: ['Gambas al ajillo', 'Pulpo a la gallega', 'Almejas a la marinera', 'Mejillones al vapor', 'Calamares'] },
+  { id: 'com_28', tema: 'Tipos de chocolate', items: ['Chocolate con leche', 'Chocolate blanco', 'Chocolate negro con almendras', 'Chocolate con avellanas', 'Chocolate negro puro 99%'] },
+  { id: 'com_29', tema: 'Tipos de arroz español', items: ['Paella valenciana', 'Arroz a banda', 'Arroz caldoso con bogavante', 'Arroz negro', 'Arroz al horno'] },
+  { id: 'com_30', tema: 'Ingredientes de una hamburguesa', items: ['Carne de ternera', 'Queso fundido', 'Bacon crujiente', 'Cebolla caramelizada', 'Pepinillo'] },
+  { id: 'com_31', tema: 'Platos con patata', items: ['Patatas fritas caseras', 'Patatas bravas', 'Puré de patatas', 'Patatas asadas', 'Patatas cocidas'] },
+  { id: 'com_32', tema: 'Empanadas por su relleno', items: ['Atún con tomate', 'Carne picada', 'Pollo', 'Jamón y queso', 'Espinacas'] },
+  { id: 'com_33', tema: 'Cosas que untar en una tostada', items: ['Aceite y jamón', 'Mantequilla y mermelada', 'Aguacate y huevo', 'Pate', 'Queso crema'] },
+  { id: 'com_34', tema: 'Embutidos ibéricos de plato', items: ['Jamón ibérico', 'Lomo embuchado', 'Salchichón', 'Chorizo', 'Mortadela'] },
+  { id: 'com_35', tema: 'Tartas de cumpleaños', items: ['Tarta de chocolate', 'Tarta de la abuela', 'Tarta de queso', 'Tarta de zanahoria', 'Tarta de manzana'] },
+  { id: 'com_36', tema: 'Legumbres tradicionales', items: ['Lentejas', 'Garbanzos', 'Alubias blancas', 'Judías pintas', 'Habas'] },
+  { id: 'com_37', tema: 'Salsas calientes para carne', items: ['Salsa a la pimienta', 'Salsa de queso roquefort', 'Salsa chimichurri', 'Salsa barbacoa', 'Salsa de champiñones'] },
+  { id: 'com_38', tema: 'Frutas tropicales', items: ['Mango', 'Piña', 'Plátano', 'Maracuyá', 'Papaya'] },
+  { id: 'com_39', tema: 'Comidas de feria o fiesta patronal', items: ['Churros con chocolate', 'Perrito caliente', 'Patatas asadas rellenas', 'Bocadillo de panceta', 'Algodón de azúcar'] },
+  { id: 'com_40', tema: 'Rellenos de croquetas', items: ['Jamón ibérico', 'Boletus', 'Pollo asado', 'Bacalao', 'Espinacas'] },
+  { id: 'com_41', tema: 'Bocadillos calientes de bar', items: ['Pepito de ternera', 'Bikini', 'Serranito', 'Bacon y queso', 'Tortilla francesa'] },
+  { id: 'com_42', tema: 'Frutas que comer todo el año', items: ['Plátano', 'Manzana', 'Mandarina', 'Uvas', 'Pera'] },
+  { id: 'com_43', tema: 'Tipos de pan de panadería', items: ['Barra rústica de leña', 'Baguette', 'Pan de masa madre', 'Hogaza de pueblo', 'Pan de molde'] },
+  { id: 'com_44', tema: 'Verduras que menos gustan a la gente', items: ['Zanahoria', 'Calabacín', 'Espinacas', 'Coliflor', 'Coles de Bruselas'] },
+  { id: 'com_45', tema: 'Comidas de domingo en familia', items: ['Paella', 'Asado de carne', 'Barbacoa', 'Lasaña casera', 'Pollo asado con patatas'] },
+  { id: 'com_46', tema: 'Postres lácteos de cuchara', items: ['Natillas con galleta', 'Arroz con leche', 'Cuajada con miel', 'Yogur con fruta', 'Gelatina'] },
+  { id: 'com_47', tema: 'Cosas que echarle a una ensalada', items: ['Atún', 'Queso feta', 'Maíz dulce', 'Tomate', 'Cebolla'] },
+  { id: 'com_48', tema: 'Pescados fritos de chiringuito', items: ['Calamares', 'Boquerones', 'Chocos', 'Puntillitas', 'Cazón en adobo'] },
+  { id: 'com_49', tema: 'Formatos de comida rápida callejera', items: ['Slice de pizza', 'Hamburguesa con patatas', 'Kebab döner', 'Burrito', 'Pollo frito'] },
+  { id: 'com_50', tema: 'Cosas que desayunar rápido por la mañana', items: ['Tostada con café', 'Tazón de leche con cereales', 'Zumo de naranja y galletas', 'Yogur con plátano', 'Café solo a toda prisa'] },
+  { id: 'com_51', tema: 'Rellenos de empanadillas caseras', items: ['Atún con huevo duro y tomate', 'Carne picada especiada', 'Jamón cocido y queso', 'Pollo con cebolla', 'Espinacas con piñones'] },
+  { id: 'com_52', tema: 'Tipos de aceite para cocinar o aliñar', items: ['Aceite de oliva virgen extra', 'Aceite de oliva suave', 'Aceite de girasol', 'Mantequilla para cocinar', 'Margarina vegetal'] },
+  { id: 'com_53', tema: 'Tipos de salchichas', items: ['Chistorra a la plancha', 'Bratwurst alemana', 'Chorizo parrillero', 'Salchicha de Frankfurt', 'Salchicha de pavo'] },
+  { id: 'com_54', tema: 'Pastas rellenas italianas', items: ['Raviolis de carne', 'Tortellini de jamón', 'Cappelletti en caldo', 'Panzerotti de queso', 'Raviolis de verdura'] },
+  { id: 'com_55', tema: 'Platos de arroz del mundo', items: ['Paella mixta', 'Risotto de champiñones', 'Arroz frito cantonés', 'Biryani indio', 'Arroz blanco con tomate'] },
+  { id: 'com_56', tema: 'Ingredientes de una tabla de embutidos', items: ['Jamón ibérico', 'Queso curado', 'Lomo embuchado', 'Salchichón', 'Chorizo'] },
+  { id: 'com_57', tema: 'Mariscos cocidos para Navidad', items: ['Percebes', 'Bogavante', 'Gambas rojas', 'Langostinos', 'Mejillones'] },
+  { id: 'com_58', tema: 'Tipos de pasta larga', items: ['Espaguetis', 'Tagliatelle', 'Fettuccine', 'Bucatini', 'Cabello de ángel'] },
+  { id: 'com_59', tema: 'Comidas de tupper para llevar al trabajo', items: ['Lasaña', 'Lentejas guisadas', 'Arroz con pollo', 'Filete empanado', 'Pescado a la plancha'] },
+  { id: 'com_60', tema: 'Bebidas alcohólicas de fiesta', items: ['Cerveza fría', 'Gin-Tonic', 'Ron con cola', 'Vodka con limón', 'Tequila solo'] },
+  { id: 'com_61', tema: 'Platos de patatas fritas', items: ['Huevos rotos con jamón', 'Patatas con bacon y queso cheddar', 'Patatas bravas', 'Patatas con alioli', 'Patatas con kétchup'] },
+  { id: 'com_62', tema: 'Sabores de patatas fritas de bolsa', items: ['Papas al punto de sal', 'Sabor jamón', 'Campesinas', 'Cebolla y queso', 'Vinagreta'] },
+  { id: 'com_63', tema: 'Tipos de café con leche', items: ['Café con leche mediano', 'Capuchino con espuma', 'Café cortado', 'Café bombón', 'Café moca con chocolate'] },
+  { id: 'com_64', tema: 'Rellenos de crepes salados', items: ['Jamón york y queso fundido', 'Pollo con champiñones', 'Salmón ahumado con queso crema', 'Cuatro quesos', 'Espinacas con bechamel'] },
+  { id: 'com_65', tema: 'Rellenos de crepes dulces', items: ['Nutella con plátano', 'Dulce de leche', 'Chocolate blanco', 'Mermelada de fresa', 'Azúcar y limón'] },
+  { id: 'com_66', tema: 'Cortes de carne de cerdo', items: ['Solomillo', 'Pluma ibérica', 'Secreto ibérico', 'Costillas', 'Panceta'] },
+  { id: 'com_67', tema: 'Bebidas calientes para merendar en invierno', items: ['Chocolate caliente', 'Café con leche', 'Té con leche o canela', 'Infusión de menta-poleo', 'Vaso de leche tibia sola'] },
+  { id: 'com_68', tema: 'Platos típicos de Navidad en España', items: ['Cordero o cochinillo asado', 'Marisco cocido', 'Sopa de picadillo o galets', 'Pavo relleno', 'Lombarda'] },
+  { id: 'com_69', tema: 'Dulces navideños típicos', items: ['Turrón de chocolate crujiente', 'Turrón blando de Jijona', 'Polvorones de almendra', 'Roscón de Reyes', 'Mazapán'] },
+  { id: 'com_70', tema: 'Verduras en tempura o fritas', items: ['Aros de cebolla', 'Berenjenas con miel', 'Tiras de calabacín', 'Pimientos verdes', 'Zanahoria'] },
+  { id: 'com_71', tema: 'Tipos de leches o bebidas para el café', items: ['Leche entera de vaca', 'Bebida de avena', 'Leche semidesnatada', 'Bebida de soja', 'Leche desnatada'] },
+  { id: 'com_72', tema: 'Salsas frías para ensaladas o carne', items: ['Vinagreta clásica con aceite y vinagre', 'Salsa césar', 'Salsa de yogur con hierbas', 'Salsa rosa', 'Salsa tártara'] },
+  { id: 'com_73', tema: 'Platos tradicionales italianos que no son pizza', items: ['Lasaña', 'Risotto de boletus', 'Gnocchi al cuatro quesos', 'Carpaccio de ternera', 'Polenta'] },
+  { id: 'com_74', tema: 'Acompañamientos de carne', items: ['Patatas fritas', 'Puré de patatas cremoso', 'Pimientos de Padrón', 'Ensalada verde', 'Arroz blanco hervido'] },
+  { id: 'com_75', tema: 'Comidas de playa en nevera portátil', items: ['Tortilla de patatas', 'Filetes rusos o empanados', 'Ensalada de pasta', 'Bocadillos de jamón', 'Fruta cortada caliente'] },
+  { id: 'com_76', tema: 'Partes del pollo frito o asado', items: ['Muslo', 'Contramuslo', 'Alitas crujientes', 'Pechuga entera', 'Carcasa'] },
+  { id: 'com_77', tema: 'Formatos de queso para picotear', items: ['Dados de queso curado', 'Tostada de queso brie fundido', 'Tequenos de queso', 'Mozzarella fresca con tomate', 'Quesito en porciones'] },
+  { id: 'com_78', tema: 'Platos de arroz caldoso o meloso', items: ['Arroz caldoso con bogavante', 'Arroz marinero con sepia', 'Arroz meloso con setas', 'Arroz con conejo', 'Sopa de arroz con pollo'] },
+  { id: 'com_79', tema: 'Cosas que ponerle a un perrito caliente', items: ['Queso fundido', 'Cebolla crujiente', 'Bacon troceado', 'Kétchup', 'Mostaza'] },
+  { id: 'com_80', tema: 'Pescados al horno con patatas', items: ['Lubina a la espalda', 'Dorada a la sal', 'Rodaballo al horno', 'Bacalao confitado', 'Merluza en salsa verde'] },
+  { id: 'com_81', tema: 'Comidas que saben mejor al día siguiente recalentadas', items: ['Lasaña', 'Guiso de lentejas', 'Fabada', 'Cocido', 'Pizza fría'] },
+  { id: 'com_82', tema: 'Aliños para una ensalada clásica', items: ['Aceite de oliva virgen extra y sal', 'Vinagreta con vinagre balsámico', 'Salsa de yogur y limón', 'Mostaza y miel', 'Limón exprimido solo'] },
+  { id: 'com_83', tema: 'Frutas para desayunar con yogur', items: ['Fresas', 'Plátano', 'Arándanos', 'Manzana cortada', 'Kiwi'] },
+  { id: 'com_84', tema: 'Entrantes para cenar en un bar', items: ['Ración de jamón con pan tumaca', 'Tabla de quesos variados', 'Bravas crujientes', 'Croquetas surtidas', 'Nachos con guacamole'] },
+  { id: 'com_85', tema: 'Tipos de pasta corta', items: ['Macarrones rigati', 'Espirales', 'Lacitos', 'Plumas', 'Fideuá'] },
+  { id: 'com_86', tema: 'Tipos de aceitunas de mesa', items: ['Aceitunas rellenas de anchoa', 'Aceitunas partidas aliñadas', 'Aceitunas gordal deshuesadas', 'Aceitunas negras', 'Aceitunas verdes simples'] },
+  { id: 'com_87', tema: 'Verduras que mejor quedan a la parrilla', items: ['Espárragos trigueros', 'Pimientos rojos', 'Calabacín en rodajas', 'Berenjena', 'Cebolla entera'] },
+  { id: 'com_88', tema: 'Formatos de comida con masa de hojaldre', items: ['Empanada gallega hojaldrada', 'Palmeritas saladas con queso', 'Croissant relleno', 'Volován de marisco', 'Salchicha envuelta en hojaldre'] },
+  { id: 'com_89', tema: 'Sabores clásicos de mermelada', items: ['Fresa', 'Melocotón', 'Frambuesa', 'Ciruela', 'Higo'] },
+  { id: 'com_90', tema: 'Tipos de vino para una cena informal', items: ['Vino tinto crianza', 'Vino blanco verdejo frío', 'Vino rosado fresco', 'Cava brut', 'Vino tinto reserva potente'] },
+  { id: 'com_91', tema: 'Salsas frías para pescado o marisco', items: ['Salsa tártara casera', 'Mayonesa ligera con limón', 'Salsa verde fresca', 'Salsa rosa', 'Vinagreta de verduras'] },
+  { id: 'com_92', tema: 'Golosinas ácidas o con pica-pica', items: ['Lenguas de fresa ácidas', 'Ladrillos con pica-pica', 'Cintas de manzana verde ácida', 'Botellitas ácidas', 'Gajos de limón picantes'] },
+  { id: 'com_93', tema: 'Ingredientes de un sándwich mixto clásico mejorado', items: ['Queso fundido extra', 'Jamón cocido de calidad', 'Mantequilla tostada en la sartén', 'Punto de orégano', 'Huevo a la plancha encima'] },
+  { id: 'com_94', tema: 'Caldos caseros de base', items: ['Caldo de jamón y carne', 'Caldo de pollo de corral', 'Fumet de pescado y marisco', 'Caldo de puchero andaluz', 'Caldo de verduras limpio'] },
+  { id: 'com_95', tema: 'Salsas picantes populares', items: ['Sriracha', 'Salsa brava española', 'Tabasco clásico', 'Chipotle ahumado', 'Habanero puro'] },
+  { id: 'com_96', tema: 'Frutos secos fritos o tostados de picoteo', items: ['Pistachos tostados salados', 'Anacardos fritos', 'Kikos de maíz crujientes', 'Almendras fritas con sal', 'Cacahuetes con cáscara'] },
+  { id: 'com_97', tema: 'Preparaciones de ternera de menú del día', items: ['Carrillera estofada', 'Entrecot a la plancha', 'Escalope empanado', 'Ternera en salsa con patatas', 'Filete de ternera a la plancha'] },
+  { id: 'com_98', tema: 'Platos de comida asiática callejera', items: ['Gyozas crujientes a la plancha', 'Baozi relleno de cerdo al vapor', 'Brochetas yakitori', 'Rollitos crujientes', 'Arroz glutinoso solo'] },
+  { id: 'com_99', tema: 'Postres de chocolate', items: ['Coulant con corazón derretido', 'Brownie templado con helado', 'Tarta tres chocolates', 'Mousse de chocolate aireada', 'Bombones surtidos'] },
+  { id: 'com_100', tema: 'Platos más queridos de la cocina española', items: ['Tortilla de patatas', 'Jamón ibérico cortado a cuchillo', 'Paella de domingo', 'Croquetas caseras', 'Gazpacho bien frío'] }
 ];

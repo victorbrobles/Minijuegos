@@ -1,103 +1,103 @@
 // server/data/seeds/ciegas/famosos.seed.js
 export default [
-  {
-    id: 'fam_1',
-    tema: '¿Con cuál de estos personajes te irías antes de fiesta una noche loca? (Del mejor compañero de juerga al más soso)',
-    items: ['Ibai Llanos', 'David Broncano', 'Joaquín Sánchez (el del Betis)', 'C. Tangana', 'Fernando Alonso']
-  },
-  {
-    id: 'fam_2',
-    tema: '¿A quién contratarías para gestionar tu dinero si te tocan 50 millones de euros en la lotería? (Del más fiable al mayor peligro)',
-    items: ['Rafa Nadal', 'Amancio Ortega', 'Gerard Piqué', 'Elon Musk', 'El Xokas']
-  },
-  {
-    id: 'fam_3',
-    tema: 'El famoso al que más te gustaría entrevistar durante 2 horas sin filtros ni cámaras (Del más fascinante al más aburrido)',
-    items: ['Leo Messi', 'Rosalía', 'Pedro Almodóvar', 'Cristiano Ronaldo', 'Penélope Cruz']
-  },
-  {
-    id: 'fam_4',
-    tema: '¿A quién elegirías como presidente del gobierno por un año en plan experimento social? (Del mal menor al caos absoluto)',
-    items: ['David Broncano', 'Arturo Pérez-Reverte', 'Ibai Llanos', 'Kiko Rivera', 'Belén Esteban']
-  },
-  {
-    id: 'fam_5',
-    tema: 'Actores de Hollywood con los que verías cualquier película sin mirar el tráiler (Del que nunca falla al más irregular)',
-    items: ['Leonardo DiCaprio', 'Cillian Murphy', 'Brad Pitt', 'Denzel Washington', 'Ryan Gosling']
-  },
-  {
-    id: 'fam_6',
-    tema: 'La celebridad que más pereza te da cuando aparece constantemente en redes sociales y noticias (De la más pesada a la más pasable)',
-    items: ['Kim Kardashian', 'Georgina Rodríguez', 'Kanye West', 'Dulceida', 'Paris Hilton']
-  },
-  {
-    id: 'fam_7',
-    tema: 'Músicos que han marcado una época y cuya trayectoria impone más respeto (Del mayor icono al menos trascendente)',
-    items: ['Freddie Mercury', 'Michael Jackson', 'David Bowie', 'Bob Marley', 'Prince']
-  },
-  {
-    id: 'fam_8',
-    tema: '¿Qué director de cine tiene la filmografía más perfecta e intachable? (Del maestro absoluto al más sobrevalorado)',
-    items: ['Christopher Nolan', 'Quentin Tarantino', 'Martin Scorsese', 'Steven Spielberg', 'Denis Villeneuve']
-  },
-  {
-    id: 'fam_9',
-    tema: 'Famosos españoles con los que te tomarías una caña un domingo por la tarde (Del más campechano al más distante)',
-    items: ['Karlos Arguiñano', 'Berto Romero', 'Mercedes Milá', 'Andreu Buenafuente', 'Tamara Falcó']
-  },
-  {
-    id: 'fam_10',
-    tema: '¿Con cuál de estos magnates tecnológicos pasarías una semana en un búnker de supervivencia? (Del más útil al más insoportable)',
-    items: ['Bill Gates', 'Steve Wozniak', 'Jeff Bezos', 'Mark Zuckerberg', 'Elon Musk']
-  },
-  {
-    id: 'fam_11',
-    tema: 'Actrices con mayor carisma y magnetismo en pantalla de los últimos 20 años (De la reina absoluta a la menos memorable)',
-    items: ['Meryl Streep', 'Cate Blanchett', 'Margot Robbie', 'Emma Stone', 'Scarlett Johansson']
-  },
-  {
-    id: 'fam_12',
-    tema: '¿Qué creador de contenido o streamer te parece más genuino y entretenido? (Del que más te engancha al que menos soportas)',
-    items: ['AuronPlay', 'Ibai Llanos', 'IlloJuan', 'Rubius', 'TheGrefg']
-  },
-  {
-    id: 'fam_13',
-    tema: 'Villanos del cine interpretados de forma tan magistral que eclipsaron al protagonista (Del mejor papel al menor)',
-    items: ['Heath Ledger como el Joker en El Caballero Oscuro', 'Anthony Hopkins como Hannibal Lecter en El silencio de los corderos', 'Christoph Waltz como Hans Landa en Malditos Bastardos', 'Javier Bardem como Anton Chigurh en No es país para viejos', 'Joaquin Phoenix como Cómodo en Gladiator']
-  },
-  {
-    id: 'fam_14',
-    tema: 'Famosos que mejor han sabido reinventarse y mantenerse relevantes con los años (Del rey de la adaptación al más estancado)',
-    items: ['David Bowie en su carrera musical', 'Dwayne La Roca Johnson de luchador a estrella de taquilla', 'Madonna cambiando de estilo por décadas', 'Will Smith de rapero de sitcom a actor dramático', 'David Beckham de futbolista a marca global de moda']
-  },
-  {
-    id: 'fam_15',
-    tema: '¿A quién dejarías a cargo de tus mascotas durante tus vacaciones de verano? (Del más responsable al peor desastre)',
-    items: ['Rafa Nadal', 'Keanu Reeves', 'Ibai Llanos', 'Mario Vaquerizo', 'Santiago Segura']
-  },
-  {
-    id: 'fam_16',
-    tema: 'Cantantes hispanos actuales con el directo más potente sobre un escenario (Del mejor concierto al más flojo)',
-    items: ['Rosalía', 'C. Tangana', 'Bad Bunny', 'Alejandro Sanz', 'Quevedo']
-  },
-  {
-    id: 'fam_17',
-    tema: '¿Qué presentador histórico de televisión española te parece más mítico e irrepetible? (Del número uno al más olvidable)',
-    items: ['Ramón García con su capa de Nochevieja', 'Jordi Hurtado y su longevidad legendaria', 'Jesús Hermida con su estilo narrativo', 'Matías Prats con sus chistes en informativos', 'Mercedes Milá al frente de debates intensos']
-  },
-  {
-    id: 'fam_18',
-    tema: 'Celebridades que dan sensación de ser las mejores personas y más humildes del mundo (Del más adorable al que genera dudas)',
-    items: ['Keanu Reeves', 'Tom Hanks', 'Pedro Pascal', 'Hugh Jackman', 'Paul Rudd']
-  },
-  {
-    id: 'fam_19',
-    tema: '¿Qué autor o novelista contemporáneo tiene el carácter más polémico y afilado? (Del más mordaz al más templado)',
-    items: ['Arturo Pérez-Reverte', 'Michel Houellebecq', 'Stephen King opinando en redes', 'J.K. Rowling y sus polémicas públicas', 'George R.R. Martin y sus retrasos escribiendo']
-  },
-  {
-    id: 'fam_20',
-    tema: '¿A cuál de estos famosos elegirías como compañero para escapar de una casa encantada? (Del más valiente al que sale corriendo primero)',
-    items: ['Iker Jiménez', 'Arnold Schwarzenegger', 'David Broncano', 'Dani Rovira', 'Carmen Porter']
-  }
+  { id: 'fam_1', tema: 'Famosos españoles para irte de fiesta una noche', items: ['Ibai Llanos', 'David Broncano', 'Joaquín Sánchez', 'C. Tangana', 'Fernando Alonso'] },
+  { id: 'fam_2', tema: 'Famosos a los que pedirías consejo de finanzas e inversión', items: ['Amancio Ortega', 'Rafa Nadal', 'Gerard Piqué', 'Elon Musk', 'El Xokas'] },
+  { id: 'fam_3', tema: 'Famosos para entrevistar 2 horas a solas sin cámaras', items: ['Leo Messi', 'Rosalía', 'Pedro Almodóvar', 'Cristiano Ronaldo', 'Penélope Cruz'] },
+  { id: 'fam_4', tema: 'Actores de Hollywood con los que verías cualquier película', items: ['Leonardo DiCaprio', 'Cillian Murphy', 'Brad Pitt', 'Denzel Washington', 'Ryan Gosling'] },
+  { id: 'fam_5', tema: 'Celebridades que más pereza dan cuando salen en noticias y redes', items: ['Kim Kardashian', 'Georgina Rodríguez', 'Kanye West', 'Dulceida', 'Paris Hilton'] },
+  { id: 'fam_6', tema: 'Músicos icónicos que más respeto imponen por su carrera', items: ['Freddie Mercury', 'Michael Jackson', 'David Bowie', 'Bob Marley', 'Prince'] },
+  { id: 'fam_7', tema: 'Directores de cine contemporáneos', items: ['Christopher Nolan', 'Quentin Tarantino', 'Martin Scorsese', 'Steven Spielberg', 'Denis Villeneuve'] },
+  { id: 'fam_8', tema: 'Famosos españoles con los que tomarte una caña de domingo', items: ['Karlos Arguiñano', 'Berto Romero', 'Andreu Buenafuente', 'Mercedes Milá', 'Tamara Falcó'] },
+  { id: 'fam_9', tema: 'Magnates tecnológicos actuales', items: ['Bill Gates', 'Jeff Bezos', 'Steve Wozniak', 'Mark Zuckerberg', 'Elon Musk'] },
+  { id: 'fam_10', tema: 'Actrices con mayor carisma en pantalla', items: ['Meryl Streep', 'Cate Blanchett', 'Margot Robbie', 'Emma Stone', 'Scarlett Johansson'] },
+  { id: 'fam_11', tema: 'Streamers y creadores de contenido hispanos', items: ['Ibai Llanos', 'IlloJuan', 'AuronPlay', 'El Rubius', 'TheGrefg'] },
+  { id: 'fam_12', tema: 'Famosos que parecen ser las mejores personas del mundo', items: ['Keanu Reeves', 'Tom Hanks', 'Pedro Pascal', 'Hugh Jackman', 'Paul Rudd'] },
+  { id: 'fam_13', tema: 'Cantantes hispanos actuales con mejor espectáculo en directo', items: ['Rosalía', 'C. Tangana', 'Bad Bunny', 'Alejandro Sanz', 'Quevedo'] },
+  { id: 'fam_14', tema: 'Presentadores de televisión en España', items: ['David Broncano', 'Roberto Leal', 'Arturo Valls', 'Pablo Motos', 'Jorge Javier Vázquez'] },
+  { id: 'fam_15', tema: 'Estrellas del pop internacional femenino', items: ['Taylor Swift', 'Dua Lipa', 'Beyoncé', 'Lady Gaga', 'Katy Perry'] },
+  { id: 'fam_16', tema: 'Actores de comedia que más gracia te hacen', items: ['Jim Carrey', 'Steve Carell', 'Rowan Atkinson', 'Will Ferrell', 'Adam Sandler'] },
+  { id: 'fam_17', tema: 'Famosos para dejarles las llaves de tu casa y cuidar a tu perro', items: ['Rafa Nadal', 'Keanu Reeves', 'Ibai Llanos', 'Mario Vaquerizo', 'Santiago Segura'] },
+  { id: 'fam_18', tema: 'Futbolistas históricos más carismáticos fuera del campo', items: ['Joaquín Sánchez', 'Ronaldinho', 'Zlatan Ibrahimović', 'Iker Casillas', 'Leo Messi'] },
+  { id: 'fam_19', tema: 'Estrellas de cine de acción clásicas', items: ['Arnold Schwarzenegger', 'Sylvester Stallone', 'Bruce Willis', 'Tom Cruise', 'Jean-Claude Van Damme'] },
+  { id: 'fam_20', tema: 'Cantantes pop masculinos internacionales', items: ['Bruno Mars', 'The Weeknd', 'Ed Sheeran', 'Harry Styles', 'Justin Bieber'] },
+  { id: 'fam_21', tema: 'Actores españoles de cine y series', items: ['Javier Bardem', 'Antonio Banderas', 'Luis Tosar', 'Eduard Fernández', 'Mario Casas'] },
+  { id: 'fam_22', tema: 'Actrices españolas reconocidas', items: ['Penélope Cruz', 'Blanca Portillo', 'Carmen Machi', 'Bárbara Lennie', 'Blanca Suárez'] },
+  { id: 'fam_23', tema: 'Artistas latinos de música urbana', items: ['Bad Bunny', 'Rauw Alejandro', 'Bizarrap', 'J Balvin', 'Maluma'] },
+  { id: 'fam_24', tema: 'Comediantes y humoristas españoles de televisión', items: ['Berto Romero', 'Dani Rovira', 'Ernesto Sevilla', 'Joaquín Reyes', 'José Mota'] },
+  { id: 'fam_25', tema: 'Modelos y figuras de la moda internacional', items: ['Naomi Campbell', 'Gisele Bündchen', 'Kendall Jenner', 'Bella Hadid', 'Cara Delevingne'] },
+  { id: 'fam_26', tema: 'Famosos que elegirías como acompañantes para escapar de una isla desierta', items: ['Bear Grylls', 'Arnold Schwarzenegger', 'Fernando Alonso', 'Ibai Llanos', 'Mario Vaquerizo'] },
+  { id: 'fam_27', tema: 'Cantantes legendarios del rock internacional', items: ['Freddie Mercury', 'Mick Jagger', 'Robert Plant', 'Axl Rose', 'Bono'] },
+  { id: 'fam_28', tema: 'Raperos estadounidenses más legendarios', items: ['Eminem', 'Tupac Shakur', 'The Notorious B.I.G.', 'Snoop Dogg', '50 Cent'] },
+  { id: 'fam_29', tema: 'Famosos españoles para salir a cenar y tener una charla profunda', items: ['Arturo Pérez-Reverte', 'Jordi Évole', 'Andreu Buenafuente', 'C. Tangana', 'Kiko Rivera'] },
+  { id: 'fam_30', tema: 'Actores que han encarnado a James Bond', items: ['Sean Connery', 'Daniel Craig', 'Pierce Brosnan', 'Roger Moore', 'Timothy Dalton'] },
+  { id: 'fam_31', tema: 'Famosos involucrados en más polémicas públicas', items: ['Kanye West', 'Piqué', 'El Xokas', 'Willy Toledo', 'Ibai Llanos'] },
+  { id: 'fam_32', tema: 'Iconos de la música española de toda la vida', items: ['Julio Iglesias', 'Joaquín Sabina', 'Rocío Jurado', 'Alejandro Sanz', 'Raphael'] },
+  { id: 'fam_33', tema: 'Actores del universo Marvel', items: ['Robert Downey Jr.', 'Chris Evans', 'Chris Hemsworth', 'Tom Holland', 'Jeremy Renner'] },
+  { id: 'fam_34', tema: 'Cocineros famosos de televisión', items: ['Karlos Arguiñano', 'Jordi Cruz', 'Dabiz Muñoz', 'Alberto Chicote', 'Gordon Ramsay'] },
+  { id: 'fam_35', tema: 'Famosos con los que harías un viaje en coche de 10 horas', items: ['IlloJuan', 'David Broncano', 'Dani Rovira', 'Rafa Nadal', 'El Xokas'] },
+  { id: 'fam_36', tema: 'Divas de la música pop de los años 2000', items: ['Britney Spears', 'Shakira', 'Rihanna', 'Beyoncé', 'Christina Aguilera'] },
+  { id: 'fam_37', tema: 'Actores que han interpretado al Joker', items: ['Heath Ledger', 'Joaquin Phoenix', 'Jack Nicholson', 'Cameron Monaghan', 'Jared Leto'] },
+  { id: 'fam_38', tema: 'Artistas de música electrónica y DJs', items: ['Daft Punk', 'Avicii', 'David Guetta', 'Calvin Harris', 'Martin Garrix'] },
+  { id: 'fam_39', tema: 'Personalidades del deporte con mayor tirón mediático', items: ['Cristiano Ronaldo', 'Lionel Messi', 'LeBron James', 'Lewis Hamilton', 'Conor McGregor'] },
+  { id: 'fam_40', tema: 'Presentadores históricos de concursos en España', items: ['Ramón García', 'Jordi Hurtado', 'Carlos Sobera', 'Arturo Valls', 'Christian Gálvez'] },
+  { id: 'fam_41', tema: 'Celebridades que empezaron como estrellas infantiles', items: ['Leonardo DiCaprio', 'Scarlett Johansson', 'Ryan Gosling', 'Miley Cyrus', 'Macaulay Culkin'] },
+  { id: 'fam_42', tema: 'Actores británicos de prestigio', items: ['Anthony Hopkins', 'Gary Oldman', 'Benedict Cumberbatch', 'Tom Hardy', 'Hugh Grant'] },
+  { id: 'fam_43', tema: 'Famosos que dan sensación de ser muy inteligentes', items: ['Brian May', 'Rowan Atkinson', 'Natalie Portman', 'Shakira', 'Ashton Kutcher'] },
+  { id: 'fam_44', tema: 'Creadores de contenido de videojuegos', items: ['El Rubius', 'Vegetta777', 'AuronPlay', 'Willyrex', 'TheGrefg'] },
+  { id: 'fam_45', tema: 'Cantantes solistas de rock en solitario', items: ['Bruce Springsteen', 'David Bowie', 'Ozzy Osbourne', 'Elton John', 'Rod Stewart'] },
+  { id: 'fam_46', tema: 'Famosos de los que te gustaría ser vecino puerta con puerta', items: ['Keanu Reeves', 'Tom Hanks', 'Ibai Llanos', 'Mario Vaquerizo', 'Kanye West'] },
+  { id: 'fam_47', tema: 'Directores de cine de terror y suspense', items: ['Alfred Hitchcock', 'Stanley Kubrick', 'Guillermo del Toro', 'James Wan', 'M. Night Shyamalan'] },
+  { id: 'fam_48', tema: 'Presentadoras y periodistas de televisión en España', items: ['Matías Prats', 'Jordi Évole', 'Pedro Piqueras', 'Vicente Vallés', 'Ana Rosa Quintana'] },
+  { id: 'fam_49', tema: 'Actores con las voces más imponentes y reconocibles', items: ['Morgan Freeman', 'James Earl Jones', 'Samuel L. Jackson', 'Ian McKellen', 'Liam Neeson'] },
+  { id: 'fam_50', tema: 'Famosos que triunfan en TikTok e Instagram', items: ['Khaby Lame', 'MrBeast', 'Georgina Rodríguez', 'Kylie Jenner', 'Charli D\'Amelio'] },
+  { id: 'fam_51', tema: 'Paseadores de perros famosos: ¿a quién le confiarías pasear a tu mascota?', items: ['Henry Cavill', 'Chris Evans', 'Zendaya', 'Snoop Dogg', 'Kanye West'] },
+  { id: 'fam_52', tema: 'Músicos que han compuesto bandas sonoras para películas', items: ['Hans Zimmer', 'John Williams', 'Ennio Morricone', 'Danny Elfman', 'Howard Shore'] },
+  { id: 'fam_53', tema: 'Actores de comedia españoles', items: ['Javier Cámara', 'Paco León', 'Santiago Segura', 'Leo Harlem', 'Florentino Fernández'] },
+  { id: 'fam_54', tema: 'Parejas de famosos más mediáticas', items: ['Zendaya y Tom Holland', 'Blake Lively y Ryan Reynolds', 'David y Victoria Beckham', 'Cristiano y Georgina', 'Kardashians'] },
+  { id: 'fam_55', tema: 'Famosos a los que pedirías ayuda para montar un mueble de IKEA', items: ['Harrison Ford', 'Nick Offerman', 'Arnold Schwarzenegger', 'David Broncano', 'Mario Vaquerizo'] },
+  { id: 'fam_56', tema: 'Cantantes de trap y música urbana argentina', items: ['Duki', 'Bizarrap', 'Trueno', 'Milo J', 'Khea'] },
+  { id: 'fam_57', tema: 'Actores veteranos con papeles míticos en el cine', items: ['Robert De Niro', 'Al Pacino', 'Morgan Freeman', 'Clint Eastwood', 'Harrison Ford'] },
+  { id: 'fam_58', tema: 'Cantantes pop juveniles actuales', items: ['Billie Eilish', 'Olivia Rodrigo', 'Sabrina Carpenter', 'Camila Cabello', 'Shawn Mendes'] },
+  { id: 'fam_59', tema: 'Famosos que tienen fama de ser muy fiesteros', items: ['Mick Jagger', 'Charlie Sheen', 'Leonardo DiCaprio', 'Mario Vaquerizo', 'Ibai Llanos'] },
+  { id: 'fam_60', tema: 'Creadores y mentes de grandes universos ficticios', items: ['J.R.R. Tolkien', 'George Lucas', 'Stan Lee', 'George R.R. Martin', 'J.K. Rowling'] },
+  { id: 'fam_61', tema: 'Celebridades que han hecho cameos divertidos en series', items: ['Brad Pitt', 'Ed Sheeran', 'Elon Musk', 'Stan Lee', 'Stephen Hawking'] },
+  { id: 'fam_62', tema: 'Músicos españoles de pop de los años 2000', items: ['Dani Martín', 'David Muñoz', 'Melendi', 'David Bisbal', 'Amaia Montero'] },
+  { id: 'fam_63', tema: 'Actores de Hollywood que destacan por su simpatía con los fans', items: ['Pedro Pascal', 'Keanu Reeves', 'Jack Black', 'Tom Holland', 'Will Smith'] },
+  { id: 'fam_64', tema: 'Entrenadores de fútbol más carismáticos ante los micrófonos', items: ['José Mourinho', 'Jürgen Klopp', 'Pep Guardiola', 'Carlo Ancelotti', 'Diego Simeone'] },
+  { id: 'fam_65', tema: 'Cantautores de habla hispana', items: ['Joaquín Sabina', 'Joan Manuel Serrat', 'Silvio Rodríguez', 'Fito Páez', 'Ricardo Arjona'] },
+  { id: 'fam_66', tema: 'Famosos que montarías en tu equipo para una pelea callejera ficticia', items: ['Dwayne Johnson', 'Mike Tyson', 'Ilia Topuria', 'Jason Statham', 'Woody Allen'] },
+  { id: 'fam_67', tema: 'Actores que han encarnado a Spiderman en cine', items: ['Tobey Maguire', 'Andrew Garfield', 'Tom Holland', 'Shameik Moore', 'Nicolas Cage'] },
+  { id: 'fam_68', tema: 'Compositores de música pop que escriben para otros', items: ['Max Martin', 'Ed Sheeran', 'Sia', 'Bruno Mars', 'Ryan Tedder'] },
+  { id: 'fam_69', tema: 'Personalidades que más han cambiado físicamente con los años', items: ['Dwayne Johnson', 'Macaulay Culkin', 'Christian Bale', 'Zac Efron', 'Tom Cruise'] },
+  { id: 'fam_70', tema: 'Estrellas de Hollywood que cantan muy bien', items: ['Hugh Jackman', 'Bradley Cooper', 'Ryan Gosling', 'Emma Stone', 'Robert Downey Jr.'] },
+  { id: 'fam_71', tema: 'Deportistas que han intentado ser actores o famosos de televisión', items: ['Dwayne Johnson', 'John Cena', 'Eric Cantona', 'Shaquille O\'Neal', 'Michael Jordan'] },
+  { id: 'fam_72', tema: 'Famosos españoles para jugar al Trivial Pursuit en equipo', items: ['Arturo Pérez-Reverte', 'Jordi Hurtado', 'Andreu Buenafuente', 'David Broncano', 'Kiko Rivera'] },
+  { id: 'fam_73', tema: 'Estrellas de Hollywood que nunca han ganado un Oscar a mejor actor', items: ['Tom Cruise', 'Johnny Depp', 'Bradley Cooper', 'Edward Norton', 'Jim Carrey'] },
+  { id: 'fam_74', tema: 'Cantantes masculinos de baladas en español', items: ['Luis Miguel', 'Pablo Alborán', 'Alejandro Sanz', 'Chayanne', 'Enrique Iglesias'] },
+  { id: 'fam_75', tema: 'Famosos con los que te irías a un parque de atracciones', items: ['Ibai Llanos', 'Tom Cruise', 'Jack Black', 'David Broncano', 'Pedro Pascal'] },
+  { id: 'fam_76', tema: 'Actores de la serie Peaky Blinders', items: ['Cillian Murphy', 'Tom Hardy', 'Paul Anderson', 'Helen McCrory', 'Adrien Brody'] },
+  { id: 'fam_77', tema: 'Influencers españoles de comida y gastronomía', items: ['Cenando con Pablo', 'Elias Dosunmu', 'Gipsy Chef', 'Guille Rodríguez', 'Foodies de postureo'] },
+  { id: 'fam_78', tema: 'Famosos que tienen su propia marca de tequila o licores', items: ['George Clooney', 'Dwayne Johnson', 'Michael Jordan', 'Kendall Jenner', 'Conor McGregor'] },
+  { id: 'fam_79', tema: 'Actores que destacan por su físico musculoso en el cine', items: ['Henry Cavill', 'Chris Hemsworth', 'Dwayne Johnson', 'Jason Momoa', 'Michael B. Jordan'] },
+  { id: 'fam_80', tema: 'Figuras de la comedia en YouTube y Twitch', items: ['IlloJuan', 'El Xokas', 'AuronPlay', 'Spursito', 'Dario Eme Hache'] },
+  { id: 'fam_81', tema: 'Músicos que murieron a los 27 años', items: ['Jimi Hendrix', 'Kurt Cobain', 'Amy Winehouse', 'Jim Morrison', 'Janis Joplin'] },
+  { id: 'fam_82', tema: 'Estrellas del rap hispanohablante de batalla', items: ['Aczino', 'Chuty', 'Bnet', 'Wos', 'Arkano'] },
+  { id: 'fam_83', tema: 'Actores de la saga Harry Potter', items: ['Robert Pattinson', 'Emma Watson', 'Daniel Radcliffe', 'Rupert Grint', 'Tom Felton'] },
+  { id: 'fam_84', tema: 'Cantantes que han ganado Eurovisión', items: ['ABBA', 'Måneskin', 'Loreen', 'Alexander Rybak', 'Lordi'] },
+  { id: 'fam_85', tema: 'Famosos que no tienen redes sociales oficiales o apenas las usan', items: ['Cillian Murphy', 'Christopher Nolan', 'Brad Pitt', 'Keanu Reeves', 'Daniel Craig'] },
+  { id: 'fam_86', tema: 'Celebridades para ir a ver un partido de fútbol en el palco', items: ['Rafa Nadal', 'Ibai Llanos', 'Antonio Banderas', 'Tom Cruise', 'Kardashians'] },
+  { id: 'fam_87', tema: 'Actores de cine de ciencia ficción', items: ['Harrison Ford', 'Keanu Reeves', 'Sigourney Weaver', 'Arnold Schwarzenegger', 'Will Smith'] },
+  { id: 'fam_88', tema: 'Creadores de contenido de divulgación científica o histórica en YouTube', items: ['QuantumFracture', 'Javier Santaolalla', 'Dot CSV', 'Memorias de Pez', 'La Gata de Schrödinger'] },
+  { id: 'fam_89', tema: 'Artistas pop que cantan tanto en inglés como en español', items: ['Shakira', 'Rosalía', 'Enrique Iglesias', 'Camila Cabello', 'Ricky Martin'] },
+  { id: 'fam_90', tema: 'Actores que han interpretado a villanos inolvidables en cine', items: ['Christoph Waltz', 'Anthony Hopkins', 'Javier Bardem', 'Mads Mikkelsen', 'Ralph Fiennes'] },
+  { id: 'fam_91', tema: 'Presentadores de podcast de entrevistas más populares', items: ['Joe Rogan', 'Jordi Wild', 'David Broncano', 'Álex Fidalgo', 'Lex Fridman'] },
+  { id: 'fam_92', tema: 'Famosos que tienen su propia línea de maquillaje o cosmética', items: ['Rihanna', 'Selena Gomez', 'Kylie Jenner', 'Lady Gaga', 'Ariana Grande'] },
+  { id: 'fam_93', tema: 'Actores cómicos de la serie The Office', items: ['Steve Carell', 'Rainn Wilson', 'John Krasinski', 'Brian Baumgartner', 'Creed Bratton'] },
+  { id: 'fam_94', tema: 'Estrellas de cine de artes marciales clásicas', items: ['Bruce Lee', 'Jackie Chan', 'Jet Li', 'Jean-Claude Van Damme', 'Chuck Norris'] },
+  { id: 'fam_95', tema: 'Famosos que han pilotado o conducido en carreras reales de motor', items: ['Paul Newman', 'Patrick Dempsey', 'Steve McQueen', 'Frankie Muniz', 'Tom Cruise'] },
+  { id: 'fam_96', tema: 'Músicos que destacan tocando la guitarra eléctrica', items: ['Jimi Hendrix', 'Slash', 'Eric Clapton', 'Brian May', 'Carlos Santana'] },
+  { id: 'fam_97', tema: 'Celebridades que dan sensación de ser muy humildes a pesar de sus millones', items: ['Keanu Reeves', 'Sadio Mané', 'Cillian Murphy', 'Rafa Nadal', 'Ed Sheeran'] },
+  { id: 'fam_98', tema: 'Actores de Hollywood que han ganado el Oscar de jóvenes', items: ['Adrien Brody', 'Leonardo DiCaprio', 'Matthew McConaughey', 'Cillian Murphy', 'Rami Malek'] },
+  { id: 'fam_99', tema: 'Famosos con los que jugarías un partido de pádel a dobles', items: ['Rafa Nadal', 'Carlos Alcaraz', 'Fernando Alonso', 'Ibai Llanos', 'David Broncano'] },
+  { id: 'fam_100', tema: 'El debate de las mayores estrellas globales de este siglo', items: ['Cristiano Ronaldo', 'Lionel Messi', 'Taylor Swift', 'Elon Musk', 'Dwayne Johnson'] }
 ];

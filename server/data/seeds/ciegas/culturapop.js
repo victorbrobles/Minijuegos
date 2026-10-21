@@ -1,103 +1,103 @@
 // server/data/seeds/ciegas/culturapop.seed.js
 export default [
-  {
-    id: 'cul_1',
-    tema: 'Sagas cinematográficas que nunca te cansarías de ver en maratón (De la joya indiscutible a la que se hace pesada)',
-    items: ['Trilogía de El Señor de los Anillos', 'Trilogía original de Star Wars (Episodios IV, V y VI)', 'Trilogía de El Caballero Oscuro de Nolan', 'Saga completa de Harry Potter', 'Trilogía de Regreso al Futuro']
-  },
-  {
-    id: 'cul_2',
-    tema: 'Series de televisión con el final más decepcionante o indignante para los fans (De la mayor estafa al final pasable)',
-    items: ['Juego de Tronos (Temporada 8)', 'Perdidos (Lost)', 'Dexter (final original)', 'Cómo conocí a vuestra madre', 'House of Cards']
-  },
-  {
-    id: 'cul_3',
-    tema: 'Videojuegos que han marcado un antes y un después en la historia del entretenimiento (Del más influyente al menor)',
-    items: ['Grand Theft Auto: San Andreas', 'The Legend of Zelda: Ocarina of Time', 'Minecraft', 'World of Warcraft', 'The Last of Us']
-  },
-  {
-    id: 'cul_4',
-    tema: 'Series de comedia clásicas que mejor se mantienen con el paso de los años (De la que más te hace reír a la más anticuada)',
-    items: ['The Office (versión estadounidense)', 'Friends', 'Aquí no hay quien viva', 'Modern Family', 'Brooklyn Nine-Nine']
-  },
-  {
-    id: 'cul_5',
-    tema: 'Canciones pop del verano de los años 2000 que todo el mundo se sabe de memoria (Del temazo mítico al más quemado)',
-    items: ['Dragostea Din Tei de O-Zone', 'Aserejé de Las Ketchup', 'Danza Kuduro de Don Omar', 'Waka Waka de Shakira', 'Gasolina de Daddy Yankee']
-  },
-  {
-    id: 'cul_6',
-    tema: 'Películas de animación de Pixar que más tocan la fibra y hacen llorar (De la que te rompe el corazón a la más ligera)',
-    items: ['Up (los primeros 10 minutos de la vida de Carl y Ellie)', 'Coco (la escena final cantando Recuerda a Mamá Coco)', 'Toy Story 3 (la despedida de Andy en el porche)', 'Del revés (Inside Out, la escena de Bing Bong)', 'Wall-E (la soledad del pequeño robot en la Tierra)']
-  },
-  {
-    id: 'cul_7',
-    tema: 'Superhéroes con el traje o diseño visual más icónico de la historia (Del mejor traje al más ridículo)',
-    items: ['Batman con su capa y armadura oscura', 'Spider-Man con el traje clásico rojo y azul', 'Iron Man con la armadura dorada y roja iluminada', 'Superman con la capa roja y la S en el pecho', 'Lobezno con el traje clásico amarillo y máscara']
-  },
-  {
-    id: 'cul_8',
-    tema: 'Formatos o programas de televisión que marcaron la infancia y juventud (Del más nostálgico al que menos recuerdas)',
-    items: ['Grand Prix del Verano con la vaquilla', 'Humor Amarillo con los comentarios españoles', 'Art Attack presentado por Jordi Cruz', 'Club Megatrix por las mañanas', 'El Diario de Patricia y sus momentos surrealistas']
-  },
-  {
-    id: 'cul_9',
-    tema: 'Bandas sonoras originales de películas que te ponen los pelos de punta al instante (De la obra de arte a la bonita)',
-    items: ['Gladiator compuesta por Hans Zimmer', 'El Señor de los Anillos compuesta por Howard Shore', 'Star Wars e Indiana Jones por John Williams', 'Interstellar y su órgano de iglesia por Hans Zimmer', 'El bueno, el feo y el malo por Ennio Morricone']
-  },
-  {
-    id: 'cul_10',
-    tema: 'Franquicias de videojuegos donde más horas puedes perder sin darte cuenta (De la más adictiva a la menos absorbente)',
-    items: ['Los Sims construyendo casas y vidas virtuales', 'Pokémon buscando criaturas y entrenando equipos', 'Animal Crossing decorando tu isla sin prisa', 'Civilization diciendo solo un turno más y me duermo', 'FIFA o EA Sports FC jugando partidos sin parar']
-  },
-  {
-    id: 'cul_11',
-    tema: '¿Qué red social actual te parece más tóxica o destructiva para la mente? (De la peor de todas a la más tolerable)',
-    items: ['X (antiguo Twitter) con debates y quejas constantes', 'TikTok con vídeos cortos que destruyen la atención', 'Instagram generando comparaciones de vidas irreales', 'LinkedIn con postureo profesional forzado', 'Reddit y sus foros de discusión anónima']
-  },
-  {
-    id: 'cul_12',
-    tema: 'Películas de terror que más trauma o miedo te provocaron en la adolescencia (De la más terrorífica a la que no asusta)',
-    items: ['El Exorcista (1973)', 'The Ring / La Señal (la cinta de vídeo y el pozo)', 'Paranormal Activity viendo puertas moverse de noche', 'Saw y los dilemas de las trampas de Jigsaw', 'Scream y las llamadas telefónicas misteriosas']
-  },
-  {
-    id: 'cul_13',
-    tema: 'Clásicos animados de Disney de los años 90 (Del rey supremo al menos memorable)',
-    items: ['El Rey León (1994)', 'Aladdín (1992)', 'La Bella y la Bestia (1991)', 'Hércules (1997)', 'Tarzán con la música de Phil Collins (1999)']
-  },
-  {
-    id: 'cul_14',
-    tema: 'Universos cinematográficos o mundos de ficción en los que preferirías vivir (Del más apetecible al más peligroso)',
-    items: ['El universo mágico de Harry Potter en Hogwarts', 'La Comarca de los Hobbits en la Tierra Media', 'El universo de Star Wars viajando por la galaxia', 'El universo de Marvel conviviendo con Vengadores', 'El mundo distópico de Blade Runner o Cyberpunk']
-  },
-  {
-    id: 'cul_15',
-    tema: 'Series de drama o suspense consideradas obras maestras absolutas (De la cúspide televisiva a la menos redonda)',
-    items: ['Breaking Bad', 'Los Soprano', 'The Wire', 'Succession', 'Chernobyl (miniserie de HBO)']
-  },
-  {
-    id: 'cul_16',
-    tema: '¿Qué cliché o tópico de películas de Hollywood da más vergüenza ajena? (Del más insoportable al más perdonable)',
-    items: ['El hackeo informático en 3 segundos tecleando sin usar ratón', 'Las bombas con pantalla digital gigante y desactivación en el segundo 1', 'El protagonista que esquiva 500 balas corriendo en línea recta', 'El coche que nunca arranca justo cuando el monstruo o asesino se acerca', 'La persona tímida que se quita las gafas y de repente es la más atractiva']
-  },
-  {
-    id: 'cul_17',
-    tema: 'Géneros musicales para poner de fondo en una reunión tranquila con amigos (Del más agradable al más molesto)',
-    items: ['Indie pop y folk acústico suave', 'Lo-fi hip hop instrumental relajante', 'Bossa nova o jazz suave de fondo', 'Reggaeton comercial a volumen moderado', 'Rock clásico de los 70 y 80']
-  },
-  {
-    id: 'cul_18',
-    tema: 'Consolas de videojuegos que mayor salto tecnológico o diversión supusieron (De la consola mítica a la secundaria)',
-    items: ['PlayStation 2 (la más vendida y con catálogo legendario)', 'Nintendo 64 (la revolución del movimiento en 3D)', 'Wii (los mandos por movimiento que jugaba toda la familia)', 'Super Nintendo (la cumbre perfecta del pixel art en 16 bits)', 'Game Boy clásica (el juego portátil en cualquier rincón)']
-  },
-  {
-    id: 'cul_19',
-    tema: 'Películas de comedia españolas más memorables de los últimos 30 años (De la más divertida a la más floja)',
-    items: ['Torrente: El brazo tonto de la ley (1998)', 'Ocho apellidos vascos (2014)', 'El día de la bestia (1995)', 'La gran aventura de Mortadelo y Filemón (2003)', 'Campeones (2018)']
-  },
-  {
-    id: 'cul_20',
-    tema: 'Intros o cabeceras de series que nunca te saltas al ver un capítulo (De la más hipnótica a la que pasas rápido)',
-    items: ['Juego de Tronos y el mapa mecánico con su tema musical', 'Narcos con la canción Tuyo de Rodrigo Amarante', 'Stranger Things con la música de sintetizadores ochenteros', 'Peaky Blinders sonando Red Right Hand de Nick Cave', 'Los Simpson y el gag cambiante del sofá']
-  }
+  { id: 'cul_1', tema: 'Sagas cinematográficas para ver en maratón', items: ['El Señor de los Anillos', 'Star Wars', 'Harry Potter', 'El Caballero Oscuro', 'Regreso al Futuro'] },
+  { id: 'cul_2', tema: 'Series con finales decepcionantes o polémicos', items: ['Juego de Tronos', 'Perdidos', 'Dexter', 'Cómo conocí a vuestra madre', 'House of Cards'] },
+  { id: 'cul_3', tema: 'Videojuegos influyentes de mundo abierto', items: ['GTA: San Andreas', 'The Witcher 3', 'Red Dead Redemption 2', 'Skyrim', 'Minecraft'] },
+  { id: 'cul_4', tema: 'Series de comedia de televisión', items: ['The Office', 'Friends', 'Aquí no hay quien viva', 'Modern Family', 'Brooklyn Nine-Nine'] },
+  { id: 'cul_5', tema: 'Películas de animación de Pixar', items: ['Up', 'Coco', 'Toy Story 3', 'Del revés', 'Buscando a Nemo'] },
+  { id: 'cul_6', tema: 'Superhéroes con el traje visualmente más icónico', items: ['Batman', 'Spider-Man', 'Iron Man', 'Superman', 'Wolverine'] },
+  { id: 'cul_7', tema: 'Redes sociales más populares', items: ['Instagram', 'TikTok', 'YouTube', 'X', 'Facebook'] },
+  { id: 'cul_8', tema: 'Películas de terror modernas', items: ['El Conjuro', 'Hereditary', 'Insidious', 'Sinister', 'La Purga'] },
+  { id: 'cul_9', tema: 'Clásicos animados de Disney', items: ['El Rey León', 'Aladdín', 'La Bella y la Bestia', 'Hércules', 'Tarzán'] },
+  { id: 'cul_10', tema: 'Series dramáticas de máxima calidad', items: ['Breaking Bad', 'Los Soprano', 'The Wire', 'Peaky Blinders', 'Succession'] },
+  { id: 'cul_11', tema: 'Consolas de videojuegos míticas', items: ['PlayStation 2', 'Nintendo DS', 'PlayStation 4', 'Nintendo 64', 'Wii'] },
+  { id: 'cul_12', tema: 'Villanos del universo Marvel en cine', items: ['Thanos', 'Loki', 'Duende Verde', 'Killmonger', 'Ultrón'] },
+  { id: 'cul_13', tema: 'Villanos del universo Batman', items: ['Joker', 'Bane', 'El Pingüino', 'Enigma', 'Dos Caras'] },
+  { id: 'cul_14', tema: 'Películas de ciencia ficción contemporáneas', items: ['Interstellar', 'Origen', 'Matrix', 'Dune', 'Avatar'] },
+  { id: 'cul_15', tema: 'Plataformas de streaming digital', items: ['Netflix', 'Max', 'Prime Video', 'Disney+', 'Apple TV+'] },
+  { id: 'cul_16', tema: 'Videojuegos multijugador competitivos', items: ['Rocket League', 'Fortnite', 'Call of Duty: Warzone', 'Valorant', 'League of Legends'] },
+  { id: 'cul_17', tema: 'Películas de acción de sagas conocidas', items: ['John Wick', 'Misión Imposible: Fallout', 'Mad Max: Furia en la carretera', 'Fast & Furious 5', 'La jungla de cristal'] },
+  { id: 'cul_18', tema: 'Series de suspense y misterio', items: ['Stranger Things', 'Dark', 'Mindhunter', 'Severance', 'La Casa de Papel'] },
+  { id: 'cul_19', tema: 'Sagas de videojuegos de aventuras', items: ['The Last of Us', 'Uncharted', 'God of War', 'The Legend of Zelda', 'Assassin\'s Creed'] },
+  { id: 'cul_20', tema: 'Películas de Quentin Tarantino', items: ['Pulp Fiction', 'Malditos Bastardos', 'Django Desencadenado', 'Kill Bill: Vol. 1', 'Reservoir Dogs'] },
+  { id: 'cul_21', tema: 'Personajes de la serie The Office', items: ['Michael Scott', 'Dwight Schrute', 'Jim Halpert', 'Kevin Malone', 'Andy Bernard'] },
+  { id: 'cul_22', tema: 'Personajes de la serie Friends', items: ['Chandler Bing', 'Joey Tribbiani', 'Phoebe Buffay', 'Rachel Green', 'Ross Geller'] },
+  { id: 'cul_23', tema: 'Películas de animación de DreamWorks', items: ['Shrek 2', 'Kung Fu Panda', 'Cómo entrenar a tu dragón', 'Madagascar', 'Megamind'] },
+  { id: 'cul_24', tema: 'Superhéroes del universo cinematográfico de Marvel', items: ['Iron Man', 'Spider-Man', 'Capitán América', 'Thor', 'Hulk'] },
+  { id: 'cul_25', tema: 'Series españolas emitidas en televisión', items: ['Aquí no hay quien viva', 'Los Serrano', 'La que se avecina', 'Cuéntame cómo pasó', 'Aída'] },
+  { id: 'cul_26', tema: 'Canciones pop del verano de los años 2000', items: ['Dragostea Din Tei', 'Aserejé', 'Gasolina', 'Danza Kuduro', 'Waka Waka'] },
+  { id: 'cul_27', tema: 'Películas de zombis y apocalipsis', items: ['Guerra Mundial Z', '28 días después', 'Soy leyenda', 'Zombies Party', 'Zombieland'] },
+  { id: 'cul_28', tema: 'Personajes principales de la saga Harry Potter', items: ['Hermione Granger', 'Harry Potter', 'Ron Weasley', 'Severus Snape', 'Albus Dumbledore'] },
+  { id: 'cul_29', tema: 'Personajes de la saga El Señor de los Anillos', items: ['Aragorn', 'Gandalf', 'Sam Gamyi', 'Legolas', 'Frodo Bolsón'] },
+  { id: 'cul_30', tema: 'Películas taquilleras de la historia del cine', items: ['Titanic', 'Avatar', 'Vengadores: Endgame', 'Star Wars: El despertar de la Fuerza', 'Jurassic World'] },
+  { id: 'cul_31', tema: 'Juegos clásicos de Nintendo', items: ['Super Mario Odyssey', 'Zelda: Ocarina of Time', 'Mario Kart 8', 'Super Smash Bros. Ultimate', 'Pokemon Rojo'] },
+  { id: 'cul_32', tema: 'Películas románticas de los años 90 y 2000', items: ['Titanic', 'Notting Hill', 'El diario de Noa', 'Pretty Woman', 'Love Actually'] },
+  { id: 'cul_33', tema: 'Personajes de Los Simpson', items: ['Homer Simpson', 'Bart Simpson', 'Moe Szyslak', 'Ned Flanders', 'Lisa Simpson'] },
+  { id: 'cul_34', tema: 'Franquicias de videojuegos de disparos bélicos', items: ['Call of Duty', 'Battlefield', 'Halo', 'Counter-Strike', 'Far Cry'] },
+  { id: 'cul_35', tema: 'Películas dirigidas por Christopher Nolan', items: ['El Caballero Oscuro', 'Interstellar', 'Origen', 'Oppenheimer', 'Tenet'] },
+  { id: 'cul_36', tema: 'Películas de comedia de instituto o adolescentes', items: ['Superbad', 'Chicas malas', 'American Pie', 'Project X', 'Scary Movie'] },
+  { id: 'cul_37', tema: 'Series de dibujos animados de nuestra infancia', items: ['Dragon Ball Z', 'Los Simpson', 'Shin-chan', 'Oliver y Benji', 'Bob Esponja'] },
+  { id: 'cul_38', tema: 'Asesinos o monstruos del cine de terror slasher', items: ['Michael Myers', 'Freddy Krueger', 'Jason Voorhees', 'Ghostface', 'Chucky'] },
+  { id: 'cul_39', tema: 'Mundos ficticios en los que vivirías', items: ['Hogwarts', 'La Comarca', 'El universo Star Wars', 'El universo Marvel', 'Cyberpunk'] },
+  { id: 'cul_40', tema: 'Bandas sonoras de películas', items: ['Gladiator', 'El Señor de los Anillos', 'Interstellar', 'Star Wars', 'Piratas del Caribe'] },
+  { id: 'cul_41', tema: 'Clichés de películas de acción', items: ['Disparar 100 balas sin recargar', 'Bombas que se desactivan en el segundo 1', 'Esquivar balas corriendo recto', 'Hackear sistemas en 3 segundos', 'El villano cuenta todo su plan'] },
+  { id: 'cul_42', tema: 'Géneros de videojuegos', items: ['Aventura y mundo abierto', 'Shooter en primera persona', 'Juegos de rol', 'Juegos de plataformas', 'Estrategia y gestión'] },
+  { id: 'cul_43', tema: 'Series emitidas en Netflix de gran éxito', items: ['Stranger Things', 'Breaking Bad', 'La Casa de Papel', 'El juego del calamar', 'Miércoles'] },
+  { id: 'cul_44', tema: 'Películas del universo Harry Potter', items: ['El prisionero de Azkaban', 'La piedra filosofal', 'El cáliz de fuego', 'Las reliquias de la muerte', 'La cámara secreta'] },
+  { id: 'cul_45', tema: 'Películas de superhéroes de Batman', items: ['El Caballero Oscuro', 'Batman Begins', 'The Batman', 'Batman', 'Batman v Superman'] },
+  { id: 'cul_46', tema: 'Videojuegos de fútbol', items: ['PES 6', 'FIFA 14', 'FIFA 18', 'EA Sports FC 24', 'eFootball'] },
+  { id: 'cul_47', tema: 'Plataformas o medios para escuchar música', items: ['Spotify', 'YouTube', 'Apple Music', 'Vinilo físico', 'Radio del coche'] },
+  { id: 'cul_48', tema: 'Películas de atracos y robos perfectos', items: ['Ocean\'s Eleven', 'Origen', 'Heat', 'La casa de papel', 'The Italian Job'] },
+  { id: 'cul_49', tema: 'Series de animación para adultos', items: ['Rick y Morty', 'South Park', 'Padre de familia', 'BoJack Horseman', 'Futurama'] },
+  { id: 'cul_50', tema: 'Canales o formatos de vídeos en YouTube', items: ['Podcasts de charlas largas', 'Gameplays con humor', 'Vlogs de viajes y comida', 'Retos virales masivos', 'Vídeos de bromas de cámara oculta'] },
+  { id: 'cul_51', tema: 'Monstruos del cine fantástico y de ciencia ficción', items: ['Godzilla', 'King Kong', 'Xenomorfo', 'Depredador', 'T-Rex'] },
+  { id: 'cul_52', tema: 'Películas de la saga Parque Jurásico', items: ['Parque Jurásico', 'El mundo perdido', 'Jurassic World', 'Jurassic Park III', 'Jurassic World: Dominion'] },
+  { id: 'cul_53', tema: 'Géneros de cine para ver en casa', items: ['Suspense y misterio', 'Comedia ligera', 'Acción y aventuras', 'Ciencia ficción', 'Drama lacrimógeno'] },
+  { id: 'cul_54', tema: 'Personajes principales de Juego de Tronos', items: ['Tyrion Lannister', 'Arya Stark', 'Jon Snow', 'Cersei Lannister', 'Joffrey Baratheon'] },
+  { id: 'cul_55', tema: 'Videojuegos de terror y supervivencia', items: ['Resident Evil 2 Remake', 'Silent Hill 2', 'Dead Space', 'Outlast', 'Amnesia'] },
+  { id: 'cul_56', tema: 'Series cortas de una sola temporada', items: ['Chernobyl', 'Hermanos de sangre', 'Gambito de dama', 'Mare of Easttown', 'Bodyguard'] },
+  { id: 'cul_57', tema: 'Películas de espías y agentes secretos', items: ['Casino Royale', 'El caso Bourne', 'Misión Imposible', 'Kingsman', 'Skyfall'] },
+  { id: 'cul_58', tema: 'Formatos de programas de televisión en España', items: ['El Hormiguero', 'La Revuelta', 'First Dates', 'MasterChef', 'Supervivientes'] },
+  { id: 'cul_59', tema: 'Dispositivos donde jugar a videojuegos', items: ['Consola de sobremesa en TV', 'PC Gaming con ratón y teclado', 'Consola portátil', 'Teléfono móvil', 'Consola retro'] },
+  { id: 'cul_60', tema: 'Sagas cinematográficas de animación', items: ['Toy Story', 'Shrek', 'Kung Fu Panda', 'Cómo entrenar a tu dragón', 'Ice Age'] },
+  { id: 'cul_61', tema: 'Películas sobre el espacio y astronautas', items: ['Apolo 13', 'Marte', 'Interstellar', 'Gravity', 'Armageddon'] },
+  { id: 'cul_62', tema: 'Memes y fenómenos virales de internet', items: ['El perro Doge', 'Rickroll', 'El novio distraído', 'El gato enfadado', 'El baile del ataúd'] },
+  { id: 'cul_63', tema: 'Series de superhéroes en plataformas', items: ['The Boys', 'Daredevil', 'Invincible', 'Peacemaker', 'Loki'] },
+  { id: 'cul_64', tema: 'Películas clásicas de acción de los años 80 y 90', items: ['Terminator 2', 'La jungla de cristal', 'Matrix', 'Depredador', 'RoboCop'] },
+  { id: 'cul_65', tema: 'Modos de juego en los videojuegos modernos', items: ['Campaña historia para un jugador', 'Multijugador cooperativo con amigos', 'Multijugador competitivo igualado', 'Modo Battle Royale', 'Modo libre'] },
+  { id: 'cul_66', tema: 'Películas de la saga Star Wars', items: ['El Imperio contraataca', 'Una nueva esperanza', 'La venganza de los Sith', 'El retorno del Jedi', 'La amenaza fantasma'] },
+  { id: 'cul_67', tema: 'Películas de comedia españolas modernas', items: ['Ocho apellidos vascos', 'Torrente', 'El día de la bestia', 'Campeones', 'Padre no hay más que uno'] },
+  { id: 'cul_68', tema: 'Aplicaciones de mensajería y comunicación', items: ['WhatsApp', 'Telegram', 'Discord', 'Instagram DMs', 'SMS tradicionales'] },
+  { id: 'cul_69', tema: 'Películas del Oeste clásicas y modernas', items: ['El bueno, el feo y el malo', 'Django Desencadenado', 'Sin perdón', 'Por un puñado de dólares', 'Los odiosos ocho'] },
+  { id: 'cul_70', tema: 'Generaciones de Pokémon', items: ['Primera generación', 'Segunda generación', 'Tercera generación', 'Cuarta generación', 'Generaciones modernas'] },
+  { id: 'cul_71', tema: 'Películas protagonizadas por Leonardo DiCaprio', items: ['El lobo de Wall Street', 'Origen', 'Titanic', 'El renacido', 'Shutter Island'] },
+  { id: 'cul_72', tema: 'Plataformas o launchers de videojuegos de PC', items: ['Steam', 'Epic Games Store', 'Battle.net', 'GOG Galaxy', 'EA App'] },
+  { id: 'cul_73', tema: 'Franquicias de superhéroes cinematográficos', items: ['Trilogía de Batman de Nolan', 'Saga del Infinito de Marvel', 'Trilogía de Spider-Man de Sam Raimi', 'Películas de X-Men', 'Universo Extendido de DC'] },
+  { id: 'cul_74', tema: 'Series de adolescentes de gran repercusión', items: ['Stranger Things', 'Sex Education', 'Euphoria', 'Élite', 'Gossip Girl'] },
+  { id: 'cul_75', tema: 'Películas ganadoras del Oscar a Mejor Película', items: ['El Señor de los Anillos', 'Gladiator', 'Oppenheimer', 'Parásitos', 'Green Book'] },
+  { id: 'cul_76', tema: 'Sagas de videojuegos de coches y conducción', items: ['Mario Kart', 'Need for Speed', 'Forza Horizon', 'Gran Turismo', 'Burnout'] },
+  { id: 'cul_77', tema: 'Tipos de humor en series y películas', items: ['Humor absurdo e inteligente', 'Sarcasmo e ironía mordaz', 'Humor negro atrevido', 'Vergüenza ajena', 'Chistes tontos infantiles'] },
+  { id: 'cul_78', tema: 'Películas de misterio con giro final impactante', items: ['El sexto sentido', 'Shutter Island', 'Los otros', 'Seven', 'Sospechosos habituales'] },
+  { id: 'cul_79', tema: 'Sagas cinematográficas de terror', items: ['Expediente Warren', 'Scream', 'Saw', 'Paranormal Activity', 'Viernes 13'] },
+  { id: 'cul_80', tema: 'Aspectos de ir al cine frente a ver películas en casa', items: ['Pantalla gigante y sonido envolvente', 'Cubo gigante de palomitas calientes', 'Desconexión total sin mirar el móvil', 'Pagar entradas y comida a precio inflado', 'Gente hablando o haciendo ruido en la sala'] },
+  { id: 'cul_81', tema: 'Series de anime japonés populares en Occidente', items: ['Dragon Ball Z', 'Attack on Titan', 'Death Note', 'Naruto', 'One Piece'] },
+  { id: 'cul_82', tema: 'Juegos de mesa modernos para jugar con amigos en casa', items: ['Catan', 'Carcassonne', 'Código Secreto', 'Virus!', 'Monopoly'] },
+  { id: 'cul_83', tema: 'Películas musicales', items: ['La La Land', 'El Gran Showman', 'Grease', 'Bohemian Rhapsody', 'Mamma Mia!'] },
+  { id: 'cul_84', tema: 'Compañías de videojuegos desarrolladoras de prestigio', items: ['Rockstar Games', 'Nintendo', 'Naughty Dog', 'FromSoftware', 'Ubisoft'] },
+  { id: 'cul_85', tema: 'Festivales de música y eventos multitudinarios', items: ['Tomorrowland', 'Coachella', 'Mad Cool', 'Viña Rock', 'Discoteca abarrotada'] },
+  { id: 'cul_86', tema: 'Películas de mafia y crimen organizado', items: ['El Padrino', 'Uno de los nuestros', 'Scarface', 'El lobo de Wall Street', 'Infiltrados'] },
+  { id: 'cul_87', tema: 'Armas de ciencia ficción míticas', items: ['Espada láser', 'Pistola de portales', 'Guantelete del Infinito', 'Lanzagranadas BFG 9000', 'Fusil de plasma'] },
+  { id: 'cul_88', tema: 'Series policíacas y detectivescas', items: ['Sherlock', 'True Detective', 'Mindhunter', 'CSI', 'Ley y Orden'] },
+  { id: 'cul_89', tema: 'Películas de animación stop-motion', items: ['Pesadilla antes de Navidad', 'Coraline', 'La novia cadáver', 'Evasión en la granja', 'Pinocho de Guillermo del Toro'] },
+  { id: 'cul_90', tema: 'Sagas cinematográficas de espías y acción encubierta', items: ['Misión Imposible', 'James Bond 007', 'Saga Bourne', 'Kingsman', 'John Wick'] },
+  { id: 'cul_91', tema: 'Videojuegos de supervivencia y crafteo en mundos procedurales', items: ['Minecraft', 'Subnautica', 'Valheim', 'Rust', 'The Forest'] },
+  { id: 'cul_92', tema: 'Villanos icónicos del cine en general', items: ['Darth Vader', 'Joker', 'Hannibal Lecter', 'Lord Voldemort', 'Sauron'] },
+  { id: 'cul_93', tema: 'Eventos masivos de cultura pop', items: ['Ceremonia de los premios Oscar', 'The Game Awards', 'Festival de Eurovisión', 'Gala de los premios Grammy', 'Comic-Con de San Diego'] },
+  { id: 'cul_94', tema: 'Formatos de contenido de vídeo corto', items: ['TikTok', 'Instagram Reels', 'YouTube Shorts', 'Historias de 24 horas', 'Estados de WhatsApp'] },
+  { id: 'cul_95', tema: 'Películas sobre juicios y abogados', items: ['12 hombres sin piedad', 'Algunos hombres buenos', 'Philadelphia', 'El abogado del diablo', 'Las dos caras de la verdad'] },
+  { id: 'cul_96', tema: 'Franquicias de lucha en videojuegos', items: ['Super Smash Bros.', 'Street Fighter', 'Tekken', 'Mortal Kombat', 'Dragon Ball FighterZ'] },
+  { id: 'cul_97', tema: 'Tipos de humor en internet', items: ['Humor absurdo sin sentido', 'Clips de caídas y situaciones inesperadas', 'Memes con texto aplicados a la vida real', 'Chistes de nostalgia de los 2000', 'Bailes virales repetitivos'] },
+  { id: 'cul_98', tema: 'Películas bélicas sobre la Segunda Guerra Mundial', items: ['Salvar al soldado Ryan', 'La lista de Schindler', 'Malditos Bastardos', 'Dunkerque', '1917'] },
+  { id: 'cul_99', tema: 'Bandas de chicos y chicas del pop', items: ['Backstreet Boys', 'Spice Girls', 'One Direction', 'NSYNC', 'Destiny\'s Child'] },
+  { id: 'cul_100', tema: 'Las mayores franquicias del entretenimiento moderno', items: ['Universo Marvel', 'Star Wars', 'Harry Potter', 'El Señor de los Anillos', 'Pokémon'] }
 ];

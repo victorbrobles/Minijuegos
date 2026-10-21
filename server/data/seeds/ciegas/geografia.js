@@ -1,103 +1,103 @@
 // server/data/seeds/ciegas/geografia.seed.js
 export default [
-  {
-    id: 'geo_1',
-    tema: '¿Qué tipo de viaje o plan de vacaciones te daría más pereza ahora mismo? (Del plan más insoportable al más apetecible)',
-    items: ['Camping en tienda de campaña con esterilla y baños compartidos', 'Crucero multitudinario de 7 días encerrado con 4.000 turistas', 'Turismo urbano de patear 25 km diarios por ciudad monumental a 38°C en agosto', 'Casa rural aislada en la montaña sin wifi ni cobertura telefónica', 'Resort con pulserita de todo incluido sin salir del recinto ni de la piscina']
-  },
-  {
-    id: 'geo_2',
-    tema: 'Capitales europeas para una escapada de fin de semana en pareja o con amigos (De la joya imprescindible a la más fría)',
-    items: ['Roma (Italia)', 'Londres (Reino Unido)', 'Praga (República Checa)', 'París (Francia)', 'Berlín (Alemania)']
-  },
-  {
-    id: 'geo_3',
-    tema: '¿Qué paisaje o maravilla natural te impresionaría más ver con tus propios ojos? (Del más sobrecogedor al menor)',
-    items: ['Auroras boreales bailando en el cielo ártico de Noruega', 'El Gran Cañón del Colorado en Estados Unidos', 'Las cataratas de Iguazú entre Argentina y Brasil', 'El glaciar Perito Moreno rompiéndose en la Patagonia', 'El desierto del Sáhara bajo un manto de millones de estrellas']
-  },
-  {
-    id: 'geo_4',
-    tema: '¿En qué país del mundo te gustaría vivir un año entero si te pagaran todo? (Del destino soñado al que menos te llama)',
-    items: ['Japón (por su seguridad, cultura y gastronomía única)', 'Australia (por su naturaleza salvaje, sol y playas surferas)', 'Canadá (por sus bosques interminables, nieve y tranquilidad social)', 'Italia (por su estilo de vida relajado, arte y cocina mediterránea)', 'Islandia (por sus paisajes lunares volcánicos y paz absoluta)']
-  },
-  {
-    id: 'geo_5',
-    tema: 'La peor pesadilla que te puede ocurrir en un aeropuerto antes de volar (Del drama absoluto al menor de los males)',
-    items: ['Que cancelen tu vuelo tras 6 horas esperando y no haya otro hasta dentro de 2 días', 'Llegar a la puerta de embarque y que cierren en tus narices por 1 minuto de retraso', 'Que la aerolínea pierda tu maleta con toda la ropa en un viaje de dos semanas', 'Tocar un asiento intermedio en un vuelo de 10 horas junto a personas que no se mueven', 'Que te hagan pagar 80 euros en la puerta de embarque por exceso de equipaje']
-  },
-  {
-    id: 'geo_6',
-    tema: 'Comunidades autónomas españolas donde mejor se come de tapeo y mesa (De la cima culinaria a la menos variada)',
-    items: ['País Vasco (con sus barras de pintxos y gastronomía de autor)', 'Galicia (con su marisco, pulpo, empanadas y carnes de ternera)', 'Andalucía (con su pescaíto frito, jamón ibérico y tapas abundantes)', 'Asturias (con sus cachopos gigantes, sidra natural y fabadas)', 'Comunidad Valenciana (con la paella tradicional y arroces al sarmiento)']
-  },
-  {
-    id: 'geo_7',
-    tema: 'Monumentos creados por la humanidad que más imponen en persona (De la obra colosal a la que decepciona en vivo)',
-    items: ['Las Grandes Pirámides de Giza en Egipto', 'La ciudadela inca de Machu Picchu en Perú', 'La Gran Muralla China serpenteando por las montañas', 'El Coliseo de Roma iluminado de noche', 'El templo del Taj Mahal en la India']
-  },
-  {
-    id: 'geo_8',
-    tema: '¿Qué medio de transporte público se te hace más pesado para viajar más de 4 horas? (Del más incómodo al más llevadero)',
-    items: ['Autobús de línea regular nocturno con paradas continuas', 'Avión de aerolínea de bajo coste con poco espacio para piernas', 'Coche compartido en el asiento trasero central', 'Tren de cercanías abarrotado de pasajeros de pie', 'Barco ferry con oleaje continuo y balanceo']
-  },
-  {
-    id: 'geo_9',
-    tema: 'Climas en los que te costaría más sobrevivir durante un mes entero (Del clima más hostil al más soportable)',
-    items: ['Calor húmedo asfixiante de 40°C con humedad del 95% y mosquitos', 'Frío seco extremo de -25°C con viento helado continuo', 'Lluvia constante y cielo gris plomizo sin ver el sol en 30 días', 'Calor de desierto seco de 45°C sin una sombra', 'Niebla densa y humedad pegajosa con frío de 4°C']
-  },
-  {
-    id: 'geo_10',
-    tema: 'Ciudades de España para pasar un puente largo festivo (De la escapada perfecta a la más aburrida)',
-    items: ['Sevilla con su paseo por el Guadalquivir y barrio de Santa Cruz', 'San Sebastián paseando por La Concha y comiendo pintxos', 'Granada con el atardecer en la Alhambra y tapas gratis', 'Madrid con su oferta interminable de teatros, bares y museos', 'Barcelona con su arquitectura modernista y paseo marítimo']
-  },
-  {
-    id: 'geo_11',
-    tema: '¿Qué tipo de playa es la más placentera para pasar el día entero? (Del paraíso terrenal al infierno costero)',
-    items: ['Cala virgen de arena blanca y agua cristalina protegida del viento', 'Playa kilométrica de dunas naturales para caminar sin agobios', 'Cala de roca con aguas profundas para bucear sin arena pegajosa', 'Playa urbana con paseo marítimo, chiringuitos y hamacas a mano', 'Playa ventosa de olas gigantes pensada solo para surfistas']
-  },
-  {
-    id: 'geo_12',
-    tema: 'Destinos del sudeste asiático que mayor choque cultural y aventura provocan (Del más exótico al más occidentalizado)',
-    items: ['Vietnam recorriendo la bahía de Ha Long y pueblos del norte', 'Tailandia entre templos dorados y comida callejera en Bangkok', 'Indonesia explorando los volcanes y selvas de Java y Bali', 'Camboya al amanecer en los templos de Angkor Wat', 'Singapur y su futurismo urbano impecable']
-  },
-  {
-    id: 'geo_13',
-    tema: 'El perfil de turista más insoportable con el que cruzarse en un viaje (Del que arruina el lugar al más inofensivo)',
-    items: ['El que se cuela descaradamente en todas las colas de monumentos', 'El que se pasa 20 minutos posando para fotos de postureo tapando la vista', 'El que va en grupo grande gritando y poniendo música con altavoz portátil', 'El que se queja en el extranjero de que la comida no es como la de su casa', 'El que va caminando con el móvil delante mirando la pantalla sin ver dónde pisa']
-  },
-  {
-    id: 'geo_14',
-    tema: 'Islas de ensueño para desconectar completamente del mundo (De la mejor desconexión a la menos atractiva)',
-    items: ['Islas Maldivas en una cabaña sobre aguas turquesas', 'Menorca en las Islas Baleares recorriendo calas de aguas calmas', 'Santorini en Grecia con sus casas blancas y acantilados', 'Hawái con su vegetación tropical, volcanes y playas negras', 'Ibiza en pleno mes de agosto con fiesta ininterrumpida']
-  },
-  {
-    id: 'geo_15',
-    tema: 'Ciudades de Estados Unidos que más merecen ser visitadas al menos una vez (De la imprescindible a la más prescindible)',
-    items: ['Nueva York (la capital del mundo con sus rascacielos y ritmo)', 'San Francisco (con sus colinas empinadas, tranvías y el Golden Gate)', 'Nueva Orleans (con su historia colonial, música jazz y ambiente sureño)', 'Las Vegas (con su parque de atracciones de casinos en medio del desierto)', 'Los Ángeles (con sus atascos eternos y el paseo de la fama)']
-  },
-  {
-    id: 'geo_16',
-    tema: '¿Qué actividad de aventura en la naturaleza te atreverías a hacer primero? (De la más apetecible a la que te da pánico)',
-    items: ['Rafting descendiendo rápidos de río en lancha con amigos', 'Buceo con botella entre arrecifes de coral y peces de colores', 'Parapente biplaza planeando sobre valles y montañas', 'Puenting o salto al vacío desde un viaducto alto', 'Escalada en pared vertical con arnés y caída libre']
-  },
-  {
-    id: 'geo_17',
-    tema: 'Pueblos con encanto de España para una escapada rural de otoño (Del pueblo de cuento al más corriente)',
-    items: ['Albarracín en Teruel con sus murallas rojizas medievales', 'Ronda en Málaga asomada al tajo sobre el abismo', 'Cudillero en Asturias con sus casas de colores sobre el puerto', 'Potes en Cantabria rodeado por los Picos de Europa', 'Pedraza en Segovia iluminada solo con velas en sus noches mágicas']
-  },
-  {
-    id: 'geo_18',
-    tema: '¿Qué aspecto de alojarse en un hotel es el que más valoras? (Del detalle más crucial al que te da igual)',
-    items: ['Una cama cómoda y almohada perfecta donde descansar de verdad', 'Aislamiento acústico impecable sin ruidos del pasillo ni de la calle', 'Presión de agua fuerte y temperatura perfecta en la ducha', 'Un desayuno buffet variado con productos de calidad', 'Vistas bonitas desde la ventana de la habitación']
-  },
-  {
-    id: 'geo_19',
-    tema: 'Regiones del mundo donde la naturaleza salvaje es la protagonista indiscutible (De la más imponente a la menor)',
-    items: ['La selva del Amazonas recorriendo el río en barco', 'Las llanuras del Serengueti en Tanzania durante la gran migración', 'La Antártida navegando entre icebergs gigantes y pingüinos', 'Los fiordos escarpados de Nueva Zelanda', 'El interior de los bosques de Alaska rodeados de osos y glaciares']
-  },
-  {
-    id: 'geo_20',
-    tema: 'Grandes urbes de América Latina con mayor riqueza cultural y gastronómica (De la reina indiscutible a la menor)',
-    items: ['Ciudad de México (con su historia azteca, museos y gastronomía callejera)', 'Buenos Aires (con sus cafés históricos, tango, librerías y asados)', 'Cusco (con su arquitectura colonial construida sobre muros incas)', 'Río de Janeiro (con sus playas míticas y el morro del Corcovado)', 'Cartagena de Indias (con su ciudad amurallada caribeña de colores)']
-  }
+  { id: 'geo_1', tema: 'Planes de vacaciones según tu preferencia', items: ['Hotel con playa tranquila y buena comida', 'Casa rural en la montaña con amigos', 'Viaje cultural recorriendo una gran ciudad', 'Crucero con todo incluido por el mar', 'Camping en tienda de campaña'] },
+  { id: 'geo_2', tema: 'Capitales de Europa para una escapada de fin de semana', items: ['Roma', 'Londres', 'Praga', 'París', 'Berlín'] },
+  { id: 'geo_3', tema: 'Maravillas de la naturaleza en el mundo', items: ['Auroras boreales en Noruega', 'Gran Cañón del Colorado en EEUU', 'Cataratas de Iguazú', 'Glaciar Perito Moreno', 'Desierto del Sáhara bajo las estrellas'] },
+  { id: 'geo_4', tema: 'Países del mundo donde vivirías un año entero con gastos pagados', items: ['Japón', 'Australia', 'Italia', 'Canadá', 'Islandia'] },
+  { id: 'geo_5', tema: 'Monumentos creados por el ser humano', items: ['Pirámides de Guiza en Egipto', 'Machu Picchu en Perú', 'Gran Muralla China', 'Coliseo de Roma', 'Taj Mahal en India'] },
+  { id: 'geo_6', tema: 'Comunidades autónomas españolas por su comida', items: ['País Vasco', 'Galicia', 'Andalucía', 'Asturias', 'Comunidad Valenciana'] },
+  { id: 'geo_7', tema: 'Medios de transporte para viajar distancias largas', items: ['Tren de alta velocidad con asiento amplio', 'Avión en vuelo directo', 'Coche propio parando cuando quieras', 'Autobús de línea nocturno', 'Barco o ferry con oleaje'] },
+  { id: 'geo_8', tema: 'Climas extremos', items: ['Frío seco con nieve pero sin viento', 'Cielo nublado con lluvia fina', 'Calor de verano junto a la playa', 'Calor seco en ciudad de asfalto', 'Calor sofocante con mucha humedad'] },
+  { id: 'geo_9', tema: 'Ciudades monumentales de España para un puente', items: ['Sevilla', 'Granada', 'Toledo', 'Salamanca', 'Santiago de Compostela'] },
+  { id: 'geo_10', tema: 'Islas de ensueño para desconectar del mundo', items: ['Maldivas en una cabaña sobre el agua', 'Menorca recorriendo calas vírgenes', 'Santorini viendo el atardecer blanco y azul', 'Hawái entre volcanes y vegetación', 'Ibiza en temporada baja'] },
+  { id: 'geo_11', tema: 'Ciudades de Estados Unidos para hacer turismo', items: ['Nueva York', 'San Francisco', 'Las Vegas', 'Los Ángeles', 'Miami'] },
+  { id: 'geo_12', tema: 'Países de América del Sur para viajar como mochilero', items: ['Argentina', 'Perú', 'Brasil', 'Colombia', 'Chile'] },
+  { id: 'geo_13', tema: 'Destinos del Sudeste Asiático', items: ['Tailandia', 'Vietnam', 'Indonesia', 'Camboya', 'Filipinas'] },
+  { id: 'geo_14', tema: 'Pueblos bonitos de España', items: ['Albarracín', 'Ronda', 'Cudillero', 'Potes', 'Cadaqués'] },
+  { id: 'geo_15', tema: 'Ríos más largos e imponentes del planeta', items: ['Amazonas', 'Nilo', 'Misisipi', 'Yangtsé', 'Danubio'] },
+  { id: 'geo_16', tema: 'Montañas y cordilleras del mundo', items: ['Himalaya', 'Cordillera de los Andes', 'Alpes europeos', 'Montañas Rocosas', 'Pirineos'] },
+  { id: 'geo_17', tema: 'Países más extensos por territorio', items: ['Rusia', 'Canadá', 'China', 'Estados Unidos', 'Brasil'] },
+  { id: 'geo_18', tema: 'Playas por tipo de costa', items: ['Cala virgen de arena blanca y agua turquesa', 'Playa kilométrica de arena fina para caminar', 'Cala de roca con aguas cristalinas para bucear', 'Playa urbana con paseo marítimo y chiringuitos', 'Playa de piedra negra con mucho oleaje'] },
+  { id: 'geo_19', tema: 'Capitales de América Latina', items: ['Buenos Aires', 'Ciudad de México', 'Lima', 'Bogotá', 'Santiago'] },
+  { id: 'geo_20', tema: 'Pesadillas comunes en un aeropuerto', items: ['Cancelación del vuelo sin hotel ni aviso', 'Pérdida de la maleta con toda la ropa', 'Perder el avión por 2 minutos de retraso en control', 'Vuelo de 9 horas en asiento del medio sin moverte', 'Pagar 70€ extra por equipaje en la puerta'] },
+  { id: 'geo_21', tema: 'Grandes urbes de Europa Occidental', items: ['Madrid', 'Londres', 'Barcelona', 'Ámsterdam', 'Berlín'] },
+  { id: 'geo_22', tema: 'Países de África para hacer un safari de animales salvajes', items: ['Tanzania', 'Kenia', 'Sudáfrica', 'Botsuana', 'Namibia'] },
+  { id: 'geo_23', tema: 'Costas de España para pasar las vacaciones de verano', items: ['Costa Brava', 'Costa de la Luz', 'Rías Baixas', 'Costa del Sol', 'Costa Blanca'] },
+  { id: 'geo_24', tema: 'Países nórdicos', items: ['Noruega', 'Islandia', 'Suecia', 'Finlandia', 'Dinamarca'] },
+  { id: 'geo_25', tema: 'Actividades de aventura al aire libre', items: ['Rafting en río con amigos', 'Buceo con botella en arrecifes de coral', 'Ruta senderista de montaña con vivac', 'Paseo en globo aerostático', 'Puenting al vacío'] },
+  { id: 'geo_26', tema: 'Islas de las Canarias', items: ['Tenerife', 'Lanzarote', 'Gran Canaria', 'Fuerteventura', 'La Palma'] },
+  { id: 'geo_27', tema: 'Islas de las Baleares', items: ['Menorca', 'Mallorca', 'Formentera', 'Ibiza', 'Cabrera'] },
+  { id: 'geo_28', tema: 'Países más poblados de la Tierra', items: ['India', 'China', 'Estados Unidos', 'Indonesia', 'Pakistán'] },
+  { id: 'geo_29', tema: 'Volcanes activos conocidos del mundo', items: ['Vesubio', 'Etna', 'Teide', 'Kilauea', 'Fuji'] },
+  { id: 'geo_30', tema: 'Ciudades de Italia para un viaje cultural', items: ['Roma', 'Florencia', 'Venecia', 'Milán', 'Nápoles'] },
+  { id: 'geo_31', tema: 'Mares y océanos del planeta', items: ['Océano Pacífico', 'Océano Atlántico', 'Mar Mediterráneo', 'Océano Índico', 'Mar Caribe'] },
+  { id: 'geo_32', tema: 'Detalles que más valoras de la habitación de un hotel', items: ['Cama cómoda con buena almohada', 'Habitación sin ruidos de la calle ni vecinos', 'Presión y temperatura del agua de la ducha', 'Desayuno buffet abundante y rico', 'Vistas bonitas desde la ventana'] },
+  { id: 'geo_33', tema: 'Tipos de relieve terrestre', items: ['Acantilados sobre el mar', 'Montañas escarpadas con nieve', 'Valles verdes de ríos', 'Dunas doradas de desierto', 'Llanura seca sin árboles'] },
+  { id: 'geo_34', tema: 'Países vecinos de España y del Mediterráneo', items: ['Portugal', 'Francia', 'Italia', 'Andorra', 'Marruecos'] },
+  { id: 'geo_35', tema: 'Monumentos de España conocidos internacionalmente', items: ['La Alhambra de Granada', 'La Sagrada Familia de Barcelona', 'La Mezquita de Córdoba', 'El Acueducto de Segovia', 'La Catedral de Santiago'] },
+  { id: 'geo_36', tema: 'Parques nacionales españoles de naturaleza', items: ['Picos de Europa', 'Teide', 'Ordesa y Monte Perdido', 'Doñana', 'Sierra de Guadarrama'] },
+  { id: 'geo_37', tema: 'Ciudades del Reino Unido e Irlanda', items: ['Londres', 'Edimburgo', 'Dublín', 'Mánchester', 'Liverpool'] },
+  { id: 'geo_38', tema: 'Comunidades autónomas del norte de España', items: ['Galicia', 'Asturias', 'Cantabria', 'País Vasco', 'Navarra'] },
+  { id: 'geo_39', tema: 'Desiertos extremos del mundo', items: ['Sáhara', 'Atacama', 'Gobi', 'Kalahari', 'Desierto de Sonora'] },
+  { id: 'geo_40', tema: 'Países de Europa del Este y Centroeuropa', items: ['Polonia', 'República Checa', 'Hungría', 'Rumanía', 'Eslovaquia'] },
+  { id: 'geo_41', tema: 'Ciudades de Francia para viajar', items: ['París', 'Niza', 'Lyon', 'Burdeos', 'Marsella'] },
+  { id: 'geo_42', tema: 'Capitales de Asia Oriental', items: ['Tokio', 'Seúl', 'Pekín', 'Bangkok', 'Singapur'] },
+  { id: 'geo_43', tema: 'Perfiles de turista molestos en un viaje', items: ['El que se cuela en las colas con descaro', 'El que tapa la vista 15 minutos haciéndose fotos', 'El que pone música alta con altavoz portátil', 'El que se queja de que no hay comida de su país', 'El que camina mirando el móvil sin mirar al frente'] },
+  { id: 'geo_44', tema: 'Parques temáticos y de atracciones del mundo', items: ['Walt Disney World', 'Universal Studios', 'PortAventura', 'Disneyland París', 'Parque Warner'] },
+  { id: 'geo_45', tema: 'Ríos de la península ibérica', items: ['Tajo', 'Ebro', 'Duero', 'Guadalquivir', 'Guadiana'] },
+  { id: 'geo_46', tema: 'Destinos de playa del Caribe', items: ['Riviera Maya', 'Punta Cana', 'Bahamas', 'Jamaica', 'Cuba'] },
+  { id: 'geo_47', tema: 'Provincias andaluzas costeras', items: ['Cádiz', 'Málaga', 'Granada', 'Huelva', 'Almería'] },
+  { id: 'geo_48', tema: 'Grandes lagos del mundo', items: ['Lago Baikal', 'Lago Victoria', 'Lago Titicaca', 'Lago Superior', 'Mar Muerto'] },
+  { id: 'geo_49', tema: 'Ciudades de Alemania para una visita', items: ['Berlín', 'Múnich', 'Colonia', 'Hamburgo', 'Fráncfort'] },
+  { id: 'geo_50', tema: 'Países insulares paradisíacos', items: ['Maldivas', 'Seychelles', 'Bora Bora', 'Mauricio', 'Fiyi'] },
+  { id: 'geo_51', tema: 'Zonas geográficas de España con acento más marcado', items: ['Andalucía occidental', 'Galicia rural', 'Murcia', 'Canarias', 'Madrid'] },
+  { id: 'geo_52', tema: 'Cosas que meter en la maleta de mano', items: ['Móvil con billetes de tren o avión', 'Cargador y batería portátil', 'Pasaporte o DNI', 'Muda limpia por si pierden la maleta', 'Auriculares con música'] },
+  { id: 'geo_53', tema: 'Ciudades de Portugal', items: ['Lisboa', 'Oporto', 'Sintra', 'Faro', 'Coímbra'] },
+  { id: 'geo_54', tema: 'Costas con agua más fría para bañarse', items: ['Océano Atlántico en Galicia', 'Mar Cantábrico en Asturias', 'Océano Atlántico en Cádiz', 'Mar Mediterráneo en Valencia', 'Mar Balear en verano'] },
+  { id: 'geo_55', tema: 'Países de Centroamérica', items: ['Costa Rica', 'Panamá', 'Guatemala', 'Nicaragua', 'Honduras'] },
+  { id: 'geo_56', tema: 'Ciudades del mundo con el transporte público más eficiente', items: ['Tokio', 'Singapur', 'Madrid', 'Londres', 'Nueva York'] },
+  { id: 'geo_57', tema: 'Sistemas montañosos de España', items: ['Pirineos', 'Sierra Nevada', 'Picos de Europa', 'Sistema Central', 'Sierra Morena'] },
+  { id: 'geo_58', tema: 'Capitales de Europa del Norte', items: ['Estocolmo', 'Copenhague', 'Oslo', 'Helsinki', 'Reikiavik'] },
+  { id: 'geo_59', tema: 'Planes para pasar una tarde de lluvia en una ciudad', items: ['Entrar a un museo interesante', 'Tomar un café caliente en una librería', 'Ir al cine a ver un estreno', 'Hacer compras en centro comercial cerrado', 'Caminar por la calle con paraguas empapado'] },
+  { id: 'geo_60', tema: 'Países de la Península Arábiga y Oriente Medio', items: ['Emiratos Árabes Unidos', 'Qatar', 'Omán', 'Jordania', 'Arabia Saudita'] },
+  { id: 'geo_61', tema: 'Monumentos de Roma', items: ['Coliseo Romano', 'Fontana di Trevi', 'Panteón de Agripa', 'Basílica de San Pedro', 'Foro Romano'] },
+  { id: 'geo_62', tema: 'Monumentos de París', items: ['Torre Eiffel', 'Museo del Louvre', 'Catedral de Notre Dame', 'Arco de Triunfo', 'Basílica del Sagrado Corazón'] },
+  { id: 'geo_63', tema: 'Maravillas del Mundo Moderno', items: ['Machu Picchu', 'Coliseo de Roma', 'Taj Mahal', 'Gran Muralla China', 'Cristo Redentor'] },
+  { id: 'geo_64', tema: 'Ciudades con los rascacielos más impresionantes del planeta', items: ['Nueva York', 'Dubái', 'Shanghái', 'Hong Kong', 'Tokio'] },
+  { id: 'geo_65', tema: 'Países de la cordillera de los Andes', items: ['Perú', 'Bolivia', 'Chile', 'Ecuador', 'Colombia'] },
+  { id: 'geo_66', tema: 'Playas famosas del mundo', items: ['Copacabana', 'Waikiki', 'Maya Bay', 'Bondi Beach', 'Venice Beach'] },
+  { id: 'geo_67', tema: 'Puntos cardinales y orientaciones', items: ['Norte', 'Sur', 'Este', 'Oeste', 'Noroeste'] },
+  { id: 'geo_68', tema: 'Lugares más fríos habitados del planeta', items: ['Oimiakón', 'Yakutsk', 'Base Amundsen-Scott', 'Nuuk', 'Fairbanks'] },
+  { id: 'geo_69', tema: 'Países de Europa Central sin salida al mar', items: ['Suiza', 'Austria', 'República Checa', 'Luxemburgo', 'Hungría'] },
+  { id: 'geo_70', tema: 'Ciudades de España con mejor red de metro', items: ['Metro de Madrid', 'Metro de Barcelona', 'Metro de Bilbao', 'Metro de Valencia', 'Metro de Sevilla'] },
+  { id: 'geo_71', tema: 'Fenómenos meteorológicos que más arruinan unas vacaciones', items: ['Huracán o tormenta tropical', 'Lluvia torrencial constante', 'Ola de calor asfixiante', 'Niebla espesa que no deja ver monumentos', 'Viento fuerte que levanta arena en la playa'] },
+  { id: 'geo_72', tema: 'Países con mayor cantidad de islas en su costa', items: ['Suecia', 'Noruega', 'Indonesia', 'Filipinas', 'Grecia'] },
+  { id: 'geo_73', tema: 'Ciudades costeras del norte de España', items: ['San Sebastián', 'Santander', 'Gijón', 'A Coruña', 'Vigo'] },
+  { id: 'geo_74', tema: 'Formatos de alojamiento en viajes', items: ['Hotel de 4 o 5 estrellas céntrico', 'Apartamento turístico privado con cocina', 'Cabaña o casa rural con encanto', 'Hostal con habitación privada', 'Albergue juvenil en litera compartida'] },
+  { id: 'geo_75', tema: 'Lugares sagrados y religiosos con mayor afluencia del mundo', items: ['La Meca', 'Ciudad del Vaticano', 'Muro de las Lamentaciones', 'Templo Dorado de Amritsar', 'Catedral de Santiago de Compostela'] },
+  { id: 'geo_76', tema: 'Países de Oceanía', items: ['Australia', 'Nueva Zelanda', 'Fiyi', 'Papúa Nueva Guinea', 'Samoa'] },
+  { id: 'geo_77', tema: 'Provincias de Castilla y León con ciudades monumentales', items: ['Salamanca', 'Segovia', 'Ávila', 'Burgos', 'Valladolid'] },
+  { id: 'geo_78', tema: 'Estrechos marítimos más transitados e importantes del comercio global', items: ['Estrecho de Malaca', 'Canal de Suez', 'Canal de Panamá', 'Estrecho de Ormuz', 'Estrecho de Gibraltar'] },
+  { id: 'geo_79', tema: 'Ciudades de los Países Bajos y Flandes', items: ['Ámsterdam', 'Brujas', 'Gante', 'Róterdam', 'Bruselas'] },
+  { id: 'geo_80', tema: 'Rutas de senderismo y peregrinación famosas', items: ['Camino de Santiago', 'Sendero de los Apalaches', 'Ruta Inca a Machu Picchu', 'Circuito del Annapurna', 'Ruta del Cares'] },
+  { id: 'geo_81', tema: 'Ciudades españolas con mejor ambiente universitario', items: ['Salamanca', 'Granada', 'Santiago de Compostela', 'Sevilla', 'Madrid'] },
+  { id: 'geo_82', tema: 'Países bañados por el Mar Báltico', items: ['Suecia', 'Finlandia', 'Polonia', 'Alemania', 'Estonia'] },
+  { id: 'geo_83', tema: 'Ciudades del mundo con mayor tráfico y atascos imposibles', items: ['Manila', 'Bogotá', 'El Cairo', 'São Paulo', 'Los Ángeles'] },
+  { id: 'geo_84', tema: 'Accidentes costeros', items: ['Fiordos profundos inundados', 'Acantilados verticales de 200 metros', 'Rías gallegas con bateas', 'Cabo rocoso con faro', 'Playa de dunas bajas'] },
+  { id: 'geo_85', tema: 'Países de habla hispana más extensos del planeta', items: ['Argentina', 'México', 'Colombia', 'Perú', 'España'] },
+  { id: 'geo_86', tema: 'Ciudades de Japón para un itinerario clásico', items: ['Tokio', 'Kioto', 'Osaka', 'Hiroshima', 'Nara'] },
+  { id: 'geo_87', tema: 'Cosas que ver en la ciudad de Londres', items: ['Big Ben y el Parlamento', 'Torre de Londres y Tower Bridge', 'Museo Británico', 'London Eye', 'Palacio de Buckingham'] },
+  { id: 'geo_88', tema: 'Ciudades monumentales de Castilla-La Mancha', items: ['Toledo', 'Cuenca', 'Almagro', 'Sigüenza', 'Albacete'] },
+  { id: 'geo_89', tema: 'Grandes deltas de ríos del planeta', items: ['Delta del Amazonas', 'Delta del Ganges', 'Delta del Nilo', 'Delta del Misisipi', 'Delta del Ebro'] },
+  { id: 'geo_90', tema: 'Pueblos de montaña de los Pirineos', items: ['Aínsa', 'Alquézar', 'Benasque', 'Viella', 'Camprodon'] },
+  { id: 'geo_91', tema: 'Islas de Grecia para el verano', items: ['Santorini', 'Mykonos', 'Creta', 'Rodas', 'Corfú'] },
+  { id: 'geo_92', tema: 'Monumentos de Nueva York', items: ['Estatua de la Libertad', 'Empire State Building', 'Central Park', 'Times Square', 'Puente de Brooklyn'] },
+  { id: 'geo_93', tema: 'Países de África Occidental', items: ['Nigeria', 'Senegal', 'Costa de Marfil', 'Ghana', 'Camerún'] },
+  { id: 'geo_94', tema: 'Cosas que más cansan en un viaje turístico', items: ['Hacer colas de pie de 2 horas al sol', 'Patear 25 kilómetros en un solo día', 'Deshacer y rehacer la maleta cada 2 días', 'Tener que madrugar mucho para ver un templo', 'Entender el plano del metro en otro idioma'] },
+  { id: 'geo_95', tema: 'Ciudades del norte de África para una visita cercana', items: ['Marrakech', 'El Cairo', 'Fez', 'Tánger', 'Túnez'] },
+  { id: 'geo_96', tema: 'Grandes cañones y desfiladeros del mundo', items: ['Gran Cañón del Colorado', 'Garganta del Salto del Tigre', 'Cañón del Colca', 'Gargantas del Verdon', 'Desfiladero de los Gaitanes'] },
+  { id: 'geo_97', tema: 'Comunidades autónomas del interior de España', items: ['Castilla y León', 'Castilla-La Mancha', 'Comunidad de Madrid', 'Extremadura', 'Aragón'] },
+  { id: 'geo_98', tema: 'Ciudades de Suiza entre lagos y montañas', items: ['Lucerna', 'Zúrich', 'Ginebra', 'Berna', 'Basilea'] },
+  { id: 'geo_99', tema: 'Países europeos donde mejor se habla inglés como segundo idioma', items: ['Países Bajos', 'Suecia', 'Dinamarca', 'Noruega', 'España'] },
+  { id: 'geo_100', tema: 'Continentes para recorrer enteros', items: ['Europa', 'Asia', 'América del Sur', 'América del Norte', 'Oceanía'] }
 ];

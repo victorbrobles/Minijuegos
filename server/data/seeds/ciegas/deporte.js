@@ -1,103 +1,103 @@
 // server/data/seeds/ciegas/deporte.seed.js
 export default [
-  {
-    id: 'dep_1',
-    tema: '¿Qué deporte se te hace más infumable de ver entero un domingo por la tarde? (Del más soporífero al más entretenido)',
-    items: ['Golf profesional a 18 hoyos', 'Carrera de Fórmula 1 sin incidentes ni lluvia', 'Etapa llana de ciclismo de carretera de 5 horas', 'Partido completo de béisbol de 9 entradas', 'Encuentro de críquet tradicional']
-  },
-  {
-    id: 'dep_2',
-    tema: 'El evento deportivo de mayor adrenalina y emoción para ver en directo (De máxima tensión a prescindible)',
-    items: ['Tanda de penaltis en una final del Mundial de fútbol', 'Tie-break en el quinto set de una final de Grand Slam', 'Últimas 2 vueltas de una carrera de MotoGP con adelantamientos', 'Últimos 10 segundos de un partido de NBA con 1 punto de ventaja', 'Final de los 100 metros lisos en los Juegos Olímpicos']
-  },
-  {
-    id: 'dep_3',
-    tema: '¿Qué deporte individual exige una preparación física y mental más inhumana? (Del más extremo al menos duro)',
-    items: ['Triatlón Ironman (3.8 km nado + 180 km bici + 42 km carrera)', 'Boxeo profesional a 12 asaltos en categoría reina', 'Gimnasia artística de alta competición', 'Maratón de montaña (ultratrail)', 'Natación de fondo en aguas abiertas con corriente']
-  },
-  {
-    id: 'dep_4',
-    tema: '¿Cuál es el mejor deporte amateur para practicar un sábado con amigos? (Del más divertido al que da más pereza)',
-    items: ['Pádel a dobles con risas aseguradas', 'Fútbol 7 o fútbol sala pachanga', 'Baloncesto 3x3 en media pista', 'Partida de voley playa al atardecer', 'Ruta en bicicleta de montaña con parada a almorzar']
-  },
-  {
-    id: 'dep_5',
-    tema: 'El trofeo o logro que mayor estatus histórico otorga a un deportista (Del olimpo absoluto al más secundario)',
-    items: ['Medalla de oro en unos Juegos Olímpicos', 'Copa Mundial de la FIFA', 'Balón de Oro o MVP de la temporada', 'Título de Grand Slam en tenis', 'Trofeo de la Champions League europea']
-  },
-  {
-    id: 'dep_6',
-    tema: '¿Qué aspecto del fútbol moderno arruina más la experiencia del aficionado? (Del más insoportable al menor)',
-    items: ['Revisiones de VAR de 5 minutos por fueras de juego milimétricos', 'Pérdidas de tiempo constantes y fingir agresiones', 'Precios desorbitados de abonos y entradas en estadios', 'Cambios continuos de horarios y días de partidos sin lógica', 'Camisetas y equipaciones estridentes que rompen la tradición']
-  },
-  {
-    id: 'dep_7',
-    tema: 'El estilo de juego de un equipo que más te engancha a la pantalla (Del más vistoso al más aburrido)',
-    items: ['Contraataque fulgurante con verticalidad extrema', 'Posesión y toque constante con pases milimétricos', 'Defensa numantina con presión asfixiante y bloque bajo', 'Juego aéreo directo con centros y segundas jugadas', 'Caos táctico de ida y vuelta constante sin pausa']
-  },
-  {
-    id: 'dep_8',
-    tema: '¿Qué habilidad técnica deportiva te parece más difícil de dominar a nivel amateur? (De casi imposible a la más accesible)',
-    items: ['Golpear con efecto un tiro libre de fútbol por la escuadra', 'Devolver un saque de tenis a más de 180 km/h', 'Hacer un mate de baloncesto con salto limpio', 'Conducir un kart de competición rozando el límite sin trompear', 'Tirar y clavar triples con regularidad en baloncesto']
-  },
-  {
-    id: 'dep_9',
-    tema: 'El deporte de invierno más espectacular para ver por televisión (Del que más atrapa al más monótono)',
-    items: ['Descenso libre de esquí alpino a más de 120 km/h', 'Saltos acrobáticos en trampolín de esquí', 'Snowboard half-pipe con trucos aéreos', 'Partidos de hockey sobre hielo con ritmo frenético', 'Curling sobre pista de hielo']
-  },
-  {
-    id: 'dep_10',
-    tema: '¿Qué tipo de personalidad en un deportista de élite te gusta más ver? (De tu perfil preferido al que menos soportas)',
-    items: ['El genio callado y humilde que habla solo en la pista', 'El líder carismático y provocador que asume toda la presión', 'El currante incansable que compensa falta de talento con físico puro', 'El estratega frío y calculador que nunca pierde los nervios', 'El veterano sabio que juega al ritmo que él decide']
-  },
-  {
-    id: 'dep_11',
-    tema: '¿Qué competición deportiva tiene el trofeo o copa más bonito estéticamente? (De obra de arte a copa corriente)',
-    items: ['Trofeo original de la Copa del Mundo de la FIFA (oro macizo)', 'La Orejona de la UEFA Champions League', 'La Jarra de las Cien Guineas del British Open de golf', 'El trofeo Vince Lombardi de la Super Bowl de la NFL', 'La Copa de los Mosqueteros de Roland Garros']
-  },
-  {
-    id: 'dep_12',
-    tema: '¿Qué situación arbitral genera más frustración viendo un partido? (De la que más indigna a la menor)',
-    items: ['Un penalti inventado o muy dudoso en el minuto 93', 'Una tarjeta roja injusta a los 10 minutos de empezar', 'Criterio dispar de faltas entre un equipo y otro en el mismo campo', 'Falta de añadido de tiempo tras perderse 10 minutos reales', 'Un gol anulado por una falta previa intrascendente hace 30 segundos']
-  },
-  {
-    id: 'dep_13',
-    tema: 'El circuito o escenario de carreras con más mística del automovilismo (Del más legendario al más genérico)',
-    items: ['Circuito urbano de Mónaco en Montecarlo', 'Spa-Francorchamps con la curva de Eau Rouge', 'Nürburgring Nordschleife (el Infierno Verde)', 'Monza (el Templo de la Velocidad italiano)', 'Silverstone (la cuna británica del motor)']
-  },
-  {
-    id: 'dep_14',
-    tema: '¿Qué superficie de tenis ofrece los partidos más entretenidos y estéticos? (De la mejor a la más aburrida)',
-    items: ['Hierba natural rápida de Wimbledon', 'Tierra batida con puntos largos de fondo de pista', 'Pista dura moderna y equilibrada', 'Tierra batida azul experimental', 'Moqueta interior ultrarrápida']
-  },
-  {
-    id: 'dep_15',
-    tema: 'El dolor o cansancio deportivo más insoportable al día siguiente (Del que no te deja moverte al más leve)',
-    items: ['Agujetas severas en glúteos y cuádriceps tras piernas en el gimnasio', 'Uña del pie machacada y morada por correr con zapatilla apretada', 'Sobrecarga lumbar tras jugar en suelo duro', 'Ampollas gigantes en la planta del pie o talón', 'Tirantez en el cuello y hombros tras nadar']
-  },
-  {
-    id: 'dep_16',
-    tema: 'La remontada o hazaña deportiva que más te pone la piel de gallina al recordarla (De la más legendaria a la menor)',
-    items: ['Remontada del Liverpool al Milan en la final de Estambul 2005 (0-3 a 3-3)', 'Los 8 oros de Michael Phelps en Pekín 2008', 'España ganando el Mundial 2010 con el gol de Iniesta en el 116', 'LeBron James remontando un 3-1 a los Warriors en las Finales NBA 2016', 'Rafael Nadal remontando dos sets abajo ante Medvedev en Australia 2022']
-  },
-  {
-    id: 'dep_17',
-    tema: '¿Qué ejercicio en el gimnasio te da más pereza mental antes de empezar? (Del que más evitas al más llevadero)',
-    items: ['Sentadillas pesadas con barra libre en la espalda', 'Burpees intensos a intervalos', 'Dominadas con peso corporal estricto', 'Peso muerto convencional desde el suelo', 'Fondos en paralelas para pecho y tríceps']
-  },
-  {
-    id: 'dep_18',
-    tema: '¿Qué posición o rol en el fútbol tiene mayor responsabilidad y estrés? (De mayor presión a menor)',
-    items: ['Portero titular (cualquier error cuesta gol en contra)', 'Lanzador designado en una tanda de penaltis decisiva', 'Defensa central último hombre frente a delanteros rápidos', 'Pivote defensivo que debe cortar contras y dar salida limpia', 'Delantero centro que lleva cinco partidos sin marcar gol']
-  },
-  {
-    id: 'dep_19',
-    tema: 'El ambiente de grada o afición más intimidante y espectacular (Del más ensordecedor al más frío)',
-    items: ['La Bombonera de Boca Juniors en un Superclásico', 'El Muro Amarillo del Borussia Dortmund en Alemania', 'Pabellón griego de baloncesto de Euroliga (Panathinaikos/Olympiacos)', 'Anfield cantando You\'ll Never Walk Alone en noche europea', 'El estadio Maracaná de Río de Janeiro con 80.000 hinchas']
-  },
-  {
-    id: 'dep_20',
-    tema: '¿Qué deporte de combate o arte marcial te parece más bonito de contemplar? (Del más estilizado al más tosco)',
-    items: ['Judo tradicional con proyecciones limpias de ippon', 'Boxeo clásico con juego de pies y fintas de cintura', 'Muay Thai tailandés con combinaciones de golpes y clinch', 'Taekwondo con patadas altas y giros acrobáticos', 'Artes marciales mixtas (MMA) con lucha de suelo']
-  }
+  { id: 'dep_1', tema: 'Deportes para ver por televisión un domingo', items: ['Fútbol', 'Baloncesto', 'Fórmula 1', 'Tenis', 'Golf'] },
+  { id: 'dep_2', tema: 'Deportes amateurs para jugar con amigos el fin de semana', items: ['Pádel', 'Fútbol 7', 'Baloncesto', 'Vóley playa', 'Tenis'] },
+  { id: 'dep_3', tema: 'Las mejores leyendas del fútbol de la historia', items: ['Lionel Messi', 'Cristiano Ronaldo', 'Diego Maradona', 'Pelé', 'Zinedine Zidane'] },
+  { id: 'dep_4', tema: 'Grandes leyendas de la NBA', items: ['Michael Jordan', 'LeBron James', 'Kobe Bryant', 'Magic Johnson', 'Shaquille O\'Neal'] },
+  { id: 'dep_5', tema: 'Los mayores tenistas de la era moderna', items: ['Rafael Nadal', 'Roger Federer', 'Novak Djokovic', 'Carlos Alcaraz', 'Andy Murray'] },
+  { id: 'dep_6', tema: 'Pilotos legendarios de Fórmula 1', items: ['Fernando Alonso', 'Michael Schumacher', 'Lewis Hamilton', 'Ayrton Senna', 'Max Verstappen'] },
+  { id: 'dep_7', tema: 'Ligas de fútbol europeas', items: ['Premier League', 'LaLiga', 'Serie A', 'Bundesliga', 'Ligue 1'] },
+  { id: 'dep_8', tema: 'Clubes grandes de Europa', items: ['Real Madrid', 'FC Barcelona', 'Bayern Múnich', 'Manchester City', 'Liverpool'] },
+  { id: 'dep_9', tema: 'Momentos de máxima tensión en un partido de fútbol', items: ['Tanda de penaltis en una final', 'Penalti en el minuto 90', 'Córner en el último segundo', 'Revisión de VAR por gol', 'Falta al borde del área'] },
+  { id: 'dep_10', tema: 'Trofeos de fútbol', items: ['Copa del Mundo', 'Champions League', 'Copa América o Eurocopa', 'Liga nacional', 'Copa nacional'] },
+  { id: 'dep_11', tema: 'Pruebas de atletismo olímpico', items: ['100 metros lisos', 'Salto de longitud', 'Salto con pértiga', 'Relevo 4x100', '10.000 metros'] },
+  { id: 'dep_12', tema: 'Deportes olímpicos de verano', items: ['Atletismo', 'Natación', 'Gimnasia artística', 'Baloncesto', 'Tiro con arco'] },
+  { id: 'dep_13', tema: 'Deportes olímpicos de invierno', items: ['Esquí alpino', 'Snowboard', 'Hockey sobre hielo', 'Saltos de esquí', 'Curling'] },
+  { id: 'dep_14', tema: 'Superficies de pista de tenis', items: ['Hierba natural', 'Tierra batida', 'Pista rápida dura', 'Pista cubierta indoor', 'Moqueta'] },
+  { id: 'dep_15', tema: 'Posiciones de fútbol según su dificultad y presión', items: ['Portero', 'Defensa central', 'Lanzador de penaltis', 'Delantero centro', 'Extremo'] },
+  { id: 'dep_16', tema: 'Deportes de combate y contacto', items: ['Boxeo', 'Artes marciales mixtas', 'Judo', 'Taekwondo', 'Lucha libre'] },
+  { id: 'dep_17', tema: 'Máximos goleadores modernos', items: ['Cristiano Ronaldo', 'Lionel Messi', 'Erling Haaland', 'Kylian Mbappé', 'Robert Lewandowski'] },
+  { id: 'dep_18', tema: 'Estadios de fútbol míticos', items: ['Santiago Bernabéu', 'Camp Nou', 'Anfield', 'San Siro', 'Signal Iduna Park'] },
+  { id: 'dep_19', tema: 'Circuitos de Fórmula 1', items: ['Mónaco', 'Spa-Francorchamps', 'Monza', 'Silverstone', 'Montmeló'] },
+  { id: 'dep_20', tema: 'Grand Slam de tenis', items: ['Wimbledon', 'Roland Garros', 'US Open', 'Open de Australia', 'Copa Davis'] },
+  { id: 'dep_21', tema: 'Deportes acuáticos', items: ['Surf', 'Waterpolo', 'Natación rápida', 'Piragüismo', 'Remo'] },
+  { id: 'dep_22', tema: 'Ejercicios de fuerza en el gimnasio', items: ['Sentadillas pesadas', 'Peso muerto', 'Dominadas estrictas', 'Press banca', 'Curl de bíceps'] },
+  { id: 'dep_23', tema: 'Pilotos históricos de motociclismo MotoGP', items: ['Marc Márquez', 'Valentino Rossi', 'Jorge Lorenzo', 'Dani Pedrosa', 'Casey Stoner'] },
+  { id: 'dep_24', tema: 'Franquicias históricas de la NBA', items: ['Los Angeles Lakers', 'Boston Celtics', 'Chicago Bulls', 'Golden State Warriors', 'Miami Heat'] },
+  { id: 'dep_25', tema: 'Deportes de raqueta o pala', items: ['Pádel', 'Tenis', 'Bádminton', 'Tenis de mesa', 'Squash'] },
+  { id: 'dep_26', tema: 'Grandes carreras ciclistas por etapas', items: ['Tour de Francia', 'Giro de Italia', 'Vuelta a España', 'París-Roubaix', 'Mundial en Ruta'] },
+  { id: 'dep_27', tema: 'Clásicos y derbis del fútbol mundial', items: ['Real Madrid vs Barcelona', 'Boca Juniors vs River Plate', 'Celtic vs Rangers', 'Milan vs Inter', 'Arsenal vs Tottenham'] },
+  { id: 'dep_28', tema: 'Cualidades físicas en el deporte de élite', items: ['Velocidad explosiva', 'Resistencia aeróbica', 'Fuerza bruta', 'Agilidad y coordinación', 'Flexibilidad'] },
+  { id: 'dep_29', tema: 'Deportes de equipo tradicionales', items: ['Fútbol', 'Baloncesto', 'Balonmano', 'Voleibol', 'Béisbol'] },
+  { id: 'dep_30', tema: 'Centrocampistas históricos de España', items: ['Andrés Iniesta', 'Xavi Hernández', 'Sergio Busquets', 'Xabi Alonso', 'Cesc Fàbregas'] },
+  { id: 'dep_31', tema: 'Deportes de invierno al aire libre', items: ['Snowboard', 'Esquí alpino', 'Patinaje sobre hielo', 'Trineo', 'Esquí de fondo'] },
+  { id: 'dep_32', tema: 'Golpes del tenis', items: ['Saque potente', 'Derecha ganadora', 'Smash en la red', 'Revés a dos manos', 'Dejada'] },
+  { id: 'dep_33', tema: 'Deportes populares en Estados Unidos', items: ['Baloncesto', 'Fútbol americano', 'Béisbol', 'Hockey sobre hielo', 'Fútbol europeo'] },
+  { id: 'dep_34', tema: 'Grandes boxeadores de peso pesado', items: ['Mike Tyson', 'Muhammad Ali', 'Evander Holyfield', 'George Foreman', 'Tyson Fury'] },
+  { id: 'dep_35', tema: 'Selecciones de fútbol sudamericanas', items: ['Brasil', 'Argentina', 'Uruguay', 'Colombia', 'Chile'] },
+  { id: 'dep_36', tema: 'Cosas que más molestan viendo fútbol en televisión', items: ['Revisiones de VAR interminables', 'Jugadores que fingen faltas y lesiones', 'Anuncios y cortes en mitad del partido', 'Comentaristas parciales', 'Pérdidas de tiempo al final'] },
+  { id: 'dep_37', tema: 'Tipos de goles de fútbol', items: ['Gol de chilena', 'Volea a la escuadra desde fuera del área', 'Gol de falta directa con efecto', 'Vaselina por encima del portero', 'Gol de rebote empujándola en la línea'] },
+  { id: 'dep_38', tema: 'Estrellas de la NBA moderna', items: ['Stephen Curry', 'Luka Dončić', 'Giannis Antetokounmpo', 'Nikola Jokić', 'Kevin Durant'] },
+  { id: 'dep_39', tema: 'Deportes extremos', items: ['Paracaidismo', 'Rafting en rápidos', 'Escalada en roca', 'Puenting', 'Surf con olas gigantes'] },
+  { id: 'dep_40', tema: 'Deportistas españoles más grandes de todos los tiempos', items: ['Rafael Nadal', 'Pau Gasol', 'Fernando Alonso', 'Andrés Iniesta', 'Marc Márquez'] },
+  { id: 'dep_41', tema: 'Partes de un entrenamiento de gimnasio', items: ['Ejercicios con pesas', 'Calentamiento suave', 'Estiramientos finales', 'Abdominales en colchoneta', 'Cardio en cinta de correr'] },
+  { id: 'dep_42', tema: 'Jugadas de baloncesto', items: ['Mate sobre un defensor', 'Triple ganador sobre la bocina', 'Pase sin mirar por la espalda', 'Tapón contra el tablero', 'Tiro libre encestado'] },
+  { id: 'dep_43', tema: 'Deportistas que mejor caen al público', items: ['Rafael Nadal', 'Carlos Alcaraz', 'Pau Gasol', 'Joaquín Sánchez', 'Fernando Alonso'] },
+  { id: 'dep_44', tema: 'Deportes de motor', items: ['Fórmula 1', 'MotoGP', 'Rally Dakar', 'Rallies WRC', 'Karts'] },
+  { id: 'dep_45', tema: 'Competiciones de selecciones de fútbol', items: ['Mundial', 'Eurocopa', 'Copa América', 'Nations League', 'Juegos Olímpicos'] },
+  { id: 'dep_46', tema: 'Delanteros históricos del Real Madrid', items: ['Cristiano Ronaldo', 'Karim Benzema', 'Raúl González', 'Ronaldo Nazário', 'Hugo Sánchez'] },
+  { id: 'dep_47', tema: 'Delanteros históricos del FC Barcelona', items: ['Lionel Messi', 'Luis Suárez', 'Ronaldinho', 'Samuel Eto\'o', 'Romário'] },
+  { id: 'dep_48', tema: 'Deportes que exigen mayor gasto calórico y fondo', items: ['Maratón', 'Triatlón', 'Ciclismo en carretera', 'Crossfit', 'Pádel'] },
+  { id: 'dep_49', tema: 'Superestrellas del fútbol europeo actual', items: ['Kylian Mbappé', 'Erling Haaland', 'Vinícius Júnior', 'Jude Bellingham', 'Rodri Hernández'] },
+  { id: 'dep_50', tema: 'Competiciones anuales de clubes de fútbol', items: ['Champions League', 'Liga doméstica', 'Copa del Rey', 'Supercopa de Europa', 'Mundial de Clubes'] },
+  { id: 'dep_51', tema: 'Deportes de precisión', items: ['Dardos', 'Billar', 'Tiro con arco', 'Bolos', 'Golf'] },
+  { id: 'dep_52', tema: 'Tipos de carreras en atletismo', items: ['100 metros lisos', '200 metros lisos', '400 metros vallas', '1.500 metros', 'Maratón'] },
+  { id: 'dep_53', tema: 'Grandes ciclistas de la historia', items: ['Eddy Merckx', 'Miguel Induráin', 'Tadej Pogačar', 'Alberto Contador', 'Chris Froome'] },
+  { id: 'dep_54', tema: 'Porteros españoles legendarios', items: ['Iker Casillas', 'David de Gea', 'Víctor Valdés', 'Santiago Cañizares', 'Andoni Zubizarreta'] },
+  { id: 'dep_55', tema: 'Deportes que practicar en la playa', items: ['Palas de playa', 'Vóley playa', 'Fútbol en la arena', 'Surf', 'Natación en mar abierto'] },
+  { id: 'dep_56', tema: 'Categorías del automovilismo', items: ['Fórmula 1', '24 Horas de Le Mans', 'Rally Dakar', 'IndyCar', 'Fórmula 2'] },
+  { id: 'dep_57', tema: 'Tipos de saque o lanzamiento', items: ['Penalti bien tirado al palo', 'Saque de tenis a 220 km/h', 'Tiro libre de baloncesto', 'Lanzamiento de siete metros en balonmano', 'Saque de banda largo'] },
+  { id: 'dep_58', tema: 'Lesiones deportivas típicas', items: ['Rotura de ligamento cruzado', 'Rotura de menisco', 'Desgarro muscular', 'Esguince de tobillo fuerte', 'Sobrecarga y agujetas'] },
+  { id: 'dep_59', tema: 'Fases de una eliminatoria de fútbol', items: ['La final a partido único', 'Vuelta de semifinales', 'Prórroga de vuelta', 'Partido de ida', 'Fase de grupos'] },
+  { id: 'dep_60', tema: 'Estilos de natación', items: ['Crol', 'Espalda', 'Braza', 'Mariposa', 'Nado subacuático'] },
+  { id: 'dep_61', tema: 'Partidos de selecciones de fútbol', items: ['Final de un Mundial', 'Semifinales de Eurocopa', 'Partido inaugural', 'Amistoso internacional', 'Clasificatorio contra país pequeño'] },
+  { id: 'dep_62', tema: 'Acciones de un portero de fútbol', items: ['Parar un penalti en el 90', 'Mano a mano sacado con los pies', 'Palomita a la escuadra', 'Atrapada en un córner por alto', 'Despeje de puños'] },
+  { id: 'dep_63', tema: 'Deportistas jóvenes con más proyección mundial', items: ['Carlos Alcaraz', 'Lamine Yamal', 'Jude Bellingham', 'Erling Haaland', 'Victor Wembanyama'] },
+  { id: 'dep_64', tema: 'Tipos de canasta en baloncesto', items: ['Mate sobre un defensor', 'Triple desde el medio campo', 'Canasta en suspensión con falta', 'Bandeja acrobática con efecto', 'Tiro libre'] },
+  { id: 'dep_65', tema: 'Sensaciones del cuerpo al terminar de hacer deporte', items: ['La ducha caliente reparadora', 'Sensación de deber cumplido y relax', 'El primer trago de agua bien fría', 'Hambre voraz', 'Piernas pesadas sin poder subir escaleras'] },
+  { id: 'dep_66', tema: 'Clubes de la Premier League inglesa', items: ['Manchester City', 'Liverpool', 'Arsenal', 'Manchester United', 'Chelsea'] },
+  { id: 'dep_67', tema: 'Cosas que hacer durante un partido aburrido de fútbol', items: ['Mirar el móvil y las redes', 'Comentar jugadas con amigos', 'Comer pipas o patatas', 'Cambiar de canal un rato', 'Quedarse dormido en el sofá'] },
+  { id: 'dep_68', tema: 'Grandes leyendas de la Selección Francesa de fútbol', items: ['Zinedine Zidane', 'Thierry Henry', 'Kylian Mbappé', 'Michel Platini', 'Antoine Griezmann'] },
+  { id: 'dep_69', tema: 'Competiciones de baloncesto de clubes', items: ['Playoffs de la NBA', 'Final Four de la Euroliga', 'Liga regular de la NBA', 'Copa del Rey de España', 'Liga regular ACB'] },
+  { id: 'dep_70', tema: 'Deportes donde más influye la suerte o el azar', items: ['Golf con viento cambiante', 'Fórmula 1 con lluvia repentina', 'Fútbol por rebotes y postes', 'Tenis por el roce de la red', 'Halterofilia por fuerza pura'] },
+  { id: 'dep_71', tema: 'Puntos en el pádel', items: ['Sacar la bola por 4 metros fuera de pista', 'Dejada milimétrica a la red', 'Globo perfecto al fondo', 'Volea rápida al cuerpo', 'Fallo no forzado del rival a la red'] },
+  { id: 'dep_72', tema: 'Grandes estadios de fútbol sudamericanos', items: ['La Bombonera', 'Maracaná', 'Monumental', 'Estadio Centenario', 'Morumbi'] },
+  { id: 'dep_73', tema: 'Errores arbitrales que más enfadan a un aficionado', items: ['Penalti claro no pitado ni revisado', 'Gol fantasma no concedido', 'Tarjeta roja rigurosa e injusta', 'Fuera de juego inexistente que cortaba jugada', 'Falta clara no concedida al borde del área'] },
+  { id: 'dep_74', tema: 'Entrenadores de fútbol de la época moderna', items: ['Pep Guardiola', 'Carlo Ancelotti', 'José Mourinho', 'Jürgen Klopp', 'Diego Simeone'] },
+  { id: 'dep_75', tema: 'Formas de celebrar un gol en el fútbol', items: ['Correr hacia el córner y deslizarse de rodillas', 'Saltar y gritar abrazado a la grada', 'Dedicación señalando el escudo', 'Baile ensayado con compañeros', 'Quitarse la camiseta y ver tarjeta amarilla'] },
+  { id: 'dep_76', tema: 'Deportistas veteranos que se mantuvieron en la cima hasta tarde', items: ['LeBron James', 'Cristiano Ronaldo', 'Luka Modrić', 'Fernando Alonso', 'Novak Djokovic'] },
+  { id: 'dep_77', tema: 'Premios individuales del fútbol', items: ['Balón de Oro', 'Bota de Oro', 'The Best de la FIFA', 'MVP de la Champions', 'Trofeo Pichichi de liga'] },
+  { id: 'dep_78', tema: 'Deportes para practicar en solitario sin depender de nadie', items: ['Salir a correr', 'Gimnasio con pesas', 'Natación en piscina', 'Bicicleta de carretera', 'Escalada en rocódromo'] },
+  { id: 'dep_79', tema: 'Acciones de defensa en el fútbol', items: ['Segada limpia cortando un contragolpe', 'Despeje de cabeza en la línea de gol', 'Anticipación cortando un pase interior', 'Cuerpo a cuerpo ganando la posición', 'Falta táctica agarrando la camiseta'] },
+  { id: 'dep_80', tema: 'Países con más tradición deportiva y títulos globales', items: ['Estados Unidos', 'España', 'Brasil', 'Alemania', 'Reino Unido'] },
+  { id: 'dep_81', tema: 'Pruebas de natación en piscina', items: ['50 metros libres', '100 metros libres', 'Relevo 4x100 estilos', '200 metros mariposa', '1.500 metros fondo'] },
+  { id: 'dep_82', tema: 'Marcas de ropa y calzado deportivo', items: ['Nike', 'Adidas', 'Puma', 'Under Armour', 'New Balance'] },
+  { id: 'dep_83', tema: 'Adversidades climáticas en un partido al aire libre', items: ['Viento fuerte incontrolable', 'Lluvia torrencial con charcos', 'Calor asfixiante al sol', 'Frío bajo cero con manos heladas', 'Cielo nublado sin lluvia'] },
+  { id: 'dep_84', tema: 'Equipos históricos que marcaron época en el fútbol', items: ['FC Barcelona de Guardiola', 'Real Madrid de las 3 Champions seguidas', 'Brasil del Mundial de 1970', 'España campeona de todo', 'AC Milan de Arrigo Sacchi'] },
+  { id: 'dep_85', tema: 'Grandes defensas centrales de la historia del fútbol', items: ['Sergio Ramos', 'Paolo Maldini', 'Franz Beckenbauer', 'Carles Puyol', 'Virgil van Dijk'] },
+  { id: 'dep_86', tema: 'Cosas que comer o beber durante un partido en el estadio', items: ['Bocadillo envuelto en papel de aluminio', 'Bolsa grande de pipas', 'Refresco con hielo', 'Cerveza sin alcohol', 'Snack de patatas rancias'] },
+  { id: 'dep_87', tema: 'Ligas de baloncesto del mundo', items: ['NBA estadounidense', 'Euroliga', 'Liga ACB española', 'NCAA universitaria', 'Ligas sudamericanas'] },
+  { id: 'dep_88', tema: 'Lanzadores de faltas directas históricos en el fútbol', items: ['Juninho Pernambucano', 'Lionel Messi', 'David Beckham', 'Cristiano Ronaldo', 'Roberto Carlos'] },
+  { id: 'dep_89', tema: 'Deportes de equipo con pelota pequeña', items: ['Tenis de mesa', 'Bádminton', 'Golf', 'Béisbol', 'Críquet'] },
+  { id: 'dep_90', tema: 'Partes de una carrera de Fórmula 1', items: ['La salida en la curva 1', 'Las últimas 5 vueltas con lucha por cabeza', 'El cambio de neumáticos en boxes', 'El relanzamiento tras coche de seguridad', 'Las vueltas intermedias rodando en solitario'] },
+  { id: 'dep_91', tema: 'Grandes centrocampistas de la era moderna del fútbol', items: ['Luka Modrić', 'Toni Kroos', 'Kevin De Bruyne', 'Rodri Hernández', 'Sergio Busquets'] },
+  { id: 'dep_92', tema: 'Tipos de bicicleta según su terreno', items: ['Bicicleta de montaña', 'Bicicleta de carretera', 'Bicicleta de gravel', 'Bicicleta urbana de paseo', 'Bicicleta estática de salón'] },
+  { id: 'dep_93', tema: 'Momentos más dolorosos para un aficionado al fútbol', items: ['Descender a Segunda División', 'Perder una final en el minuto 93', 'Perder una tanda de penaltis decisiva', 'Perder por goleada ante el eterno rival', 'Quedar eliminado en fase de grupos'] },
+  { id: 'dep_94', tema: 'Pruebas de fuerza en competiciones de Strongman', items: ['Arrastrar un camión de bomberos con cuerdas', 'Levantar piedras esféricas pesadas', 'Paseo del granjero con maletas de hierro', 'Levantamiento de peso muerto con ruedas', 'Tirón de barra con peso'] },
+  { id: 'dep_95', tema: 'Extremos y regateadores del fútbol mundial', items: ['Neymar Jr', 'Vinícius Júnior', 'Kylian Mbappé', 'Lamine Yamal', 'Mohamed Salah'] },
+  { id: 'dep_96', tema: 'Deportistas que cambiaron las reglas de su propio deporte', items: ['Michael Jordan', 'Stephen Curry', 'Dick Fosbury', 'Johan Cruyff', 'Usain Bolt'] },
+  { id: 'dep_97', tema: 'Cosas que hacer cuando marcas gol jugando con amigos', items: ['Chocar las manos con todos', 'Gritarlo con rabia', 'Hacer un gesto gracioso', 'Volver trotando al centro del campo como si nada', 'Hacer una celebración ensayada exagerada'] },
+  { id: 'dep_98', tema: 'Pistas y parajes para esquiar en invierno', items: ['Alpes suizos', 'Pirineos', 'Sierra Nevada al sol', 'Andorra', 'Pista indoor de nieve artificial'] },
+  { id: 'dep_99', tema: 'Habilidades técnicas individuales en el fútbol', items: ['Regate de ruleta o elástica', 'Pase filtrado milimétrico entre líneas', 'Control orientado al primer toque', 'Cambio de juego largo de 40 metros', 'Pase raso al pie a 3 metros'] },
+  { id: 'dep_100', tema: 'El debate de los deportes universales', items: ['Fútbol', 'Baloncesto', 'Tenis', 'Fórmula 1', 'Ciclismo'] }
 ];

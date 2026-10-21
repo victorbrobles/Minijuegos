@@ -2,6 +2,7 @@
 import express from 'express';
 import comida from '../data/seeds/ciegas/comida.js';
 import deporte from '../data/seeds/ciegas/deporte.js';
+import deportistas from '../data/seeds/ciegas/deportistas.js';
 import famosos from '../data/seeds/ciegas/famosos.js';
 import culturapop from '../data/seeds/ciegas/culturapop.js';
 import geografia from '../data/seeds/ciegas/geografia.js';
@@ -11,6 +12,7 @@ const router = express.Router();
 const CATEGORIAS = {
   comida,
   deporte,
+  deportistas,
   famosos,
   culturapop,
   geografia

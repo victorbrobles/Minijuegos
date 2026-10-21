@@ -9,9 +9,10 @@ const MIN_JUGADORES = 4;
 const MAX_JUGADORES = 10;
 const CATEGORIAS = [
   { id: 'comida', label: 'Comida' },
-  { id: 'deporte', label: 'Deporte' },
-  { id: 'famosos', label: 'Famosos' },
   { id: 'culturapop', label: 'Cultura Pop' },
+  { id: 'deporte', label: 'Deporte' },
+  { id: 'deportistas', label: 'Deportistas' },
+  { id: 'famosos', label: 'Famosos' },
   { id: 'geografia', label: 'Geografía' }
 ];
 
