@@ -44,14 +44,13 @@ router.post('/iniciar-local', (req, res) => {
   const pool = disponibles.length > 0 ? disponibles : lista;
   const seleccionado = barajar(pool)[0];
 
-  // Barajamos el orden en el que saldrán al jugador a ciegas
+  // Barajamos aleatoriamente el orden en que irán saliendo
   const itemsBarajados = barajar(seleccionado.items);
 
   res.json({
     success: true,
     rankingId: seleccionado.id,
     tema: seleccionado.tema,
-    // Devolvemos el array directo de strings
     itemsSecuencia: itemsBarajados,
     itemsOriginales: seleccionado.items
   });
@@ -164,7 +163,7 @@ router.post('/online/sala/:code/iniciar-ronda', (req, res) => {
     return res.status(400).json({ error: 'Se necesitan mínimo 4 jugadores.' });
   }
 
-  // Elegir jugador al azar
+  // Elegir jugador activo al azar
   const elegido = sala.jugadores[Math.floor(Math.random() * sala.jugadores.length)];
   sala.jugadorActivoId = elegido.id;
 
@@ -174,16 +173,17 @@ router.post('/online/sala/:code/iniciar-ronda', (req, res) => {
   const seleccionado = barajar(pool)[0];
   sala.usados.push(seleccionado.id);
 
-  const secuencia = barajar(seleccionado.items);
+  // Barajamos los 5 elementos para que salgan en orden 100% aleatorio
+  const secuenciaBarajada = barajar(seleccionado.items);
 
   sala.ronda = {
     id: seleccionado.id,
     tema: seleccionado.tema,
     itemsOriginales: seleccionado.items,
-    itemsSecuencia: secuencia.map((it) => it.nombre),
+    itemsSecuencia: secuenciaBarajada, // Array de strings barajados
     indiceSecuencia: 0,
     topArmado: [null, null, null, null, null],
-    votos: {}, // { jugadorId: numeroAciertosVotados }
+    votos: {},
     aciertosReales: 0
   };
 
@@ -214,13 +214,12 @@ router.post('/online/sala/:code/colocar-posicion', (req, res) => {
   sala.ronda.topArmado[idx] = itemActual;
   sala.ronda.indiceSecuencia += 1;
 
-  // Si ya colocó los 5 elementos, pasa a fase de votación de los demás
+  // Si ya colocó los 5 elementos, pasa a fase de votación
   if (sala.ronda.indiceSecuencia >= 5) {
-    // Calculamos cuántos quedaron bien ordenados en realidad
     let aciertos = 0;
     sala.ronda.topArmado.forEach((nombre, posIdx) => {
-      const original = sala.ronda.itemsOriginales.find((it) => it.nombre === nombre);
-      if (original && original.posicionReal === (posIdx + 1)) {
+      // Comparación directa de strings con el array original
+      if (sala.ronda.itemsOriginales[posIdx] === nombre) {
         aciertos += 1;
       }
     });
@@ -244,7 +243,7 @@ router.post('/online/sala/:code/votar', (req, res) => {
     return res.status(400).json({ error: 'El jugador activo no vota su propio top.' });
   }
 
-  const { prediccion } = req.body; // número de 0 a 5
+  const { prediccion } = req.body;
   sala.ronda.votos[jugador.id] = parseInt(prediccion, 10);
 
   // Comprobar si ya votaron todos los demás jugadores
@@ -252,7 +251,6 @@ router.post('/online/sala/:code/votar', (req, res) => {
   const votosEmitidos = Object.keys(sala.ronda.votos).length;
 
   if (votosEmitidos >= votantesNecesarios) {
-    // Sumamos los votos recibidos y se los damos al jugador activo
     const totalPuntos = Object.values(sala.ronda.votos).reduce(
       (acc, val) => acc + (Number(val) || 0),
       0
