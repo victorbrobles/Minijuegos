@@ -1,10 +1,12 @@
 // server/routes/bingoball.js
 import express from 'express';
 import crypto from 'crypto';
-import { getBingoPorId, getTodosJugadoresBingo, LISTA_BINGOS } from '../data/seeds/bingoball/bingoballData.js';
+import { GRUPOS_BINGOS, getBingoPorId, getTodosJugadoresBingo } from '../data/seeds/bingoball/bingoballData.js';
 
 const router = express.Router();
 const salasOnline = {};
+
+const TIEMPO_FUTBOLISTA = 15; // 15 segundos por futbolista
 
 const barajar = (arr) => {
   const a = [...arr];
@@ -24,17 +26,24 @@ const generarCodigoSala = () => {
   return c;
 };
 
-// Genera un cartón de 4 filas x 5 columnas (20 casillas)
+// Selecciona un sub-bingo aleatorio dentro del grupo principal seleccionado
+function elegirBingoAleatorioDeGrupo(grupoId) {
+  const grupo = GRUPOS_BINGOS.find(g => g.id === grupoId) || GRUPOS_BINGOS[0];
+  const bingos = grupo.bingos;
+  const elegido = bingos[Math.floor(Math.random() * bingos.length)];
+  return elegido.id;
+}
+
+// Genera un cartón de 4 filas x 3 columnas (12 casillas en total)
 function generarCartonParaJugador(bingoId) {
   const bingo = getBingoPorId(bingoId);
-  // Barajamos todo el catálogo del bingo y tomamos exactamente 20 categorías distintas
   const pool = barajar([...bingo.categorias]);
-  const seleccionadas = pool.slice(0, 20);
+  const seleccionadas = pool.slice(0, 12);
   const carton = [];
 
   for (let i = 0; i < seleccionadas.length; i++) {
     const cat = seleccionadas[i];
-    const fila = Math.floor(i / 5); // 0, 1, 2, 3
+    const fila = Math.floor(i / 3); // 0, 1, 2, 3
     carton.push({
       id: `c_${i}_${Math.random().toString(36).substring(2, 7)}`,
       categoriaId: cat.id,
@@ -47,15 +56,44 @@ function generarCartonParaJugador(bingoId) {
   return carton;
 }
 
-// Obtiene un futbolista aleatorio del pool del bingo evitando repetir los recientes
+// Obtiene un futbolista aleatorio que tenga UTILIDAD REAL para al menos un jugador
 function obtenerSiguienteFutbolista(sala) {
-  const todos = getTodosJugadoresBingo(sala.bingoId);
-  if (!todos || todos.length === 0) return 'Futbolista Misterioso';
+  const bingo = getBingoPorId(sala.bingoId);
+  if (!bingo || !bingo.categorias) return 'Futbolista Misterioso';
 
-  const disponibles = todos.filter(f => !sala.historialJugadores.slice(-15).includes(f));
-  const pool = disponibles.length > 0 ? disponibles : todos;
+  // 1. Recopilar qué categorías siguen ABIERTAS (no marcadas) en los cartones de todos los jugadores
+  const categoriasAbiertasIds = new Set();
+  sala.jugadores.forEach(j => {
+    (j.carton || []).forEach(casilla => {
+      if (!casilla.marcada) {
+        categoriasAbiertasIds.add(casilla.categoriaId);
+      }
+    });
+  });
+
+  // Si ya no quedan casillas abiertas en ningún cartón (o todos terminaron)
+  if (categoriasAbiertasIds.size === 0) {
+    return 'Fin del Cartón';
+  }
+
+  // 2. Buscar únicamente los futbolistas que pertenezcan a alguna de esas categorías abiertas
+  const futbolistasUtilesSet = new Set();
+  bingo.categorias.forEach(cat => {
+    if (categoriasAbiertasIds.has(cat.id)) {
+      cat.jugadores.forEach(f => futbolistasUtilesSet.add(f));
+    }
+  });
+
+  const futbolistasUtiles = Array.from(futbolistasUtilesSet);
+  if (futbolistasUtiles.length === 0) {
+    return 'Futbolista Misterioso';
+  }
+
+  // 3. Filtrar para evitar que se repitan los recién salidos (últimos 15) entre los que siguen siendo útiles
+  const disponibles = futbolistasUtiles.filter(f => !sala.historialJugadores.slice(-15).includes(f));
+  const pool = disponibles.length > 0 ? disponibles : futbolistasUtiles;
+  
   const elegido = pool[Math.floor(Math.random() * pool.length)];
-
   sala.historialJugadores.push(elegido);
   return elegido;
 }
@@ -96,7 +134,6 @@ function iniciarPartidaJugando(sala) {
   sala.historialJugadores = [];
   sala.jugadores.forEach(j => {
     j.bloqueado = false;
-    j.siguienteBloqueado = false;
     j.haMarcadoEsteTurno = false;
   });
   siguienteTurnoFutbolista(sala);
@@ -106,15 +143,14 @@ function siguienteTurnoFutbolista(sala) {
   if (sala.estado !== 'jugando') return;
   if (sala.timer) clearInterval(sala.timer);
 
-  // Actualizar estados de bloqueo para este nuevo futbolista
+  // Al salir un nuevo futbolista, el bloqueo temporal por fallo se resetea
   sala.jugadores.forEach(j => {
-    j.bloqueado = Boolean(j.siguienteBloqueado);
-    j.siguienteBloqueado = false;
+    j.bloqueado = false;
     j.haMarcadoEsteTurno = false;
   });
 
   sala.jugadorActual = obtenerSiguienteFutbolista(sala);
-  sala.segundosRestantes = 10;
+  sala.segundosRestantes = TIEMPO_FUTBOLISTA;
 
   sala.timer = setInterval(() => {
     if (sala.estado !== 'jugando') {
@@ -148,8 +184,9 @@ router.post('/crear', (req, res) => {
 
   salasOnline[code] = {
     code,
-    estado: 'lobby', // 'lobby' | 'preparacion' | 'cuenta_atras' | 'jugando' | 'bingo_cantado' | 'final'
-    bingoId: 'internacional_1',
+    estado: 'lobby',
+    grupoId: 'internacional',
+    bingoId: 'internacional_unico',
     segundosRestantes: 10,
     cuentaAtras321: 3,
     jugadorActual: null,
@@ -165,7 +202,6 @@ router.post('/crear', (req, res) => {
         esAdmin: true,
         carton: [],
         bloqueado: false,
-        siguienteBloqueado: false,
         haMarcadoEsteTurno: false
       }
     ]
@@ -199,7 +235,6 @@ router.post('/unirse', (req, res) => {
     esAdmin: false,
     carton: [],
     bloqueado: false,
-    siguienteBloqueado: false,
     haMarcadoEsteTurno: false
   });
 
@@ -221,6 +256,7 @@ router.get('/sala/:code', (req, res) => {
     success: true,
     code: sala.code,
     estado: sala.estado,
+    grupoId: sala.grupoId,
     bingoId: sala.bingoId,
     segundosRestantes: sala.segundosRestantes,
     cuentaAtras321: sala.cuentaAtras321,
@@ -240,21 +276,21 @@ router.get('/sala/:code', (req, res) => {
   });
 });
 
-// 4. Configurar temática de Bingo
+// 4. Configurar categoría principal del Bingo
 router.post('/sala/:code/configurar', (req, res) => {
   const code = req.params.code.toUpperCase();
-  const { token, bingoId } = req.body || {};
+  const { token, grupoId } = req.body || {};
   const sala = salasOnline[code];
 
   if (!sala) return res.status(404).json({ error: 'Sala no encontrada' });
   const yo = sala.jugadores.find(j => j.token === token);
   if (!yo || !yo.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión puede cambiar la temática' });
 
-  sala.bingoId = bingoId || 'internacional_1';
-  res.json({ success: true, bingoId: sala.bingoId });
+  sala.grupoId = grupoId || 'internacional';
+  res.json({ success: true, grupoId: sala.grupoId });
 });
 
-// 5. Iniciar partida desde el lobby (reinicio total a 0)
+// 5. Iniciar partida desde el lobby
 router.post('/sala/:code/iniciar', (req, res) => {
   const code = req.params.code.toUpperCase();
   const { token } = req.body || {};
@@ -265,12 +301,12 @@ router.post('/sala/:code/iniciar', (req, res) => {
   if (!yo || !yo.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión puede iniciar la partida' });
   if (sala.jugadores.length < 3) return res.status(400).json({ error: 'Se necesitan mínimo 3 jugadores' });
 
-  // Reiniciar puntuaciones para una partida completa desde cero
+  sala.bingoId = elegirBingoAleatorioDeGrupo(sala.grupoId);
+
   sala.jugadores.forEach(j => {
     j.puntos = 0;
     j.carton = generarCartonParaJugador(sala.bingoId);
     j.bloqueado = false;
-    j.siguienteBloqueado = false;
     j.haMarcadoEsteTurno = false;
   });
 
@@ -292,16 +328,16 @@ router.post('/sala/:code/marcar', (req, res) => {
   if (!yo) return res.status(403).json({ error: 'Jugador no encontrado' });
 
   if (yo.bloqueado) {
-    return res.status(400).json({ error: 'Estás bloqueado este turno por tu fallo anterior' });
+    return res.status(400).json({ error: 'Estás bloqueado durante este turno por haber fallado.' });
   }
 
   if (yo.haMarcadoEsteTurno) {
-    return res.status(400).json({ error: 'Ya has actuado con este futbolista' });
+    return res.status(400).json({ error: 'Ya has actuado con este futbolista.' });
   }
 
   const casilla = (yo.carton || []).find(c => c.id === casillaId);
   if (!casilla || casilla.marcada) {
-    return res.status(400).json({ error: 'Casilla no válida o ya marcada' });
+    return res.status(400).json({ error: 'Casilla no válida o ya marcada.' });
   }
 
   const bingo = getBingoPorId(sala.bingoId);
@@ -317,11 +353,11 @@ router.post('/sala/:code/marcar', (req, res) => {
   if (esCorrecto) {
     casilla.marcada = true;
     casilla.jugadorAsignado = futbolistaActual;
+    yo.puntos += 2;
 
-    // Verificar si ha completado todo el cartón (Bingo)
     const cartonCompleto = yo.carton.every(c => c.marcada);
     if (cartonCompleto) {
-      yo.puntos += 10;
+      yo.puntos += 25;
       sala.ganadorBingo = yo.nombre;
       sala.estado = 'bingo_cantado';
       if (sala.timer) clearInterval(sala.timer);
@@ -329,28 +365,28 @@ router.post('/sala/:code/marcar', (req, res) => {
       return res.json({
         success: true,
         acierto: true,
-        mensaje: `¡CORRECTO! ¡${yo.nombre} ha cantado BINGO!`
+        mensaje: `¡CORRECTO (+2 pts)! ¡${yo.nombre} ha cantado BINGO (+25 pts)!`
       });
     }
 
     return res.json({
       success: true,
       acierto: true,
-      mensaje: `¡Correcto! ${futbolistaActual} encaja en "${casilla.nombre}".`
+      mensaje: `¡Correcto (+2 pts)! ${futbolistaActual} encaja en "${casilla.nombre}".`
     });
   } else {
-    // Fallo: queda bloqueado en el siguiente turno
-    yo.siguienteBloqueado = true;
+    yo.puntos = Math.max(0, yo.puntos - 1);
+    yo.bloqueado = true;
 
     return res.json({
       success: true,
       acierto: false,
-      mensaje: `¡Fallo! ${futbolistaActual} NO encaja en "${casilla.nombre}". Quedarás bloqueado el próximo turno.`
+      mensaje: `¡Fallo (-1 pt)! ${futbolistaActual} NO encaja en "${casilla.nombre}". Bloqueado hasta el siguiente futbolista.`
     });
   }
 });
 
-// Reemplazar endpoint de cantar línea:
+// 7. Cantar línea (Fila de 3 casillas)
 router.post('/sala/:code/linea', (req, res) => {
   const code = req.params.code.toUpperCase();
   const { token, filaIndex } = req.body || {};
@@ -362,24 +398,24 @@ router.post('/sala/:code/linea', (req, res) => {
   if (!yo) return res.status(403).json({ error: 'No autorizado' });
 
   const casillasFila = (yo.carton || []).filter(c => c.fila === filaIndex);
-  if (casillasFila.length === 5 && casillasFila.every(c => c.marcada)) {
-    yo.puntos += 5;
+  if (casillasFila.length === 3 && casillasFila.every(c => c.marcada)) {
+    yo.puntos += 15;
 
     const bingo = getBingoPorId(sala.bingoId);
     
-    // 1. Categorías presentes en las otras 3 filas del cartón
+    // Categorías presentes en las otras 3 filas del cartón
     const categoriasEnOtrasFilas = new Set(
       yo.carton.filter(c => c.fila !== filaIndex).map(c => c.categoriaId)
     );
 
-    // 2. Categorías del bingo que NO están en las otras 3 filas
+    // Categorías del bingo que NO están en las otras 3 filas
     const candidatas = bingo.categorias.filter(c => !categoriasEnOtrasFilas.has(c.id));
 
-    // 3. Priorizar las que tampoco acaban de completarse en esta fila
+    // Priorizar las que no acaban de completarse en esta fila
     const categoriasCompletadas = new Set(casillasFila.map(c => c.categoriaId));
     const frescas = candidatas.filter(c => !categoriasCompletadas.has(c.id));
 
-    const seleccionadasParaFila = barajar(frescas.length >= 5 ? frescas : candidatas).slice(0, 5);
+    const seleccionadasParaFila = barajar(frescas.length >= 3 ? frescas : candidatas).slice(0, 3);
 
     casillasFila.forEach((casilla, idx) => {
       const nuevaCat = seleccionadasParaFila[idx];
@@ -390,31 +426,31 @@ router.post('/sala/:code/linea', (req, res) => {
       casilla.jugadorAsignado = null;
     });
 
-    return res.json({ success: true, mensaje: '¡Línea cantada! +5 puntos.' });
+    return res.json({ success: true, mensaje: '¡Línea cantada! +15 puntos.' });
   }
 
   res.status(400).json({ error: 'Fila incompleta' });
 });
 
-// 8. Siguiente Bingo (conservando los puntos de cada jugador)
+// 8. Siguiente Bingo (conservando puntos)
 router.post('/sala/:code/siguiente-bingo', (req, res) => {
   const code = req.params.code.toUpperCase();
-  const { token, bingoId } = req.body || {};
+  const { token, grupoId } = req.body || {};
   const sala = salasOnline[code];
 
   if (!sala) return res.status(404).json({ error: 'Sala no encontrada' });
   const yo = sala.jugadores.find(j => j.token === token);
   if (!yo || !yo.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión puede iniciar el siguiente bingo' });
 
-  if (bingoId) {
-    sala.bingoId = bingoId;
+  if (grupoId) {
+    sala.grupoId = grupoId;
   }
 
-  // Se regeneran los cartones pero se conservan los puntos acumulados
+  sala.bingoId = elegirBingoAleatorioDeGrupo(sala.grupoId);
+
   sala.jugadores.forEach(j => {
     j.carton = generarCartonParaJugador(sala.bingoId);
     j.bloqueado = false;
-    j.siguienteBloqueado = false;
     j.haMarcadoEsteTurno = false;
   });
 
@@ -425,7 +461,7 @@ router.post('/sala/:code/siguiente-bingo', (req, res) => {
   res.json({ success: true });
 });
 
-// 9. Finalizar partida y mostrar Podio Definitivo
+// 9. Finalizar partida
 router.post('/sala/:code/finalizar', (req, res) => {
   const code = req.params.code.toUpperCase();
   const { token } = req.body || {};

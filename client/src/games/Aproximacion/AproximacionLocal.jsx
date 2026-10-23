@@ -29,6 +29,9 @@ export default function AproximacionLocal({ onVolver, onExit }) {
   const [rondaActual, setRondaActual] = useState(1);
   const [preguntaActual, setPreguntaActual] = useState(null);
 
+  // Índice sorteado en la ronda 1 para rotar correlativamente en las siguientes
+  const [primerIndexInicial, setPrimerIndexInicial] = useState(null);
+
   const [ordenTurnos, setOrdenTurnos] = useState([]);
   const [subTurnoIndex, setSubTurnoIndex] = useState(0);
   const [decisiones, setDecisiones] = useState({});
@@ -89,11 +92,15 @@ export default function AproximacionLocal({ onVolver, onExit }) {
     });
     setPuntos(puntuaciones);
 
+    // Sorteo aleatorio inicial una única vez
+    const primerIndexSorteado = Math.floor(Math.random() * listaActualizada.length);
+    setPrimerIndexInicial(primerIndexSorteado);
+
     setRondaActual(1);
-    prepararRonda(1, listaActualizada);
+    prepararRonda(1, listaActualizada, primerIndexSorteado);
   };
 
-  const prepararRonda = (numRonda, listaJugadores = jugadores) => {
+  const prepararRonda = (numRonda, listaJugadores = jugadores, baseIndex = primerIndexInicial) => {
     const preg = preguntas[(numRonda - 1) % preguntas.length] || {
       id: 999,
       pregunta: '¿Cuántos países hay en el mundo?',
@@ -102,7 +109,8 @@ export default function AproximacionLocal({ onVolver, onExit }) {
     };
     setPreguntaActual(preg);
 
-    const primerIndex = Math.floor(Math.random() * listaJugadores.length);
+    // Turno inicial desplazado de forma correlativa por cada ronda
+    const primerIndex = (baseIndex + (numRonda - 1)) % listaJugadores.length;
     const orden = [];
     for (let i = 0; i < listaJugadores.length; i++) {
       orden.push((primerIndex + i) % listaJugadores.length);

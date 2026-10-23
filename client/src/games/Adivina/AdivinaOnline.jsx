@@ -7,7 +7,7 @@ import './Adivina.css';
 const CLAVE_SESION_ADIVINA = 'adivina_online_session';
 
 export default function AdivinaOnline({ onLocal, onSalir }) {
-  const [vista, setVista] = useState('menu'); // 'menu' | 'crear' | 'unirse' | 'sala'
+  const [vista, setVista] = useState('menu');
   const [nombre, setNombre] = useState('');
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -98,7 +98,6 @@ export default function AdivinaOnline({ onLocal, onSalir }) {
     }
   };
 
-  // Temporizador de 15 segundos al responder online
   useEffect(() => {
     if (!alguienHaPulsado) {
       setSegundosRespuesta(15);
@@ -168,13 +167,17 @@ export default function AdivinaOnline({ onLocal, onSalir }) {
     }
   };
 
-  const handleCambiarModo = async (nuevoModo) => {
+  const handleCambiarModo = async (nuevoModo, nuevaSubcategoria) => {
     if (!sesion || !sala?.esAdmin) return;
     try {
       await fetch(`/api/adivina/online/sala/${sesion.code}/modo`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion.token, modo: nuevoModo })
+        body: JSON.stringify({
+          token: sesion.token,
+          modo: nuevoModo !== undefined ? nuevoModo : sala.modo,
+          subcategoria: nuevaSubcategoria !== undefined ? nuevaSubcategoria : sala.subcategoria
+        })
       });
     } catch (err) {
       console.error(err);
@@ -316,9 +319,7 @@ export default function AdivinaOnline({ onLocal, onSalir }) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ token: sesion.token })
         });
-      } catch {
-        /* ignorar */
-      }
+      } catch {}
     }
     sessionStorage.removeItem(CLAVE_SESION_ADIVINA);
     setSesion(null);
@@ -354,7 +355,7 @@ export default function AdivinaOnline({ onLocal, onSalir }) {
 
   return (
     <div className="adv-contenedor">
-      {/* ---------------- BOTÓN Y MODAL DE AYUDA ---------------- */}
+      {/* BOTÓN Y MODAL DE AYUDA */}
       {mostrarAyuda && (
         <button
           type="button"
@@ -376,7 +377,7 @@ export default function AdivinaOnline({ onLocal, onSalir }) {
             <div className="modal-ayuda-cuerpo">
               <p><strong>1. Dinámica del juego:</strong></p>
               <ul>
-                <li>Elige si jugar a adivinar <strong>Canciones</strong> o <strong>Películas</strong>.</li>
+                <li>Elige si jugar a adivinar <strong>Canciones</strong> (modernas o clásicas) o <strong>Películas</strong>.</li>
                 <li><strong>Pulsa el botón rojo</strong> para parar el tiempo e introducir el título. Dispondrás de <strong>15 segundos</strong> para responder.</li>
                 <li>Si aciertas, ganas la ronda. Si fallas (o se te acaba el tiempo), quedas eliminado esa ronda.</li>
               </ul>
@@ -404,7 +405,6 @@ export default function AdivinaOnline({ onLocal, onSalir }) {
           </div>
         </div>
       )}
-      {/* ---------------- FIN AYUDA ---------------- */}
 
       {/* 1. MENÚ PRINCIPAL */}
       {vista === 'menu' && (
@@ -574,25 +574,51 @@ export default function AdivinaOnline({ onLocal, onSalir }) {
           <div className="panel" style={{ marginTop: '1rem' }}>
             <h3 className="panel-title"><Icon name="dice" size={20} /> Modalidad de juego</h3>
             {esAdmin ? (
-              <div className="adv-selector-modo">
-                <button
-                  type="button"
-                  className={`adv-btn-modo ${sala.modo === 'canciones' ? 'activo' : ''}`}
-                  onClick={() => handleCambiarModo('canciones')}
-                >
-                  🎵 Canciones
-                </button>
-                <button
-                  type="button"
-                  className={`adv-btn-modo ${sala.modo === 'peliculas' ? 'activo' : ''}`}
-                  onClick={() => handleCambiarModo('peliculas')}
-                >
-                  🎬 Películas
-                </button>
-              </div>
+              <>
+                <div className="adv-selector-modo">
+                  <button
+                    type="button"
+                    className={`adv-btn-modo ${sala.modo === 'canciones' ? 'activo' : ''}`}
+                    onClick={() => handleCambiarModo('canciones', sala.subcategoria || 'moderna')}
+                  >
+                    🎵 Canciones
+                  </button>
+                  <button
+                    type="button"
+                    className={`adv-btn-modo ${sala.modo === 'peliculas' ? 'activo' : ''}`}
+                    onClick={() => handleCambiarModo('peliculas', undefined)}
+                  >
+                    🎬 Películas
+                  </button>
+                </div>
+
+                {sala.modo === 'canciones' && (
+                  <div style={{ marginTop: '1rem' }}>
+                    <span className="field-label">Época de las canciones:</span>
+                    <div className="adv-selector-modo" style={{ gridTemplateColumns: '1fr 1fr', marginTop: '0.4rem' }}>
+                      <button
+                        type="button"
+                        className={`adv-btn-modo ${sala.subcategoria !== 'antigua' ? 'activo' : ''}`}
+                        onClick={() => handleCambiarModo('canciones', 'moderna')}
+                      >
+                        🔥 Actual / Urbana
+                      </button>
+                      <button
+                        type="button"
+                        className={`adv-btn-modo ${sala.subcategoria === 'antigua' ? 'activo' : ''}`}
+                        onClick={() => handleCambiarModo('canciones', 'antigua')}
+                      >
+                        📻 Clásica (80s, 90s, 2000s)
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </>
             ) : (
               <p className="hint" style={{ fontWeight: 700 }}>
-                Temática: {sala.modo === 'canciones' ? '🎵 Canciones' : '🎬 Películas'}
+                Temática: {sala.modo === 'canciones'
+                  ? `🎵 Canciones (${sala.subcategoria === 'antigua' ? 'Clásica: 80s-2000s' : 'Moderna / Actual'})`
+                  : '🎬 Películas'}
               </p>
             )}
           </div>
@@ -682,11 +708,12 @@ export default function AdivinaOnline({ onLocal, onSalir }) {
           <div className="hud">
             <span className="chip"><Icon name="flagFinish" size={18} />Ronda {sala.rondaNum}</span>
             <span className="chip alt">
-              {sala.modo === 'canciones' ? '🎵 Canción' : '🎬 Película'} · Pista {ronda.pistaActual}/3 ({ronda.pistaActual === 1 ? '10 pts' : ronda.pistaActual === 2 ? '5 pts' : '3 pts'})
+              {sala.modo === 'canciones'
+                ? `🎵 ${sala.subcategoria === 'antigua' ? 'Clásica' : 'Moderna'}`
+                : '🎬 Película'} · Pista {ronda.pistaActual}/3 ({ronda.pistaActual === 1 ? '10 pts' : ronda.pistaActual === 2 ? '5 pts' : '3 pts'})
             </span>
           </div>
 
-          {/* Marcador superior */}
           <div className="scoreboard-container" style={{ justifyContent: 'center', marginBottom: '0.8rem' }}>
             {sala.jugadores.map((j) => (
               <div key={j.id} className={`score-pill ${j.bloqueado ? 'locked' : ''}`}>
@@ -696,7 +723,6 @@ export default function AdivinaOnline({ onLocal, onSalir }) {
             ))}
           </div>
 
-          {/* Pistas */}
           <div className="panel adv-panel-pistas">
             <div className="adv-pista-caja activa">
               <span className="adv-pista-badge">
@@ -745,7 +771,6 @@ export default function AdivinaOnline({ onLocal, onSalir }) {
             )}
           </div>
 
-          {/* ZONA DE PULSADOR Y RESPUESTA ONLINE */}
           {ronda.estadoRonda === 'activa' ? (
             <div className="interactive-controls" style={{ marginTop: '0.8rem' }}>
               {!alguienHaPulsado && (
@@ -788,7 +813,6 @@ export default function AdivinaOnline({ onLocal, onSalir }) {
                       Escribe el título {sala.modo === 'canciones' ? 'de la canción' : 'de la película'}. Los demás ven lo que escribes en directo:
                     </p>
 
-                    {/* Temporizador de 15 segundos */}
                     <div
                       className="timer"
                       role="timer"
@@ -859,7 +883,6 @@ export default function AdivinaOnline({ onLocal, onSalir }) {
                     Tiempo detenido. Está escribiendo su respuesta en directo:
                   </p>
 
-                  {/* Temporizador de 15 segundos visible para los rivales */}
                   <div
                     className="timer"
                     role="timer"

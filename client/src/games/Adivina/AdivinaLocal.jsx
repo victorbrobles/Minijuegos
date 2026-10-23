@@ -9,10 +9,12 @@ const MIN_JUGADORES = 2;
 const MAX_JUGADORES = 15;
 
 export default function AdivinaLocal({ onVolver, onExit }) {
-  const [fase, setFase] = useState('setup'); // 'setup' | 'jugando' | 'resolucion' | 'final'
+  const [fase, setFase] = useState('setup');
   const [modalAyuda, setModalAyuda] = useState(false);
 
-  const [modo, setModo] = useState('canciones');
+  const [modo, setModo] = useState('canciones'); // 'canciones' | 'peliculas'
+  const [subcategoria, setSubcategoria] = useState('moderna'); // 'moderna' | 'antigua'
+
   const [numJugadores, setNumJugadores] = useState(4);
   const [jugadores, setJugadores] = useState([
     { id: 1, nombre: 'Jugador 1' },
@@ -99,7 +101,7 @@ export default function AdivinaLocal({ onVolver, onExit }) {
       const res = await fetch('/api/adivina/iniciar-ronda', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ modo, usados: listaUsados })
+        body: JSON.stringify({ modo, subcategoria, usados: listaUsados })
       });
       const data = await res.json();
 
@@ -139,7 +141,6 @@ export default function AdivinaLocal({ onVolver, onExit }) {
     setFeedbackError('');
   };
 
-  // Temporizador de 15 segundos al pulsar
   useEffect(() => {
     if (!pulsadorActivo) {
       setSegundosRespuesta(15);
@@ -179,7 +180,6 @@ export default function AdivinaLocal({ onVolver, onExit }) {
     const jId = jugadorSeleccionadoRef.current;
     const texto = inputRespuestaRef.current.trim();
 
-    // Si no se ha elegido jugador, simplemente se cierra el modal sin penalización
     if (!jId) {
       cancelarRespuesta();
       return;
@@ -192,10 +192,8 @@ export default function AdivinaLocal({ onVolver, onExit }) {
     }
 
     if (texto) {
-      // Si hay algo escrito y no se ha enviado, se envía como respuesta
       confirmarRespuestaJugador(jugador, texto);
     } else {
-      // Si no ha escrito nada, cuenta como fallo
       aplicarFallo(jugador, `¡${jugador.nombre} ha agotado el tiempo sin responder!`);
     }
   };
@@ -210,6 +208,7 @@ export default function AdivinaLocal({ onVolver, onExit }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           modo,
+          subcategoria,
           id: rondaData.id,
           respuesta: texto
         })
@@ -248,7 +247,7 @@ export default function AdivinaLocal({ onVolver, onExit }) {
       const res = await fetch('/api/adivina/solucion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ modo, id: rondaData.id })
+        body: JSON.stringify({ modo, subcategoria, id: rondaData.id })
       });
       const data = await res.json();
 
@@ -323,7 +322,7 @@ export default function AdivinaLocal({ onVolver, onExit }) {
                 <div className="modal-ayuda-cuerpo">
                   <p><strong>1. Dinámica del juego:</strong></p>
                   <ul>
-                    <li>Elige si jugar a adivinar <strong>Canciones</strong> o <strong>Películas</strong>.</li>
+                    <li>Elige si jugar a adivinar <strong>Canciones</strong> (modernas o clásicas) o <strong>Películas</strong>.</li>
                     <li><strong>Pulsa el botón rojo</strong> para parar el tiempo e introducir el título. Dispondrás de <strong>15 segundos</strong> para responder.</li>
                     <li>Si aciertas, ganas la ronda. Si fallas (o se te acaba el tiempo), quedas eliminado esa ronda.</li>
                   </ul>
@@ -384,6 +383,29 @@ export default function AdivinaLocal({ onVolver, onExit }) {
                 🎬 Películas
               </button>
             </div>
+
+            {/* Subcategoría de canciones si modo === 'canciones' */}
+            {modo === 'canciones' && (
+              <div style={{ marginTop: '1.2rem' }}>
+                <span className="field-label">Época musical:</span>
+                <div className="adv-selector-modo" style={{ gridTemplateColumns: '1fr 1fr', marginTop: '0.4rem' }}>
+                  <button
+                    type="button"
+                    className={`adv-btn-modo ${subcategoria === 'moderna' ? 'activo' : ''}`}
+                    onClick={() => setSubcategoria('moderna')}
+                  >
+                    🔥 Moderna (Actual / Urbana)
+                  </button>
+                  <button
+                    type="button"
+                    className={`adv-btn-modo ${subcategoria === 'antigua' ? 'activo' : ''}`}
+                    onClick={() => setSubcategoria('antigua')}
+                  >
+                    📻 Clásica (80s, 90s, 2000s)
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="panel">
@@ -425,17 +447,18 @@ export default function AdivinaLocal({ onVolver, onExit }) {
         </section>
       )}
 
-      {/* 2. EN JUEGO CON PULSADOR ROJO */}
+      {/* 2. EN JUEGO */}
       {fase === 'jugando' && rondaData && (
         <section className="game">
           <div className="hud">
             <span className="chip"><Icon name="flagFinish" size={18} />Ronda {rondaNum}</span>
             <span className="chip alt">
-              {modo === 'canciones' ? '🎵 Canción' : '🎬 Película'} · Pista {pistaActual}/3 ({pistaActual === 1 ? '10 pts' : pistaActual === 2 ? '5 pts' : '3 pts'})
+              {modo === 'canciones'
+                ? `🎵 ${subcategoria === 'antigua' ? 'Clásica' : 'Moderna'}`
+                : '🎬 Película'} · Pista {pistaActual}/3 ({pistaActual === 1 ? '10 pts' : pistaActual === 2 ? '5 pts' : '3 pts'})
             </span>
           </div>
 
-          {/* Marcador superior compacto */}
           <div className="scoreboard-container" style={{ justifyContent: 'center', marginBottom: '0.8rem' }}>
             {jugadores.map((j) => {
               const eliminado = bloqueados.includes(j.id);
@@ -448,7 +471,6 @@ export default function AdivinaLocal({ onVolver, onExit }) {
             })}
           </div>
 
-          {/* Pistas */}
           <div className="panel adv-panel-pistas">
             <div className="adv-pista-caja activa">
               <span className="adv-pista-badge">
@@ -497,7 +519,6 @@ export default function AdivinaLocal({ onVolver, onExit }) {
             )}
           </div>
 
-          {/* CONTROL DE PULSADOR ROJO */}
           <div className="interactive-controls" style={{ marginTop: '0.8rem' }}>
             {!pulsadorActivo ? (
               <div className="pulsador-container">
@@ -533,7 +554,6 @@ export default function AdivinaLocal({ onVolver, onExit }) {
                     Escribe el título y selecciona el jugador que responde:
                   </p>
 
-                  {/* Temporizador de 15 segundos */}
                   <div
                     className="timer"
                     role="timer"

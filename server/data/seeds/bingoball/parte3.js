@@ -1,208 +1,395 @@
 // server/data/seeds/bingoball/parte3.js
 
 export const BINGOS_LALIGA = [
-  // =========================================================================
-  // BINGO 1: El Clásico: Real Madrid vs FC Barcelona
-  // =========================================================================
   {
-    id: 'laliga_1',
+    id: 'laliga_unico',
     grupo: 'laliga',
-    titulo: 'LaLiga 1: El Clásico: Real Madrid vs FC Barcelona',
+    titulo: 'LaLiga Española: Reto de Primera División',
     categorias: [
-      { id: 'gol_en_el_clasico', nombre: 'Ha marcado gol en El Clásico', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Karim Benzema', 'Luis Suárez', 'Vinícius Júnior', 'Jude Bellingham', 'Robert Lewandowski', 'Lamine Yamal', 'Sergio Ramos', 'Gareth Bale', 'Neymar', 'Ronaldinho', 'Raúl González', 'Andrés Iniesta', 'Xavi Hernández', 'David Villa', 'Pedro Rodríguez', 'Ferran Torres', 'Pierre-Emerick Aubameyang', 'Marco Asensio', 'Lucas Vázquez', 'Casemiro', 'Marcelo', 'Raphaël Varane', 'Carles Puyol', 'Gerard Piqué', 'Ronaldo Nazário', 'Samuel Eto\'o', 'Luís Figo', 'Guti', 'Fernando Morientes'] },
-      { id: 'campeon_liga_con_madrid', nombre: 'Ha ganado La Liga con el Real Madrid', jugadores: ['Cristiano Ronaldo', 'Karim Benzema', 'Luka Modrić', 'Toni Kroos', 'Sergio Ramos', 'Vinícius Júnior', 'Jude Bellingham', 'Rodrygo', 'Casemiro', 'Marcelo', 'Dani Carvajal', 'Iker Casillas', 'Thibaut Courtois', 'Federico Valverde', 'Eduardo Camavinga', 'Éder Militão', 'David Alaba', 'Antonio Rüdiger', 'Nacho Fernández', 'Lucas Vázquez', 'Gareth Bale', 'Isco Alarcón', 'Marco Asensio', 'Keylor Navas', 'Raphaël Varane', 'Raúl González', 'Roberto Carlos', 'Guti', 'Mesut Özil', 'Ángel Di María', 'Xabi Alonso', 'Pepe', 'Fernando Hierro', 'Joselu Mato', 'Brahim Díaz'] },
-      { id: 'campeon_liga_con_barca', nombre: 'Ha ganado La Liga con el FC Barcelona', jugadores: ['Lionel Messi', 'Andrés Iniesta', 'Xavi Hernández', 'Gerard Piqué', 'Sergio Busquets', 'Luis Suárez', 'Neymar', 'Robert Lewandowski', 'Pedri', 'Gavi', 'Marc-André ter Stegen', 'Carles Puyol', 'Víctor Valdés', 'Dani Alves', 'Jordi Alba', 'Javier Mascherano', 'Pedro Rodríguez', 'David Villa', 'Ivan Rakitić', 'Samuel Eto\'o', 'Thierry Henry', 'Ronaldinho', 'Deco', 'Ronaldo Nazário', 'Rivaldo', 'Ronald Araújo', 'Alejandro Balde', 'Ferran Torres', 'Frenkie de Jong', 'Raphinha', 'Andreas Christensen', 'Jules Koundé', 'Sergi Roberto', 'Ousmane Dembélé'] },
-      { id: 'jugo_en_madrid_y_barca', nombre: 'Ha jugado en Real Madrid y FC Barcelona', jugadores: ['Ronaldo Nazário', 'Luís Figo', 'Luis Enrique', 'Michael Laudrup', 'Samuel Eto\'o', 'Javier Saviola', 'Albert Celades', 'Bernd Schuster', 'Gheorghe Hagi', 'Robert Prosinečki', 'Alfonso Pérez', 'Miquel Soler', 'Daniel García Lara'] },
-      { id: 'hat_trick_en_clasico', nombre: 'Ha marcado hat-trick en El Clásico', jugadores: ['Lionel Messi', 'Luis Suárez', 'Karim Benzema', 'Vinícius Júnior', 'Romário', 'Gary Lineker', 'Ferenc Puskás'] },
-      { id: 'expulsado_en_el_clasico', nombre: 'Ha sido expulsado en un Clásico', jugadores: ['Sergio Ramos', 'Gerard Piqué', 'Dani Carvajal', 'Pepe', 'Cristiano Ronaldo', 'Víctor Valdés', 'Iker Casillas', 'Lassana Diarra', 'Roberto Carlos'] },
-      { id: 'capitan_en_un_clasico', nombre: 'Ha portado el brazalete de capitán en un Clásico', jugadores: ['Sergio Ramos', 'Lionel Messi', 'Iker Casillas', 'Carles Puyol', 'Karim Benzema', 'Sergio Busquets', 'Luka Modrić', 'Xavi Hernández', 'Andrés Iniesta', 'Raúl González', 'Marc-André ter Stegen', 'Dani Carvajal', 'Nacho Fernández', 'Sergi Roberto'] },
-      { id: 'portero_en_el_clasico', nombre: 'Ha defendido la portería en El Clásico', jugadores: ['Iker Casillas', 'Víctor Valdés', 'Thibaut Courtois', 'Marc-André ter Stegen', 'Keylor Navas', 'Claudio Bravo', 'Andriy Lunin', 'Diego López', 'Wojciech Szczęsny', 'Jasper Cillessen'] },
-      { id: 'gol_en_su_primer_clasico', nombre: 'Marcó gol el día de su debut en El Clásico', jugadores: ['Jude Bellingham', 'Neymar', 'David Villa', 'Sergio Agüero', 'Pedro Rodríguez', 'Romário', 'Ferran Torres', 'Pierre-Emerick Aubameyang', 'Ruud van Nistelrooy'] },
-      { id: 'mas_30_clasicos_jugados', nombre: 'Más de 30 Clásicos oficiales disputados', jugadores: ['Sergio Ramos', 'Lionel Messi', 'Sergio Busquets', 'Karim Benzema', 'Gerard Piqué', 'Xavi Hernández', 'Iker Casillas', 'Andrés Iniesta', 'Manuel Sanchís', 'Paco Gento', 'Santillana', 'Luka Modrić', 'Dani Carvajal'] },
-      { id: 'asistencia_en_el_clasico', nombre: 'Ha dado al menos una asistencia en El Clásico', jugadores: ['Lionel Messi', 'Xavi Hernández', 'Andrés Iniesta', 'Karim Benzema', 'Dani Carvajal', 'Jordi Alba', 'Roberto Carlos', 'Marcelo', 'Luka Modrić', 'Dani Alves', 'Neymar', 'Luis Suárez', 'Vinícius Júnior', 'Ferran Torres', 'Rodrygo', 'Pedri', 'Mesut Özil', 'Ángel Di María'] },
-      { id: 'campeon_supercopa_espana_clasico', nombre: 'Ganó una Supercopa de España batiendo al eterno rival', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Karim Benzema', 'Gavi', 'Vinícius Júnior', 'Sergio Ramos', 'Luka Modrić', 'Pedri', 'Robert Lewandowski', 'Rodrygo', 'Dani Carvajal', 'Marc-André ter Stegen', 'Thibaut Courtois', 'Xavi Hernández', 'Andrés Iniesta', 'Casemiro', 'Marcelo'] },
-      { id: 'gol_en_el_bernabeu_con_el_barca', nombre: 'Marcó gol en el Santiago Bernabéu con el Barça', jugadores: ['Lionel Messi', 'Luis Suárez', 'Ronaldinho', 'Andrés Iniesta', 'Lamine Yamal', 'Robert Lewandowski', 'Pierre-Emerick Aubameyang', 'Ferran Torres', 'Pedro Rodríguez', 'David Villa', 'Carles Puyol', 'Gerard Piqué', 'Neymar', 'Raphinha', 'Cesc Fàbregas'] },
-      { id: 'gol_en_el_camp_nou_con_el_madrid', nombre: 'Marcó gol en el Camp Nou con el Real Madrid', jugadores: ['Cristiano Ronaldo', 'Karim Benzema', 'Gareth Bale', 'Sergio Ramos', 'Jude Bellingham', 'David Alaba', 'Lucas Vázquez', 'Vinícius Júnior', 'Marco Asensio', 'Raphaël Varane', 'Sami Khedira', 'Raúl González', 'Roberto Carlos', 'Zinedine Zidane'] },
-      { id: 'ovacionado_en_estadio_rival', nombre: 'Ovacionado por la afición rival en un Clásico', jugadores: ['Ronaldinho', 'Andrés Iniesta', 'Diego Maradona', 'Laurie Cunningham'] },
-      { id: 'doblete_en_el_clasico', nombre: 'Marcó dos goles en un mismo partido de Clásico', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Karim Benzema', 'Luis Suárez', 'Robert Lewandowski', 'Jude Bellingham', 'Pierre-Emerick Aubameyang', 'Raúl González', 'Ronaldinho', 'Thierry Henry'] },
-      { id: 'campeon_copa_rey_final_clasico', nombre: 'Ganó la Copa del Rey venciendo al eterno rival en la final', jugadores: ['Cristiano Ronaldo', 'Karim Benzema', 'Gareth Bale', 'Iker Casillas', 'Sergio Ramos', 'Marcelo', 'Dani Carvajal', 'Luka Modrić', 'Xabi Alonso', 'Ángel Di María', 'Pepe', 'Lionel Messi', 'Xavi Hernández'] },
-      { id: 'canterano_goleador_clasico', nombre: 'Canterano formado en La Masia o La Fábrica que marcó en el Clásico', jugadores: ['Lionel Messi', 'Raúl González', 'Lamine Yamal', 'Pedro Rodríguez', 'Carles Puyol', 'Gerard Piqué', 'Sergi Roberto', 'Lucas Vázquez', 'Marc Bartra', 'Fermín López'] },
-      { id: 'defensa_goleador_clasico', nombre: 'Defensa que ha marcado gol en El Clásico', jugadores: ['Sergio Ramos', 'Gerard Piqué', 'Carles Puyol', 'Roberto Carlos', 'Dani Alves', 'David Alaba', 'Lucas Vázquez', 'Marc Bartra', 'Jérémy Mathieu', 'Raphaël Varane'] },
-      { id: 'penalti_marcado_clasico', nombre: 'Ha marcado gol de penalti en un Clásico', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Luis Suárez', 'Karim Benzema', 'Sergio Ramos'] },
-      { id: 'titular_con_menos_20_clasico', nombre: 'Titular en El Clásico con menos de 20 años', jugadores: ['Lamine Yamal', 'Gavi', 'Pedri', 'Ansu Fati', 'Pau Cubarsí', 'Vinícius Júnior', 'Rodrygo', 'Eduardo Camavinga', 'Lionel Messi', 'Raúl González', 'Iker Casillas'] },
-      { id: 'jugo_el_2_6_bernabeu', nombre: 'Disputó el histórico 2-6 de 2009 en el Bernabéu', jugadores: ['Lionel Messi', 'Thierry Henry', 'Samuel Eto\'o', 'Carles Puyol', 'Gerard Piqué', 'Xavi Hernández', 'Andrés Iniesta', 'Dani Alves', 'Eric Abidal', 'Víctor Valdés', 'Iker Casillas', 'Sergio Ramos', 'Raúl González', 'Gonzalo Higuaín', 'Arjen Robben', 'Fernando Gago', 'Lassana Diarra', 'Marcelo'] },
-      { id: 'jugo_el_5_0_camp_nou', nombre: 'Disputó el histórico 5-0 de 2010 en el Camp Nou', jugadores: ['Lionel Messi', 'David Villa', 'Pedro Rodríguez', 'Xavi Hernández', 'Jeffrén Suárez', 'Andrés Iniesta', 'Carles Puyol', 'Gerard Piqué', 'Sergio Busquets', 'Dani Alves', 'Eric Abidal', 'Víctor Valdés', 'Cristiano Ronaldo', 'Karim Benzema', 'Mesut Özil', 'Ángel Di María', 'Xabi Alonso', 'Sami Khedira', 'Sergio Ramos', 'Pepe', 'Marcelo', 'Iker Casillas'] },
-      { id: 'asistente_tres_clasicos_distintos', nombre: 'Ha dado asistencias en 3 o más ediciones de El Clásico', jugadores: ['Lionel Messi', 'Xavi Hernández', 'Andrés Iniesta', 'Karim Benzema', 'Dani Carvajal', 'Jordi Alba', 'Roberto Carlos', 'Marcelo'] },
-      { id: 'gol_tiro_libre_clasico', nombre: 'Marcó gol de falta directa en El Clásico', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Ronaldinho', 'Roberto Carlos', 'Rivaldo'] },
-      { id: 'fichaje_mas_100m_clasico', nombre: 'Fichaje de más de 100M€ que disputó El Clásico', jugadores: ['Jude Bellingham', 'Eden Hazard', 'Gareth Bale', 'Cristiano Ronaldo', 'Philippe Coutinho', 'Antoine Griezmann', 'Ousmane Dembélé'] },
-      { id: 'ganador_balon_oro_jugando_clasico', nombre: 'Disputó El Clásico habiendo ganado o ganando después el Balón de Oro', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Karim Benzema', 'Luka Modrić', 'Ronaldinho', 'Zinedine Zidane', 'Ronaldo Nazário', 'Luís Figo', 'Rivaldo', 'Hristo Stoichkov', 'Michael Laudrup'] },
-      { id: 'marcador_en_ambas_porterias_clasico', nombre: 'Marcó gol en el Bernabéu y también en el Camp Nou / Montjuïc', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Karim Benzema', 'Luis Suárez', 'Robert Lewandowski', 'Gareth Bale', 'Raúl González'] },
-      { id: 'entrenador_y_jugador_clasico', nombre: 'Ha disputado El Clásico como jugador y también como entrenador', jugadores: ['Zinedine Zidane', 'Xavi Hernández', 'Pep Guardiola', 'Luis Enrique', 'Ronald Koeman', 'Bernd Schuster', 'Vicente del Bosque'] },
-      { id: 'portero_penalti_parado_clasico', nombre: 'Paró un penalti durante el desarrollo de un Clásico', jugadores: ['Iker Casillas', 'Víctor Valdés', 'Thibaut Courtois'] }
-    ]
-  },
-
-  // =========================================================================
-  // BINGO 2: Premios Individuales: Pichichis, Zamoras y Zarras
-  // =========================================================================
-  {
-    id: 'laliga_2',
-    grupo: 'laliga',
-    titulo: 'LaLiga 2: Premios de Oro: Pichichis, Zamoras y Zarras',
-    categorias: [
-      { id: 'ganador_trofeo_pichichi', nombre: 'Ha ganado el Trofeo Pichichi', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Karim Benzema', 'Robert Lewandowski', 'Artem Dovbyk', 'Luis Suárez', 'Diego Forlán', 'Samuel Eto\'o', 'Ruud van Nistelrooy', 'Ronaldo Nazário', 'Raúl González', 'Roy Makaay', 'Christian Vieri', 'Romário', 'Hugo Sánchez', 'Quini', 'Mario Kempes', 'Telmo Zarra', 'Alfredo Di Stéfano', 'Daniel Güiza'] },
-      { id: 'ganador_trofeo_zamora', nombre: 'Ha ganado el Trofeo Zamora', jugadores: ['Thibaut Courtois', 'Marc-André ter Stegen', 'Jan Oblak', 'Yassine Bounou', 'Unai Simón', 'Claudio Bravo', 'Iker Casillas', 'Víctor Valdés', 'Santiago Cañizares', 'José Francisco Molina', 'Jacques Songo\'o', 'Francisco Liaño', 'Andoni Zubizarreta', 'Juan Carlos Ablanedo', 'Antoni Ramallets'] },
-      { id: 'ganador_trofeo_zarra', nombre: 'Ha ganado el Trofeo Zarra (máximo goleador español)', jugadores: ['Iago Aspas', 'Gerard Moreno', 'Borja Mayoral', 'Aritz Aduriz', 'David Villa', 'Álvaro Morata', 'Roberto Soldado', 'Daniel Güiza', 'Raúl Tamudo'] },
-      { id: 'mas_tres_pichichis', nombre: 'Ha ganado 3 o más Trofeos Pichichi', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Telmo Zarra', 'Hugo Sánchez', 'Alfredo Di Stéfano', 'Quini'] },
-      { id: 'mas_tres_zamoras', nombre: 'Ha ganado 3 o más Trofeos Zamora', jugadores: ['Jan Oblak', 'Víctor Valdés', 'Antoni Ramallets', 'Juan Carlos Ablanedo', 'Santiago Cañizares', 'Thibaut Courtois'] },
-      { id: 'mas_tres_zarras', nombre: 'Ha ganado 3 o más Trofeos Zarra', jugadores: ['Iago Aspas', 'David Villa'] },
-      { id: 'bota_oro_laliga', nombre: 'Bota de Oro europea jugando en La Liga', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Luis Suárez', 'Diego Forlán', 'Roy Makaay', 'Hugo Sánchez'] },
-      { id: 'rey_asistencias_laliga', nombre: 'Máximo asistente de una temporada de La Liga', jugadores: ['Lionel Messi', 'Luis Suárez', 'Xavi Hernández', 'Mesut Özil', 'Ángel Di María', 'Antoine Griezmann', 'Vinícius Júnior', 'Raphinha', 'Álex Baena', 'Koke Resurrección', 'Dani Alves'] },
-      { id: 'mejor_jugador_laliga', nombre: 'Elegido Mejor Jugador de la temporada de La Liga', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Antoine Griezmann', 'Karim Benzema', 'Jude Bellingham'] },
-      { id: 'jugador_revelacion_laliga', nombre: 'Premio revelación o mejor jugador joven de La Liga', jugadores: ['Lamine Yamal', 'Pedri', 'Gavi', 'Isco Alarcón', 'Sergio Ramos', 'Javi Martínez', 'Gerard Deulofeu', 'Nico Williams'] },
-      { id: 'pichichi_mas_40_goles', nombre: 'Marcó más de 40 goles en una sola Liga', jugadores: ['Lionel Messi', 'Cristiano Ronaldo'] },
-      { id: 'pichichi_mas_30_goles', nombre: 'Marcó más de 30 goles en una sola edición de La Liga', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Luis Suárez', 'Diego Forlán', 'Samuel Eto\'o', 'Ronaldo Nazário', 'Romário', 'Hugo Sánchez', 'Baltazar'] },
-      { id: 'zamora_menos_20_goles', nombre: 'Ganó el Zamora encajando menos de 20 goles', jugadores: ['Jan Oblak', 'Marc-André ter Stegen', 'Francisco Liaño'] },
-      { id: 'portero_ataja_penaltis_laliga', nombre: 'Famoso especialista en parar penaltis en La Liga', jugadores: ['Diego Alves', 'Jan Oblak', 'Thibaut Courtois', 'Sergio Asenjo', 'Unai Simón', 'Claudio Bravo', 'Keylor Navas', 'Andrés Palop'] },
-      { id: 'doblete_pichichi_asistencias', nombre: 'Fue máximo goleador y máximo asistente la misma temporada', jugadores: ['Lionel Messi', 'Luis Suárez'] },
-      { id: 'pichichi_no_madrid_barca', nombre: 'Pichichi con club distinto a Real Madrid o Barcelona', jugadores: ['Artem Dovbyk', 'Diego Forlán', 'Daniel Güiza', 'Roy Makaay', 'Salva Ballesta', 'Christian Vieri', 'Luboslav Penev', 'Juan Antonio Pizzi'] },
-      { id: 'zamora_no_madrid_barca', nombre: 'Zamora con club distinto a Real Madrid o Barcelona', jugadores: ['Jan Oblak', 'Unai Simón', 'Yassine Bounou', 'Santiago Cañizares', 'José Francisco Molina', 'Jacques Songo\'o', 'Francisco Liaño', 'Juan Carlos Ablanedo', 'Pablo Cavallero'] },
-      { id: 'gol_mas_rapido_laliga_b2', nombre: 'Marcó gol antes del primer minuto de juego en La Liga', jugadores: ['Joseba Llorente', 'Seydou Keita', 'Ángel Correa', 'Dario Silva', 'Morten Skoubo'] },
-      { id: 'hat_trick_laliga_b2', nombre: 'Ha marcado hat-trick en un partido de La Liga', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Luis Suárez', 'Karim Benzema', 'Robert Lewandowski', 'Antoine Griezmann', 'Vinícius Júnior', 'Iago Aspas', 'Aritz Aduriz', 'Radamel Falcao', 'Wissam Ben Yedder', 'Gerard Moreno', 'Cristhian Stuani', 'Alexander Sørloth'] },
-      { id: 'cinco_goles_partido_laliga', nombre: 'Marcó 5 goles en un solo partido de La Liga', jugadores: ['Cristiano Ronaldo', 'Radamel Falcao', 'Fernando Morientes', 'Bebeto', 'Alen Peternac'] },
-      { id: 'cuatro_goles_partido_laliga', nombre: 'Marcó 4 goles en un solo partido de La Liga', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Luis Suárez', 'Antoine Griezmann', 'Alexander Sørloth', 'Valentín Castellanos', 'Diego Milito', 'Júlio Baptista'] },
-      { id: 'mas_penaltis_marcados_laliga_b2', nombre: 'Entre los máximos goleadores históricos de penalti en La Liga', jugadores: ['Cristiano Ronaldo', 'Lionel Messi', 'Hugo Sánchez', 'Karim Benzema', 'Iago Aspas', 'Ronald Koeman', 'Dani Parejo'] },
-      { id: 'gol_tiro_libre_laliga', nombre: 'Más de 10 goles de tiro libre directo en La Liga', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Roberto Carlos', 'Ronaldinho', 'Rivaldo', 'Duda', 'Beñat Etxebarria', 'Juan Arango'] },
-      { id: 'zarra_consecutivo', nombre: 'Ganó el Trofeo Zarra en temporadas consecutivas', jugadores: ['Iago Aspas', 'David Villa', 'Aritz Aduriz', 'Gerard Moreno'] },
-      { id: 'pichichi_espanol', nombre: 'Futbolista español que conquistó el Trofeo Pichichi', jugadores: ['Daniel Güiza', 'Raúl González', 'Emilio Butragueño', 'Poli Rincón', 'Quini', 'Telmo Zarra', 'Amancio Amaro'] },
-      { id: 'portero_mas_porterias_cero_temporada', nombre: 'Más de 20 partidos imbatido en una sola Liga', jugadores: ['Marc-André ter Stegen', 'Jan Oblak', 'Claudio Bravo', 'Thibaut Courtois', 'Francisco Liaño'] },
-      { id: 'jugador_del_mes_laliga_tres_veces', nombre: 'Elegido Jugador del Mes de La Liga (POTM) 3 o más veces', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Antoine Griezmann', 'Karim Benzema', 'Iago Aspas', 'Luis Suárez'] },
-      { id: 'pichichi_extranjero_debutante', nombre: 'Ganó el Pichichi en su primera temporada en La Liga', jugadores: ['Robert Lewandowski', 'Artem Dovbyk', 'Ruud van Nistelrooy', 'Ronaldo Nazário', 'Romário', 'Christian Vieri'] },
-      { id: 'zarra_con_club_gallego_o_vasco', nombre: 'Ganó el Trofeo Zarra con Celta o Athletic Club', jugadores: ['Iago Aspas', 'Aritz Aduriz'] },
-      { id: 'mas_30_asistencias_totales_laliga', nombre: 'Más de 30 asistencias registradas en su carrera en La Liga', jugadores: ['Lionel Messi', 'Xavi Hernández', 'Andrés Iniesta', 'Karim Benzema', 'Cristiano Ronaldo', 'Dani Alves', 'Koke Resurrección', 'Antoine Griezmann', 'Iago Aspas', 'Jesús Navas', 'Jordi Alba', 'Marcelo', 'Dani Parejo'] }
-    ]
-  },
-
-  // =========================================================================
-  // BINGO 3: Derbis Regionales y Clubes Históricos
-  // =========================================================================
-  {
-    id: 'laliga_3',
-    grupo: 'laliga',
-    titulo: 'LaLiga 3: Derbis Regionales y Clubes Históricos',
-    categorias: [
-      { id: 'campeon_con_el_atletico', nombre: 'Campeón de Liga con el Atlético de Madrid', jugadores: ['Antoine Griezmann', 'Luis Suárez', 'Koke Resurrección', 'Jan Oblak', 'Diego Godín', 'Ángel Correa', 'Stefan Savić', 'Marcos Llorente', 'Yannick Carrasco', 'Gabi Fernández', 'Filipe Luís', 'Miranda', 'Juanfran Torres', 'Raúl García', 'Tiago Mendes', 'David Villa', 'Arda Turan', 'Thibaut Courtois', 'José María Giménez', 'Mario Hermoso', 'Kieran Trippier'] },
-      { id: 'jugo_derbi_madrileno', nombre: 'Ha disputado el Derbi Madrileño (Real Madrid vs Atleti)', jugadores: ['Cristiano Ronaldo', 'Sergio Ramos', 'Karim Benzema', 'Antoine Griezmann', 'Koke Resurrección', 'Jan Oblak', 'Luka Modrić', 'Thibaut Courtois', 'Diego Godín', 'Fernando Torres', 'Álvaro Morata', 'Marcos Llorente', 'Gareth Bale', 'Marcelo', 'Casemiro', 'Ángel Correa', 'Stefan Savić', 'Dani Carvajal', 'Vinícius Júnior', 'Jude Bellingham'] },
-      { id: 'leyenda_athletic_club', nombre: 'Ha vestido la camiseta del Athletic Club', jugadores: ['Aritz Aduriz', 'Iker Muniain', 'Iñaki Williams', 'Nico Williams', 'Unai Simón', 'Aymeric Laporte', 'Fernando Llorente', 'Kepa Arrizabalaga', 'Julen Guerrero', 'Gorka Iraizoz', 'Markel Susaeta', 'Óscar de Marcos', 'Mikel San José', 'Dani Vivian', 'Oihan Sancet', 'Aitor Paredes', 'Yeray Álvarez', 'Ander Herrera'] },
-      { id: 'leyenda_real_sociedad', nombre: 'Ha jugado en la Real Sociedad', jugadores: ['Mikel Oyarzabal', 'Mikel Merino', 'Martín Zubimendi', 'Takefusa Kubo', 'Antoine Griezmann', 'Alexander Isak', 'David Silva', 'Xabi Alonso', 'Claudio Bravo', 'Asier Illarramendi', 'Carlos Vela', 'Robin Le Normand', 'Álex Remiro', 'Brais Méndez', 'Igor Zubeldia', 'Aritz Elustondo', 'Darko Kovačević', 'Nihat Kahveci'] },
-      { id: 'jugo_el_derbi_vasco', nombre: 'Ha disputado el Derbi Vasco (Athletic vs Real Sociedad)', jugadores: ['Iker Muniain', 'Aritz Aduriz', 'Nico Williams', 'Iñaki Williams', 'Mikel Oyarzabal', 'Mikel Merino', 'Martín Zubimendi', 'Unai Simón', 'Iñigo Martínez', 'Álex Remiro', 'Robin Le Normand', 'Takefusa Kubo', 'Dani Vivian', 'Oihan Sancet', 'Óscar de Marcos', 'Asier Illarramendi'] },
-      { id: 'jugo_en_sevilla_o_betis', nombre: 'Ha jugado en Sevilla FC o Real Betis', jugadores: ['Jesús Navas', 'Ivan Rakitić', 'Sergio Ramos', 'Joaquín Sánchez', 'Nabil Fekir', 'Isco Alarcón', 'Yassine Bounou', 'Youssef En-Nesyri', 'Luuk de Jong', 'Éver Banega', 'Frédéric Kanouté', 'Luis Fabiano', 'Dani Alves', 'Marcos Acuña', 'Lucas Ocampos', 'Borja Iglesias', 'Sergio Canales', 'Marc Bartra', 'Guido Rodríguez', 'Germán Pezzella', 'Ayoze Pérez', 'Giovani Lo Celso'] },
-      { id: 'jugo_el_gran_derbi_sevillano', nombre: 'Ha disputado El Gran Derbi (Sevilla vs Betis)', jugadores: ['Jesús Navas', 'Joaquín Sánchez', 'Ivan Rakitić', 'Nabil Fekir', 'Sergio Ramos', 'Isco Alarcón', 'Yassine Bounou', 'Youssef En-Nesyri', 'Borja Iglesias', 'Sergio Canales', 'Marc Bartra', 'Lucas Ocampos', 'Marcos Acuña', 'Guido Rodríguez', 'Germán Pezzella'] },
-      { id: 'leyenda_valencia_cf', nombre: 'Ha jugado en el Valencia CF', jugadores: ['David Villa', 'David Silva', 'Santiago Cañizares', 'Roberto Ayala', 'Rubén Baraja', 'Carlos Soler', 'Gonçalo Guedes', 'Paco Alcácer', 'Dani Parejo', 'José Gayà', 'Rodrigo Moreno', 'Juan Mata', 'Jordi Alba', 'Éver Banega', 'Geoffrey Kondogbia', 'Gabriel Paulista', 'Giorgi Mamardashvili', 'Pablo Aimar', 'Claudio López'] },
-      { id: 'leyenda_villarreal_cf', nombre: 'Ha jugado en el Villarreal CF', jugadores: ['Gerard Moreno', 'Pau Torres', 'Diego Forlán', 'Santi Cazorla', 'Juan Román Riquelme', 'Marcos Senna', 'Dani Parejo', 'Pepe Reina', 'Raúl Albiol', 'Samu Chukwueze', 'Yeremy Pino', 'Álex Baena', 'Manu Trigueros', 'Sergio Asenjo', 'Bruno Soriano', 'Giuseppe Rossi', 'Arnaut Danjuma', 'Alexander Sørloth'] },
-      { id: 'derbi_de_la_comunitat', nombre: 'Ha disputado el Derbi de la Comunitat (Valencia vs Villarreal)', jugadores: ['Dani Parejo', 'Paco Alcácer', 'Raúl Albiol', 'José Gayà', 'Gerard Moreno', 'Pau Torres', 'Carlos Soler', 'Santi Cazorla', 'Diego Forlán', 'David Silva', 'David Villa'] },
-      { id: 'girona_historico_2024', nombre: 'Formó parte del histórico Girona 2023-24', jugadores: ['Artem Dovbyk', 'Sávio Moreira', 'Aleix García', 'Cristhian Stuani', 'Viktor Tsygankov', 'Miguel Gutiérrez', 'Yan Couto', 'Eric García', 'Daley Blind', 'Paulo Gazzaniga', 'Iván Martín', 'Yangel Herrera'] },
-      { id: 'campeon_copa_rey_no_clasico', nombre: 'Ganó la Copa del Rey con Betis, Sevilla, Athletic, Valencia o Real Sociedad', jugadores: ['Joaquín Sánchez', 'Nabil Fekir', 'Jesús Navas', 'Iker Muniain', 'Nico Williams', 'Unai Simón', 'Iñaki Williams', 'Dani Vivian', 'Mikel Oyarzabal', 'Mikel Merino', 'Martín Zubimendi', 'Dani Parejo', 'Gonçalo Guedes', 'Carlos Soler', 'José Gayà', 'Rodrigo Moreno', 'Ivan Rakitić', 'Frédéric Kanouté', 'Luis Fabiano'] },
-      { id: 'campeon_europa_league_laliga', nombre: 'Ganó la Europa League con Sevilla, Atlético o Villarreal', jugadores: ['Jesús Navas', 'Ivan Rakitić', 'Yassine Bounou', 'Youssef En-Nesyri', 'Lucas Ocampos', 'Marcos Acuña', 'Éver Banega', 'Antoine Griezmann', 'Diego Godín', 'Koke Resurrección', 'Jan Oblak', 'Gabi Fernández', 'Radamel Falcao', 'Gerard Moreno', 'Pau Torres', 'Raúl Albiol', 'Dani Parejo', 'Yeremy Pino'] },
-      { id: 'icono_celta_de_vigo', nombre: 'Ha jugado en el RC Celta de Vigo', jugadores: ['Iago Aspas', 'Alexander Mostovoi', 'Valery Karpin', 'Nolito', 'Hugo Mallo', 'Brais Méndez', 'Maxi Gómez', 'Stanislav Lobotka', 'Borja Oubiña', 'Gustavo López', 'Denis Suárez', 'Jørgen Strand Larsen'] },
-      { id: 'icono_rcd_espanyol', nombre: 'Ha jugado en el RCD Espanyol', jugadores: ['Raúl Tamudo', 'Sergi Darder', 'Gerard Moreno', 'Joselu Mato', 'Borja Iglesias', 'Diego López', 'Mauricio Pochettino', 'Iván de la Peña', 'Luis García Fernández', 'Carlos Kameni'] },
-      { id: 'jugo_derbi_barcelones', nombre: 'Ha disputado el Derbi Barcelonés (Barça vs Espanyol)', jugadores: ['Lionel Messi', 'Gerard Piqué', 'Sergio Busquets', 'Andrés Iniesta', 'Xavi Hernández', 'Jordi Alba', 'Raúl Tamudo', 'Sergi Darder', 'Diego López', 'Gerard Moreno', 'Joselu Mato', 'Iván de la Peña'] },
-      { id: 'icono_osasuna', nombre: 'Ha jugado en el CA Osasuna', jugadores: ['Chimy Ávila', 'Ante Budimir', 'Rubén García', 'David García', 'Roberto Torres', 'Patxi Puñal', 'Raúl García', 'Nacho Monreal', 'César Azpilicueta', 'Javier Camuñas'] },
-      { id: 'icono_mallorca', nombre: 'Ha jugado en el RCD Mallorca', jugadores: ['Samuel Eto\'o', 'Daniel Güiza', 'Aritz Aduriz', 'Vedat Muriqi', 'Marco Asensio', 'Predrag Rajković', 'Dani Rodríguez', 'Pablo Maffeo', 'Juan Arango', 'Miguel Ángel Nadal'] },
-      { id: 'jugo_tres_clubes_laliga', nombre: 'Ha jugado en 3 o más clubes diferentes de La Liga', jugadores: ['David Villa', 'Diego Forlán', 'Isco Alarcón', 'Álvaro Morata', 'Joselu Mato', 'Paco Alcácer', 'Gerard Moreno', 'Borja Iglesias', 'Santi Cazorla', 'Denis Suárez', 'Munir El Haddadi', 'Sandro Ramírez', 'Rubén Rochina'] },
-      { id: 'jugo_atleti_y_otro_grande', nombre: 'Ha jugado en el Atlético de Madrid y también en Madrid o Barça', jugadores: ['Thibaut Courtois', 'Álvaro Morata', 'Marcos Llorente', 'Sergio Reguilón', 'Hugo Sánchez', 'Bernd Schuster', 'Raúl González', 'Luis Suárez', 'Antoine Griezmann', 'David Villa', 'Arda Turan', 'Memphis Depay'] },
-      { id: 'marcador_derbi_madrileno', nombre: 'Ha marcado gol en el Derbi Madrileño', jugadores: ['Cristiano Ronaldo', 'Karim Benzema', 'Sergio Ramos', 'Antoine Griezmann', 'Diego Godín', 'Álvaro Morata', 'Koke Resurrección', 'Ángel Correa', 'Fernando Torres', 'Diego Costa', 'Vinícius Júnior', 'Rodrygo', 'Jude Bellingham'] },
-      { id: 'marcador_derbi_sevillano', nombre: 'Ha marcado gol en El Gran Derbi', jugadores: ['Jesús Navas', 'Ivan Rakitić', 'Joaquín Sánchez', 'Nabil Fekir', 'Youssef En-Nesyri', 'Luuk de Jong', 'Borja Iglesias', 'Sergio Canales', 'Ayoze Pérez'] },
-      { id: 'marcador_derbi_vasco', nombre: 'Ha marcado gol en el Derbi Vasco', jugadores: ['Aritz Aduriz', 'Iker Muniain', 'Iñaki Williams', 'Nico Williams', 'Mikel Oyarzabal', 'Mikel Merino', 'Alexander Isak', 'Willian José', 'Takefusa Kubo', 'Oihan Sancet'] },
-      { id: 'campeon_intertoto_o_conferencia', nombre: 'Ha ganado torneos europeos menores con clubes de La Liga', jugadores: ['Marcos Senna', 'Diego Forlán', 'Pepe Reina', 'Santiago Cañizares', 'Roberto Ayala'] },
-      { id: 'descendido_y_campeon_laliga', nombre: 'Vivió un descenso a Segunda y también fue campeón de Primera en su carrera', jugadores: ['Koke Resurrección', 'Antoine Griezmann', 'Diego Godín', 'Isco Alarcón', 'Marcos Llorente', 'Joselu Mato'] },
-      { id: 'mas_100_partidos_atleti', nombre: 'Más de 100 partidos oficiales con el Atlético de Madrid', jugadores: ['Koke Resurrección', 'Jan Oblak', 'Antoine Griezmann', 'Diego Godín', 'Ángel Correa', 'Stefan Savić', 'José María Giménez', 'Saúl Ñíguez', 'Gabi Fernández', 'Juanfran Torres', 'Filipe Luís', 'Fernando Torres'] },
-      { id: 'mas_100_partidos_sevilla', nombre: 'Más de 100 partidos oficiales con el Sevilla FC', jugadores: ['Jesús Navas', 'Ivan Rakitić', 'Yassine Bounou', 'Youssef En-Nesyri', 'Lucas Ocampos', 'Marcos Acuña', 'Éver Banega', 'Frédéric Kanouté', 'Luis Fabiano', 'Sergio Ramos', 'Dani Alves'] },
-      { id: 'mas_100_partidos_betis', nombre: 'Más de 100 partidos oficiales con el Real Betis', jugadores: ['Joaquín Sánchez', 'Nabil Fekir', 'Borja Iglesias', 'Sergio Canales', 'Marc Bartra', 'Guido Rodríguez', 'Germán Pezzella', 'Andrés Guardado', 'Rui Silva'] },
-      { id: 'mas_100_partidos_athletic', nombre: 'Más de 100 partidos oficiales con el Athletic Club', jugadores: ['Iker Muniain', 'Aritz Aduriz', 'Iñaki Williams', 'Nico Williams', 'Unai Simón', 'Óscar de Marcos', 'Mikel San José', 'Markel Susaeta', 'Gorka Iraizoz', 'Dani Vivian', 'Yeray Álvarez'] },
-      { id: 'mas_100_partidos_real_sociedad', nombre: 'Más de 100 partidos oficiales con la Real Sociedad', jugadores: ['Mikel Oyarzabal', 'Mikel Merino', 'Martín Zubimendi', 'Robin Le Normand', 'Álex Remiro', 'Aritz Elustondo', 'Igor Zubeldia', 'Asier Illarramendi', 'Antoine Griezmann', 'Carlos Vela', 'Xabi Alonso'] }
-    ]
-  },
-
-  // =========================================================================
-  // BINGO 4: Canteras de Oro: La Masia, La Fábrica y Sellos Propios
-  // =========================================================================
-  {
-    id: 'laliga_4',
-    grupo: 'laliga',
-    titulo: 'LaLiga 4: Canteras de Oro: La Masia, La Fábrica y Canteras Propias',
-    categorias: [
-      { id: 'canterano_la_masia', nombre: 'Canterano formado en La Masia del Barça', jugadores: ['Lionel Messi', 'Andrés Iniesta', 'Xavi Hernández', 'Sergio Busquets', 'Gerard Piqué', 'Carles Puyol', 'Lamine Yamal', 'Gavi', 'Alejandro Balde', 'Pedro Rodríguez', 'Pau Cubarsí', 'Fermín López', 'Víctor Valdés', 'Cesc Fàbregas', 'Jordi Alba', 'Thiago Alcántara', 'Sergi Roberto', 'Bojan Krkić', 'Ansu Fati', 'Marc Bartra', 'Pepe Reina', 'Mikel Arteta', 'Guillermo Amor', 'Albert Ferrer'] },
-      { id: 'canterano_la_fabrica', nombre: 'Canterano formado en La Fábrica del Real Madrid', jugadores: ['Raúl González', 'Iker Casillas', 'Dani Carvajal', 'Nacho Fernández', 'Lucas Vázquez', 'Álvaro Morata', 'Borja Mayoral', 'Marcos Llorente', 'Guti', 'Emilio Butragueño', 'Manuel Sanchís', 'Míchel González', 'Dani Parejo', 'Pablo Sarabia', 'Mario Hermoso', 'Álvaro Arbeloa', 'Raúl Albiol', 'Juan Mata', 'Esteban Granero', 'José Callejón', 'Rodrigo Moreno', 'Fran García', 'Nico Paz'] },
-      { id: 'la_masia_campeon_mundo', nombre: 'Canterano de La Masia campeón del Mundo', jugadores: ['Xavi Hernández', 'Andrés Iniesta', 'Carles Puyol', 'Gerard Piqué', 'Sergio Busquets', 'Pedro Rodríguez', 'Cesc Fàbregas', 'Víctor Valdés', 'Pepe Reina', 'Lionel Messi', 'Lamine Yamal', 'Pau Cubarsí', 'Fermín López'] },
-      { id: 'la_fabrica_campeon_mundo', nombre: 'Canterano de La Fábrica campeón del Mundo', jugadores: ['Iker Casillas', 'Álvaro Arbeloa', 'Raúl Albiol', 'Juan Mata', 'Dani Carvajal'] },
-      { id: 'oro_olimpico_canterano_espanol', nombre: 'Canterano español con medalla de oro olímpica', jugadores: ['Lionel Messi', 'Fermín López', 'Pau Cubarsí', 'Eric García', 'Álex Baena', 'Pep Guardiola', 'Albert Ferrer', 'Kiko Narváez'] },
-      { id: 'canterano_que_brillo_fuera', nombre: 'Canterano de Madrid o Barça que triunfó en otro club de La Liga', jugadores: ['Dani Parejo', 'Marcos Llorente', 'Álvaro Morata', 'Mario Hermoso', 'Pablo Sarabia', 'Borja Mayoral', 'Takefusa Kubo', 'Alejandro Grimaldo', 'Marc Bartra', 'Pepe Reina', 'Cristian Tello', 'Munir El Haddadi'] },
-      { id: 'debut_antes_17_laliga', nombre: 'Debutó en Primera División antes de los 17 años', jugadores: ['Lamine Yamal', 'Ansu Fati', 'Luka Romero', 'Fabrice Olinga', 'Sansón', 'Pedro Irastorza'] },
-      { id: 'capitan_canterano_madrid', nombre: 'Canterano que fue capitán del Real Madrid', jugadores: ['Raúl González', 'Iker Casillas', 'Nacho Fernández', 'Dani Carvajal', 'Manuel Sanchís', 'Guti'] },
-      { id: 'capitan_canterano_barca', nombre: 'Canterano que fue capitán del Barcelona', jugadores: ['Carles Puyol', 'Xavi Hernández', 'Andrés Iniesta', 'Lionel Messi', 'Sergio Busquets', 'Sergi Roberto', 'Pep Guardiola', 'Guillermo Amor'] },
-      { id: 'goleador_joven_la_masia', nombre: 'Goleador más joven de la historia de La Liga', jugadores: ['Lamine Yamal', 'Ansu Fati', 'Bojan Krkić', 'Gavi', 'Lionel Messi'] },
-      { id: 'lateral_canterano_top', nombre: 'Lateral de élite salido de La Masia o La Fábrica', jugadores: ['Dani Carvajal', 'Jordi Alba', 'Alejandro Balde', 'Álvaro Arbeloa', 'Fran García', 'Sergi Roberto', 'Albert Ferrer'] },
-      { id: 'cantera_lezama_athletic', nombre: 'Sello Lezama (Cantera del Athletic Club)', jugadores: ['Iker Muniain', 'Iñaki Williams', 'Nico Williams', 'Unai Simón', 'Aritz Aduriz', 'Julen Guerrero', 'Kepa Arrizabalaga', 'Óscar de Marcos', 'Markel Susaeta', 'Mikel San José', 'Dani Vivian', 'Oihan Sancet', 'Yeray Álvarez', 'Aitor Paredes', 'Asier del Horno', 'Fernando Llorente'] },
-      { id: 'cantera_zubieta_real_sociedad', nombre: 'Sello Zubieta (Cantera de la Real Sociedad)', jugadores: ['Mikel Oyarzabal', 'Martín Zubimendi', 'Xabi Alonso', 'Asier Illarramendi', 'Antoine Griezmann', 'Aritz Elustondo', 'Igor Zubeldia', 'Álvaro Odriozola', 'Aihen Muñoz', 'Jon Bautista'] },
-      { id: 'cantera_andaluza_estrella', nombre: 'Formado en canteras andaluzas (Sevilla, Betis o Málaga)', jugadores: ['Sergio Ramos', 'Jesús Navas', 'Joaquín Sánchez', 'Isco Alarcón', 'Fabián Ruiz', 'Gavi', 'Brahim Díaz', 'Dani Ceballos', 'Alberto Moreno', 'Carlos Marchena', 'José Antonio Reyes'] },
-      { id: 'golden_boy_salido_laliga', nombre: 'Ganador del Golden Boy formado en clubes de La Liga', jugadores: ['Lionel Messi', 'Pedri', 'Gavi', 'Isco Alarcón', 'Cesc Fàbregas', 'Sergio Agüero', 'Rafael van der Vaart'] },
-      { id: 'cantera_valencianista_paterna', nombre: 'Sello Paterna (Cantera del Valencia CF)', jugadores: ['David Silva', 'Jordi Alba', 'Paco Alcácer', 'Carlos Soler', 'Ferran Torres', 'José Gayà', 'Isco Alarcón', 'Raúl Albiol', 'Kang-in Lee', 'Javi Guerra'] },
-      { id: 'cantera_colchonera_atleti', nombre: 'Canterano del Atlético de Madrid', jugadores: ['Fernando Torres', 'Koke Resurrección', 'Saúl Ñíguez', 'Álvaro Morata', 'Lucas Hernández', 'Theo Hernández', 'David de Gea', 'Gabi Fernández', 'Mario Suárez', 'Rodrigo Hernández', 'Alejandro Garnacho'] },
-      { id: 'cantera_mareo_sporting', nombre: 'Sello Mareo (Cantera del Real Sporting de Gijón)', jugadores: ['David Villa', 'Luis Enrique', 'Quini', 'Abelardo Fernández', 'Javier Manjarín', 'José Ángel Valdés'] },
-      { id: 'cantera_celta_a_madroa', nombre: 'Canterano formado en el Celta de Vigo', jugadores: ['Iago Aspas', 'Brais Méndez', 'Hugo Mallo', 'Borja Oubiña', 'Denis Suárez', 'Gabri Veiga', 'Stefan Bajčetić'] },
-      { id: 'debut_antes_18_laliga', nombre: 'Debutó en La Liga siendo menor de 18 años', jugadores: ['Lamine Yamal', 'Gavi', 'Pedri', 'Ansu Fati', 'Pau Cubarsí', 'Iker Muniain', 'Bojan Krkić', 'Sergio Ramos', 'Raúl González', 'Lionel Messi', 'Ferran Torres'] },
-      { id: 'traspaso_mas_50m_canterano', nombre: 'Canterano vendido o recomprado por más de 50M€', jugadores: ['Álvaro Morata', 'Marc Cucurella', 'Ferran Torres', 'Kepa Arrizabalaga', 'Lucas Hernández', 'Thomas Partey', 'Rodrigo Hernández'] },
-      { id: 'mediocentro_toque_la_masia', nombre: 'Centrocampista de posesión formado en La Masia', jugadores: ['Xavi Hernández', 'Andrés Iniesta', 'Sergio Busquets', 'Pep Guardiola', 'Cesc Fàbregas', 'Thiago Alcántara', 'Gavi', 'Fermín López'] },
-      { id: 'portero_salido_la_fabrica', nombre: 'Portero profesional formado en La Fábrica del Madrid', jugadores: ['Iker Casillas', 'Diego López', 'Kiko Casilla', 'Santiago Cañizares', 'David Soria', 'Antonio Adán', 'Fernando Pacheco'] },
-      { id: 'delantero_goleador_lezama', nombre: 'Delantero de referencia criado en Lezama', jugadores: ['Aritz Aduriz', 'Fernando Llorente', 'Iñaki Williams', 'Julen Guerrero', 'Ismael Urzaiz'] },
-      { id: 'hermanos_en_primera_division', nombre: 'Ha jugado en La Liga teniendo a su hermano en la categoría', jugadores: ['Nico Williams', 'Iñaki Williams', 'Lucas Hernández', 'Theo Hernández', 'Thiago Alcántara', 'Rafinha Alcántara', 'Gabriel Milito', 'Diego Milito', 'Frank de Boer', 'Ronald de Boer'] },
-      { id: 'ganador_trofeo_bravo_laliga', nombre: 'Ganador del Trofeo Bravo (mejor sub-21 de Europa) jugando en España', jugadores: ['Lionel Messi', 'Iker Casillas', 'Emilio Butragueño', 'Pep Guardiola'] },
-      { id: 'canterano_titular_final_champions', nombre: 'Canterano titular en una final de Champions ganada por su club', jugadores: ['Iker Casillas', 'Raúl González', 'Dani Carvajal', 'Nacho Fernández', 'Manuel Sanchís', 'Carles Puyol', 'Xavi Hernández', 'Andrés Iniesta', 'Gerard Piqué', 'Sergio Busquets', 'Lionel Messi', 'Pedro Rodríguez', 'Víctor Valdés'] },
-      { id: 'canterano_mvp_partido_laliga', nombre: 'Canterano elegido MVP oficial en partidos de La Liga', jugadores: ['Lionel Messi', 'Lamine Yamal', 'Gavi', 'Pedri', 'Iago Aspas', 'Mikel Oyarzabal', 'Nico Williams', 'Iñaki Williams', 'Dani Carvajal', 'Koke Resurrección'] },
-      { id: 'hijo_de_futbolista_en_laliga', nombre: 'Futbolista cuyo padre también jugó en La Liga', jugadores: ['Sergio Busquets', 'Marcos Llorente', 'Thiago Alcántara', 'Rafinha Alcántara', 'Mikel Merino', 'Pepe Reina', 'Denis Cheryshev'] },
-      { id: 'fidelidad_canterana_10_anos', nombre: 'Más de 10 temporadas en el primer equipo del club donde se formó', jugadores: ['Lionel Messi', 'Xavi Hernández', 'Andrés Iniesta', 'Carles Puyol', 'Sergio Busquets', 'Iker Casillas', 'Raúl González', 'Nacho Fernández', 'Koke Resurrección', 'Iker Muniain', 'Jesús Navas'] }
-    ]
-  },
-
-  // =========================================================================
-  // BINGO 5: Récords Históricos, Centenarios y Leyendas
-  // =========================================================================
-  {
-    id: 'laliga_5',
-    grupo: 'laliga',
-    titulo: 'LaLiga 5: Récords Históricos, Centenarios y Leyendas',
-    categorias: [
-      { id: 'liga_100_puntos', nombre: 'Campeón de La Liga de los 100 puntos (Madrid 2012 o Barça 2013)', jugadores: ['Cristiano Ronaldo', 'Karim Benzema', 'Sergio Ramos', 'Mesut Özil', 'Iker Casillas', 'Xabi Alonso', 'Ángel Di María', 'Marcelo', 'Pepe', 'Álvaro Arbeloa', 'Gonzalo Higuaín', 'Sami Khedira', 'Kaká', 'José Callejón', 'Lionel Messi', 'Xavi Hernández', 'Andrés Iniesta', 'Gerard Piqué', 'Sergio Busquets', 'Cesc Fàbregas', 'Dani Alves', 'Víctor Valdés', 'Pedro Rodríguez', 'David Villa', 'Jordi Alba', 'Javier Mascherano', 'Alexis Sánchez', 'Carles Puyol', 'Alex Song'] },
-      { id: 'mas_200_goles_laliga', nombre: 'Más de 200 goles en la historia de La Liga', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Telmo Zarra', 'Hugo Sánchez', 'Raúl González', 'Alfredo Di Stéfano', 'Karim Benzema', 'Quini'] },
-      { id: 'mas_100_goles_laliga', nombre: 'Más de 100 goles en Primera División española', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Karim Benzema', 'Raúl González', 'Luis Suárez', 'Antoine Griezmann', 'Iago Aspas', 'Aritz Aduriz', 'David Villa', 'Diego Forlán', 'Samuel Eto\'o', 'Ronaldo Nazário', 'Hugo Sánchez', 'Fernando Morientes', 'Gareth Bale', 'Allvaro Negredo', 'Roberto Soldado', 'Raúl Tamudo', 'Fernando Torres', 'Gonzalo Higuaín', 'Wissam Ben Yedder', 'Cristhian Stuani', 'Gerard Moreno'] },
-      { id: 'mas_500_partidos_laliga', nombre: 'Más de 500 partidos disputados en La Liga', jugadores: ['Joaquín Sánchez', 'Andoni Zubizarreta', 'Raúl González', 'Eusebio Sacristán', 'Francisco Buyo', 'Sergio Ramos', 'Lionel Messi', 'Iker Casillas', 'Manuel Sanchís', 'Jesús Navas'] },
-      { id: 'mas_400_partidos_laliga', nombre: 'Más de 400 partidos disputados en La Liga', jugadores: ['Joaquín Sánchez', 'Lionel Messi', 'Sergio Ramos', 'Iker Casillas', 'Raúl González', 'Jesús Navas', 'Koke Resurrección', 'Antoine Griezmann', 'Iago Aspas', 'Sergio Busquets', 'Andoni Zubizarreta', 'Eusebio Sacristán', 'Francisco Buyo', 'Manuel Sanchís', 'Xavi Hernández', 'Andrés Iniesta', 'Gerard Piqué', 'Aritz Aduriz', 'Dani Alves', 'Fernando Hierro', 'Raúl Tamudo', 'Alberto Lopo', 'Dani Parejo'] },
-      { id: 'extranjero_mas_partidos_laliga', nombre: 'Extranjero con más partidos en la historia de La Liga', jugadores: ['Lionel Messi', 'Antoine Griezmann', 'Karim Benzema', 'Jan Oblak', 'Roberto Carlos', 'Dani Alves', 'Luka Modrić', 'Diego Godín', 'Marcelo', 'Ivan Rakitić'] },
-      { id: 'campeon_tres_ligas_seguidas', nombre: 'Ganó 3 o más Ligas españolas consecutivas', jugadores: ['Lionel Messi', 'Andrés Iniesta', 'Xavi Hernández', 'Gerard Piqué', 'Sergio Busquets', 'Carles Puyol', 'Dani Alves', 'Víctor Valdés', 'Pedro Rodríguez', 'Eric Abidal', 'Emilio Butragueño', 'Manuel Sanchís', 'Míchel González', 'Hugo Sánchez', 'Paco Gento', 'Alfredo Di Stéfano'] },
-      { id: 'gol_en_descuento_decisivo', nombre: 'Marcó gol en el añadido para ganar un partido clave de Liga', jugadores: ['Lionel Messi', 'Jude Bellingham', 'Sergio Ramos', 'Luis Suárez', 'Cristiano Ronaldo', 'Antoine Griezmann', 'Iago Aspas', 'Ángel Correa'] },
-      { id: 'barca_casi_invicto_2018', nombre: 'Formó parte del Barça casi invicto (37 jornadas invicto en 2017-18)', jugadores: ['Lionel Messi', 'Luis Suárez', 'Gerard Piqué', 'Sergio Busquets', 'Marc-André ter Stegen', 'Andrés Iniesta', 'Jordi Alba', 'Ivan Rakitić', 'Paulinho', 'Samuel Umtiti', 'Sergi Roberto', 'Ousmane Dembélé', 'Philippe Coutinho'] },
-      { id: 'record_21_jornadas_marcando', nombre: 'Récord histórico de 21 jornadas consecutivas marcando en La Liga', jugadores: ['Lionel Messi'] },
-      { id: 'mas_penaltis_parados_historia', nombre: 'Récord histórico de más penaltis parados en La Liga (22 penaltis)', jugadores: ['Diego Alves'] },
-      { id: 'jugador_mas_veterano_en_marcar', nombre: 'Marcó gol en Primera División con más de 38 años', jugadores: ['Joaquín Sánchez', 'Aritz Aduriz', 'Donato Gama da Silva', 'Jorge Molina', 'César Rodríguez'] },
-      { id: 'jugador_mas_joven_en_marcar', nombre: 'Marcó gol en Primera División con menos de 17 años', jugadores: ['Lamine Yamal', 'Ansu Fati', 'Fabrice Olinga', 'Iker Muniain', 'Xisco Nadal'] },
-      { id: 'mas_expulsiones_laliga', nombre: 'Récord histórico de más tarjetas rojas en La Liga (20 o más)', jugadores: ['Sergio Ramos'] },
-      { id: 'entrenador_mas_partidos_laliga', nombre: 'Entrenador con más partidos dirigidos en La Liga', jugadores: ['Luis Aragonés', 'Javier Irureta', 'Miguel Ángel Lotina', 'Ernesto Valverde', 'Diego Simeone', 'Manuel Pellegrini'] },
-      { id: 'ganador_liga_con_dos_clubes', nombre: 'Ha ganado La Liga con dos clubes distintos', jugadores: ['Luis Suárez', 'David Villa', 'Thibaut Courtois', 'Marcos Llorente', 'Radomir Antić', 'Miquel Soler', 'Albert Celades', 'Bernd Schuster'] },
-      { id: 'portero_record_imbatibilidad_minutos', nombre: 'Récord de más de 1000 minutos consecutivos sin encajar gol en La Liga', jugadores: ['Abel Resino'] },
-      { id: 'campeon_liga_con_atleti_y_barca', nombre: 'Ganó La Liga con el Atlético de Madrid y con el FC Barcelona', jugadores: ['Luis Suárez', 'David Villa', 'Arda Turan'] },
-      { id: 'campeon_liga_con_atleti_y_madrid', nombre: 'Ganó La Liga con el Atlético de Madrid y con el Real Madrid', jugadores: ['Thibaut Courtois', 'Marcos Llorente', 'Hugo Sánchez', 'Bernd Schuster'] },
-      { id: 'marcador_en_cuatro_decadas_distintas', nombre: 'Ha jugado partidos oficiales de Primera División en tres o cuatro décadas', jugadores: ['Joaquín Sánchez', 'Miquel Soler', 'César Rodríguez'] },
-      { id: 'asistente_mas_100_pases_gol', nombre: 'Más de 100 asistencias de gol en la historia de La Liga', jugadores: ['Lionel Messi', 'Xavi Hernández', 'Dani Alves', 'Karim Benzema'] },
-      { id: 'mas_titulos_liga_espanola', nombre: 'Futbolista con más títulos de La Liga en la historia (12 títulos)', jugadores: ['Paco Gento'] },
-      { id: 'diez_titulos_liga_espanola', nombre: 'Ha ganado 10 títulos de La Liga española', jugadores: ['Lionel Messi', 'Pirri'] },
-      { id: 'nueve_o_ocho_titulos_liga', nombre: 'Ha ganado 8 o 9 títulos de La Liga', jugadores: ['Andrés Iniesta', 'Xavi Hernández', 'Gerard Piqué', 'Sergio Busquets', 'Amancio Amaro', 'Santillana', 'Manuel Sanchís', 'Dani Carvajal', 'Luka Modrić'] },
-      { id: 'goleador_olimpico_de_corner_laliga', nombre: 'Ha marcado un gol olímpico (directo de córner) en La Liga', jugadores: ['Duda', 'Chimy Ávila', 'Toni Kroos', 'Roberto Carlos'] },
-      { id: 'capitan_campeon_liga_tres_veces', nombre: 'Capitán que alzó el trofeo de campeón de Liga en 3 o más ocasiones', jugadores: ['Sergio Ramos', 'Carles Puyol', 'Lionel Messi', 'Raúl González', 'Manuel Sanchís', 'Paco Gento'] },
-      { id: 'doblete_liga_y_champions_laliga', nombre: 'Ganó La Liga y la Champions League en la misma temporada con club español', jugadores: ['Cristiano Ronaldo', 'Karim Benzema', 'Luka Modrić', 'Toni Kroos', 'Sergio Ramos', 'Dani Carvajal', 'Marcelo', 'Casemiro', 'Vinícius Júnior', 'Jude Bellingham', 'Rodrygo', 'Thibaut Courtois', 'Nacho Fernández', 'Lionel Messi', 'Andrés Iniesta', 'Xavi Hernández', 'Gerard Piqué', 'Sergio Busquets', 'Carles Puyol', 'Víctor Valdés', 'Dani Alves', 'Luis Suárez', 'Neymar', 'Marc-André ter Stegen', 'Pedro Rodríguez', 'David Villa'] },
-      { id: 'jugador_con_mas_victorias_laliga', nombre: 'Top histórico de partidos ganados en La Liga (más de 300 victorias)', jugadores: ['Lionel Messi', 'Iker Casillas', 'Sergio Ramos', 'Andoni Zubizarreta', 'Raúl González', 'Sergio Busquets', 'Karim Benzema', 'Manuel Sanchís'] },
-      { id: 'delantero_extranjero_mas_150_goles', nombre: 'Delantero extranjero con más de 150 goles en La Liga', jugadores: ['Lionel Messi', 'Cristiano Ronaldo', 'Hugo Sánchez', 'Karim Benzema', 'Antoine Griezmann', 'Luis Suárez'] },
-      { id: 'pichichi_y_zamora_mismo_club_ano', nombre: 'Jugó en el equipo que ganó el Trofeo Pichichi y el Trofeo Zamora en el mismo curso', jugadores: ['Robert Lewandowski', 'Marc-André ter Stegen', 'Lionel Messi', 'Claudio Bravo', 'Víctor Valdés', 'Samuel Eto\'o', 'Iker Casillas', 'Ruud van Nistelrooy', 'Hugo Sánchez', 'Francisco Buyo'] }
+      {
+        id: 'ganador_5_o_mas_ligas',
+        nombre: 'Ha ganado 5 o más títulos de LaLiga',
+        jugadores: [
+          'Lionel Messi',
+          'Andrés Iniesta',
+          'Xavi Hernández',
+          'Gerard Piqué',
+          'Sergio Busquets',
+          'Dani Alves',
+          'Carles Puyol',
+          'Víctor Valdés',
+          'Sergi Roberto',
+          'Luka Modrić',
+          'Dani Carvajal',
+          'Karim Benzema',
+          'Marcelo',
+          'Sergio Ramos',
+          'Iker Casillas',
+          'Fernando Hierro',
+          'Manuel Sanchís',
+          'Raúl González',
+          'Paco Gento',
+          'Alfredo Di Stéfano',
+          'Pirri',
+          'Santillana',
+          'Emilio Butragueño',
+          'Míchel González'
+        ]
+      },
+      {
+        id: 'mas_de_300_goles',
+        nombre: 'Ha marcado más de 300 goles en la historia de LaLiga',
+        jugadores: [
+          'Lionel Messi',
+          'Cristiano Ronaldo'
+        ]
+      },
+      {
+        id: 'mas_de_500_partidos',
+        nombre: 'Ha disputado más de 500 partidos en Primera División',
+        jugadores: [
+          'Joaquín Sánchez',
+          'Andoni Zubizarreta',
+          'Raúl García',
+          'Raúl González',
+          'Eusebio Sacristán',
+          'Francisco Buyo',
+          'Manuel Sanchís',
+          'Lionel Messi',
+          'Sergio Ramos',
+          'Iker Casillas',
+          'Jesús Navas'
+        ]
+      },
+      {
+        id: 'jugo_en_10_o_mas_equipos',
+        nombre: 'Ha jugado en 10 o más clubes a lo largo de su carrera profesional',
+        jugadores: [
+          'Sebastián Abreu',
+          'Javier Saviola',
+          'Miquel Soler',
+          'Lluís Carreras',
+          'Rubén Castro',
+          'Aritz Aduriz',
+          'Roberto Soldado',
+          'Diego Costa',
+          'Álvaro Negredo',
+          'Borja Valero',
+          'Bojan Krkić',
+          'Christian Vieri',
+          'Nicolas Anelka'
+        ]
+      },
+      {
+        id: 'gano_5_copas_del_rey',
+        nombre: 'Ha ganado 5 o más títulos de Copa del Rey',
+        jugadores: [
+          'Lionel Messi',
+          'Sergio Busquets',
+          'Gerard Piqué',
+          'Andrés Iniesta',
+          'Sergi Roberto',
+          'Agustín Gaínza',
+          'José María Belauste',
+          'Piru Gaínza',
+          'Bernd Schuster'
+        ]
+      },
+      {
+        id: '50_o_mas_expulsiones',
+        nombre: 'Jugadores con récord histórico de tarjetas rojas en LaLiga (Top expulsados)',
+        jugadores: [
+          'Sergio Ramos',
+          'Pablo Alfaro',
+          'Xavi Aguado',
+          'Juanito Rodríguez',
+          'Patxi Salinas',
+          'Albert Lopo',
+          'Fernando Hierro',
+          'Santi Denia',
+          'Mauricio Pochettino',
+          'Aritz Aduriz'
+        ]
+      },
+      {
+        id: '2_o_mas_zamoras',
+        nombre: 'Ha ganado 2 o más Trofeos Zamora',
+        jugadores: [
+          'Jan Oblak',
+          'Víctor Valdés',
+          'Antoni Ramallets',
+          'Santiago Cañizares',
+          'Juan Carlos Ablanedo',
+          'Thibaut Courtois',
+          'Ricardo Zamora',
+          'Gregorio Blasco',
+          'José Vicente Train',
+          'Salvador Sadurní',
+          'Luis Arconada',
+          'Paco Liaño'
+        ]
+      },
+      {
+        id: 'pichichi_con_equipo_no_barcelona_madrid',
+        nombre: 'Ganó el Trofeo Pichichi con un equipo que no sea Real Madrid ni Barcelona',
+        jugadores: [
+          'Artem Dovbyk',
+          'Diego Forlán',
+          'Daniel Güiza',
+          'Roy Makaay',
+          'Salva Ballesta',
+          'Christian Vieri',
+          'Juan Antonio Pizzi',
+          'Manolo Sánchez',
+          'Baltazar',
+          'Quini',
+          'Mario Kempes',
+          'Telmo Zarra',
+          'Pahiño',
+          'Mundo Suárez'
+        ]
+      },
+      {
+        id: 'campeon_depor',
+        nombre: 'Campeón de LaLiga con el histórico Deportivo de La Coruña (1999-2000)',
+        jugadores: [
+          'Roy Makaay',
+          'Djalminha',
+          'Mauro Silva',
+          'Fran González',
+          'Donato Gama da Silva',
+          'Noureddine Naybet',
+          'Jacques Songo\'o',
+          'Víctor Sánchez',
+          'Pauleta',
+          'Turu Flores',
+          'Slaviša Jokanović',
+          'Manuel Pablo',
+          'Enrique Romero'
+        ]
+      },
+      {
+        id: 'maximo_asistente_liga',
+        nombre: 'Ha sido el máximo asistente de una temporada de LaLiga',
+        jugadores: [
+          'Lionel Messi',
+          'Luis Suárez',
+          'Xavi Hernández',
+          'Mesut Özil',
+          'Ángel Di María',
+          'Antoine Griezmann',
+          'Álex Baena',
+          'Koke Resurrección',
+          'Dani Alves',
+          'Pablo Hernandez'
+        ]
+      },
+      {
+        id: 'leyenda_getafe',
+        nombre: 'Ha jugado y dejado huella en el Getafe CF',
+        jugadores: [
+          'Manu del Moral',
+          'Ángel Rodríguez',
+          'Jaime Mata',
+          'Jorge Molina',
+          'Roberto Soldado',
+          'Esteban Granero',
+          'Pablo Sarabia',
+          'David Soria',
+          'Damián Suárez',
+          'Mauro Arambarri',
+          'Nemanja Maksimović',
+          'Marc Cucurella',
+          'Enes Ünal',
+          'Pedro León',
+          'Borja Mayoral',
+          'Mason Greenwood'
+        ]
+      },
+      {
+        id: 'jugo_10_o_mas_clasicos',
+        nombre: 'Ha disputado 10 o más Clásicos (Real Madrid vs Barcelona)',
+        jugadores: [
+          'Sergio Ramos',
+          'Lionel Messi',
+          'Sergio Busquets',
+          'Karim Benzema',
+          'Gerard Piqué',
+          'Xavi Hernández',
+          'Iker Casillas',
+          'Andrés Iniesta',
+          'Luka Modrić',
+          'Dani Carvajal',
+          'Marcelo',
+          'Cristiano Ronaldo',
+          'Luis Suárez',
+          'Dani Alves',
+          'Roberto Carlos',
+          'Carles Puyol',
+          'Víctor Valdés',
+          'Toni Kroos',
+          'Casemiro',
+          'Gareth Bale',
+          'Raúl González',
+          'Fernando Hierro',
+          'Manuel Sanchís',
+          'Paco Gento'
+        ]
+      },
+      {
+        id: 'tres_zarras',
+        nombre: 'Ha ganado 3 o más Trofeos Zarra (máximo goleador español)',
+        jugadores: [
+          'David Villa',
+          'Iago Aspas'
+        ]
+      },
+      {
+        id: 'one_club_man',
+        nombre: 'One-Club Man en España (toda su carrera en un único club)',
+        jugadores: [
+          'Carles Puyol',
+          'Manuel Sanchís',
+          'Chendo',
+          'Josu Urrutia',
+          'Julen Guerrero',
+          'Jesús María Satrústegui',
+          'Luis Arconada',
+          'Tonono',
+          'Ignacio Eizaguirre'
+        ]
+      },
+      {
+        id: 'jugo_en_sevilla_betis',
+        nombre: 'Ha jugado tanto en el Sevilla FC como en el Real Betis',
+        jugadores: [
+          'Isco Alarcón',
+          'Diego Rodríguez',
+          'José Mari Romero',
+          'Antoñito',
+          'Fernando Vega',
+          'Francisco López Alfaro',
+          'Gabriel Moya',
+          'Salva Ballesta'
+        ]
+      },
+      {
+        id: 'jugo_en_realsociedad_bilbao',
+        nombre: 'Ha jugado tanto en la Real Sociedad como en el Athletic Club',
+        jugadores: [
+          'Iñigo Martínez',
+          'Joseba Etxeberria',
+          'Loren Juarros',
+          'Gorka Elustondo',
+          'Mikel Balenziaga',
+          'Bittor Alkiza',
+          'Igor Gabilondo',
+          'Xabier Castillo',
+          'Jon Andoni Goikoetxea',
+          'Alexanco'
+        ]
+      },
+      {
+        id: '25_goles_o_mas_1_edicion',
+        nombre: 'Marcó 25 o más goles en una sola temporada de LaLiga',
+        jugadores: [
+          'Lionel Messi',
+          'Cristiano Ronaldo',
+          'Luis Suárez',
+          'Karim Benzema',
+          'Robert Lewandowski',
+          'Diego Forlán',
+          'Samuel Eto\'o',
+          'Ronaldo Nazário',
+          'David Villa',
+          'Daniel Güiza',
+          'Ruud van Nistelrooy',
+          'Roy Makaay',
+          'Christian Vieri',
+          'Hugo Sánchez',
+          'Baltazar',
+          'Romário',
+          'Telmo Zarra'
+        ]
+      },
+      {
+        id: 'pichichi_equipo_en_debut',
+        nombre: 'Máximo goleador de su club en su primera temporada en LaLiga',
+        jugadores: [
+          'Cristiano Ronaldo',
+          'Robert Lewandowski',
+          'Jude Bellingham',
+          'Radamel Falcao',
+          'Ruud van Nistelrooy',
+          'Ronaldo Nazário',
+          'Diego Forlán',
+          'Christian Vieri',
+          'Romário',
+          'Artem Dovbyk',
+          'Alexander Sørloth'
+        ]
+      },
+      {
+        id: 'gano_liga_en_club_formador',
+        nombre: 'Ganó el título de LaLiga en el club donde se formó como canterano',
+        jugadores: [
+          'Lionel Messi',
+          'Xavi Hernández',
+          'Andrés Iniesta',
+          'Carles Puyol',
+          'Gerard Piqué',
+          'Sergio Busquets',
+          'Víctor Valdés',
+          'Pedro Rodríguez',
+          'Sergi Roberto',
+          'Gavi',
+          'Alejandro Balde',
+          'Raúl González',
+          'Iker Casillas',
+          'Dani Carvajal',
+          'Nacho Fernández',
+          'Lucas Vázquez',
+          'Guti',
+          'Manuel Sanchís',
+          'Emilio Butragueño',
+          'Koke Resurrección',
+          'Saúl Ñíguez'
+        ]
+      },
+      {
+        id: 'gano_liga_champions_el_mismo_año',
+        nombre: 'Ganó LaLiga y la Champions League en la misma temporada',
+        jugadores: [
+          'Lionel Messi',
+          'Andrés Iniesta',
+          'Xavi Hernández',
+          'Gerard Piqué',
+          'Sergio Busquets',
+          'Carles Puyol',
+          'Víctor Valdés',
+          'Dani Alves',
+          'Luis Suárez',
+          'Neymar',
+          'Marc-André ter Stegen',
+          'Ivan Rakitić',
+          'Pedro Rodríguez',
+          'Cristiano Ronaldo',
+          'Karim Benzema',
+          'Luka Modrić',
+          'Toni Kroos',
+          'Sergio Ramos',
+          'Marcelo',
+          'Dani Carvajal',
+          'Casemiro',
+          'Vinícius Júnior',
+          'Jude Bellingham',
+          'Rodrygo',
+          'Thibaut Courtois',
+          'Nacho Fernández',
+          'Federico Valverde',
+          'Eduardo Camavinga'
+        ]
+      }
     ]
   }
 ];

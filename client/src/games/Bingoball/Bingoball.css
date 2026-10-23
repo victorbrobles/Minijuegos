@@ -3,7 +3,7 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 900px;
+  max-width: 850px;
   margin: 0 auto;
 }
 
@@ -11,30 +11,30 @@
 .bb-jugador-display {
   background: linear-gradient(135deg, #1e3a8a, #1d4ed8);
   border-radius: 20px;
-  padding: 1.2rem;
+  padding: 1.1rem 0.9rem;
   color: #ffffff;
   text-align: center;
   box-shadow: 0 8px 24px rgba(29, 78, 216, 0.35);
-  margin-bottom: 1.2rem;
+  margin-bottom: 1rem;
   position: relative;
   overflow: hidden;
 }
 
 .bb-jugador-avatar {
-  width: 80px;
-  height: 80px;
-  margin: 0 auto 0.6rem;
+  width: 65px;
+  height: 65px;
+  margin: 0 auto 0.4rem;
   background: #ffffff;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.2rem;
+  font-size: 1.8rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .bb-jugador-nombre {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: 900;
   margin: 0;
   letter-spacing: -0.5px;
@@ -44,12 +44,12 @@
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  padding: 0.3rem 0.9rem;
+  padding: 0.3rem 0.85rem;
   border-radius: 9999px;
   background: rgba(255, 255, 255, 0.2);
   font-weight: 800;
-  font-size: 0.9rem;
-  margin-top: 0.6rem;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
 }
 
 .bb-timer-badge.peligro {
@@ -90,52 +90,46 @@
   100% { transform: scale(1); }
 }
 
-/* Cartón del bingo: 4 filas x 5 columnas */
+/* Cartón del bingo: 4 filas x 3 columnas */
 .bb-carton-wrap {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
-  margin: 1rem 0;
+  gap: 0.55rem;
+  margin: 0.8rem 0;
+  width: 100%;
 }
 
 .bb-fila-contenedor {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  width: 100%;
 }
 
 .bb-fila-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.5rem;
   flex: 1;
-}
-
-@media (max-width: 600px) {
-  .bb-fila-contenedor {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .bb-fila-grid {
-    gap: 0.35rem;
-  }
+  width: 100%;
 }
 
 .bb-casilla-btn {
   background: #ffffff;
   border: 2px solid #cbd5e1;
   border-radius: 12px;
-  padding: 0.65rem 0.4rem;
-  min-height: 85px;
+  padding: 0.6rem 0.45rem;
+  min-height: 72px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
   text-align: center;
   cursor: pointer;
   transition: all 0.15s ease;
   user-select: none;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+  word-break: break-word;
 }
 
 .bb-casilla-btn:hover:not(:disabled) {
@@ -145,10 +139,10 @@
 }
 
 .bb-casilla-cat {
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 800;
   color: #1e293b;
-  line-height: 1.2;
+  line-height: 1.25;
 }
 
 .bb-casilla-btn.marcada {
@@ -164,7 +158,7 @@
   background: #d1fae5;
   padding: 0.15rem 0.4rem;
   border-radius: 6px;
-  margin-top: 0.3rem;
+  margin-top: 0.35rem;
   max-width: 95%;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -178,8 +172,8 @@
   border: none;
   border-radius: 10px;
   font-weight: 900;
-  font-size: 0.8rem;
-  padding: 0.6rem 0.7rem;
+  font-size: 0.85rem;
+  padding: 0.65rem 0.8rem;
   cursor: pointer;
   box-shadow: 0 3px 8px rgba(217, 119, 6, 0.35);
   animation: pulseLinea 1s infinite alternate;
@@ -200,6 +194,39 @@
   padding: 0.75rem 1rem;
   font-weight: 700;
   font-size: 0.9rem;
-  margin: 0.8rem 0;
+  margin: 0.6rem 0;
   text-align: center;
+}
+
+/* Adaptación completa a pantallas móviles */
+@media (max-width: 600px) {
+  .bb-fila-contenedor {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.4rem;
+  }
+  .bb-fila-grid {
+    gap: 0.35rem;
+  }
+  .bb-casilla-btn {
+    min-height: 64px;
+    padding: 0.45rem 0.25rem;
+  }
+  .bb-casilla-cat {
+    font-size: 0.74rem;
+    line-height: 1.15;
+  }
+  .bb-jugador-nombre {
+    font-size: 1.35rem;
+  }
+  .bb-jugador-avatar {
+    width: 50px;
+    height: 50px;
+    font-size: 1.4rem;
+  }
+  .bb-btn-linea {
+    width: 100%;
+    padding: 0.45rem;
+    font-size: 0.8rem;
+  }
 }

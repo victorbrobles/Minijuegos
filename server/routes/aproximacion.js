@@ -117,7 +117,13 @@ function prepararNuevaRonda(sala) {
     manual: false
   };
 
-  const primerIndex = Math.floor(Math.random() * sala.jugadores.length);
+  // Se sortea el primer jugador únicamente en la ronda 1
+  if (sala.primerIndexInicial === undefined || sala.primerIndexInicial === null) {
+    sala.primerIndexInicial = Math.floor(Math.random() * sala.jugadores.length);
+  }
+
+  // Rotación correlativa en base al jugador inicial y la ronda
+  const primerIndex = (sala.primerIndexInicial + (sala.rondaNum - 1)) % sala.jugadores.length;
   const orden = [];
   for (let i = 0; i < sala.jugadores.length; i++) {
     orden.push((primerIndex + i) % sala.jugadores.length);
@@ -147,6 +153,7 @@ router.post('/online/crear', (req, res) => {
     estado: 'lobby', // 'lobby' | 'jugando' | 'final'
     adminToken: tokenAdmin,
     rondaNum: 1,
+    primerIndexInicial: null,
     preguntas: barajar([...PREGUNTAS]),
     jugadores: [{ id: 1, nombre: nombre.trim(), token: tokenAdmin, puntos: 0 }],
     ronda: null

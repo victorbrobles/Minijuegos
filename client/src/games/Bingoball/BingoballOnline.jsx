@@ -1,11 +1,18 @@
 // client/src/games/Bingoball/BingoballOnline.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
-import { LISTA_BINGOS } from '../../../../server/data/seeds/bingoball/bingoballData.js';
 import './Bingoball.css';
 import '../Adivina/Adivina.css';
 
 const CLAVE_SESION_BB = 'bingoball_online_session';
+
+const CATEGORIAS_PRINCIPALES = [
+  { id: 'internacional', nombre: 'Fútbol Internacional y Selecciones' },
+  { id: 'champions', nombre: 'UEFA Champions League' },
+  { id: 'laliga', nombre: 'La Liga Española' },
+  { id: 'grandes_ligas', nombre: 'Grandes Ligas Europeas' },
+  { id: 'leyendas', nombre: 'Leyendas y Récords' }
+];
 
 export default function BingoballOnline({ onSalir }) {
   const [vista, setVista] = useState('menu');
@@ -18,7 +25,7 @@ export default function BingoballOnline({ onSalir }) {
   const [codigoCopiado, setCodigoCopiado] = useState(false);
 
   const [feedbackTurno, setFeedbackTurno] = useState('');
-  const [siguienteBingoId, setSiguienteBingoId] = useState('');
+  const [siguienteGrupoId, setSiguienteGrupoId] = useState('');
 
   const [sala, setSala] = useState(null);
   const [sesion, setSesion] = useState(() => {
@@ -41,8 +48,8 @@ export default function BingoballOnline({ onSalir }) {
           if (d.success) {
             setSala(d);
             setVista('sala');
-            if (!siguienteBingoId && d.bingoId) {
-              setSiguienteBingoId(d.bingoId);
+            if (!siguienteGrupoId && d.grupoId) {
+              setSiguienteGrupoId(d.grupoId);
             }
           }
         }).catch(() => {
@@ -169,20 +176,21 @@ export default function BingoballOnline({ onSalir }) {
           <h3>¿Cómo se juega a Bingoball?</h3>
         </div>
         <div className="aprox-modal-cuerpo">
-          <p><strong>1. El Cartón (4x5):</strong></p>
+          <p><strong>1. El Cartón (4x3):</strong></p>
           <ul>
-            <li>Cada participante recibe un cartón con <strong>20 categorías futboleras</strong>.</li>
+            <li>Cada participante recibe un cartón de <strong>12 categorías</strong> elegidas al azar de un total de 20.</li>
             <li>Tendrás <strong>10 segundos</strong> al inicio para memorizar la disposición de tu cartón.</li>
           </ul>
-          <p><strong>2. Jugadores en pantalla (10s):</strong></p>
+          <p><strong>2. Jugadores en pantalla (15s):</strong></p>
           <ul>
-            <li>Aparecerán futbolistas en pantalla de uno en uno durante 10 segundos. Toca una casilla válida de tu cartón para marcarlo.</li>
-            <li><strong>¡Cuidado al fallar!</strong> Si te equivocas, quedarás bloqueado durante el siguiente futbolista.</li>
+            <li>Aparecerán futbolistas en pantalla de uno en uno durante <strong>15 segundos</strong>. Toca una casilla válida de tu cartón para colocarlo.</li>
+            <li>Cada acierto suma <strong>+2 puntos</strong>.</li>
+            <li><strong>¡Cuidado al fallar!</strong> Si te equivocas, se te restará <strong>-1 punto</strong> y quedarás bloqueado durante el resto de ese turno.</li>
           </ul>
           <p><strong>3. Líneas y Bingo:</strong></p>
           <ul>
-            <li><strong>Línea (+5 pts):</strong> Al completar una fila entera puedes cantar línea.</li>
-            <li><strong>Bingo (+10 pts):</strong> El primer jugador en rellenar todas las casillas consigue el Bingo.</li>
+            <li><strong>Línea (+15 pts):</strong> Al completar las 3 casillas de una fila entera puedes cantar línea. La fila se renovará con nuevas categorías.</li>
+            <li><strong>Bingo (+25 pts):</strong> El primer jugador en rellenar todas las casillas de su cartón consigue el Bingo.</li>
           </ul>
         </div>
         <div className="rg-modal-acciones" style={{ marginTop: '1.2rem' }}>
@@ -201,7 +209,7 @@ export default function BingoballOnline({ onSalir }) {
             <BotonAyudaCard />
             <span className="lb-luna chica"><Icon name="soccer" size={42} strokeWidth={1.6} /></span>
             <h1 className="title">Bingoball</h1>
-            <p className="hint">Completa tu cartón de 4x5 relacionando futbolistas con categorías antes que tus rivales. (3 a 15 jugadores).</p>
+            <p className="hint">Completa tu cartón de 4x3 relacionando futbolistas con categorías antes que tus rivales. (3 a 15 jugadores).</p>
             {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
             <div className="lb-menu">
               <button className="big full" onClick={() => { setVista('crear'); setErrorMsg(''); }}>
@@ -318,21 +326,24 @@ export default function BingoballOnline({ onSalir }) {
             {esAdmin ? (
               <div style={{ marginTop: '1.2rem', textAlign: 'left' }}>
                 <label className="field-label" htmlFor="bb-select-tema">
-                  Temática del Bingo
+                  Categoría del Bingo
                 </label>
                 <select
                   id="bb-select-tema"
-                  value={sala.bingoId}
-                  onChange={(e) => peticionPost(`sala/${sesion.code}/configurar`, { bingoId: e.target.value })}
+                  value={sala.grupoId || 'internacional'}
+                  onChange={(e) => peticionPost(`sala/${sesion.code}/configurar`, { grupoId: e.target.value })}
                 >
-                  {LISTA_BINGOS.map(b => (
-                    <option key={b.id} value={b.id}>{b.titulo}</option>
+                  {CATEGORIAS_PRINCIPALES.map(cat => (
+                    <option key={cat.id} value={cat.id}>{cat.nombre}</option>
                   ))}
                 </select>
+                <p className="hint small" style={{ marginTop: '0.4rem' }}>
+                  Se seleccionará un bingo aleatorio de esta temática al iniciar la ronda.
+                </p>
               </div>
             ) : (
               <div style={{ marginTop: '0.8rem', padding: '0.6rem', background: '#f8fafc', borderRadius: '10px', textAlign: 'center' }}>
-                <span className="hint small">Temática: <strong>{LISTA_BINGOS.find(b => b.id === sala.bingoId)?.titulo || sala.bingoId}</strong></span>
+                <span className="hint small">Categoría: <strong>{CATEGORIAS_PRINCIPALES.find(c => c.id === sala.grupoId)?.nombre || sala.grupoId}</strong></span>
               </div>
             )}
 
@@ -368,7 +379,7 @@ export default function BingoballOnline({ onSalir }) {
 
           <div className="panel center">
             <h2 style={{ margin: '0 0 0.4rem', color: '#1e1b4b' }}>¡Revisa tus categorías!</h2>
-            <p className="hint small">En {sala.segundosRestantes} segundos empezarán a salir futbolistas:</p>
+            <p className="hint small">En {sala.segundosRestantes} segundos empezarán a salir futbolistas (15s cada uno):</p>
 
             <div className="bb-carton-wrap">
               {[0, 1, 2, 3].map(fila => (
@@ -406,14 +417,14 @@ export default function BingoballOnline({ onSalir }) {
           <div className="bb-jugador-display">
             <div className="bb-jugador-avatar">⚽</div>
             <h2 className="bb-jugador-nombre">{sala.jugadorActual}</h2>
-            <div className={`bb-timer-badge ${sala.segundosRestantes <= 3 ? 'peligro' : ''}`}>
+            <div className={`bb-timer-badge ${sala.segundosRestantes <= 4 ? 'peligro' : ''}`}>
               <Icon name="clock" size={15} /> {sala.segundosRestantes}s restantes
             </div>
           </div>
 
           {sala.bloqueado && (
             <div className="bb-alerta-bloqueo">
-              🚫 ¡Estás bloqueado este turno por fallar en el anterior! No puedes marcar a {sala.jugadorActual}.
+              🚫 ¡Has fallado! Bloqueado en este turno (-1 pt). Espera al siguiente futbolista.
             </div>
           )}
 
@@ -423,15 +434,15 @@ export default function BingoballOnline({ onSalir }) {
             </div>
           )}
 
-          <div className="panel" style={{ padding: '1rem' }}>
-            <h3 className="panel-title" style={{ textAlign: 'center', marginBottom: '0.8rem' }}>
-              Tu Cartón (4x5)
+          <div className="panel" style={{ padding: '0.8rem' }}>
+            <h3 className="panel-title" style={{ textAlign: 'center', marginBottom: '0.6rem' }}>
+              Tu Cartón (4x3)
             </h3>
 
             <div className="bb-carton-wrap">
               {[0, 1, 2, 3].map(fila => {
                 const casillasFila = sala.miCarton?.filter(c => c.fila === fila) || [];
-                const filaCompleta = casillasFila.length === 5 && casillasFila.every(c => c.marcada);
+                const filaCompleta = casillasFila.length === 3 && casillasFila.every(c => c.marcada);
 
                 return (
                   <div key={fila} className="bb-fila-contenedor">
@@ -460,7 +471,7 @@ export default function BingoballOnline({ onSalir }) {
                         className="bb-btn-linea"
                         onClick={() => handleCantarLinea(fila)}
                       >
-                        ⭐ ¡Cantar Línea! (+5 pts)
+                        ⭐ ¡Línea! (+15 pts)
                       </button>
                     )}
                   </div>
@@ -483,14 +494,14 @@ export default function BingoballOnline({ onSalir }) {
         </section>
       )}
 
-      {/* 5. FIN DEL BINGO (CARTÓN RESUELTO) -> DECISIÓN DE NUEVO BINGO O FINALIZAR */}
+      {/* 5. FIN DEL BINGO (CARTÓN RESUELTO) */}
       {sala.estado === 'bingo_cantado' && (
         <section className="game">
           <div className="end-card">
             <span className="end-icon">🎉</span>
             <h1 className="title">¡BINGO COMPLETADO!</h1>
             <p className="final-score" style={{ color: '#16a34a' }}>
-              ¡{sala.ganadorBingo || 'Un jugador'} ha cantado BINGO (+10 pts)!
+              ¡{sala.ganadorBingo || 'Un jugador'} ha cantado BINGO (+25 pts)!
             </p>
           </div>
 
@@ -509,22 +520,22 @@ export default function BingoballOnline({ onSalir }) {
           {esAdmin ? (
             <div className="panel" style={{ marginTop: '1rem' }}>
               <h3 className="panel-title"><Icon name="cards" size={20} /> Siguiente Bingo</h3>
-              <p className="hint small">Elige la temática para el siguiente cartón o continúa con la actual:</p>
+              <p className="hint small">Elige la categoría para el siguiente cartón:</p>
               
               <select
-                value={siguienteBingoId}
-                onChange={(e) => setSiguienteBingoId(e.target.value)}
+                value={siguienteGrupoId || sala.grupoId}
+                onChange={(e) => setSiguienteGrupoId(e.target.value)}
                 style={{ marginBottom: '1rem' }}
               >
-                {LISTA_BINGOS.map(b => (
-                  <option key={b.id} value={b.id}>{b.titulo}</option>
+                {CATEGORIAS_PRINCIPALES.map(cat => (
+                  <option key={cat.id} value={cat.id}>{cat.nombre}</option>
                 ))}
               </select>
 
               <div className="actions">
                 <button
                   className="big full"
-                  onClick={() => peticionPost(`sala/${sesion.code}/siguiente-bingo`, { bingoId: siguienteBingoId })}
+                  onClick={() => peticionPost(`sala/${sesion.code}/siguiente-bingo`, { grupoId: siguienteGrupoId || sala.grupoId })}
                 >
                   <Icon name="play" size={20} /> Jugar Siguiente Bingo (+Puntos)
                 </button>
@@ -550,7 +561,7 @@ export default function BingoballOnline({ onSalir }) {
         </section>
       )}
 
-      {/* 6. PODIO DEFINITIVO (FINAL DEL TORNEO) */}
+      {/* 6. PODIO DEFINITIVO */}
       {sala.estado === 'final' && (
         <section className="game">
           <div className="end-card">

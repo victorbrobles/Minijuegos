@@ -1,10 +1,17 @@
 // server/routes/adivina.js
 import { Router } from 'express';
-import { CANCIONES, PELICULAS } from '../data/seeds/adivina/adivina.js';
+import { CANCIONES_MODERNAS, CANCIONES_ANTIGUAS, CANCIONES, PELICULAS } from '../data/seeds/adivina/adivina.js';
 import { barajar } from '../lib/barajar.js';
 
 const router = Router();
 const cacheAudio = new Map();
+
+function obtenerColeccion(modo, subcategoria) {
+  if (modo === 'peliculas') return PELICULAS;
+  if (subcategoria === 'antigua') return CANCIONES_ANTIGUAS;
+  if (subcategoria === 'moderna') return CANCIONES_MODERNAS;
+  return CANCIONES;
+}
 
 async function obtenerAudioPreview(titulo, artista) {
   const clave = `${titulo}-${artista}`.toLowerCase();
@@ -76,11 +83,11 @@ function esCoincidencia(usuario, objetivo) {
 }
 
 // ==========================================
-// ENDPOINTS OFFLINE / LOCAL (INTACTOS)
+// ENDPOINTS OFFLINE / LOCAL
 // ==========================================
 router.post('/iniciar-ronda', async (req, res) => {
-  const { modo, usados = [] } = req.body ?? {};
-  const coleccion = modo === 'canciones' ? CANCIONES : PELICULAS;
+  const { modo, subcategoria = 'moderna', usados = [] } = req.body ?? {};
+  const coleccion = obtenerColeccion(modo, subcategoria);
   const disponibles = coleccion.filter((item) => !usados.includes(item.id));
   const pool = disponibles.length > 0 ? disponibles : coleccion;
   const elegido = barajar([...pool])[0];
@@ -93,6 +100,7 @@ router.post('/iniciar-ronda', async (req, res) => {
   res.json({
     id: elegido.id,
     modo,
+    subcategoria,
     pista1: modo === 'canciones' ? elegido.frase : elegido.protagonistas,
     pista2: modo === 'canciones' ? `${elegido.artista} (${elegido.año})` : `${elegido.genero} (${elegido.año})`,
     pista3: modo === 'canciones' ? audioUrl : elegido.sinopsis
@@ -100,9 +108,9 @@ router.post('/iniciar-ronda', async (req, res) => {
 });
 
 router.post('/validar', (req, res) => {
-  const { modo, id, respuesta } = req.body ?? {};
-  const coleccion = modo === 'canciones' ? CANCIONES : PELICULAS;
-  const item = coleccion.find((x) => x.id === id);
+  const { modo, subcategoria = 'moderna', id, respuesta } = req.body ?? {};
+  const coleccion = obtenerColeccion(modo, subcategoria);
+  const item = coleccion.find((x) => x.id === id) || CANCIONES.find((x) => x.id === id) || PELICULAS.find((x) => x.id === id);
 
   if (!item) return res.status(404).json({ error: 'Ronda no encontrada' });
 
@@ -117,9 +125,9 @@ router.post('/validar', (req, res) => {
 });
 
 router.post('/solucion', (req, res) => {
-  const { modo, id } = req.body ?? {};
-  const coleccion = modo === 'canciones' ? CANCIONES : PELICULAS;
-  const item = coleccion.find((x) => x.id === id);
+  const { modo, subcategoria = 'moderna', id } = req.body ?? {};
+  const coleccion = obtenerColeccion(modo, subcategoria);
+  const item = coleccion.find((x) => x.id === id) || CANCIONES.find((x) => x.id === id) || PELICULAS.find((x) => x.id === id);
 
   if (!item) return res.status(404).json({ error: 'Ronda no encontrada' });
 
@@ -130,7 +138,7 @@ router.post('/solucion', (req, res) => {
 });
 
 // ==========================================
-// SALAS ONLINE (MULTIDISPOSITIVO CON PULSADOR)
+// SALAS ONLINE
 // ==========================================
 const salasOnline = {};
 
@@ -148,7 +156,7 @@ function generarToken() {
 }
 
 async function prepararNuevaRondaOnline(sala) {
-  const coleccion = sala.modo === 'canciones' ? CANCIONES : PELICULAS;
+  const coleccion = obtenerColeccion(sala.modo, sala.subcategoria);
   const disponibles = coleccion.filter((item) => !sala.usados.includes(item.id));
   const pool = disponibles.length > 0 ? disponibles : coleccion;
   const elegido = barajar([...pool])[0];
@@ -162,20 +170,19 @@ async function prepararNuevaRondaOnline(sala) {
   sala.ronda = {
     id: elegido.id,
     item: elegido,
-    pistaActual: 1, // 1, 2, 3
+    pistaActual: 1,
     pista1: sala.modo === 'canciones' ? elegido.frase : elegido.protagonistas,
     pista2: sala.modo === 'canciones' ? `${elegido.artista} (${elegido.año})` : `${elegido.genero} (${elegido.año})`,
     pista3: sala.modo === 'canciones' ? audioUrl : elegido.sinopsis,
     bloqueados: [],
-    pulsado: null, // { jugadorId, nombre, texto }
-    estadoRonda: 'activa', // 'activa' | 'resuelta'
+    pulsado: null,
+    estadoRonda: 'activa',
     solucion: null,
     extra: null,
     mensaje: null
   };
 }
 
-// 1. Crear sala online
 router.post('/online/crear', (req, res) => {
   const nombre = (req.body?.nombre || '').trim();
   if (!nombre) return res.status(400).json({ error: 'Debes indicar un nombre.' });
@@ -188,8 +195,9 @@ router.post('/online/crear', (req, res) => {
   salasOnline[code] = {
     code,
     adminToken: tokenAdmin,
-    estado: 'lobby', // 'lobby' | 'jugando' | 'final'
-    modo: 'canciones', // 'canciones' | 'peliculas'
+    estado: 'lobby',
+    modo: 'canciones',
+    subcategoria: 'moderna',
     rondaNum: 1,
     usados: [],
     jugadores: [{ id: 1, token: tokenAdmin, nombre, puntos: 0, conectado: true }],
@@ -199,7 +207,6 @@ router.post('/online/crear', (req, res) => {
   res.json({ success: true, code, token: tokenAdmin, jugadorId: 1 });
 });
 
-// 2. Unirse a sala online
 router.post('/online/unirse', (req, res) => {
   const code = (req.body?.code || '').trim().toUpperCase();
   const nombre = (req.body?.nombre || '').trim();
@@ -219,18 +226,18 @@ router.post('/online/unirse', (req, res) => {
   res.json({ success: true, code, token, jugadorId: nuevoId });
 });
 
-// 3. Cambiar modalidad (sólo anfitrión en el lobby)
 router.post('/online/sala/:code/modo', (req, res) => {
   const code = req.params.code.toUpperCase();
-  const { token, modo } = req.body || {};
+  const { token, modo, subcategoria } = req.body || {};
   const sala = salasOnline[code];
   if (!sala || sala.adminToken !== token) return res.status(403).json({ error: 'No autorizado.' });
 
-  sala.modo = modo === 'peliculas' ? 'peliculas' : 'canciones';
-  res.json({ success: true, modo: sala.modo });
+  if (modo) sala.modo = modo === 'peliculas' ? 'peliculas' : 'canciones';
+  if (subcategoria) sala.subcategoria = subcategoria === 'antigua' ? 'antigua' : 'moderna';
+
+  res.json({ success: true, modo: sala.modo, subcategoria: sala.subcategoria });
 });
 
-// 4. Estado de la sala
 router.get('/online/sala/:code', (req, res) => {
   const code = req.params.code.toUpperCase();
   const token = req.query.token;
@@ -248,6 +255,7 @@ router.get('/online/sala/:code', (req, res) => {
     code: sala.code,
     estado: sala.estado,
     modo: sala.modo,
+    subcategoria: sala.subcategoria,
     esAdmin,
     yoId: jugadorActual.id,
     rondaNum: sala.rondaNum,
@@ -273,7 +281,6 @@ router.get('/online/sala/:code', (req, res) => {
   });
 });
 
-// 5. Iniciar partida desde el lobby (sólo anfitrión)
 router.post('/online/sala/:code/iniciar', async (req, res) => {
   const code = req.params.code.toUpperCase();
   const { token } = req.body || {};
@@ -291,7 +298,6 @@ router.post('/online/sala/:code/iniciar', async (req, res) => {
   res.json({ success: true });
 });
 
-// 6. Avanzar pista (1 -> 2 -> 3)
 router.post('/online/sala/:code/pista-siguiente', (req, res) => {
   const code = req.params.code.toUpperCase();
   const { token } = req.body || {};
@@ -306,7 +312,6 @@ router.post('/online/sala/:code/pista-siguiente', (req, res) => {
   res.json({ success: true, pistaActual: sala.ronda.pistaActual });
 });
 
-// 7. Pulsador rojo online
 router.post('/online/sala/:code/pulsar', (req, res) => {
   const code = req.params.code.toUpperCase();
   const { token } = req.body || {};
@@ -334,7 +339,6 @@ router.post('/online/sala/:code/pulsar', (req, res) => {
   res.json({ success: true });
 });
 
-// 8. Transmisión de tecleo en vivo
 router.post('/online/sala/:code/teclear', (req, res) => {
   const code = req.params.code.toUpperCase();
   const { token, texto } = req.body || {};
@@ -349,7 +353,6 @@ router.post('/online/sala/:code/teclear', (req, res) => {
   res.json({ success: true });
 });
 
-// 9. Responder y validar online
 router.post('/online/sala/:code/responder', (req, res) => {
   const code = req.params.code.toUpperCase();
   const { token, respuesta } = req.body || {};
@@ -398,7 +401,6 @@ router.post('/online/sala/:code/responder', (req, res) => {
   res.json({ success: true, acierto });
 });
 
-// 10. Rendirse / solución
 router.post('/online/sala/:code/solucion', (req, res) => {
   const code = req.params.code.toUpperCase();
   const sala = salasOnline[code];
@@ -417,7 +419,6 @@ router.post('/online/sala/:code/solucion', (req, res) => {
   res.json({ success: true });
 });
 
-// 11. Siguiente ronda online
 router.post('/online/sala/:code/siguiente-ronda', async (req, res) => {
   const code = req.params.code.toUpperCase();
   const { token } = req.body || {};
@@ -431,7 +432,6 @@ router.post('/online/sala/:code/siguiente-ronda', async (req, res) => {
   res.json({ success: true });
 });
 
-// 12. Finalizar partida y ver podio
 router.post('/online/sala/:code/finalizar', (req, res) => {
   const code = req.params.code.toUpperCase();
   const { token } = req.body || {};
@@ -443,7 +443,6 @@ router.post('/online/sala/:code/finalizar', (req, res) => {
   res.json({ success: true });
 });
 
-// 13. Reiniciar
 router.post('/online/sala/:code/reiniciar', (req, res) => {
   const code = req.params.code.toUpperCase();
   const { token } = req.body || {};
@@ -460,7 +459,6 @@ router.post('/online/sala/:code/reiniciar', (req, res) => {
   res.json({ success: true });
 });
 
-// 14. Salir
 router.post('/online/sala/:code/salir', (req, res) => {
   const code = req.params.code.toUpperCase();
   const { token } = req.body || {};
