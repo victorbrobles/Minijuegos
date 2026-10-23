@@ -249,9 +249,9 @@ function inicializarRondaOnline(sala, catNombre) {
     };
   });
 
+  // Primera ronda: jugador inicial aleatorio. Resto de rondas: el que dejó fijado la ronda anterior.
   const ids = sala.jugadores.map((j) => j.id);
-  const orden = barajar([...ids]);
-  const primerTurnoId = orden[0];
+  const primerTurnoId = sala.proximoInicialId ?? barajar([...ids])[0];
 
   sala.ronda = {
     categoria: catElegida,
@@ -272,6 +272,21 @@ function inicializarRondaOnline(sala, catNombre) {
   };
 }
 
+// Decide quién abre la siguiente ronda:
+// - Si un jugador que recibió un rebote completa el ranking, abre él la siguiente.
+// - En cualquier otro caso (el inicial completa el ranking, o nadie lo completa), pasa al siguiente en orden.
+function fijarProximoInicial(sala, completado) {
+  const ronda = sala.ronda;
+  const ids = sala.jugadores.map((j) => j.id);
+
+  if (completado && ronda.esRebote) {
+    sala.proximoInicialId = ronda.jugadorTurnoId;
+  } else {
+    const idx = ids.indexOf(ronda.jugadorInicialRondaId);
+    sala.proximoInicialId = ids[(idx + 1) % ids.length];
+  }
+}
+
 function pasarReboteOnline(sala, tipoFallo) {
   const ronda = sala.ronda;
 
@@ -289,7 +304,10 @@ function pasarReboteOnline(sala, tipoFallo) {
     .filter((id) => !ronda.jugadoresIntentados.includes(id));
 
   if (noHanJugado.length > 0) {
-    const siguienteRebote = noHanJugado[Math.floor(Math.random() * noHanJugado.length)];
+    // Rebote secuencial: el siguiente jugador en orden respecto al que acaba de fallar
+    const ids = sala.jugadores.map((j) => j.id);
+    const idxActual = ids.indexOf(ronda.jugadorTurnoId);
+    const siguienteRebote = ids[(idxActual + 1) % ids.length];
     ronda.jugadorTurnoId = siguienteRebote;
     ronda.jugadoresIntentados.push(siguienteRebote);
     ronda.esRebote = true;
@@ -297,6 +315,7 @@ function pasarReboteOnline(sala, tipoFallo) {
     ronda.mensajeFeedback = null;
   } else {
     // Todos fallaron: mostrar solución
+    fijarProximoInicial(sala, false);
     ronda.solucionFinal = ronda.elementosOriginales.map((e) => ({
       posicion: e.posicion,
       valor: e.valor
@@ -319,6 +338,7 @@ router.post('/online/crear', (req, res) => {
     estado: 'lobby', // 'lobby' | 'categoria' | 'jugando' | 'final'
     adminToken: tokenAdmin,
     rondaNum: 1,
+    proximoInicialId: null,
     jugadores: [{ id: 1, nombre: nombre.trim(), token: tokenAdmin, puntos: 0 }],
     ronda: null
   };
@@ -501,6 +521,7 @@ router.post('/online/sala/:code/validar', (req, res) => {
 
     const quedanOcultos = sala.ronda.puestos.some((p) => p.oculto);
     if (!quedanOcultos) {
+      fijarProximoInicial(sala, true);
       setTimeout(() => {
         if (!sala.ronda) return;
         sala.ronda.faseRonda = 'resumen';
