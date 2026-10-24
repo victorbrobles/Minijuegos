@@ -344,10 +344,10 @@ export default function RankingsOnline({ onLocal, onSalir }) {
               <p><strong>1. Dinámica del juego:</strong></p>
               <ul>
                 <li>Elige categoría y aparecerá un ranking real con varios puestos ocultos.</li>
-                <li>Un jugador al azar empieza la primera ronda con <strong>90 segundos</strong> de tiempo. En las siguientes, el turno inicial pasa al siguiente jugador en orden (salvo que alguien complete el ranking tras un rebote: entonces abre él la siguiente ronda).</li>
+                <li>La primera ronda empieza con un jugador al azar. En las siguientes, el turno inicial pasa de forma <strong>secuencial</strong> al siguiente jugador de la lista.</li>
                 <li><strong>No hace falta indicar el puesto:</strong> escribe cualquier elemento que creas que falta; si es correcto, se colocará en su posición automáticamente.</li>
                 <li>Si fallas o se agota el tiempo, el turno pasa por <strong>rebote</strong> al siguiente jugador en orden.</li>
-                <li>Si nadie completa el ranking tras probar todos, se revela la <strong>solución completa</strong> antes de mostrar las puntuaciones.</li>
+                <li>La siguiente ronda <strong>SIEMPRE</strong> la abre el jugador que va después de quien abrió la actual, independientemente de quién acierte por rebote.</li>
               </ul>
 
               <p><strong>2. Pistas y bloqueo en rebote:</strong></p>

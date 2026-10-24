@@ -73,8 +73,8 @@ function Turno({ jugador, ronda, esRebote, motivo, categoria, reto, onAcierto, o
       <p className="categoria"><Icon name={categoria.icono} size={16} />{categoria.nombre}</p>
 
       <div className="sigla-card rf-reto">
-        <p className="rf-n">{reto.n}</p>
-        <p className="rf-texto">{reto.texto}</p>
+        <p className="rf-n" style={{ color: '#dc2626', fontSize: '3.5rem', fontWeight: '900', lineHeight: 1 }}>{reto.n}</p>
+        <p className="rf-texto" style={{ color: '#1e293b', fontSize: '1.25rem', fontWeight: '600', marginTop: '0.5rem' }}>{reto.texto}</p>
       </div>
 
       <div className="timer" role="timer" aria-label="Tiempo restante">
@@ -116,6 +116,8 @@ export default function RapidfireLocal({ onVolver, onExit }) {
   ]);
   const [puntos, setPuntos] = useState({});
   const [ronda, setRonda] = useState(1);
+  const [jugadorInicialRonda, setJugadorInicialRonda] = useState(0);
+  const [proximoInicialRonda, setProximoInicialRonda] = useState(0);
   const [turno, setTurno] = useState(0);
   const [intento, setIntento] = useState(0);
   const [motivo, setMotivo] = useState(null);
@@ -124,11 +126,8 @@ export default function RapidfireLocal({ onVolver, onExit }) {
   const [reto, setReto] = useState(null);
   const [ultimo, setUltimo] = useState(null);
   const usados = useRef([]);
-  const bolsa = useRef([]);
-  const ultimoAbre = useRef(-1);
   const intentados = useRef(new Set());
 
-  // Carga de categorías desde el backend al montar el componente
   useEffect(() => {
     fetch('/api/rapidfire/categorias')
       .then((r) => r.json())
@@ -150,27 +149,6 @@ export default function RapidfireLocal({ onVolver, onExit }) {
     setJugadores(jugadores.map((j, i) => (i === index ? { ...j, nombre: valor } : j)));
   };
 
-  const siguienteApertura = () => {
-    if (bolsa.current.length === 0) bolsa.current = jugadores.map((_, i) => i);
-    const sinRepetir = bolsa.current.filter((i) => i !== ultimoAbre.current);
-    const candidatos = sinRepetir.length > 0 ? sinRepetir : bolsa.current;
-    const elegido = candidatos[aleatorio(candidatos.length)];
-    bolsa.current = bolsa.current.filter((i) => i !== elegido);
-    ultimoAbre.current = elegido;
-    return elegido;
-  };
-
-  const siguienteRebote = (actual) => {
-    let candidatos = jugadores.map((_, i) => i).filter((i) => !intentados.current.has(i));
-    if (candidatos.length === 0) {
-      intentados.current = new Set([actual]);
-      candidatos = jugadores.map((_, i) => i).filter((i) => i !== actual);
-    }
-    const elegido = candidatos[aleatorio(candidatos.length)];
-    intentados.current.add(elegido);
-    return elegido;
-  };
-
   const sortearOpciones = (cats = categoriasTodas) => {
     if (!cats.length) return;
     setOpciones(barajar(cats).slice(0, NUM_OPCIONES));
@@ -182,9 +160,12 @@ export default function RapidfireLocal({ onVolver, onExit }) {
     setPuntos(Object.fromEntries(lista.map((j) => [j.id, 0])));
     usados.current = [];
     setRonda(1);
-    bolsa.current = [];
-    ultimoAbre.current = -1;
-    setTurno(siguienteApertura());
+
+    const primer = aleatorio(lista.length);
+    setJugadorInicialRonda(primer);
+    setProximoInicialRonda((primer + 1) % lista.length);
+    setTurno(primer);
+    
     setUltimo(null);
     sortearOpciones(categoriasTodas);
     setPaso('categorias');
@@ -214,14 +195,26 @@ export default function RapidfireLocal({ onVolver, onExit }) {
   };
 
   const pasarTurno = (porque) => {
-    setTurno(siguienteRebote(turno));
-    setIntento((k) => k + 1);
-    setMotivo(porque);
+    let sig = (turno + 1) % jugadores.length;
+    let intentosLoop = 0;
+    while (intentados.current.has(sig) && intentosLoop < jugadores.length) {
+      sig = (sig + 1) % jugadores.length;
+      intentosLoop++;
+    }
+
+    if (!intentados.current.has(sig)) {
+      intentados.current.add(sig);
+      setTurno(sig);
+      setIntento((k) => k + 1);
+      setMotivo(porque);
+    } else {
+      setProximoInicialRonda((jugadorInicialRonda + 1) % jugadores.length);
+      cerrarRonda({ tipo: 'rendido' });
+    }
   };
 
   const cerrarRonda = (resultado) => {
     setUltimo(resultado);
-    setTurno(siguienteApertura());
     setPaso('puntuaciones');
   };
 
@@ -229,13 +222,25 @@ export default function RapidfireLocal({ onVolver, onExit }) {
     const jugador = jugadores[turno];
     const ganados = reto.n * PUNTOS_POR_ACIERTO;
     setPuntos((p) => ({ ...p, [jugador.id]: (p[jugador.id] ?? 0) + ganados }));
+
+    // Siempre avanza de forma secuencial al que le sigue al que abrió la ronda actual
+    setProximoInicialRonda((jugadorInicialRonda + 1) % jugadores.length);
+
     cerrarRonda({ tipo: intento > 0 ? 'rebote' : 'acierto', jugador: jugador.nombre, puntos: ganados });
   };
 
-  const rendirse = () => cerrarRonda({ tipo: 'rendido' });
+  const rendirse = () => {
+    setProximoInicialRonda((jugadorInicialRonda + 1) % jugadores.length);
+    cerrarRonda({ tipo: 'rendido' });
+  };
 
   const continuar = () => {
     setRonda((r) => r + 1);
+    setJugadorInicialRonda(proximoInicialRonda);
+    setTurno(proximoInicialRonda);
+    intentados.current = new Set();
+    setMotivo(null);
+    setIntento(0);
     sortearOpciones(categoriasTodas);
     setPaso('categorias');
   };
@@ -289,12 +294,12 @@ export default function RapidfireLocal({ onVolver, onExit }) {
               <div className="modal-ayuda-cuerpo">
                 <p><strong>1. Dinámica del juego:</strong></p>
                 <ul>
-                  <li>Configura los jugadores y pulsa <em>¡Empezar!</em>. Se sorteará quién abre la ronda.</li>
+                  <li>Configura los jugadores y pulsa <em>¡Empezar!</em>. El primer turno de la primera ronda se sortea. En las siguientes será secuencial.</li>
                   <li>El jugador en turno elige 1 de las 3 categorías temáticas sorteadas.</li>
                   <li>Aparece un reto con el número de elementos requeridos (ej. <em>Di 5 películas de terror</em>).</li>
                   <li>Hay <strong>3 segundos de preparación</strong> antes de que empiecen a correr los <strong>60 segundos</strong>.</li>
-                  <li>Si dice todos los elementos requeridos a tiempo, pulsa <strong>«Correcto»</strong>.</li>
-                  <li>Si falla o se agota el tiempo, el turno pasa por <strong>rebote aleatorio</strong> a otro jugador.</li>
+                  <li>Si fallas o se agota el tiempo, el turno pasa por <strong>rebote</strong> al siguiente jugador de forma secuencial.</li>
+                  <li>La siguiente ronda siempre la abrirá el jugador siguiente al que empezó la ronda actual, independientemente de quién acierte o si hay rebotes.</li>
                 </ul>
 
                 <p><strong>2. Sistema de puntuación:</strong></p>
@@ -355,7 +360,7 @@ export default function RapidfireLocal({ onVolver, onExit }) {
           </div>
         </div>
         <button className="big full" onClick={empezar}>
-          <Icon name="dice" size={24} />¡Empezar! Sortear quién abre
+          <Icon name="dice" size={24} />¡Empezar! Sortear primer turno
         </button>
       </section>
     );
@@ -365,10 +370,13 @@ export default function RapidfireLocal({ onVolver, onExit }) {
     const jugador = jugadores[turno];
     return (
       <section className="game">
-        <p className="categoria"><Icon name="flagFinish" size={16} />Ronda {ronda}</p>
+        <div className="hud">
+          <span className="chip"><Icon name="flagFinish" size={18} />Ronda {ronda}</span>
+          <span className="chip alt">Turno de: {jugador.nombre}</span>
+        </div>
         <div className="starter">
           <Icon name="dice" size={28} />
-          <p>{ronda === 1 ? 'Empieza' : 'Abre la ronda'} <strong>{jugador.nombre}</strong></p>
+          <p>{ronda === 1 ? 'Empieza al azar' : 'Abre la ronda'} <strong>{jugador.nombre}</strong></p>
         </div>
         <h3 className="section-title">{jugador.nombre}, elige una categoría</h3>
         <div className="rf-opciones">
@@ -413,7 +421,7 @@ export default function RapidfireLocal({ onVolver, onExit }) {
           {ultimo && (
             <p className="reveal">
               {ultimo.tipo === 'rendido'
-                ? 'Os habéis rendido: nadie suma puntos esta ronda.'
+                ? 'Os habéis rendido o nadie lo logró: nadie suma puntos esta ronda.'
                 : ultimo.tipo === 'rebote'
                   ? <><strong>{ultimo.jugador}</strong> ha cogido el rebote y se lleva <strong>{ultimo.puntos} puntos</strong>.</>
                   : <><strong>{ultimo.jugador}</strong> lo ha dicho todo y suma <strong>{ultimo.puntos} puntos</strong>.</>}

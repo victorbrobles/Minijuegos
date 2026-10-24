@@ -189,3 +189,10 @@
 .lb-punto {
   display: none !important;
 }
+
+.rf-reto .rf-texto {
+  color: #1e293b; /* Color oscuro para que se lea perfectamente */
+  font-weight: 600;
+  font-size: 1.2rem;
+  margin-top: 0.5rem;
+}

@@ -20,9 +20,6 @@ function barajarArray(array) {
 // ==========================================
 // RUTAS MODO LOCAL
 // ==========================================
-
-// GET /api/rapidfire/categorias
-// Devuelve las categorías con sus metadatos sin cargar todos los retos de golpe
 router.get('/categorias', (req, res) => {
   const lista = CATEGORIAS.map((c) => ({
     id: c.id,
@@ -32,8 +29,6 @@ router.get('/categorias', (req, res) => {
   res.json({ success: true, categorias: lista });
 });
 
-// POST /api/rapidfire/reto-local
-// Devuelve un reto al azar de la categoría elegida
 router.post('/reto-local', (req, res) => {
   const { categoriaId, usados = [] } = req.body || {};
   const catObj = CATEGORIAS.find((c) => c.id === categoriaId);
@@ -74,27 +69,23 @@ function sortearCategorias() {
   }));
 }
 
-function elegirSiguienteApertura(sala) {
-  if (sala.bolsa.length === 0) {
-    sala.bolsa = sala.jugadores.map((j) => j.id);
-  }
-  const sinRepetir = sala.bolsa.filter((id) => id !== sala.ultimoAbre);
-  const candidatos = sinRepetir.length > 0 ? sinRepetir : sala.bolsa;
-  const elegido = candidatos[Math.floor(Math.random() * candidatos.length)];
-  sala.bolsa = sala.bolsa.filter((id) => id !== elegido);
-  sala.ultimoAbre = elegido;
-  return elegido;
-}
-
 function elegirSiguienteRebote(sala, actualId) {
-  let candidatos = sala.jugadores.map((j) => j.id).filter((id) => !sala.ronda.intentados.includes(id));
-  if (candidatos.length === 0) {
-    sala.ronda.intentados = [actualId];
-    candidatos = sala.jugadores.map((j) => j.id).filter((id) => id !== actualId);
+  const ids = sala.jugadores.map((j) => j.id);
+  const idxActual = ids.indexOf(actualId);
+  let siguienteIdx = (idxActual + 1) % ids.length;
+  let intentos = 0;
+
+  while (sala.ronda.intentados.includes(ids[siguienteIdx]) && intentos < ids.length) {
+    siguienteIdx = (siguienteIdx + 1) % ids.length;
+    intentos++;
   }
-  const elegido = candidatos[Math.floor(Math.random() * candidatos.length)];
-  sala.ronda.intentados.push(elegido);
-  return elegido;
+
+  const elegido = ids[siguienteIdx];
+  if (!sala.ronda.intentados.includes(elegido)) {
+    sala.ronda.intentados.push(elegido);
+    return elegido;
+  }
+  return null; // Todos han jugado
 }
 
 // POST /api/rapidfire/online/crear
@@ -111,8 +102,7 @@ router.post('/online/crear', (req, res) => {
     estado: 'lobby', // 'lobby' | 'categorias' | 'turno' | 'puntuaciones' | 'final'
     adminToken: tokenAdmin,
     rondaNum: 1,
-    bolsa: [],
-    ultimoAbre: -1,
+    proximoInicialId: null,
     usados: [],
     jugadores: [{ id: 1, nombre: nombre.trim(), token: tokenAdmin, puntos: 0 }],
     ronda: null
@@ -169,13 +159,23 @@ router.get('/online/sala/:code', (req, res) => {
         segsTurno = Math.max(0, Math.ceil((sala.ronda.finTurno - ahora) / 1000));
         if (segsTurno === 0 && !sala.ronda.tiempoAgotadoProcesado) {
           sala.ronda.tiempoAgotadoProcesado = true;
+          
           const siguienteId = elegirSiguienteRebote(sala, sala.ronda.jugadorTurnoId);
-          sala.ronda.jugadorTurnoId = siguienteId;
-          sala.ronda.intento += 1;
-          sala.ronda.motivo = 'tiempo';
-          sala.ronda.finPrep = ahora + PREPARACION_S * 1000;
-          sala.ronda.finTurno = ahora + (PREPARACION_S + TIEMPO_S) * 1000;
-          sala.ronda.tiempoAgotadoProcesado = false;
+          if (siguienteId) {
+            sala.ronda.jugadorTurnoId = siguienteId;
+            sala.ronda.intento += 1;
+            sala.ronda.motivo = 'tiempo';
+            sala.ronda.finPrep = ahora + PREPARACION_S * 1000;
+            sala.ronda.finTurno = ahora + (PREPARACION_S + TIEMPO_S) * 1000;
+            sala.ronda.tiempoAgotadoProcesado = false;
+          } else {
+            // Todos han fallado
+            const ids = sala.jugadores.map(j => j.id);
+            const idxInicial = ids.indexOf(sala.ronda.jugadorInicialRondaId);
+            sala.proximoInicialId = ids[(idxInicial + 1) % ids.length];
+            sala.ronda.ultimo = { tipo: 'rendido' };
+            sala.estado = 'puntuaciones';
+          }
         }
       }
     }
@@ -216,13 +216,14 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
 
   sala.estado = 'categorias';
   sala.rondaNum = 1;
-  sala.bolsa = [];
-  sala.ultimoAbre = -1;
   sala.usados = [];
 
-  const primerTurno = elegirSiguienteApertura(sala);
+  const ids = sala.jugadores.map((j) => j.id);
+  const primerTurno = ids[Math.floor(Math.random() * ids.length)];
+  sala.proximoInicialId = ids[(ids.indexOf(primerTurno) + 1) % ids.length];
 
   sala.ronda = {
+    jugadorInicialRondaId: primerTurno,
     jugadorTurnoId: primerTurno,
     opciones: sortearCategorias(),
     categoria: null,
@@ -278,39 +279,55 @@ router.post('/online/sala/:code/elegir-categoria', (req, res) => {
 });
 
 // POST /api/rapidfire/online/sala/:code/accion-admin
-// Exclusivo del anfitrión: decide si fue acierto, rebote o rendición
 router.post('/online/sala/:code/accion-admin', (req, res) => {
   const sala = salasOnline.get(req.params.code?.toUpperCase());
   if (!sala || sala.adminToken !== req.body?.token) {
     return res.status(403).json({ error: 'Solo el anfitrión tiene el rol de juez.' });
   }
 
-  const { accion } = req.body || {}; // 'acierto' | 'rebote' | 'rendirse'
+  const { accion } = req.body || {}; 
   const ahora = Date.now();
   const jTurno = sala.jugadores.find((j) => j.id === sala.ronda.jugadorTurnoId);
+  const ids = sala.jugadores.map((j) => j.id);
 
   if (accion === 'acierto') {
     const ganados = sala.ronda.reto.n * PUNTOS_POR_ACIERTO;
     jTurno.puntos += ganados;
 
+    const esRebote = sala.ronda.intento > 0;
+    
+    // Siempre avanza al siguiente secuencial
+    const idx = ids.indexOf(sala.ronda.jugadorInicialRondaId);
+    sala.proximoInicialId = ids[(idx + 1) % ids.length];
+
     sala.ronda.ultimo = {
-      tipo: sala.ronda.intento > 0 ? 'rebote' : 'acierto',
+      tipo: esRebote ? 'rebote' : 'acierto',
       jugador: jTurno.nombre,
       puntos: ganados
     };
-    sala.ronda.jugadorTurnoId = elegirSiguienteApertura(sala);
     sala.estado = 'puntuaciones';
+
   } else if (accion === 'rebote') {
     const siguienteId = elegirSiguienteRebote(sala, sala.ronda.jugadorTurnoId);
-    sala.ronda.jugadorTurnoId = siguienteId;
-    sala.ronda.intento += 1;
-    sala.ronda.motivo = 'rebote';
-    sala.ronda.finPrep = ahora + PREPARACION_S * 1000;
-    sala.ronda.finTurno = ahora + (PREPARACION_S + TIEMPO_S) * 1000;
-    sala.ronda.tiempoAgotadoProcesado = false;
+    if (siguienteId) {
+      sala.ronda.jugadorTurnoId = siguienteId;
+      sala.ronda.intento += 1;
+      sala.ronda.motivo = 'rebote';
+      sala.ronda.finPrep = ahora + PREPARACION_S * 1000;
+      sala.ronda.finTurno = ahora + (PREPARACION_S + TIEMPO_S) * 1000;
+      sala.ronda.tiempoAgotadoProcesado = false;
+    } else {
+      // Si todos han fallado
+      const idx = ids.indexOf(sala.ronda.jugadorInicialRondaId);
+      sala.proximoInicialId = ids[(idx + 1) % ids.length];
+      sala.ronda.ultimo = { tipo: 'rendido' };
+      sala.estado = 'puntuaciones';
+    }
+
   } else if (accion === 'rendirse') {
+    const idx = ids.indexOf(sala.ronda.jugadorInicialRondaId);
+    sala.proximoInicialId = ids[(idx + 1) % ids.length];
     sala.ronda.ultimo = { tipo: 'rendido' };
-    sala.ronda.jugadorTurnoId = elegirSiguienteApertura(sala);
     sala.estado = 'puntuaciones';
   }
 
@@ -323,13 +340,22 @@ router.post('/online/sala/:code/continuar-ronda', (req, res) => {
   if (!sala || sala.adminToken !== req.body?.token) return res.status(403).json({ error: 'No autorizado.' });
 
   sala.rondaNum += 1;
-  sala.ronda.opciones = sortearCategorias();
-  sala.ronda.categoria = null;
-  sala.ronda.reto = null;
-  sala.ronda.intento = 0;
-  sala.ronda.motivo = null;
-  sala.ronda.intentados = [sala.ronda.jugadorTurnoId];
-  sala.ronda.ultimo = null;
+  const siguienteTurno = sala.proximoInicialId;
+
+  sala.ronda = {
+    jugadorInicialRondaId: siguienteTurno,
+    jugadorTurnoId: siguienteTurno,
+    opciones: sortearCategorias(),
+    categoria: null,
+    reto: null,
+    intento: 0,
+    motivo: null,
+    intentados: [siguienteTurno],
+    finPrep: 0,
+    finTurno: 0,
+    tiempoAgotadoProcesado: false,
+    ultimo: null
+  };
   sala.estado = 'categorias';
 
   res.json({ success: true });

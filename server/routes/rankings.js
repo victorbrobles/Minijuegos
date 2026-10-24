@@ -249,9 +249,14 @@ function inicializarRondaOnline(sala, catNombre) {
     };
   });
 
-  // Primera ronda: jugador inicial aleatorio. Resto de rondas: el que dejó fijado la ronda anterior.
   const ids = sala.jugadores.map((j) => j.id);
-  const primerTurnoId = sala.proximoInicialId ?? barajar([...ids])[0];
+  
+  let primerTurnoId;
+  if (sala.rondaNum === 1 || !sala.proximoInicialId) {
+    primerTurnoId = barajar([...ids])[0];
+  } else {
+    primerTurnoId = sala.proximoInicialId;
+  }
 
   sala.ronda = {
     categoria: catElegida,
@@ -268,29 +273,20 @@ function inicializarRondaOnline(sala, catNombre) {
     motivo: null,
     mensajeFeedback: null,
     solucionFinal: null,
-    faseRonda: 'jugando' // 'jugando' | 'solucion' | 'resumen'
+    faseRonda: 'jugando' 
   };
 }
 
-// Decide quién abre la siguiente ronda:
-// - Si un jugador que recibió un rebote completa el ranking, abre él la siguiente.
-// - En cualquier otro caso (el inicial completa el ranking, o nadie lo completa), pasa al siguiente en orden.
-function fijarProximoInicial(sala, completado) {
-  const ronda = sala.ronda;
+// Fija el siguiente jugador inicial de forma puramente secuencial
+function fijarProximoInicial(sala) {
   const ids = sala.jugadores.map((j) => j.id);
-
-  if (completado && ronda.esRebote) {
-    sala.proximoInicialId = ronda.jugadorTurnoId;
-  } else {
-    const idx = ids.indexOf(ronda.jugadorInicialRondaId);
-    sala.proximoInicialId = ids[(idx + 1) % ids.length];
-  }
+  const idx = ids.indexOf(sala.ronda.jugadorInicialRondaId);
+  sala.proximoInicialId = ids[(idx + 1) % ids.length];
 }
 
 function pasarReboteOnline(sala, tipoFallo) {
   const ronda = sala.ronda;
 
-  // Bloqueo de pistas no pedidas
   const nuevosBloqueos = { ...ronda.pistasBloqueadas };
   ronda.puestos.forEach((p) => {
     if (p.oculto && !ronda.pistasUsadas[p.posicion]) {
@@ -299,23 +295,26 @@ function pasarReboteOnline(sala, tipoFallo) {
   });
   ronda.pistasBloqueadas = nuevosBloqueos;
 
-  const noHanJugado = sala.jugadores
-    .map((j) => j.id)
-    .filter((id) => !ronda.jugadoresIntentados.includes(id));
+  const ids = sala.jugadores.map((j) => j.id);
+  const idxActual = ids.indexOf(ronda.jugadorTurnoId);
+  let siguienteIdx = (idxActual + 1) % ids.length;
+  let intentos = 0;
 
-  if (noHanJugado.length > 0) {
-    // Rebote secuencial: el siguiente jugador en orden respecto al que acaba de fallar
-    const ids = sala.jugadores.map((j) => j.id);
-    const idxActual = ids.indexOf(ronda.jugadorTurnoId);
-    const siguienteRebote = ids[(idxActual + 1) % ids.length];
-    ronda.jugadorTurnoId = siguienteRebote;
-    ronda.jugadoresIntentados.push(siguienteRebote);
+  while (ronda.jugadoresIntentados.includes(ids[siguienteIdx]) && intentos < ids.length) {
+    siguienteIdx = (siguienteIdx + 1) % ids.length;
+    intentos++;
+  }
+
+  const elegido = ids[siguienteIdx];
+
+  if (!ronda.jugadoresIntentados.includes(elegido)) {
+    ronda.jugadorTurnoId = elegido;
+    ronda.jugadoresIntentados.push(elegido);
     ronda.esRebote = true;
     ronda.motivo = tipoFallo;
     ronda.mensajeFeedback = null;
   } else {
-    // Todos fallaron: mostrar solución
-    fijarProximoInicial(sala, false);
+    fijarProximoInicial(sala);
     ronda.solucionFinal = ronda.elementosOriginales.map((e) => ({
       posicion: e.posicion,
       valor: e.valor
@@ -335,7 +334,7 @@ router.post('/online/crear', (req, res) => {
   const tokenAdmin = 'tok_' + Math.random().toString(36).substring(2);
   const sala = {
     code,
-    estado: 'lobby', // 'lobby' | 'categoria' | 'jugando' | 'final'
+    estado: 'lobby',
     adminToken: tokenAdmin,
     rondaNum: 1,
     proximoInicialId: null,
@@ -419,6 +418,7 @@ router.post('/online/sala/:code/iniciar-partida', (req, res) => {
 
   sala.estado = 'categoria';
   sala.rondaNum = 1;
+  sala.proximoInicialId = null;
   res.json({ success: true });
 });
 
@@ -521,7 +521,7 @@ router.post('/online/sala/:code/validar', (req, res) => {
 
     const quedanOcultos = sala.ronda.puestos.some((p) => p.oculto);
     if (!quedanOcultos) {
-      fijarProximoInicial(sala, true);
+      fijarProximoInicial(sala);
       setTimeout(() => {
         if (!sala.ronda) return;
         sala.ronda.faseRonda = 'resumen';

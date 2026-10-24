@@ -28,7 +28,7 @@ function TurnoRanking({
   onPasarTurno,
   onTiempoAgotado,
   mensajeFeedback,
-  elementosRojos // <-- NUEVO ESTADO PARA EL DESTELLO ROJO
+  elementosRojos
 }) {
   const [prep, setPrep] = useState(PREPARACION_S);
   const [restante, setRestante] = useState(TIEMPO_TURNO);
@@ -302,6 +302,7 @@ export default function RankingsLocal({ onVolver, onExit }) {
     });
     setPuntos(puntuacionesIniciales);
 
+    // Turno del primer jugador de la primera ronda: aleatorio
     const primerJugador = Math.floor(Math.random() * listaActualizada.length);
     setJugadorInicialRonda(primerJugador);
     setJugadorTurno(primerJugador);
@@ -365,10 +366,11 @@ export default function RankingsLocal({ onVolver, onExit }) {
 
         const quedanOcultos = puestosActualizados.some((p) => p.oculto);
         if (!quedanOcultos) {
-          setTimeout(() => finalizarRonda(true), 1200);
+          // El ranking se completó. Siempre pasamos la próxima apertura al siguiente secuencial de la ronda actual.
+          setJugadorInicialRonda((jugadorInicialRonda + 1) % jugadores.length);
+          setTimeout(() => finalizarRonda(), 1200);
         }
       } else {
-        // LÓGICA DE FALLO: DESTELLO ROJO Y MENSAJE ANTES DE REBOTAR
         setElementosRojos(true);
         setMensajeFeedback({ tipo: 'alerta', texto: `¡Fallo! "${inputRespuesta}" no está en el ranking.` });
         setTimeout(() => {
@@ -390,22 +392,25 @@ export default function RankingsLocal({ onVolver, onExit }) {
     });
     setPistasBloqueadas(nuevosBloqueos);
 
-    const noHanJugado = [];
-    for (let i = 0; i < jugadores.length; i++) {
-      if (!jugadoresIntentados.includes(i)) noHanJugado.push(i);
+    // Siguiente jugador secuencial que aún no haya participado en esta ronda
+    let siguienteIdx = (jugadorTurno + 1) % jugadores.length;
+    let intentosBucle = 0;
+    while (jugadoresIntentados.includes(siguienteIdx) && intentosBucle < jugadores.length) {
+      siguienteIdx = (siguienteIdx + 1) % jugadores.length;
+      intentosBucle++;
     }
 
-    if (noHanJugado.length > 0) {
-      // Rebote secuencial: el siguiente jugador en orden
-      const siguienteRebote = (jugadorTurno + 1) % jugadores.length;
-      setJugadorTurno(siguienteRebote);
-      setJugadoresIntentados([...jugadoresIntentados, siguienteRebote]);
+    if (!jugadoresIntentados.includes(siguienteIdx)) {
+      setJugadorTurno(siguienteIdx);
+      setJugadoresIntentados([...jugadoresIntentados, siguienteIdx]);
       setEsRebote(true);
       setIntento((prev) => prev + 1);
       setMotivo(tipoFallo);
       setInputRespuesta('');
       setMensajeFeedback(null);
     } else {
+      // Nadie completó el ranking, avanzamos secuencialmente de todas formas
+      setJugadorInicialRonda((jugadorInicialRonda + 1) % jugadores.length);
       try {
         const res = await fetch('/api/rankings/solucion', {
           method: 'POST',
@@ -419,19 +424,13 @@ export default function RankingsLocal({ onVolver, onExit }) {
         setSolucionFinal(data.elementos);
         setPaso('solucion');
       } catch {
-        finalizarRonda(false);
+        finalizarRonda();
       }
     }
   };
 
-  const finalizarRonda = (completado) => {
-    if (completado && esRebote) {
-      setJugadorInicialRonda(jugadorTurno);
-    } else {
-      const siguiente = (jugadorInicialRonda + 1) % jugadores.length;
-      setJugadorInicialRonda(siguiente);
-      setJugadorTurno(siguiente);
-    }
+  const finalizarRonda = () => {
+    setJugadorTurno(jugadorInicialRonda);
     setPaso('resumen_ronda');
   };
 
@@ -488,10 +487,10 @@ export default function RankingsLocal({ onVolver, onExit }) {
                   <p><strong>1. Dinámica del juego:</strong></p>
                   <ul>
                     <li>Elige categoría y aparecerá un ranking real con varios puestos ocultos.</li>
-                    <li>Un jugador al azar empieza la primera ronda con <strong>90 segundos</strong> de tiempo. En las siguientes, el turno inicial pasa al siguiente jugador en orden (salvo que alguien complete el ranking tras un rebote: entonces abre él la siguiente ronda).</li>
+                    <li>La primera ronda empieza con un jugador al azar. En las siguientes, el turno inicial pasa de forma <strong>secuencial</strong> al siguiente jugador de la lista.</li>
                     <li><strong>No hace falta indicar el puesto:</strong> escribe cualquier elemento que creas que falta; si es correcto, se colocará en su posición automáticamente.</li>
                     <li>Si fallas o se agota el tiempo, el turno pasa por <strong>rebote</strong> al siguiente jugador en orden.</li>
-                    <li>Si nadie completa el ranking tras probar todos, se revela la <strong>solución completa</strong> antes de mostrar las puntuaciones.</li>
+                    <li>La siguiente ronda <strong>SIEMPRE</strong> la abre el jugador que va después de quien abrió la actual, independientemente de quién acierte por rebote.</li>
                   </ul>
 
                   <p><strong>2. Pistas y bloqueo en rebote:</strong></p>
@@ -692,7 +691,7 @@ export default function RankingsLocal({ onVolver, onExit }) {
             </div>
           </div>
 
-          <button className="big full" onClick={() => finalizarRonda(false)}>
+          <button className="big full" onClick={() => finalizarRonda()}>
             <Icon name="trophy" size={22} />Ver puntuaciones de la ronda
           </button>
         </section>

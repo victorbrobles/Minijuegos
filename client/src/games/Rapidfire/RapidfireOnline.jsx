@@ -198,12 +198,10 @@ export default function RapidfireOnline({ onLocal, onSalir }) {
   const maximo = ranking.length ? ranking[0].puntos : 0;
   const ganadores = maximo > 0 ? ranking.filter((j) => j.puntos === maximo) : [];
 
-  // Mostrar ayuda solo en menús y en el lobby
   const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
 
   return (
     <div className="rf-contenedor">
-      {/* ---------------- BOTÓN Y MODAL DE AYUDA ---------------- */}
       {mostrarAyuda && (
         <button
           type="button"
@@ -228,7 +226,8 @@ export default function RapidfireOnline({ onLocal, onSalir }) {
                 <li>Se mostrará un reto de enumerar varios elementos de una categoría.</li>
                 <li>Dispones de un cronómetro de <strong>60 segundos</strong>.</li>
                 <li>Debes decir en voz alta los elementos. <strong>El anfitrión actúa como juez</strong> para marcarlos como correctos.</li>
-                <li>Si no sabes más, el anfitrión puede marcar "Rebote" para que pase al siguiente jugador.</li>
+                <li>Si no sabes más o se agota el tiempo, el anfitrión marca "Rebote" y el turno pasa al siguiente jugador.</li>
+                <li>El turno inicial de la siguiente ronda pasará siempre de forma secuencial al jugador que siga al que abrió la ronda actual, independientemente de quién acierte.</li>
               </ul>
               <p><strong>2. Puntuación:</strong></p>
               <div className="tabla-ayuda-puntos">
@@ -250,7 +249,6 @@ export default function RapidfireOnline({ onLocal, onSalir }) {
           </div>
         </div>
       )}
-      {/* ---------------- FIN AYUDA ---------------- */}
 
       {/* 1. MENÚ ONLINE */}
       {vista === 'menu' && (
@@ -479,9 +477,9 @@ export default function RapidfireOnline({ onLocal, onSalir }) {
 
           <p className="categoria"><Icon name={ronda.categoria.icono} size={16} />{ronda.categoria.nombre}</p>
 
-          <div className="rf-reto-card">
-            <div className="rf-reto-numero">{ronda.reto.n}</div>
-            <div className="rf-reto-texto">{ronda.reto.texto}</div>
+          <div className="sigla-card rf-reto">
+            <div className="rf-reto-numero" style={{ color: '#dc2626', fontSize: '3.5rem', fontWeight: '900', lineHeight: 1 }}>{ronda.reto.n}</div>
+            <div className="rf-reto-texto" style={{ color: '#1e293b', fontSize: '1.25rem', fontWeight: '600', marginTop: '0.5rem' }}>{ronda.reto.texto}</div>
           </div>
 
           <div className="timer" role="timer" aria-label="Tiempo restante">
