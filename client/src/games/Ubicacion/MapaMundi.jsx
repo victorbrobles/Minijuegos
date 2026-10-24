@@ -3,7 +3,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
 // Capa base mundial libre de OpenStreetMap (no requiere API key ni añade marcas de agua)
-const TESELAS_OSM = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+const TESELAS_OSM = 'https://mt1.google.com/vt/lyrs=y&hl=es&x={x}&y={y}&z={z}';
 const LIMITES_MUNDO = [[-85, -180], [85, 180]];
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -46,7 +46,7 @@ export default function MapaMundi({ marcadores = [], lineas = [], onClickMapa, o
     L.tileLayer(TESELAS_OSM, {
       maxZoom: 19,
       noWrap: true,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      attribution: '&copy; Google Maps'
     }).addTo(mapa);
 
     capaRef.current = L.layerGroup().addTo(mapa);
