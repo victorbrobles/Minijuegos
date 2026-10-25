@@ -1,15 +1,12 @@
 import express from 'express';
-
-// Estructura esperada de los datos (server/data/seeds/trescientosuno/index.js):
-// export const equiposData = { realmadrid: { nombre, escudo, data: [{ nombre, goles, asistencias, partidos }] }, ... }
 import { equiposData } from '../data/seeds/trescientosuno/index.js';
 
 const router = express.Router();
 
 const ESTADISTICAS = ['goles', 'asistencias', 'partidos'];
-const OBJETIVOS = [101, 201, 301, 501];
 const TIEMPO_TURNO = 60; // segundos
-const PAUSA_MS = { acierto: 2000, plantado: 1500, eliminado: 2500, ganador: 3000 };
+// Ajuste de los tiempos en pantalla (Acierto se deja un poco más para ver la animación, fallo es penalización leve)
+const PAUSA_MS = { acierto: 2500, plantado: 1500, eliminado: 3000, ganador: 3500, fallo: 2000 };
 
 const normalizar = (str) =>
   String(str ?? '')
@@ -20,18 +17,17 @@ const normalizar = (str) =>
     .replace(/\s+/g, ' ')
     .trim();
 
-// Busca un futbolista del equipo por lo que escribe el jugador.
-// Devuelve { jugador } | { ambiguo: [nombres] } | { corto: true } | null
 function buscarJugador(equipo, texto) {
   const q = normalizar(texto);
   if (q.length < 3) return { corto: true };
 
-  const exacto = equipo.data.find((j) => normalizar(j.nombre) === q);
+  const listaJugadores = equipo.data || equipo.jugadores || [];
+
+  const exacto = listaJugadores.find((j) => normalizar(j.nombre) === q);
   if (exacto) return { jugador: exacto };
 
-  // Cada palabra escrita debe ser el comienzo de alguna palabra del nombre ("messi", "leo mes", "cristiano ron")
   const palabrasQ = q.split(' ');
-  const candidatos = equipo.data.filter((j) => {
+  const candidatos = listaJugadores.filter((j) => {
     const palabrasJ = normalizar(j.nombre).split(' ');
     return palabrasQ.every((pq) => palabrasJ.some((pj) => pj.startsWith(pq)));
   });
@@ -60,24 +56,27 @@ router.get('/equipos', (req, res) => {
 });
 
 router.post('/validar-jugador', (req, res) => {
-  const { equipoId, nombreJugador } = req.body || {};
-  if (!equipoId || !nombreJugador) {
-    return res.status(400).json({ success: false, error: 'Datos incompletos' });
-  }
-  const equipo = equiposData[equipoId];
-  if (!equipo) return res.status(404).json({ success: false, error: 'Equipo no encontrado' });
+  try {
+    const { equipoId, nombreJugador } = req.body || {};
+    if (!equipoId || !nombreJugador) {
+      return res.status(400).json({ success: false, error: 'Datos incompletos' });
+    }
+    const equipo = equiposData[equipoId];
+    if (!equipo) return res.status(404).json({ success: false, error: 'Equipo no encontrado' });
 
-  const r = buscarJugador(equipo, nombreJugador);
-  if (r?.jugador) return res.json({ success: true, encontrado: true, jugador: r.jugador });
-  if (r?.corto) return res.json({ success: true, encontrado: false, mensaje: 'Escribe al menos 3 letras.' });
-  if (r?.ambiguo) return res.json({ success: true, encontrado: false, mensaje: mensajeAmbiguo(r.ambiguo) });
-  res.json({ success: true, encontrado: false });
+    const r = buscarJugador(equipo, nombreJugador);
+    if (r?.jugador) return res.json({ success: true, encontrado: true, jugador: r.jugador });
+    if (r?.corto) return res.json({ success: true, encontrado: false, mensaje: 'Escribe al menos 3 letras.' });
+    if (r?.ambiguo) return res.json({ success: true, encontrado: false, mensaje: mensajeAmbiguo(r.ambiguo) });
+    res.json({ success: true, encontrado: false });
+  } catch (error) {
+    console.error("Error en /validar-jugador:", error);
+    res.status(500).json({ success: false, error: 'Error interno en la base de datos de jugadores.' });
+  }
 });
 
 // ==========================================
 // MODO ONLINE
-// Estados de la sala: lobby → configuracion → jugando → resultados (→ configuracion otra vez)
-// El turno y el tiempo los controla el servidor; se resuelven al consultar (los clientes consultan cada segundo).
 // ==========================================
 export const salasOnline = new Map();
 
@@ -90,22 +89,12 @@ function generarCodigo() {
 
 const nuevoToken = () => 'tok_' + Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2);
 
-const mezclar = (arr) => {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-};
-
 const turnoActual = (sala) => sala.jugadores[sala.turnoActualIndex];
 
 function empezarTurno(sala) {
   sala.turnoFin = Date.now() + TIEMPO_TURNO * 1000;
 }
 
-// Pasa al siguiente jugador que siga en juego; si no queda ninguno, termina la partida
 function avanzarTurno(sala) {
   const n = sala.jugadores.length;
   if (!sala.jugadores.some((j) => j.estado === 'vivo')) {
@@ -118,23 +107,25 @@ function avanzarTurno(sala) {
   empezarTurno(sala);
 }
 
-// Cierra el turno del jugador actual mostrando un aviso a todos durante unos segundos
-function cerrarTurno(sala, tipo, mensaje) {
+function cerrarTurno(sala, tipo, mensaje, jugadorId = null, valor = null) {
   const jugador = turnoActual(sala);
+  const idObjetivo = jugadorId || jugador.id;
+  
   if (tipo === 'eliminado') jugador.estado = 'eliminado';
   if (tipo === 'plantado') jugador.estado = 'plantado';
   if (tipo === 'ganador') { jugador.estado = 'ganador'; jugador.puntuacionActual = 0; }
+  
   const sinJugadores = !sala.jugadores.some((j) => j.estado === 'vivo');
   sala.evento = {
     tipo,
     mensaje,
-    jugadorId: jugador.id,
+    jugadorId: idObjetivo,
+    valor,
     hasta: Date.now() + PAUSA_MS[tipo],
     fin: tipo === 'ganador' || sinJugadores
   };
 }
 
-// Resuelve lo que haya vencido: fin de un aviso o tiempo agotado
 function tick(sala) {
   if (sala.estado !== 'jugando') return;
   const ahora = Date.now();
@@ -146,10 +137,10 @@ function tick(sala) {
     else avanzarTurno(sala);
     return;
   }
-  if (ahora >= sala.turnoFin) cerrarTurno(sala, 'eliminado', `¡Tiempo agotado para ${turnoActual(sala).nombre}!`);
+  // Penalización leve si agota el tiempo: Pierde el turno, pero no la vida
+  if (ahora >= sala.turnoFin) cerrarTurno(sala, 'fallo', `¡Tiempo agotado para ${turnoActual(sala).nombre}!`);
 }
 
-// Localiza la sala y al jugador; responde con el error si algo falla
 function contexto(req, res, token) {
   const sala = salasOnline.get(String(req.params.code || '').toUpperCase());
   if (!sala) { res.status(404).json({ error: 'Sala no encontrada.' }); return null; }
@@ -174,7 +165,7 @@ router.post('/online/crear', (req, res) => {
     jugadores: [{ id: 1, nombre: nombre.trim(), token: tokenAdmin, puntuacionActual: 0, estado: 'vivo' }],
     equipoSeleccionado: null,
     configuracion: { objetivo: 301, estadistica: 'goles' },
-    jugadoresUsados: [], // nombres de futbolistas ya dichos
+    jugadoresUsados: [], 
     usadosClaves: [],
     turnoActualIndex: 0,
     turnoFin: 0,
@@ -222,7 +213,7 @@ router.get('/online/sala/:code', (req, res) => {
     turnoActualId: sala.estado === 'jugando' ? turnoActual(sala)?.id : null,
     tiempoTurno: TIEMPO_TURNO,
     tiempoRestante: segundos,
-    evento: sala.evento ? { tipo: sala.evento.tipo, mensaje: sala.evento.mensaje, jugadorId: sala.evento.jugadorId } : null,
+    evento: sala.evento ? { tipo: sala.evento.tipo, mensaje: sala.evento.mensaje, jugadorId: sala.evento.jugadorId, valor: sala.evento.valor } : null,
     jugadoresUsados: sala.jugadoresUsados,
     jugadores: sala.jugadores.map((j) => ({
       id: j.id,
@@ -234,7 +225,6 @@ router.get('/online/sala/:code', (req, res) => {
   });
 });
 
-// El anfitrión pasa del lobby a elegir equipo y reglas
 router.post('/online/sala/:code/empezar', (req, res) => {
   const ctx = contexto(req, res, req.body?.token);
   if (!ctx) return;
@@ -246,7 +236,6 @@ router.post('/online/sala/:code/empezar', (req, res) => {
   res.json({ success: true });
 });
 
-// El anfitrión elige equipo, estadística y objetivo, y arranca la partida
 router.post('/online/sala/:code/configurar', (req, res) => {
   const { token, equipoId, estadistica, objetivo } = req.body || {};
   const ctx = contexto(req, res, token);
@@ -258,15 +247,17 @@ router.post('/online/sala/:code/configurar', (req, res) => {
   const equipo = equiposData[equipoId];
   if (!equipo) return res.status(400).json({ error: 'Equipo no válido.' });
   if (!ESTADISTICAS.includes(estadistica)) return res.status(400).json({ error: 'Estadística no válida.' });
-  if (!OBJETIVOS.includes(Number(objetivo))) return res.status(400).json({ error: 'Objetivo no válido.' });
+  if (!Number(objetivo) || Number(objetivo) <= 0) return res.status(400).json({ error: 'Objetivo no válido.' });
 
   sala.equipoSeleccionado = { id: equipoId, nombre: equipo.nombre, escudo: equipo.escudo };
   sala.configuracion = { objetivo: Number(objetivo), estadistica };
-  sala.jugadores = mezclar(sala.jugadores);
+  
+  // No barajamos jugadores, mantenemos el orden secuencial
   sala.jugadores.forEach((j) => { j.puntuacionActual = sala.configuracion.objetivo; j.estado = 'vivo'; });
   sala.jugadoresUsados = [];
   sala.usadosClaves = [];
-  sala.turnoActualIndex = 0;
+  // Seleccionamos un jugador inicial al azar
+  sala.turnoActualIndex = Math.floor(Math.random() * sala.jugadores.length);
   sala.evento = null;
   sala.estado = 'jugando';
   empezarTurno(sala);
@@ -281,19 +272,20 @@ router.post('/online/sala/:code/jugar', (req, res) => {
   if (sala.estado !== 'jugando' || sala.evento) return res.status(400).json({ error: 'Ahora no puedes responder.' });
   if (turnoActual(sala).id !== yo.id) return res.status(400).json({ error: 'No es tu turno.' });
 
+  // Si hay error de validación, consumimos el turno con tipo 'fallo' sin lanzar un HTTP 400 
   const r = buscarJugador(equiposData[sala.equipoSeleccionado.id], nombreJugador);
-  if (r?.corto) return res.status(400).json({ error: 'Escribe al menos 3 letras.' });
-  if (r?.ambiguo) return res.status(400).json({ error: mensajeAmbiguo(r.ambiguo) });
-  if (!r?.jugador) return res.status(400).json({ error: 'Jugador no encontrado en la base de datos de este equipo.' });
+  if (r?.corto) { cerrarTurno(sala, 'fallo', 'Escribe al menos 3 letras. Pierdes el turno.'); return res.json({ success: true }); }
+  if (r?.ambiguo) { cerrarTurno(sala, 'fallo', mensajeAmbiguo(r.ambiguo) + ' Pierdes el turno.'); return res.json({ success: true }); }
+  if (!r?.jugador) { cerrarTurno(sala, 'fallo', 'Jugador no encontrado. Pierdes el turno.'); return res.json({ success: true }); }
 
   const jug = r.jugador;
   const clave = normalizar(jug.nombre);
-  if (sala.usadosClaves.includes(clave)) return res.status(400).json({ error: `${jug.nombre} ya ha sido dicho.` });
+  if (sala.usadosClaves.includes(clave)) { cerrarTurno(sala, 'fallo', `${jug.nombre} ya ha sido dicho. Pierdes el turno.`); return res.json({ success: true }); }
 
   const { estadistica } = sala.configuracion;
   const valor = Number(jug[estadistica]) || 0;
   if (valor === 0) {
-    cerrarTurno(sala, 'eliminado', `${jug.nombre} tiene 0 ${estadistica}. ¡${yo.nombre} eliminado!`);
+    cerrarTurno(sala, 'eliminado', `${jug.nombre} tiene 0 ${estadistica}. ¡Eliminado!`);
     return res.json({ success: true });
   }
 
@@ -301,13 +293,13 @@ router.post('/online/sala/:code/jugar', (req, res) => {
   sala.jugadoresUsados.push(jug.nombre);
   const nueva = yo.puntuacionActual - valor;
   if (nueva === 0) {
-    cerrarTurno(sala, 'ganador', `¡DIANA! ${yo.nombre} ha clavado el 0 con ${jug.nombre} (${valor}).`);
+    cerrarTurno(sala, 'ganador', `¡DIANA! Ha clavado el 0 con ${jug.nombre}.`, yo.id, valor);
   } else if (nueva < 0) {
     yo.puntuacionActual = nueva;
-    cerrarTurno(sala, 'eliminado', `${jug.nombre} resta ${valor}. ¡${yo.nombre} se ha pasado de 0!`);
+    cerrarTurno(sala, 'eliminado', `${jug.nombre} restó ${valor}. ¡Te has pasado de 0!`);
   } else {
     yo.puntuacionActual = nueva;
-    cerrarTurno(sala, 'acierto', `${jug.nombre} resta ${valor} ${estadistica} a ${yo.nombre}.`);
+    cerrarTurno(sala, 'acierto', `¡${jug.nombre}!`, yo.id, valor);
   }
   res.json({ success: true });
 });
@@ -322,7 +314,6 @@ router.post('/online/sala/:code/plantarse', (req, res) => {
   res.json({ success: true });
 });
 
-// Tras los resultados, el anfitrión puede elegir otro equipo
 router.post('/online/sala/:code/revancha', (req, res) => {
   const ctx = contexto(req, res, req.body?.token);
   if (!ctx) return;
@@ -347,7 +338,6 @@ router.post('/online/sala/:code/salir', (req, res) => {
     salasOnline.delete(sala.code);
     return res.json({ success: true });
   }
-  // Si se va el anfitrión, el puesto pasa al siguiente jugador
   if (sala.adminToken === salio.token) sala.adminToken = sala.jugadores[0].token;
 
   if (sala.estado === 'jugando') {

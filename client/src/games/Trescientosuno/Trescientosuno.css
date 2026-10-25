@@ -1,24 +1,25 @@
 .tcu-contenedor {
-  --g1: #22c55e;
-  --g2: #15803d;
+  --g1: #10b981; /* Verde exacto de meta.js */
+  --g2: #047857;
   width: 100%;
   max-width: 960px;
   margin: 0 auto;
   position: relative;
+  font-family: system-ui, -apple-system, sans-serif;
 }
 
 /* ========================================================
-   ESTILOS DE MENÚ INICIAL Y SETUP (Heredados de Trayectoria)
+   ESTILOS DE MENÚ INICIAL Y SETUP
    ======================================================== */
 .game-intro-banner {
-  background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+  background: linear-gradient(135deg, var(--g1) 0%, var(--g2) 100%);
   border-radius: 26px;
   padding: 1.5rem 1.75rem;
   display: flex;
   align-items: center;
   gap: 1.25rem;
   color: white;
-  box-shadow: 0 10px 25px -5px rgba(21, 128, 61, 0.3);
+  box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.3);
   margin-bottom: 1.25rem;
 }
 
@@ -46,18 +47,64 @@
   opacity: 0.92;
 }
 
-.game-setup-white-card {
-  background: #ffffff;
-  border-radius: 26px;
-  padding: 1.75rem 2rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+/* Deja esto solo para los paneles y quita .tcu-equipo-card de aquí */
+.game-setup-white-card, .panel {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* NUEVOS ESTILOS PARA LA CUADRÍCULA DE ESCUDOS */
+.tcu-grid-equipos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 1.2rem;
+  margin-top: 1.5rem;
+}
+
+.tcu-equipo-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  aspect-ratio: 1 / 1; /* Cuadrados perfectos */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tcu-equipo-card:hover {
+  border-color: var(--g1);
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 12px 25px rgba(16, 185, 129, 0.25);
+}
+
+.tcu-equipo-card.sel {
+  border-color: var(--g1);
+  background: #f0fdf4;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+  transform: scale(1.05);
+}
+
+.tcu-escudo {
+  font-size: 4.5rem; /* Escudo mucho más grande */
+  line-height: 1;
+  margin: 0;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
 }
 
 .section-title {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #15803d;
+  color: var(--g2);
   font-size: 1.25rem;
   font-weight: 700;
   margin-bottom: 1.25rem;
@@ -80,18 +127,29 @@
   width: 100%;
 }
 
-.game-select {
+.game-select, .player-text-input {
   width: 100%;
-  padding: 0.85rem 1.25rem;
-  border-radius: 16px;
-  border: 2px solid #bbf7d0;
-  background: #ffffff;
+  box-sizing: border-box;
+  padding: 1rem 1.25rem;
+  border-radius: 12px;
+  border: 2px solid #e2e8f0;
+  background: #f8fafc;
   color: #1e293b;
   font-size: 1rem;
   font-weight: 500;
   outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.game-select {
   cursor: pointer;
   appearance: none;
+}
+
+.player-text-input:focus, .game-select:focus {
+  border-color: var(--g1);
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+  outline: none;
 }
 
 .select-wrapper::after {
@@ -114,29 +172,17 @@
   gap: 0.85rem;
 }
 
-.player-text-input {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 0.85rem 1.25rem;
-  border-radius: 16px;
-  border: 2px solid #bbf7d0;
-  background: #ffffff;
-  color: #1e293b;
-  font-size: 1rem;
-  outline: none;
-}
-
 .btn-start {
-  background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+  background: linear-gradient(135deg, var(--g1) 0%, var(--g2) 100%);
   color: white;
   border: none;
-  border-radius: 14px;
-  padding: 0.85rem 1.75rem;
-  font-size: 1rem;
+  border-radius: 12px;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
   font-weight: 700;
   cursor: pointer;
-  transition: transform 0.15s, opacity 0.2s;
-  box-shadow: 0 6px 18px rgba(21, 128, 61, 0.28);
+  transition: all 0.2s ease;
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -145,16 +191,19 @@
 
 .btn-start:hover:not(:disabled) {
   opacity: 0.95;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 25px rgba(16, 185, 129, 0.4);
 }
 
 .btn-start:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 /* ========================================================
-   ESTILOS DE SALA ONLINE (Heredados de Trayectoria)
+   ESTILOS DE SALA ONLINE
    ======================================================== */
 .lb-lista {
   display: grid;
@@ -169,7 +218,7 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.85rem 1.1rem;
-  background: var(--g1, #16a34a);
+  background: var(--g1);
   border: 2px solid rgba(255, 255, 255, 0.35);
   border-radius: 16px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
@@ -237,20 +286,21 @@
 }
 
 .tcu-equipo-card {
-  background: #ffffff;
-  border: 2px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 1.5rem 1rem;
   text-align: center;
   cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem 1rem;
 }
 
 .tcu-equipo-card:hover {
-  border-color: #22c55e;
+  border-color: var(--g1);
   transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(34, 197, 94, 0.2);
+  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.2);
+}
+
+.tcu-equipo-card.sel {
+  border-color: var(--g1);
+  background: #f0fdf4;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.35);
 }
 
 .tcu-escudo {
@@ -272,18 +322,22 @@
 }
 
 .tcu-marcador-item {
-  background: #f8fafc;
-  border: 2px solid #cbd5e1;
-  border-radius: 12px;
-  padding: 0.5rem 1rem;
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1rem;
   text-align: center;
   min-width: 100px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  transition: all 0.3s ease;
+  position: relative;
 }
 
 .tcu-marcador-item.activo {
-  border-color: #16a34a;
-  background: #f0fdf4;
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.3);
+  border-color: var(--g1);
+  background: linear-gradient(to bottom, #ffffff, #ecfdf5);
+  transform: scale(1.05);
+  box-shadow: 0 10px 25px rgba(16, 185, 129, 0.2);
 }
 
 .tcu-marcador-item.eliminado {
@@ -315,6 +369,27 @@
   color: #1e293b;
 }
 
+/* ANIMACIÓN DE PUNTOS RESTADOS */
+.floating-resta {
+  position: absolute;
+  top: -30px;
+  right: -10px;
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #ef4444; 
+  text-shadow: 0 4px 10px rgba(239, 68, 68, 0.4);
+  animation: floatUpFade 2.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  pointer-events: none;
+  z-index: 20;
+}
+
+@keyframes floatUpFade {
+  0% { opacity: 0; transform: translateY(20px) scale(0.5); }
+  15% { opacity: 1; transform: translateY(0) scale(1.1); }
+  70% { opacity: 1; transform: translateY(-30px) scale(1); }
+  100% { opacity: 0; transform: translateY(-40px) scale(1); }
+}
+
 .tcu-turno-panel {
   padding: 2.5rem 1.5rem;
 }
@@ -329,7 +404,7 @@
 
 .timer-bar {
   height: 100%;
-  background-color: #16a34a;
+  background-color: var(--g1);
   transition: width 1s linear, background-color 0.3s ease;
 }
 
@@ -346,7 +421,6 @@
 .tcu-form input {
   width: 100%;
   font-size: 1.2rem;
-  padding: 1rem;
   text-align: center;
   margin-bottom: 1rem;
 }
@@ -357,18 +431,28 @@
   gap: 0.5rem;
 }
 
-.tcu-feedback {
-  font-size: 1.4rem;
-  font-weight: 800;
-  padding: 2rem;
-  border-radius: 16px;
-  animation: popIn 0.3s ease-out;
+/* MENSAJE ESTILIZADO DEL RESULTADO */
+.tcu-evento-display {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  padding: 1.5rem;
 }
 
-.tcu-feedback.acierto { color: #16a34a; background: #f0fdf4; border: 2px solid #22c55e; }
-.tcu-feedback.eliminado { color: #dc2626; background: #fef2f2; border: 2px solid #ef4444; }
-.tcu-feedback.plantado { color: #d97706; background: #fffbeb; border: 2px solid #f59e0b; }
-.tcu-feedback.ganador { color: #a16207; background: #fefce8; border: 2px solid #eab308; }
+.evento-icon {
+  font-size: 4rem;
+  line-height: 1;
+}
+
+.tcu-evento-display h3 {
+  font-size: 1.3rem;
+  color: #1e293b;
+  margin: 0;
+  text-align: center;
+  font-weight: 800;
+}
 
 .tcu-usados {
   margin-top: 1.5rem;
@@ -382,19 +466,6 @@
   0% { transform: scale(0.9); opacity: 0; }
   100% { transform: scale(1); opacity: 1; }
 }
-/* ========================================================
-   ONLINE: elegir equipo y reglas
-   ======================================================== */
-.tcu-equipo-card.sel {
-  border-color: #16a34a;
-  background: #f0fdf4;
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.35);
-}
-
-.tcu-equipo-card h4 {
-  margin: 0;
-  color: #1e293b;
-}
 
 .tcu-ajustes {
   display: grid;
@@ -406,7 +477,82 @@
 .tcu-ajustes .form-group { margin-bottom: 0; }
 
 .tcu-turno-aviso {
-  color: #15803d;
+  color: var(--g2);
   font-weight: 800;
   font-size: 1.1rem;
+}
+
+/* NUEVOS ESTILOS PARA LA CUADRÍCULA DE ESCUDOS */
+.tcu-grid-equipos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 1.2rem;
+  margin-top: 1.5rem;
+}
+
+.tcu-equipo-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 1rem;
+  text-align: center;
+}
+
+.tcu-equipo-card:hover {
+  border-color: var(--g1);
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 12px 25px rgba(16, 185, 129, 0.25);
+}
+
+.tcu-equipo-card.sel {
+  border-color: var(--g1);
+  background: #f0fdf4;
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+  transform: scale(1.05);
+}
+
+/* IMAGEN DEL ESCUDO */
+.tcu-escudo-img {
+  width: 100%;
+  height: 100%;
+  max-width: 80px;
+  max-height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+}
+
+/* TEXTO FALLBACK SI NO HAY IMAGEN */
+.tcu-escudo-texto {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #1e293b !important; /* Forza el color oscuro */
+  text-align: center;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+/* CONTENEDOR GRANDE (Fase de configuración) */
+.tcu-escudo-big {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+  min-height: 140px;
+}
+
+.tcu-escudo-big .tcu-escudo-img {
+  max-width: 130px;
+  max-height: 130px;
+}
+
+.tcu-escudo-big .tcu-escudo-texto {
+  font-size: 2.5rem;
 }
