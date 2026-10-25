@@ -5,7 +5,6 @@ const router = express.Router();
 
 const ESTADISTICAS = ['goles', 'asistencias', 'partidos'];
 const TIEMPO_TURNO = 60; // segundos
-// Ajuste de los tiempos en pantalla (Acierto se deja un poco más para ver la animación, fallo es penalización leve)
 const PAUSA_MS = { acierto: 2500, plantado: 1500, eliminado: 3000, ganador: 3500, fallo: 2000 };
 
 const normalizar = (str) =>
@@ -37,6 +36,16 @@ function buscarJugador(equipo, texto) {
 }
 
 const mensajeAmbiguo = (nombres) => `Hay varios jugadores que encajan (${nombres.join(', ')}). Escribe nombre y apellido.`;
+
+// Función para mezclar arrays
+const mezclar = (arr) => {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+};
 
 // ==========================================
 // ENDPOINTS OFFLINE / LOCAL
@@ -72,6 +81,22 @@ router.post('/validar-jugador', (req, res) => {
   } catch (error) {
     console.error("Error en /validar-jugador:", error);
     res.status(500).json({ success: false, error: 'Error interno en la base de datos de jugadores.' });
+  }
+});
+
+router.post('/revelar-opciones', (req, res) => {
+  try {
+    const { equipoId, usados } = req.body || {};
+    const equipo = equiposData[equipoId];
+    if (!equipo) return res.status(404).json({ success: false, error: 'Equipo no encontrado' });
+
+    const listaJugadores = equipo.data || equipo.jugadores || [];
+    const disponibles = listaJugadores.filter(j => !(usados || []).includes(j.nombre));
+    const mezclados = mezclar(disponibles).slice(0, 3);
+
+    res.json({ success: true, opciones: mezclados });
+  } catch (error) {
+    res.status(500).json({ success: false, error: 'Error al obtener opciones' });
   }
 });
 
@@ -126,6 +151,12 @@ function cerrarTurno(sala, tipo, mensaje, jugadorId = null, valor = null) {
   };
 }
 
+function consumirComodin(jugador, comodin) {
+  if (comodin && jugador.comodines) {
+    jugador.comodines = jugador.comodines.filter(c => c !== comodin);
+  }
+}
+
 function tick(sala) {
   if (sala.estado !== 'jugando') return;
   const ahora = Date.now();
@@ -137,8 +168,10 @@ function tick(sala) {
     else avanzarTurno(sala);
     return;
   }
-  // Penalización leve si agota el tiempo: Pierde el turno, pero no la vida
-  if (ahora >= sala.turnoFin) cerrarTurno(sala, 'fallo', `¡Tiempo agotado para ${turnoActual(sala).nombre}!`);
+  if (ahora >= sala.turnoFin) {
+    const jugador = turnoActual(sala);
+    cerrarTurno(sala, 'fallo', `¡Tiempo agotado para ${jugador.nombre}!`);
+  }
 }
 
 function contexto(req, res, token) {
@@ -162,7 +195,7 @@ router.post('/online/crear', (req, res) => {
     code,
     estado: 'lobby',
     adminToken: tokenAdmin,
-    jugadores: [{ id: 1, nombre: nombre.trim(), token: tokenAdmin, puntuacionActual: 0, estado: 'vivo' }],
+    jugadores: [{ id: 1, nombre: nombre.trim(), token: tokenAdmin, puntuacionActual: 0, estado: 'vivo', comodines: ['x2', 'x3', 'x5', 'revelar'] }],
     equipoSeleccionado: null,
     configuracion: { objetivo: 301, estadistica: 'goles' },
     jugadoresUsados: [], 
@@ -188,7 +221,8 @@ router.post('/online/unirse', (req, res) => {
     nombre: nombre?.trim() || `Jugador ${nuevoId}`,
     token,
     puntuacionActual: 0,
-    estado: 'vivo'
+    estado: 'vivo',
+    comodines: ['x2', 'x3', 'x5', 'revelar']
   });
   res.json({ success: true, code: sala.code, token });
 });
@@ -220,6 +254,7 @@ router.get('/online/sala/:code', (req, res) => {
       nombre: j.nombre,
       puntuacionActual: j.puntuacionActual,
       estado: j.estado,
+      comodines: j.comodines,
       esAdmin: sala.adminToken === j.token
     }))
   });
@@ -252,11 +287,13 @@ router.post('/online/sala/:code/configurar', (req, res) => {
   sala.equipoSeleccionado = { id: equipoId, nombre: equipo.nombre, escudo: equipo.escudo };
   sala.configuracion = { objetivo: Number(objetivo), estadistica };
   
-  // No barajamos jugadores, mantenemos el orden secuencial
-  sala.jugadores.forEach((j) => { j.puntuacionActual = sala.configuracion.objetivo; j.estado = 'vivo'; });
+  sala.jugadores.forEach((j) => { 
+    j.puntuacionActual = sala.configuracion.objetivo; 
+    j.estado = 'vivo';
+    j.comodines = ['x2', 'x3', 'x5', 'revelar'];
+  });
   sala.jugadoresUsados = [];
   sala.usadosClaves = [];
-  // Seleccionamos un jugador inicial al azar
   sala.turnoActualIndex = Math.floor(Math.random() * sala.jugadores.length);
   sala.evento = null;
   sala.estado = 'jugando';
@@ -264,42 +301,81 @@ router.post('/online/sala/:code/configurar', (req, res) => {
   res.json({ success: true });
 });
 
+router.post('/online/sala/:code/revelar-opciones', (req, res) => {
+  const ctx = contexto(req, res, req.body?.token);
+  if (!ctx) return;
+  const { sala, yo } = ctx;
+  if (sala.estado !== 'jugando' || sala.evento) return res.status(400).json({ error: 'No es el momento.' });
+  if (turnoActual(sala).id !== yo.id) return res.status(400).json({ error: 'No es tu turno.' });
+  if (!yo.comodines.includes('revelar')) return res.status(400).json({ error: 'Ya no tienes este comodín.' });
+
+  const equipo = equiposData[sala.equipoSeleccionado.id];
+  const listaJugadores = equipo.data || equipo.jugadores || [];
+  const disponibles = listaJugadores.filter(j => !sala.jugadoresUsados.includes(j.nombre));
+  const mezclados = mezclar(disponibles).slice(0, 3);
+
+  res.json({ success: true, opciones: mezclados });
+});
+
 router.post('/online/sala/:code/jugar', (req, res) => {
-  const { token, nombreJugador } = req.body || {};
+  const { token, nombreJugador, comodin } = req.body || {};
   const ctx = contexto(req, res, token);
   if (!ctx) return;
   const { sala, yo } = ctx;
   if (sala.estado !== 'jugando' || sala.evento) return res.status(400).json({ error: 'Ahora no puedes responder.' });
   if (turnoActual(sala).id !== yo.id) return res.status(400).json({ error: 'No es tu turno.' });
+  if (comodin && !yo.comodines.includes(comodin)) return res.status(400).json({ error: 'No tienes ese comodín.' });
 
-  // Si hay error de validación, consumimos el turno con tipo 'fallo' sin lanzar un HTTP 400 
   const r = buscarJugador(equiposData[sala.equipoSeleccionado.id], nombreJugador);
-  if (r?.corto) { cerrarTurno(sala, 'fallo', 'Escribe al menos 3 letras. Pierdes el turno.'); return res.json({ success: true }); }
-  if (r?.ambiguo) { cerrarTurno(sala, 'fallo', mensajeAmbiguo(r.ambiguo) + ' Pierdes el turno.'); return res.json({ success: true }); }
-  if (!r?.jugador) { cerrarTurno(sala, 'fallo', 'Jugador no encontrado. Pierdes el turno.'); return res.json({ success: true }); }
+  if (r?.corto) { 
+    consumirComodin(yo, comodin);
+    cerrarTurno(sala, 'fallo', 'Escribe al menos 3 letras. Pierdes el turno.'); return res.json({ success: true }); 
+  }
+  if (r?.ambiguo) { 
+    consumirComodin(yo, comodin);
+    cerrarTurno(sala, 'fallo', mensajeAmbiguo(r.ambiguo) + ' Pierdes el turno.'); return res.json({ success: true }); 
+  }
+  if (!r?.jugador) { 
+    consumirComodin(yo, comodin);
+    cerrarTurno(sala, 'fallo', 'Jugador no encontrado. Pierdes el turno.'); return res.json({ success: true }); 
+  }
 
   const jug = r.jugador;
   const clave = normalizar(jug.nombre);
-  if (sala.usadosClaves.includes(clave)) { cerrarTurno(sala, 'fallo', `${jug.nombre} ya ha sido dicho. Pierdes el turno.`); return res.json({ success: true }); }
+  if (sala.usadosClaves.includes(clave)) { 
+    consumirComodin(yo, comodin);
+    cerrarTurno(sala, 'fallo', `${jug.nombre} ya ha sido dicho. Pierdes el turno.`); return res.json({ success: true }); 
+  }
 
   const { estadistica } = sala.configuracion;
-  const valor = Number(jug[estadistica]) || 0;
-  if (valor === 0) {
+  const valorBase = Number(jug[estadistica]) || 0;
+
+  if (valorBase === 0) {
+    consumirComodin(yo, comodin);
     cerrarTurno(sala, 'eliminado', `${jug.nombre} tiene 0 ${estadistica}. ¡Eliminado!`);
     return res.json({ success: true });
   }
 
+  consumirComodin(yo, comodin);
+
+  let multiplicador = 1;
+  if (comodin === 'x2') multiplicador = 2;
+  if (comodin === 'x3') multiplicador = 3;
+  if (comodin === 'x5') multiplicador = 5;
+
+  const valorFinal = valorBase * multiplicador;
+
   sala.usadosClaves.push(clave);
   sala.jugadoresUsados.push(jug.nombre);
-  const nueva = yo.puntuacionActual - valor;
+  const nueva = yo.puntuacionActual - valorFinal;
   if (nueva === 0) {
-    cerrarTurno(sala, 'ganador', `¡DIANA! Ha clavado el 0 con ${jug.nombre}.`, yo.id, valor);
+    cerrarTurno(sala, 'ganador', `¡DIANA! Ha clavado el 0 con ${jug.nombre}.`, yo.id, valorFinal);
   } else if (nueva < 0) {
     yo.puntuacionActual = nueva;
-    cerrarTurno(sala, 'eliminado', `${jug.nombre} restó ${valor}. ¡Te has pasado de 0!`);
+    cerrarTurno(sala, 'eliminado', `${jug.nombre} restó ${valorFinal}. ¡Te has pasado de 0!`);
   } else {
     yo.puntuacionActual = nueva;
-    cerrarTurno(sala, 'acierto', `¡${jug.nombre}!`, yo.id, valor);
+    cerrarTurno(sala, 'acierto', `¡${jug.nombre}!`, yo.id, valorFinal);
   }
   res.json({ success: true });
 });

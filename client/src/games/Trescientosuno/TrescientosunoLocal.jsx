@@ -8,8 +8,6 @@ const MIN_JUGADORES = 2;
 const MAX_JUGADORES = 12;
 const TIEMPO_TURNO = 60;
 
-// Sustituye este diccionario y la función getLogoUrl en la parte superior de ambos archivos
-
 const ESCUDOS_MAP = {
   // Clubes (Tus URLs exactas)
   barcelona: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
@@ -115,9 +113,9 @@ export default function TrescientosunoLocal({ onVolver, onExit }) {
 
   const [numJugadores, setNumJugadores] = useState(3);
   const [jugadores, setJugadores] = useState([
-    { id: 1, nombre: 'Jugador 1', puntos: 0, estado: 'vivo' },
-    { id: 2, nombre: 'Jugador 2', puntos: 0, estado: 'vivo' },
-    { id: 3, nombre: 'Jugador 3', puntos: 0, estado: 'vivo' }
+    { id: 1, nombre: 'Jugador 1', puntos: 0, estado: 'vivo', comodines: ['x2', 'x3', 'x5', 'revelar'] },
+    { id: 2, nombre: 'Jugador 2', puntos: 0, estado: 'vivo', comodines: ['x2', 'x3', 'x5', 'revelar'] },
+    { id: 3, nombre: 'Jugador 3', puntos: 0, estado: 'vivo', comodines: ['x2', 'x3', 'x5', 'revelar'] }
   ]);
 
   const [equipos, setEquipos] = useState([]);
@@ -131,6 +129,10 @@ export default function TrescientosunoLocal({ onVolver, onExit }) {
   const [inputJugador, setInputJugador] = useState('');
   const [mensajeError, setMensajeError] = useState('');
   const [ultimoAcierto, setUltimoAcierto] = useState(null);
+
+  // Estados Comodines
+  const [comodinActivo, setComodinActivo] = useState(null);
+  const [opcionesReveladas, setOpcionesReveladas] = useState(null);
 
   const [tiempoRestante, setTiempoRestante] = useState(TIEMPO_TURNO);
   const timerRef = useRef(null);
@@ -169,7 +171,7 @@ export default function TrescientosunoLocal({ onVolver, onExit }) {
       const nuevaLista = [];
       for (let i = 1; i <= cant; i++) {
         const existente = prev.find((p) => p.id === i);
-        nuevaLista.push(existente || { id: i, nombre: `Jugador ${i}`, puntos: 0, estado: 'vivo' });
+        nuevaLista.push(existente || { id: i, nombre: `Jugador ${i}`, puntos: 0, estado: 'vivo', comodines: ['x2', 'x3', 'x5', 'revelar'] });
       }
       jugadoresRef.current = nuevaLista;
       return nuevaLista;
@@ -189,12 +191,15 @@ export default function TrescientosunoLocal({ onVolver, onExit }) {
       ...j,
       nombre: j.nombre.trim() || `Jugador ${j.id}`,
       puntos: objetivo,
-      estado: 'vivo'
+      estado: 'vivo',
+      comodines: ['x2', 'x3', 'x5', 'revelar']
     }));
     
     guardarJugadores(jActualizados);
     setJugadoresUsados([]);
     setUltimoAcierto(null);
+    setComodinActivo(null);
+    setOpcionesReveladas(null);
     const startIndex = Math.floor(Math.random() * jActualizados.length);
     guardarTurno(startIndex);
     setFase('jugando');
@@ -218,6 +223,8 @@ export default function TrescientosunoLocal({ onVolver, onExit }) {
     setMensajeError('');
     setInputJugador('');
     setUltimoAcierto(null);
+    setComodinActivo(null);
+    setOpcionesReveladas(null);
 
     const lista = jugadoresRef.current;
     if (!lista.some(j => j.estado === 'vivo')) {
@@ -239,8 +246,15 @@ export default function TrescientosunoLocal({ onVolver, onExit }) {
     return nuevos;
   };
 
+  const consumirComodinActivo = () => {
+    if (!comodinActivo) return;
+    const jActual = jugadoresRef.current[turnoRef.current];
+    actualizarActual({ comodines: jActual.comodines.filter(c => c !== comodinActivo) });
+  };
+
   const handlePierdeTurno = (motivo) => {
     detenerTemporizador();
+    consumirComodinActivo();
     const currId = jugadoresRef.current[turnoRef.current].id;
     setUltimoAcierto({ tipo: 'fallo', msj: motivo, jugadorId: currId });
     despuesDe(2000, pasarTurno);
@@ -248,6 +262,7 @@ export default function TrescientosunoLocal({ onVolver, onExit }) {
 
   const handleEliminacion = (motivo) => {
     detenerTemporizador();
+    consumirComodinActivo();
     const currId = jugadoresRef.current[turnoRef.current].id;
     actualizarActual({ estado: 'eliminado' });
     setUltimoAcierto({ tipo: 'eliminado', msj: motivo, jugadorId: currId });
@@ -262,11 +277,28 @@ export default function TrescientosunoLocal({ onVolver, onExit }) {
     despuesDe(1500, pasarTurno);
   };
 
-  const validarJugadorSubmit = async (e) => {
-    e.preventDefault();
+  const activarRevelar = async () => {
+    setComodinActivo('revelar');
+    try {
+      const res = await fetch('/api/trescientosuno/revelar-opciones', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ equipoId: equipoSel.id, usados: jugadoresUsados })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setOpcionesReveladas(data.opciones);
+      } else {
+        setMensajeError(data.error || 'Error al obtener opciones');
+      }
+    } catch (err) {
+      setMensajeError('Error de conexión.');
+    }
+  };
+
+  const validarJugador = async (nombreAValidar) => {
     if (ultimoAcierto) return;
-    
-    if (!inputJugador.trim()) {
+    if (!nombreAValidar.trim()) {
       handlePierdeTurno('No has escrito ningún jugador.');
       return;
     }
@@ -275,7 +307,7 @@ export default function TrescientosunoLocal({ onVolver, onExit }) {
       const res = await fetch('/api/trescientosuno/validar-jugador', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ equipoId: equipoSel.id, nombreJugador: inputJugador })
+        body: JSON.stringify({ equipoId: equipoSel.id, nombreJugador: nombreAValidar })
       });
       
       if (!res.ok) {
@@ -302,14 +334,22 @@ export default function TrescientosunoLocal({ onVolver, onExit }) {
       }
 
       if (turnoCerradoRef.current) return;
-      const valorEstadistica = Number(jbd[estadistica]) || 0;
       
-      if (valorEstadistica === 0) {
+      let multiplicador = 1;
+      if (comodinActivo === 'x2') multiplicador = 2;
+      if (comodinActivo === 'x3') multiplicador = 3;
+      if (comodinActivo === 'x5') multiplicador = 5;
+
+      const valorBase = Number(jbd[estadistica]) || 0;
+      const valorEstadistica = valorBase * multiplicador;
+      
+      if (valorBase === 0) {
         handleEliminacion(`${jbd.nombre} tiene 0 ${estadistica}. ¡Eliminado!`);
         return;
       }
 
       detenerTemporizador();
+      consumirComodinActivo();
       const currId = jugadoresRef.current[turnoRef.current].id;
       const nuevaPuntuacion = jugadoresRef.current[turnoRef.current].puntos - valorEstadistica;
       setJugadoresUsados((prev) => [...prev, jbd.nombre]);
@@ -338,6 +378,8 @@ export default function TrescientosunoLocal({ onVolver, onExit }) {
   };
   const rankingFinal = getGanador();
 
+  const jActual = jugadores[turnoIndex];
+
   return (
     <div className="tcu-contenedor">
       {fase === 'setup' && (
@@ -358,7 +400,8 @@ export default function TrescientosunoLocal({ onVolver, onExit }) {
               <ul>
                 <li>Se selecciona un equipo y una estadística a restar (Goles, Asistencias o Partidos).</li>
                 <li>Por turnos, introduce el nombre de un jugador que haya estado en ese club.</li>
-                <li>Se restarán de tu marcador los puntos correspondientes a ese jugador en el club.</li>
+                <li>Se restarán de tu marcador los puntos correspondientes a ese jugador.</li>
+                <li>Dispones de 4 comodines por equipo (x2, x3, x5 y Revelar). Úsalos sabiamente antes de escribir.</li>
                 <li>Si no lo aciertas o no respondes a tiempo, perderás tu turno pero seguirás vivo.</li>
                 <li>¡Cuidado! Si te pasas del 0 exacto, o nombras a alguien con 0 en esa estadística, quedas eliminado.</li>
               </ul>
@@ -565,27 +608,69 @@ export default function TrescientosunoLocal({ onVolver, onExit }) {
               </div>
             ) : (
               <>
-                <h2 className="title">Turno de {jugadores[turnoIndex].nombre}</h2>
+                <h2 className="title">Turno de {jActual.nombre}</h2>
+                
+                {jActual.comodines && jActual.comodines.length > 0 && (
+                  <div className="tcu-comodines">
+                    {jActual.comodines.map(c => (
+                      <button 
+                        key={c} 
+                        type="button"
+                        className={`btn-comodin ${comodinActivo === c ? 'activo' : ''} ${c === 'revelar' && comodinActivo === 'revelar' ? 'revelar' : ''}`}
+                        onClick={() => {
+                          if (c === 'revelar') {
+                            if (comodinActivo === 'revelar') {
+                              setComodinActivo(null);
+                              setOpcionesReveladas(null);
+                            } else {
+                              activarRevelar();
+                            }
+                          } else {
+                            setComodinActivo(comodinActivo === c ? null : c);
+                          }
+                        }}
+                      >
+                        {c === 'revelar' ? '🔍 Revelar' : `⭐ ${c.toUpperCase()}`}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
                 <div className="timer-bar-container">
                   <div className={`timer-bar ${tiempoRestante <= 10 ? 'low' : ''}`} style={{ width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%` }} />
                 </div>
                 <p className="timer-text">{tiempoRestante} s</p>
 
-                <form onSubmit={validarJugadorSubmit} className="tcu-form">
-                  <input 
-                    type="text" 
-                    value={inputJugador} 
-                    onChange={(e) => { setInputJugador(e.target.value); setMensajeError(''); }} 
-                    placeholder={`Dime un jugador del ${equipoSel.nombre}...`}
-                    className="player-text-input"
-                    autoFocus 
-                  />
-                  {mensajeError && <p className="error" style={{ marginBottom: '1rem' }}>{mensajeError}</p>}
-                  <div className="tcu-actions">
-                    <button type="submit" className="btn-start" style={{ width: '100%' }}>Enviar</button>
-                    <button type="button" className="secondary danger" onClick={handlePlantarse}>Plantarse</button>
+                {comodinActivo === 'revelar' && opcionesReveladas ? (
+                  <div className="opciones-revelar-grid">
+                    {opcionesReveladas.length > 0 ? opcionesReveladas.map(op => (
+                      <button 
+                        key={op.nombre} 
+                        type="button"
+                        className="btn-opcion-revelada"
+                        onClick={() => validarJugador(op.nombre)}
+                      >
+                        {op.nombre}
+                      </button>
+                    )) : <p className="hint">No quedan jugadores disponibles.</p>}
                   </div>
-                </form>
+                ) : (
+                  <form onSubmit={(e) => { e.preventDefault(); validarJugador(inputJugador); }} className="tcu-form">
+                    <input 
+                      type="text" 
+                      value={inputJugador} 
+                      onChange={(e) => { setInputJugador(e.target.value); setMensajeError(''); }} 
+                      placeholder={`Dime un jugador del ${equipoSel.nombre}...`}
+                      className="player-text-input"
+                      autoFocus 
+                    />
+                    {mensajeError && <p className="error" style={{ marginBottom: '1rem' }}>{mensajeError}</p>}
+                    <div className="tcu-actions">
+                      <button type="submit" className="btn-start" style={{ width: '100%' }}>Enviar</button>
+                      <button type="button" className="secondary danger" onClick={handlePlantarse}>Plantarse</button>
+                    </div>
+                  </form>
+                )}
               </>
             )}
           </div>

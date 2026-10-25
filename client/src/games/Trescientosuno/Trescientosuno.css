@@ -1,5 +1,5 @@
 .tcu-contenedor {
-  --g1: #10b981; /* Verde exacto de meta.js */
+  --g1: #10b981;
   --g2: #047857;
   width: 100%;
   max-width: 960px;
@@ -47,7 +47,6 @@
   opacity: 0.92;
 }
 
-/* Deja esto solo para los paneles y quita .tcu-equipo-card de aquí */
 .game-setup-white-card, .panel {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
@@ -58,7 +57,6 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* NUEVOS ESTILOS PARA LA CUADRÍCULA DE ESCUDOS */
 .tcu-grid-equipos {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
@@ -70,7 +68,7 @@
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   border-radius: 20px;
-  aspect-ratio: 1 / 1; /* Cuadrados perfectos */
+  aspect-ratio: 1 / 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -78,6 +76,8 @@
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
   border: 2px solid rgba(255, 255, 255, 0.5);
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 1rem;
+  text-align: center;
 }
 
 .tcu-equipo-card:hover {
@@ -93,11 +93,39 @@
   transform: scale(1.05);
 }
 
-.tcu-escudo {
-  font-size: 4.5rem; /* Escudo mucho más grande */
-  line-height: 1;
-  margin: 0;
+.tcu-escudo-img {
+  width: 100%;
+  height: 100%;
+  max-width: 80px;
+  max-height: 80px;
+  object-fit: contain;
   filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+}
+
+.tcu-escudo-texto {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #1e293b !important;
+  text-align: center;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.tcu-escudo-big {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+  min-height: 140px;
+}
+
+.tcu-escudo-big .tcu-escudo-img {
+  max-width: 130px;
+  max-height: 130px;
+}
+
+.tcu-escudo-big .tcu-escudo-texto {
+  font-size: 2.5rem;
 }
 
 .section-title {
@@ -202,9 +230,6 @@
   box-shadow: none;
 }
 
-/* ========================================================
-   ESTILOS DE SALA ONLINE
-   ======================================================== */
 .lb-lista {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -275,44 +300,6 @@
   100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
 }
 
-/* ========================================================
-   ESTILOS PROPIOS DE 301 GOLES
-   ======================================================== */
-.tcu-grid-equipos {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 1rem;
-  margin-top: 1.5rem;
-}
-
-.tcu-equipo-card {
-  text-align: center;
-  cursor: pointer;
-  padding: 1.5rem 1rem;
-}
-
-.tcu-equipo-card:hover {
-  border-color: var(--g1);
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(16, 185, 129, 0.2);
-}
-
-.tcu-equipo-card.sel {
-  border-color: var(--g1);
-  background: #f0fdf4;
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.35);
-}
-
-.tcu-escudo {
-  font-size: 3rem;
-  margin-bottom: 0.5rem;
-}
-
-.tcu-escudo-big {
-  font-size: 5rem;
-  margin-bottom: 1rem;
-}
-
 .tcu-marcador-grid {
   display: flex;
   flex-wrap: wrap;
@@ -369,7 +356,6 @@
   color: #1e293b;
 }
 
-/* ANIMACIÓN DE PUNTOS RESTADOS */
 .floating-resta {
   position: absolute;
   top: -30px;
@@ -431,7 +417,6 @@
   gap: 0.5rem;
 }
 
-/* MENSAJE ESTILIZADO DEL RESULTADO */
 .tcu-evento-display {
   display: flex;
   flex-direction: column;
@@ -482,77 +467,71 @@
   font-size: 1.1rem;
 }
 
-/* NUEVOS ESTILOS PARA LA CUADRÍCULA DE ESCUDOS */
-.tcu-grid-equipos {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-  gap: 1.2rem;
-  margin-top: 1.5rem;
-}
-
-.tcu-equipo-card {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
-  aspect-ratio: 1 / 1;
+/* ========================================================
+   SISTEMA DE COMODINES
+   ======================================================== */
+.tcu-comodines {
   display: flex;
-  align-items: center;
   justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.btn-comodin {
+  background: #f8fafc;
+  border: 2px solid #cbd5e1;
+  color: #475569;
+  border-radius: 99px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 700;
   cursor: pointer;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  padding: 1rem;
-  text-align: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-.tcu-equipo-card:hover {
-  border-color: var(--g1);
-  transform: translateY(-5px) scale(1.05);
-  box-shadow: 0 12px 25px rgba(16, 185, 129, 0.25);
+.btn-comodin:hover {
+  background: #f1f5f9;
+  transform: translateY(-1px);
 }
 
-.tcu-equipo-card.sel {
-  border-color: var(--g1);
-  background: #f0fdf4;
-  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+.btn-comodin.activo {
+  background: #fef08a;
+  border-color: #eab308;
+  color: #854d0e;
+  box-shadow: 0 4px 10px rgba(234, 179, 8, 0.3);
   transform: scale(1.05);
 }
 
-/* IMAGEN DEL ESCUDO */
-.tcu-escudo-img {
-  width: 100%;
-  height: 100%;
-  max-width: 80px;
-  max-height: 80px;
-  object-fit: contain;
-  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+.btn-comodin.activo.revelar {
+  background: #dbeafe;
+  border-color: #3b82f6;
+  color: #1e40af;
+  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
 }
 
-/* TEXTO FALLBACK SI NO HAY IMAGEN */
-.tcu-escudo-texto {
-  font-size: 1.1rem;
-  font-weight: 800;
-  color: #1e293b !important; /* Forza el color oscuro */
-  text-align: center;
-  line-height: 1.2;
-  word-break: break-word;
-}
-
-/* CONTENEDOR GRANDE (Fase de configuración) */
-.tcu-escudo-big {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.opciones-revelar-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
   margin-bottom: 1rem;
-  min-height: 140px;
 }
 
-.tcu-escudo-big .tcu-escudo-img {
-  max-width: 130px;
-  max-height: 130px;
+.btn-opcion-revelada {
+  background: #ffffff;
+  border: 2px solid #93c5fd;
+  color: #1e3a8a;
+  padding: 0.8rem;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.tcu-escudo-big .tcu-escudo-texto {
-  font-size: 2.5rem;
+.btn-opcion-revelada:hover {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  transform: translateY(-2px);
 }

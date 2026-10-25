@@ -4,8 +4,6 @@ import './Trescientosuno.css';
 
 const CLAVE_SESION_trescientosuno = 'trescientosuno_online_session';
 
-// Sustituye este diccionario y la función getLogoUrl en la parte superior de ambos archivos
-
 const ESCUDOS_MAP = {
   // Clubes (Tus URLs exactas)
   barcelona: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
@@ -135,6 +133,10 @@ export default function TrescientosunoOnline({ onLocal, onSalir }) {
   const [errorJuego, setErrorJuego] = useState('');
   const [enviando, setEnviando] = useState(false);
 
+  // Estados Comodines
+  const [comodinActivo, setComodinActivo] = useState(null);
+  const [opcionesReveladas, setOpcionesReveladas] = useState(null);
+
   useEffect(() => {
     if (!sesion) {
       if (intervalRef.current) clearInterval(intervalRef.current);
@@ -204,18 +206,47 @@ export default function TrescientosunoOnline({ onLocal, onSalir }) {
   }, [estadoSala, equipos.length]);
 
   const turnoId = sala?.turnoActualId;
-  useEffect(() => { setInputJugador(''); setErrorJuego(''); }, [turnoId, estadoSala]);
+  useEffect(() => { 
+    setInputJugador(''); 
+    setErrorJuego(''); 
+    setComodinActivo(null); 
+    setOpcionesReveladas(null);
+  }, [turnoId, estadoSala]);
 
-  const enviarJugador = async (e) => {
-    e.preventDefault();
-    if (!inputJugador.trim() || enviando) return;
+  const activarRevelar = async () => {
+    setComodinActivo('revelar');
+    try {
+      const res = await fetch(`/api/trescientosuno/online/sala/${sesion.code}/revelar-opciones`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: sesion.token })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setOpcionesReveladas(data.opciones);
+      } else {
+        setErrorJuego(data.error || 'Error al obtener opciones');
+      }
+    } catch (err) {
+      setErrorJuego('Error de conexión.');
+    }
+  };
+
+  const enviarJugador = async (nombreAValidar) => {
+    if (!nombreAValidar.trim() || enviando) return;
     setEnviando(true);
     setErrorJuego('');
     try {
-      await llamar('jugar', { nombreJugador: inputJugador });
+      await llamar('jugar', { nombreJugador: nombreAValidar, comodin: comodinActivo });
       setInputJugador('');
+      setComodinActivo(null);
+      setOpcionesReveladas(null);
     } catch (err) {
       setErrorJuego(err.message);
+      // Consumimos el comodin localmente visualmente si el backend devuelve un error de fallo, 
+      // pero el backend ya se encarga de quitartelo si el mensaje se envió
+      setComodinActivo(null);
+      setOpcionesReveladas(null);
     } finally {
       setEnviando(false);
     }
@@ -328,7 +359,8 @@ export default function TrescientosunoOnline({ onLocal, onSalir }) {
               <ul>
                 <li>Se selecciona un equipo y una estadística a restar (Goles, Asistencias o Partidos).</li>
                 <li>Por turnos, introduce el nombre de un jugador que haya estado en ese club.</li>
-                <li>Se restarán de tu marcador los puntos correspondientes a ese jugador en el club.</li>
+                <li>Se restarán de tu marcador los puntos correspondientes a ese jugador.</li>
+                <li>Dispones de 4 comodines por equipo (x2, x3, x5 y Revelar). Úsalos sabiamente antes de escribir.</li>
                 <li>Si no lo aciertas o no respondes a tiempo, perderás tu turno pero seguirás vivo.</li>
                 <li>¡Cuidado! Si te pasas del 0 exacto, o nombras a alguien con 0 en esa estadística, quedas eliminado.</li>
               </ul>
@@ -638,6 +670,7 @@ export default function TrescientosunoOnline({ onLocal, onSalir }) {
       {vista === 'sala' && sala && sala.estado === 'jugando' && (() => {
         const stat = sala.configuracion.estadistica;
         const jTurno = sala.jugadores.find((j) => j.id === sala.turnoActualId);
+        const yoInfo = sala.jugadores.find((j) => j.id === yoId);
         const esMiTurno = sala.turnoActualId === yoId;
         const ev = sala.evento;
         
@@ -679,6 +712,33 @@ export default function TrescientosunoOnline({ onLocal, onSalir }) {
               ) : esMiTurno ? (
                 <>
                   <h2 className="title">¡Es tu turno!</h2>
+                  
+                  {yoInfo.comodines && yoInfo.comodines.length > 0 && (
+                    <div className="tcu-comodines">
+                      {yoInfo.comodines.map(c => (
+                        <button 
+                          key={c} 
+                          type="button"
+                          className={`btn-comodin ${comodinActivo === c ? 'activo' : ''} ${c === 'revelar' && comodinActivo === 'revelar' ? 'revelar' : ''}`}
+                          onClick={() => {
+                            if (c === 'revelar') {
+                              if (comodinActivo === 'revelar') {
+                                setComodinActivo(null);
+                                setOpcionesReveladas(null);
+                              } else {
+                                activarRevelar();
+                              }
+                            } else {
+                              setComodinActivo(comodinActivo === c ? null : c);
+                            }
+                          }}
+                        >
+                          {c === 'revelar' ? '🔍 Revelar' : `⭐ ${c.toUpperCase()}`}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
                   <div className="timer-bar-container">
                     <div
                       className={`timer-bar ${sala.tiempoRestante <= 10 ? 'low' : ''}`}
@@ -686,21 +746,37 @@ export default function TrescientosunoOnline({ onLocal, onSalir }) {
                     />
                   </div>
                   <p className="timer-text">{sala.tiempoRestante} s</p>
-                  <form onSubmit={enviarJugador} className="tcu-form">
-                    <input
-                      type="text"
-                      value={inputJugador}
-                      onChange={(e) => { setInputJugador(e.target.value); setErrorJuego(''); }}
-                      placeholder={`Dime un jugador del ${sala.equipoSeleccionado?.nombre}...`}
-                      className="player-text-input"
-                      autoFocus
-                    />
-                    {errorJuego && <p className="error" style={{ marginBottom: '1rem' }}>{errorJuego}</p>}
-                    <div className="tcu-actions">
-                      <button type="submit" className="btn-start" style={{ width: '100%' }} disabled={enviando || !inputJugador.trim()}>Enviar</button>
-                      <button type="button" className="secondary danger" disabled={enviando} onClick={plantarse}>Plantarse</button>
+
+                  {comodinActivo === 'revelar' && opcionesReveladas ? (
+                    <div className="opciones-revelar-grid">
+                      {opcionesReveladas.length > 0 ? opcionesReveladas.map(op => (
+                        <button 
+                          key={op.nombre} 
+                          type="button"
+                          className="btn-opcion-revelada"
+                          onClick={(e) => enviarJugador(op.nombre, e)}
+                        >
+                          {op.nombre}
+                        </button>
+                      )) : <p className="hint">No quedan jugadores disponibles.</p>}
                     </div>
-                  </form>
+                  ) : (
+                    <form onSubmit={(e) => enviarJugador(inputJugador, e)} className="tcu-form">
+                      <input
+                        type="text"
+                        value={inputJugador}
+                        onChange={(e) => { setInputJugador(e.target.value); setErrorJuego(''); }}
+                        placeholder={`Dime un jugador del ${sala.equipoSeleccionado?.nombre}...`}
+                        className="player-text-input"
+                        autoFocus
+                      />
+                      {errorJuego && <p className="error" style={{ marginBottom: '1rem' }}>{errorJuego}</p>}
+                      <div className="tcu-actions">
+                        <button type="submit" className="btn-start" style={{ width: '100%' }} disabled={enviando || !inputJugador.trim()}>Enviar</button>
+                        <button type="button" className="secondary danger" disabled={enviando} onClick={plantarse}>Plantarse</button>
+                      </div>
+                    </form>
+                  )}
                 </>
               ) : (
                 <>
