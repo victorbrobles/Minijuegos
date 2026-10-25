@@ -441,3 +441,19 @@
   user-select: none;
   pointer-events: none;
 }
+/* ========================================================
+   LOGO EN SU COLOR REAL
+   Antes se forzaba a silueta blanca (filter: brightness(0) invert(1)). Ahora se muestra con el
+   color oficial de la marca sobre una ficha blanca, para que los logos oscuros también se vean.
+   ======================================================== */
+.lg-logo-img {
+  filter: none;
+  box-sizing: content-box;
+  width: 140px;
+  height: 140px;
+  max-width: min(140px, 62vw);
+  padding: 1rem;
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.4);
+}

@@ -1,0 +1,412 @@
+.tcu-contenedor {
+  --g1: #22c55e;
+  --g2: #15803d;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* ========================================================
+   ESTILOS DE MENÚ INICIAL Y SETUP (Heredados de Trayectoria)
+   ======================================================== */
+.game-intro-banner {
+  background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+  border-radius: 26px;
+  padding: 1.5rem 1.75rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  color: white;
+  box-shadow: 0 10px 25px -5px rgba(21, 128, 61, 0.3);
+  margin-bottom: 1.25rem;
+}
+
+.game-intro-icon-box {
+  width: 68px;
+  height: 68px;
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  backdrop-filter: blur(4px);
+}
+
+.game-intro-text h2 {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.65rem;
+  font-weight: 800;
+}
+
+.game-intro-text p {
+  margin: 0;
+  font-size: 0.95rem;
+  opacity: 0.92;
+}
+
+.game-setup-white-card {
+  background: #ffffff;
+  border-radius: 26px;
+  padding: 1.75rem 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #15803d;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 0.6rem;
+}
+
+.select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.game-select {
+  width: 100%;
+  padding: 0.85rem 1.25rem;
+  border-radius: 16px;
+  border: 2px solid #bbf7d0;
+  background: #ffffff;
+  color: #1e293b;
+  font-size: 1rem;
+  font-weight: 500;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+}
+
+.select-wrapper::after {
+  content: "";
+  position: absolute;
+  right: 1.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 10px;
+  height: 6px;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+.players-inputs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.85rem;
+}
+
+.player-text-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.85rem 1.25rem;
+  border-radius: 16px;
+  border: 2px solid #bbf7d0;
+  background: #ffffff;
+  color: #1e293b;
+  font-size: 1rem;
+  outline: none;
+}
+
+.btn-start {
+  background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  padding: 0.85rem 1.75rem;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s, opacity 0.2s;
+  box-shadow: 0 6px 18px rgba(21, 128, 61, 0.28);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-start:hover:not(:disabled) {
+  opacity: 0.95;
+  transform: translateY(-1px);
+}
+
+.btn-start:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ========================================================
+   ESTILOS DE SALA ONLINE (Heredados de Trayectoria)
+   ======================================================== */
+.lb-lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.85rem;
+  margin-top: 1.1rem;
+  width: 100%;
+}
+
+.lb-jug {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.1rem;
+  background: var(--g1, #16a34a);
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  animation: popInJugador 0.3s ease-out;
+}
+
+.lb-jug:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  filter: brightness(1.05);
+}
+
+.lb-jug.yo {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.45), 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+
+.lb-punto {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.lb-punto.on {
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.35);
+  animation: pulsoOnlineBlanco 1.8s infinite;
+}
+
+.lb-jug-nombre {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #ffffff !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+@keyframes popInJugador {
+  0% { opacity: 0; transform: scale(0.9) translateY(8px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes pulsoOnlineBlanco {
+  0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.6); }
+  70% { box-shadow: 0 0 0 7px rgba(255, 255, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+
+/* ========================================================
+   ESTILOS PROPIOS DE 301 GOLES
+   ======================================================== */
+.tcu-grid-equipos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.tcu-equipo-card {
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 1.5rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.tcu-equipo-card:hover {
+  border-color: #22c55e;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(34, 197, 94, 0.2);
+}
+
+.tcu-escudo {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.tcu-escudo-big {
+  font-size: 5rem;
+  margin-bottom: 1rem;
+}
+
+.tcu-marcador-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  justify-content: center;
+}
+
+.tcu-marcador-item {
+  background: #f8fafc;
+  border: 2px solid #cbd5e1;
+  border-radius: 12px;
+  padding: 0.5rem 1rem;
+  text-align: center;
+  min-width: 100px;
+}
+
+.tcu-marcador-item.activo {
+  border-color: #16a34a;
+  background: #f0fdf4;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.3);
+}
+
+.tcu-marcador-item.eliminado {
+  opacity: 0.5;
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+.tcu-marcador-item.ganador {
+  border-color: #eab308;
+  background: #fefce8;
+}
+
+.tcu-marcador-item.plantado {
+  border-color: #f59e0b;
+  background: #fffbeb;
+}
+
+.tcu-marcador-item .nombre {
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.tcu-marcador-item .puntos {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: #1e293b;
+}
+
+.tcu-turno-panel {
+  padding: 2.5rem 1.5rem;
+}
+
+.timer-bar-container {
+  background: #e2e8f0;
+  border-radius: 9999px;
+  height: 8px;
+  overflow: hidden;
+  margin: 1rem 0 0.5rem;
+}
+
+.timer-bar {
+  height: 100%;
+  background-color: #16a34a;
+  transition: width 1s linear, background-color 0.3s ease;
+}
+
+.timer-bar.low {
+  background-color: #ef4444;
+}
+
+.timer-text {
+  font-weight: 800;
+  color: #64748b;
+  margin-bottom: 1.5rem;
+}
+
+.tcu-form input {
+  width: 100%;
+  font-size: 1.2rem;
+  padding: 1rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.tcu-actions {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 0.5rem;
+}
+
+.tcu-feedback {
+  font-size: 1.4rem;
+  font-weight: 800;
+  padding: 2rem;
+  border-radius: 16px;
+  animation: popIn 0.3s ease-out;
+}
+
+.tcu-feedback.acierto { color: #16a34a; background: #f0fdf4; border: 2px solid #22c55e; }
+.tcu-feedback.eliminado { color: #dc2626; background: #fef2f2; border: 2px solid #ef4444; }
+.tcu-feedback.plantado { color: #d97706; background: #fffbeb; border: 2px solid #f59e0b; }
+.tcu-feedback.ganador { color: #a16207; background: #fefce8; border: 2px solid #eab308; }
+
+.tcu-usados {
+  margin-top: 1.5rem;
+  font-size: 0.85rem;
+  color: #64748b;
+  text-align: center;
+  line-height: 1.5;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.9); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+/* ========================================================
+   ONLINE: elegir equipo y reglas
+   ======================================================== */
+.tcu-equipo-card.sel {
+  border-color: #16a34a;
+  background: #f0fdf4;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.35);
+}
+
+.tcu-equipo-card h4 {
+  margin: 0;
+  color: #1e293b;
+}
+
+.tcu-ajustes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.tcu-ajustes .form-group { margin-bottom: 0; }
+
+.tcu-turno-aviso {
+  color: #15803d;
+  font-weight: 800;
+  font-size: 1.1rem;
+}

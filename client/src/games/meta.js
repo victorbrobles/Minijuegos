@@ -284,6 +284,14 @@ export const META = {
     descripcion: 'Cada ronda el laboratorio esconde una verdad y tú solo conoces un trocito. Formula una hipótesis (cierta o de farol), apuesta por las de los demás y descubre quién miente.',
     categorias: ['favoritos', 'estrategia']
   },
+  'trescientosuno': {
+    titulo: '301 goles',
+    icono: 'soccer',
+    colores: ['#10b981', '#047857'],
+    etiquetas: 'futbol goles clubes goleadores asistencias partidos adivinar seleccion balon',
+    descripcion: 'Llega al número objetivo de goles, asistencias o partidos y demuestra lo mucho que conoces al club escogido.',
+    categorias: ['favoritos', 'futbol']
+  }
 };
 
 export const META_POR_DEFECTO = {

@@ -6,7 +6,8 @@
     "dev": "node --watch index.js",
     "start": "node index.js",
     "sync:fundadores": "node scripts/sync-fundadores.mjs",
-    "sim:fundadores": "node scripts/fundadores-sim.mjs"
+    "sim:fundadores": "node scripts/fundadores-sim.mjs",
+    "sync:logos": "node scripts/sync-logos.mjs"
   },
   "dependencies": {
     "better-sqlite3": "^13.0.3",
@@ -14,6 +15,7 @@
     "express": "^4.19.2",
     "express-basic-auth": "^1.2.1",
     "sharp": "^0.35.5",
+    "simple-icons": "^16.35.0",
     "socket.io": "^4.8.4"
   }
 }

@@ -1,14 +1,43 @@
 // server/routes/logos.js
 import express from 'express';
 import crypto from 'crypto';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import * as simpleIcons from 'simple-icons';
 import { getLogoAleatorio, TODOS_LOS_LOGOS } from '../data/seeds/logos/logosData.js';
 
 const router = express.Router();
 const salas = {};
 const MAX_RONDAS = 30;
 
-// Caché en memoria para no volver a descargar los logos ya servidos
+// Imágenes propias opcionales: server/data/seeds/logos/img/<slug>.(svg|png|webp|jpg)
+// Tienen prioridad sobre Simple Icons. Quien las añade es responsable de tener derecho a usarlas.
+const DIR_IMG = path.join(path.dirname(fileURLToPath(import.meta.url)), '../data/seeds/logos/img');
+const EXT_IMG = { svg: 'image/svg+xml', png: 'image/png', webp: 'image/webp', jpg: 'image/jpeg', jpeg: 'image/jpeg' };
+
+// Simple Icons va incluido en el paquete npm: sin descargas ni dependencia de ningún CDN
+const ICONOS = new Map(Object.values(simpleIcons).filter((i) => i && i.slug && i.svg).map((i) => [i.slug, i]));
 const svgCache = {};
+
+// SVG con el color oficial de la marca y sin <title> (el título contiene el nombre de la marca)
+const luminosidad = (hex) => {
+  const [r, g, b] = [0, 2, 4].map((k) => parseInt(hex.slice(k, k + 2), 16));
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+};
+const svgDeMarca = (icono) => {
+  // Los colores casi blancos no se verían sobre el fondo claro del logo
+  const color = luminosidad(icono.hex) > 0.85 ? '1f2937' : icono.hex;
+  return icono.svg.replace(/<title>.*?<\/title>/s, '').replace('<svg ', `<svg fill="#${color}" `);
+};
+
+const imagenLocal = (slug) => {
+  for (const ext of Object.keys(EXT_IMG)) {
+    const f = path.join(DIR_IMG, `${slug}.${ext}`);
+    if (fs.existsSync(f)) return { f, tipo: EXT_IMG[ext] };
+  }
+  return null;
+};
 
 const generarCodigo = () => Math.random().toString(36).substring(2, 6).toUpperCase();
 
@@ -54,44 +83,28 @@ const esRespuestaCorrecta = (intento, logo) => {
 };
 
 // ==========================================================
-// RUTA PROXY INTERNA PARA ENTREGAR EL LOGO SIN BLOQUEOS
+// IMAGEN DEL LOGO (sin CDN: imagen propia o Simple Icons del paquete npm)
 // ==========================================================
-router.get('/imagen/:id', async (req, res) => {
+router.get('/imagen/:id', (req, res) => {
   const id = Number(req.params.id);
-  const logo = TODOS_LOS_LOGOS.find(l => l.id === id);
+  const logo = TODOS_LOS_LOGOS.find((l) => l.id === id);
   if (!logo) return res.status(404).send('Logo no encontrado');
-
-  // Si ya lo tenemos en caché en memoria, se entrega al instante
-  if (svgCache[id]) {
-    res.setHeader('Content-Type', 'image/svg+xml');
-    res.setHeader('Cache-Control', 'public, max-age=86400');
-    return res.send(svgCache[id]);
-  }
-
   const slug = logo.slug || normalizar(logo.nombre);
+  res.setHeader('Cache-Control', 'public, max-age=86400');
 
-  try {
-    let resp = await fetch(`https://cdn.simpleicons.org/${slug}/ffffff`);
-    if (!resp.ok) {
-      resp = await fetch(`https://api.iconify.design/simple-icons:${slug}.svg?color=%23ffffff`);
-    }
-    if (resp.ok) {
-      const svg = await resp.text();
-      svgCache[id] = svg;
-      res.setHeader('Content-Type', 'image/svg+xml');
-      res.setHeader('Cache-Control', 'public, max-age=86400');
-      return res.send(svg);
-    }
-  } catch {
-    // Si no hay internet o falla el CDN, salta al vector de respaldo
+  const local = imagenLocal(slug);
+  if (local) {
+    res.setHeader('Content-Type', local.tipo);
+    return res.sendFile(local.f);
   }
-
-  // Respaldo garantizado: círculo con la inicial de la marca para que NUNCA aparezca rota
-  const inicial = (logo.nombre || '?')[0].toUpperCase();
-  const fallbackSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100"><circle cx="50" cy="50" r="42" fill="none" stroke="#ffffff" stroke-width="6"/><text x="50" y="63" font-family="system-ui, sans-serif" font-size="38" font-weight="900" fill="#ffffff" text-anchor="middle">${inicial}</text></svg>`;
-
-  res.setHeader('Content-Type', 'image/svg+xml');
-  return res.send(fallbackSvg);
+  const icono = ICONOS.get(slug);
+  if (icono) {
+    svgCache[slug] ??= svgDeMarca(icono);
+    res.setHeader('Content-Type', 'image/svg+xml');
+    return res.send(svgCache[slug]);
+  }
+  // Sin imagen real no se inventa ninguna (antes salía un círculo con la inicial, que delataba la respuesta)
+  return res.status(404).send('Sin imagen');
 });
 
 router.post('/crear', (req, res) => {

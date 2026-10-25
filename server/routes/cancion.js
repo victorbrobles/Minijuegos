@@ -1,4 +1,3 @@
-// server/routes/cancion.js
 import express from 'express';
 import parte1 from '../data/seeds/cancion/parte1.js';
 import parte2 from '../data/seeds/cancion/parte2.js';
@@ -60,7 +59,6 @@ function barajarArray(array) {
   return c;
 }
 
-// Búsqueda en la API de iTunes para obtener el fragmento oficial de 30s
 async function obtenerAudioReal(titulo, artista) {
   try {
     const consulta = encodeURIComponent(`${titulo} ${artista}`);
@@ -79,7 +77,6 @@ async function obtenerAudioReal(titulo, artista) {
 // RUTAS MODO OFFLINE / LOCAL
 // ==========================================
 
-// POST /api/cancion/iniciar-ronda
 router.post('/iniciar-ronda', async (req, res) => {
   const { usados = [] } = req.body || {};
   const disponibles = TODAS_LAS_CANCIONES.filter((c) => !usados.includes(c.id));
@@ -95,9 +92,8 @@ router.post('/iniciar-ronda', async (req, res) => {
   });
 });
 
-// POST /api/cancion/validar
 router.post('/validar', (req, res) => {
-  const { id, respuesta = '', segundosRestantes = 0 } = req.body || {};
+  const { id, respuesta = '' } = req.body || {};
   const cancion = TODAS_LAS_CANCIONES.find((c) => c.id === id);
 
   if (!cancion) {
@@ -105,18 +101,17 @@ router.post('/validar', (req, res) => {
   }
 
   const acierto = esCoincidente(respuesta, cancion);
-  const pts = Math.max(1, Math.min(30, parseInt(segundosRestantes, 10) || 1));
-
+  
   res.json({
     success: true,
     acierto,
-    puntos: pts,
+    puntosAcierto: 10,
+    puntosFallo: 5,
     tituloReal: cancion.titulo,
     artistaReal: cancion.artista
   });
 });
 
-// POST /api/cancion/solucion
 router.post('/solucion', (req, res) => {
   const { id } = req.body || {};
   const cancion = TODAS_LAS_CANCIONES.find((c) => c.id === id);
@@ -160,14 +155,12 @@ async function prepararRondaOnline(sala) {
     cancionReal: elegida,
     estadoRonda: 'activa',
     reproduciendo: false,
-    segundosRestantes: 30,
     pulsado: null,
     mensaje: null,
     solucion: null
   };
 }
 
-// POST /api/cancion/online/crear
 router.post('/online/crear', (req, res) => {
   const { nombre } = req.body || {};
   if (!nombre?.trim()) return res.status(400).json({ error: 'Nombre requerido.' });
@@ -192,7 +185,6 @@ router.post('/online/crear', (req, res) => {
   res.json({ success: true, code, token: tokenAdmin });
 });
 
-// POST /api/cancion/online/unirse
 router.post('/online/unirse', (req, res) => {
   const { code, nombre } = req.body || {};
   const sala = salasOnline.get(code?.toUpperCase());
@@ -215,7 +207,6 @@ router.post('/online/unirse', (req, res) => {
   res.json({ success: true, code: sala.code, token });
 });
 
-// GET /api/cancion/online/sala/:code
 router.get('/online/sala/:code', (req, res) => {
   const sala = salasOnline.get(req.params.code?.toUpperCase());
   if (!sala) return res.status(404).json({ error: 'Sala no encontrada.' });
@@ -242,7 +233,6 @@ router.get('/online/sala/:code', (req, res) => {
           estadoRonda: sala.ronda.estadoRonda,
           audio: sala.ronda.audio,
           reproduciendo: sala.ronda.reproduciendo,
-          segundosRestantes: sala.ronda.segundosRestantes,
           pulsado: sala.ronda.pulsado,
           mensaje: sala.ronda.mensaje,
           solucion: sala.ronda.solucion
@@ -251,7 +241,6 @@ router.get('/online/sala/:code', (req, res) => {
   });
 });
 
-// POST /api/cancion/online/sala/:code/iniciar
 router.post('/online/sala/:code/iniciar', async (req, res) => {
   const sala = salasOnline.get(req.params.code?.toUpperCase());
   if (!sala || sala.adminToken !== req.body?.token) return res.status(403).json({ error: 'No autorizado.' });
@@ -264,7 +253,6 @@ router.post('/online/sala/:code/iniciar', async (req, res) => {
   res.json({ success: true });
 });
 
-// POST /api/cancion/online/sala/:code/reproducir
 router.post('/online/sala/:code/reproducir', (req, res) => {
   const sala = salasOnline.get(req.params.code?.toUpperCase());
   if (!sala || !sala.ronda) return res.status(404).json({ error: 'Ronda no activa.' });
@@ -273,19 +261,6 @@ router.post('/online/sala/:code/reproducir', (req, res) => {
   res.json({ success: true });
 });
 
-// POST /api/cancion/online/sala/:code/tick
-router.post('/online/sala/:code/tick', (req, res) => {
-  const sala = salasOnline.get(req.params.code?.toUpperCase());
-  if (!sala || !sala.ronda) return res.status(404).json({ error: 'Ronda no activa.' });
-
-  const { segundos } = req.body || {};
-  if (typeof segundos === 'number') {
-    sala.ronda.segundosRestantes = segundos;
-  }
-  res.json({ success: true });
-});
-
-// POST /api/cancion/online/sala/:code/pulsar
 router.post('/online/sala/:code/pulsar', (req, res) => {
   const sala = salasOnline.get(req.params.code?.toUpperCase());
   if (!sala || !sala.ronda || sala.ronda.estadoRonda !== 'activa') {
@@ -309,7 +284,6 @@ router.post('/online/sala/:code/pulsar', (req, res) => {
   res.json({ success: true });
 });
 
-// POST /api/cancion/online/sala/:code/teclear
 router.post('/online/sala/:code/teclear', (req, res) => {
   const sala = salasOnline.get(req.params.code?.toUpperCase());
   if (!sala || !sala.ronda?.pulsado) return res.json({ success: true });
@@ -321,7 +295,6 @@ router.post('/online/sala/:code/teclear', (req, res) => {
   res.json({ success: true });
 });
 
-// POST /api/cancion/online/sala/:code/responder
 router.post('/online/sala/:code/responder', (req, res) => {
   const sala = salasOnline.get(req.params.code?.toUpperCase());
   if (!sala || !sala.ronda || !sala.ronda.pulsado) {
@@ -335,19 +308,20 @@ router.post('/online/sala/:code/responder', (req, res) => {
 
   const respuesta = req.body?.respuesta || '';
   const acierto = esCoincidente(respuesta, sala.ronda.cancionReal);
-  const pts = Math.max(1, Math.min(30, parseInt(sala.ronda.segundosRestantes, 10) || 1));
+  const ptsAcierto = 10;
+  const ptsFallo = 5;
 
   if (acierto) {
-    jugador.puntos += pts;
+    jugador.puntos += ptsAcierto;
     sala.ronda.estadoRonda = 'resuelta';
     sala.ronda.solucion = `${sala.ronda.cancionReal.titulo} — ${sala.ronda.cancionReal.artista}`;
     sala.ronda.mensaje = {
       tipo: 'acierto',
-      texto: `¡Correcto! ${jugador.nombre} suma +${pts} puntos.`
+      texto: `¡Correcto! ${jugador.nombre} suma +${ptsAcierto} puntos.`
     };
     sala.ronda.pulsado = null;
   } else {
-    jugador.puntos = Math.max(0, jugador.puntos - pts);
+    jugador.puntos = Math.max(0, jugador.puntos - ptsFallo);
     jugador.bloqueado = true;
     sala.ronda.pulsado = null;
 
@@ -357,13 +331,14 @@ router.post('/online/sala/:code/responder', (req, res) => {
       sala.ronda.solucion = `${sala.ronda.cancionReal.titulo} — ${sala.ronda.cancionReal.artista}`;
       sala.ronda.mensaje = {
         tipo: 'fallo',
-        texto: `¡Han fallado todos! (${jugador.nombre} -${pts} pts)`
+        texto: `¡Han fallado todos! (${jugador.nombre} -${ptsFallo} pts)`
       };
     } else {
+      // Rebote para el resto
       sala.ronda.reproduciendo = true;
       sala.ronda.mensaje = {
         tipo: 'fallo',
-        texto: `¡Incorrecto! ${jugador.nombre} resta -${pts} pts. ¡Rebote para el resto!`
+        texto: `¡Incorrecto! ${jugador.nombre} resta -${ptsFallo} pts. ¡Rebote para el resto!`
       };
     }
   }
@@ -371,7 +346,6 @@ router.post('/online/sala/:code/responder', (req, res) => {
   res.json({ success: true, acierto });
 });
 
-// POST /api/cancion/online/sala/:code/solucion
 router.post('/online/sala/:code/solucion', (req, res) => {
   const sala = salasOnline.get(req.params.code?.toUpperCase());
   if (!sala || !sala.ronda) return res.status(404).json({ error: 'Ronda no activa.' });
@@ -385,7 +359,6 @@ router.post('/online/sala/:code/solucion', (req, res) => {
   res.json({ success: true });
 });
 
-// POST /api/cancion/online/sala/:code/siguiente-ronda
 router.post('/online/sala/:code/siguiente-ronda', async (req, res) => {
   const sala = salasOnline.get(req.params.code?.toUpperCase());
   if (!sala || sala.adminToken !== req.body?.token) return res.status(403).json({ error: 'No autorizado.' });
@@ -395,7 +368,6 @@ router.post('/online/sala/:code/siguiente-ronda', async (req, res) => {
   res.json({ success: true });
 });
 
-// POST /api/cancion/online/sala/:code/finalizar
 router.post('/online/sala/:code/finalizar', (req, res) => {
   const sala = salasOnline.get(req.params.code?.toUpperCase());
   if (!sala || sala.adminToken !== req.body?.token) return res.status(403).json({ error: 'No autorizado.' });
@@ -404,7 +376,6 @@ router.post('/online/sala/:code/finalizar', (req, res) => {
   res.json({ success: true });
 });
 
-// POST /api/cancion/online/sala/:code/salir
 router.post('/online/sala/:code/salir', (req, res) => {
   const sala = salasOnline.get(req.params.code?.toUpperCase());
   if (sala) {

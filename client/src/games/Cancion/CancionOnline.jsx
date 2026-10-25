@@ -1,4 +1,3 @@
-// client/src/games/Cancion/CancionOnline.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { reproducirConRampa, pausarAudio, detenerReproduccion } from './audioPlayerCancion.js';
@@ -6,7 +5,7 @@ import './Cancion.css';
 import '../Adivina/Adivina.css';
 
 const CLAVE_SESION_CANCION = 'cancion_online_session';
-const TIEMPO_RESPUESTA = 30;
+const TIEMPO_RESPUESTA = 60; // Actualizado a 60 segundos
 
 export default function CancionOnline({ onLocal, onSalir }) {
   const [vista, setVista] = useState('menu'); // 'menu' | 'crear' | 'unirse' | 'sala'
@@ -87,23 +86,14 @@ export default function CancionOnline({ onLocal, onSalir }) {
       reproducirConRampa(
         ronda.audio,
         (s) => {
+          // El admin puede enviar el progreso si quiere que la barra se sincronice perfectamente
           if (sala.esAdmin) {
-            fetch(`/api/cancion/online/sala/${sala.code}/tick`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ token: sesion.token, segundos: s })
-            }).catch(() => {});
+             // Opcional: fetch(`/api/cancion/online/sala/${sala.code}/tick`, ...)
           }
         },
         () => {
           setSonandoLocal(false);
-          if (sala.esAdmin) {
-            fetch(`/api/cancion/online/sala/${sala.code}/solucion`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ token: sesion.token })
-            }).catch(() => {});
-          }
+          // Audio finalizado, se detiene pero NO revelamos la solución
         }
       );
     } else if (!ronda.reproduciendo && sonandoLocal) {
@@ -182,6 +172,8 @@ export default function CancionOnline({ onLocal, onSalir }) {
 
   const handlePulsarRojo = async () => {
     detenerReproduccion();
+    pausarAudio();
+    setSonandoLocal(false);
     try {
       setMiTexto('');
       await fetch(`/api/cancion/online/sala/${sesion.code}/pulsar`, {
@@ -289,7 +281,7 @@ export default function CancionOnline({ onLocal, onSalir }) {
   const miJugador = sala?.jugadores?.find((j) => j.id === yoId);
   const estoyBloqueado = Boolean(miJugador?.bloqueado);
 
-  // Efecto para el temporizador sincronizado cuando alguien pulsa
+  // Efecto para el temporizador sincronizado cuando alguien pulsa (60 segundos)
   useEffect(() => {
     if (!alguienHaPulsado || ronda?.estadoRonda !== 'activa') {
       if (timerRespuestaRef.current) clearInterval(timerRespuestaRef.current);
@@ -345,12 +337,12 @@ export default function CancionOnline({ onLocal, onSalir }) {
               <p><strong>1. Dinámica musical:</strong></p>
               <ul>
                 <li>El anfitrión iniciará la canción. Empezará casi inaudible e irá <strong>subiendo gradualmente de volumen</strong>.</li>
-                <li>En cuanto reconozcas el tema, <strong>pulsa el botón rojo</strong> en tu pantalla para detener la reproducción. Tienes <strong>30 segundos para responder</strong>.</li>
+                <li>En cuanto reconozcas el tema, <strong>pulsa el botón rojo</strong> para detener la reproducción de todos. Tienes <strong>60 segundos para responder</strong>.</li>
               </ul>
               <p><strong>2. Puntuación y rebote:</strong></p>
               <ul>
-                <li>Si aciertas, sumas <strong>tantos puntos como segundos queden</strong> de la canción.</li>
-                <li>Si fallas o se te acaba el tiempo de respuesta, restas esa misma cantidad de puntos y quedas bloqueado, ¡habiendo rebote para el resto!</li>
+                <li>Si aciertas, sumas <strong>+10 puntos</strong>.</li>
+                <li>Si fallas o se te acaba el tiempo de respuesta, restas <strong>-5 puntos</strong> y quedas bloqueado, ¡reanudándose el audio y la ronda para el resto!</li>
               </ul>
             </div>
 
@@ -373,7 +365,7 @@ export default function CancionOnline({ onLocal, onSalir }) {
             </span>
             <h1 className="title">Afina ese oído Online</h1>
             <p className="hint">
-              Adivina la canción antes de que alcance su volumen máximo. ¡El más rápido en pulsar suma los segundos que queden!
+              Adivina la canción antes de que alcance su volumen máximo. ¡El más rápido en pulsar se la lleva!
             </p>
 
             {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
@@ -539,7 +531,6 @@ export default function CancionOnline({ onLocal, onSalir }) {
         <section className="game">
           <div className="hud">
             <span className="chip"><Icon name="flagFinish" size={18} />Ronda {sala.rondaNum}</span>
-            <span className="chip alt">⏱️ {ronda.segundosRestantes}s (+{ronda.segundosRestantes} / -{ronda.segundosRestantes} pts)</span>
           </div>
 
           {/* Marcador superior */}
@@ -572,12 +563,12 @@ export default function CancionOnline({ onLocal, onSalir }) {
             <span className="cancion-timer-tag">
               {ronda.reproduciendo ? '¡Música sonando!' : 'Pausado'}
             </span>
-            <span className="hint small">Subiendo gradualmente de volumen ({ronda.segundosRestantes}s)</span>
+            <span className="hint small">Subiendo gradualmente de volumen</span>
 
             <div className="cancion-volume-meter">
               <div
                 className="cancion-volume-fill"
-                style={{ width: `${((30 - ronda.segundosRestantes) / 30) * 100}%` }}
+                style={{ width: `${((30 - (ronda.segundosRestantes || 30)) / 30) * 100}%` }}
               />
             </div>
           </div>
@@ -607,7 +598,7 @@ export default function CancionOnline({ onLocal, onSalir }) {
                 </div>
               )}
 
-              {/* Si alguien ha pulsado, mostrar el temporizador para todos */}
+              {/* Si alguien ha pulsado, mostrar el temporizador de 60s para todos */}
               {alguienHaPulsado && (
                 <div style={{ padding: '0', marginTop: '0.5rem', marginBottom: '0.8rem', width: '100%' }}>
                   <div
@@ -616,11 +607,11 @@ export default function CancionOnline({ onLocal, onSalir }) {
                     style={{ margin: '0.4rem 0', background: '#e2e8f0', borderRadius: '9999px', height: '8px', overflow: 'hidden' }}
                   >
                     <div
-                      className={`timer-bar ${tiempoRespuesta <= 10 ? 'low' : ''}`}
+                      className={`timer-bar ${tiempoRespuesta <= 15 ? 'low' : ''}`}
                       style={{
                         width: `${(tiempoRespuesta / TIEMPO_RESPUESTA) * 100}%`,
                         height: '100%',
-                        backgroundColor: tiempoRespuesta <= 10 ? '#ef4444' : '#16a34a',
+                        backgroundColor: tiempoRespuesta <= 15 ? '#ef4444' : '#16a34a',
                         borderRadius: '9999px',
                         transition: 'width 0.1s linear, background-color 0.3s ease'
                       }}
@@ -630,7 +621,7 @@ export default function CancionOnline({ onLocal, onSalir }) {
                     className="timer-text"
                     style={{
                       display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem',
-                      color: tiempoRespuesta <= 10 ? '#dc2626' : '#64748b', fontSize: '0.9rem', fontWeight: 700, margin: '0'
+                      color: tiempoRespuesta <= 15 ? '#dc2626' : '#64748b', fontSize: '0.9rem', fontWeight: 700, margin: '0'
                     }}
                   >
                     <Icon name="clock" size={16} />
@@ -643,7 +634,7 @@ export default function CancionOnline({ onLocal, onSalir }) {
               {soyElQueHaPulsado && (
                 <form onSubmit={handleEnviarRespuesta} className="respuesta-pulsada-box" style={{ width: '100%' }}>
                   <div className="respuesta-pulsada-header">
-                    <span className="pulsado-badge">🔴 Has pulsado · {ronda.segundosRestantes}s restantes</span>
+                    <span className="pulsado-badge">🔴 Tiempo detenido (+10 / -5 pts)</span>
                     <p className="hint small" style={{ margin: '0.3rem 0' }}>Escribe el nombre de la canción:</p>
                   </div>
 

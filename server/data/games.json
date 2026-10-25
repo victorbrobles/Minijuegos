@@ -202,5 +202,11 @@
     "name": "La Hipótesis Ganadora",
     "description": "Cada ronda el laboratorio esconde una verdad y tú solo conoces un trocito. Formula una hipótesis (cierta o de farol), apuesta por las de los demás y descubre quién miente.",
     "isNew": true
+  },
+  {
+    "id": "trescientosuno",
+    "name": "301 Goles",
+    "description": "Llega al número objetivo de goles, asistencias o partidos y demuestra lo mucho que conoces al club escogido.",
+    "isNew": true
   }
 ]

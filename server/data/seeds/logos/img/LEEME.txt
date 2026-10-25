@@ -1,0 +1,10 @@
+Imágenes propias de logos (opcional)
+====================================
+Coloca aquí una imagen por marca con el nombre del slug que aparece en parte1.js ... parte4.js:
+    heineken.svg   realmadrid.png   mahou.webp ...
+Formatos: svg, png, webp, jpg. Tienen prioridad sobre Simple Icons.
+Después ejecuta:  npm run sync:logos   (desde la carpeta server)
+
+Consejos:
+- Si el logo lleva el nombre escrito, recórtalo o usa una versión solo con el símbolo: así no regala la respuesta.
+- Usa solo imágenes que tengas derecho a usar.
