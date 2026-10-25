@@ -20,8 +20,9 @@ export default function ImpostorLocal({ onVolver, onExit }) {
   ]);
   const [puntos, setPuntos] = useState({});
 
-  const [palabraSecreta, setPalabraSecreta] = useState('');
-  const [restriccion, setRestriccion] = useState('');
+  const [modoJuego, setModoJuego] = useState('clasico');
+  const [itemJuego, setItemJuego] = useState(null);
+  
   const [impostorId, setImpostorId] = useState(null);
   const [jugadorInicialId, setJugadorInicialId] = useState(null);
 
@@ -66,11 +67,10 @@ export default function ImpostorLocal({ onVolver, onExit }) {
 
   const prepararRonda = async (lista = jugadores) => {
     try {
-      const res = await fetch('/api/impostor/palabra');
+      const res = await fetch(`/api/impostor/palabra?modo=${modoJuego}`);
       const data = await res.json();
       if (data.success) {
-        setPalabraSecreta(data.palabra);
-        setRestriccion(data.restriccion);
+        setItemJuego(data.item);
 
         const impElegido = lista[Math.floor(Math.random() * lista.length)];
         setImpostorId(impElegido.id);
@@ -98,6 +98,18 @@ export default function ImpostorLocal({ onVolver, onExit }) {
 
   const jugadorEnTurnoReparto = jugadores[indiceReparto];
   const esImpostorEnTurno = jugadorEnTurnoReparto?.id === impostorId;
+
+  let miPalabra = null;
+  let infoImpostor = null;
+  if (itemJuego) {
+    if (esImpostorEnTurno) {
+      if (modoJuego === 'pista') infoImpostor = itemJuego.pista;
+      if (modoJuego === 'camuflado') infoImpostor = itemJuego.palabraImpostor;
+      if (modoJuego === 'preguntas') infoImpostor = itemJuego.categoria;
+    } else {
+      miPalabra = itemJuego.palabra;
+    }
+  }
 
   const resolverPartida = () => {
     const scores = {};
@@ -134,54 +146,24 @@ export default function ImpostorLocal({ onVolver, onExit }) {
 
   return (
     <div className="aprox-contenedor">
-      {/* AYUDA */}
       {fase === 'setup' && (
         <>
-          <button
-            type="button"
-            className="aprox-btn-ayuda"
-            onClick={() => setModalAyuda(true)}
-            title="Reglas de Miente como puedas"
-          >
+          <button type="button" className="aprox-btn-ayuda" onClick={() => setModalAyuda(true)} title="Reglas">
             <span className="aprox-btn-ayuda-signo">?</span>
           </button>
-
           {modalAyuda && (
             <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
               <div className="rg-modal aprox-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-                <div className="aprox-modal-header">
-                  <h3>¿Cómo se juega a Miente como puedas?</h3>
-                </div>
-
+                <div className="aprox-modal-header"><h3>¿Cómo se juega?</h3></div>
                 <div className="aprox-modal-cuerpo">
-                  <p><strong>1. Dinámica del juego:</strong></p>
+                  <p><strong>1. Dinámica:</strong></p>
                   <ul>
-                    <li>Participan de 3 a 20 jugadores. Uno de ellos será el impostor en secreto.</li>
-                    <li>Todos ven en privado la palabra secreta excepto el impostor.</li>
-                    <li>Hay una <strong>restricción obligatoria común</strong> para todos.</li>
-                    <li>Por turnos en voz alta, cada uno dice una pista sin saltarse la restricción.</li>
+                    <li>Elige el modo de juego y pasad el móvil.</li>
+                    <li>Sigue las instrucciones en pantalla según tu rol (Impostor o Pueblo).</li>
                   </ul>
-                  <p><strong>2. Puntuación:</strong></p>
-                  <div className="aprox-tabla-puntos">
-                    <div className="aprox-puntos-fila acierto" style={{ background: '#dbeafe', color: '#1d4ed8' }}>
-                      <span>🎭 Victoria del Impostor</span>
-                      <strong>+10 puntos</strong>
-                    </div>
-                    <div className="aprox-puntos-fila cercana">
-                      <span>⏳ Rondas sobrevividas</span>
-                      <strong>+3 puntos por ronda superada</strong>
-                    </div>
-                    <div className="aprox-puntos-fila acierto">
-                      <span>👥 Victoria del Pueblo</span>
-                      <strong>+3 puntos para cada inocente</strong>
-                    </div>
-                  </div>
                 </div>
-
                 <div className="rg-modal-acciones">
-                  <button className="big full" onClick={() => setModalAyuda(false)}>
-                    Entendido
-                  </button>
+                  <button className="big full" onClick={() => setModalAyuda(false)}>Entendido</button>
                 </div>
               </div>
             </div>
@@ -189,46 +171,35 @@ export default function ImpostorLocal({ onVolver, onExit }) {
         </>
       )}
 
-      {/* 1. SETUP DE JUGADORES */}
       {fase === 'setup' && (
         <section className="game">
-          <GameIntro gameId="impostor" titulo="Miente como puedas (Un solo dispositivo)" />
+          <GameIntro gameId="impostor" titulo="Miente como puedas (Un dispositivo)" />
 
           <div className="panel">
             <div className="hud" style={{ marginBottom: '1rem' }}>
-              <button className="btn-back-inline" onClick={onVolver}>
-                &larr; Cambiar modo
-              </button>
+              <button className="btn-back-inline" onClick={onVolver}>&larr; Cambiar modo</button>
             </div>
 
+            <label className="field-label" htmlFor="modo-juego">Modo de Juego</label>
+            <select id="modo-juego" value={modoJuego} onChange={(e) => setModoJuego(e.target.value)} style={{ marginBottom: '1rem', width: '100%', padding: '0.6rem' }}>
+              <option value="clasico">🤫 Clásico (El impostor no sabe nada)</option>
+              <option value="pista">🔍 Con Pista (El impostor recibe una pista)</option>
+              <option value="camuflado">🎭 Camuflado (Recibe una palabra similar)</option>
+              <option value="preguntas">❓ Preguntas (Sabe la categoría. Turnos de Sí/No)</option>
+            </select>
+
             <h3 className="panel-title"><Icon name="users" size={22} /> Participantes</h3>
-            <label className="field-label" htmlFor="num-jugadores-imp">
-              Número de jugadores ({MIN_JUGADORES} a {MAX_JUGADORES})
-            </label>
-            <select
-              id="num-jugadores-imp"
-              value={numJugadores}
-              onChange={handleNumJugadoresChange}
-            >
+            <label className="field-label" htmlFor="num-jugadores-imp">Número de jugadores ({MIN_JUGADORES} a {MAX_JUGADORES})</label>
+            <select id="num-jugadores-imp" value={numJugadores} onChange={handleNumJugadoresChange}>
               {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => (
-                <option key={i + MIN_JUGADORES} value={i + MIN_JUGADORES}>
-                  {i + MIN_JUGADORES} jugadores
-                </option>
+                <option key={i + MIN_JUGADORES} value={i + MIN_JUGADORES}>{i + MIN_JUGADORES} jugadores</option>
               ))}
             </select>
 
             <span className="field-label">Nombres</span>
             <div className="names-grid">
               {jugadores.map((j, idx) => (
-                <input
-                  key={j.id}
-                  type="text"
-                  value={j.nombre}
-                  onChange={(e) => handleNombreChange(idx, e.target.value)}
-                  placeholder={`Jugador ${j.id}`}
-                  maxLength={30}
-                  required
-                />
+                <input key={j.id} type="text" value={j.nombre} onChange={(e) => handleNombreChange(idx, e.target.value)} placeholder={`Jugador ${j.id}`} maxLength={30} required />
               ))}
             </div>
           </div>
@@ -239,7 +210,6 @@ export default function ImpostorLocal({ onVolver, onExit }) {
         </section>
       )}
 
-      {/* 2. REPARTO SECRETO */}
       {fase === 'reparto' && jugadorEnTurnoReparto && (
         <section className="game">
           <div className="hud">
@@ -257,15 +227,10 @@ export default function ImpostorLocal({ onVolver, onExit }) {
               <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>🔒</div>
               <h2 className="aprox-pregunta-texto">{jugadorEnTurnoReparto.nombre}</h2>
               <p className="field-label" style={{ marginTop: '0.6rem' }}>
-                Asegúrate de que nadie más esté mirando la pantalla antes de revelar tu palabra.
+                Asegúrate de que nadie más mire la pantalla antes de revelar.
               </p>
-              <button
-                type="button"
-                className="big full"
-                style={{ marginTop: '1.5rem' }}
-                onClick={() => setRevelado(true)}
-              >
-                <Icon name="eye" size={22} /> Ver mi palabra secreta
+              <button type="button" className="big full" style={{ marginTop: '1.5rem' }} onClick={() => setRevelado(true)}>
+                <Icon name="eye" size={22} /> Ver mi palabra
               </button>
             </div>
           ) : (
@@ -280,38 +245,58 @@ export default function ImpostorLocal({ onVolver, onExit }) {
                 color: esImpostorEnTurno ? '#dc2626' : '#2563eb',
                 margin: '0.8rem 0'
               }}>
-                {esImpostorEnTurno ? '¡ERES EL IMPOSTOR!' : palabraSecreta}
+                {esImpostorEnTurno ? '¡ERES EL IMPOSTOR!' : miPalabra}
               </h1>
 
               {esImpostorEnTurno ? (
-                <p style={{ color: '#64748b', fontSize: '0.95rem', margin: '0.5rem 0 1.5rem' }}>
-                  No conoces la palabra. Escucha con atención a los demás y usa la restricción para disimular.
-                </p>
+                <>
+                  {modoJuego === 'clasico' && (
+                    <p style={{ color: '#64748b', fontSize: '0.95rem', margin: '0.4rem 0 1.2rem' }}>
+                      No tienes ninguna pista. Escucha a los demás e intenta pasar desapercibido.
+                    </p>
+                  )}
+                  {modoJuego === 'pista' && (
+                    <div className="imp-restriccion-box" style={{ background: '#fffbeb', borderColor: '#fde68a', margin: '0.5rem 0 1rem' }}>
+                       <span className="imp-restriccion-tag" style={{ color: '#d97706' }}>TU PISTA EXCLUSIVA</span>
+                       <p className="imp-restriccion-texto" style={{ color: '#92400e' }}>{infoImpostor}</p>
+                    </div>
+                  )}
+                  {modoJuego === 'camuflado' && (
+                    <div className="imp-restriccion-box" style={{ background: '#f3e8ff', borderColor: '#d8b4fe', margin: '0.5rem 0 1rem' }}>
+                       <span className="imp-restriccion-tag" style={{ color: '#9333ea' }}>TU PALABRA FALSA</span>
+                       <p className="imp-restriccion-texto" style={{ color: '#6b21a8' }}>{infoImpostor}</p>
+                       <p style={{ fontSize: '0.8rem', color: '#6b21a8', marginTop: '0.5rem' }}>Actúa como si esta fuera la palabra real.</p>
+                    </div>
+                  )}
+                  {modoJuego === 'preguntas' && (
+                    <div className="imp-restriccion-box" style={{ background: '#e0f2fe', borderColor: '#bae6fd', margin: '0.5rem 0 1rem' }}>
+                       <span className="imp-restriccion-tag" style={{ color: '#0284c7' }}>CATEGORÍA DE LA PALABRA</span>
+                       <p className="imp-restriccion-texto" style={{ color: '#075985' }}>{infoImpostor}</p>
+                    </div>
+                  )}
+                </>
               ) : (
-                <p style={{ color: '#64748b', fontSize: '0.95rem', margin: '0.5rem 0 1.5rem' }}>
-                  Describe la palabra sin decirla directamente y respetando la restricción obligatoria.
-                </p>
+                <>
+                  {modoJuego === 'preguntas' ? (
+                    <p style={{ color: '#64748b', fontSize: '0.95rem', margin: '0.4rem 0 1.2rem' }}>
+                      Por turnos, elegid a otro jugador y hacedle una pregunta de "Sí" o "No" sobre esta palabra para cazar al impostor.
+                    </p>
+                  ) : (
+                    <p style={{ color: '#64748b', fontSize: '0.95rem', margin: '0.4rem 0 1.2rem' }}>
+                      Da una pista sutil sobre la palabra. Que no sea ni muy obvia (el impostor la adivinará) ni muy rara (creerán que eres tú).
+                    </p>
+                  )}
+                </>
               )}
 
-              <div className="imp-restriccion-box">
-                <span className="imp-restriccion-tag">⚠️ RESTRICCIÓN PARA TODOS</span>
-                <p className="imp-restriccion-texto">{restriccion}</p>
-              </div>
-
-              <button
-                type="button"
-                className="big full"
-                style={{ marginTop: '1.8rem' }}
-                onClick={pasarSiguienteJugadorReparto}
-              >
-                <Icon name="check" size={22} /> Ya lo he visto / Siguiente
+              <button type="button" className="big full" style={{ marginTop: '1.8rem' }} onClick={pasarSiguienteJugadorReparto}>
+                <Icon name="check" size={22} /> Ya lo he visto / Ocultar
               </button>
             </div>
           )}
         </section>
       )}
 
-      {/* 3. EN JUEGO: HABLANDO ENTRE ELLOS */}
       {fase === 'en_juego' && (
         <section className="game">
           <div className="hud">
@@ -327,16 +312,11 @@ export default function ImpostorLocal({ onVolver, onExit }) {
           <div className="panel aprox-pregunta-card" style={{ padding: '2rem 1.5rem' }}>
             <span className="aprox-badge-pregunta">Partida en juego</span>
             <h2 className="aprox-pregunta-texto" style={{ margin: '0.8rem 0' }}>
-              ¡Hablad por turnos y descubrid al impostor!
+              ¡Debatid y descubrid al impostor!
             </h2>
             <p className="field-label">
-              Recordad que todos debéis respetar la restricción al dar vuestras pistas:
+              Recordad las reglas del modo de juego que habéis elegido.
             </p>
-
-            <div className="imp-restriccion-box" style={{ marginTop: '1.2rem' }}>
-              <span className="imp-restriccion-tag">⚠️ RESTRICCIÓN ACTIVA</span>
-              <p className="imp-restriccion-texto">{restriccion}</p>
-            </div>
           </div>
 
           <div className="actions">
@@ -347,7 +327,6 @@ export default function ImpostorLocal({ onVolver, onExit }) {
         </section>
       )}
 
-      {/* 4. RESOLUCIÓN */}
       {fase === 'resolucion' && (
         <section className="game">
           <div className="hud">
@@ -363,54 +342,24 @@ export default function ImpostorLocal({ onVolver, onExit }) {
           <div className="panel aprox-pregunta-card">
             <span className="aprox-badge-pregunta">Datos de la partida</span>
             <div style={{ margin: '0.8rem 0', fontSize: '1.2rem', color: '#1e1b4b' }}>
-              Palabra secreta: <strong style={{ color: '#2563eb' }}>{palabraSecreta}</strong>
+              Palabra secreta: <strong style={{ color: '#2563eb' }}>{itemJuego?.palabra}</strong>
             </div>
           </div>
 
           <div className="panel" style={{ textAlign: 'center' }}>
             <h3 className="panel-title" style={{ justifyContent: 'center' }}>¿Quién ha ganado la partida?</h3>
             <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-              <button
-                type="button"
-                className={`imp-btn-ganador ${ganador === 'impostor' ? 'activa' : ''}`}
-                onClick={() => setGanador('impostor')}
-              >
-                🎭 El Impostor (+10 pts)
-              </button>
-              <button
-                type="button"
-                className={`imp-btn-ganador ${ganador === 'pueblo' ? 'activa' : ''}`}
-                onClick={() => setGanador('pueblo')}
-              >
-                👥 El Pueblo (+3 pts c/u)
-              </button>
+              <button type="button" className={`imp-btn-ganador ${ganador === 'impostor' ? 'activa' : ''}`} onClick={() => setGanador('impostor')}>🎭 El Impostor</button>
+              <button type="button" className={`imp-btn-ganador ${ganador === 'pueblo' ? 'activa' : ''}`} onClick={() => setGanador('pueblo')}>👥 El Pueblo</button>
             </div>
 
             <div style={{ marginTop: '1.8rem' }}>
-              <h3 className="panel-title" style={{ justifyContent: 'center' }}>
-                ¿Cuántas rondas sobrevivió el impostor?
-              </h3>
+              <h3 className="panel-title" style={{ justifyContent: 'center' }}>¿Cuántas rondas sobrevivió el impostor?</h3>
               <p className="field-label">(+3 puntos por ronda para el impostor)</p>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1.5rem', margin: '0.8rem 0' }}>
-                <button
-                  type="button"
-                  className="aprox-btn-ayuda"
-                  style={{ position: 'static', width: '48px', height: '48px', fontSize: '1.5rem' }}
-                  onClick={() => setRondasSobrevividas(Math.max(0, rondasSobrevividas - 1))}
-                >
-                  -
-                </button>
-                <span style={{ fontSize: '3rem', fontWeight: '900', color: '#4338ca', minWidth: '60px' }}>
-                  {rondasSobrevividas}
-                </span>
-                <button
-                  type="button"
-                  className="aprox-btn-ayuda"
-                  style={{ position: 'static', width: '48px', height: '48px', fontSize: '1.5rem' }}
-                  onClick={() => setRondasSobrevividas(rondasSobrevividas + 1)}
-                >
-                  +
-                </button>
+                <button type="button" className="aprox-btn-ayuda" style={{ position: 'static', width: '48px', height: '48px', fontSize: '1.5rem' }} onClick={() => setRondasSobrevividas(Math.max(0, rondasSobrevividas - 1))}>-</button>
+                <span style={{ fontSize: '3rem', fontWeight: '900', color: '#4338ca', minWidth: '60px' }}>{rondasSobrevividas}</span>
+                <button type="button" className="aprox-btn-ayuda" style={{ position: 'static', width: '48px', height: '48px', fontSize: '1.5rem' }} onClick={() => setRondasSobrevividas(rondasSobrevividas + 1)}>+</button>
               </div>
             </div>
           </div>
@@ -421,50 +370,35 @@ export default function ImpostorLocal({ onVolver, onExit }) {
         </section>
       )}
 
-      {/* 5. RESULTADOS DE LA RONDA */}
       {fase === 'resultados' && (
         <section className="game">
           <div className="end-card aprox-resolucion-card">
             <span className="end-icon"><Icon name="trophy" size={44} /></span>
-            <p className="categoria">Palabra: {palabraSecreta} | Impostor: {jugadores.find((j) => j.id === impostorId)?.nombre}</p>
-            <h1 className="title">
-              {ganador === 'impostor' ? '¡Victoria del Impostor!' : '¡Victoria del Pueblo!'}
-            </h1>
+            <p className="categoria">Palabra: {itemJuego?.palabra} | Impostor: {jugadores.find((j) => j.id === impostorId)?.nombre}</p>
+            <h1 className="title">{ganador === 'impostor' ? '¡Victoria del Impostor!' : '¡Victoria del Pueblo!'}</h1>
 
             <div className="scoreboard" style={{ width: '100%', marginTop: '1.5rem' }}>
-              <h3 className="section-title" style={{ margin: '0 0 0.8rem', textAlign: 'center' }}>
-                Puntos de esta ronda
-              </h3>
+              <h3 className="section-title" style={{ margin: '0 0 0.8rem', textAlign: 'center' }}>Puntos de esta ronda</h3>
               {jugadores.map((j) => {
                 const delta = puntosRonda[j.id] || 0;
                 const esImp = j.id === impostorId;
                 return (
                   <div key={j.id} className="score-row">
-                    <span className="score-name">
-                      {esImp ? '🎭 ' : '👤 '}
-                      {j.nombre} {esImp && <em style={{ fontSize: '0.8rem', color: '#64748b' }}>(Impostor)</em>}
-                    </span>
-                    <span className="score-pts" style={{ color: delta > 0 ? '#10b981' : '#64748b' }}>
-                      +{delta} pts
-                    </span>
+                    <span className="score-name">{esImp ? '🎭 ' : '👤 '}{j.nombre}</span>
+                    <span className="score-pts" style={{ color: delta > 0 ? '#10b981' : '#64748b' }}>+{delta} pts</span>
                   </div>
                 );
               })}
             </div>
 
             <div className="scoreboard" style={{ width: '100%', marginTop: '1.5rem' }}>
-              <h3 className="section-title" style={{ margin: '0 0 0.8rem', textAlign: 'center' }}>
-                Marcador acumulado
-              </h3>
+              <h3 className="section-title" style={{ margin: '0 0 0.8rem', textAlign: 'center' }}>Marcador acumulado</h3>
               {ranking.map((j, i) => {
                 const pts = puntos[j.id] ?? 0;
                 const primero = maximo > 0 && pts === maximo;
                 return (
                   <div key={j.id} className={`score-row${primero ? ' first' : ''}`}>
-                    <span className="score-name">
-                      {primero ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
-                      {j.nombre}
-                    </span>
+                    <span className="score-name">{primero ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}{j.nombre}</span>
                     <span className="score-pts">{pts} pts</span>
                   </div>
                 );
@@ -473,10 +407,7 @@ export default function ImpostorLocal({ onVolver, onExit }) {
           </div>
 
           <div className="actions">
-            <button onClick={() => {
-              setRondaActual((r) => r + 1);
-              prepararRonda();
-            }}>
+            <button onClick={() => { setRondaActual((r) => r + 1); prepararRonda(); }}>
               <Icon name="play" size={20} /> Siguiente partida
             </button>
             <button className="secondary danger" onClick={() => setFase('final')}>
@@ -486,44 +417,30 @@ export default function ImpostorLocal({ onVolver, onExit }) {
         </section>
       )}
 
-      {/* 6. PANTALLA FINAL */}
       {fase === 'final' && (
         <section className="game">
           <div className="end-card">
             <span className="end-icon"><Icon name="crown" size={44} /></span>
             <h1 className="title">Puntuaciones Finales</h1>
             <p className="final-score">
-              {ganadores.length === 0
-                ? 'Nadie ha sumado puntos'
-                : ganadores.length === 1
-                ? <>¡Gana {ganadores[0].nombre}!</>
-                : <>Empate entre {ganadores.map((g) => g.nombre).join(', ')}</>}
+              {ganadores.length === 0 ? 'Nadie ha sumado puntos' : ganadores.length === 1 ? <>¡Gana {ganadores[0].nombre}!</> : <>Empate entre {ganadores.map((g) => g.nombre).join(', ')}</>}
             </p>
-
             <div className="scoreboard">
               {ranking.map((j, i) => {
                 const pts = puntos[j.id] ?? 0;
                 const primero = maximo > 0 && pts === maximo;
                 return (
                   <div key={j.id} className={`score-row${primero ? ' first' : ''}`}>
-                    <span className="score-name">
-                      {primero ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
-                      {j.nombre}
-                    </span>
+                    <span className="score-name">{primero ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}{j.nombre}</span>
                     <span className="score-pts">{pts} pts</span>
                   </div>
                 );
               })}
             </div>
           </div>
-
           <div className="actions">
-            <button onClick={() => setFase('setup')}>
-              <Icon name="refresh" size={20} /> Nueva partida
-            </button>
-            <button className="secondary danger" onClick={onVolver}>
-              <Icon name="door" size={20} /> Volver al menú
-            </button>
+            <button onClick={() => setFase('setup')}><Icon name="refresh" size={20} /> Nueva partida</button>
+            <button className="secondary danger" onClick={onVolver}><Icon name="door" size={20} /> Volver al menú</button>
           </div>
         </section>
       )}

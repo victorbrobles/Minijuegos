@@ -3,22 +3,27 @@ import express from 'express';
 import parte1 from '../data/seeds/impostor/parte1.js';
 import parte2 from '../data/seeds/impostor/parte2.js';
 import parte3 from '../data/seeds/impostor/parte3.js';
+import parte4 from '../data/seeds/impostor/parte4.js';
 
 const router = express.Router();
-const TODAS_LAS_PALABRAS = [...parte1, ...parte2, ...parte3];
+
+const BASES_DATOS = {
+  clasico: parte1,
+  pista: parte2,
+  camuflado: parte3,
+  preguntas: parte4
+};
 
 // ==========================================
-// ENDPOINT OFFLINE / LOCAL (INTACTO)
+// ENDPOINT OFFLINE / LOCAL
 // ==========================================
 router.get('/palabra', (req, res) => {
   try {
-    const elegido = TODAS_LAS_PALABRAS[Math.floor(Math.random() * TODAS_LAS_PALABRAS.length)];
-    res.json({
-      success: true,
-      id: elegido.id,
-      palabra: elegido.palabra,
-      restriccion: elegido.restriccion
-    });
+    const modo = req.query.modo || 'clasico';
+    const pool = BASES_DATOS[modo] || BASES_DATOS.clasico;
+    const elegido = pool[Math.floor(Math.random() * pool.length)];
+    
+    res.json({ success: true, item: elegido, modo });
   } catch (error) {
     console.error('Error al obtener palabra de Impostor:', error);
     res.status(500).json({ success: false, error: 'Error del servidor' });
@@ -44,12 +49,12 @@ function generarToken() {
 }
 
 function prepararPartidaOnline(sala) {
-  const elegido = TODAS_LAS_PALABRAS[Math.floor(Math.random() * TODAS_LAS_PALABRAS.length)];
+  const pool = BASES_DATOS[sala.modoJuego] || BASES_DATOS.clasico;
+  const elegido = pool[Math.floor(Math.random() * pool.length)];
   const impElegido = sala.jugadores[Math.floor(Math.random() * sala.jugadores.length)];
   const inicialElegido = sala.jugadores[Math.floor(Math.random() * sala.jugadores.length)];
 
-  sala.palabraSecreta = elegido.palabra;
-  sala.restriccion = elegido.restriccion;
+  sala.itemJuego = elegido; 
   sala.impostorId = impElegido.id;
   sala.jugadorInicialId = inicialElegido.id;
   sala.puntosRonda = {};
@@ -58,7 +63,6 @@ function prepararPartidaOnline(sala) {
   sala.estado = 'en_juego';
 }
 
-// 1. Crear sala online
 router.post('/online/crear', (req, res) => {
   const nombre = (req.body?.nombre || '').trim();
   if (!nombre) return res.status(400).json({ error: 'Debes indicar un nombre.' });
@@ -71,10 +75,10 @@ router.post('/online/crear', (req, res) => {
   salasOnline[code] = {
     code,
     adminToken: tokenAdmin,
-    estado: 'lobby', // 'lobby' | 'en_juego' | 'resolucion' | 'resultados' | 'final'
+    estado: 'lobby',
+    modoJuego: 'clasico',
     rondaActual: 1,
-    palabraSecreta: '',
-    restriccion: '',
+    itemJuego: null,
     impostorId: null,
     jugadorInicialId: null,
     ganador: null,
@@ -86,7 +90,6 @@ router.post('/online/crear', (req, res) => {
   res.json({ success: true, code, token: tokenAdmin, jugadorId: 1 });
 });
 
-// 2. Unirse a sala online
 router.post('/online/unirse', (req, res) => {
   const code = (req.body?.code || '').trim().toUpperCase();
   const nombre = (req.body?.nombre || '').trim();
@@ -94,7 +97,6 @@ router.post('/online/unirse', (req, res) => {
   const sala = salasOnline[code];
   if (!sala) return res.status(404).json({ error: 'La sala no existe o el código es incorrecto.' });
   if (sala.estado !== 'lobby') return res.status(400).json({ error: 'La partida ya ha comenzado.' });
-  if (sala.jugadores.length >= 20) return res.status(400).json({ error: 'La sala está completa.' });
   if (sala.jugadores.some((j) => j.nombre.toLowerCase() === nombre.toLowerCase())) {
     return res.status(400).json({ error: 'Ya hay un jugador con ese nombre en la sala.' });
   }
@@ -106,16 +108,16 @@ router.post('/online/unirse', (req, res) => {
   res.json({ success: true, code, token, jugadorId: nuevoId });
 });
 
-// 3. Iniciar partida (sólo anfitrión)
 router.post('/online/sala/:code/iniciar', (req, res) => {
   const code = req.params.code.toUpperCase();
-  const { token } = req.body || {};
+  const { token, modo } = req.body || {};
 
   const sala = salasOnline[code];
   if (!sala) return res.status(404).json({ error: 'La sala no existe.' });
   if (sala.adminToken !== token) return res.status(403).json({ error: 'Solo el anfitrión puede iniciar.' });
   if (sala.jugadores.length < 3) return res.status(400).json({ error: 'Se necesitan al menos 3 jugadores.' });
 
+  if (modo) sala.modoJuego = modo;
   sala.jugadores.forEach((j) => { j.puntos = 0; });
   sala.rondaActual = 1;
   prepararPartidaOnline(sala);
@@ -123,7 +125,6 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
   res.json({ success: true });
 });
 
-// 4. Estado sincronizado (reparto confidencial de palabra según el rol)
 router.get('/online/sala/:code', (req, res) => {
   const code = req.params.code.toUpperCase();
   const token = req.query.token;
@@ -138,10 +139,22 @@ router.get('/online/sala/:code', (req, res) => {
   const esImpostor = sala.impostorId === jugadorActual.id;
   const partidaTerminada = sala.estado === 'resultados' || sala.estado === 'final';
 
-  // Si la partida está activa, el impostor recibe null en la palabra; el pueblo la ve completa
-  const miPalabra = partidaTerminada
-    ? sala.palabraSecreta
-    : (esImpostor ? null : sala.palabraSecreta);
+  let miPalabra = null;
+  let infoImpostor = null;
+
+  if (sala.itemJuego && sala.estado !== 'lobby') {
+    if (partidaTerminada) {
+       miPalabra = sala.itemJuego.palabra; 
+    } else {
+       if (esImpostor) {
+          if (sala.modoJuego === 'pista') infoImpostor = sala.itemJuego.pista;
+          if (sala.modoJuego === 'camuflado') infoImpostor = sala.itemJuego.palabraImpostor;
+          if (sala.modoJuego === 'preguntas') infoImpostor = sala.itemJuego.categoria;
+       } else {
+          miPalabra = sala.itemJuego.palabra;
+       }
+    }
+  }
 
   const inicialJugador = sala.jugadores.find((j) => j.id === sala.jugadorInicialId);
   const impostorJugador = sala.jugadores.find((j) => j.id === sala.impostorId);
@@ -150,12 +163,13 @@ router.get('/online/sala/:code', (req, res) => {
     success: true,
     code: sala.code,
     estado: sala.estado,
+    modoJuego: sala.modoJuego,
     rondaActual: sala.rondaActual,
     esAdmin,
     yoId: jugadorActual.id,
     esImpostor,
     miPalabra,
-    restriccion: sala.restriccion,
+    infoImpostor,
     nombreInicial: inicialJugador ? inicialJugador.nombre : null,
     nombreImpostor: partidaTerminada && impostorJugador ? impostorJugador.nombre : null,
     ganador: sala.ganador,
@@ -169,23 +183,18 @@ router.get('/online/sala/:code', (req, res) => {
   });
 });
 
-// 5. Pasar a pantalla de resolución (sólo anfitrión)
 router.post('/online/sala/:code/ir-resolucion', (req, res) => {
   const code = req.params.code.toUpperCase();
   const { token } = req.body || {};
-
   const sala = salasOnline[code];
   if (!sala || sala.adminToken !== token) return res.status(403).json({ error: 'No autorizado.' });
-
   sala.estado = 'resolucion';
   res.json({ success: true });
 });
 
-// 6. Resolver partida y calcular puntos (+10 impostor, +3 por ronda, +3 pueblo)
 router.post('/online/sala/:code/resolver', (req, res) => {
   const code = req.params.code.toUpperCase();
   const { token, ganador, rondasSobrevividas } = req.body || {};
-
   const sala = salasOnline[code];
   if (!sala || sala.adminToken !== token) return res.status(403).json({ error: 'No autorizado.' });
 
@@ -218,11 +227,9 @@ router.post('/online/sala/:code/resolver', (req, res) => {
   res.json({ success: true, scores });
 });
 
-// 7. Siguiente partida
 router.post('/online/sala/:code/siguiente-partida', (req, res) => {
   const code = req.params.code.toUpperCase();
   const { token } = req.body || {};
-
   const sala = salasOnline[code];
   if (!sala || sala.adminToken !== token) return res.status(403).json({ error: 'No autorizado.' });
 
@@ -231,11 +238,9 @@ router.post('/online/sala/:code/siguiente-partida', (req, res) => {
   res.json({ success: true });
 });
 
-// 8. Finalizar juego y ver podio
 router.post('/online/sala/:code/finalizar', (req, res) => {
   const code = req.params.code.toUpperCase();
   const { token } = req.body || {};
-
   const sala = salasOnline[code];
   if (!sala || sala.adminToken !== token) return res.status(403).json({ error: 'No autorizado.' });
 
@@ -243,11 +248,9 @@ router.post('/online/sala/:code/finalizar', (req, res) => {
   res.json({ success: true });
 });
 
-// 9. Reiniciar partida
 router.post('/online/sala/:code/reiniciar', (req, res) => {
   const code = req.params.code.toUpperCase();
   const { token } = req.body || {};
-
   const sala = salasOnline[code];
   if (!sala || sala.adminToken !== token) return res.status(403).json({ error: 'No autorizado.' });
 
@@ -259,11 +262,9 @@ router.post('/online/sala/:code/reiniciar', (req, res) => {
   res.json({ success: true });
 });
 
-// 10. Salir
 router.post('/online/sala/:code/salir', (req, res) => {
   const code = req.params.code.toUpperCase();
   const { token } = req.body || {};
-
   const sala = salasOnline[code];
   if (!sala) return res.json({ success: true });
 
@@ -276,7 +277,6 @@ router.post('/online/sala/:code/salir', (req, res) => {
       sala.adminToken = sala.jugadores[0].token;
     }
   }
-
   res.json({ success: true });
 });
 

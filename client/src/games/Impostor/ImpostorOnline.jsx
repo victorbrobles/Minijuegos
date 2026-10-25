@@ -6,13 +6,15 @@ import './Impostor.css';
 const CLAVE_SESION_IMP = 'impostor_online_session';
 
 export default function ImpostorOnline({ onLocal, onSalir }) {
-  const [vista, setVista] = useState('menu'); // 'menu' | 'crear' | 'unirse' | 'sala'
+  const [vista, setVista] = useState('menu');
   const [nombre, setNombre] = useState('');
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modalSalir, setModalSalir] = useState(false);
   const [modalAyuda, setModalAyuda] = useState(false);
+  
+  const [modoAdmin, setModoAdmin] = useState('clasico');
 
   const [sesion, setSesion] = useState(() => {
     try {
@@ -26,7 +28,6 @@ export default function ImpostorOnline({ onLocal, onSalir }) {
   const [codigoCopiado, setCodigoCopiado] = useState(false);
   const [ocultarPalabra, setOcultarPalabra] = useState(false);
 
-  // Estados de resolución (Anfitrión)
   const [ganador, setGanador] = useState('impostor');
   const [rondasSobrevividas, setRondasSobrevividas] = useState(1);
 
@@ -121,7 +122,7 @@ export default function ImpostorOnline({ onLocal, onSalir }) {
       await fetch(`/api/impostor/online/sala/${sesion.code}/iniciar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion.token })
+        body: JSON.stringify({ token: sesion.token, modo: modoAdmin })
       });
     } catch (err) {
       setErrorMsg(err.message);
@@ -207,7 +208,7 @@ export default function ImpostorOnline({ onLocal, onSalir }) {
           body: JSON.stringify({ token: sesion.token })
         });
       } catch {
-        /* ignorar */
+        // ignorar
       }
     }
     sessionStorage.removeItem(CLAVE_SESION_IMP);
@@ -228,13 +229,10 @@ export default function ImpostorOnline({ onLocal, onSalir }) {
   const ranking = [...(sala?.jugadores || [])].sort((a, b) => b.puntos - a.puntos);
   const maximoPuntos = ranking.length ? ranking[0].puntos : 0;
   const ganadores = maximoPuntos > 0 ? ranking.filter((j) => j.puntos === maximoPuntos) : [];
-
-  // Mostrar ayuda en menús y en la sala de espera (lobby), desaparece al empezar a jugar
   const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
 
   return (
     <div className="aprox-contenedor">
-      {/* ---------------- BOTÓN Y MODAL DE AYUDA ---------------- */}
       {mostrarAyuda && (
         <button
           type="button"
@@ -253,43 +251,21 @@ export default function ImpostorOnline({ onLocal, onSalir }) {
               <span className="aprox-modal-signo-title">?</span>
               <h3>¿Cómo se juega a Miente como puedas?</h3>
             </div>
-
             <div className="aprox-modal-cuerpo">
               <p><strong>1. Dinámica del juego:</strong></p>
               <ul>
-                <li>Participan de 3 a 20 jugadores. Uno de ellos será el impostor en secreto.</li>
-                <li>Todos ven en su pantalla la palabra secreta excepto el impostor.</li>
-                <li>Hay una <strong>restricción obligatoria común</strong> para todos.</li>
-                <li>Por turnos en voz alta, cada uno dice una pista sin saltarse la restricción.</li>
+                <li>Participan de 3 a 20 jugadores. Uno será el impostor en secreto.</li>
+                <li>Existen distintos modos de juego elegibles por el anfitrión.</li>
+                <li>Sigue las instrucciones en pantalla según tu rol (Impostor o Pueblo).</li>
               </ul>
-              <p><strong>2. Puntuación:</strong></p>
-              <div className="aprox-tabla-puntos">
-                <div className="aprox-puntos-fila acierto" style={{ background: '#dbeafe', color: '#1d4ed8' }}>
-                  <span>🎭 Victoria del Impostor</span>
-                  <strong>+10 puntos</strong>
-                </div>
-                <div className="aprox-puntos-fila cercana">
-                  <span>⏳ Rondas sobrevividas</span>
-                  <strong>+3 puntos por ronda superada</strong>
-                </div>
-                <div className="aprox-puntos-fila acierto">
-                  <span>👥 Victoria del Pueblo</span>
-                  <strong>+3 puntos para cada inocente</strong>
-                </div>
-              </div>
             </div>
-
             <div className="rg-modal-acciones">
-              <button className="big full" onClick={() => setModalAyuda(false)}>
-                Entendido
-              </button>
+              <button className="big full" onClick={() => setModalAyuda(false)}>Entendido</button>
             </div>
           </div>
         </div>
       )}
-      {/* ---------------- FIN AYUDA ---------------- */}
 
-      {/* 1. MENÚ PRINCIPAL */}
       {vista === 'menu' && (
         <section className="game">
           <div className="panel center">
@@ -298,7 +274,7 @@ export default function ImpostorOnline({ onLocal, onSalir }) {
             </span>
             <h1 className="title">Miente como puedas</h1>
             <p className="hint">
-              Uno de vosotros es el impostor. Hablad por turnos respetando la restricción sin ser descubiertos. El anfitrión crea la sala y comparte el código.
+              Uno de vosotros es el impostor. Hablad por turnos para cazarlo o engañar al resto. El anfitrión crea la sala.
             </p>
 
             {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
@@ -318,7 +294,6 @@ export default function ImpostorOnline({ onLocal, onSalir }) {
         </section>
       )}
 
-      {/* 2. CREAR SALA */}
       {vista === 'crear' && (
         <section className="game">
           <div className="panel center">
@@ -361,7 +336,6 @@ export default function ImpostorOnline({ onLocal, onSalir }) {
         </section>
       )}
 
-      {/* 3. UNIRSE A SALA */}
       {vista === 'unirse' && (
         <section className="game">
           <div className="panel center">
@@ -416,7 +390,6 @@ export default function ImpostorOnline({ onLocal, onSalir }) {
         </section>
       )}
 
-      {/* 4. SALA: LOBBY */}
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
         <section className="game">
           <div className="panel center">
@@ -436,21 +409,15 @@ export default function ImpostorOnline({ onLocal, onSalir }) {
                   lineHeight: 1
                 }}
               >
-                <Icon name="lock" size={15} />
-                Sala de espera
+                <Icon name="lock" size={15} /> Sala de espera
               </span>
             </div>
             <p className="hint">Código de la partida</p>
-            <button
-              type="button"
-              className="qq-codigo-btn"
-              onClick={copiarCodigo}
-              title="Copiar código"
-            >
+            <button type="button" className="qq-codigo-btn" onClick={copiarCodigo} title="Copiar código">
               {sala.code}
             </button>
             <p className="hint small">
-              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Pulsa el código para copiarlo y compártelo con los demás.'}
+              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Pulsa el código para copiarlo.'}
             </p>
           </div>
 
@@ -467,13 +434,29 @@ export default function ImpostorOnline({ onLocal, onSalir }) {
             </div>
             {sala.jugadores.length < 3 && (
               <p className="hint" style={{ marginTop: '0.8rem' }}>
-                Faltan al menos {3 - sala.jugadores.length} jugadores para poder empezar (mínimo 3).
+                Faltan al menos {3 - sala.jugadores.length} jugadores para poder empezar.
               </p>
             )}
           </div>
 
           {esAdmin ? (
             <div style={{ marginTop: '1.2rem' }}>
+              <div className="panel" style={{ marginBottom: '1rem', padding: '1rem' }}>
+                <label className="field-label" style={{ marginBottom: '0.5rem' }}>
+                  Modo de Juego
+                </label>
+                <select 
+                  value={modoAdmin} 
+                  onChange={(e) => setModoAdmin(e.target.value)}
+                  style={{ width: '100%', padding: '0.6rem', borderRadius: '8px', border: '2px solid #cbd5e1' }}
+                >
+                  <option value="clasico">🤫 Clásico (El impostor no sabe nada)</option>
+                  <option value="pista">🔍 Con Pista (El impostor recibe una pista)</option>
+                  <option value="camuflado">🎭 Camuflado (Recibe una palabra similar)</option>
+                  <option value="preguntas">❓ Preguntas (Sabe la categoría. Turnos de Sí/No)</option>
+                </select>
+              </div>
+
               <button
                 className="big full"
                 disabled={sala.jugadores.length < 3}
@@ -487,7 +470,7 @@ export default function ImpostorOnline({ onLocal, onSalir }) {
             <div className="panel center" style={{ padding: '2rem 1.5rem', marginTop: '1rem' }}>
               <span className="lb-luna chica"><Icon name="hourglass" size={40} /></span>
               <h3 style={{ margin: '0.5rem 0' }}>Esperando al anfitrión...</h3>
-              <p className="hint">En cuanto comience la partida, verás tu palabra secreta en tu pantalla.</p>
+              <p className="hint">En cuanto comience la partida, verás tu palabra secreta.</p>
             </div>
           )}
 
@@ -499,7 +482,6 @@ export default function ImpostorOnline({ onLocal, onSalir }) {
         </section>
       )}
 
-      {/* 5. SALA: EN JUEGO */}
       {vista === 'sala' && sala && sala.estado === 'en_juego' && (
         <section className="game">
           <div className="hud">
@@ -531,13 +513,44 @@ export default function ImpostorOnline({ onLocal, onSalir }) {
                 </h1>
 
                 {esImpostor ? (
-                  <p style={{ color: '#64748b', fontSize: '0.95rem', margin: '0.4rem 0 1.2rem' }}>
-                    No conoces la palabra. Escucha con atención las pistas de los demás e improvisa usando la restricción obligatoria.
-                  </p>
+                  <>
+                    {sala.modoJuego === 'clasico' && (
+                      <p style={{ color: '#64748b', fontSize: '0.95rem', margin: '0.4rem 0 1.2rem' }}>
+                        No tienes ninguna pista. Escucha a los demás e intenta pasar desapercibido.
+                      </p>
+                    )}
+                    {sala.modoJuego === 'pista' && (
+                      <div className="imp-restriccion-box" style={{ background: '#fffbeb', borderColor: '#fde68a', margin: '0.5rem 0 1rem' }}>
+                         <span className="imp-restriccion-tag" style={{ color: '#d97706' }}>TU PISTA EXCLUSIVA</span>
+                         <p className="imp-restriccion-texto" style={{ color: '#92400e' }}>{sala.infoImpostor}</p>
+                      </div>
+                    )}
+                    {sala.modoJuego === 'camuflado' && (
+                      <div className="imp-restriccion-box" style={{ background: '#f3e8ff', borderColor: '#d8b4fe', margin: '0.5rem 0 1rem' }}>
+                         <span className="imp-restriccion-tag" style={{ color: '#9333ea' }}>TU PALABRA FALSA</span>
+                         <p className="imp-restriccion-texto" style={{ color: '#6b21a8' }}>{sala.infoImpostor}</p>
+                         <p style={{ fontSize: '0.8rem', color: '#6b21a8', marginTop: '0.5rem' }}>Actúa como si esta fuera la palabra real.</p>
+                      </div>
+                    )}
+                    {sala.modoJuego === 'preguntas' && (
+                      <div className="imp-restriccion-box" style={{ background: '#e0f2fe', borderColor: '#bae6fd', margin: '0.5rem 0 1rem' }}>
+                         <span className="imp-restriccion-tag" style={{ color: '#0284c7' }}>CATEGORÍA DE LA PALABRA</span>
+                         <p className="imp-restriccion-texto" style={{ color: '#075985' }}>{sala.infoImpostor}</p>
+                      </div>
+                    )}
+                  </>
                 ) : (
-                  <p style={{ color: '#64748b', fontSize: '0.95rem', margin: '0.4rem 0 1.2rem' }}>
-                    Describe la palabra con pistas sin decirla directamente y respetando la restricción obligatoria.
-                  </p>
+                  <>
+                    {sala.modoJuego === 'preguntas' ? (
+                      <p style={{ color: '#64748b', fontSize: '0.95rem', margin: '0.4rem 0 1.2rem' }}>
+                        Por turnos, elegid a otro jugador y hacedle una pregunta de "Sí" o "No" sobre esta palabra para cazar al impostor.
+                      </p>
+                    ) : (
+                      <p style={{ color: '#64748b', fontSize: '0.95rem', margin: '0.4rem 0 1.2rem' }}>
+                        Da una pista sutil sobre la palabra. Que no sea ni muy obvia (el impostor la adivinará) ni muy rara (creerán que eres tú).
+                      </p>
+                    )}
+                  </>
                 )}
 
                 <button
@@ -562,11 +575,6 @@ export default function ImpostorOnline({ onLocal, onSalir }) {
                 </button>
               </div>
             )}
-
-            <div className="imp-restriccion-box" style={{ marginTop: '1.4rem' }}>
-              <span className="imp-restriccion-tag">⚠️ RESTRICCIÓN PARA TODOS</span>
-              <p className="imp-restriccion-texto">{sala.restriccion}</p>
-            </div>
           </div>
 
           {esAdmin ? (
@@ -589,7 +597,6 @@ export default function ImpostorOnline({ onLocal, onSalir }) {
         </section>
       )}
 
-      {/* 6. SALA: RESOLUCIÓN */}
       {vista === 'sala' && sala && sala.estado === 'resolucion' && (
         <section className="game">
           <div className="hud">
@@ -667,20 +674,17 @@ export default function ImpostorOnline({ onLocal, onSalir }) {
         </section>
       )}
 
-      {/* 7. SALA: RESULTADOS DE LA RONDA */}
       {vista === 'sala' && sala && sala.estado === 'resultados' && (
         <section className="game">
           <div className="end-card aprox-resolucion-card">
             <span className="end-icon"><Icon name="trophy" size={44} /></span>
-            <p className="categoria">Palabra: {sala.miPalabra} | Impostor: {sala.nombreImpostor}</p>
+            <p className="categoria">Palabra: {sala.miPalabra || "(Oculta)"} | Impostor: {sala.nombreImpostor}</p>
             <h1 className="title">
               {sala.ganador === 'impostor' ? '¡Victoria del Impostor!' : '¡Victoria del Pueblo!'}
             </h1>
 
             <div className="scoreboard" style={{ width: '100%', marginTop: '1.5rem' }}>
-              <h3 className="section-title" style={{ margin: '0 0 0.8rem', textAlign: 'center' }}>
-                Puntos de esta ronda
-              </h3>
+              <h3 className="section-title" style={{ margin: '0 0 0.8rem', textAlign: 'center' }}>Puntos de esta ronda</h3>
               {sala.jugadores.map((j) => {
                 const delta = sala.puntosRonda?.[j.id] || 0;
                 const esImp = j.nombre === sala.nombreImpostor;
@@ -699,9 +703,7 @@ export default function ImpostorOnline({ onLocal, onSalir }) {
             </div>
 
             <div className="scoreboard" style={{ width: '100%', marginTop: '1.5rem' }}>
-              <h3 className="section-title" style={{ margin: '0 0 0.8rem', textAlign: 'center' }}>
-                Marcador general
-              </h3>
+              <h3 className="section-title" style={{ margin: '0 0 0.8rem', textAlign: 'center' }}>Marcador general</h3>
               {ranking.map((j, i) => {
                 const pts = j.puntos ?? 0;
                 const primero = maximoPuntos > 0 && pts === maximoPuntos;
@@ -739,7 +741,6 @@ export default function ImpostorOnline({ onLocal, onSalir }) {
         </section>
       )}
 
-      {/* 8. SALA: PODIO FINAL */}
       {vista === 'sala' && sala && sala.estado === 'final' && (
         <section className="game">
           <div className="end-card">
@@ -783,14 +784,9 @@ export default function ImpostorOnline({ onLocal, onSalir }) {
         </section>
       )}
 
-      {/* MODAL DE CONFIRMACIÓN PARA SALIR */}
       {modalSalir && (
         <div className="rg-modal-fondo" onClick={() => setModalSalir(false)}>
-          <div 
-            className="rg-modal" 
-            onClick={(e) => e.stopPropagation()} 
-            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
-          >
+          <div className="rg-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}>
             <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
             <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
               ¿Abandonar la partida?
@@ -798,26 +794,9 @@ export default function ImpostorOnline({ onLocal, onSalir }) {
             <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
               Si sales de la sala perderás tu progreso actual en la partida. ¿Estás seguro de que deseas salir?
             </p>
-
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
-              <button 
-                type="button" 
-                className="secondary full" 
-                onClick={() => setModalSalir(false)}
-              >
-                No, quedarme
-              </button>
-              <button 
-                type="button" 
-                className="secondary danger full" 
-                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
-                onClick={() => {
-                  setModalSalir(false);
-                  handleSalir();
-                }}
-              >
-                Sí, salir
-              </button>
+              <button type="button" className="secondary full" onClick={() => setModalSalir(false)}>No, quedarme</button>
+              <button type="button" className="secondary danger full" style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }} onClick={() => { setModalSalir(false); handleSalir(); }}>Sí, salir</button>
             </div>
           </div>
         </div>
