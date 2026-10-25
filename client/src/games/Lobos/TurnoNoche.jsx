@@ -6,10 +6,21 @@ import { ConsultarRol } from './TarjetaRol.jsx';
 
 /* ───────── Piezas reutilizables ───────── */
 
-export function ElegirUno({ e, opciones, onConfirmar, texto = 'Confirmar', extra = null }) {
+// Botón grande y destacado de abstención (la opción más habitual al votar)
+export function BotonAbstenerse({ onClick }) {
+  return (
+    <button type="button" className="big full lb-abstener" onClick={onClick}>
+      <Icon name="hourglass" size={22} /> Me abstengo
+    </button>
+  );
+}
+
+// `arriba`: contenido sobre la lista (p. ej. abstención) · `secundarias`: más botones de confirmación [{ texto, icono, onClick(sel), clase }]
+export function ElegirUno({ e, opciones, onConfirmar, texto = 'Confirmar', extra = null, arriba = null, secundarias = [] }) {
   const [sel, setSel] = useState(null);
   return (
     <>
+      {arriba}
       <div className="names-grid lb-eleccion">
         {opciones.map((id) => (
           <button key={id} type="button" className={`secondary lb-op ${sel === id ? 'sel' : ''}`} onClick={() => setSel(id)}>
@@ -20,6 +31,11 @@ export function ElegirUno({ e, opciones, onConfirmar, texto = 'Confirmar', extra
       <button type="button" className="big full" disabled={sel == null} onClick={() => onConfirmar(sel)}>
         <Icon name="check" size={20} strokeWidth={2.5} /> {texto}
       </button>
+      {secundarias.map((b) => (
+        <button key={b.texto} type="button" className={`big full ${b.clase || 'danger'}`} style={{ marginTop: '.7rem' }} disabled={sel == null} onClick={() => b.onClick(sel)}>
+          {b.icono && <Icon name={b.icono} size={20} />} {b.texto}
+        </button>
+      ))}
       {extra}
     </>
   );
@@ -46,7 +62,7 @@ function ElegirDos({ e, opciones, onConfirmar }) {
 }
 
 // Los jugadores sin acción también «tardan» unos segundos para no delatar su rol por el tiempo de su turno
-function Dormir({ onListo, mensaje }) {
+function Dormir({ onListo, mensaje, esperar = false }) {
   const [t, setT] = useState(() => 4 + Math.floor(Math.random() * 4));
   useEffect(() => {
     if (t <= 0) return undefined;
@@ -56,8 +72,8 @@ function Dormir({ onListo, mensaje }) {
   return (
     <>
       {mensaje && <div className="lb-resultado"><p>{mensaje}</p></div>}
-      <button type="button" className="big full" disabled={t > 0} onClick={onListo}>
-        {t > 0 ? <><Icon name="hourglass" size={20} /> Un momento… ({t})</> : <><Icon name="check" size={20} strokeWidth={2.5} /> Terminar turno</>}
+      <button type="button" className="big full" disabled={t > 0 || esperar} onClick={onListo}>
+        {esperar && t <= 0 ? <><Icon name="hourglass" size={20} /> Esperando a los lobos…</> : t > 0 ? <><Icon name="hourglass" size={20} /> Un momento… ({t})</> : <><Icon name="check" size={20} strokeWidth={2.5} /> Terminar turno</>}
       </button>
     </>
   );
@@ -77,7 +93,7 @@ const pickOtro = (b) => { const o = ['lobos', 'pueblo', 'solitario'].filter((x) 
 
 /* ───────── Turno ───────── */
 
-export default function TurnoNoche({ e, id, onTerminar }) {
+export default function TurnoNoche({ e, id, onTerminar, remoto = false, bloqueada = false }) {
   const j = e.jugadores[id];
   const r = ROLES[j.rol];
   const est = j.estado;
@@ -91,6 +107,10 @@ export default function TurnoNoche({ e, id, onTerminar }) {
 
   const vivosIds = vivos(e).map((x) => x.id);
   const otros = vivosIds.filter((x) => x !== id);
+  // Compañeros de manada: en red solo los conoce el servidor (e.companeros); en local se deducen de los roles
+  const companerosIds = remoto
+    ? (e.companeros || []).map((c) => Number(c && typeof c === 'object' ? c.id : c))
+    : e.jugadores.filter((x) => esLobo(x) && x.id !== id).map((x) => x.id);
   const terminar = (acc) => onTerminar(extra ? { ...(acc || {}), objeto: extra } : acc);
 
   const textoAviso = (a) => {
@@ -165,7 +185,7 @@ export default function TurnoNoche({ e, id, onTerminar }) {
               <ElegirUno e={e} opciones={otros} texto="Confirmar"
                 onConfirmar={(t) => {
                   setExtra({ tipo: j.estado.objeto, objetivo: t });
-                  setObjPaso(j.estado.objeto === 'pergamino' ? 'resultado' : 'listo');
+                  setObjPaso(j.estado.objeto === 'pergamino' && !remoto ? 'resultado' : 'listo');
                   setDatos((d) => ({ ...d, objObjetivo: t }));
                 }} />
             </>
@@ -202,25 +222,22 @@ export default function TurnoNoche({ e, id, onTerminar }) {
           </>
         );
       }
-      const manada = vivos(e).filter((x) => esLobo(x) && x.id !== id);
+      const manada = companerosIds.map((c) => e.jugadores[c]).filter((x) => x && x.vivo);
+      const hayMuertos = companerosIds.some((c) => e.jugadores[c] && !e.jugadores[c].vivo);
       const manadaTxt = manada.length
         ? <p className="lb-companeros"><Icon name="paw" size={16} /> Tu manada: <strong>{manada.map((m) => m.nombre).join(', ')}</strong></p>
-        : <p className="lb-companeros"><Icon name="paw" size={16} /> Estás solo: el resto de la manada ha caído.</p>;
+        : <p className="lb-companeros"><Icon name="paw" size={16} /> {hayMuertos ? 'Estás solo: el resto de la manada ha caído.' : 'Eres el único lobo de la manada.'}</p>;
       const votosPrevios = manada.filter((m) => e.noche.acc[m.id]?.objetivo != null);
       if (e.flags.sinAtaque) {
         return envoltorio(<>{manadaTxt}<Dormir mensaje="El sacrificio del Mártir os impide atacar esta noche. Descansad." onListo={() => terminar(null)} /></>);
       }
-      const objetivos = vivosIds.filter((x) => !esLobo(e.jugadores[x]));
+      const objetivos = vivosIds.filter((x) => x !== id && !companerosIds.includes(x));
+      const puedeInfectar = j.rol === 'lobo_alfa' && !est.infeccionUsada;
       return envoltorio(
         <>
           {manadaTxt}
           {votosPrevios.length > 0 && (
             <p className="hint small">Votos de la manada hasta ahora: {votosPrevios.map((m) => `${m.nombre} → ${nombre(e.noche.acc[m.id].objetivo)}`).join(' · ')}</p>
-          )}
-          {j.rol === 'lobo_alfa' && !est.infeccionUsada && (
-            <button type="button" className={`secondary lb-toggle ${datos.infectar ? 'on' : ''}`} onClick={() => setDatos((d) => ({ ...d, infectar: !d.infectar }))}>
-              <Icon name="paw" size={18} /> Mordisco infectado: {datos.infectar ? 'ACTIVADO (la víctima final se convertirá en lobo)' : 'desactivado'}
-            </button>
           )}
           {j.rol === 'falsificador' && !est.falsificacionUsada && (
             <button type="button" className={`secondary lb-toggle ${datos.falso ? 'on' : ''}`} onClick={() => setPaso('falsoObj')}>
@@ -228,7 +245,10 @@ export default function TurnoNoche({ e, id, onTerminar }) {
             </button>
           )}
           <p className="field-label">¿A quién atacáis?</p>
-          <ElegirUno e={e} opciones={objetivos} texto="Confirmar víctima" onConfirmar={(t) => terminar({ objetivo: t, infectar: !!datos.infectar, falsificar: datos.falso })} />
+          {puedeInfectar && <p className="hint small">Elige a la víctima y decide: devorarla o usar tu mordisco infectado (un solo uso) para convertirla en lobo.</p>}
+          <ElegirUno e={e} opciones={objetivos} texto={puedeInfectar ? 'Devorar a la víctima' : 'Confirmar víctima'}
+            onConfirmar={(t) => terminar({ objetivo: t, infectar: false, falsificar: datos.falso })}
+            secundarias={puedeInfectar ? [{ texto: 'Infectar: convertir en lobo (un solo uso)', icono: 'paw', onClick: (t) => terminar({ objetivo: t, infectar: true, falsificar: datos.falso }) }] : []} />
         </>
       );
     }
@@ -247,6 +267,8 @@ export default function TurnoNoche({ e, id, onTerminar }) {
         );
       }
       return envoltorio(<ElegirUno e={e} opciones={otros} texto="Investigar" onConfirmar={(t) => {
+        // En red el cliente no conoce los roles ajenos: el resultado real llega del servidor
+        if (remoto) { terminar({ objetivo: t }); return; }
         let b = bandoVisible(e.jugadores[t]);
         if (e.noche.evento === 'niebla' && Math.random() < 0.5) b = pickOtro(b);
         setDatos({ objetivo: t, mostrado: b }); setPaso('resultado');
@@ -265,6 +287,7 @@ export default function TurnoNoche({ e, id, onTerminar }) {
         );
       }
       return envoltorio(<ElegirDos e={e} opciones={e.jugadores.map((x) => x.id)} onConfirmar={(a, b) => {
+        if (remoto) { terminar({ a, b }); return; }
         let d = distanciaAsientos(e, a, b);
         if (e.noche.evento === 'niebla' && Math.random() < 0.5) d = Math.max(1, Math.min(Math.floor(e.jugadores.length / 2), d + (Math.random() < 0.5 ? -1 : 1)));
         setDatos({ a, b, dist: d }); setPaso('resultado');
@@ -277,35 +300,56 @@ export default function TurnoNoche({ e, id, onTerminar }) {
       return envoltorio(<ElegirUno e={e} opciones={opciones} texto="Proteger" onConfirmar={(t) => terminar({ objetivo: t })} />);
     }
     case 'bruja': {
-      const v = e.noche.victima;
-      const info = (
-        <div className="lb-resultado">
-          <p className="lb-res-titulo">Esta noche los lobos atacan a…</p>
-          <p className="lb-res-grande">{v != null ? nombre(v) : 'nadie'}</p>
-        </div>
-      );
-      if (!est.pocionVida && !est.pocionVeneno) return envoltorio(<><div className="lb-resultado"><p>Los lobos atacan a: <strong>{v != null ? nombre(v) : 'nadie'}</strong>. No tienes pociones.</p></div><Dormir onListo={() => terminar(null)} /></>);
-      const puedeSalvar = est.pocionVida && v != null;
-      if (paso === 'inicio' && puedeSalvar) {
+      const v = e.noche.victima; // undefined = los lobos aún no han decidido · null = nadie
+      const tieneVida = !!est.pocionVida;
+      const tieneVeneno = !!est.pocionVeneno;
+      // Sin pociones no puede actuar ni ver a quién atacan los lobos
+      if (!tieneVida && !tieneVeneno) {
+        return envoltorio(<><div className="lb-resultado"><p>Has gastado tus dos pociones: ya no puedes actuar ni ver a quién atacan los lobos.</p></div><Dormir esperar={remoto && bloqueada} onListo={() => terminar(null)} /></>);
+      }
+      const esperando = remoto && bloqueada;
+      const hayVictima = v != null;
+      const salvar = !!datos.salvar;
+      const veneno = datos.veneno ?? null;
+
+      if (paso === 'salvar') {
         return envoltorio(
           <>
-            {info}
-            <button type="button" className="big full" onClick={() => { setDatos({ salvar: true }); setPaso('veneno'); }}><Icon name="heart" size={20} /> Salvar con la poción de vida</button>
-            <button type="button" className="secondary full" style={{ marginTop: '.7rem' }} onClick={() => { setDatos({ salvar: false }); setPaso('veneno'); }}>No salvar</button>
+            <div className="lb-resultado">
+              <p className="lb-res-titulo">Esta noche los lobos atacan a…</p>
+              <p className="lb-res-grande">{hayVictima ? nombre(v) : 'nadie'}</p>
+            </div>
+            <button type="button" className="big full" disabled={!hayVictima} onClick={() => { setDatos((d) => ({ ...d, salvar: true })); setPaso('inicio'); }}><Icon name="heart" size={20} /> Salvar con la poción de vida</button>
+            <button type="button" className="secondary full" style={{ marginTop: '.7rem' }} onClick={() => setPaso('inicio')}>No salvar</button>
           </>
         );
       }
-      const salvo = paso === 'veneno' ? !!datos.salvar : false;
-      // Paso del veneno
-      if (!est.pocionVeneno) return envoltorio(<Resultado onListo={() => terminar({ salvar: salvo, veneno: null })}><p>{salvo ? 'Has usado tu poción de vida.' : 'No usas ninguna poción.'}</p></Resultado>);
+      if (paso === 'veneno') {
+        return envoltorio(
+          <>
+            <p className="field-label">¿A quién envenenas? (un solo uso)</p>
+            <ElegirUno e={e} opciones={otros} texto="Envenenar"
+              onConfirmar={(t) => { setDatos((d) => ({ ...d, veneno: t })); setPaso('inicio'); }}
+              extra={<button type="button" className="secondary full" style={{ marginTop: '.7rem' }} onClick={() => setPaso('inicio')}>Volver</button>} />
+          </>
+        );
+      }
+      const hayDecision = salvar || veneno != null;
       return envoltorio(
         <>
-          <p className="field-label">¿Quieres envenenar a alguien? (un solo uso)</p>
-          <ElegirUno
-            e={e} opciones={otros} texto="Envenenar"
-            onConfirmar={(t) => terminar({ salvar: salvo, veneno: t })}
-            extra={<button type="button" className="secondary full" style={{ marginTop: '.7rem' }} onClick={() => terminar({ salvar: salvo, veneno: null })}>No envenenar a nadie</button>}
-          />
+          <button type="button" className="big full danger" disabled={!tieneVeneno || veneno != null} onClick={() => setPaso('veneno')}>
+            <Icon name="flask" size={20} /> {!tieneVeneno ? 'Poción de veneno gastada' : veneno != null ? `Envenenarás a ${nombre(veneno)}` : 'Envenenar a alguien'}
+          </button>
+          <button type="button" className="big full" style={{ marginTop: '.7rem' }} disabled={!tieneVida || !hayVictima || salvar} onClick={() => setPaso('salvar')}>
+            <Icon name="heart" size={20} /> {!tieneVida ? 'Poción de vida gastada' : salvar ? 'Salvarás a la víctima de los lobos' : hayVictima ? 'Salvar a la víctima de los lobos' : 'Salvar (aún no hay víctima)'}
+          </button>
+          {tieneVida && !hayVictima && <p className="hint small">Este botón se activará cuando los lobos ataquen a alguien.</p>}
+          {hayDecision && (
+            <button type="button" className="secondary full" style={{ marginTop: '.7rem' }} onClick={() => setDatos((d) => ({ ...d, salvar: false, veneno: null }))}>Deshacer mis decisiones</button>
+          )}
+          <button type="button" className="big full" style={{ marginTop: '.7rem' }} disabled={esperando} onClick={() => terminar({ salvar: salvar && hayVictima, veneno })}>
+            <Icon name="check" size={20} strokeWidth={2.5} /> {esperando ? 'Esperando a los lobos…' : hayDecision ? 'Terminar turno' : 'No usar pociones esta noche'}
+          </button>
         </>
       );
     }

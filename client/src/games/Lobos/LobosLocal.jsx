@@ -14,7 +14,7 @@ import {
 } from './composiciones.js';
 import { simularComposicion } from './simulacion.js';
 import TarjetaRol, { ConsultarRol } from './TarjetaRol.jsx';
-import TurnoNoche, { ElegirUno } from './TurnoNoche.jsx';
+import TurnoNoche, { ElegirUno, BotonAbstenerse } from './TurnoNoche.jsx';
 import SelectorRoles, { selInicial, rolesDeSel } from './SelectorRoles.jsx';
 
 const nombresPorDefecto = (n) => Array.from({ length: n }, (_, i) => `Jugador ${i + 1}`);
@@ -38,9 +38,7 @@ function VotoTurno({ e, id, robadoDe, segunda, onVotar }) {
   const [verRol, setVerRol] = useState(false);
   const j = e.jugadores[id];
   const opciones = vivos(e).map((x) => x.id).filter((x) => x !== id);
-  const abstener = (cb) => (
-    <button type="button" className="secondary full" style={{ marginTop: '.7rem' }} onClick={() => cb(null)}>Me abstengo</button>
-  );
+  const abstener = (cb) => <BotonAbstenerse onClick={() => cb(null)} />;
   return (
     <section className="game">
       <div className="hud">
@@ -54,9 +52,9 @@ function VotoTurno({ e, id, robadoDe, segunda, onVotar }) {
             <h2 className="title">{segunda ? 'Votación repetida' : 'Votación'}</h2>
             <p className="hint">Elige a quién linchar. Tu voto es secreto hasta el recuento.</p>
             <ElegirUno
-              e={e} opciones={opciones} texto="Votar"
+              e={e} opciones={opciones} texto="Votar a este jugador"
               onConfirmar={(t) => { if (robadoDe != null) { setPropio(t); setPaso('robado'); } else onVotar(t, undefined); }}
-              extra={abstener((t) => { if (robadoDe != null) { setPropio(t); setPaso('robado'); } else onVotar(t, undefined); })}
+              arriba={abstener((t) => { if (robadoDe != null) { setPropio(t); setPaso('robado'); } else onVotar(t, undefined); })}
             />
           </>
         ) : (
@@ -66,7 +64,7 @@ function VotoTurno({ e, id, robadoDe, segunda, onVotar }) {
             <ElegirUno
               e={e} opciones={vivos(e).map((x) => x.id).filter((x) => x !== robadoDe)} texto="Emitir voto robado"
               onConfirmar={(t) => onVotar(propio, t)}
-              extra={abstener((t) => onVotar(propio, t))}
+              arriba={abstener((t) => onVotar(propio, t))}
             />
           </>
         )}
@@ -621,6 +619,8 @@ export default function LobosLocal({ onSalir }) {
             <p className="final-score">
               {res.fichaDe != null
                 ? 'La ficha de favor ha anulado la sentencia'
+                : res.anuladaAbstencion
+                ? `Hay más abstenciones (${res.abstenciones}) que votos contra ${e.jugadores[res.empatados[0]]?.nombre ?? 'el más votado'} (${res.max}): no hay linchamiento`
                 : res.victima == null
                 ? (res.max === 0 ? 'Nadie ha recibido votos: no hay linchamiento' : `Empate entre ${res.empatados.map((i) => e.jugadores[i].nombre).join(' y ')}: no hay linchamiento`)
                 : `El pueblo señala a ${e.jugadores[res.victima].nombre} (${res.max} ${res.max === 1 ? 'voto' : 'votos'})`}
@@ -635,6 +635,7 @@ export default function LobosLocal({ onSalir }) {
                   <span className="score-pts">{res.conteo[j.id]} {res.conteo[j.id] === 1 ? 'voto' : 'votos'}</span>
                 </div>
               ))}
+              {res.abstenciones > 0 && <div className="score-row"><span className="score-name">Abstenciones</span><span className="score-pts">{res.abstenciones}</span></div>}
             </div>
           </div>
           {e.config.votosPublicos && (

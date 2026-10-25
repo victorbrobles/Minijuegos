@@ -598,6 +598,7 @@ function cerrarVotacion(sala) {
   sala.res = {
     conteo: r.conteo, max: r.max, empatados: r.empatados, modif: r.modif || null,
     votos: sala.config.votosPublicos ? votos : null,
+    abstenciones: r.abstenciones, anuladaAbstencion: r.anuladaAbstencion,
     victima, juezMuere, identico, fichaDe, repeticion: v.segunda
   };
   nuevaFase(sala, 'resultado');
@@ -672,7 +673,8 @@ export function vista(sala, id) {
         info: sala.infoNoche[id] || [],
         turno: {
           bloqueada,
-          victima: j.rol === 'bruja' && !bloqueada ? (e.noche.victima ?? null) : undefined,
+          // La Bruja solo ve a la víctima mientras le quede alguna poción
+          victima: j.rol === 'bruja' && !bloqueada && (j.estado.pocionVida || j.estado.pocionVeneno) ? (e.noche.victima ?? null) : undefined,
           manadaVotos,
           sinAtaque: lobo && (e.flags.sinAtaque || e.noche.evento === 'paz'),
           eco: j.rol === 'eco' ? e.eco : null

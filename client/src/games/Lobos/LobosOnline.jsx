@@ -5,8 +5,8 @@ import Icon from '../../components/Icon.jsx';
 import { ROLES, BANDOS } from './roles.js';
 import { EVENTOS, OBJETOS, MODIFICADORES, TEXTO_CAUSA, CAUSAS_PUBLICAS } from './engine.js';
 import TarjetaRol from './TarjetaRol.jsx';
-import TurnoNoche, { ElegirUno } from './TurnoNoche.jsx';
-import SelectorRoles, { ChipsRoles, selInicial } from './SelectorRoles.jsx';
+import TurnoNoche, { ElegirUno, BotonAbstenerse } from './TurnoNoche.jsx';
+import SelectorRoles, { ChipsRoles, ListaRolesExplicados, selInicial } from './SelectorRoles.jsx';
 
 const API = '/api/lobos';
 const CLAVE_SESION = 'lobos-sesion';
@@ -41,7 +41,7 @@ export function vistaAE(v) {
     flags: { sinAtaque: !!t?.sinAtaque, juezArmado: !!m.juezArmado, ladron: null },
     noche: { evento: v?.noche?.evento ?? v?.nocheEvento ?? null, victima: t?.victima, acc: Object.fromEntries(Object.entries(t?.manadaVotos || {}).map(([k, o]) => [k, { objetivo: o }])) },
     eco: t?.eco || null,
-    companeros: m.companeros || [],
+    companeros: (m.companeros || []).map((c) => (c && typeof c === 'object' ? c.id : c)),
     config: { votosPublicos: v?.config?.votosPublicos ?? true },
     modDia: v?.modDia || null,
     pendientes: [],
@@ -294,6 +294,7 @@ export function Lobby({ v, enviar, onAbrirModalSalir }) {
             <h3 className="panel-title"><Icon name="dice" size={20} /> Roles previstos</h3>
             <p className="hint small">El anfitrión está eligiendo los roles. Esto es lo que hay ahora mismo:</p>
             <ChipsRoles roles={v.roles} />
+            <ListaRolesExplicados roles={v.roles} conDetalle />
             {Object.entries(v.config.mec).some(([, on]) => on) && <p className="hint small">Mecánicas activadas: {Object.entries(v.config.mec).filter(([, on]) => on).map(([k]) => ({ eventos: 'eventos nocturnos', objetos: 'objetos', rumores: 'rumores', modif: 'votos especiales' }[k])).join(', ')}.</p>}
           </div>
           <div className="actions"><button className="secondary danger full" onClick={onAbrirModalSalir}>Salir de la partida</button></div>
@@ -309,7 +310,7 @@ function VotoRemoto({ v, e, enviar, offset }) {
   const vivos = v.jugadores.filter((p) => p.vivo).map((p) => p.id);
   const otros = vivos.filter((x) => x !== v.yo);
   const robadoDe = v.votacion.robadoDe;
-  const abstener = (cb) => <button type="button" className="secondary full" style={{ marginTop: '.7rem' }} onClick={() => cb(null)}>Me abstengo</button>;
+  const abstener = (cb) => <BotonAbstenerse onClick={() => cb(null)} />;
   const finalizar = (voto, robado) => enviar({ tipo: 'votar', voto, ...(robado !== undefined ? { robado } : {}) });
 
   return (
@@ -320,14 +321,14 @@ function VotoRemoto({ v, e, enviar, offset }) {
         <>
           <h2 className="title">{v.votacion.segunda ? 'Votación repetida' : 'Votación'}</h2>
           <p className="hint">Elige a quién linchar. Tu voto es secreto hasta el recuento. <Cuenta finTs={v.finTs} offset={offset} /></p>
-          <ElegirUno e={e} opciones={otros} texto="Votar" onConfirmar={(t) => { if (robadoDe != null) { setPropio(t); setPaso('robado'); } else finalizar(t); }}
-            extra={abstener((t) => { if (robadoDe != null) { setPropio(t); setPaso('robado'); } else finalizar(t); })} />
+          <ElegirUno e={e} opciones={otros} texto="Votar a este jugador" onConfirmar={(t) => { if (robadoDe != null) { setPropio(t); setPaso('robado'); } else finalizar(t); }}
+            arriba={abstener((t) => { if (robadoDe != null) { setPropio(t); setPaso('robado'); } else finalizar(t); })} />
         </>
       ) : (
         <>
           <h2 className="title">Voto robado</h2>
           <div className="lb-haz"><p>Como <strong>Ladrón de Voces</strong>, emites también el voto de <strong>{e.jugadores[robadoDe].nombre}</strong>. Él no lo sabrá hasta el recuento.</p></div>
-          <ElegirUno e={e} opciones={vivos.filter((x) => x !== robadoDe)} texto="Emitir voto robado" onConfirmar={(t) => finalizar(propio, t)} extra={abstener((t) => finalizar(propio, t))} />
+          <ElegirUno e={e} opciones={vivos.filter((x) => x !== robadoDe)} texto="Emitir voto robado" onConfirmar={(t) => finalizar(propio, t)} arriba={abstener((t) => finalizar(propio, t))} />
         </>
       )}
     </div>
@@ -398,6 +399,9 @@ export function VistaJuego({ v, enviar, offset, onAbrirModalSalir }) {
       <button type="button" className="big full" onClick={() => enviar({ tipo: 'eco', texto: textoEco })}><Icon name="check" size={20} strokeWidth={2.5} /> {textoEco.trim() ? 'Dejar el mensaje' : 'No dejar mensaje'}</button>
     </div>
   );
+
+  // En el turno propio de noche, TurnoNoche ya pinta su cabecera con «Mi rol»: no duplicarla
+  const turnoPropioNoche = v.fase === 'noche' && vivo && !v.listo;
 
   let cuerpo = null;
   switch (v.fase) {
@@ -544,6 +548,7 @@ export function VistaJuego({ v, enviar, offset, onAbrirModalSalir }) {
             <h1 className="title">Recuento de votos</h1>
             <p className="final-score">
               {r.fichaDe != null ? 'La ficha de favor ha anulado la sentencia'
+                : r.anuladaAbstencion ? `Hay más abstenciones (${r.abstenciones}) que votos contra ${e.jugadores[r.empatados[0]]?.nombre ?? 'el más votado'} (${r.max}): no hay linchamiento`
                 : r.victima == null ? (r.max === 0 ? 'Nadie ha recibido votos: no hay linchamiento' : `Empate entre ${r.empatados.map((i) => e.jugadores[i].nombre).join(' y ')}: no hay linchamiento`)
                 : `El pueblo señala a ${e.jugadores[r.victima].nombre} (${r.max} ${r.max === 1 ? 'voto' : 'votos'})`}
             </p>
@@ -556,6 +561,7 @@ export function VistaJuego({ v, enviar, offset, onAbrirModalSalir }) {
                   <span className="score-name">{p.nombre}</span><span className="score-pts">{r.conteo[p.id]} {r.conteo[p.id] === 1 ? 'voto' : 'votos'}</span>
                 </div>
               ))}
+              {r.abstenciones > 0 && <div className="score-row"><span className="score-name">Abstenciones</span><span className="score-pts">{r.abstenciones}</span></div>}
             </div>
           </div>
           {r.votos && (
@@ -620,7 +626,7 @@ export function VistaJuego({ v, enviar, offset, onAbrirModalSalir }) {
 
   return (
     <section className="game">
-      {cabecera}
+      {!turnoPropioNoche && cabecera}
       {cuerpo}
       {v.fase !== 'fin' && <ListaJugadores v={v} />}
       {v.fase !== 'fin' && <div className="actions"><button className="secondary danger full" onClick={onAbrirModalSalir}>Salir de la partida</button></div>}

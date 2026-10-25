@@ -127,6 +127,9 @@ export function victimaFinal(e, rnd = Math.random) {
   const n = e.noche;
   if (n.victima !== undefined) return n.victima;
   if (e.flags.sinAtaque || n.evento === 'paz') { n.victima = null; return null; }
+  // Lobo Alfa con mordisco activado: su elección manda (si no, un empate de la manada podía desviar el mordisco)
+  const alfaMuerde = vivos(e).find((j) => j.rol === 'lobo_alfa' && n.acc[j.id]?.infectar && n.acc[j.id]?.objetivo != null && !j.estado.infeccionUsada);
+  if (alfaMuerde) { n.victima = n.acc[alfaMuerde.id].objetivo; return n.victima; }
   const cuenta = {};
   vivos(e).filter(esLobo).forEach((l) => {
     const t = n.acc[l.id]?.objetivo;
@@ -167,6 +170,20 @@ export function limpiarAvisos(e, id) {
   const s = clonar(e);
   s.jugadores[id].avisos = [];
   if (s.jugadores[id].rol === 'eco') s.eco = null; // ya ha leído el mensaje
+  return s;
+}
+
+// Solo borra los avisos del jugador (en red: «Noticias para ti» ya leídas)
+export function limpiarSoloAvisos(e, id) {
+  const s = clonar(e);
+  if (s.jugadores[id]) s.jugadores[id].avisos = [];
+  return s;
+}
+
+// El Eco ya ha leído el mensaje de los difuntos
+export function consumirEco(e) {
+  const s = clonar(e);
+  s.eco = null;
   return s;
 }
 
@@ -398,7 +415,16 @@ export function contarVotos(e, votos, modif = null) {
   }
   let victima = max > 0 && candidatos.length === 1 ? candidatos[0] : null;
   if (modif === 'quorum' && victima != null && conteo[victima] * 3 < vivosIds.length) victima = null;
-  return { conteo, max, empatados: candidatos, victima, modif };
+  // Abstenciones: votantes vivos que no han votado a nadie (con el mismo peso que tendría su voto)
+  let abstenciones = 0;
+  vivosIds.forEach((id) => {
+    const c = votos[id];
+    if (c == null || conteo[c] == null) abstenciones += dobles.includes(id) ? 2 : 1;
+  });
+  // Si hay más abstenciones que votos contra el señalado, no se linchea a nadie
+  let anuladaAbstencion = false;
+  if (victima != null && abstenciones > conteo[victima]) { victima = null; anuladaAbstencion = true; }
+  return { conteo, max, empatados: candidatos, victima, modif, abstenciones, anuladaAbstencion };
 }
 
 // Camaleón: se une al bando contrario al de su primer acusador

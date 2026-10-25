@@ -198,3 +198,63 @@
 }
 
 
+
+
+/* ========================================================
+   LEGIBILIDAD: texto oscuro sobre las tarjetas claras
+   (la ficha de rol y los modales heredaban un color de letra claro)
+   ======================================================== */
+.lb-ficha, .lb-modal { color: var(--ink, #1f1a47); }
+.lb-ficha .lb-ficha-nombre,
+.lb-ficha .lb-ficha-resumen,
+.lb-ficha .lb-haz,
+.lb-ficha .lb-haz p,
+.lb-ficha .lb-hab,
+.lb-ficha .lb-hab li,
+.lb-ficha .lb-detalle,
+.lb-modal .lb-aviso,
+.lb-modal .lb-modal-titulo + p { color: var(--ink, #1f1a47); }
+.lb-ficha .lb-bando { color: var(--rol); }
+.lb-ficha .lb-bando-texto { color: var(--ink-soft, #5b5780); }
+.lb-ficha .lb-companeros { color: #b91c1c; }
+.lb-resultado, .lb-resultado p, .lb-haz, .lb-haz p, .lb-aviso, .lb-explicado strong, .lb-rol-fila strong { color: var(--ink, #1f1a47); }
+
+/* Botón de abstención destacado */
+.lb-abstener { margin: 0 0 .9rem; color: #fff; background: linear-gradient(135deg, #f59e0b, #d97706); box-shadow: 0 5px 0 rgba(120,53,15,.3); }
+
+/* Detalle desplegable de cada rol en la sala de espera */
+.lb-mas { margin-top: .3rem; }
+.lb-mas summary { cursor: pointer; font-size: .85rem; font-weight: 700; color: var(--g1, #4f46e5); }
+.lb-mas p { margin: .3rem 0 0; color: var(--ink-soft, #5b5780); }
+
+/* ========================================================
+   LEGIBILIDAD (2): tarjetas blancas de composiciones, equilibrio y listas de roles
+   El tema oscuro hace que el texto herede un color claro: se fuerza el oscuro con
+   selectores específicos para ganar a las reglas globales de h3, p, small, etc.
+   ======================================================== */
+.lb-tipo, .lb-equilibrio, .lb-explicado, .lb-rol-fila, .lb-muerte, .lb-cartas { color: var(--ink, #1f1a47); }
+.lb-tipo .lb-tipo-cab h3,
+.lb-tipo .lb-tipo-desc,
+.lb-tipo .lb-tags span,
+.lb-equilibrio .lb-equilibrio-cab strong,
+.lb-explicado div strong,
+.lb-rol-fila .lb-rol-fila-info strong,
+.lb-muerte div strong,
+.lb-cartas p { color: var(--ink, #1f1a47); }
+.lb-tipo .lb-lema,
+.lb-explicado div small,
+.lb-rol-fila .lb-rol-fila-info small,
+.lb-explicado p,
+.lb-rol-fila p,
+.lb-muerte p,
+.lb-equilibrio .hint { color: var(--ink-soft, #5b5780); }
+/* Estos conservan su color propio */
+.lb-tipo .lb-tags span { background: #f3f0ff; }
+.lb-tipo .lb-chip-rol { color: var(--rol); }
+.lb-equilibrio .lb-etiqueta.ok { color: #166534; }
+.lb-equilibrio .lb-etiqueta.warn { color: #92400e; }
+.lb-equilibrio .lb-etiqueta.mal { color: #991b1b; }
+.lb-equilibrio .lb-leyenda .l { color: #ef4444; }
+.lb-equilibrio .lb-leyenda .o { color: #d97706; }
+.lb-equilibrio .lb-leyenda .p { color: #3b82f6; }
+.lb-tipo .lb-aviso-comp { color: #92400e; }

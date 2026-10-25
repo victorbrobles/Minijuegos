@@ -25,7 +25,7 @@ export const ROLES = {
   lobo_alfa: {
     id: 'lobo_alfa', nombre: 'Lobo Alfa', bando: 'lobos', icono: 'crown', unico: true, complejidad: 2, accion: 'noche',
     resumen: 'Una vez por partida, convierte a la víctima en lobo en lugar de matarla.',
-    detalle: 'Actúa como un lobo normal, pero una vez por partida puedes usar tu mordisco infectado: la víctima final de la manada no muere, sino que se convierte en lobo (lo sabrá al empezar su próximo turno de noche). Si la víctima está protegida o salvada, la infección falla y se gasta igualmente.',
+    detalle: 'Actúa como un lobo normal, pero una vez por partida puedes usar tu mordisco infectado: la víctima que elijas tú (tu elección manda sobre la votación de la manada) no muere, sino que se convierte en lobo (lo sabrá al empezar su próximo turno de noche). Si la víctima está protegida o salvada, la infección falla y se gasta igualmente.',
     guiaNoche: (est) => est.infeccionUsada
       ? 'Elige a la víctima junto a tu manada. Ya has gastado tu mordisco infectado.'
       : 'Elige a la víctima junto a tu manada. Además puedes activar tu mordisco infectado (un solo uso): la víctima final se convertirá en lobo en vez de morir.',
@@ -66,11 +66,11 @@ export const ROLES = {
   bruja: {
     id: 'bruja', nombre: 'Bruja', bando: 'pueblo', icono: 'flask', unico: true, complejidad: 2, accion: 'noche',
     resumen: 'Una poción para salvar y otra para envenenar, una vez cada una.',
-    detalle: 'Conoces a la víctima de los lobos y puedes salvarla con tu poción de vida. Además, una vez por partida, puedes envenenar a cualquier jugador vivo. Puedes usar las dos en la misma noche.',
+    detalle: 'Cada noche tienes un botón para envenenar (una vez por partida, a cualquier jugador vivo) y otro para salvar, que se activa cuando los lobos atacan a alguien: al pulsarlo ves quién es la víctima y puedes salvarla con tu poción de vida (una vez por partida). Puedes usar las dos en la misma noche. Cuando has gastado las dos pociones ya no puedes ver a quién atacan los lobos.',
     guiaNoche: (est) => {
       const v = est.pocionVida, p = est.pocionVeneno;
-      if (!v && !p) return 'Ya has gastado ambas pociones. Solo te queda observar.';
-      return `Verás a quién atacan los lobos. ${v ? 'Puedes salvarle con tu poción de vida. ' : 'Tu poción de vida ya está gastada. '}${p ? 'También puedes envenenar a alguien con tu poción de veneno.' : 'Tu poción de veneno ya está gastada.'}`;
+      if (!v && !p) return 'Ya has gastado ambas pociones. Ya no puedes ver a quién atacan los lobos.';
+      return `${p ? 'Pulsa «Envenenar» si quieres envenenar a alguien. ' : 'Tu poción de veneno ya está gastada. '}${v ? 'El botón de salvar se activa cuando los lobos atacan a alguien: púlsalo para ver a la víctima y salvarla.' : 'Tu poción de vida ya está gastada.'}`;
     },
     guiaDia: 'Si salvaste a alguien, sabes algo que el pueblo ignora. Decide cuándo contarlo.'
   },

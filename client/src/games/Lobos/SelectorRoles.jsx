@@ -62,14 +62,16 @@ export function ChipsRoles({ roles }) {
   );
 }
 
-export function ListaRolesExplicados({ roles }) {
+export function ListaRolesExplicados({ roles, conDetalle = false }) {
   const unicos = ORDEN_ROLES.filter((r) => roles.includes(r));
   return (
     <div className="lb-explicados">
       {unicos.map((r) => (
         <div key={r} className="lb-explicado" style={{ '--rol': BANDOS[ROLES[r].bando].color }}>
           <span className="lb-explicado-icono"><Icon name={ROLES[r].icono} size={22} /></span>
-          <div><strong>{ROLES[r].nombre}</strong> <small>({BANDOS[ROLES[r].bando].nombre})</small><p>{ROLES[r].resumen}</p></div>
+          <div><strong>{ROLES[r].nombre}</strong> <small>({BANDOS[ROLES[r].bando].nombre})</small><p>{ROLES[r].resumen}</p>
+            {conDetalle && <details className="lb-mas"><summary>Cómo funciona</summary><p>{ROLES[r].detalle}</p></details>}
+          </div>
         </div>
       ))}
     </div>
