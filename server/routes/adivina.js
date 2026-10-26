@@ -13,27 +13,105 @@ function obtenerColeccion(modo, subcategoria) {
   return CANCIONES;
 }
 
-async function obtenerAudioPreview(titulo, artista) {
+// ---- Búsqueda de previews con validación de título y artista ----
+function normalizarBusqueda(t) {
+  return String(t ?? '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// Quita "(feat. X)", "(Instrumental)", "- Remastered 2011", etc.
+function limpiarTituloItunes(t) {
+  return normalizarBusqueda(
+    String(t ?? '').replace(/\(.*?\)|\[.*?\]/g, ' ').replace(/\s[-–]\s.*$/, ' ')
+  );
+}
+
+function artistasDe(texto) {
+  // Se separa ANTES de normalizar, porque normalizar elimina el "&" y las comas
+  return String(texto ?? '')
+    .split(/\s*(?:&|,|\bfeat\.?|\bft\.?|\bcon\b|\bx\b|\by\b)\s*/i)
+    .map(normalizarBusqueda)
+    .filter(Boolean);
+}
+
+function coincideTituloArtista(r, titulos, artistas) {
+  if (!r.previewUrl) return false;
+  const tituloR = limpiarTituloItunes(r.trackName);
+  if (!titulos.includes(tituloR)) return false;
+  const artistaR = normalizarBusqueda(r.artistName);
+  return artistas.some((a) => artistaR.includes(a));
+}
+
+const esperar = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// Deezer: clips de 30 s, sin clave de API. Lanza error si falla o limita (no confundir con "no encontrada").
+async function buscarDeezer(consulta) {
+  const url = `https://api.deezer.com/search?q=${encodeURIComponent(consulta)}&limit=25`;
+  const esperas = [0, 3000, 10000];
+  let ultimoError;
+  for (const espera of esperas) {
+    if (espera) await esperar(espera);
+    try {
+      const res = await fetch(url, { signal: AbortSignal.timeout(8000) });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.error) throw new Error(`Deezer: ${data.error.message || data.error.code}`);
+        // Normalizamos al formato que usa coincideTituloArtista
+        return (data.data ?? []).map((r) => ({
+          trackName: r.title,
+          artistName: r.artist?.name,
+          previewUrl: r.preview || null
+        }));
+      }
+      ultimoError = new Error(`Deezer HTTP ${res.status}`);
+    } catch (e) {
+      ultimoError = e;
+    }
+  }
+  throw ultimoError;
+}
+
+// Lanza error en fallos de red/limitación. Devuelve null SOLO si de verdad no hay coincidencia.
+export async function buscarPreview(titulo, artista, alias = []) {
+  const titulos = [titulo, ...alias].map(limpiarTituloItunes).filter(Boolean);
+  const artistas = artistasDe(artista);
+
+  const elegir = (resultados) => {
+    const validos = resultados.filter((r) => coincideTituloArtista(r, titulos, artistas));
+    // Preferimos la versión instrumental si existe (para que no se cante el título)
+    return validos.find((r) => /instrumental/i.test(r.trackName)) ?? validos[0];
+  };
+
+  let elegido = elegir(await buscarDeezer(`${titulo} ${artista}`));
+
+  // Segundo intento más preciso, solo si el primero no dio coincidencia
+  if (!elegido && artistas[0]) {
+    const principal = String(artista).split(/\s*(?:&|,|\bfeat\.?|\bft\.?)\s*/i)[0].trim();
+    elegido = elegir(await buscarDeezer(`artist:"${principal}" track:"${titulo}"`));
+  }
+  return elegido?.previewUrl ?? null;
+}
+
+// Las URLs de preview de Deezer llevan un token que caduca: se cachean poco tiempo.
+const TTL_URL_MS = 20 * 60 * 1000;
+const TTL_NULO_MS = 24 * 60 * 60 * 1000;
+
+export async function obtenerAudioPreview(titulo, artista, alias = []) {
   const clave = `${titulo}-${artista}`.toLowerCase();
-  if (cacheAudio.has(clave)) return cacheAudio.get(clave);
+  const hit = cacheAudio.get(clave);
+  if (hit && hit.expira > Date.now()) return hit.url;
 
   try {
-    const qInst = encodeURIComponent(`${titulo} ${artista} instrumental`);
-    let res = await fetch(`https://itunes.apple.com/search?term=${qInst}&entity=song&limit=3`);
-    let data = await res.json();
-    let preview = data.results?.find((r) => r.previewUrl)?.previewUrl;
-
-    if (!preview) {
-      const qOrig = encodeURIComponent(`${titulo} ${artista}`);
-      res = await fetch(`https://itunes.apple.com/search?term=${qOrig}&entity=song&limit=1`);
-      data = await res.json();
-      preview = data.results?.[0]?.previewUrl || null;
-    }
-
-    if (preview) cacheAudio.set(clave, preview);
-    return preview;
+    const url = await buscarPreview(titulo, artista, alias);
+    cacheAudio.set(clave, { url, expira: Date.now() + (url ? TTL_URL_MS : TTL_NULO_MS) });
+    return url;
   } catch {
-    return null;
+    return null; // fallo temporal: NO se cachea
   }
 }
 
@@ -94,7 +172,7 @@ router.post('/iniciar-ronda', async (req, res) => {
 
   let audioUrl = null;
   if (modo === 'canciones') {
-    audioUrl = await obtenerAudioPreview(elegido.titulo, elegido.artista);
+    audioUrl = await obtenerAudioPreview(elegido.titulo, elegido.artista, elegido.alias);
   }
 
   res.json({
@@ -164,7 +242,7 @@ async function prepararNuevaRondaOnline(sala) {
 
   let audioUrl = null;
   if (sala.modo === 'canciones') {
-    audioUrl = await obtenerAudioPreview(elegido.titulo, elegido.artista);
+    audioUrl = await obtenerAudioPreview(elegido.titulo, elegido.artista, elegido.alias);
   }
 
   sala.ronda = {

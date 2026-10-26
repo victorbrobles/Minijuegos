@@ -681,22 +681,6 @@ export const CANCIONES_3 = [
     "año": 2007
   },
   {
-    "id": "c286",
-    "titulo": "Bailando en el parking",
-    "alias": ["bailando en el parking"],
-    "frase": "Las luces de los faros alumbraban el asfalto gris",
-    "artista": "Maldita Nerea",
-    "año": 2011
-  },
-  {
-    "id": "c287",
-    "titulo": "Cosquillas",
-    "alias": ["cosquillas"],
-    "frase": "Esa risa nerviosa que te sale cuando te rozo el cuello",
-    "artista": "Maldita Nerea",
-    "año": 2010
-  },
-  {
     "id": "c288",
     "titulo": "Fácil",
     "alias": ["facil maldita nerea"],

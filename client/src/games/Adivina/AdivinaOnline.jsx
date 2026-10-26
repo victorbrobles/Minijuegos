@@ -4,6 +4,8 @@ import Icon from '../../components/Icon.jsx';
 import { reproducirClip, detenerClip } from './audioPlayer.js';
 import './Adivina.css';
 
+const TIEMPO_RESPUESTA = 30; // segundos para responder tras pulsar
+
 const CLAVE_SESION_ADIVINA = 'adivina_online_session';
 
 export default function AdivinaOnline({ onLocal, onSalir }) {
@@ -28,7 +30,7 @@ export default function AdivinaOnline({ onLocal, onSalir }) {
   const [miTexto, setMiTexto] = useState('');
   const [reproduciendoAudio, setReproduciendoAudio] = useState(false);
   const [segundosAudio, setSegundosAudio] = useState(20);
-  const [segundosRespuesta, setSegundosRespuesta] = useState(15);
+  const [segundosRespuesta, setSegundosRespuesta] = useState(TIEMPO_RESPUESTA);
 
   const intervalRef = useRef(null);
   const miTextoRef = useRef(miTexto);
@@ -100,11 +102,11 @@ export default function AdivinaOnline({ onLocal, onSalir }) {
 
   useEffect(() => {
     if (!alguienHaPulsado) {
-      setSegundosRespuesta(15);
+      setSegundosRespuesta(TIEMPO_RESPUESTA);
       return;
     }
 
-    setSegundosRespuesta(15);
+    setSegundosRespuesta(TIEMPO_RESPUESTA);
     const t = setInterval(() => {
       setSegundosRespuesta((prev) => {
         if (prev <= 0.1) {
@@ -218,7 +220,7 @@ export default function AdivinaOnline({ onLocal, onSalir }) {
     setReproduciendoAudio(false);
     try {
       setMiTexto('');
-      setSegundosRespuesta(15);
+      setSegundosRespuesta(TIEMPO_RESPUESTA);
       await fetch(`/api/adivina/online/sala/${sesion.code}/pulsar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -378,7 +380,7 @@ export default function AdivinaOnline({ onLocal, onSalir }) {
               <p><strong>1. Dinámica del juego:</strong></p>
               <ul>
                 <li>Elige si jugar a adivinar <strong>Canciones</strong> (modernas o clásicas) o <strong>Películas</strong>.</li>
-                <li><strong>Pulsa el botón rojo</strong> para parar el tiempo e introducir el título. Dispondrás de <strong>15 segundos</strong> para responder.</li>
+                <li><strong>Pulsa el botón rojo</strong> para parar el tiempo e introducir el título. Dispondrás de <strong>30 segundos</strong> para responder.</li>
                 <li>Si aciertas, ganas la ronda. Si fallas (o se te acaba el tiempo), quedas eliminado esa ronda.</li>
               </ul>
               <p><strong>2. Puntuación:</strong></p>
@@ -763,6 +765,12 @@ export default function AdivinaOnline({ onLocal, onSalir }) {
                     ) : (
                       <p className="hint">Audio no disponible para este tema.</p>
                     )}
+                    {ronda.pista3 && (
+                      <p className="hint" style={{ fontSize: '0.75rem', marginTop: '0.4rem' }}>
+                        Fragmento de audio proporcionado por{' '}
+                        <a href="https://www.deezer.com" target="_blank" rel="noopener noreferrer">Deezer</a>
+                      </p>
+                    )}
                   </div>
                 ) : (
                   <p className="adv-pista-contenido">{ronda.pista3}</p>
@@ -827,7 +835,7 @@ export default function AdivinaOnline({ onLocal, onSalir }) {
                       <div
                         className={`timer-bar ${segundosRespuesta <= 4 ? 'low' : ''}`}
                         style={{
-                          width: `${(segundosRespuesta / 15) * 100}%`,
+                          width: `${(segundosRespuesta / TIEMPO_RESPUESTA) * 100}%`,
                           height: '100%',
                           backgroundColor: segundosRespuesta <= 4 ? '#ef4444' : '#16a34a',
                           borderRadius: '9999px',
@@ -897,7 +905,7 @@ export default function AdivinaOnline({ onLocal, onSalir }) {
                     <div
                       className={`timer-bar ${segundosRespuesta <= 4 ? 'low' : ''}`}
                       style={{
-                        width: `${(segundosRespuesta / 15) * 100}%`,
+                        width: `${(segundosRespuesta / TIEMPO_RESPUESTA) * 100}%`,
                         height: '100%',
                         backgroundColor: segundosRespuesta <= 4 ? '#ef4444' : '#16a34a',
                         borderRadius: '9999px',

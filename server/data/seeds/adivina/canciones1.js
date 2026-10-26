@@ -1,16 +1,6 @@
 // server/data/seeds/adivina/canciones1.seed.js
 export const CANCIONES_1 = [
   {
-    "id": "c1",
-    "titulo": "Despechá",
-    "alias": [
-      "despecha"
-    ],
-    "frase": "Ando con la falda, aro y cadena",
-    "artista": "Rosalía",
-    "año": 2022
-  },
-  {
     "id": "c2",
     "titulo": "Malamente",
     "alias": [
@@ -19,57 +9,6 @@ export const CANCIONES_1 = [
     "frase": "Aunque no esté bonita la noche, yo salgo a la calle",
     "artista": "Rosalía",
     "año": 2018
-  },
-  {
-    "id": "c3",
-    "titulo": "Saoko",
-    "alias": [
-      "saoko"
-    ],
-    "frase": "Cuando el caballo entra a Troya, tú te confías y yo te quito la joya",
-    "artista": "Rosalía",
-    "año": 2022
-  },
-  {
-    "id": "c4",
-    "titulo": "Tití me preguntó",
-    "alias": [
-      "titi me pregunto",
-      "titi"
-    ],
-    "frase": "Hoy tengo a una, mañana otra, pero no hay boda",
-    "artista": "Bad Bunny",
-    "año": 2022
-  },
-  {
-    "id": "c5",
-    "titulo": "Monaco",
-    "alias": [
-      "monaco"
-    ],
-    "frase": "Créeme que la nostalgia me dio un abrazo y yo le dije que no",
-    "artista": "Bad Bunny",
-    "año": 2023
-  },
-  {
-    "id": "c6",
-    "titulo": "Safaera",
-    "alias": [
-      "safaera"
-    ],
-    "frase": "Hoy se bebe, hoy se gasta, hoy se fuma como un rasta",
-    "artista": "Bad Bunny",
-    "año": 2020
-  },
-  {
-    "id": "c7",
-    "titulo": "Yonaguni",
-    "alias": [
-      "yonaguni"
-    ],
-    "frase": "Dime dónde tú estás, que yo por ti cojo un vuelo",
-    "artista": "Bad Bunny",
-    "año": 2021
   },
   {
     "id": "c8",
@@ -112,16 +51,6 @@ export const CANCIONES_1 = [
     "año": 2023
   },
   {
-    "id": "c12",
-    "titulo": "Polaris",
-    "alias": [
-      "polaris"
-    ],
-    "frase": "Sé que te vas y no vas a volver, pero déjame una noche más",
-    "artista": "Saiko",
-    "año": 2022
-  },
-  {
     "id": "c13",
     "titulo": "Buenas",
     "alias": [
@@ -162,16 +91,6 @@ export const CANCIONES_1 = [
     "año": 2021
   },
   {
-    "id": "c17",
-    "titulo": "Classy 101",
-    "alias": [
-      "classy 101"
-    ],
-    "frase": "Ella tiene un piquete fino que a cualquiera vuelve loco",
-    "artista": "Feid & Young Miko",
-    "año": 2023
-  },
-  {
     "id": "c18",
     "titulo": "Feliz Cumpleaños Ferxxo",
     "alias": [
@@ -190,26 +109,6 @@ export const CANCIONES_1 = [
     "frase": "Pensando en todo lo que hacíamos cuando nadie nos miraba",
     "artista": "Feid & ATL Jacob",
     "año": 2023
-  },
-  {
-    "id": "c20",
-    "titulo": "Todo de ti",
-    "alias": [
-      "todo de ti"
-    ],
-    "frase": "El acelerador a fondo y la brisa dándonos en la cara",
-    "artista": "Rauw Alejandro",
-    "año": 2021
-  },
-  {
-    "id": "c21",
-    "titulo": "Desesperados",
-    "alias": [
-      "desesperados"
-    ],
-    "frase": "Cierra la puerta que no quiero que nadie escuche los gritos",
-    "artista": "Rauw Alejandro & Chencho Corleone",
-    "año": 2021
   },
   {
     "id": "c22",
@@ -372,40 +271,6 @@ export const CANCIONES_1 = [
     "año": 2022
   },
   {
-    "id": "c38",
-    "titulo": "Bzrp Music Sessions #52",
-    "alias": [
-      "quedate",
-      "sesion 52",
-      "quevedo bizarrap"
-    ],
-    "frase": "Nos fuimos en el asiento de atrás camino al mirador",
-    "artista": "Bizarrap & Quevedo",
-    "año": 2022
-  },
-  {
-    "id": "c39",
-    "titulo": "Bzrp Music Sessions #53",
-    "alias": [
-      "shakira bizarrap",
-      "sesion 53"
-    ],
-    "frase": "Las mujeres ya no lloran, las mujeres facturan",
-    "artista": "Bizarrap & Shakira",
-    "año": 2023
-  },
-  {
-    "id": "c40",
-    "titulo": "Bzrp Music Sessions #36",
-    "alias": [
-      "nathy peluso bizarrap",
-      "sesion 36"
-    ],
-    "frase": "Una perra sorprendente, curvilínea y elocuente",
-    "artista": "Bizarrap & Nathy Peluso",
-    "año": 2020
-  },
-  {
     "id": "c41",
     "titulo": "Hips Don't Lie",
     "alias": [
@@ -526,36 +391,6 @@ export const CANCIONES_1 = [
     "año": 2021
   },
   {
-    "id": "c53",
-    "titulo": "Moonlight",
-    "alias": [
-      "moonlight"
-    ],
-    "frase": "Brillando en el asfalto cuando las farolas se apagan",
-    "artista": "Cruz Cafuné",
-    "año": 2023
-  },
-  {
-    "id": "c54",
-    "titulo": "Mina El Hammani",
-    "alias": [
-      "mina el hammani"
-    ],
-    "frase": "La cámara la busca pero ella solo tiene ojos para mí",
-    "artista": "Cruz Cafuné",
-    "año": 2020
-  },
-  {
-    "id": "c55",
-    "titulo": "La venia bendita",
-    "alias": [
-      "la venia bendita"
-    ],
-    "frase": "Llevo tres días despierto escribiendo lo que nadie se atreve a decir",
-    "artista": "Delaossa",
-    "año": 2020
-  },
-  {
     "id": "c56",
     "titulo": "Ojos verdes",
     "alias": [
@@ -563,16 +398,6 @@ export const CANCIONES_1 = [
     ],
     "frase": "Esa mirada me dejó helado en medio de la barra",
     "artista": "Delaossa",
-    "año": 2021
-  },
-  {
-    "id": "c57",
-    "titulo": "Cayena",
-    "alias": [
-      "cayena"
-    ],
-    "frase": "La flor más peligrosa del jardín no se deja tocar por nadie",
-    "artista": "Carolina Durante",
     "año": 2021
   },
   {
@@ -855,16 +680,6 @@ export const CANCIONES_1 = [
     "frase": "Sun is down, freezing cold, that's how we already know winter's here",
     "artista": "Travis Scott",
     "año": 2018
-  },
-  {
-    "id": "c86",
-    "titulo": "Fe!n",
-    "alias": [
-      "fein"
-    ],
-    "frase": "The career's more at stake when you in your prime, fiending for more",
-    "artista": "Travis Scott & Playboi Carti",
-    "año": 2023
   },
   {
     "id": "c87",

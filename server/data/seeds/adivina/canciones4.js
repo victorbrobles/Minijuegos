@@ -553,22 +553,6 @@ export const CANCIONES_4 = [
     "año": 1999
   },
   {
-    "id": "c370",
-    "titulo": "Better Off Alone",
-    "alias": ["better off alone"],
-    "frase": "Do you think you're standing in the corner waiting for nobody?",
-    "artista": "Alice Deejay",
-    "año": 1999
-  },
-  {
-    "id": "c371",
-    "titulo": "Will I Ever Care",
-    "alias": ["will i ever care alice deejay"],
-    "frase": "Tears are falling down like heavy winter rain on the windshield",
-    "artista": "Alice Deejay",
-    "año": 2000
-  },
-  {
     "id": "c372",
     "titulo": "Freed from Desire",
     "alias": ["freed from desire"],

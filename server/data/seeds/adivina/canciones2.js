@@ -101,16 +101,6 @@ export const CANCIONES_2 = [
     "año": 2006
   },
   {
-    "id": "c111",
-    "titulo": "En las nubes",
-    "alias": [
-      "en las nubes"
-    ],
-    "frase": "Volando bajito para que nadie se entere de lo nuestro",
-    "artista": "Ñengo Flow",
-    "año": 2011
-  },
-  {
     "id": "c112",
     "titulo": "Propuesta indecente",
     "alias": [
@@ -191,16 +181,6 @@ export const CANCIONES_2 = [
     "año": 2013
   },
   {
-    "id": "c120",
-    "titulo": "Danza de los mirlos",
-    "alias": [
-      "danza de los mirlos"
-    ],
-    "frase": "Cumbia psicodélica con guitarras eléctricas del Amazonas",
-    "artista": "Los Mirlos",
-    "año": 1973
-  },
-  {
     "id": "c121",
     "titulo": "La raja de tu falda",
     "alias": [
@@ -243,16 +223,6 @@ export const CANCIONES_2 = [
     "frase": "No me dejas pasar porque llevo la ropa que me da la gana",
     "artista": "El Canto del Loco",
     "año": 2005
-  },
-  {
-    "id": "c125",
-    "titulo": "Foto en blanco y negro",
-    "alias": [
-      "foto en blanco y negro"
-    ],
-    "frase": "Aquel banco de madera gastada donde nos juramos todo",
-    "artista": "El Canto del Loco",
-    "año": 2003
   },
   {
     "id": "c126",
@@ -325,16 +295,6 @@ export const CANCIONES_2 = [
     "frase": "Haciendo malabares en el semáforo para arrancarte una sonrisa",
     "artista": "Extremoduro",
     "año": 1996
-  },
-  {
-    "id": "c133",
-    "titulo": "Standby",
-    "alias": [
-      "standby"
-    ],
-    "frase": "Quedarse congelado mientras el resto de la ciudad sigue corriendo",
-    "artista": "Extremoduro",
-    "año": 2002
   },
   {
     "id": "c134",
@@ -419,16 +379,6 @@ export const CANCIONES_2 = [
     "año": 2018
   },
   {
-    "id": "c142",
-    "titulo": "Bikini",
-    "alias": [
-      "bikini"
-    ],
-    "frase": "Cruzando la Castellana en una moto trucada a medianoche",
-    "artista": "Recycled J",
-    "año": 2019
-  },
-  {
     "id": "c143",
     "titulo": "Cayetano",
     "alias": [
@@ -436,16 +386,6 @@ export const CANCIONES_2 = [
     ],
     "frase": "Polo Ralph Lauren y jersey atado al cuello en los bares caros",
     "artista": "Carolina Durante",
-    "año": 2018
-  },
-  {
-    "id": "c144",
-    "titulo": "A.D.R.O.M.I.C.F.M.S.",
-    "alias": [
-      "adromicfms"
-    ],
-    "frase": "Llorando en la trastienda mientras suena autotune de fondo",
-    "artista": "Yung Beef",
     "año": 2018
   },
   {
@@ -457,16 +397,6 @@ export const CANCIONES_2 = [
     "frase": "Pidiéndole clemencia a la Virgen después de hacer de las mías",
     "artista": "Kaydy Cain",
     "año": 2017
-  },
-  {
-    "id": "c146",
-    "titulo": "Corbeille",
-    "alias": [
-      "corbeille"
-    ],
-    "frase": "Flotando entre nubes de humo sintético en el último piso",
-    "artista": "Sticky M.A.",
-    "año": 2020
   },
   {
     "id": "c147",
@@ -567,16 +497,6 @@ export const CANCIONES_2 = [
     "frase": "Haciéndose la que no rompe un plato mientras incendia el cuarto",
     "artista": "Mora & Feid",
     "año": 2022
-  },
-  {
-    "id": "c157",
-    "titulo": "Rápido y certero",
-    "alias": [
-      "rapido y certero"
-    ],
-    "frase": "Un disparo limpio al blanco que no deja rastro en la pared",
-    "artista": "Lucho RK & La Pantera",
-    "año": 2023
   },
   {
     "id": "c158",
@@ -819,16 +739,6 @@ export const CANCIONES_2 = [
     "año": 1967
   },
   {
-    "id": "c182",
-    "titulo": "Como yo te amo",
-    "alias": [
-      "como yo te amo"
-    ],
-    "frase": "Olvídate de todo lo demás, nadie podrá quererte con tanta furia",
-    "artista": "Raphael / Rocío Jurado",
-    "año": 1980
-  },
-  {
     "id": "c183",
     "titulo": "Soy un truhán, soy un señor",
     "alias": [
@@ -847,26 +757,6 @@ export const CANCIONES_2 = [
     "frase": "La brisa del mar, el olor a salitre y una copa servida a mediodía",
     "artista": "Julio Iglesias",
     "año": 1984
-  },
-  {
-    "id": "c185",
-    "titulo": "No dudaría",
-    "alias": [
-      "no dudaria"
-    ],
-    "frase": "Prometo tirar las armas al río y abrazar a quien me cruce",
-    "artista": "Rosario Flores",
-    "año": 1992
-  },
-  {
-    "id": "c186",
-    "titulo": "Cómo quieres que te quiera",
-    "alias": [
-      "como quieres que te quiera"
-    ],
-    "frase": "Si no dejas que me acerque ni a la sombra de tu portal",
-    "artista": "Rosario Flores",
-    "año": 2001
   },
   {
     "id": "c187",

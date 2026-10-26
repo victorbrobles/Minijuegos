@@ -5,6 +5,8 @@ import GameIntro from '../../components/GameIntro.jsx';
 import { reproducirClip, detenerClip } from './audioPlayer.js';
 import './Adivina.css';
 
+const TIEMPO_RESPUESTA = 30; // segundos para responder tras pulsar
+
 const MIN_JUGADORES = 2;
 const MAX_JUGADORES = 15;
 
@@ -35,7 +37,7 @@ export default function AdivinaLocal({ onVolver, onExit }) {
   const [pulsadorActivo, setPulsadorActivo] = useState(false);
   const [inputRespuesta, setInputRespuesta] = useState('');
   const [jugadorSeleccionadoId, setJugadorSeleccionadoId] = useState(null);
-  const [segundosRespuesta, setSegundosRespuesta] = useState(15);
+  const [segundosRespuesta, setSegundosRespuesta] = useState(TIEMPO_RESPUESTA);
   const [feedbackError, setFeedbackError] = useState('');
   const [resultadoRonda, setResultadoRonda] = useState(null);
 
@@ -112,7 +114,7 @@ export default function AdivinaLocal({ onVolver, onExit }) {
       setPulsadorActivo(false);
       setInputRespuesta('');
       setJugadorSeleccionadoId(null);
-      setSegundosRespuesta(15);
+      setSegundosRespuesta(TIEMPO_RESPUESTA);
       setFeedbackError('');
       setReproduciendoAudio(false);
       setSegundosAudio(20);
@@ -131,7 +133,7 @@ export default function AdivinaLocal({ onVolver, onExit }) {
     setInputRespuesta('');
     setJugadorSeleccionadoId(null);
     setFeedbackError('');
-    setSegundosRespuesta(15);
+    setSegundosRespuesta(TIEMPO_RESPUESTA);
   };
 
   const cancelarRespuesta = () => {
@@ -143,11 +145,11 @@ export default function AdivinaLocal({ onVolver, onExit }) {
 
   useEffect(() => {
     if (!pulsadorActivo) {
-      setSegundosRespuesta(15);
+      setSegundosRespuesta(TIEMPO_RESPUESTA);
       return;
     }
 
-    setSegundosRespuesta(15);
+    setSegundosRespuesta(TIEMPO_RESPUESTA);
     const t = setInterval(() => {
       setSegundosRespuesta((prev) => {
         if (prev <= 0.1) {
@@ -323,7 +325,7 @@ export default function AdivinaLocal({ onVolver, onExit }) {
                   <p><strong>1. Dinámica del juego:</strong></p>
                   <ul>
                     <li>Elige si jugar a adivinar <strong>Canciones</strong> (modernas o clásicas) o <strong>Películas</strong>.</li>
-                    <li><strong>Pulsa el botón rojo</strong> para parar el tiempo e introducir el título. Dispondrás de <strong>15 segundos</strong> para responder.</li>
+                    <li><strong>Pulsa el botón rojo</strong> para parar el tiempo e introducir el título. Dispondrás de <strong>30 segundos</strong> para responder.</li>
                     <li>Si aciertas, ganas la ronda. Si fallas (o se te acaba el tiempo), quedas eliminado esa ronda.</li>
                   </ul>
                   <p><strong>2. Puntuación:</strong></p>
@@ -511,6 +513,12 @@ export default function AdivinaLocal({ onVolver, onExit }) {
                     ) : (
                       <p className="hint">Audio no disponible para este tema.</p>
                     )}
+                    {rondaData.pista3 && (
+                      <p className="hint" style={{ fontSize: '0.75rem', marginTop: '0.4rem' }}>
+                        Fragmento de audio proporcionado por{' '}
+                        <a href="https://www.deezer.com" target="_blank" rel="noopener noreferrer">Deezer</a>
+                      </p>
+                    )}
                   </div>
                 ) : (
                   <p className="adv-pista-contenido">{rondaData.pista3}</p>
@@ -568,7 +576,7 @@ export default function AdivinaLocal({ onVolver, onExit }) {
                     <div
                       className={`timer-bar ${segundosRespuesta <= 4 ? 'low' : ''}`}
                       style={{
-                        width: `${(segundosRespuesta / 15) * 100}%`,
+                        width: `${(segundosRespuesta / TIEMPO_RESPUESTA) * 100}%`,
                         height: '100%',
                         backgroundColor: segundosRespuesta <= 4 ? '#ef4444' : '#16a34a',
                         borderRadius: '9999px',
