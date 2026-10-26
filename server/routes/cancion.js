@@ -1,3 +1,4 @@
+// server/routes/cancion.js
 import express from 'express';
 import parte1 from '../data/seeds/cancion/parte1.js';
 import parte2 from '../data/seeds/cancion/parte2.js';
@@ -8,7 +9,6 @@ import parte5 from '../data/seeds/cancion/parte5.js';
 const router = express.Router();
 const TODAS_LAS_CANCIONES = [...parte1, ...parte2, ...parte3, ...parte4, ...parte5];
 
-// Normalización de texto sin tildes, caracteres especiales ni mayúsculas
 function normalizar(texto) {
   return String(texto ?? '')
     .toLowerCase()
@@ -62,13 +62,15 @@ function barajarArray(array) {
 async function obtenerAudioReal(titulo, artista) {
   try {
     const consulta = encodeURIComponent(`${titulo} ${artista}`);
-    const respuesta = await fetch(`https://itunes.apple.com/search?term=${consulta}&entity=song&limit=1`);
+    const respuesta = await fetch(`https://api.deezer.com/search?q=${consulta}&limit=5`);
     const data = await respuesta.json();
-    if (data.results && data.results.length > 0) {
-      return data.results[0].previewUrl;
+    if (data.data && data.data.length > 0) {
+      // Intentamos evadir covers/instrumentales si la API devuelve varios
+      const pista = data.data.find(t => !/instrumental|cover/i.test(t.title)) || data.data[0];
+      return pista.preview;
     }
   } catch (error) {
-    console.error('Error al obtener vista previa de iTunes:', error);
+    console.error('Error al obtener vista previa de Deezer:', error);
   }
   return null;
 }
@@ -76,7 +78,6 @@ async function obtenerAudioReal(titulo, artista) {
 // ==========================================
 // RUTAS MODO OFFLINE / LOCAL
 // ==========================================
-
 router.post('/iniciar-ronda', async (req, res) => {
   const { usados = [] } = req.body || {};
   const disponibles = TODAS_LAS_CANCIONES.filter((c) => !usados.includes(c.id));
@@ -257,7 +258,8 @@ router.post('/online/sala/:code/reproducir', (req, res) => {
   const sala = salasOnline.get(req.params.code?.toUpperCase());
   if (!sala || !sala.ronda) return res.status(404).json({ error: 'Ronda no activa.' });
 
-  sala.ronda.reproduciendo = true;
+  // Se convierte en un interruptor Toggle para que el admin pueda pausar manualmente si quiere
+  sala.ronda.reproduciendo = !sala.ronda.reproduciendo;
   res.json({ success: true });
 });
 
@@ -274,6 +276,7 @@ router.post('/online/sala/:code/pulsar', (req, res) => {
 
   if (sala.ronda.pulsado) return res.status(400).json({ error: 'Alguien ya ha pulsado.' });
 
+  // Detener el audio para todos automáticamente
   sala.ronda.reproduciendo = false;
   sala.ronda.pulsado = {
     jugadorId: jugador.id,
@@ -334,8 +337,7 @@ router.post('/online/sala/:code/responder', (req, res) => {
         texto: `¡Han fallado todos! (${jugador.nombre} -${ptsFallo} pts)`
       };
     } else {
-      // Rebote para el resto
-      sala.ronda.reproduciendo = true;
+      sala.ronda.reproduciendo = true; // Reanudamos el audio automáticamente para el rebote
       sala.ronda.mensaje = {
         tipo: 'fallo',
         texto: `¡Incorrecto! ${jugador.nombre} resta -${ptsFallo} pts. ¡Rebote para el resto!`

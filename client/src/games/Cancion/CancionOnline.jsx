@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
-import { reproducirConRampa, pausarAudio, detenerReproduccion } from './audioPlayerCancion.js';
+import { reproducirOReanudar, pausarAudio, detenerReproduccion } from './audioPlayerCancion.js';
 import './Cancion.css';
 import '../Adivina/Adivina.css';
 
 const CLAVE_SESION_CANCION = 'cancion_online_session';
-const TIEMPO_RESPUESTA = 60; // Actualizado a 60 segundos
+const TIEMPO_RESPUESTA = 60;
 
 export default function CancionOnline({ onLocal, onSalir }) {
-  const [vista, setVista] = useState('menu'); // 'menu' | 'crear' | 'unirse' | 'sala'
+  const [vista, setVista] = useState('menu'); 
   const [nombre, setNombre] = useState('');
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -29,7 +29,6 @@ export default function CancionOnline({ onLocal, onSalir }) {
   const [miTexto, setMiTexto] = useState('');
   const [sonandoLocal, setSonandoLocal] = useState(false);
 
-  // Temporizador para responder una vez pulsado
   const [tiempoRespuesta, setTiempoRespuesta] = useState(TIEMPO_RESPUESTA);
 
   const intervalRef = useRef(null);
@@ -39,7 +38,6 @@ export default function CancionOnline({ onLocal, onSalir }) {
     return () => detenerReproduccion();
   }, []);
 
-  // Polling de sincronización
   useEffect(() => {
     if (!sesion) {
       if (intervalRef.current) clearInterval(intervalRef.current);
@@ -76,31 +74,24 @@ export default function CancionOnline({ onLocal, onSalir }) {
     };
   }, [sesion]);
 
-  // Manejo reactivo de audio sincronizado
   useEffect(() => {
     const ronda = sala?.ronda;
     if (!ronda) return;
 
     if (ronda.reproduciendo && !sonandoLocal && ronda.estadoRonda === 'activa') {
       setSonandoLocal(true);
-      reproducirConRampa(
+      reproducirOReanudar(
         ronda.audio,
-        (s) => {
-          // El admin puede enviar el progreso si quiere que la barra se sincronice perfectamente
-          if (sala.esAdmin) {
-             // Opcional: fetch(`/api/cancion/online/sala/${sala.code}/tick`, ...)
-          }
-        },
+        null,
         () => {
           setSonandoLocal(false);
-          // Audio finalizado, se detiene pero NO revelamos la solución
         }
       );
     } else if (!ronda.reproduciendo && sonandoLocal) {
       pausarAudio();
       setSonandoLocal(false);
     }
-  }, [sala?.ronda?.reproduciendo, sala?.ronda?.estadoRonda, sonandoLocal, sala?.esAdmin, sala?.code, sesion?.token]);
+  }, [sala?.ronda?.reproduciendo, sala?.ronda?.estadoRonda, sonandoLocal]);
 
   const handleCrear = async () => {
     if (!nombre.trim()) return;
@@ -201,7 +192,7 @@ export default function CancionOnline({ onLocal, onSalir }) {
       await fetch(`/api/cancion/online/sala/${sesion.code}/responder`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion.token, respuesta: '' }) // Envío vacío equivale a fallo
+        body: JSON.stringify({ token: sesion.token, respuesta: '' }) 
       });
       setMiTexto('');
     } catch (err) {
@@ -281,7 +272,6 @@ export default function CancionOnline({ onLocal, onSalir }) {
   const miJugador = sala?.jugadores?.find((j) => j.id === yoId);
   const estoyBloqueado = Boolean(miJugador?.bloqueado);
 
-  // Efecto para el temporizador sincronizado cuando alguien pulsa (60 segundos)
   useEffect(() => {
     if (!alguienHaPulsado || ronda?.estadoRonda !== 'activa') {
       if (timerRespuestaRef.current) clearInterval(timerRespuestaRef.current);
@@ -296,7 +286,7 @@ export default function CancionOnline({ onLocal, onSalir }) {
         if (prev <= 1) {
           clearInterval(timerRespuestaRef.current);
           if (soyElQueHaPulsado && enviarFalloTimeoutRef.current) {
-            enviarFalloTimeoutRef.current(); // Envía el error si somos nosotros
+            enviarFalloTimeoutRef.current(); 
           }
           return 0;
         }
@@ -313,14 +303,8 @@ export default function CancionOnline({ onLocal, onSalir }) {
 
   return (
     <div className="cancion-contenedor">
-      {/* ---------------- BOTÓN Y MODAL DE AYUDA ---------------- */}
       {mostrarAyuda && (
-        <button
-          type="button"
-          className="btn-ayuda-flotante"
-          onClick={() => setModalAyuda(true)}
-          title="Reglas del juego"
-        >
+        <button type="button" className="btn-ayuda-flotante" onClick={() => setModalAyuda(true)} title="Reglas del juego">
           <span className="btn-ayuda-flotante-signo">?</span>
         </button>
       )}
@@ -336,7 +320,7 @@ export default function CancionOnline({ onLocal, onSalir }) {
             <div className="aprox-modal-cuerpo">
               <p><strong>1. Dinámica musical:</strong></p>
               <ul>
-                <li>El anfitrión iniciará la canción. Empezará casi inaudible e irá <strong>subiendo gradualmente de volumen</strong>.</li>
+                <li>El anfitrión iniciará la canción que durará hasta un máximo de 30s.</li>
                 <li>En cuanto reconozcas el tema, <strong>pulsa el botón rojo</strong> para detener la reproducción de todos. Tienes <strong>60 segundos para responder</strong>.</li>
               </ul>
               <p><strong>2. Puntuación y rebote:</strong></p>
@@ -354,9 +338,7 @@ export default function CancionOnline({ onLocal, onSalir }) {
           </div>
         </div>
       )}
-      {/* ---------------- FIN AYUDA ---------------- */}
 
-      {/* 1. MENÚ ONLINE */}
       {vista === 'menu' && (
         <section className="game">
           <div className="panel center">
@@ -365,7 +347,7 @@ export default function CancionOnline({ onLocal, onSalir }) {
             </span>
             <h1 className="title">Afina ese oído Online</h1>
             <p className="hint">
-              Adivina la canción antes de que alcance su volumen máximo. ¡El más rápido en pulsar se la lleva!
+              Adivina la canción antes de que acabe. ¡El más rápido en pulsar se la lleva!
             </p>
 
             {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
@@ -385,7 +367,6 @@ export default function CancionOnline({ onLocal, onSalir }) {
         </section>
       )}
 
-      {/* 2. CREAR SALA */}
       {vista === 'crear' && (
         <section className="game">
           <div className="panel center">
@@ -401,12 +382,7 @@ export default function CancionOnline({ onLocal, onSalir }) {
                 maxLength={20}
                 autoFocus
               />
-              <button
-                className="big full"
-                style={{ marginTop: '1rem' }}
-                disabled={cargando || !nombre.trim()}
-                onClick={handleCrear}
-              >
+              <button className="big full" style={{ marginTop: '1rem' }} disabled={cargando || !nombre.trim()} onClick={handleCrear}>
                 Crear sala
               </button>
               <button className="secondary full" style={{ marginTop: '0.6rem' }} onClick={() => setVista('menu')}>
@@ -417,7 +393,6 @@ export default function CancionOnline({ onLocal, onSalir }) {
         </section>
       )}
 
-      {/* 3. UNIRSE A SALA */}
       {vista === 'unirse' && (
         <section className="game">
           <div className="panel center">
@@ -456,7 +431,6 @@ export default function CancionOnline({ onLocal, onSalir }) {
         </section>
       )}
 
-      {/* 4. LOBBY */}
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
         <section className="game">
           <div className="panel center">
@@ -481,12 +455,7 @@ export default function CancionOnline({ onLocal, onSalir }) {
               </span>
             </div>
             <p className="hint">Código de la partida</p>
-            <button
-              type="button"
-              className="qq-codigo-btn"
-              onClick={copiarCodigo}
-              title="Copiar código"
-            >
+            <button type="button" className="qq-codigo-btn" onClick={copiarCodigo} title="Copiar código">
               {sala.code}
             </button>
             <p className="hint small">
@@ -526,14 +495,12 @@ export default function CancionOnline({ onLocal, onSalir }) {
         </section>
       )}
 
-      {/* 5. JUGANDO ONLINE */}
       {vista === 'sala' && sala && sala.estado === 'jugando' && ronda && (
         <section className="game">
           <div className="hud">
             <span className="chip"><Icon name="flagFinish" size={18} />Ronda {sala.rondaNum}</span>
           </div>
 
-          {/* Marcador superior */}
           <div className="scoreboard-container" style={{ justifyContent: 'center', marginBottom: '0.8rem' }}>
             {sala.jugadores.map((j) => (
               <div key={j.id} className={`score-pill ${j.bloqueado ? 'locked' : ''}`}>
@@ -543,39 +510,49 @@ export default function CancionOnline({ onLocal, onSalir }) {
             ))}
           </div>
 
-          {/* Reproductor con rampa de volumen */}
-          <div className="cancion-player-box">
-            {esAdmin ? (
-              <button
-                type="button"
-                className={`cancion-play-btn ${ronda.reproduciendo ? 'sonando' : ''}`}
-                onClick={handlePlayAudio}
-                disabled={alguienHaPulsado || ronda.estadoRonda !== 'activa'}
-              >
-                <Icon name={ronda.reproduciendo ? 'pause' : 'play'} size={42} strokeWidth={2.5} />
-              </button>
-            ) : (
-              <div className={`cancion-play-btn ${ronda.reproduciendo ? 'sonando' : ''}`} style={{ cursor: 'default' }}>
-                <Icon name="music" size={42} strokeWidth={2.5} />
+          <div className="panel" style={{ marginBottom: '1.2rem', padding: '1.2rem' }}>
+            <div className="adv-pista-caja activa" style={{ margin: 0, width: '100%' }}>
+              <span className="adv-pista-badge" style={{ marginBottom: '0.8rem' }}>
+                🎵 MÚSICA DEL TEMA (30S)
+              </span>
+              <div className="adv-audio-player" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.5rem', marginTop: '0.2rem' }}>
+                {ronda.audio ? (
+                  esAdmin ? (
+                    <button
+                      type="button"
+                      className={`adv-btn-audio ${ronda.reproduciendo ? 'sonando' : ''}`}
+                      onClick={handlePlayAudio}
+                      disabled={alguienHaPulsado || ronda.estadoRonda !== 'activa'}
+                    >
+                      <Icon name={ronda.reproduciendo ? 'pause' : 'play'} size={20} />
+                      {ronda.reproduciendo
+                        ? 'Pausar canción (Admin)'
+                        : 'Reproducir / Reanudar (30s)'}
+                    </button>
+                  ) : (
+                    <div className={`adv-btn-audio ${ronda.reproduciendo ? 'sonando' : ''}`} style={{ cursor: 'default', opacity: 1 }}>
+                      <Icon name={ronda.reproduciendo ? 'music' : 'pause'} size={20} />
+                      {ronda.reproduciendo
+                        ? 'Escuchando canción...'
+                        : 'Música pausada'}
+                    </div>
+                  )
+                ) : (
+                  <p className="hint">Audio no disponible para este tema.</p>
+                )}
+
+                {ronda.audio && (
+                  <p className="hint" style={{ fontSize: '0.75rem', marginTop: '0.3rem' }}>
+                    Fragmento de audio proporcionado por{' '}
+                    <a href="https://www.deezer.com" target="_blank" rel="noopener noreferrer">Deezer</a>
+                  </p>
+                )}
               </div>
-            )}
-
-            <span className="cancion-timer-tag">
-              {ronda.reproduciendo ? '¡Música sonando!' : 'Pausado'}
-            </span>
-            <span className="hint small">Subiendo gradualmente de volumen</span>
-
-            <div className="cancion-volume-meter">
-              <div
-                className="cancion-volume-fill"
-                style={{ width: `${((30 - (ronda.segundosRestantes || 30)) / 30) * 100}%` }}
-              />
             </div>
           </div>
 
-          {/* Zona del pulsador interactivo online */}
           {ronda.estadoRonda === 'activa' ? (
-            <div className="cancion-pulsador-wrapper">
+            <div className="cancion-pulsador-wrapper" style={{ marginTop: '0' }}>
               {!alguienHaPulsado && (
                 <div className="pulsador-container">
                   <button
@@ -598,14 +575,9 @@ export default function CancionOnline({ onLocal, onSalir }) {
                 </div>
               )}
 
-              {/* Si alguien ha pulsado, mostrar el temporizador de 60s para todos */}
               {alguienHaPulsado && (
                 <div style={{ padding: '0', marginTop: '0.5rem', marginBottom: '0.8rem', width: '100%' }}>
-                  <div
-                    className="timer"
-                    role="timer"
-                    style={{ margin: '0.4rem 0', background: '#e2e8f0', borderRadius: '9999px', height: '8px', overflow: 'hidden' }}
-                  >
+                  <div className="timer" role="timer" style={{ margin: '0.4rem 0', background: '#e2e8f0', borderRadius: '9999px', height: '8px', overflow: 'hidden' }}>
                     <div
                       className={`timer-bar ${tiempoRespuesta <= 15 ? 'low' : ''}`}
                       style={{
@@ -617,27 +589,19 @@ export default function CancionOnline({ onLocal, onSalir }) {
                       }}
                     />
                   </div>
-                  <p
-                    className="timer-text"
-                    style={{
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem',
-                      color: tiempoRespuesta <= 15 ? '#dc2626' : '#64748b', fontSize: '0.9rem', fontWeight: 700, margin: '0'
-                    }}
-                  >
+                  <p className="timer-text" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem', color: tiempoRespuesta <= 15 ? '#dc2626' : '#64748b', fontSize: '0.9rem', fontWeight: 700, margin: '0' }}>
                     <Icon name="clock" size={16} />
                     {tiempoRespuesta} s para responder
                   </p>
                 </div>
               )}
 
-              {/* Si yo he pulsado */}
               {soyElQueHaPulsado && (
                 <form onSubmit={handleEnviarRespuesta} className="respuesta-pulsada-box" style={{ width: '100%' }}>
                   <div className="respuesta-pulsada-header">
                     <span className="pulsado-badge">🔴 Tiempo detenido (+10 / -5 pts)</span>
                     <p className="hint small" style={{ margin: '0.3rem 0' }}>Escribe el nombre de la canción:</p>
                   </div>
-
                   <div className="answer-form">
                     <input
                       autoFocus
@@ -654,7 +618,6 @@ export default function CancionOnline({ onLocal, onSalir }) {
                 </form>
               )}
 
-              {/* Si otro jugador ha pulsado */}
               {alguienHaPulsado && !soyElQueHaPulsado && (
                 <div className="online-tecleo-preview-card" style={{ width: '100%' }}>
                   <p>🔴 <strong>{ronda.pulsado.nombre}</strong> ha pulsado:</p>
@@ -697,14 +660,9 @@ export default function CancionOnline({ onLocal, onSalir }) {
         </section>
       )}
 
-      {/* MODAL DE CONFIRMACIÓN PARA SALIR */}
       {modalSalir && (
         <div className="rg-modal-fondo" onClick={() => setModalSalir(false)}>
-          <div 
-            className="rg-modal" 
-            onClick={(e) => e.stopPropagation()} 
-            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
-          >
+          <div className="rg-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}>
             <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
             <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
               ¿Abandonar la partida?
@@ -714,11 +672,7 @@ export default function CancionOnline({ onLocal, onSalir }) {
             </p>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
-              <button 
-                type="button" 
-                className="secondary full" 
-                onClick={() => setModalSalir(false)}
-              >
+              <button type="button" className="secondary full" onClick={() => setModalSalir(false)}>
                 No, quedarme
               </button>
               <button 

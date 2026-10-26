@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
 import GameIntro from '../../components/GameIntro.jsx';
-import { reproducirConRampa, pausarAudio, reanudarAudio, detenerReproduccion } from './audioPlayerCancion.js';
+import { reproducir, pausarAudio, reanudarAudio, detenerReproduccion } from './audioPlayerCancion.js';
 import './Cancion.css';
-import '../Adivina/Adivina.css';
+import '../Adivina/Adivina.css'; // Usamos estilos del reproductor de Adivina
 
 const MIN_JUGADORES = 2;
 const MAX_JUGADORES = 20;
-const TIEMPO_RESPUESTA = 60; // Actualizado a 60 segundos
+const TIEMPO_RESPUESTA = 60;
 
 export default function CancionLocal({ onVolver, onExit }) {
-  const [fase, setFase] = useState('setup'); // 'setup' | 'jugando' | 'resolucion' | 'final'
+  const [fase, setFase] = useState('setup');
   const [modalAyuda, setModalAyuda] = useState(false);
 
   const [numJugadores, setNumJugadores] = useState(4);
@@ -27,17 +27,14 @@ export default function CancionLocal({ onVolver, onExit }) {
   const [usados, setUsados] = useState([]);
   const [bloqueados, setBloqueados] = useState([]);
 
-  // Audio progress (no fuerza final de ronda)
   const [sonando, setSonando] = useState(false);
   const [segundosAudio, setSegundosAudio] = useState(30);
 
-  // Pulsador
   const [pulsado, setPulsado] = useState(false);
   const [inputTexto, setInputTexto] = useState('');
   const [mensajeFeedback, setMensajeFeedback] = useState(null);
   const [resultadoRonda, setResultadoRonda] = useState(null);
 
-  // Temporizador para responder una vez pulsado
   const [tiempoRespuesta, setTiempoRespuesta] = useState(TIEMPO_RESPUESTA);
   const timerRespuestaRef = useRef(null);
 
@@ -109,14 +106,15 @@ export default function CancionLocal({ onVolver, onExit }) {
       setSonando(false);
     } else {
       setSonando(true);
-      reproducirConRampa(
-        cancionActual?.audio,
-        (s) => setSegundosAudio(s),
-        () => {
-          // El audio finalizó, pero no forzamos revelarSolucion
-          setSonando(false);
-        }
-      );
+      if (segundosAudio < 30 && segundosAudio > 0) {
+        reanudarAudio();
+      } else {
+        reproducir(
+          cancionActual?.audio,
+          (s) => setSegundosAudio(s),
+          () => setSonando(false)
+        );
+      }
     }
   };
 
@@ -133,7 +131,6 @@ export default function CancionLocal({ onVolver, onExit }) {
     setPulsado(false);
     setInputTexto('');
     setTiempoRespuesta(TIEMPO_RESPUESTA);
-    // Solo reanudamos la música si todavía queda audio (segundosAudio > 0)
     if (segundosAudio > 0) {
       setSonando(true);
       reanudarAudio();
@@ -145,7 +142,6 @@ export default function CancionLocal({ onVolver, onExit }) {
     cancelarPulsadoRef.current = cancelarPulsado;
   });
 
-  // Efecto para el temporizador de 60 segundos al responder
   useEffect(() => {
     if (!pulsado) {
       if (timerRespuestaRef.current) clearInterval(timerRespuestaRef.current);
@@ -159,7 +155,7 @@ export default function CancionLocal({ onVolver, onExit }) {
       setTiempoRespuesta((prev) => {
         if (prev <= 1) {
           clearInterval(timerRespuestaRef.current);
-          if (cancelarPulsadoRef.current) cancelarPulsadoRef.current(); // Cierra el modal de respuesta
+          if (cancelarPulsadoRef.current) cancelarPulsadoRef.current();
           return 0;
         }
         return prev - 1;
@@ -199,7 +195,7 @@ export default function CancionLocal({ onVolver, onExit }) {
           tipo: 'acierto',
           ganador: jugador,
           puntos: data.puntosAcierto,
-          titulo: `${data.tituloReal} —${data.artistaReal}`
+          titulo: `${data.tituloReal} — ${data.artistaReal}`
         });
         setFase('resolucion');
       } else {
@@ -241,7 +237,7 @@ export default function CancionLocal({ onVolver, onExit }) {
 
       setResultadoRonda({
         tipo: motivo,
-        titulo: `${data.titulo} —${data.artista}`
+        titulo: `${data.titulo} — ${data.artista}`
       });
       setFase('resolucion');
     } catch {
@@ -262,15 +258,9 @@ export default function CancionLocal({ onVolver, onExit }) {
 
   return (
     <div className="cancion-contenedor">
-      {/* AYUDA */}
       {fase === 'setup' && (
         <>
-          <button
-            type="button"
-            className="btn-ayuda-flotante"
-            onClick={() => setModalAyuda(true)}
-            title="Reglas del juego"
-          >
+          <button type="button" className="btn-ayuda-flotante" onClick={() => setModalAyuda(true)} title="Reglas del juego">
             <span className="btn-ayuda-flotante-signo">?</span>
           </button>
 
@@ -285,9 +275,9 @@ export default function CancionLocal({ onVolver, onExit }) {
                 <div className="modal-ayuda-cuerpo">
                   <p><strong>1. Dinámica musical:</strong></p>
                   <ul>
-                    <li>Pulsa el reproductor para iniciar la canción.</li>
-                    <li>Empezará casi inaudible e irá <strong>subiendo gradualmente de volumen</strong>.</li>
-                    <li>En cuanto reconozcas el tema, <strong>pulsa el botón rojo</strong> para detener la reproducción automáticamente. Tienes <strong>60 segundos para responder</strong>.</li>
+                    <li>Pulsa el reproductor para escuchar el tema. El volumen es progresivo.</li>
+                    <li>En cuanto reconozcas el tema, <strong>pulsa el botón rojo</strong> para detener el tiempo. Dispondrás de <strong>60 segundos para responder</strong>.</li>
+                    <li>Si cierras la ventana de respuesta, el audio se reanudará en lugar de empezar de 0.</li>
                   </ul>
                   <p><strong>2. Puntuación y rebote:</strong></p>
                   <ul>
@@ -307,7 +297,6 @@ export default function CancionLocal({ onVolver, onExit }) {
         </>
       )}
 
-      {/* 1. SETUP */}
       {fase === 'setup' && (
         <section className="game">
           <GameIntro gameId="cancion" titulo="Afina ese oído" />
@@ -323,11 +312,7 @@ export default function CancionLocal({ onVolver, onExit }) {
             <label className="field-label" htmlFor="num-jugadores-can">
               Número de jugadores
             </label>
-            <select
-              id="num-jugadores-can"
-              value={numJugadores}
-              onChange={handleNumChange}
-            >
+            <select id="num-jugadores-can" value={numJugadores} onChange={handleNumChange}>
               {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => (
                 <option key={i + MIN_JUGADORES} value={i + MIN_JUGADORES}>
                   {i + MIN_JUGADORES} jugadores
@@ -357,14 +342,12 @@ export default function CancionLocal({ onVolver, onExit }) {
         </section>
       )}
 
-      {/* 2. JUGANDO */}
       {fase === 'jugando' && cancionActual && (
         <section className="game">
           <div className="hud">
             <span className="chip"><Icon name="flagFinish" size={18} />Ronda {rondaNum}</span>
           </div>
 
-          {/* Marcador superior */}
           <div className="scoreboard-container" style={{ justifyContent: 'center', marginBottom: '0.8rem' }}>
             {jugadores.map((j) => (
               <div key={j.id} className={`score-pill ${bloqueados.includes(j.id) ? 'locked' : ''}`}>
@@ -374,38 +357,46 @@ export default function CancionLocal({ onVolver, onExit }) {
             ))}
           </div>
 
-          {/* Reproductor con subida gradual de volumen */}
-          <div className="cancion-player-box">
-            <button
-              type="button"
-              className={`cancion-play-btn ${sonando ? 'sonando' : ''}`}
-              onClick={toggleReproductor}
-              disabled={pulsado}
-            >
-              <Icon name={sonando ? 'pause' : 'play'} size={42} strokeWidth={2.5} />
-            </button>
-            <span className="cancion-timer-tag">
-              {sonando ? '¡Música sonando!' : segundosAudio === 30 ? 'Pulsa para reproducir' : 'Pausado'}
-            </span>
-            <span className="hint small">Volumen en aumento progresivo</span>
-
-            <div className="cancion-volume-meter">
-              <div
-                className="cancion-volume-fill"
-                style={{ width: `${((30 - segundosAudio) / 30) * 100}%` }}
-              />
+          <div className="panel" style={{ marginBottom: '1.2rem', padding: '1.2rem' }}>
+            <div className="adv-pista-caja activa" style={{ margin: 0, width: '100%' }}>
+              <span className="adv-pista-badge" style={{ marginBottom: '0.8rem' }}>
+                🎵 MÚSICA DEL TEMA (30S)
+              </span>
+              <div className="adv-audio-player" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '0.5rem', marginTop: '0.2rem' }}>
+                {cancionActual.audio ? (
+                  <button
+                    type="button"
+                    className={`adv-btn-audio ${sonando ? 'sonando' : ''}`}
+                    onClick={toggleReproductor}
+                    disabled={pulsado}
+                  >
+                    <Icon name={sonando ? 'pause' : 'play'} size={20} />
+                    {sonando
+                      ? `Reproduciendo música (${segundosAudio}s)...`
+                      : segundosAudio < 30 && segundosAudio > 0
+                      ? `Reanudar música (${segundosAudio}s restantes)`
+                      : 'Escuchar la canción (30s)'}
+                  </button>
+                ) : (
+                  <p className="hint">Audio no disponible para este tema.</p>
+                )}
+                {cancionActual.audio && (
+                  <p className="hint" style={{ fontSize: '0.75rem', marginTop: '0.3rem' }}>
+                    Fragmento de audio proporcionado por{' '}
+                    <a href="https://www.deezer.com" target="_blank" rel="noopener noreferrer">Deezer</a>
+                  </p>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Feedback de rebote o error */}
           {mensajeFeedback && (
             <div className={`status-alert ${mensajeFeedback.tipo}`} style={{ marginBottom: '1rem' }}>
               {mensajeFeedback.texto}
             </div>
           )}
 
-          {/* PULSADOR Y CAJA DE RESPUESTA */}
-          <div className="cancion-pulsador-wrapper">
+          <div className="cancion-pulsador-wrapper" style={{ marginTop: '0' }}>
             {!pulsado ? (
               <div className="pulsador-container">
                 <button
@@ -433,7 +424,6 @@ export default function CancionLocal({ onVolver, onExit }) {
                   </p>
                 </div>
 
-                {/* Temporizador de respuesta */}
                 <div style={{ padding: '0', marginTop: '0.5rem', marginBottom: '0.8rem' }}>
                   <div
                     className="timer"
@@ -501,22 +491,18 @@ export default function CancionLocal({ onVolver, onExit }) {
         </section>
       )}
 
-      {/* 3. RESOLUCIÓN */}
       {fase === 'resolucion' && resultadoRonda && (
         <section className="game">
           <div className="end-card">
             <span className="end-icon">
               <Icon name={resultadoRonda.tipo === 'acierto' ? 'trophy' : 'hourglass'} size={44} />
             </span>
-
             <h1 className="title">
               {resultadoRonda.tipo === 'acierto' ? '¡Canción adivinada!' : 'Fin de la ronda'}
             </h1>
-
             <p className="reveal" style={{ fontSize: '1.4rem', margin: '0.8rem 0' }}>
               🎵 <strong>{resultadoRonda.titulo}</strong>
             </p>
-
             <p className="categoria">
               {resultadoRonda.tipo === 'acierto'
                 ? `¡${resultadoRonda.ganador.nombre} ha acertado y suma +${resultadoRonda.puntos} puntos!`
@@ -541,7 +527,6 @@ export default function CancionLocal({ onVolver, onExit }) {
               })}
             </div>
           </div>
-
           <div className="actions">
             <button onClick={siguienteRonda}>
               <Icon name="play" size={20} /> Siguiente canción ({rondaNum + 1})
@@ -553,7 +538,6 @@ export default function CancionLocal({ onVolver, onExit }) {
         </section>
       )}
 
-      {/* 4. PODIO FINAL */}
       {fase === 'final' && (
         <section className="game">
           <div className="end-card">

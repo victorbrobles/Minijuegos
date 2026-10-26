@@ -1,18 +1,18 @@
 // client/src/games/Cancion/audioPlayerCancion.js
 
 let reproductorActual = null;
-let temporizadorCorte = null;
 let intervaloProgreso = null;
+let tickGlobal = null;
+let terminarGlobal = null;
+let tiempoRestante = 30;
 
-// Contexto y nodos de la Web Audio API para compatibilidad móvil
 let audioContext = null;
 let gainNode = null;
 let sourceNode = null;
 
-// Rango de volumen interno (desde un 0.1% casi inaudible hasta el 45% máximo)
-const VOL_INICIAL = 0.001;
-const VOL_MAX_MEDIO = 0.45;
-const DURACION_TOTAL = 30;
+const DURACION_TOTAL = 30; // Adaptado a 30 segundos
+const VOL_INICIAL = 0.02;  // Ligeramente audible al principio
+const VOL_MAX = 0.50;      // Volumen máximo
 
 function obtenerAudioContext() {
   const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -27,9 +27,14 @@ function obtenerAudioContext() {
 }
 
 function aplicarGanancia(volumen) {
-  const clampedVol = Math.min(VOL_MAX_MEDIO, Math.max(VOL_INICIAL, volumen));
+  const clampedVol = Math.min(VOL_MAX, Math.max(VOL_INICIAL, volumen));
+  
+  // Fallback estándar 
+  if (reproductorActual) {
+    try { reproductorActual.volume = clampedVol; } catch (e) {}
+  }
 
-  // 1. Modulación por Web Audio API (imprescindible en móviles iOS y Android)
+  // API Web Audio (Vital para controlar volumen en iOS/Android)
   if (gainNode && gainNode.gain) {
     if (audioContext && audioContext.currentTime) {
       gainNode.gain.cancelScheduledValues(audioContext.currentTime);
@@ -38,95 +43,80 @@ function aplicarGanancia(volumen) {
       gainNode.gain.value = clampedVol;
     }
   }
-
-  // 2. Modulación clásica como fallback para navegadores de escritorio
-  if (reproductorActual) {
-    try {
-      reproductorActual.volume = clampedVol;
-    } catch (_) {}
-  }
 }
 
-export function reproducirConRampa(urlAudio, onTickSegundos, onTerminar) {
+export function reproducir(urlAudio, onTick, onTerminar) {
   detenerReproduccion();
 
   if (!urlAudio) {
-    console.warn('No se proporcionó URL de audio para reproducir.');
+    if (onTerminar) onTerminar();
     return;
   }
 
-  const audio = new Audio();
-  // Permite que Web Audio API procese el audio sin restricciones de origen
-  audio.crossOrigin = 'anonymous';
-  audio.src = urlAudio;
-  audio.preload = 'auto';
-  reproductorActual = audio;
+  // Es crítico establecer crossOrigin y volume ANTES que el src
+  reproductorActual = new Audio();
+  reproductorActual.crossOrigin = 'anonymous';
+  reproductorActual.volume = VOL_INICIAL;
+  reproductorActual.src = urlAudio;
+  reproductorActual.preload = 'auto';
 
-  // Configuración de la cadena Web Audio API
   const ctx = obtenerAudioContext();
   if (ctx) {
     try {
-      sourceNode = ctx.createMediaElementSource(audio);
+      sourceNode = ctx.createMediaElementSource(reproductorActual);
       gainNode = ctx.createGain();
       gainNode.gain.value = VOL_INICIAL;
       sourceNode.connect(gainNode);
       gainNode.connect(ctx.destination);
     } catch (e) {
-      console.warn('Fallback a audio estándar:', e);
+      console.warn('CORS bloqueó WebAudio, usando fallback estándar:', e);
     }
   }
 
-  aplicarGanancia(VOL_INICIAL);
+  tiempoRestante = DURACION_TOTAL;
+  tickGlobal = onTick;
+  terminarGlobal = onTerminar;
 
-  let segundosRestantes = DURACION_TOTAL;
-  if (onTickSegundos) onTickSegundos(segundosRestantes);
+  if (tickGlobal) tickGlobal(tiempoRestante);
 
-  audio.play()
-    .then(() => {
-      if (ctx && ctx.state === 'suspended') {
-        ctx.resume().catch(() => {});
-      }
+  reproductorActual.play().then(() => {
+    if (ctx && ctx.state === 'suspended') ctx.resume().catch(()=>{});
+    iniciarIntervalo();
+  }).catch((err) => {
+    console.error("Error reproduciendo:", err);
+    if (onTerminar) onTerminar();
+  });
+}
 
-      const intervaloMs = 100;
-      let tickActual = 0;
+function iniciarIntervalo() {
+  if (intervaloProgreso) clearInterval(intervaloProgreso);
+  
+  intervaloProgreso = setInterval(() => {
+    if (!reproductorActual) return;
 
-      intervaloProgreso = setInterval(() => {
-        tickActual += 1;
-        const tiempoTranscurrido = (tickActual * intervaloMs) / 1000;
-        const segundosEnterosRestantes = Math.max(0, Math.ceil(DURACION_TOTAL - tiempoTranscurrido));
+    // Calculamos el volumen en tiempo real basado en el currentTime exacto
+    const current = reproductorActual.currentTime;
+    const progreso = Math.min(1, current / DURACION_TOTAL);
+    
+    // Curva exponencial (2.5) para una sensación natural de tensión
+    const factor = Math.pow(progreso, 2.5);
+    const vol = VOL_INICIAL + (VOL_MAX - VOL_INICIAL) * factor;
+    
+    aplicarGanancia(vol);
 
-        const progreso = Math.min(1, tiempoTranscurrido / DURACION_TOTAL);
-        // Curva cúbica (t^3) para una subida suave y progresiva
-        const factorCurva = Math.pow(progreso, 3);
-        const nuevoVolumen = VOL_INICIAL + (VOL_MAX_MEDIO - VOL_INICIAL) * factorCurva;
+    tiempoRestante = Math.max(0, Math.ceil(DURACION_TOTAL - current));
+    if (tickGlobal) tickGlobal(tiempoRestante);
 
-        aplicarGanancia(nuevoVolumen);
-
-        if (tickActual % (1000 / intervaloMs) === 0) {
-          if (onTickSegundos) onTickSegundos(segundosEnterosRestantes);
-        }
-
-        if (tiempoTranscurrido >= DURACION_TOTAL) {
-          detenerReproduccion();
-          if (onTerminar) onTerminar();
-        }
-      }, intervaloMs);
-
-      temporizadorCorte = setTimeout(() => {
-        detenerReproduccion();
-        if (onTerminar) onTerminar();
-      }, DURACION_TOTAL * 1000);
-    })
-    .catch((error) => {
-      console.error('Error al reproducir audio:', error);
-    });
+    if (current >= DURACION_TOTAL || reproductorActual.ended) {
+      detenerReproduccion();
+      if (terminarGlobal) terminarGlobal();
+    }
+  }, 100);
 }
 
 export function pausarAudio() {
   if (reproductorActual) {
-    try {
-      reproductorActual.pause();
-    } catch (_) {}
+    try { reproductorActual.pause(); } catch (e) {}
   }
   if (intervaloProgreso) {
     clearInterval(intervaloProgreso);
@@ -135,14 +125,23 @@ export function pausarAudio() {
 }
 
 export function reanudarAudio() {
-  const ctx = obtenerAudioContext();
-  if (ctx && ctx.state === 'suspended') {
-    ctx.resume().catch(() => {});
+  if (reproductorActual && tiempoRestante > 0) {
+    const ctx = obtenerAudioContext();
+    if (ctx && ctx.state === 'suspended') ctx.resume().catch(()=>{});
+
+    reproductorActual.play().then(() => {
+      iniciarIntervalo();
+    }).catch(() => {});
   }
-  if (reproductorActual) {
-    try {
-      reproductorActual.play().catch(() => {});
-    } catch (_) {}
+}
+
+export function reproducirOReanudar(urlAudio, onTick, onTerminar) {
+  if (reproductorActual && reproductorActual.src === urlAudio && tiempoRestante > 0) {
+    if (onTick) tickGlobal = onTick;
+    if (onTerminar) terminarGlobal = onTerminar;
+    reanudarAudio();
+  } else {
+    reproducir(urlAudio, onTick, onTerminar);
   }
 }
 
@@ -150,10 +149,6 @@ export function detenerReproduccion() {
   if (intervaloProgreso) {
     clearInterval(intervaloProgreso);
     intervaloProgreso = null;
-  }
-  if (temporizadorCorte) {
-    clearTimeout(temporizadorCorte);
-    temporizadorCorte = null;
   }
   if (reproductorActual) {
     try {
@@ -163,15 +158,11 @@ export function detenerReproduccion() {
     reproductorActual = null;
   }
   if (sourceNode) {
-    try {
-      sourceNode.disconnect();
-    } catch (_) {}
+    try { sourceNode.disconnect(); } catch (_) {}
     sourceNode = null;
   }
   if (gainNode) {
-    try {
-      gainNode.disconnect();
-    } catch (_) {}
+    try { gainNode.disconnect(); } catch (_) {}
     gainNode = null;
   }
 }
