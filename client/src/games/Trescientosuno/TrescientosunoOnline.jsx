@@ -5,7 +5,7 @@ import './Trescientosuno.css';
 const CLAVE_SESION_trescientosuno = 'trescientosuno_online_session';
 
 const ESCUDOS_MAP = {
-  // Clubes (Tus URLs exactas)
+  // Clubes
   barcelona: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
   fcbarcelona: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
   madrid: "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg",
@@ -243,10 +243,7 @@ export default function TrescientosunoOnline({ onLocal, onSalir }) {
       setOpcionesReveladas(null);
     } catch (err) {
       setErrorJuego(err.message);
-      // Consumimos el comodin localmente visualmente si el backend devuelve un error de fallo, 
-      // pero el backend ya se encarga de quitartelo si el mensaje se envió
-      setComodinActivo(null);
-      setOpcionesReveladas(null);
+      // No reseteamos el comodín aquí para que puedan intentarlo de nuevo en el mismo turno
     } finally {
       setEnviando(false);
     }
@@ -258,6 +255,19 @@ export default function TrescientosunoOnline({ onLocal, onSalir }) {
     setErrorJuego('');
     try {
       await llamar('plantarse');
+    } catch (err) {
+      setErrorJuego(err.message);
+    } finally {
+      setEnviando(false);
+    }
+  };
+
+  const pasarTurno = async () => {
+    if (enviando) return;
+    setEnviando(true);
+    setErrorJuego('');
+    try {
+      await llamar('pasar');
     } catch (err) {
       setErrorJuego(err.message);
     } finally {
@@ -361,7 +371,7 @@ export default function TrescientosunoOnline({ onLocal, onSalir }) {
                 <li>Por turnos, introduce el nombre de un jugador que haya estado en ese club.</li>
                 <li>Se restarán de tu marcador los puntos correspondientes a ese jugador.</li>
                 <li>Dispones de 4 comodines por equipo (x2, x3, x5 y Revelar). Úsalos sabiamente antes de escribir.</li>
-                <li>Si no lo aciertas o no respondes a tiempo, perderás tu turno pero seguirás vivo.</li>
+                <li>Si no lo aciertas o el jugador no existe, conservarás tu turno para seguir probando.</li>
                 <li>¡Cuidado! Si te pasas del 0 exacto, o nombras a alguien con 0 en esa estadística, quedas eliminado.</li>
               </ul>
             </div>
@@ -754,14 +764,22 @@ export default function TrescientosunoOnline({ onLocal, onSalir }) {
                           key={op.nombre} 
                           type="button"
                           className="btn-opcion-revelada"
-                          onClick={(e) => enviarJugador(op.nombre, e)}
+                          onClick={() => enviarJugador(op.nombre)}
                         >
                           {op.nombre}
                         </button>
                       )) : <p className="hint">No quedan jugadores disponibles.</p>}
+                      <button 
+                        type="button" 
+                        className="secondary" 
+                        style={{marginTop: '0.5rem'}}
+                        onClick={() => { setComodinActivo(null); setOpcionesReveladas(null); }}
+                      >
+                        Ninguno (Volver)
+                      </button>
                     </div>
                   ) : (
-                    <form onSubmit={(e) => enviarJugador(inputJugador, e)} className="tcu-form">
+                    <form onSubmit={(e) => { e.preventDefault(); enviarJugador(inputJugador); }} className="tcu-form">
                       <input
                         type="text"
                         value={inputJugador}
@@ -773,6 +791,7 @@ export default function TrescientosunoOnline({ onLocal, onSalir }) {
                       {errorJuego && <p className="error" style={{ marginBottom: '1rem' }}>{errorJuego}</p>}
                       <div className="tcu-actions">
                         <button type="submit" className="btn-start" style={{ width: '100%' }} disabled={enviando || !inputJugador.trim()}>Enviar</button>
+                        <button type="button" className="secondary" disabled={enviando} onClick={pasarTurno}>Pasar</button>
                         <button type="button" className="secondary danger" disabled={enviando} onClick={plantarse}>Plantarse</button>
                       </div>
                     </form>

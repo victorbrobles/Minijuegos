@@ -9,7 +9,7 @@ const MAX_JUGADORES = 12;
 const TIEMPO_TURNO = 60;
 
 const ESCUDOS_MAP = {
-  // Clubes (Tus URLs exactas)
+  // Clubes
   barcelona: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
   fcbarcelona: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
   madrid: "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg",
@@ -214,7 +214,13 @@ export default function TrescientosunoLocal({ onVolver, onExit }) {
     timerRef.current = setInterval(() => {
       const restante = Math.max(0, Math.ceil((finTurnoRef.current - Date.now()) / 1000));
       setTiempoRestante(restante);
-      if (restante <= 0) handlePierdeTurno('¡Tiempo agotado!');
+      if (restante <= 0) {
+        detenerTemporizador();
+        consumirComodinActivo();
+        const currId = jugadoresRef.current[turnoRef.current].id;
+        setUltimoAcierto({ tipo: 'fallo', msj: '¡Tiempo agotado!', jugadorId: currId });
+        despuesDe(2000, pasarTurno);
+      }
     }, 250);
   };
 
@@ -252,14 +258,6 @@ export default function TrescientosunoLocal({ onVolver, onExit }) {
     actualizarActual({ comodines: jActual.comodines.filter(c => c !== comodinActivo) });
   };
 
-  const handlePierdeTurno = (motivo) => {
-    detenerTemporizador();
-    consumirComodinActivo();
-    const currId = jugadoresRef.current[turnoRef.current].id;
-    setUltimoAcierto({ tipo: 'fallo', msj: motivo, jugadorId: currId });
-    despuesDe(2000, pasarTurno);
-  };
-
   const handleEliminacion = (motivo) => {
     detenerTemporizador();
     consumirComodinActivo();
@@ -275,6 +273,13 @@ export default function TrescientosunoLocal({ onVolver, onExit }) {
     actualizarActual({ estado: 'plantado' });
     setUltimoAcierto({ tipo: 'plantado', msj: `${jugadoresRef.current[turnoRef.current].nombre} se ha plantado.`, jugadorId: currId });
     despuesDe(1500, pasarTurno);
+  };
+
+  const handlePasar = () => {
+    detenerTemporizador();
+    const currId = jugadoresRef.current[turnoRef.current].id;
+    setUltimoAcierto({ tipo: 'fallo', msj: `${jugadoresRef.current[turnoRef.current].nombre} ha pasado el turno.`, jugadorId: currId });
+    despuesDe(2000, pasarTurno);
   };
 
   const activarRevelar = async () => {
@@ -299,7 +304,7 @@ export default function TrescientosunoLocal({ onVolver, onExit }) {
   const validarJugador = async (nombreAValidar) => {
     if (ultimoAcierto) return;
     if (!nombreAValidar.trim()) {
-      handlePierdeTurno('No has escrito ningún jugador.');
+      setMensajeError('No has escrito ningún jugador.');
       return;
     }
 
@@ -313,9 +318,9 @@ export default function TrescientosunoLocal({ onVolver, onExit }) {
       if (!res.ok) {
         try {
           const errData = await res.json();
-          handlePierdeTurno(errData.error || `Error del servidor: ${res.status}`);
+          setMensajeError(errData.error || `Error del servidor: ${res.status}`);
         } catch {
-          handlePierdeTurno(`Error del servidor: ${res.status}`);
+          setMensajeError(`Error del servidor: ${res.status}`);
         }
         return;
       }
@@ -323,13 +328,13 @@ export default function TrescientosunoLocal({ onVolver, onExit }) {
       const data = await res.json();
 
       if (!(data.success && data.encontrado)) {
-        handlePierdeTurno(data.mensaje || 'Jugador no encontrado.');
+        setMensajeError(data.mensaje || 'Jugador no encontrado.');
         return;
       }
 
       const jbd = data.jugador;
       if (jugadoresUsados.includes(jbd.nombre)) {
-        handlePierdeTurno(`${jbd.nombre} ya ha sido dicho.`);
+        setMensajeError(`${jbd.nombre} ya ha sido dicho.`);
         return;
       }
 
@@ -367,7 +372,7 @@ export default function TrescientosunoLocal({ onVolver, onExit }) {
         despuesDe(2500, pasarTurno);
       }
     } catch (err) {
-      handlePierdeTurno('Error de conexión.');
+      setMensajeError('Error de conexión.');
     }
   };
 
@@ -402,7 +407,7 @@ export default function TrescientosunoLocal({ onVolver, onExit }) {
                 <li>Por turnos, introduce el nombre de un jugador que haya estado en ese club.</li>
                 <li>Se restarán de tu marcador los puntos correspondientes a ese jugador.</li>
                 <li>Dispones de 4 comodines por equipo (x2, x3, x5 y Revelar). Úsalos sabiamente antes de escribir.</li>
-                <li>Si no lo aciertas o no respondes a tiempo, perderás tu turno pero seguirás vivo.</li>
+                <li>Si no lo aciertas o el jugador no existe, conservarás tu turno para seguir probando.</li>
                 <li>¡Cuidado! Si te pasas del 0 exacto, o nombras a alguien con 0 en esa estadística, quedas eliminado.</li>
               </ul>
             </div>
@@ -653,6 +658,14 @@ export default function TrescientosunoLocal({ onVolver, onExit }) {
                         {op.nombre}
                       </button>
                     )) : <p className="hint">No quedan jugadores disponibles.</p>}
+                    <button 
+                      type="button" 
+                      className="secondary" 
+                      style={{marginTop: '0.5rem'}}
+                      onClick={() => { setComodinActivo(null); setOpcionesReveladas(null); }}
+                    >
+                      Ninguno (Volver)
+                    </button>
                   </div>
                 ) : (
                   <form onSubmit={(e) => { e.preventDefault(); validarJugador(inputJugador); }} className="tcu-form">
@@ -667,6 +680,7 @@ export default function TrescientosunoLocal({ onVolver, onExit }) {
                     {mensajeError && <p className="error" style={{ marginBottom: '1rem' }}>{mensajeError}</p>}
                     <div className="tcu-actions">
                       <button type="submit" className="btn-start" style={{ width: '100%' }}>Enviar</button>
+                      <button type="button" className="secondary" onClick={handlePasar}>Pasar</button>
                       <button type="button" className="secondary danger" onClick={handlePlantarse}>Plantarse</button>
                     </div>
                   </form>

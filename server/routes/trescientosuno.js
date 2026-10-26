@@ -37,7 +37,6 @@ function buscarJugador(equipo, texto) {
 
 const mensajeAmbiguo = (nombres) => `Hay varios jugadores que encajan (${nombres.join(', ')}). Escribe nombre y apellido.`;
 
-// Función para mezclar arrays
 const mezclar = (arr) => {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -46,10 +45,6 @@ const mezclar = (arr) => {
   }
   return a;
 };
-
-// ==========================================
-// ENDPOINTS OFFLINE / LOCAL
-// ==========================================
 
 router.get('/equipos', (req, res) => {
   try {
@@ -79,7 +74,6 @@ router.post('/validar-jugador', (req, res) => {
     if (r?.ambiguo) return res.json({ success: true, encontrado: false, mensaje: mensajeAmbiguo(r.ambiguo) });
     res.json({ success: true, encontrado: false });
   } catch (error) {
-    console.error("Error en /validar-jugador:", error);
     res.status(500).json({ success: false, error: 'Error interno en la base de datos de jugadores.' });
   }
 });
@@ -100,9 +94,6 @@ router.post('/revelar-opciones', (req, res) => {
   }
 });
 
-// ==========================================
-// MODO ONLINE
-// ==========================================
 export const salasOnline = new Map();
 
 function generarCodigo() {
@@ -327,24 +318,21 @@ router.post('/online/sala/:code/jugar', (req, res) => {
   if (comodin && !yo.comodines.includes(comodin)) return res.status(400).json({ error: 'No tienes ese comodín.' });
 
   const r = buscarJugador(equiposData[sala.equipoSeleccionado.id], nombreJugador);
+  
   if (r?.corto) { 
-    consumirComodin(yo, comodin);
-    cerrarTurno(sala, 'fallo', 'Escribe al menos 3 letras. Pierdes el turno.'); return res.json({ success: true }); 
+    return res.status(400).json({ error: 'Escribe al menos 3 letras.' }); 
   }
   if (r?.ambiguo) { 
-    consumirComodin(yo, comodin);
-    cerrarTurno(sala, 'fallo', mensajeAmbiguo(r.ambiguo) + ' Pierdes el turno.'); return res.json({ success: true }); 
+    return res.status(400).json({ error: mensajeAmbiguo(r.ambiguo) }); 
   }
   if (!r?.jugador) { 
-    consumirComodin(yo, comodin);
-    cerrarTurno(sala, 'fallo', 'Jugador no encontrado. Pierdes el turno.'); return res.json({ success: true }); 
+    return res.status(400).json({ error: 'Jugador no encontrado.' }); 
   }
 
   const jug = r.jugador;
   const clave = normalizar(jug.nombre);
   if (sala.usadosClaves.includes(clave)) { 
-    consumirComodin(yo, comodin);
-    cerrarTurno(sala, 'fallo', `${jug.nombre} ya ha sido dicho. Pierdes el turno.`); return res.json({ success: true }); 
+    return res.status(400).json({ error: `${jug.nombre} ya ha sido dicho.` }); 
   }
 
   const { estadistica } = sala.configuracion;
@@ -387,6 +375,17 @@ router.post('/online/sala/:code/plantarse', (req, res) => {
   if (sala.estado !== 'jugando' || sala.evento) return res.status(400).json({ error: 'Ahora no puedes plantarte.' });
   if (turnoActual(sala).id !== yo.id) return res.status(400).json({ error: 'No es tu turno.' });
   cerrarTurno(sala, 'plantado', `${yo.nombre} se ha plantado.`);
+  res.json({ success: true });
+});
+
+router.post('/online/sala/:code/pasar', (req, res) => {
+  const ctx = contexto(req, res, req.body?.token);
+  if (!ctx) return;
+  const { sala, yo } = ctx;
+  if (sala.estado !== 'jugando' || sala.evento) return res.status(400).json({ error: 'Ahora no puedes pasar.' });
+  if (turnoActual(sala).id !== yo.id) return res.status(400).json({ error: 'No es tu turno.' });
+  
+  cerrarTurno(sala, 'fallo', `${yo.nombre} ha pasado el turno.`);
   res.json({ success: true });
 });
 
