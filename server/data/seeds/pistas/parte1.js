@@ -3,821 +3,821 @@ import { pt } from './helper.js';
 export const PARTE_1 = [
   // --- OBJETOS Y UTENSILIOS (p1 - p10) ---
   pt('p1', 'Frigorífico', ['nevera', 'refrigerador'], [
-    'Es un objeto artificial.',
-    'Suele encontrarse en interiores cerrados.',
-    'Requiere conexión continua a una fuente de energía.',
-    'Modifica de forma constante el ambiente de su interior.',
-    'Se sitúa en la cocina y tiene bandejas con una puerta vertical.',
-    'Electrodoméstico que mantiene fríos y frescos los alimentos.'
+    'Es un elemento material de fabricación humana.',
+    'Su funcionamiento depende de una conexión a una fuente de energía externa.',
+    'Fue diseñado para ralentizar procesos naturales de degradación.',
+    'Mantiene un clima artificial constante en los distintos compartimentos de su interior.',
+    'Es un mueble grande con una puerta vertical que suele ubicarse en la cocina.',
+    'Electrodoméstico que enfría y congela los alimentos para que no se estropeen.'
   ]),
   pt('p2', 'Paraguas', ['sombrilla'], [
-    'Es un objeto portátil.',
-    'Está fabricado con una combinación de piezas rígidas y flexibles.',
-    'Su empleo depende de factores atmosféricos.',
-    'Dispone de un mecanismo manual o automático de varillas desplegables.',
-    'Tiene un mango para sostenerlo y una cúpula de tela sobre la cabeza.',
-    'Se abre para evitar mojarse cuando caen precipitaciones de lluvia.'
+    'Es un utensilio portátil diseñado para el uso individual.',
+    'Su estructura combina materiales rígidos con partes flexibles.',
+    'Su utilidad está estrictamente ligada a las condiciones atmosféricas del momento.',
+    'Posee un mecanismo que le permite expandirse y retraerse según la necesidad.',
+    'Se sostiene por un mango inferior y crea una cúpula de tela sobre la cabeza.',
+    'Accesorio que se abre para protegerse de la lluvia y no mojarse.'
   ]),
   pt('p3', 'Espejo', ['espejos'], [
-    'Es un elemento sólido.',
-    'Posee una superficie plana muy pulida.',
-    'Guarda una relación directa con el comportamiento de la luz.',
-    'Se suele colocar en paredes y puertas de armarios.',
-    'Se empaña con el vapor de agua y refleja lo que tiene delante.',
-    'Superficie de cristal que muestra el reflejo idéntico de tu imagen.'
+    'Es un objeto sólido inanimado.',
+    'Se encuentra habitualmente fijado a paredes o integrado en mobiliario.',
+    'Su principal función depende completamente de la presencia de luz ambiental.',
+    'Posee una superficie plana, lisa y extremadamente pulida que a menudo es frágil.',
+    'La gente lo utiliza a diario para comprobar su aspecto antes de salir de casa.',
+    'Superficie de cristal que refleja de manera idéntica la imagen de quien se pone delante.'
   ]),
   pt('p4', 'Cafetera', ['cafetera italiana', 'cafetera express'], [
-    'Es un utensilio de uso diario.',
-    'Funciona aplicando calor o presión a un líquido.',
-    'Se ubica en espacios de preparación de bebidas.',
-    'Procesa granos triturados de origen vegetal desprendiendo vapor.',
-    'Prepara una bebida oscura caliente y aromática con cafeína.',
-    'Aparato que sirve específicamente para elaborar café.'
+    'Es un aparato de uso cotidiano.',
+    'Requiere líquidos y variaciones térmicas para cumplir su propósito.',
+    'Forma parte de la rutina matutina de millones de personas en todo el mundo.',
+    'Funciona sometiendo un producto vegetal molido a agua a alta temperatura o presión.',
+    'Al funcionar desprende un aroma intenso y produce una bebida oscura y estimulante.',
+    'Máquina o utensilio que sirve específicamente para preparar café.'
   ]),
   pt('p5', 'Gafas', ['lentes', 'anteojos'], [
-    'Es un artículo ligero.',
-    'Diseñado para colocarse directamente sobre el cuerpo humano.',
-    'Tiene piezas transparentes montadas sobre una montura.',
-    'Se apoya en las orejas y en el puente de la nariz.',
-    'Puede tener cristales oscuros para el sol o lentes graduadas.',
-    'Accesorio con dos cristales que ayuda a corregir problemas de visión.'
+    'Es un objeto personal de tamaño reducido.',
+    'Está fabricado combinando una estructura de soporte con elementos transparentes.',
+    'Su uso modifica directamente la forma en la que el usuario percibe el entorno.',
+    'Se apoya en tres puntos específicos del rostro humano para mantenerse estable.',
+    'Consiste en una montura con dos lentes que se coloca delante de los ojos.',
+    'Accesorio que mejora la visión de quienes tienen miopía o protege del sol.'
   ]),
   pt('p6', 'Tijeras', ['las tijeras'], [
-    'Es una herramienta manual.',
-    'Consta de dos piezas metálicas móviles cruzadas.',
-    'Mecánicamente funciona mediante el principio de palancas.',
-    'Tiene dos orificios en un extremo para colocar los dedos.',
-    'Las usan sastres, peluqueros y escolares para separar materiales.',
-    'Herramienta con dos hojas afiladas que corta al juntar los dedos.'
+    'Es un instrumento mecánico simple.',
+    'Su diseño se basa en el principio físico de la palanca.',
+    'Requiere la aplicación de fuerza manual coordinada para realizar su función.',
+    'Se compone de dos piezas metálicas cruzadas sobre un eje central.',
+    'Tiene dos orificios en un extremo para introducir los dedos y hojas afiladas en el otro.',
+    'Herramienta manual que sirve para cortar papel, tela o el pelo.'
   ]),
   pt('p7', 'Cepillo de dientes', ['el cepillo de dientes'], [
-    'Es un utensilio de uso privado.',
-    'Tiene una estructura alargada y compacta.',
-    'Se guarda normalmente cerca de un grifo en el aseo.',
-    'Se acompaña de una pasta o crema aromática para frotar.',
-    'Posee un cabezal con cerdas finas para la higiene bucal.',
-    'Objeto con mango y cerdas que sirve para lavarse los dientes.'
+    'Es un utensilio de uso estrictamente individual.',
+    'Está presente en prácticamente todos los hogares modernos.',
+    'Su utilización está ligada a los hábitos de higiene diaria.',
+    'Suele requerir el uso complementario de una pasta aromática e interactuar con agua.',
+    'Posee un mango alargado y un cabezal cubierto de cerdas sintéticas cortas.',
+    'Objeto que se usa frotándolo en la boca para limpiar la dentadura tras las comidas.'
   ]),
   pt('p8', 'Sartén', ['la sarten'], [
-    'Es un recipiente resistente.',
-    'Está elaborado con materiales metálicos conductores.',
-    'Se utiliza directamente sobre fuentes de calor elevadas.',
-    'Tiene una base circular plana y un mango largo lateral.',
-    'Cuenta con una capa antiadherente para cocinar tortillas o carnes.',
-    'Utensilio metálico de cocina con mango que sirve para freír y saltear.'
+    'Es un artículo resistente a condiciones extremas.',
+    'Está compuesto por materiales con alta conductividad térmica.',
+    'Juega un papel fundamental en la alteración química de otros productos.',
+    'Tiene una base circular ancha y plana acompañada de un mango lateral largo.',
+    'Suele estar recubierta de teflón u otros materiales antiadherentes y usa aceite.',
+    'Utensilio metálico de cocina donde se fríen los huevos o se hace la tortilla.'
   ]),
   pt('p9', 'Reloj', ['el reloj', 'relojes'], [
-    'Es un instrumento de medición.',
-    'Presenta divisiones regulares en su superficie.',
-    'Puede ser mecánico, analógico o electrónico.',
-    'Muchos modelos emiten una cadencia regular de sonido.',
-    'Tiene manecillas numeradas del 1 al 12 o dígitos que marcan minutos.',
-    'Aparato que se lleva en la muñeca o se cuelga para saber qué hora es.'
+    'Es un dispositivo de medición.',
+    'Puede estar basado en principios mecánicos, analógicos o electrónicos.',
+    'Sirve para cuantificar y organizar una magnitud física invisible.',
+    'En los modelos clásicos, su funcionamiento emite un sonido rítmico y constante.',
+    'Lleva números grabados y manecillas, o una pantalla digital, y se lleva en la muñeca.',
+    'Aparato que sirve para consultar la hora, los minutos y los segundos.'
   ]),
   pt('p10', 'Llave', ['las llaves'], [
-    'Es una pieza pequeña sólida.',
-    'Suele estar fabricada en aleaciones de metal.',
-    'Posee estrías y ranuras con un patrón geométrico específico.',
-    'Muchos ejemplares se transportan juntos agrupados en un llavero.',
-    'Encaja en una ranura específica y se gira para accionar un pestillo.',
+    'Es un objeto sólido de pequeño tamaño.',
+    'Suele estar fabricado a partir de aleaciones metálicas duras.',
+    'Su diseño incorpora un patrón geométrico único destinado a encajar en un único lugar.',
+    'Garantiza la seguridad y restringe el acceso a espacios o contenedores privados.',
+    'A menudo se transportan varias agrupadas en una anilla dentro del bolsillo.',
     'Pieza metálica dentada que se introduce en una cerradura para abrir puertas.'
   ]),
 
   // --- CIUDADES Y LUGARES (p11 - p20) ---
   pt('p11', 'París', ['paris'], [
-    'Es una entidad geográfica concreta.',
-    'Se encuentra en el continente europeo.',
-    'Está cruzada por un curso fluvial navegable.',
-    'Es conocida internacionalmente como la Ciudad de la Luz.',
-    'El río que la baña es el Sena y alberga el Museo del Louvre.',
+    'Es un asentamiento humano de gran tamaño.',
+    'Se encuentra geográficamente en el hemisferio norte.',
+    'Ha sido el epicentro de movimientos culturales y revoluciones históricas.',
+    'Su trazado urbano está dividido en dos grandes mitades por el cauce de un río.',
+    'Es conocida mundialmente como la Ciudad de la Luz y alberga el Museo del Louvre.',
     'Capital de Francia coronada por la famosa Torre Eiffel.'
   ]),
   pt('p12', 'Tokio', ['tokyo'], [
-    'Es un asentamiento urbano.',
-    'Se encuentra situado en territorio insular.',
-    'Es una de las metrópolis con mayor densidad demográfica del mundo.',
-    'Combina rascacielos vanguardistas con el epicentro del manga y el anime.',
-    'Tiene el cruce peatonal de Shibuya y se divisa el monte Fuji.',
+    'Es un núcleo de población excepcionalmente denso.',
+    'Se ubica en un territorio de naturaleza insular.',
+    'Destaca por un enorme contraste entre rascacielos tecnológicos y templos antiguos.',
+    'Es el epicentro mundial de las industrias del manga, el anime y los videojuegos.',
+    'Alberga el famoso y caótico cruce peatonal de Shibuya.',
     'Capital de Japón.'
   ]),
   pt('p13', 'Nueva York', ['new york', 'nyc'], [
-    'Es una urbe costera.',
-    'Situada en América del Norte.',
-    'Está dividida en cinco grandes distritos o distritos metropolitanos.',
-    'Es apodada mundialmente con el nombre de La Gran Manzana.',
-    'Tiene rascacielos como el Empire State y el parque de Central Park.',
-    'Metrópolis estadounidense famosa por Times Square y Wall Street.'
+    'Es un foco de aglomeración urbana internacional.',
+    'Se desarrolló históricamente como un importante puerto comercial.',
+    'Su estructura administrativa se divide en cinco grandes distritos diferentes.',
+    'Es el corazón financiero de Estados Unidos gracias a la bolsa de Wall Street.',
+    'Se la apoda "La Gran Manzana" y cuenta con el parque Central Park.',
+    'Gran metrópolis estadounidense famosa por Times Square y la Estatua de la Libertad.'
   ]),
   pt('p14', 'Roma', ['roma'], [
-    'Es un núcleo urbano milenario.',
-    'Su relieve se asienta sobre suaves colinas.',
-    'Es apodada históricamente con el título de La Ciudad Eterna.',
-    'Alberga en su interior el estado independiente del Vaticano.',
-    'Por ella discurre el río Tíber y cuenta con la Fontana di Trevi.',
-    'Capital de Italia, donde se encuentra el anfiteatro del Coliseo.'
+    'Es una urbe de origen milenario.',
+    'Su geografía original se asienta sobre un relieve de suaves colinas.',
+    'Fue el centro administrativo de uno de los mayores imperios de la Antigüedad.',
+    'En su interior alberga el territorio soberano más pequeño del mundo: el Vaticano.',
+    'Cuenta con ruinas famosas, foros y la turística Fontana di Trevi.',
+    'Capital de Italia apodada "La Ciudad Eterna", donde se sitúa el Coliseo.'
   ]),
   pt('p15', 'Egipto', ['republica arabe de egipto'], [
-    'Es un país soberano.',
-    'La mayor parte de su superficie es árida y seca.',
-    'Su desarrollo histórico dependió de una gran arteria fluvial.',
-    'Sus antiguos monarcas recibían el título de faraones.',
-    'El río Nilo lo cruza y sus templos tienen jeroglíficos.',
-    'País africano famoso por las pirámides de Guiza y la Esfinge.'
+    'Es una nación soberana.',
+    'Su climatología se caracteriza por la aridez y las altas temperaturas.',
+    'El desarrollo de su civilización dependió vitalmente de las crecidas de un río.',
+    'Sus antiguos monarcas recibían un título específico y eran considerados dioses.',
+    'A orillas del río Nilo se asientan enormes templos llenos de jeroglíficos.',
+    'País africano famoso por las momias, los faraones y las pirámides de Guiza.'
   ]),
   pt('p16', 'Londres', ['london'], [
-    'Es una gran capital.',
-    'Se ubica en una masa insular europea.',
-    'Un río navegable divide su territorio en dos mitades.',
-    'En sus calles circulan icónicos autobuses de dos plantas de color rojo.',
-    'El río que la cruza es el Támesis y tiene la torre del Big Ben.',
+    'Es un gran centro metropolitano.',
+    'Su localización geográfica pertenece al continente europeo.',
+    'Sufrió devastadores incendios en el pasado y soportó asedios aéreos en el siglo XX.',
+    'Es conocida por su densa niebla, sus guardias reales y sus autobuses de dos pisos.',
+    'La atraviesa el río Támesis y tiene una gran torre de reloj llamada Big Ben.',
     'Capital de Inglaterra y del Reino Unido.'
   ]),
   pt('p17', 'Madrid', ['villa de madrid'], [
-    'Es una población interior.',
-    'Situada sobre una meseta a gran altitud.',
-    'Su escudo oficial luce un animal junto a un árbol con frutos.',
-    'Sus celebraciones populares se realizan en fuentes como Cibeles.',
-    'En su centro se halla la Puerta del Sol y el Museo del Prado.',
+    'Es un núcleo urbano de interior.',
+    'Se sitúa sobre una meseta a una altitud considerable sobre el nivel del mar.',
+    'Su emblema oficial incluye la figura de un animal interactuando con un árbol.',
+    'Las victorias deportivas se celebran habitualmente en torno a la fuente de Cibeles.',
+    'En su centro neurálgico se encuentra el kilómetro cero en la Puerta del Sol.',
     'Capital de España.'
   ]),
   pt('p18', 'Brasil', ['brasil'], [
-    'Es un país soberano de gran extensión.',
-    'Se sitúa en la mitad sur del continente americano.',
-    'Su idioma oficial es de origen europeo pero no es el español.',
-    'Alberga la mayor parte de la selva y cuenca del río Amazonas.',
-    'Es la selección con más Mundiales de fútbol y celebra el carnaval en Río.',
-    'El país más grande de América del Sur, cuya lengua es el portugués.'
+    'Es un Estado soberano de gran extensión.',
+    'Su territorio ocupa una enorme porción del hemisferio sur.',
+    'Es mundialmente reconocido por su biodiversidad y su exportación de café.',
+    'Alberga en sus fronteras la mayor cuenca fluvial y selva tropical del planeta.',
+    'Es una potencia del fútbol mundial y celebra un inmenso carnaval en Río de Janeiro.',
+    'El país más grande de América del Sur, cuya lengua oficial es el portugués.'
   ]),
   pt('p19', 'Venecia', ['venezia'], [
-    'Es una localidad europea.',
-    'Se alza sobre una formación pantanosa costera.',
-    'Carece por completo de carreteras y de tráfico de coches.',
-    'Sus calles son canales cruzados por puentes de piedra.',
-    'Es famosa por sus máscaras de carnaval y la Plaza de San Marcos.',
-    'Ciudad italiana donde los turistas pasean en góndolas por los canales.'
+    'Es un asentamiento humano histórico.',
+    'Se desarrolló en un entorno geográfico de gran fragilidad y nivel freático alto.',
+    'La peculiaridad de sus calles imposibilita por completo el tráfico rodado.',
+    'Está conformada por decenas de islas pequeñas conectadas por cientos de puentes.',
+    'Es célebre por su carnaval de máscaras, la Plaza de San Marcos y sus góndolas.',
+    'Ciudad italiana donde no hay coches, sino canales de agua para navegar.'
   ]),
   pt('p20', 'Monte Everest', ['everest'], [
-    'Es un accidente orográfico.',
-    'Se sitúa en el continente asiático.',
-    'Está permanentemente cubierto de nieve y temperaturas gélidas.',
-    'Forma parte de la imponente cordillera del Himalaya.',
-    'Supera los ocho mil ochocientos metros de altitud.',
-    'La montaña más alta de todo el planeta Tierra.'
+    'Es una prominencia geográfica natural.',
+    'Se encuentra en el continente asiático.',
+    'Sus condiciones ambientales son hostiles e imposibilitan la vida permanente.',
+    'Forma parte de la cordillera montañosa más imponente de todo el globo.',
+    'Miles de alpinistas intentan escalar su cumbre enfrentándose a la falta de oxígeno.',
+    'La montaña más alta y famosa de todo el planeta Tierra.'
   ]),
 
   // --- PERSONAJES FAMOSOS E HISTÓRICOS (p21 - p30) ---
   pt('p21', 'Albert Einstein', ['einstein'], [
     'Es una figura histórica real.',
-    'Vivió a caballo entre los siglos XIX y XX.',
-    'Se dedicó al estudio teórico de las leyes físicas.',
-    'Fue galardonado con el Premio Nobel de su disciplina.',
-    'Formuló la famosa ecuación de masa y energía E = mc².',
-    'El físico más famoso del siglo XX, padre de la Teoría de la Relatividad.'
+    'Dedicó su vida a intentar comprender el funcionamiento de la naturaleza.',
+    'Sus aportaciones cambiaron por completo los paradigmas científicos de su época.',
+    'Su imagen icónica, a menudo desaliñada y sacando la lengua, es mundialmente famosa.',
+    'Estableció la equivalencia entre masa y energía con la ecuación E = mc².',
+    'Físico que formuló la Teoría de la Relatividad y ganó el Premio Nobel en 1921.'
   ]),
   pt('p22', 'Leonardo da Vinci', ['da vinci'], [
-    'Es un personaje del pasado.',
-    'Nació en el sur del continente europeo.',
-    'Es considerado el modelo ideal del hombre del Renacimiento.',
-    'Diseñó bocetos de artefactos voladores y dibujó el Hombre de Vitruvio.',
-    'Pintó el fresco de La Última Cena en Milán.',
-    'Genio renacentista italiano que pintó el cuadro de La Gioconda.'
+    'Es un personaje del pasado europeo.',
+    'Sobresalió por dominar simultáneamente multitud de disciplinas muy dispares.',
+    'Es el arquetipo histórico de lo que se conoce como un hombre del Renacimiento.',
+    'Llenó cuadernos con bocetos de máquinas voladoras, anatomía y botánica.',
+    'Pintó el famoso mural de La Última Cena y dibujó el Hombre de Vitruvio.',
+    'Genio italiano del Renacimiento que pintó el célebre cuadro de La Gioconda.'
   ]),
   pt('p23', 'Lionel Messi', ['messi', 'leo messi'], [
-    'Es una persona viva en la actualidad.',
-    'Nació en América del Sur.',
-    'Se dedica profesionalmente al deporte de competición.',
-    'Compite como atacante zurdo vistiendo habitualmente el dorsal 10.',
-    'Ha ganado ocho Balones de Oro y jugó muchos años en el Barcelona.',
-    'Astro del fútbol argentino que ganó el Mundial en Qatar 2022.'
+    'Es una figura pública contemporánea.',
+    'Su trayectoria está vinculada al esfuerzo físico y a la competición al máximo nivel.',
+    'Abandonó su país natal sudamericano en su juventud para forjar su carrera en Europa.',
+    'Se ha caracterizado por su baja estatura, su regate imparable y llevar el dorsal 10.',
+    'Ha ganado múltiples Balones de Oro y pasó la mayor parte de su carrera en el Barcelona.',
+    'Astro del fútbol argentino que ganó la Copa del Mundo en Qatar 2022.'
   ]),
   pt('p24', 'William Shakespeare', ['shakespeare'], [
-    'Es un creador del mundo literario.',
-    'Vivió entre los siglos XVI y XVII en Europa.',
-    'Escribió en lengua inglesa dramas, sonetos y comedias.',
-    'Muchas de sus obras se estrenaban en el teatro The Globe.',
-    'Autor de monólogos célebres como "Ser o no ser" y de Hamlet.',
+    'Es un exponente clave de la cultura humana.',
+    'Produjo su obra en Europa durante los siglos XVI y XVII.',
+    'Su legado se centra en la representación dramática y el estudio de las pasiones.',
+    'Sus obras se estrenaban habitualmente en un famoso teatro circular llamado The Globe.',
+    'Escribió frases inmortales como "Ser o no ser, esa es la cuestión".',
     'El dramaturgo inglés más famoso de la historia, autor de Romeo y Julieta.'
   ]),
   pt('p25', 'Cleopatra', ['cleopatra vii'], [
-    'Es una persona del pasado remoto.',
-    'Vivió en el siglo I antes de Cristo.',
-    'Gobernó un territorio en el norte de África.',
-    'Mantuvo vínculos políticos y sentimentales con Julio César y Marco Antonio.',
-    'La tradición clásica vincula su trágico final a una serpiente áspid.',
-    'La reina más famosa y poderosa del Antiguo Egipto.'
+    'Es una personalidad del pasado remoto.',
+    'Ejerció el poder supremo sobre una de las naciones más ricas de la Antigüedad.',
+    'Dominaba varios idiomas y utilizó la diplomacia para proteger la soberanía de su tierra.',
+    'Tuvo sonados romances políticos y personales con Julio César y Marco Antonio.',
+    'La leyenda cuenta que se quitó la vida dejándose morder por una serpiente venenosa.',
+    'La reina más famosa del Antiguo Egipto.'
   ]),
   pt('p26', 'Cristiano Ronaldo', ['cr7'], [
-    'Es un deportista profesional en activo.',
-    'Nació en un territorio insular europeo.',
-    'Destaca por una estricta preparación física y potencia de salto.',
-    'Es reconocido internacionalmente por lucir el dorsal 7.',
-    'Goleador histórico del Real Madrid con cinco Balones de Oro.',
-    'Astro del fútbol portugués apodado CR7 famoso por su grito de "¡Siuuu!".'
+    'Es una figura internacional en activo.',
+    'Ha dedicado su vida a la disciplina deportiva y al entrenamiento estricto.',
+    'Sus saltos atléticos y su potencia física han marcado su trayectoria profesional.',
+    'Es conocido mundialmente por llevar el número 7 en la espalda de sus camisetas.',
+    'Logró cinco Balones de Oro y es el máximo goleador histórico del Real Madrid.',
+    'Astro del fútbol portugués famoso por su grito de celebración "¡Siuuu!".'
   ]),
   pt('p27', 'Marie Curie', ['madame curie'], [
-    'Es una figura pionera de la ciencia.',
-    'Desarrolló su labor en Europa entre los siglos XIX y XX.',
-    'Investigó elementos atómicos con emisiones invisibles de energía.',
-    'Fue la primera persona en lograr dos premios Nobel en áreas distintas.',
-    'Descubrió junto a su esposo elementos como el polonio y el radio.',
-    'Científica de origen polaco pionera en el estudio de la radiactividad.'
+    'Es una pionera en el campo de la investigación.',
+    'Su trabajo sentó las bases para importantes descubrimientos del siglo XX.',
+    'Su constante exposición a su propio objeto de estudio acabó deteriorando su salud.',
+    'Descubrió nuevos elementos químicos y fue la primera persona en ganar dos premios Nobel.',
+    'Junto a su marido, logró aislar el polonio y el radio en su laboratorio.',
+    'Famosa científica de origen polaco pionera en el estudio de la radiactividad.'
   ]),
   pt('p28', 'Napoleón Bonaparte', ['napoleon'], [
-    'Es un personaje histórico militar.',
-    'Nació en una isla del mar Mediterráneo.',
-    'Ascendió al mando tras un proceso revolucionario.',
-    'Se proclamó emperador y conquistó gran parte de Europa.',
-    'Sufrió una desastrosa retirada en Rusia y cayó en Waterloo.',
-    'Emperador militar francés derrotado definitivamente en Waterloo.'
+    'Es un personaje clave de la historia militar.',
+    'Ascendió al poder aprovechando la inestabilidad de un gran proceso revolucionario.',
+    'Redactó un código civil que sigue siendo la base del derecho en muchos países.',
+    'Conquistó gran parte del continente europeo pero fracasó en su invasión a Rusia.',
+    'Fue exiliado a una isla tras ser derrotado de manera definitiva en la batalla de Waterloo.',
+    'Famoso emperador militar francés que solía ser retratado con la mano en el chaleco.'
   ]),
   pt('p29', 'Pablo Picasso', ['picasso'], [
-    'Es una personalidad del mundo del arte.',
-    'Nació en el sur de Europa a finales del siglo XIX.',
-    'Rompió con las normas de perspectiva con sus etapas Azul y Rosa.',
-    'Fue el fundador y máximo representante del movimiento cubista.',
-    'Nació en Málaga y pintó rostros vistos de frente y perfil.',
-    'Pintor español malagueño creador del cubismo y autor del Guernica.'
+    'Es un individuo influyente del mundo del arte.',
+    'Vivió la mayor parte de su carrera creativa fuera de su país de nacimiento.',
+    'Pasó por distintas etapas creativas, conocidas por colores como el azul y el rosa.',
+    'Destruyó las normas clásicas de la perspectiva mostrando varios ángulos a la vez.',
+    'Fue el fundador del movimiento vanguardista conocido como el cubismo.',
+    'Pintor español malagueño autor del cuadro antibelicista Guernica.'
   ]),
   pt('p30', 'Michael Jackson', ['rey del pop'], [
-    'Es un artista musical del siglo XX.',
-    'Comenzó a actuar ante el público desde su niñez.',
-    'Fue coronado por el público como el Rey del Pop.',
-    'Publicó en 1982 el álbum más vendido de la historia: Thriller.',
-    'Vestía un guante blanco y popularizó el paso de baile moonwalk.',
-    'Cantante estadounidense apodado el Rey del Pop, autor de Billie Jean.'
+    'Es una estrella mundial de la industria del entretenimiento.',
+    'Conoció la fama desde que era un niño actuando junto a sus hermanos.',
+    'Cambió la forma de concebir los videoclips, convirtiéndolos en pequeñas películas.',
+    'Llevaba guantes blancos, sombreros y popularizó un paso de baile que simulaba caminar hacia atrás.',
+    'Lanzó Thriller, que sigue siendo el álbum más vendido de toda la historia de la música.',
+    'Cantante estadounidense coronado como el Rey del Pop, autor de Billie Jean.'
   ]),
 
   // --- ANIMALES (p31 - p40) ---
   pt('p31', 'León', ['leones', 'el leon'], [
-    'Es un organismo vertebrado.',
-    'Pertenece al grupo de los mamíferos carnívoros.',
-    'Habita en llanuras y sabanas del continente africano.',
-    'Vive y caza en manadas donde las hembras capturan las presas.',
-    'Los machos adultos poseen una frondosa melena alrededor del cuello.',
+    'Es un organismo vivo y vertebrado.',
+    'Sus hábitats naturales se encuentran en zonas de altas temperaturas.',
+    'Basa su supervivencia en el consumo de la carne de otros animales.',
+    'Cuenta con una jerarquía social estricta donde las hembras realizan la caza.',
+    'Los machos adultos lucen una imponente y frondosa melena alrededor del cuello.',
     'Gran felino africano conocido tradicionalmente como el rey de la selva.'
   ]),
   pt('p32', 'Delfín', ['delfines', 'el delfin'], [
-    'Es una criatura que vive en el agua.',
-    'No es un pez; respira aire y amamanta a sus crías.',
-    'Utiliza emisiones de sonido y ecos para orientarse bajo el mar.',
-    'Es considerado uno de los animales marinos con mayor inteligencia.',
-    'Tiene piel lisa gris, aleta dorsal y nada dando saltos acrobáticos.',
-    'Mamífero marino inteligente de morro curvado que salta en el agua.'
+    'Es una criatura ligada a entornos acuáticos.',
+    'A pesar del medio en el que vive, necesita asomarse a la superficie para respirar.',
+    'Es objeto de estudio científico debido a su compleja estructura cerebral.',
+    'Utiliza un avanzado sistema de chasquidos y ecos para navegar y cazar.',
+    'Posee un espiráculo, piel gris lisa y fama de ser muy amigable con los humanos.',
+    'Mamífero marino muy inteligente de morro curvado que salta sobre las olas.'
   ]),
   pt('p33', 'Camaleón', ['camaleones'], [
-    'Es un animal de sangre fría.',
-    'Pertenece al grupo de los reptiles escamosos.',
-    'Habita en ramas de zonas cálidas y tiene cola prensil.',
-    'Sus dos ojos pueden moverse en direcciones totalmente independientes.',
-    'Caza insectos lanzando una lengua muy larga y pegajosa.',
-    'Reptil que cambia de color para camuflarse en su entorno.'
+    'Es un ser vivo de sangre fría.',
+    'Pertenece a un gran grupo de especies provistas de piel cubierta por escamas.',
+    'Su anatomía incluye patas prensiles adaptadas para sujetarse fuertemente a las ramas.',
+    'Puede mover sus dos ojos en direcciones opuestas de manera totalmente independiente.',
+    'Es capaz de modificar la pigmentación de su piel para mimetizarse con el entorno.',
+    'Reptil que caza insectos lanzando una lengua muy larga y cambia de color para camuflarse.'
   ]),
   pt('p34', 'Pingüino', ['pinguinos', 'el pinguino'], [
-    'Es un animal con plumas.',
-    'Pertenece a las aves pero carece de vuelo por el aire.',
-    'Habita en aguas frías de regiones del hemisferio sur.',
-    'Sus alas funcionan como aletas hidrodinámicas bajo el agua.',
-    'Tiene plumaje blanco en el pecho, dorso negro y anda torpemente.',
-    'Ave marina que no vuela y vive en las zonas heladas de la Antártida.'
+    'Es una especie perteneciente a la clase de las aves.',
+    'Su organismo está biológicamente adaptado para soportar climas gélidos extremos.',
+    'A lo largo de su evolución ha perdido por completo la capacidad de volar por el aire.',
+    'Sus alas se han transformado en eficientes aletas para bucear a gran velocidad.',
+    'Camina torpemente erguido y su plumaje blanco y negro recuerda a un traje de esmoquin.',
+    'Ave marina incapaz de volar que vive en las zonas heladas de la Antártida.'
   ]),
   pt('p35', 'Elefante', ['elefantes', 'el elefante'], [
-    'Es un mamífero cuadrúpedo.',
-    'Su alimentación es estrictamente herbívora.',
-    'Es el mayor animal que pisa la tierra firme en la actualidad.',
-    'Posee dos orejas gigantescas que abanica y colmillos de marfil.',
-    'Cuenta con una memoria prodigiosa y vive en manadas familiares.',
-    'El animal terrestre más grande del mundo, dotado de una larga trompa.'
+    'Es un animal vertebrado cuadrúpedo.',
+    'Es capaz de consumir diariamente decenas de kilos de vegetación.',
+    'Organiza su estructura familiar en manadas matriarcales de gran cohesión.',
+    'Posee unos incisivos alargados que forman dos valiosos colmillos de marfil.',
+    'Tiene unas orejas inmensas para disipar el calor y un apéndice nasal alargado.',
+    'El animal terrestre más grande del mundo, famoso por su larga trompa.'
   ]),
   pt('p36', 'Perro', ['el perro', 'can'], [
-    'Es un mamífero terrestre.',
-    'Fue el primer animal domesticado a partir del lobo.',
-    'Posee un sentido del olfato sumamente desarrollado.',
-    'Convive en los hogares familiares como animal de compañía.',
-    'Mueve la cola al estar contento y avisa emitiendo ladridos.',
-    'Mascota doméstica de cuatro patas conocida como el mejor amigo del hombre.'
+    'Es un mamífero de costumbres terrestres.',
+    'Ha estado estrechamente ligado al desarrollo humano desde la prehistoria.',
+    'Fue utilizado históricamente para tareas de pastoreo, vigilancia y caza.',
+    'Posee un sistema olfativo miles de veces más desarrollado que el nuestro.',
+    'Mueve su cola cuando experimenta alegría y emite ladridos para alertar.',
+    'Mascota doméstica de cuatro patas conocida mundialmente como el mejor amigo del hombre.'
   ]),
   pt('p37', 'Tiburón', ['tiburon', 'el tiburon'], [
-    'Es una criatura marina con branquias.',
-    'Su esqueleto no está formado por huesos, sino por cartílago.',
-    'Puede detectar disoluciones mínimas de sangre a gran distancia.',
-    'Posee varias hileras de dientes afilados que se renuevan solas.',
-    'Su aleta triangular asomando sobre el agua asusta en la playa.',
-    'Gran pez carnívoro del océano temido por sus dientes como el tiburón blanco.'
+    'Es una forma de vida adaptada al medio marino.',
+    'Su fisiología interna carece por completo de estructura ósea dura.',
+    'Es un depredador clave para mantener el equilibrio en los océanos.',
+    'Su dentadura está dispuesta en varias hileras que se renuevan continuamente.',
+    'Detecta mínimas gotas de sangre a distancia y su aleta dorsal aterra en las playas.',
+    'Gran pez cartilaginoso temido por su agresividad, como la variedad del gran blanco.'
   ]),
   pt('p38', 'Caballo', ['el caballo', 'equino'], [
-    'Es un mamífero herbívoro de gran porte.',
-    'Fue domesticado en las estepas hace miles de años.',
-    'Apoya sus patas sobre pezuñas protegidas por herraduras.',
-    'Se desplaza cambiando de ritmo entre paso, trote y galope.',
-    'Tiene crines en el cuello, se monta con silla y relincha.',
-    'Animal de campo y granja que se monta con riendas y galopa.'
+    'Es un vertebrado de gran porte.',
+    'Su domesticación cambió para siempre las comunicaciones y la guerra en el mundo antiguo.',
+    'Apoya su considerable peso sobre un único dedo protegido por una pezuña dura.',
+    'Dispone de un paso rítmico que puede acelerar pasando del trote al galope.',
+    'Lleva herraduras, crines en el cuello y se controla mediante riendas y montura.',
+    'Animal de granja y campo que se monta para cabalgar y emite relinchos.'
   ]),
   pt('p39', 'Serpiente', ['serpientes', 'la serpiente'], [
-    'Es un reptil de sangre fría.',
-    'Carece por completo de extremidades o patas.',
-    'Muda su piel escamosa alargada de una sola pieza.',
-    'Saca una lengua bífida dividida en dos puntas para oler el aire.',
-    'Se desplaza reptando por el suelo y algunas inoculan veneno.',
-    'Reptil alargado sin patas que se arrastra por el suelo y sisea.'
+    'Es un animal que depende del calor ambiental.',
+    'Su anatomía se ha especializado mediante la pérdida de ciertas estructuras óseas.',
+    'Crece mediante un proceso de ecdisis, donde abandona su antigua piel de una pieza.',
+    'Saca repetidamente una lengua bífida para recoger partículas químicas del aire.',
+    'Carece por completo de patas y se desplaza reptando o inyecta veneno al morder.',
+    'Reptil alargado que sisea y se arrastra por el suelo.'
   ]),
   pt('p40', 'Ballena azul', ['la ballena azul'], [
-    'Es un habitante permanente del mar.',
-    'No es un pez; amamanta a sus crías y respira aire.',
-    'No tiene dientes, sino barbas filtradoras con las que come kril.',
-    'Expulsa un potente chorro de vapor por su lomo al respirar.',
-    'Puede superar los treinta metros de largo y ciento cincuenta toneladas.',
-    'El animal más grande que jamás ha existido en la Tierra.'
+    'Es una especie que habita el medio acuático.',
+    'Pertenece biológicamente a un grupo muy distante al de los peces.',
+    'No utiliza dientes para alimentarse, sino que filtra el agua para atrapar pequeños crustáceos.',
+    'Sale a la superficie para respirar expulsando un enorme chorro de vapor húmedo.',
+    'Su tamaño puede alcanzar los treinta metros y su corazón pesa como un coche pequeño.',
+    'El mamífero marino más colosal y el animal más grande que ha existido en la Tierra.'
   ]),
 
   // --- SENTIMIENTOS Y CONCEPTOS ABSTRACTOS (p41 - p50) ---
   pt('p41', 'Amor', ['el amor'], [
-    'Es un concepto intangible.',
-    'Ha inspirado obras de arte y poemas a lo largo de la historia.',
-    'Se acompaña de una sensación descrita como mariposas en el estómago.',
-    'Tiene una festividad internacional el 14 de febrero.',
-    'En los mitos clásicos se representa con el arquero Cupido.',
-    'Sentimiento de afecto y cariño simbolizado con un corazón rojo.'
+    'Es una experiencia conceptual humana.',
+    'Está profundamente arraigada en el funcionamiento psicológico y biológico.',
+    'Su intensidad ha inspirado grandes sacrificios y obras maestras a lo largo de la historia.',
+    'Provoca reacciones físicas como nerviosismo y lo que se describe como mariposas en el estómago.',
+    'La cultura popular le dedica una celebración específica cada catorce de febrero.',
+    'Sentimiento de afecto y cariño intenso que se simboliza habitualmente con un corazón.'
   ]),
   pt('p42', 'Miedo', ['el miedo', 'temor'], [
-    'Es una emoción primaria.',
-    'Presente tanto en seres humanos como en animales.',
-    'Cumple una función vital para alertar y huir ante peligros.',
-    'Provoca aceleración del pulso, temblor y piel de gallina.',
-    'Es la reacción que buscan provocar las películas de terror.',
-    'Emoción que sentimos cuando algo nos asusta o estamos en peligro.'
+    'Es una respuesta del sistema nervioso.',
+    'Está presente como instinto de supervivencia en múltiples especies animales.',
+    'Prepara al organismo inyectando adrenalina para luchar o huir frente a un peligro.',
+    'Sus síntomas físicos incluyen sudoración, aceleración del pulso y temblores.',
+    'Es la sensación que los directores de cine buscan provocar en las películas de terror.',
+    'Emoción de angustia que sentimos cuando algo nos asusta o nos amenaza.'
   ]),
   pt('p43', 'Nostalgia', ['la nostalgia'], [
-    'Es un estado de ánimo abstracto.',
-    'Etimológicamente une la idea de regreso con la de dolor.',
-    'Combina una mezcla agridulce entre alegría y pena.',
-    'Suele despertarse al escuchar canciones viejas o ver fotos antiguas.',
-    'Se asocia con la frase de que cualquier tiempo pasado fue mejor.',
-    'Sentimiento de tristeza y añoranza por momentos felices del pasado.'
+    'Es un estado anímico abstracto.',
+    'Se nutre casi en su totalidad de elementos pertenecientes a la memoria.',
+    'Suele evocar una sensación agridulce que mezcla alegría y una sutil pena.',
+    'Se activa frecuentemente al escuchar una vieja canción o revisar un cajón con fotografías.',
+    'Conecta con la famosa creencia de que cualquier tiempo pasado siempre fue mejor.',
+    'Sentimiento de tristeza o añoranza por momentos felices o personas del pasado.'
   ]),
   pt('p44', 'Esperanza', ['la esperanza'], [
-    'Es una actitud mental positiva.',
-    'Figura como una de las virtudes clásicas tradicionales.',
-    'Ayuda a mantener la entereza en momentos de incertidumbre.',
-    'Se simboliza habitualmente mediante el color verde.',
-    'Un dicho popular asegura que es lo último que se pierde.',
-    'Sentimiento de confianza en que algo bueno va a suceder.'
+    'Es una disposición mental y emocional.',
+    'Figura históricamente entre los grandes pilares de la virtud humana.',
+    'Se convierte en el último refugio psicológico cuando las circunstancias son muy adversas.',
+    'En la simbología clásica de los colores, suele representarse con el tono verde.',
+    'Un refrán muy popular asegura que es lo último que se debe perder.',
+    'Sentimiento de confianza plena en que algo bueno sucederá en el futuro.'
   ]),
   pt('p45', 'Envidia', ['la envidia'], [
-    'Es una emoción humana.',
-    'Forma parte de la lista de los siete pecados capitales.',
-    'Suele considerarse un sentimiento difícil de admitir en público.',
-    'Consiste en desear lo que otra persona tiene o sus logros.',
-    'Se asocia a menudo con tener los ojos verdes o bilis amarilla.',
-    'Sentimiento de disgusto o rabia por el éxito o los bienes ajenos.'
+    'Es una emoción catalogada como negativa.',
+    'Surge de la constante comparación social entre individuos.',
+    'Es un sentimiento que casi nadie reconoce sentir en público por su mala fama.',
+    'Se fundamenta en desear ardientemente las posesiones o los éxitos que otra persona disfruta.',
+    'Se asocia metafóricamente con tener la mirada de color verde o morderse de rabia.',
+    'Sentimiento de celos, disgusto o rencor por los logros y bienes de los demás.'
   ]),
   pt('p46', 'Felicidad', ['la felicidad', 'alegria'], [
-    'Es un estado emocional.',
-    'Muchos pensadores la consideraron la meta de la vida humana.',
-    'Se asocia a la vivencia de plenitud, bienestar y satisfacción.',
-    'Su reflejo exterior más contagioso y claro es una sonrisa.',
-    'Provoca ganas de reír, cantar y celebrar.',
-    'Sentimiento de alegría plena, dicha y bienestar con la vida.'
+    'Es un estado psicológico subjetivo.',
+    'Muchos sistemas filosóficos la han definido como el propósito final de la existencia.',
+    'Se asocia con periodos de bienestar sostenido y profunda satisfacción personal.',
+    'Cuando es intensa, empuja a las personas a celebrar, saltar o reír a carcajadas.',
+    'Su signo exterior más universal y reconocible es esbozar una gran sonrisa.',
+    'Sentimiento de alegría plena y dicha con la propia vida.'
   ]),
   pt('p47', 'Ira', ['la ira', 'rabia', 'enfado'], [
-    'Es una reacción emocional vehemente.',
-    'Está incluida entre los siete pecados capitales.',
-    'Se desata ante una ofensa, engaño o injusticia.',
-    'Hace que la persona apriete los puños y los dientes con furia.',
-    'Se describe diciendo que hace hervir la sangre o ver todo rojo.',
-    'Emoción intensa de furia, rabia y enfado descontrolado.'
+    'Es una reacción visceral intensa.',
+    'Históricamente ha sido clasificada entre los peores vicios o defectos de carácter.',
+    'Se desencadena como respuesta directa a una ofensa, engaño o injusticia.',
+    'Físicamente provoca que la persona apriete los puños, los dientes y frunza el ceño.',
+    'Coloquialmente se describe como que a uno le hierve la sangre o lo ve todo rojo.',
+    'Emoción destructiva de furia, rabia y enfado descontrolado.'
   ]),
   pt('p48', 'Vergüenza', ['la verguenza'], [
-    'Es una emoción social.',
-    'Nace de la percepción de haber cometido una torpeza en público.',
-    'Provoca una reacción involuntaria en la que las mejillas enrojecen.',
-    'Hace que la persona baje la cabeza y esquive la mirada.',
-    'Se expresa con la frase de desear que la tierra te trague.',
-    'Emoción de sonrojo e incomodidad que se siente al hacer el ridículo.'
+    'Es una emoción de naturaleza estrictamente social.',
+    'Aparece cuando el individuo siente que ha vulnerado las expectativas de un grupo.',
+    'Desata una reacción involuntaria que aumenta el flujo sanguíneo hacia el rostro.',
+    'Hace que la persona esquive la mirada, baje la cabeza y sienta mucho bochorno.',
+    'Provoca que quien la sufre exprese el deseo de que "la tierra se lo trague".',
+    'Sensación de sonrojo e incomodidad que se experimenta al hacer el ridículo.'
   ]),
   pt('p49', 'Paz', ['la paz'], [
-    'Es una condición social.',
-    'Describe asimismo un estado de quietud interior.',
-    'Tiene un Premio Nobel específico entregado en la ciudad de Oslo.',
-    'Se simboliza con una paloma blanca con una rama de olivo en el pico.',
-    'Se representa con dos dedos levantados en forma de V.',
-    'Situación de calma y tranquilidad donde no hay guerras ni violencia.'
+    'Es un concepto relacional y de orden.',
+    'Puede referirse tanto a la quietud interior como a un escenario político.',
+    'Tiene dedicado un prestigioso premio internacional que se entrega cada año en Oslo.',
+    'Suele representarse iconográficamente con los dedos índice y corazón en forma de V.',
+    'Su símbolo más universal y antiguo es una paloma blanca con una rama en el pico.',
+    'Situación de calma, tranquilidad y concordia donde no hay conflictos ni guerras.'
   ]),
   pt('p50', 'Libertad', ['la libertad'], [
-    'Es una aspiración filosófica fundamental.',
-    'Figura como el primer término del lema republicano de Francia.',
-    'Se define como la capacidad de decidir y obrar sin coacciones.',
-    'Su privación en una celda es la sanción penitenciaria que impone la ley.',
-    'Tiene un gigantesco monumento con antorcha en Nueva York.',
-    'Derecho de las personas a actuar según su voluntad sin estar prisioneras.'
+    'Es una cualidad existencial y política.',
+    'Ha sido el reclamo central de innumerables revoluciones a lo largo de los siglos.',
+    'Constituye el primer término del famoso lema de la República Francesa.',
+    'A nivel jurídico, su privación en una celda es el máximo castigo antes de la pena de muerte.',
+    'Tiene un gigantesco monumento en forma de mujer con antorcha en Nueva York.',
+    'Derecho de las personas a decidir por sí mismas sin estar prisioneras ni oprimidas.'
   ]),
 
   // --- EVENTOS HISTÓRICOS Y EFEMÉRIDES (p51 - p60) ---
   pt('p51', 'Llegada a la Luna', ['alunizaje', 'apolo 11'], [
-    'Es un acontecimiento histórico moderno.',
-    'Se produjo durante la segunda mitad del siglo XX.',
-    'Fue la cumbre de una carrera tecnológica entre dos potencias.',
-    'La misión espacial responsable se llamó Apolo 11 en 1969.',
-    'Neil Armstrong descendió por la escalerilla y pisó suelo gris.',
-    'El momento histórico en que el ser humano pisó la superficie lunar.'
+    'Es un suceso documentado de la era moderna.',
+    'Tuvo lugar durante la segunda mitad del convulso siglo XX.',
+    'Fue el punto culminante de una carrera tecnológica e ideológica entre dos superpotencias.',
+    'Logró que tres astronautas viajaran en la famosa misión conocida como Apolo 11.',
+    'Inmortalizó la imagen de una bota dejando una huella gris y la frase "un pequeño paso...".',
+    'El acontecimiento histórico de 1969 donde el ser humano caminó por primera vez en el satélite terrestre.'
   ]),
   pt('p52', 'Hundimiento del Titanic', ['el titanic', 'naufragio del titanic'], [
-    'Es un desastre marítimo histórico.',
-    'Ocurrió a principios del siglo XX, en abril de 1912.',
-    'Sucedió en aguas del océano Atlántico Norte.',
-    'Se decía erróneamente que era un barco prácticamente insumergible.',
-    'Colisionó en la noche contra un enorme bloque de hielo flotante.',
-    'El famoso naufragio del gran barco que chocó contra un iceberg.'
+    'Es un desastre que conmocionó a la opinión pública.',
+    'Ocurrió en los albores del siglo XX, marcando el fin de una era de optimismo tecnológico.',
+    'La magnitud de la tragedia obligó a reescribir las normativas internacionales de salvamento marítimo.',
+    'El suceso tuvo lugar en las heladas aguas del océano Atlántico en plena noche.',
+    'Fue provocado por el impacto de un supuesto buque "insumergible" contra un bloque de hielo.',
+    'Famoso naufragio de 1912 del mayor barco de pasajeros del mundo tras chocar contra un iceberg.'
   ]),
   pt('p53', 'Caída del Muro de Berlín', ['muro de berlin', 'caida del muro'], [
-    'Es un suceso geopolítico europeo.',
-    'Marcó el declive visible de la división de la Guerra Fría.',
-    'Una barrera física había dividido una ciudad durante casi tres décadas.',
-    'Ocurrió en la noche del 9 de noviembre de 1989.',
-    'Miles de ciudadanos comenzaron a derribarlo pacíficamente con picos.',
-    'El derribo en 1989 del muro que dividía la capital alemana en dos.'
+    'Es un acontecimiento de enorme peso geopolítico.',
+    'Representó visualmente el principio del fin de la Guerra Fría en Europa.',
+    'Surgió tras el anuncio precipitado de la apertura de fronteras en un país dividido.',
+    'Ocurrió en noviembre de 1989 ante la mirada atónita de millones de telespectadores.',
+    'Miles de ciudadanos se subieron a una barrera de hormigón armado y la destrozaron con picos.',
+    'El histórico derribo de la pared que dividía la capital de Alemania en dos mitades.'
   ]),
   pt('p54', 'Revolución Francesa', ['la revolucion francesa'], [
-    'Es un alzamiento sociopolítico.',
-    'Tuvo lugar en Europa occidental a finales del siglo XVIII.',
-    'Difundió la consigna de Libertad, Igualdad y Fraternidad.',
-    'El hecho detonante fue la toma de la prisión de la Bastilla en 1789.',
-    'Puso fin al absolutismo y ejecutó a los reyes en la guillotina.',
-    'Levantamiento popular en Francia en 1789 que derrocó la monarquía.'
+    'Es un alzamiento sociopolítico clave en la historia.',
+    'Ocurrió en Europa occidental durante las últimas décadas del siglo XVIII.',
+    'Inauguró la Edad Contemporánea y extendió las ideas de la Ilustración.',
+    'El evento que marcó su estallido oficial fue la violenta toma de la prisión de la Bastilla.',
+    'Acabó con la monarquía absolutista y llevó a los reyes Luis XVI y María Antonieta a la guillotina.',
+    'Rebelión popular de 1789 que cambió Francia bajo el lema "Libertad, Igualdad y Fraternidad".'
   ]),
   pt('p55', 'Halloween', ['noche de brujas'], [
-    'Es una fecha señalada del calendario.',
-    'Posee raíces vinculadas al cambio estacional celta de Samhain.',
-    'Se celebra anualmente en la noche del 31 de octubre.',
-    'La gente se disfraza con atuendos de monstruos o brujas.',
-    'Los niños piden caramelos diciendo "Truco o trato".',
-    'Noche de brujas con disfraces de miedo y calabazas iluminadas.'
+    'Es un evento cíclico del calendario.',
+    'Sus orígenes se remontan a festivales paganos celtas que celebraban el fin de las cosechas.',
+    'Ha evolucionado hacia una festividad moderna de marcado carácter comercial y lúdico.',
+    'Se celebra cada año durante la víspera del primero de noviembre.',
+    'Los barrios se llenan de calabazas talladas y niños que piden golosinas puerta por puerta.',
+    'La noche de brujas donde la gente se disfraza de monstruos y dice "truco o trato".'
   ]),
   pt('p56', 'Juegos Olímpicos', ['olimpiadas', 'jjoo'], [
-    'Es una cita deportiva internacional.',
-    'Nació en la antigua Grecia en honor a los dioses.',
-    'Se celebra de forma ordinaria una vez cada cuatro años.',
-    'Su logotipo está formado por cinco anillos entrelazados de colores.',
-    'Un fuego sagrado viaja en una antorcha hasta encender un pebetero.',
-    'La mayor competición deportiva mundial donde se entregan medallas.'
+    'Es una congregación de escala mundial.',
+    'Sus primeras ediciones se remontan a competiciones en honor a los dioses de la Antigüedad.',
+    'Tras su restauración moderna, se celebra de manera regular una vez cada cuatro años.',
+    'Comienza siempre con el encendido de un fuego que viaja por el mundo mediante una antorcha.',
+    'Su logotipo está formado por cinco anillos de colores entrelazados sobre fondo blanco.',
+    'La mayor competición multideportiva mundial donde los atletas compiten por medallas de oro.'
   ]),
   pt('p57', 'Año Nuevo', ['nochevieja', 'ano nuevo'], [
-    'Es una festividad cíclica.',
-    'Se produce en el paso de un mes a otro en el calendario.',
-    'Tiene lugar en la medianoche del 31 de diciembre al 1 de enero.',
-    'En España se toman doce uvas siguiendo el ritmo de las campanadas.',
-    'Al finalizar la cuenta se brinda con champán o cava festejando.',
-    'Celebración de Nochevieja para despedir el año y dar la bienvenida al nuevo.'
+    'Es un rito de transición temporal.',
+    'Las civilizaciones lo calculan siguiendo los ciclos de sus respectivos calendarios.',
+    'Reúne a multitudes en plazas emblemáticas como Times Square para hacer cuentas atrás.',
+    'En España, la tradición dicta celebrarlo al ritmo de doce campanadas desde la Puerta del Sol.',
+    'La gente se felicita, brinda con champán y come doce uvas de la suerte a medianoche.',
+    'La fiesta de Nochevieja donde se despide a diciembre y se da la bienvenida a enero.'
   ]),
   pt('p58', 'Primera Guerra Mundial', ['la gran guerra', 'i guerra mundial'], [
-    'Es un conflicto bélico de gran escala.',
-    'Se conoció durante décadas simplemente como La Gran Guerra.',
-    'Comenzó en 1914 tras un magnicidio en Sarajevo.',
-    'Los combatientes permanecían atrincherados en zanjas de barro.',
-    'Se utilizaron por primera vez tanques y gases tóxicos.',
-    'Guerra mundial librada en trincheras en Europa entre 1914 y 1918.'
+    'Es un enfrentamiento bélico de proporciones inéditas.',
+    'Introdujo cambios aterradores en la forma de combatir gracias a la industrialización.',
+    'Durante décadas fue conocida en los libros de historia simplemente como La Gran Guerra.',
+    'El detonante fue el asesinato del archiduque de Austria en la ciudad de Sarajevo en 1914.',
+    'Los soldados pasaron años estancados luchando en el barro y las enfermedades de las trincheras.',
+    'Conflicto armado que arrasó Europa entre 1914 y 1918 empleando gases tóxicos y tanques.'
   ]),
   pt('p59', 'Segunda Guerra Mundial', ['ii guerra mundial'], [
-    'Es el conflicto militar más destructivo de la historia.',
-    'Comenzó en septiembre de 1939 tras el ataque sobre Polonia.',
-    'Enfrentó a los Aliados contra las fuerzas totalitarias del Eje.',
-    'Tuvo un gran desembarco en las costas de Normandía el Día D.',
-    'Concluyó en 1945 tras el lanzamiento de dos bombas atómicas.',
-    'La gran guerra mundial librada entre 1939 y 1945 contra Hitler y el nazismo.'
+    'Es el conflicto con mayor índice de mortalidad de todos los tiempos.',
+    'Su estallido oficial se desencadenó tras la invasión de Polonia en el año 1939.',
+    'Enfrentó al bloque de los Países Aliados contra las potencias del llamado Eje.',
+    'Vivió episodios decisivos como el desembarco del Día D en las playas de Normandía.',
+    'Culminó en 1945 con el lanzamiento de dos bombas atómicas sobre territorio japonés.',
+    'La guerra global donde el mundo entero luchó para derrotar a Hitler y al nazismo.'
   ]),
   pt('p60', 'San Valentín', ['dia de san valentin', 'dia de los enamorados'], [
-    'Es una jornada festiva recurrente.',
-    'Lleva el nombre de un mártir de la época romana.',
-    'Tiene fijada su fecha en el calendario cada 14 de febrero.',
-    'Es conocida popularmente como el Día de los Enamorados.',
-    'Las parejas se regalan bombones, corazones y rosas rojas.',
-    'El día de los enamorados que se celebra en pareja el 14 de febrero.'
+    'Es una jornada temática anual.',
+    'Toma su nombre del martirologio romano y de la figura de un sacerdote antiguo.',
+    'Se ha consolidado como una de las fechas con mayores picos de ventas florales.',
+    'Tiene fijado su espacio en el calendario de cada año en el ecuador del mes de febrero.',
+    'Ese día las parejas tienen citas románticas y se regalan bombones y corazones rojos.',
+    'Festividad del 14 de febrero conocida universalmente como el Día de los Enamorados.'
   ]),
 
   // --- ALIMENTOS Y BEBIDAS (p61 - p70) ---
   pt('p61', 'Pizza', ['la pizza'], [
-    'Es una receta culinaria.',
-    'Tiene sus antecedentes históricos en el sur de Italia.',
-    'Su base está hecha con una masa de harina fermentada.',
-    'Lleva una capa de tomate triturado y queso que se funde al horno.',
-    'Suele cortarse en porciones triangulares para comerla con la mano.',
-    'Comida italiana redonda al horno con base de masa, tomate y mozzarella.'
+    'Es un preparado de la industria culinaria.',
+    'Sus raíces históricas se encuentran en la cuenca mediterránea europea.',
+    'Es uno de los productos más estandarizados y exportados mediante franquicias.',
+    'Se construye partiendo de un disco plano de masa fermentada horneado a alta temperatura.',
+    'Se cubre obligatoriamente con salsa de tomate y queso mozzarella fundido.',
+    'Famosa comida italiana redonda que se corta en porciones triangulares.'
   ]),
   pt('p62', 'Chocolate', ['el chocolate'], [
     'Es una sustancia comestible procesada.',
-    'Su materia prima se utilizaba en culturas mesoamericanas.',
-    'Se elabora a partir de los granos tostados del fruto del cacao.',
-    'Contiene teobromina y se presenta en tabletas o bombones.',
-    'Puede ser negro puro, con leche o blanco y se derrite al calor.',
-    'Delicioso dulce elaborado a partir del cacao que se come en tabletas.'
+    'Fue utilizado inicialmente por culturas mesoamericanas como bebida ceremonial.',
+    'La revolución de su sabor se produjo al combinar su polvo amargo con azúcar y lácteos.',
+    'Se elabora tostando y moliendo las semillas extraídas del interior del fruto del cacao.',
+    'Su variante en tabletas oscuras o bombones se derrite fácilmente con el calor de las manos.',
+    'Delicioso dulce de cacao que encanta a los niños y sirve para hacer postres.'
   ]),
   pt('p63', 'Paella', ['la paella'], [
-    'Es un preparado gastronómico tradicional.',
-    'Procede de la cuenca mediterránea de la península ibérica.',
-    'Toma su nombre del recipiente metálico ancho con dos asas donde se cocina.',
-    'Se le añade azafrán para darle su característico tono amarillo.',
-    'La costra de grano crujiente que queda en el fondo se llama socarrat.',
-    'Plato típico valenciano de arroz amarillo cocinado en sartén con marisco o carne.'
+    'Es una elaboración gastronómica arraigada.',
+    'Su origen se sitúa en entornos agrícolas cercanos a la costa este de la Península Ibérica.',
+    'Curiosamente recibe el mismo nombre que el recipiente ancho y plano donde se cocina.',
+    'Debe su característico tono amarillento al uso de hebras de azafrán o colorante alimentario.',
+    'Sus puristas defienden que la auténtica lleva pollo, conejo y garrofón, y no lleva marisco.',
+    'El plato valenciano y español más famoso, hecho a base de arroz cocinado en sartén.'
   ]),
   pt('p64', 'Cerveza', ['la cerveza', 'birra', 'cana'], [
-    'Es una bebida obtenida por fermentación.',
-    'Se consume desde la Antigüedad en civilizaciones como Mesopotamia.',
-    'Se elabora empleando agua, cebada malteada y levaduras.',
-    'La planta que le proporciona su gusto amargo es el lúpulo.',
-    'En los bares de España se suele pedir servida fría de grifo como caña.',
-    'Bebida alcohólica dorada elaborada con cebada y lúpulo con espuma blanca.'
+    'Es un brebaje de consumo generalizado.',
+    'Se elabora mediante un proceso bioquímico ancestral de fermentación controlada.',
+    'Sus componentes base exigen una fuente de almidón vegetal, agua y agentes biológicos levaduriformes.',
+    'El uso de las flores del lúpulo le otorga su persistente amargor característico.',
+    'Se sirve muy fría en jarras o vasos, generando una espesa corona de espuma blanca.',
+    'Bebida alcohólica dorada elaborada con cebada que en los bares se pide como "caña".'
   ]),
   pt('p65', 'Helado', ['el helado'], [
-    'Es un preparado alimenticio dulce.',
-    'Se consume de manera masiva durante los meses más calurosos.',
-    'Se elabora batiendo crema, leche y azúcar a temperaturas bajo cero.',
-    'Entre sus sabores clásicos destacan el chocolate, la vainilla y la nata.',
-    'Se sirve en tarrinas o sobre un cucurucho de barquillo y se derrite al calor.',
-    'Postre frío y dulce que se toma en cucurucho de barquillo en verano.'
+    'Es un producto de la industria alimentaria.',
+    'Su estado óptimo de consumo depende estrechamente del control de su temperatura.',
+    'Su elaboración requiere batir enérgicamente ingredientes líquidos mientras se congelan.',
+    'Suele consumirse de forma masiva para refrescarse durante los meses más cálidos del año.',
+    'Se despacha en tarrinas con cucharilla o montado sobre un cucurucho crujiente de barquillo.',
+    'Postre muy frío y dulce de diferentes sabores que se derrite rápidamente al sol.'
   ]),
   pt('p66', 'Café', ['el cafe'], [
-    'Es una bebida extendida por todo el planeta.',
-    'Se obtiene a partir de semillas tostadas de un arbusto tropical.',
-    'Posee un sabor amargo y un contrastado efecto estimulante.',
-    'Contiene una sustancia alcaloide natural llamada cafeína.',
-    'Puede pedirse solo, cortado, con leche o descafeinado.',
-    'Bebida caliente negra y amarga que se toma para despertar por las mañanas.'
+    'Es una bebida extendida a nivel global.',
+    'Se obtiene a partir de materias primas procedentes de climas tropicales y subtropicales.',
+    'Su consumo es habitual en los descansos laborales debido a sus propiedades estimulantes.',
+    'Se elabora filtrando agua caliente a través de semillas molidas de color marrón oscuro.',
+    'Posee un alcaloide que ayuda a despertarse y se puede servir cortado, solo o con leche.',
+    'Bebida caliente negra, amarga y aromática indispensable para muchos por la mañana.'
   ]),
   pt('p67', 'Vino', ['el vino'], [
-    'Es una bebida alcohólica de larga historia.',
-    'En la mitología clásica estaba consagrada al dios Baco.',
-    'Se obtiene a través de la fermentación del mosto de una fruta.',
-    'Madura reposando en barricas de madera dentro de bodegas.',
-    'Se clasifica por su color en variedades como tinto, blanco o rosado.',
-    'Bebida alcohólica elaborada a partir de uvas que puede ser tinta o blanca.'
+    'Es un producto líquido destinado al consumo.',
+    'Ha tenido un papel central en ceremonias religiosas e imperios desde la Antigüedad.',
+    'Su calidad mejora y se estabiliza al dejarlo reposar en el interior de barricas de roble.',
+    'Su proceso de creación transforma los azúcares del mosto de las frutas en alcohol.',
+    'Se clasifica visualmente en distintas categorías, siendo las más comunes el blanco y el tinto.',
+    'Bebida alcohólica que se elabora pisando y fermentando las uvas de la vid.'
   ]),
   pt('p68', 'Pan', ['el pan'], [
-    'Es un alimento fundamental en la historia humana.',
-    'Se elabora mezclando harina molida, agua, sal y levaduras.',
-    'La masa reposa para fermentar y se introduce después en un horno.',
-    'Posee una corteza exterior tostada y una masa interior blanda llamada miga.',
-    'Se adquiere en panaderías en formato de barra para preparar bocadillos.',
-    'Alimento básico horneado de harina y levadura con corteza y miga.'
+    'Es un alimento de preparación básica.',
+    'Surgió hace milenios al dominar el fuego y el procesamiento inicial de la agricultura.',
+    'El volumen final de su masa se consigue gracias a la acción de gases durante la fermentación.',
+    'Presenta dos texturas muy contrastadas: una corteza exterior dura y una parte interna esponjosa.',
+    'Se compra a diario en formato de barra redonda o alargada para acompañar comidas o hacer bocadillos.',
+    'Alimento horneado elaborado a partir de harina de trigo, agua, sal y levadura.'
   ]),
   pt('p69', 'Tortilla de patatas', ['tortilla espanola', 'la tortilla'], [
-    'Es una elaboración gastronómica de origen ibérico.',
-    'Se prepara empleando ingredientes básicos del campo.',
-    'Sus componentes indispensables son tubérculos cortados y huevos batidos.',
-    'Se cuaja dentro de una sartén circular y exige voltearla con un plato.',
-    'Genera debate eterno entre partidarios y detractores de la cebolla.',
-    'Famoso plato español de sartén elaborado con patatas y huevo, con o sin cebolla.'
+    'Es una preparación de la cocina tradicional.',
+    'Utiliza ingredientes extremadamente básicos y asequibles para generar un plato contundente.',
+    'La pericia del cocinero se demuestra en el momento crítico de darle la vuelta sobre la sartén.',
+    'Su base consiste en freír finas láminas de tubérculo para luego cuajarlas junto a huevos batidos.',
+    'En España existe un enorme debate popular sobre si su receta original debe incluir o no cebolla.',
+    'Plato redondo y grueso muy típico de la gastronomía española hecho de huevos y papas.'
   ]),
   pt('p70', 'Sushi', ['el sushi'], [
-    'Es una preparación culinaria de origen oriental.',
-    'Procede de las tradiciones gastronómicas de Japón.',
-    'Tiene como base principal granos de arroz aderezados con vinagre.',
-    'Suele presentarse acompañado de piezas de pescado crudo como atún o salmón.',
-    'Con frecuencia viene envuelto en láminas de alga negra llamadas nori.',
-    'Plato japonés de rollitos de arroz con pescado crudo que se toma con palillos.'
+    'Es un alimento originario del continente asiático.',
+    'Inició como un antiguo método de conservación fermentada antes de ser un plato de consumo rápido.',
+    'La base de todas sus preparaciones es el grano corto cocido y aderezado con vinagre dulce.',
+    'Suele presentarse en pequeños rollos envueltos en algas negras u oscuras secas.',
+    'Incluye pequeñas porciones de atún o salmón completamente crudos y se come con palillos.',
+    'Famoso plato de la gastronomía de Japón compuesto por arroces y pescado fresco crudo.'
   ]),
 
   // --- NATURALEZA Y FENÓMENOS (p71 - p80) ---
   pt('p71', 'Volcán', ['volcanes', 'el volcan'], [
-    'Es una formación orográfica de la Tierra.',
-    'Suele situarse en puntos de fricción entre placas tectónicas.',
-    'Tiene un conducto o abertura superior llamado cráter.',
-    'Acumula material rocoso fundido en una cámara en su interior.',
-    'Al entrar en erupción arroja ceniza y ríos de roca fundida.',
-    'Montaña con un cráter que entra en erupción expulsando lava y cenizas.'
+    'Es una formación que altera el relieve geográfico.',
+    'Suele surgir en zonas de inestabilidad tectónica del manto del planeta.',
+    'Actúa como una válvula de escape natural para la inmensa presión subterránea.',
+    'En su cima presenta un cráter o caldera por el que expulsa gases y proyecciones de ceniza.',
+    'Al entrar en erupción de manera violenta arroja corrientes de roca fundida roja incandescente.',
+    'Montaña que expulsa fuego y ríos de lava desde las entrañas de la Tierra.'
   ]),
   pt('p72', 'Arcoíris', ['arco iris', 'el arcoiris'], [
-    'Es un fenómeno visual que ocurre en la atmósfera.',
-    'Fue estudiado por Newton al experimentar con prismas de cristal.',
-    'Se origina por la descomposición y refracción de la luz solar.',
-    'Precisa que haya diminutas gotas de agua suspendidas en el aire.',
-    'Dibuja una franja curvada luminosa con siete tonalidades cromáticas.',
-    'Arco multicolor que se forma en el cielo cuando llueve y sale el sol a la vez.'
+    'Es una percepción óptica transitoria.',
+    'Para que ocurra, el observador debe encontrarse posicionado entre la fuente de luz y la humedad.',
+    'Isaac Newton lo estudió utilizando primas de vidrio transparente en un cuarto oscuro.',
+    'Se produce cuando los rayos del sol atraviesan y se refractan en finas gotas de agua suspendidas.',
+    'Traza una semicircunferencia colorida en el cielo mezclando rojo, amarillo, verde, azul y violeta.',
+    'Banda de múltiples colores que aparece en el cielo cuando sale el sol tras haber llovido.'
   ]),
   pt('p73', 'Terremoto', ['seismo', 'sismo'], [
-    'Es un suceso geológico repentino.',
-    'Nace por la brusca liberación de energía en fallas subterráneas.',
-    'El punto interno de fractura se llama hipocentro y el superficial epicentro.',
-    'Su intensidad se mide habitualmente utilizando la escala de Richter.',
-    'Hace temblar el terreno y si ocurre bajo el mar puede originar tsunamis.',
-    'Temblor violento de tierra que hace temblar los edificios y el suelo.'
+    'Es un suceso originado por la dinámica del planeta.',
+    'Puede sentirse a miles de kilómetros del punto donde se ha desencadenado.',
+    'Es causado por la ruptura y choque repentino de las grandes fallas tectónicas.',
+    'Su punto de origen subterráneo se llama hipocentro y el superficial epicentro.',
+    'Se mide científicamente utilizando los sismógrafos y la conocida escala de Richter.',
+    'Fuerte sacudida y temblor violento del suelo que derrumba edificios.'
   ]),
   pt('p74', 'Desierto', ['los desiertos', 'el desierto'], [
-    'Es una demarcación geográfica natural.',
-    'Se define por registrar niveles mínimos de precipitaciones al año.',
-    'Padece bruscas variaciones térmicas entre el día y la noche.',
-    'El viento arrastra arena formando colinas onduladas llamadas dunas.',
-    'Los pequeños manantiales con vegetación y agua se llaman oasis.',
-    'Territorio árido y sin apenas agua cubierto de arena y dunas como el Sahara.'
+    'Es una clasificación del paisaje físico.',
+    'Su principal rasgo distintivo es un déficit extremo y prolongado de precipitaciones.',
+    'Soporta una amplitud térmica inmensa, con días abrasadores y noches casi heladas.',
+    'El escaso agua se concentra en oasis subterráneos rodeados de algunas palmeras.',
+    'El viento modela enormes extensiones de arena creando colinas cambiantes llamadas dunas.',
+    'Vasto territorio árido sin apenas agua ni vida, como el conocido ecosistema del Sahara.'
   ]),
   pt('p75', 'Luna', ['la luna'], [
-    'Es un cuerpo celeste del espacio.',
-    'Se encuentra en rotación orbital continua en torno a la Tierra.',
-    'Atraviesa cuatro fases visibles: nueva, creciente, llena y menguante.',
-    'Su fuerza gravitacional provoca el ciclo de las mareas en los mares.',
-    'Fue pisada por astronautas en misiones de exploración en 1969.',
-    'El satélite natural de la Tierra que brilla en el cielo nocturno.'
+    'Es un objeto material que orbita en el vacío.',
+    'Carece de atmósfera propia, por lo que su superficie conserva cráteres de antiguos impactos.',
+    'Su gravedad invisible ejerce la fuerza que provoca el movimiento de las mareas oceánicas.',
+    'Pasa periódicamente por diferentes fases de iluminación: nueva, creciente, llena y menguante.',
+    'A finales de los años sesenta fue pisada por las botas de astronautas estadounidenses.',
+    'El satélite natural de la Tierra que brilla de color blanco en el cielo de noche.'
   ]),
   pt('p76', 'Nieve', ['la nieve'], [
-    'Es agua en estado sólido.',
-    'Cae desde la atmósfera cuando las temperaturas son muy bajas.',
-    'Se precipita flotando de manera pausada en forma de copos blancos.',
-    'Al acumularse cubre el paisaje de un manto blanco uniforme.',
-    'Permite esquiar y los niños la moldean para hacer muñecos con zanahorias.',
-    'Copos blancos de agua congelada que caen en invierno y cubren el suelo de blanco.'
+    'Es una manifestación atmosférica.',
+    'Depende enteramente de unas condiciones termodinámicas concretas en altura.',
+    'Modifica drásticamente el comportamiento acústico y el paisaje de las zonas donde precipita.',
+    'Se compone de intrincados cristales geométricos de hielo que caen suavemente desde las nubes.',
+    'Cuando se acumula en invierno, permite practicar el esquí o amasar bolas redondas.',
+    'Precipitación en forma de copos blancos fríos que cubre las montañas y el suelo.'
   ]),
   pt('p77', 'Huracán', ['huracanes', 'tifon', 'ciclon'], [
-    'Es un fenómeno climático de extrema potencia.',
-    'Se origina sobre masas de agua oceánica cálida en regiones tropicales.',
-    'La rotación de la Tierra lo hace girar como un gigantesco vórtice de nubes.',
-    'En el centro de su estructura existe una zona en calma llamada el ojo.',
-    'Genera vientos destructivos de más de doscientos kilómetros por hora.',
-    'Enorme tormenta tropical con vientos destructivos y un ojo en calma en el centro.'
+    'Es un fenómeno meteorológico masivo.',
+    'Solo puede formarse y retroalimentarse sobre la superficie cálida de océanos tropicales.',
+    'La rotación terrestre le confiere una característica forma de espiral espumosa de nubes.',
+    'Paradójicamente, en su mismo centro de rotación existe un "ojo" despejado y totalmente en calma.',
+    'Lanza lluvias torrenciales y vientos devastadores que superan los doscientos kilómetros por hora.',
+    'Enorme tormenta en forma de remolino gigante que arrasa las costas con fuertes vientos.'
   ]),
   pt('p78', 'Océano', ['oceanos', 'el oceano'], [
-    'Es una masa líquida continua del planeta.',
-    'Ocupa más de dos tercios de toda la superficie terrestre.',
-    'Sus aguas contienen una elevada concentración mineral de sal y no se pueden beber.',
-    'Se subdivide geográficamente en cinco grandes masas, siendo el Pacífico la mayor.',
-    'Separa a los continentes de la Tierra.',
-    'Masa gigante de agua salada que cubre el 70% de la superficie de la Tierra.'
+    'Es una demarcación superficial del globo terráqueo.',
+    'Es el principal responsable de la regulación climática de todo el planeta Tierra.',
+    'Ocupa aproximadamente el setenta por ciento del área total y alberga fosas abisales insondables.',
+    'Sus líquidos presentan una alta concentración de salinidad, haciéndolos intomables para los humanos.',
+    'Separan las enormes masas de los continentes y sus aguas experimentan mareas regulares.',
+    'La inmensa extensión de agua salada marina, como el Pacífico, el Atlántico o el Índico.'
   ]),
   pt('p79', 'Marte', ['el planeta rojo', 'marte'], [
-    'Es un cuerpo astronómico del sistema solar.',
-    'Ocupa la cuarta posición en orden de distancia desde el Sol.',
-    'Cuenta con dos diminutos satélites irregulares llamados Fobos y Deimos.',
-    'Acoge el volcán más elevado del sistema solar, el Monte Olimpo.',
-    'Posee abundantes minerales de óxido de hierro en su suelo rocoso.',
-    'El cuarto planeta del sistema solar, conocido como el Planeta Rojo.'
+    'Es un astro de nuestro vecindario cósmico.',
+    'La exploración de su superficie se ha realizado con sondas robóticas y vehículos rover.',
+    'Alberga tanto el volcán más alto conocido como uno de los cañones más grandes del sistema.',
+    'Su órbita y proximidad lo convierten en el siguiente gran objetivo de las misiones espaciales humanas.',
+    'Su tono oxidado característico se debe a la abundancia de hierro en sus llanuras de polvo.',
+    'El cuarto planeta del sistema solar, mundialmente conocido por su apodo de el "Planeta Rojo".'
   ]),
   pt('p80', 'Bosque', ['los bosques', 'el bosque'], [
-    'Es una formación vegetal sobre tierra firme.',
-    'Ocupa amplias extensiones de los continentes.',
-    'Se caracteriza por una densa y tupida agrupación de árboles.',
-    'El suelo suele acumular hojas secas, ramas, musgos y setas.',
-    'Es el entorno natural donde habitan ciervos, zorros, lobos y ardillas.',
-    'Extensión de terreno poblada de muchos árboles donde viven animales salvajes.'
+    'Es una agrupación de organismos vegetales.',
+    'Representa uno de los sumideros de dióxido de carbono más importantes del clima.',
+    'Sus formaciones pueden variar desde especies de hoja perenne hasta caducifolios en otoño.',
+    'El suelo está oscurecido y cubierto por musgos, setas, matorrales y hojas caídas.',
+    'Es el ecosistema característico de los cuentos donde habitan lobos, osos, ciervos y ardillas.',
+    'Gran extensión de tierra poblada tupidamente de árboles de la que se saca madera.'
   ]),
 
   // --- ELEMENTOS, TRANSPORTE Y OBJETOS (p81 - p90) ---
   pt('p81', 'Lavadora', ['la lavadora', 'lavarropas'], [
-    'Es un artefacto para el hogar.',
-    'Tiene un volumen considerable y peso elevado.',
-    'Precisa conectarse a la red eléctrica y a tuberías de agua.',
-    'Tiene un tambor metálico cilíndrico lleno de pequeños agujeros.',
-    'Incorpora un cajetín para detergente y realiza el centrifugado.',
-    'Electrodoméstico con tambor giratorio que sirve para lavar la ropa.'
+    'Es un aparato mecánico de dimensiones considerables.',
+    'Ha supuesto un inmenso ahorro de tiempo en las tareas de mantenimiento rutinario.',
+    'Requiere conexiones independientes de suministro hídrico y de electricidad.',
+    'Utiliza la fuerza centrífuga a altas revoluciones para expulsar la humedad de su interior.',
+    'Se compone de un tambor cilíndrico metálico rotatorio donde se introduce detergente.',
+    'Electrodoméstico del hogar diseñado para frotar, enjuagar y lavar la ropa sucia.'
   ]),
   pt('p82', 'Lámpara', ['lamparas', 'la lampara'], [
-    'Es un objeto doméstico.',
-    'Suele estar enchufada o conectada a un circuito de cables.',
-    'Puede colocarse sobre mesas, colgar del techo o apoyarse en el suelo.',
-    'Dispone de un interruptor para activarla a voluntad.',
-    'Suele estar cubierta por una pantalla que suaviza el resplandor de la bombilla.',
-    'Objeto que da luz a una estancia mediante una bombilla.'
+    'Es una herramienta artificial.',
+    'Depende de un circuito eléctrico cerrado para ofrecer alguna utilidad.',
+    'Existen variaciones diseñadas para colgar, sostenerse sobre mesas o afirmarse en el suelo.',
+    'Incorpora materiales reflectantes o pantallas de tela para suavizar su impacto.',
+    'Consta de un soporte, un cable con interruptor y un casquillo para una bombilla.',
+    'Objeto que enchufas y enciendes para aportar luz y claridad a las habitaciones.'
   ]),
   pt('p83', 'Televisión', ['television', 'la television', 'tele', 'televisor'], [
-    'Es un aparato tecnológico.',
-    'Comenzó a difundirse en blanco y negro a mediados del siglo XX.',
-    'Ha evolucionado hacia formatos de pantalla plana LED u OLED.',
-    'Su tamaño se cuantifica mediante la longitud de su diagonal en pulgadas.',
-    'Se ubica en el salón y se maneja a distancia con un mando.',
-    'Aparato electrónico de salón con pantalla para ver series, películas y noticias.'
+    'Es un dispositivo tecnológico de consumo.',
+    'Su historia comercial masiva comenzó con transmisiones monocromáticas en tubo de rayos catódicos.',
+    'La evolución técnica ha sustituido su volumen posterior por paneles planos y ligeros.',
+    'Su tamaño se mide estableciendo la distancia diagonal de esquina a esquina en pulgadas.',
+    'Suele presidir los salones modernos y se controla utilizando un mando a distancia.',
+    'Pantalla electrónica en la que se sintonizan programas, telediarios y películas.'
   ]),
   pt('p84', 'Auriculares', ['audifonos', 'cascos'], [
-    'Es un complemento electrónico.',
-    'Diseñado para ser utilizado por una sola persona.',
-    'Puede tener formato de diadema exterior o de botón intrauditivo.',
-    'Muchos modelos modernos se enlazan sin cables por Bluetooth.',
-    'Se introducen o apoyan directamente en los oídos.',
-    'Dispositivo que te pones en las orejas para escuchar música en privado.'
+    'Es un dispositivo electrónico perimetral.',
+    'Fue ideado para independizar una experiencia aislando al usuario de su entorno.',
+    'Puede presentarse en formato de almohadillas unidas por diadema o pequeñas piezas intrauditivas.',
+    'Las versiones actuales evitan el enredo de cables sincronizándose mediante Bluetooth.',
+    'Posee dos diminutos altavoces que se acercan o introducen en las orejas.',
+    'Aparato que te pones para poder escuchar música sin que nadie más la oiga.'
   ]),
   pt('p85', 'Submarino', ['submarinos'], [
-    'Es un vehículo de transporte.',
-    'Diseñado para desplazarse por el medio marino.',
-    'Utiliza tanques de lastre que se llenan de agua para bajar o aire para subir.',
-    'Cuenta con un tubo óptico extensible llamado periscopio para ver la superficie.',
-    'Existen modelos militares de propulsión nuclear que pasan meses bajo el agua.',
-    'Embarcación marina capaz de navegar por debajo del agua.'
+    'Es una máquina diseñada para la movilidad.',
+    'Afronta retos de ingeniería excepcionales debido a la presión ambiental constante.',
+    'Logra su maniobra vertical inundando o vaciando con aire comprimido sus tanques de lastre.',
+    'Cuando no asoma a la superficie depende de radares acústicos o sonares para navegar a ciegas.',
+    'Permite ver por encima del agua utilizando un tubo óptico cilíndrico llamado periscopio.',
+    'Embarcación marina que puede cerrarse herméticamente para navegar por debajo del agua.'
   ]),
   pt('p86', 'Guitarra', ['guitarra española', 'guitarra clasica'], [
-    'Es un objeto musical.',
-    'Perteneciente a la familia de los instrumentos de cuerda.',
-    'Consta de una caja de resonancia de madera con una boca circular.',
-    'Tiene un mástil dividido por barritas metálicas llamadas trastes.',
-    'Es el instrumento protagonista e indispensable de la música flamenca.',
-    'Instrumento musical de seis cuerdas que se toca rasgueando con los dedos.'
+    'Es un objeto utilizado en el ámbito cultural.',
+    'Su construcción depende de la selección y tensión precisa de varios componentes.',
+    'Su diseño clásico incorpora un diapasón atravesado por divisiones metálicas llamadas trastes.',
+    'El sonido se amplifica al vibrar sobre la boca circular de su caja de resonancia de madera.',
+    'Es el elemento indispensable, junto a las palmas y el cajón, del folclore flamenco.',
+    'Instrumento musical de seis cuerdas que se toca punteando y rasgueando con las manos.'
   ]),
   pt('p87', 'Teléfono móvil', ['smartphone', 'celular'], [
-    'Es un dispositivo electrónico.',
-    'Apareció en formatos voluminosos en el último tercio del siglo XX.',
-    'Funciona mediante tarjetas SIM comunicadas con repetidores de señal.',
-    'Ha concentrado funciones de reloj, cámara fotográfica, linterna y mapa.',
-    'Tiene una pantalla táctil de cristal y se transporta dentro del bolsillo.',
-    'Dispositivo táctil de bolsillo que usamos para llamar, chatear y navegar.'
+    'Es una herramienta tecnológica contemporánea.',
+    'Sus primeros modelos comerciales apenas cabían en un maletín por el tamaño de las baterías.',
+    'Su popularización ha relegado al olvido a dispositivos como las cámaras compactas y mapas de papel.',
+    'Carece de botones físicos frontales, operando íntegramente mediante un panel táctil luminoso.',
+    'Se lleva siempre en el bolsillo para mantener conexión a internet mediante tarjetas SIM o WiFi.',
+    'Aparato que usamos constantemente para chatear, enviar fotos, consultar redes y llamar.'
   ]),
   pt('p88', 'Fuego', ['el fuego'], [
-    'Es una manifestación física y química.',
-    'Resulta de una reacción de oxidación rápida con desprendimiento de energía.',
-    'Precisa para su existencia de calor, material combustible y oxígeno.',
-    'En los mitos clásicos el titán Prometeo lo robó a los dioses para el hombre.',
-    'Produce humo, residuos de ceniza y altas temperaturas ardientes.',
-    'Llamas ardientes que producen luz y calor al quemar algo.'
+    'Es un fenómeno desencadenado por una reacción físico-química.',
+    'Su domesticación por los homínidos primitivos marcó el despegue evolutivo de nuestra especie.',
+    'En los mitos helénicos, Prometeo fue castigado por robárselo a los dioses para darlo a los mortales.',
+    'Produce de manera simultánea dos tipos de emisión medibles: radiación luminosa y térmica.',
+    'Necesita oxígeno, combustible y calor para mantenerse y emite humo que sube hacia el cielo.',
+    'Llamas ardientes de color naranja que desprenden un calor intenso y queman lo que tocan.'
   ]),
   pt('p89', 'Bicicleta', ['la bicicleta', 'bici'], [
-    'Es un medio mecánico de locomoción.',
-    'Funciona enteramente gracias al esfuerzo muscular de quien la monta.',
-    'Consta de un cuadro tubular ligero, sillín y frenos en un manillar.',
-    'Posee pedales unidos a platos que transmiten el giro mediante una cadena.',
-    'Es la protagonista de competiciones célebres como el Tour de Francia.',
-    'Vehículo de dos ruedas con pedales, cadena y manillar para desplazarse.'
+    'Es un vehículo mecánico articulado.',
+    'Constituye uno de los sistemas de transporte energéticamente más eficientes jamás inventados.',
+    'Carece de motor y su impulso proviene enteramente de la fuerza y el equilibrio humano.',
+    'Su tracción se transfiere desde un plato dentado a un piñón trasero a través de una cadena engrasada.',
+    'Sus dos ruedas están alineadas y el corredor va sentado en un sillín agarrando el manillar.',
+    'Transporte sostenible que se mueve utilizando las piernas para hacer girar unos pedales.'
   ]),
   pt('p90', 'Avión', ['aviones', 'aeroplano'], [
-    'Es una máquina de desplazamiento.',
-    'Fue lograda con motor controlado por primera vez por los hermanos Wright.',
-    'Posee una cabina presurizada con asientos para los viajeros.',
-    'Requiere circular a gran velocidad por pistas de asfalto para despegar.',
-    'Lleva grandes alas laterales con turbinas y vuela sobre las nubes.',
-    'Vehículo con alas y motores que transporta pasajeros volando por el aire.'
+    'Es una creación pesada de la ingeniería moderna.',
+    'Venció las leyes de la física aprovechando los principios de la sustentación aerodinámica.',
+    'Para iniciar su funcionamiento requiere acelerar largamente sobre extensas pistas asfaltadas.',
+    'Presuriza su habitáculo interior para permitir a la gente respirar a diez mil metros de altitud.',
+    'Las turbinas de sus grandes alas metálicas le proporcionan el empuje para cruzar los cielos.',
+    'Gran vehículo volador capaz de transportar a cientos de pasajeros de un continente a otro.'
   ]),
 
   // --- ANIMALES, CULTURA Y VARIOS (p91 - p100) ---
   pt('p91', 'Lobo', ['lobos', 'el lobo'], [
-    'Es un mamífero terrestre.',
-    'Pertenece a la familia de los cánidos carnívoros.',
-    'Es el ancestro genético directo del perro doméstico.',
-    'Vive y colabora en manadas jerarquizadas bajo una pareja alfa.',
-    'Es el antagonista tradicional en fábulas como Caperucita Roja.',
-    'Cánido salvaje que vive en manadas en los bosques y aúlla a la luna.'
+    'Es un ser vivo vertebrado.',
+    'Sus poblaciones se han reducido en Europa al competir históricamente por el territorio.',
+    'Se comunica mediante vocalizaciones corales de largo alcance que fortalecen el vínculo del grupo.',
+    'Es el ancestro genético directo de los animales de compañía que tenemos en casa.',
+    'Caza en manadas jerárquicas y tiene un largo hocico con el que aúlla de noche a la luna.',
+    'Cánido salvaje del bosque que aparece como el feroz villano en el cuento de Caperucita Roja.'
   ]),
   pt('p92', 'Jirafa', ['jirafas', 'la jirafa'], [
-    'Es un mamífero cuadrúpedo.',
-    'Habita en llanuras y sabanas del continente africano.',
-    'Se alimenta arrancando hojas en copas de árboles con su lengua larga.',
-    'Su cuerpo luce un patrón de manchas pardas sobre fondo claro.',
-    'Duerme casi siempre de pie y apenas unas pocas horas.',
-    'Animal africano de cuello larguísimo y manchas marrones.'
+    'Es un animal perteneciente a los mamíferos.',
+    'Ha evolucionado adaptando su esqueleto para poder alimentarse sin apenas competencia.',
+    'Su lengua prensil es áspera y azulada para resistir las espinas de las copas de las acacias.',
+    'Para beber agua en una charca debe separar sus extremidades delanteras de forma muy incómoda.',
+    'Luce un pelaje pardo organizado en polígonos manchados sobre fondo claro amarillento.',
+    'El mamífero más alto del mundo que destaca en la sabana por su larguísimo cuello.'
   ]),
   pt('p93', 'Canguro', ['canguros', 'el canguro'], [
-    'Es un mamífero propio de Oceanía.',
-    'Pertenece a la subclase de los marsupiales.',
-    'Tiene unas extremidades traseras elásticas de gran envergadura.',
-    'Se traslada a gran velocidad dando continuos saltos.',
-    'Figura en el escudo nacional oficial de Australia.',
-    'Animal marsupial de Australia que salta y lleva a su cría en una bolsa en la barriga.'
+    'Es una criatura del reino animal.',
+    'Pertenece a una rama de mamíferos que prosperó tras aislarse un continente hace millones de años.',
+    'Sus extremidades delanteras son cortas y débiles, contrastando con una cola gruesa y musculosa.',
+    'Logra desplazarse a gran velocidad encadenando saltos sobre sus poderosas patas traseras.',
+    'Al nacer siendo minúsculos, sus crías trepan y acaban de desarrollarse en una bolsa del abdomen materno.',
+    'Marsupial saltarín típico de Australia que lleva a sus bebés metidos en un bolsillo del vientre.'
   ]),
   pt('p94', 'Oso polar', ['el oso polar'], [
-    'Es un mamífero del orden de los carnívoros.',
-    'Habita en los confines helados del hemisferio norte.',
-    'Su piel debajo del pelaje es totalmente negra para retener calor.',
-    'Su pelaje parece completamente blanco para mimetizarse con el hielo.',
-    'Se alimenta casi en exclusiva cazando focas en respiraderos.',
-    'Gran mamífero carnívoro de pelaje blanco que vive en el hielo del Ártico.'
+    'Es un enorme mamífero carnívoro.',
+    'Su hábitat se encuentra amenazado por el aumento global progresivo de las temperaturas.',
+    'Tiene la piel real de color negro bajo una gruesa capa de grasa para absorber mejor el calor solar.',
+    'Sus presas favoritas son focas a las que acecha pacientemente desde orificios en el hielo marino.',
+    'Los pelos translúcidos de su denso pelaje reflejan la luz haciéndolo parecer blanco intenso.',
+    'El oso de color blanco que vive en los hielos del Ártico y domina el Polo Norte.'
   ]),
   pt('p95', 'Murciélago', ['murcielagos'], [
-    'Es un ser vivo vertebrado.',
-    'Pertenece a la clase de los mamíferos.',
-    'Desarrolla su actividad de forma preferente durante la noche.',
-    'Duerme colgado boca abajo en el interior de cuevas o grietas.',
-    'Caza en la oscuridad emitiendo impulsos ultrasónicos por ecolocalización.',
-    'Único mamífero que vuela, duerme boca abajo y caza insectos de noche.'
+    'Es un organismo vertebrado y volador.',
+    'Pese a su apariencia, no tiene ninguna relación taxonómica con la familia de las aves.',
+    'Sus alas están formadas por una membrana elástica de piel estirada entre huesos de dedos alargados.',
+    'Pasa sus jornadas de inactividad descansando boca abajo en el techo oscuro de grutas y cuevas.',
+    'Caza polillas en completa oscuridad guiándose por los ecos ultrasónicos de sus agudos chillidos.',
+    'El único mamífero que vuela y al que la leyenda y la cultura asocian con los vampiros.'
   ]),
   pt('p96', 'Tortuga', ['tortugas', 'la tortuga'], [
-    'Es un animal vertebrado de sangre fría.',
-    'Pertenece al grupo de los reptiles.',
-    'Carece de dientes y posee un pico córneo afilado.',
-    'Su cuerpo está protegido permanentemente por un caparazón óseo.',
-    'Puede retraer las patas y la cabeza dentro del caparazón ante una amenaza.',
-    'Reptil lento con caparazón duro en la espalda.'
+    'Es un animal ligado al medio terrestre y acuático.',
+    'Pertenece a uno de los órdenes evolutivos más antiguos que han logrado llegar a nuestros días.',
+    'Carece totalmente de dentición, supliendo esa carencia con un pico córneo fuerte y afilado.',
+    'Toda la estructura de su tórax y columna está fusionada dentro de un abultado escudo calcáreo protector.',
+    'Al sentirse en peligro, recoge de manera defensiva su cabeza rugosa y sus extremidades.',
+    'Reptil lento que carga continuamente con un duro caparazón sobre su espalda a modo de casa.'
   ]),
   pt('p97', 'Hormiga', ['hormigas', 'la hormiga'], [
     'Es un animal invertebrado.',
-    'Pertenece a la clase de los insectos himenópteros.',
-    'Vive en comunidades organizadas compuestas por miles de miembros.',
-    'Se comunican siguiendo rastros químicos invisibles de feromonas.',
-    'Suele marchar en largas filas transportando fragmentos de hojas o comida.',
-    'Insecto pequeño y fuerte que vive en colonias dentro de un hormiguero.'
+    'Constituye una parte asombrosa de toda la biomasa animal del planeta debido a su enorme número.',
+    'Se comunican e identifican trazando sofisticadas pistas químicas de feromonas en el suelo.',
+    'Se organizan en complejas estructuras jerárquicas con soldados, obreras estériles y reinas ponedoras.',
+    'Se las ve marchando en largas filas recogiendo alimentos o trozos de hoja en fila india.',
+    'Pequeño insecto muy trabajador y fuerte que excava colonias subterráneas llamadas hormigueros.'
   ]),
   pt('p98', 'Vaca', ['las vacas', 'la vaca'], [
-    'Es un mamífero herbívoro de cuatro patas.',
-    'Su aparato digestivo cuenta con cuatro compartimentos para rumiar.',
-    'El macho de su especie se llama toro y su cría es el ternero.',
-    'En la religión hinduista de la India es respetada como animal sagrado.',
-    'Dispone de glándulas mamarias colgantes en el vientre llamadas ubres.',
-    'Animal doméstico de granja que da leche y hace mu.'
+    'Es un mamífero cuadrúpedo.',
+    'La ganadería basó en su domesticación gran parte del desarrollo nutricional humano en Occidente.',
+    'Posee un sistema gástrico compuesto por cuatro cámaras que le permite regurgitar y rumiar pastos duros.',
+    'Tiene un marcado estatus sagrado e intocable dentro de las tradiciones religiosas de la India.',
+    'Tiene cuernos cortos, una cola con mechón y unas prominentes ubres para alimentar a los terneros.',
+    'Gran animal doméstico que hace "mu", pasta en los prados y nos da la leche.'
   ]),
   pt('p99', 'Steve Jobs', ['jobs'], [
-    'Es una figura del ámbito empresarial contemporáneo.',
-    'Nació en California a mediados del siglo XX.',
-    'Comenzó su proyecto en el garaje de su familia junto a un socio.',
-    'Vestía de manera fija con vaqueros y un jersey negro de cuello vuelto.',
-    'Lanzó al mercado dispositivos de éxito masivo como el iPod y el iPad.',
-    'Cofundador de Apple que presentó el primer iPhone en 2007.'
+    'Es un líder destacado de la era de la información.',
+    'Su carácter perfeccionista y exigente le valió críticas a pesar de su innegable talento visionario.',
+    'Cimentó los inicios de su imperio ensamblando circuitos en un modesto garaje californiano.',
+    'Infundió un diseño pulido y minimalista a dispositivos que alteraron las rutinas de la sociedad global.',
+    'Pronunciaba recordados discursos vestido invariablemente con zapatillas, vaqueros y jersey negro de cuello alto.',
+    'El carismático empresario fundador de la marca Apple y presentador original del iPhone.'
   ]),
   pt('p100', 'Frida Kahlo', ['frida'], [
-    'Es una artista plástica latinoamericana.',
-    'Sufrió un grave accidente en su juventud que marcó su salud.',
-    'Vivió en la conocida Casa Azul en la localidad de Coyoacán.',
-    'La gran mayoría de sus lienzos son autorretratos cargados de dolor.',
-    'Es un icono del arte mexicano y un referente del feminismo.',
-    'Pintora mexicana de autorretratos reconocible por su uniceja y flores en el pelo.'
+    'Es una creadora artística del siglo XX.',
+    'Una tragedia física en el inicio de su juventud condicionó para siempre su obra y su movilidad.',
+    'Vivió y pintó en un icónico inmueble de color intenso en el barrio de Coyoacán.',
+    'Pintó de forma visceral sobre el lienzo sus sufrimientos, abortos y su tormentoso matrimonio con Diego Rivera.',
+    'Plasmó repetidamente su propio rostro acentuando con orgullo un entrecejo poblado y tupido.',
+    'Pintora mexicana de autorretratos surrealistas famosa por sus diademas de flores y su uniceja.'
   ])
 ];
