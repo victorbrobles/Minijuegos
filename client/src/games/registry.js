@@ -34,6 +34,7 @@ import Logos from './Logos/Logos.jsx';
 import Hipotesis from './Hipotesis/Hipotesis.jsx';
 import Trescientosuno from './Trescientosuno/Trescientosuno.jsx';
 import Jugadores from './Jugadores/Jugadores.jsx';
+import Furbo from './Furbo/FurboPartida.jsx';
 
 // id del juego (el mismo que en server/data/games.json) -> componente React
 const registry = {
@@ -72,7 +73,8 @@ const registry = {
   'logos': Logos,
   'hipotesis': Hipotesis,
   'trescientosuno': Trescientosuno,
-  'jugadores': Jugadores
+  'jugadores': Jugadores,
+  'furbo': Furbo
 };
 
 export default registry;

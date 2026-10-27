@@ -1,0 +1,170 @@
+/* client/src/games/Furbo/Furbo.css
+   Solo estilos propios de Furbo. El resto (panel, hud, chip, score-pill, end-card,
+   scoreboard, actions, big, secondary...) viene de Adivina.css como en los demás juegos. */
+
+.furbo-contenedor { width: 100%; }
+
+.furbo-fase-emoji { display: block; font-size: 3rem; line-height: 1; margin-bottom: 0.4rem; }
+
+.furbo-reglas {
+  text-align: left;
+  margin: 0.8rem auto 1.2rem;
+  padding-left: 1.2rem;
+  max-width: 34rem;
+  line-height: 1.5;
+}
+.furbo-reglas li { margin-bottom: 0.4rem; }
+
+/* ---- Pregunta ---- */
+.furbo-pregunta {
+  text-align: center;
+  padding: 1.1rem 1rem;
+  margin: 0 0 1rem;
+  border-radius: 1rem;
+  background: rgba(99, 102, 241, 0.08);
+  border: 1.5px solid rgba(99, 102, 241, 0.3);
+}
+.furbo-pregunta h2 { margin: 0.5rem 0 0; font-size: 1.3rem; line-height: 1.3; }
+
+.furbo-tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  background: rgba(99, 102, 241, 0.18);
+}
+
+/* ---- Reloj ---- */
+.furbo-reloj { margin: 0.4rem 0 1rem; }
+.furbo-reloj-barra { height: 8px; border-radius: 9999px; overflow: hidden; background: rgba(148, 163, 184, 0.35); }
+.furbo-reloj-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background: #16a34a;
+  transition: width 0.25s linear, background-color 0.3s ease;
+}
+.furbo-reloj-fill.low { background: #ef4444; }
+.furbo-reloj-texto {
+  display: flex; align-items: center; justify-content: center; gap: 0.35rem;
+  margin: 0.35rem 0 0; font-size: 0.9rem; font-weight: 700; color: #64748b;
+}
+.furbo-reloj-texto.low { color: #dc2626; }
+
+/* ---- Opciones (quiniela y penaltis) ---- */
+.furbo-opciones { display: grid; gap: 0.6rem; margin: 0.6rem 0 1rem; }
+.furbo-opcion-btn {
+  display: flex; align-items: center; gap: 0.75rem;
+  width: 100%; text-align: left;
+  padding: 0.8rem 1rem;
+  border-radius: 0.9rem;
+  border: 2px solid rgba(100, 116, 139, 0.45);
+  background: transparent; color: inherit;
+  font-weight: 600; font-size: 1rem; cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.1s ease;
+}
+.furbo-opcion-btn:hover:not(:disabled) { border-color: #6366f1; transform: translateY(-1px); }
+.furbo-opcion-btn:disabled { cursor: default; opacity: 0.95; }
+.furbo-letra {
+  flex: 0 0 auto; width: 2.1rem; height: 2.1rem; border-radius: 50%;
+  display: grid; place-items: center; font-weight: 800;
+  background: rgba(99, 102, 241, 0.18);
+}
+.furbo-opcion-btn.elegida { border-color: #6366f1; background: rgba(99, 102, 241, 0.14); }
+.furbo-opcion-btn.correcta { border-color: #16a34a; background: rgba(22, 163, 74, 0.15); }
+.furbo-opcion-btn.incorrecta { border-color: #ef4444; background: rgba(239, 68, 68, 0.13); }
+.furbo-opcion-btn .furbo-quien { margin-left: auto; font-size: 0.8rem; font-weight: 700; opacity: 0.85; }
+
+/* ---- Penaltis: zonas ---- */
+.furbo-zonas { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin: 0.8rem 0 1rem; }
+.furbo-zona-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
+  padding: 1.1rem 0.6rem; border-radius: 1rem;
+  border: 2px solid rgba(100, 116, 139, 0.45);
+  background: transparent; color: inherit; cursor: pointer;
+  font-weight: 800; font-size: 1.05rem; text-align: center;
+  transition: transform 0.1s ease, border-color 0.15s ease;
+}
+.furbo-zona-btn:hover { transform: translateY(-2px); }
+.furbo-zona-btn .furbo-zona-emoji { font-size: 2rem; }
+.furbo-zona-btn small { font-weight: 600; opacity: 0.8; }
+.furbo-zona-btn.centro:hover { border-color: #16a34a; }
+.furbo-zona-btn.escuadra:hover { border-color: #f59e0b; }
+
+.furbo-banner-resultado {
+  text-align: center; padding: 1.2rem 1rem; border-radius: 1rem; margin: 0.4rem 0 1rem;
+  font-weight: 800; font-size: 1.5rem;
+}
+.furbo-banner-resultado.gol { background: rgba(22, 163, 74, 0.15); border: 2px solid #16a34a; }
+.furbo-banner-resultado.parada { background: rgba(239, 68, 68, 0.13); border: 2px solid #ef4444; }
+.furbo-banner-resultado small { display: block; font-size: 0.95rem; font-weight: 600; margin-top: 0.3rem; }
+
+/* ---- Prórroga ---- */
+.furbo-palabra-card {
+  text-align: center; padding: 1.3rem 1rem; border-radius: 1rem; margin-bottom: 0.8rem;
+  background: rgba(22, 163, 74, 0.1); border: 2px solid #16a34a;
+}
+.furbo-palabra-card h2 { margin: 0.4rem 0 0; font-size: 1.7rem; line-height: 1.2; }
+.furbo-prohibidas { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin-bottom: 1rem; }
+.furbo-prohibida-chip {
+  padding: 0.35rem 0.85rem; border-radius: 9999px; font-weight: 700; font-size: 0.95rem;
+  background: rgba(239, 68, 68, 0.13); border: 1.5px solid #ef4444; color: #dc2626;
+}
+.furbo-prohibidas-titulo { text-align: center; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: #dc2626; margin: 0.4rem 0 0.4rem; }
+.furbo-acciones-grid { display: grid; grid-template-columns: 1fr; gap: 0.6rem; }
+.furbo-contadores { display: flex; justify-content: center; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.8rem; }
+.furbo-contador { padding: 0.3rem 0.8rem; border-radius: 9999px; font-weight: 700; font-size: 0.9rem; background: rgba(99, 102, 241, 0.12); }
+
+/* ---- Pasar el móvil (modo local) ---- */
+.furbo-gate { text-align: center; }
+
+/* ---- Revelado de Vestuario ---- */
+.furbo-grupo {
+  padding: 0.7rem 0.9rem; border-radius: 0.9rem; margin-bottom: 0.6rem;
+  border: 2px solid rgba(100, 116, 139, 0.4);
+}
+.furbo-grupo.ganadora { border-color: #16a34a; background: rgba(22, 163, 74, 0.12); }
+.furbo-grupo-titulo { font-weight: 800; font-size: 0.85rem; margin-bottom: 0.3rem; }
+.furbo-grupo-fila { display: flex; justify-content: space-between; gap: 0.6rem; padding: 0.15rem 0; }
+.furbo-grupo-fila strong { font-weight: 800; }
+
+.furbo-chips-espera { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem; margin-top: 0.6rem; }
+.furbo-chip-espera { padding: 0.2rem 0.65rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 700; background: rgba(148, 163, 184, 0.25); }
+.furbo-chip-espera.listo { background: rgba(22, 163, 74, 0.18); color: #16a34a; }
+
+.furbo-respuesta-real {
+  text-align: center; font-size: 1.15rem; font-weight: 800; padding: 0.8rem; margin: 0.4rem 0 1rem;
+  border-radius: 0.9rem; background: rgba(99, 102, 241, 0.1); border: 1.5px solid rgba(99, 102, 241, 0.35);
+}
+
+/* ---- Configuración de partida ---- */
+.furbo-fases-config { display: grid; gap: 0.5rem; margin: 0.5rem 0 1rem; }
+.furbo-fase-check {
+  display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.6rem 0.8rem; border-radius: 0.8rem;
+  border: 1.5px solid rgba(100, 116, 139, 0.4); cursor: pointer; text-align: left;
+}
+.furbo-fase-check.activa { border-color: #6366f1; background: rgba(99, 102, 241, 0.1); }
+.furbo-fase-check.solo-lectura { cursor: default; }
+.furbo-fase-check input { margin-top: 0.25rem; accent-color: #6366f1; }
+.furbo-fase-check strong { display: block; font-size: 0.95rem; }
+.furbo-fase-check small { opacity: 0.8; }
+.furbo-duracion { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin: 0.5rem 0 1rem; }
+.furbo-duracion button { padding: 0.55rem 0.3rem; font-size: 0.9rem; }
+.furbo-duracion button.activa { outline: 2px solid #6366f1; }
+
+/* ---- Ayuda ---- */
+.furbo-ayuda-header { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.8rem; }
+.furbo-ayuda-header h3 { margin: 0; }
+.furbo-ayuda-signo {
+  display: grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%;
+  background: #6366f1; color: #fff; font-weight: 800;
+}
+.furbo-ayuda-cuerpo { max-height: 60vh; overflow-y: auto; text-align: left; padding-right: 0.3rem; }
+.furbo-ayuda-cuerpo ul { margin: 0.3rem 0 0.9rem; padding-left: 1.2rem; line-height: 1.45; }
+.furbo-ayuda-cuerpo p { margin: 0.6rem 0 0.2rem; }
+
+@media (max-width: 420px) {
+  .furbo-zonas { grid-template-columns: 1fr; }
+}

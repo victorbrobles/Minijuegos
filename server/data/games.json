@@ -214,5 +214,11 @@
     "name": "Con quién he jugado?",
     "description": "Sale una dupla de jugadores y tienes que encontrar un compañero común a ambos.",
     "isNew": true
+  },
+  {
+    "id": "furbo",
+    "name": "Furbo!",
+    "description": "La prueba definitiva para poner a prueba tus conocimientos sobre fútbol. Explora las diversas categorías de este juego y humíllalos a todos!",
+    "isNew": true
   }
 ]

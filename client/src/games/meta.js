@@ -299,6 +299,14 @@ export const META = {
     etiquetas: 'futbol jugadores clubes compañero adivinar seleccion balon',
     descripcion: 'Sale una dupla de jugadores y tienes que encontrar un compañero común a ambos.',
     categorias: ['dos_jugadores', 'futbol']
+  },
+  'furbo': {
+    titulo: 'Furbo!',
+    icono: 'soccer',
+    colores: ['#2563eb', '#4f46e5'],
+    etiquetas: 'futbol jugadores quiz clubes adivinar seleccion balon',
+    descripcion: 'La prueba definitiva para poner a prueba tus conocimientos sobre fútbol. Explora las diversas categorías de este juego y humíllalos a todos!',
+    categorias: ['favoritos', 'chill', 'futbol']
   }
 };
 
