@@ -48,6 +48,7 @@ import conoceRoutes from './routes/conoce.js';
 import logosRoutes from './routes/logos.js';
 import hipotesisRoutes from './routes/hipotesis.js';
 import trescientosunoRoutes from './routes/trescientosuno.js';
+import jugadoresRoutes from './routes/jugadores.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -123,6 +124,7 @@ app.use('/api/conoce', conoceRoutes);
 app.use('/api/logos', logosRoutes);
 app.use('/api/hipotesis', hipotesisRoutes);
 app.use('/api/trescientosuno', trescientosunoRoutes);
+app.use('/api/jugadores', jugadoresRoutes);
 
 // 5. Redirección para React Router (Single Page Application)
 app.get('*', (req, res) => {

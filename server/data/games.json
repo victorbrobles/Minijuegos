@@ -208,5 +208,11 @@
     "name": "301 Goles",
     "description": "Llega al número objetivo de goles, asistencias o partidos y demuestra lo mucho que conoces al club escogido.",
     "isNew": true
+  },
+  {
+    "id": "jugadores",
+    "name": "Con quién he jugado?",
+    "description": "Sale una dupla de jugadores y tienes que encontrar un compañero común a ambos.",
+    "isNew": true
   }
 ]

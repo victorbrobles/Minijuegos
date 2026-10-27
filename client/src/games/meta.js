@@ -291,6 +291,14 @@ export const META = {
     etiquetas: 'futbol goles clubes goleadores asistencias partidos adivinar seleccion balon',
     descripcion: 'Llega al número objetivo de goles, asistencias o partidos y demuestra lo mucho que conoces al club escogido.',
     categorias: ['favoritos', 'futbol']
+  },
+  'jugadores': {
+    titulo: 'Con quién he jugado?',
+    icono: 'soccer',
+    colores: ['#fb923c', '#dc2626'],
+    etiquetas: 'futbol jugadores clubes compañero adivinar seleccion balon',
+    descripcion: 'Sale una dupla de jugadores y tienes que encontrar un compañero común a ambos.',
+    categorias: ['dos_jugadores', 'futbol']
   }
 };
 
