@@ -3,7 +3,7 @@
 // Recibe la «vista» que prepara el motor del servidor y envía acciones con onAccion.
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
-import { FASES_INFO } from './furboInfo.js';
+import { FASES_INFO } from './FurboInfo.js';
 import './Furbo.css';
 import '../Adivina/Adivina.css';
 
