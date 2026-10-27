@@ -550,7 +550,8 @@ export default function FurboPartida({
   setSostiene = () => {},
   onAccion,
   onTiempo,
-  finalAcciones = null
+  finalAcciones = null,
+  pie = null
 }) {
   const ronda = vista.ronda;
   const info = FASES_INFO[vista.fase];
@@ -692,6 +693,7 @@ export default function FurboPartida({
             <Icon name="flagFinish" size={18} /> Finalizar partida
           </button>
         )}
+        {pie}
       </section>
     );
   }
@@ -756,6 +758,8 @@ export default function FurboPartida({
           <Icon name="flag" size={18} /> Saltar turno
         </button>
       )}
+
+      {pie}
     </section>
   );
 }
