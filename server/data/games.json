@@ -226,5 +226,11 @@
     "name": "Fútbol en raya",
     "description": "Cuadra categorías que cumplan tus jugadores y crea una línea completa con ellos antes que tu rival. Para jugar individual o por equipos.",
     "isNew": true
+  },
+  {
+    "id": "footballsplit",
+    "name": "FrankensFootball",
+    "description": "Adivina de qué tres jugadores viene el híbrido que vas a ver por pantalla. Si eres buen futbolero lo sabrás a la primera, si no siempre puedes acudir a las pistas.",
+    "isNew": true
   }
 ]

@@ -315,6 +315,14 @@ export const META = {
     etiquetas: 'futbol jugadores quiz clubes adivinar seleccion balon',
     descripcion: 'Cuadra categorías que cumplan tus jugadores y crea una línea completa con ellos antes que tu rival. Para jugar individual o por equipos.',
     categorias: ['favoritos', 'dos_jugadores', 'futbol']
+  },
+  'footballsplit': {
+    titulo: 'FrankensFootball',
+    icono: 'soccer',
+    colores: ['#8b5cf6', '#b91c1c'],
+    etiquetas: 'futbol jugadores quiz clubes adivinar seleccion balon cara cabeza cuerpo',
+    descripcion: 'Adivina de qué tres jugadores viene el híbrido que vas a ver por pantalla. Si eres buen futbolero lo sabrás a la primera, si no siempre puedes acudir a las pistas.',
+    categorias: ['favoritos', 'dos_jugadores', 'futbol']
   }
 };
 
