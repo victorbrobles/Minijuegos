@@ -307,6 +307,14 @@ export const META = {
     etiquetas: 'futbol jugadores quiz clubes adivinar seleccion balon',
     descripcion: 'La prueba definitiva para poner a prueba tus conocimientos sobre fútbol. Explora las diversas categorías de este juego y humíllalos a todos!',
     categorias: ['favoritos', 'chill', 'futbol']
+  },
+  'futbolgrid': {
+    titulo: 'Fútbol en raya',
+    icono: 'soccer',
+    colores: ['#8b5cf6', '#b91c1c'],
+    etiquetas: 'futbol jugadores quiz clubes adivinar seleccion balon',
+    descripcion: 'Cuadra categorías que cumplan tus jugadores y crea una línea completa con ellos antes que tu rival. Para jugar individual o por equipos.',
+    categorias: ['favoritos', 'dos_jugadores', 'futbol']
   }
 };
 

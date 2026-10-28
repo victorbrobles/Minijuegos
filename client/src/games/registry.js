@@ -35,6 +35,7 @@ import Hipotesis from './Hipotesis/Hipotesis.jsx';
 import Trescientosuno from './Trescientosuno/Trescientosuno.jsx';
 import Jugadores from './Jugadores/Jugadores.jsx';
 import Furbo from './Furbo/Furbo.jsx';
+import FutbolGrid from './FutbolGrid/FutbolGrid.jsx';
 
 // id del juego (el mismo que en server/data/games.json) -> componente React
 const registry = {
@@ -74,7 +75,8 @@ const registry = {
   'hipotesis': Hipotesis,
   'trescientosuno': Trescientosuno,
   'jugadores': Jugadores,
-  'furbo': Furbo
+  'furbo': Furbo,
+  'futbolgrid': FutbolGrid
 };
 
 export default registry;

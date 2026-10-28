@@ -1,0 +1,109 @@
+/* client/src/games/FutbolGrid/FutbolGrid.css */
+
+.eq-badge {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+  border: 2px solid transparent;
+}
+
+.eq-badge.active-x {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  color: #1e40af;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+}
+
+.eq-badge.active-o {
+  background: #fef2f2;
+  border-color: #ef4444;
+  color: #991b1b;
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.3);
+}
+
+.grid-board-container {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.grid-board {
+  display: grid;
+  grid-template-columns: 80px repeat(3, 1fr);
+  grid-template-rows: 80px repeat(3, 1fr);
+  gap: 6px;
+  background: #cbd5e1; /* border color between cells */
+  padding: 6px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 500px;
+  aspect-ratio: 1 / 1;
+}
+
+.grid-cell {
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.grid-cell.empty {
+  background: transparent;
+}
+
+.grid-cell.header {
+  font-size: 0.75rem;
+  color: #475569;
+  background: #f8fafc;
+  padding: 4px;
+}
+
+.grid-cell.interactable {
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  font-size: 3rem;
+}
+
+.grid-cell.interactable:hover {
+  background: #f1f5f9;
+}
+
+.grid-cell.interactable:active {
+  transform: scale(0.95);
+}
+
+.grid-cell.cell-x {
+  background: #dbeafe;
+  color: #2563eb;
+  cursor: default;
+}
+
+.grid-cell.cell-o {
+  background: #fee2e2;
+  color: #dc2626;
+  cursor: default;
+}
+
+.grid-reto {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  background: #f8fafc;
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 2px dashed #cbd5e1;
+}
+
+.grid-reto-cat {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #0f172a;
+  text-align: center;
+}

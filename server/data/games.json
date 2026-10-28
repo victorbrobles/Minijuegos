@@ -220,5 +220,11 @@
     "name": "Furbo!",
     "description": "La prueba definitiva para poner a prueba tus conocimientos sobre fútbol. Explora las diversas categorías de este juego y humíllalos a todos!",
     "isNew": true
+  },
+  {
+    "id": "futbolgrid",
+    "name": "Fútbol en raya",
+    "description": "Cuadra categorías que cumplan tus jugadores y crea una línea completa con ellos antes que tu rival. Para jugar individual o por equipos.",
+    "isNew": true
   }
 ]

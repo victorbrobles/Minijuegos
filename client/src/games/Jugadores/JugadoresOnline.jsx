@@ -23,6 +23,7 @@ export default function JugadoresOnline({ onLocal, onSalir }) {
   });
 
   const [sala, setSala] = useState(null);
+  const [codigoCopiado, setCodigoCopiado] = useState(false);
   const [modalAsignar, setModalAsignar] = useState(null); // 'acierto' | 'fallo'
   const intervalRef = useRef(null);
 
@@ -118,6 +119,13 @@ export default function JugadoresOnline({ onLocal, onSalir }) {
     setSala(null);
     setVista('menu');
   };
+  
+  const copiarCodigo = () => {
+    if (!sala?.code) return;
+    navigator.clipboard?.writeText(sala.code);
+    setCodigoCopiado(true);
+    setTimeout(() => setCodigoCopiado(false), 2000);
+  };
 
   const esAdmin = sala?.esAdmin;
   const ronda = sala?.ronda;
@@ -127,25 +135,32 @@ export default function JugadoresOnline({ onLocal, onSalir }) {
   const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
 
   return (
-    <div className="cancion-contenedor">
+    <div className="rk-contenedor">
       {mostrarAyuda && (
-        <button type="button" className="btn-ayuda-flotante" onClick={() => setModalAyuda(true)} title="Reglas">
-          <span className="btn-ayuda-flotante-signo">?</span>
+        <button type="button" className="rk-btn-ayuda" onClick={() => setModalAyuda(true)} title="Reglas">
+          <span className="rk-btn-ayuda-signo">?</span>
         </button>
       )}
 
       {modalAyuda && (
         <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
-          <div className="rg-modal" onClick={(e) => e.stopPropagation()}>
-            <h3>¿Cómo se juega a ¿Con quién jugaste?</h3>
-            <p>Aparecerá en pantalla una dupla de jugadores de fútbol que <strong>han tenido al menos un compañero en común a lo largo de su carrera.</strong></p>
-            <ul>
-              <li>El <strong>Anfitrión (👑)</strong> hace de juez y escucha las respuestas del grupo por voz durante los 120 segundos.</li>
-              <li>Si alguien lo adivina, el juez pulsa "Correcto" y le adjudica los puntos. Si alguien dice una locura, puede pulsar "Fallo" y restarle puntos.</li>
-              <li><strong>Acierto:</strong> +3 puntos.</li>
-              <li><strong>Fallo:</strong> -1 punto.</li>
-            </ul>
-            <button className="big full" style={{ marginTop: '1rem' }} onClick={() => setModalAyuda(false)}>Entendido</button>
+          <div className="rg-modal rk-modal-ayuda" onClick={(e) => e.stopPropagation()}>
+            <div className="rk-modal-header">
+              <span className="rk-modal-signo-title">?</span>
+              <h3>¿Cómo se juega a ¿Con quién jugaste?</h3>
+            </div>
+            <div className="rk-modal-cuerpo">
+              <p>Aparecerá en pantalla una dupla de jugadores de fútbol que <strong>han tenido al menos un compañero en común a lo largo de su carrera.</strong></p>
+              <ul>
+                <li>El <strong>Anfitrión (👑)</strong> hace de juez y escucha las respuestas del grupo por voz durante los 120 segundos.</li>
+                <li>Si alguien lo adivina, el juez pulsa "Correcto" y le adjudica los puntos. Si alguien dice una locura, puede pulsar "Fallo" y restarle puntos.</li>
+                <li><strong>Acierto:</strong> +3 puntos.</li>
+                <li><strong>Fallo:</strong> -1 punto.</li>
+              </ul>
+            </div>
+            <div className="rg-modal-acciones">
+              <button className="big full" onClick={() => setModalAyuda(false)}>Entendido</button>
+            </div>
           </div>
         </div>
       )}
@@ -199,9 +214,18 @@ export default function JugadoresOnline({ onLocal, onSalir }) {
       {vista === 'sala' && sala?.estado === 'lobby' && (
         <section className="game">
           <div className="panel center">
-            <p className="categoria"><Icon name="lock" size={16} />Sala de espera</p>
-            <h2 style={{ fontSize: '2.5rem', margin: '0.5rem 0', letterSpacing: '4px' }}>{sala.code}</h2>
+            <p className="categoria" style={{ display: 'inline-flex', padding: '0.3rem 0.8rem', borderRadius: '12px', alignItems: 'center', gap: '0.3rem', color: '#059669', background: '#dcfce7', border: '1px solid #34d399', fontSize: '0.85rem', fontWeight: 'bold' }}>
+              <Icon name="lock" size={16} /> Sala de espera
+            </p>
+            <p className="hint" style={{ marginTop: '0.8rem', marginBottom: '0.2rem' }}>Código de la partida</p>
+            <div style={{ display: 'inline-block', border: '2px dashed #3b82f6', borderRadius: '16px', background: '#eff6ff', padding: '1rem 2.5rem', margin: '0.5rem 0' }}>
+              <h2 style={{ fontSize: '3.5rem', margin: '0', letterSpacing: '8px', color: '#1d4ed8', fontWeight: '900', cursor: 'pointer' }} onClick={copiarCodigo}>{sala.code}</h2>
+            </div>
+            <p className="hint small" style={{ fontStyle: 'italic', marginBottom: '0' }}>
+              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Comparte este código para que se unan (2 a 15 jugadores).'}
+            </p>
           </div>
+          
           <div className="panel" style={{ marginTop: '1rem' }}>
             <h3 className="panel-title"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length}/15)</h3>
             <div className="lb-lista">
@@ -212,12 +236,15 @@ export default function JugadoresOnline({ onLocal, onSalir }) {
               ))}
             </div>
           </div>
-          {esAdmin ? (
-            <button className="big full" style={{ marginTop: '1.2rem' }} disabled={sala.jugadores.length < 2} onClick={() => accionAdmin('iniciar')}>¡Empezar Partida!</button>
-          ) : (
-            <p className="hint center" style={{ marginTop: '1.2rem' }}>Esperando al anfitrión...</p>
-          )}
-          <button className="secondary danger full" style={{ marginTop: '1rem' }} onClick={() => setModalSalir(true)}>Salir de la sala</button>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', marginTop: '1.2rem' }}>
+            {esAdmin ? (
+              <button className="big full" disabled={sala.jugadores.length < 2} onClick={() => accionAdmin('iniciar')}>¡Empezar Partida!</button>
+            ) : (
+              <p className="hint center">Esperando al anfitrión...</p>
+            )}
+            <button className="secondary danger full" onClick={() => setModalSalir(true)}>Salir de la sala</button>
+          </div>
         </section>
       )}
 
@@ -329,15 +356,15 @@ export default function JugadoresOnline({ onLocal, onSalir }) {
           </div>
         </section>
       )}
-
+      
       {modalSalir && (
         <div className="rg-modal-fondo" onClick={() => setModalSalir(false)}>
           <div className="rg-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}>
             <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>¿Abandonar la partida?</h3>
             <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem' }}>Si sales de la sala perderás tu progreso actual en la partida.</p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
-              <button type="button" className="secondary full" onClick={() => setModalSalir(false)}>No, quedarme</button>
-              <button type="button" className="secondary danger full" style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }} onClick={() => { setModalSalir(false); handleSalir(); }}>Sí, salir</button>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem', marginTop: '1rem' }}>
+              <button type="button" className="secondary full" onClick={() => setModalSalir(false)}>Quedarme</button>
+              <button type="button" className="secondary danger full" onClick={() => { setModalSalir(false); handleSalir(); }}>Sí, salir</button>
             </div>
           </div>
         </div>
