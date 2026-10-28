@@ -6,13 +6,14 @@ import '../Adivina/Adivina.css';
 const CLAVE_SESION_JUG = 'jugadores_online_session';
 
 export default function JugadoresOnline({ onLocal, onSalir }) {
-  const [vista, setVista] = useState('menu'); // 'menu' | 'crear' | 'unirse' | 'sala'
+  const [vista, setVista] = useState('menu'); 
   const [nombre, setNombre] = useState('');
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modalSalir, setModalSalir] = useState(false);
   const [modalAyuda, setModalAyuda] = useState(false);
+  const [modalRespuestas, setModalRespuestas] = useState(false);
 
   const [sesion, setSesion] = useState(() => {
     try {
@@ -24,7 +25,7 @@ export default function JugadoresOnline({ onLocal, onSalir }) {
 
   const [sala, setSala] = useState(null);
   const [codigoCopiado, setCodigoCopiado] = useState(false);
-  const [modalAsignar, setModalAsignar] = useState(null); // 'acierto' | 'fallo'
+  const [modalAsignar, setModalAsignar] = useState(null); 
   const intervalRef = useRef(null);
 
   useEffect(() => {
@@ -60,60 +61,51 @@ export default function JugadoresOnline({ onLocal, onSalir }) {
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [sesion]);
 
+  const apiFetch = async (endpoint, payload) => {
+    const res = await fetch(`/api/jugadores/online/${endpoint}`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    return res.json();
+  };
+
   const handleCrear = async () => {
     if (!nombre.trim()) return;
     setCargando(true);
     try {
-      const res = await fetch('/api/jugadores/online/crear', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nombre: nombre.trim() })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-
+      const data = await apiFetch('crear', { nombre: nombre.trim() });
+      if (!data.success) throw new Error(data.error);
       const nueva = { code: data.code, token: data.token };
       sessionStorage.setItem(CLAVE_SESION_JUG, JSON.stringify(nueva));
       setSesion(nueva);
-    } catch (err) { setErrorMsg(err.message); }
-    finally { setCargando(false); }
+    } catch (err) { setErrorMsg(err.message); } finally { setCargando(false); }
   };
 
   const handleUnirse = async () => {
     if (!nombre.trim() || !codigoInput.trim()) return;
     setCargando(true);
     try {
-      const res = await fetch('/api/jugadores/online/unirse', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: codigoInput.trim().toUpperCase(), nombre: nombre.trim() })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-
+      const data = await apiFetch('unirse', { code: codigoInput.trim().toUpperCase(), nombre: nombre.trim() });
+      if (!data.success) throw new Error(data.error);
       const nueva = { code: data.code, token: data.token };
       sessionStorage.setItem(CLAVE_SESION_JUG, JSON.stringify(nueva));
       setSesion(nueva);
-    } catch (err) { setErrorMsg(err.message); }
-    finally { setCargando(false); }
+    } catch (err) { setErrorMsg(err.message); } finally { setCargando(false); }
   };
 
-  const accionAdmin = async (endpoint, payload = {}) => {
-    try {
-      await fetch(`/api/jugadores/online/sala/${sesion.code}/${endpoint}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion.token, ...payload })
-      });
-    } catch (err) { console.error(err); }
+  const accionSala = async (accion, extra = {}) => {
+    return apiFetch(`sala/${sesion.code}/${accion}`, { token: sesion.token, ...extra });
   };
 
   const handleAsignar = (jugadorId) => {
-    accionAdmin('asignar', { playerId: jugadorId, tipo: modalAsignar });
+    accionSala('asignar', { playerId: jugadorId, tipo: modalAsignar });
     setModalAsignar(null);
   };
 
   const handleSalir = () => {
+    if (sala) {
+      accionSala('abandonar').catch(() => console.error("Error al abandonar sala"));
+    }
     sessionStorage.removeItem(CLAVE_SESION_JUG);
     setSesion(null);
     setSala(null);
@@ -131,7 +123,6 @@ export default function JugadoresOnline({ onLocal, onSalir }) {
   const ronda = sala?.ronda;
   const ranking = sala?.jugadores ? [...sala.jugadores].sort((a, b) => b.puntos - a.puntos) : [];
   const maximo = ranking.length ? ranking[0].puntos : 0;
-  const ganadores = maximo > 0 ? ranking.filter((j) => j.puntos === maximo) : [];
   const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
 
   return (
@@ -182,7 +173,7 @@ export default function JugadoresOnline({ onLocal, onSalir }) {
         </section>
       )}
 
-      {/* CREAR / UNIRSE */}
+      {/* CREAR */}
       {vista === 'crear' && (
         <section className="game">
           <div className="panel center">
@@ -196,6 +187,7 @@ export default function JugadoresOnline({ onLocal, onSalir }) {
         </section>
       )}
 
+      {/* UNIRSE */}
       {vista === 'unirse' && (
         <section className="game">
           <div className="panel center">
@@ -231,7 +223,7 @@ export default function JugadoresOnline({ onLocal, onSalir }) {
             <div className="lb-lista">
               {sala.jugadores.map((j) => (
                 <div key={j.id} className={`lb-jug ${j.id === sala.yoId ? 'yo' : ''}`}>
-                  <span className="lb-jug-nombre">{j.nombre}{j.id === sala.yoId ? ' (Tú)' : ''}{j.id === 1 ? ' 👑' : ''}</span>
+                  <span className="lb-jug-nombre">{j.nombre}{j.id === sala.yoId ? ' (Tú)' : ''}{j.id === sala.adminId ? ' 👑' : ''}</span>
                 </div>
               ))}
             </div>
@@ -239,7 +231,7 @@ export default function JugadoresOnline({ onLocal, onSalir }) {
           
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', marginTop: '1.2rem' }}>
             {esAdmin ? (
-              <button className="big full" disabled={sala.jugadores.length < 2} onClick={() => accionAdmin('iniciar')}>¡Empezar Partida!</button>
+              <button className="big full" disabled={sala.jugadores.length < 2} onClick={() => accionSala('iniciar')}>¡Empezar Partida!</button>
             ) : (
               <p className="hint center">Esperando al anfitrión...</p>
             )}
@@ -255,7 +247,7 @@ export default function JugadoresOnline({ onLocal, onSalir }) {
             <span className="chip"><Icon name="flagFinish" size={18} />Ronda {sala.rondaNum} de {sala.maxRondas}</span>
           </div>
 
-          <div className="panel center" style={{ margin: '2rem 0', padding: '3rem 1rem' }}>
+          <div className="panel center" style={{ margin: '2rem 0', padding: '2rem 1rem' }}>
             <h3 style={{ color: '#64748b', textTransform: 'uppercase', fontSize: '0.9rem', letterSpacing: '2px', marginBottom: '1rem' }}>Compañero en común</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center' }}>
               <div style={{ fontSize: '2rem', fontWeight: '900', color: '#1e293b', textAlign: 'center' }}>{ronda.reto.jugador1}</div>
@@ -265,22 +257,57 @@ export default function JugadoresOnline({ onLocal, onSalir }) {
           </div>
 
           <div className="timer" role="timer" aria-label="Tiempo restante">
-            <div className={`timer-bar${ronda.segsRestantes <= 15 ? ' low' : ''}`} style={{ width: `${(ronda.segsRestantes / TIEMPO_TURNO) * 100}%` }} />
+            <div className={`timer-bar${ronda.segsRestantes <= 15 ? ' low' : ''}`} style={{ width: `${(ronda.segsRestantes / TIEMPO_S) * 100}%` }} />
           </div>
           <p className="timer-text"><Icon name="clock" size={16} />{ronda.segsRestantes} s</p>
 
           {esAdmin ? (
-            <div style={{ marginTop: '2rem', background: '#f8fafc', padding: '1rem', borderRadius: '12px', border: '2px dashed #cbd5e1' }}>
-              <p className="hint small" style={{ marginBottom: '0.8rem', textAlign: 'center' }}>👑 Eres el juez. Valida las respuestas en voz alta:</p>
+            <div style={{ marginTop: '2rem', background: '#f8fafc', padding: '1.5rem 1rem', borderRadius: '12px', border: '2px dashed #cbd5e1' }}>
+              <p className="hint small" style={{ marginBottom: '1rem', textAlign: 'center' }}>👑 Eres el juez. Valida las respuestas en voz alta:</p>
+              
+              {/* Botón revelar solo dentro del panel del Admin */}
+              <button 
+                type="button" 
+                className="secondary full" 
+                style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '0.4rem', fontWeight: 'bold' }} 
+                onClick={() => setModalRespuestas(true)}
+              >
+                 <Icon name="eye" size={18} /> Ver posibles respuestas (Chuleta)
+              </button>
+
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.6rem' }}>
                 <button className="ok" onClick={() => setModalAsignar('acierto')}><Icon name="check" size={20} /> Correcto</button>
                 <button className="secondary danger" style={{ background: '#ef4444', color: '#fff', borderColor: '#dc2626' }} onClick={() => setModalAsignar('fallo')}><Icon name="close" size={20} /> Fallo</button>
               </div>
-              <button className="secondary full" style={{ marginTop: '0.6rem' }} onClick={() => accionAdmin('asignar', { tipo: 'rendirse' })}><Icon name="flag" size={18} /> Nadie lo sabe</button>
+              <button className="secondary full" style={{ marginTop: '0.6rem' }} onClick={() => accionSala('asignar', { tipo: 'rendirse' })}><Icon name="flag" size={18} /> Nadie lo sabe</button>
             </div>
           ) : (
             <div className="status-alert info" style={{ marginTop: '1.5rem', textAlign: 'center' }}>
               Debatid por voz. El anfitrión (👑) validará la respuesta.
+            </div>
+          )}
+          
+          {/* Modal Respuestas Posibles (Solo Admin) */}
+          {modalRespuestas && esAdmin && (
+            <div className="rg-modal-fondo" onClick={() => setModalRespuestas(false)}>
+              <div className="rg-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '400px' }}>
+                <h3 style={{ marginBottom: '1rem', color: '#1e1b4b' }}>Posibles Respuestas</h3>
+                <p className="hint small" style={{ marginBottom: '1rem', fontStyle: 'italic' }}>Aquí tienes algunos jugadores que han compartido vestuario con ambos. (Pueden existir otros no listados que también sean correctos).</p>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '300px', overflowY: 'auto', marginBottom: '1.5rem', background: '#f1f5f9', padding: '1rem', borderRadius: '12px', textAlign: 'left' }}>
+                  {ronda.reto.comunes && ronda.reto.comunes.length > 0 ? (
+                    ronda.reto.comunes.map((c, i) => (
+                      <div key={i} style={{ padding: '0.4rem 0', borderBottom: i !== ronda.reto.comunes.length - 1 ? '1px solid #cbd5e1' : 'none', fontWeight: 'bold', color: '#0f172a' }}>
+                        • {c}
+                      </div>
+                    ))
+                  ) : (
+                    <div style={{ color: '#64748b' }}>No hay datos registrados.</div>
+                  )}
+                </div>
+                
+                <button className="big full" onClick={() => setModalRespuestas(false)}>Cerrar</button>
+              </div>
             </div>
           )}
 

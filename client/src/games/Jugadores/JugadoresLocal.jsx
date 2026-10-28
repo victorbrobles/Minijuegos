@@ -10,9 +10,10 @@ const MAX_RONDAS = 20;
 
 export default function JugadoresLocal({ onVolver, onExit }) {
   const navigate = useNavigate();
-  const [paso, setPaso] = useState('config'); // config, jugando, resumen, final
+  const [paso, setPaso] = useState('config'); 
   const [modalAyuda, setModalAyuda] = useState(false);
-  const [modalAsignar, setModalAsignar] = useState(null); // 'acierto' | 'fallo'
+  const [modalAsignar, setModalAsignar] = useState(null);
+  const [modalRespuestas, setModalRespuestas] = useState(false);
 
   const [jugadores, setJugadores] = useState([
     { id: 1, nombre: 'Jugador 1' },
@@ -114,8 +115,7 @@ export default function JugadoresLocal({ onVolver, onExit }) {
 
   const ranking = [...jugadores].sort((a, b) => (puntos[b.id] ?? 0) - (puntos[a.id] ?? 0));
   const maximo = ranking.length ? (puntos[ranking[0].id] ?? 0) : 0;
-  const ganadores = ranking.filter((j) => (puntos[j.id] ?? 0) === maximo);
-
+  
   return (
     <div className="rk-contenedor">
       {paso === 'config' && (
@@ -173,7 +173,7 @@ export default function JugadoresLocal({ onVolver, onExit }) {
             <span className="chip"><Icon name="flagFinish" size={18} />Ronda {ronda} de {MAX_RONDAS}</span>
           </div>
 
-          <div className="panel center" style={{ margin: '2rem 0', padding: '3rem 1rem' }}>
+          <div className="panel center" style={{ margin: '2rem 0', padding: '2rem 1rem' }}>
             <h3 style={{ color: '#64748b', textTransform: 'uppercase', fontSize: '0.9rem', letterSpacing: '2px', marginBottom: '1rem' }}>Compañero en común</h3>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center' }}>
@@ -181,6 +181,10 @@ export default function JugadoresLocal({ onVolver, onExit }) {
               <Icon name="refresh" size={28} color="#94a3b8" />
               <div style={{ fontSize: '2rem', fontWeight: '900', color: '#1e293b', textAlign: 'center' }}>{reto.jugador2}</div>
             </div>
+            
+            <button type="button" className="secondary" style={{ marginTop: '2rem', fontSize: '0.9rem', padding: '0.4rem 1rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }} onClick={() => setModalRespuestas(true)}>
+               <Icon name="eye" size={16} /> Revelar algunas respuestas posibles
+            </button>
           </div>
 
           <div className="timer" role="timer" aria-label="Tiempo restante">
@@ -194,6 +198,31 @@ export default function JugadoresLocal({ onVolver, onExit }) {
           </div>
           <button className="secondary full" style={{ marginTop: '1rem' }} onClick={rendirse}><Icon name="flag" size={18} /> Nadie lo sabe (Pasar)</button>
 
+          {/* Modal Respuestas Posibles */}
+          {modalRespuestas && (
+            <div className="rg-modal-fondo" onClick={() => setModalRespuestas(false)}>
+              <div className="rg-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '400px' }}>
+                <h3 style={{ marginBottom: '1rem', color: '#1e1b4b' }}>Posibles Respuestas</h3>
+                <p className="hint small" style={{ marginBottom: '1rem', fontStyle: 'italic' }}>Aquí tienes algunos jugadores que han compartido vestuario con ambos. (Pueden existir otros no listados que también sean correctos).</p>
+                
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '300px', overflowY: 'auto', marginBottom: '1.5rem', background: '#f1f5f9', padding: '1rem', borderRadius: '12px', textAlign: 'left' }}>
+                  {reto.comunes && reto.comunes.length > 0 ? (
+                    reto.comunes.map((c, i) => (
+                      <div key={i} style={{ padding: '0.4rem 0', borderBottom: i !== reto.comunes.length - 1 ? '1px solid #cbd5e1' : 'none', fontWeight: 'bold', color: '#0f172a' }}>
+                        • {c}
+                      </div>
+                    ))
+                  ) : (
+                    <div style={{ color: '#64748b' }}>No hay datos registrados.</div>
+                  )}
+                </div>
+                
+                <button className="big full" onClick={() => setModalRespuestas(false)}>Cerrar</button>
+              </div>
+            </div>
+          )}
+
+          {/* Modal Asignación */}
           {modalAsignar && (
             <div className="rg-modal-fondo" onClick={() => setModalAsignar(null)}>
               <div className="rg-modal" onClick={(e) => e.stopPropagation()}>

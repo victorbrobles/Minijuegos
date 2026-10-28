@@ -1,110 +1,111 @@
 // server/data/seeds/jugadores/jugadores.seed.js
 
 const PARES_JUGADORES = [
-  ["Sergio Ramos", "Robert Lewandowski"], // Toni Kroos, Xabi Alonso, James Rodríguez
-  ["Paul Scholes", "Xavi Hernández"], // Gerard Piqué
-  ["Giorgio Chiellini", "Neymar Jr"], // Dani Alves, Gianluigi Buffon
-  ["Bastian Schweinsteiger", "Xavi Hernández"], // Thiago Alcántara
-  ["Gianluigi Buffon", "Iker Casillas"], // Fabio Cannavaro, Álvaro Morata
-  ["Jude Bellingham", "Steven Gerrard"], // Jordan Henderson
-  ["Francesco Totti", "Xavi Hernández"], // Bojan Krkić, Seydou Keita
-  ["Ángel Di María", "Gareth Bale"], // Cristiano Ronaldo, Luka Modrić, Pepe
-  ["David Silva", "Andrés Iniesta"], // Yaya Touré, Jesús Navas, Nolito
-  ["Gerard Piqué", "Sergio Agüero"], // Lionel Messi, Gabriel Milito
-  ["Xavi Hernández", "Karim Benzema"], // Thierry Henry (Sel. Francia), Lassana Diarra
-  ["Steven Gerrard", "Andrés Iniesta"], // Javier Mascherano, Luis Suárez, Fernando Torres
-  ["Cesc Fàbregas", "Luka Modrić"], // Thibaut Courtois, Mateo Kovačić
-  ["Andrés Iniesta", "Gareth Bale"], // Giovani dos Santos, Luka Modrić
-  ["Pedri", "Xavi Hernández"], // Sergio Busquets, Jordi Alba
-  ["Cristiano Ronaldo", "Sergio Agüero"], // Carlos Tevez, Ángel Di María
-  ["Romelu Lukaku", "Harry Kane"], // Christian Eriksen, Jan Vertonghen
-  ["Alessandro Del Piero", "Andrés Iniesta"], // Gianluca Zambrotta, Lilian Thuram
-  ["Gabriel Batistuta", "Alan Shearer"], // Hernán Crespo
-  ["Sergio Aguero", "Luis Suarez"], // Lionel Messi, Javier Mascherano
-  ["Alisson Becker", "Antoine Griezmann"], // Philippe Coutinho, Fabinho
-  ["Keylor Navas", "Wayne Rooney"], // Ángel Di María, Cristiano Ronaldo
-  ["Pepe", "Zlatan Ibrahimović"], // Cristiano Ronaldo (Juve), Ángel Di María
-  ["Lionel Messi", "Wayne Rooney"], // Gerard Piqué, Ángel Di María, Carlos Tevez
-  ["Aubameyang", "Icardi"], // Ivan Perišić, Ousmane Dembélé
-  ["Lionel Messi", "Gianluigi Buffon"], // Dani Alves, Arturo Vidal, Arthur
-  ["Cristiano Ronaldo", "Franck Ribéry"], // Toni Kroos, Xabi Alonso, James Rodríguez
-  ["Andrea Pirlo", "Luka Modrić"], // Álvaro Morata, Mario Mandžukić
-  ["Neymar Jr", "Karim Benzema"], // Keylor Navas, Ángel Di María, Casemiro
-  ["Olivier Giroud", "Gonzalo Higuain"], // Mesut Özil, Alexis Sánchez
-  ["Petr Čech", "Karim Benzema"], // Thibaut Courtois, Lassana Diarra
-  ["Cristiano Ronaldo", "Luis Suárez"], // Arthur Melo
-  ["João Moutinho", "Ivan Rakitić"], // Radamel Falcao, James Rodríguez
-  ["Lucas Moura", "Willian"], // Marquinhos, Thiago Silva
-  ["Edin Dzeko", "Radamel Falcao"], // Miralem Pjanić, Sergio Agüero
-  ["Paulo Dybala", "Antoine Griezmann"], // Cristiano Ronaldo, Álvaro Morata
-  ["Rivaldo", "Dennis Bergkamp"], // Patrick Kluivert, Marc Overmars
-  ["Ronaldo Nazário", "Thierry Henry"], // Zinedine Zidane, Lilian Thuram
-  ["Gianluigi Buffon", "Sergio Agüero"], // Carlos Tevez, Ángel Di María
-  ["Raheem Sterling", "Ousmane Dembele"], // Pierre-Emerick Aubameyang, İlkay Gündoğan
-  ["Julian Draxler", "Isco"], // Raúl González, Jesé Rodríguez
-  ["Manuel Neuer", "Luis Suárez"], // Thiago Alcántara, Arturo Vidal
-  ["Thibaut Courtois", "Zlatan Ibrahimović"], // Eden Hazard, Romelu Lukaku
-  ["Lionel Messi", "Frank Lampard"], // Deco, Cesc Fàbregas, Eidur Gudjohnsen
-  ["Sadio Mane", "Son Heung-min"], // Roberto Firmino, Hugo Lloris
-  ["Xherdan Shaqiri", "Pedro Rodríguez"], // Thiago Alcántara, Cesc Fàbregas
-  ["Lionel Messi", "Didier Drogba"], // Deco, Samuel Eto'o, Cesc Fàbregas
-  ["Dani Alves", "Iker Casillas"], // Sergio Ramos (PSG / Sel.)
-  ["Mario Mandzukic", "Diego Costa"], // Luka Modrić, Arda Turan
-  ["Thierry Henry", "Sergio Ramos"], // Zinedine Zidane, Iker Casillas (Sel. Francia/España)
-  ["Lionel Messi", "Manuel Neuer"], // Thiago Alcántara, Arturo Vidal, Coutinho
-  ["Kylian Mbappé", "Thierry Henry"], // Ousmane Dembélé, Olivier Giroud
-  ["George Weah", "Hristo Stoichkov"], // Roberto Baggio, Demetrio Albertini
-  ["Javier Zanetti", "Sergio Ramos"], // Wesley Sneijder, Walter Samuel
-  ["Jordi Alba", "Marcelo"], // Neymar, Dani Alves (Sel. Brasil / Barça)
-  ["Xabi Alonso", "Toni Kroos"], // Cristiano Ronaldo, Sergio Ramos
-  ["Zlatan Ibrahimović", "Gareth Bale"], // Rafael van der Vaart, Hakan Çalhanoğlu
-  ["Paolo Maldini", "Carles Puyol"], // Demetrio Albertini, Rivaldo
-  ["Ciro Immobile", "Jamie Vardy"], // Luis Alberto, Pedro
-  ["Mario Balotelli", "Karim Benzema"], // Patrick Vieira, Lassana Diarra
-  ["Neymar Jr", "Sergio Agüero"], // Lionel Messi, Ángel Di María
-  ["Vincent Kompany", "Kylian Mbappé"], // Bernardo Silva, Benjamin Mendy
-  ["Didier Drogba", "Carles Puyol"], // Deco, Eidur Gudjohnsen
-  ["Erling Haaland", "Wayne Rooney"], // Jadon Sancho
-  ["Lionel Messi", "Francesco Totti"], // Bojan Krkić, Seydou Keita
-  ["Vinícius Júnior", "Ronaldinho"], // Marcelo, Casemiro
-  ["Cristiano Ronaldo", "Robert Lewandowski"], // Toni Kroos, Xabi Alonso, James Rodríguez
-  ["Luis Figo", "Ryan Giggs"], // Cristiano Ronaldo, Carlos Tevez
-  ["Iker Casillas", "Robert Lewandowski"], // Xabi Alonso, Arjen Robben
-  ["Hatem Ben Arfa", "Santi Cazorla"], // Samir Nasri, Yohan Cabaye
-  ["Sergio Agüero", "Karim Benzema"], // Ángel Di María, Gonzalo Higuaín
-  ["Carles Puyol", "Pepe"], // Cristiano Ronaldo (con Puyol nunca), Deco (con Pepe en Sel., con Puyol en FCB)
-  ["Mario Götze", "Oscar"], // Robert Lewandowski, André Schürrle
-  ["Phil Foden", "Paul Scholes"], // Raheem Sterling
-  ["Cristiano Ronaldo", "Zlatan Ibrahimović"], // Ángel Di María, Paul Pogba, Varane
-  ["Lionel Messi", "Alessandro Del Piero"], // Gianluca Zambrotta, Lilian Thuram
-  ["Neymar Jr", "Eden Hazard"], // Thibaut Courtois, Thomas Meunier
-  ["Zlatan Ibrahimović", "Toni Kroos"], // Arturo Vidal
-  ["Neymar Jr", "Wayne Rooney"], // Ángel Di María, Ander Herrera
-  ["Zlatan Ibrahimović", "Karim Benzema"], // Paul Pogba, Raphaël Varane
-  ["Neymar Jr", "Robert Lewandowski"], // Philippe Coutinho, Juan Bernat
-  ["Bukayo Saka", "Thierry Henry"], // Pierre-Emerick Aubameyang
-  ["Neymar Jr", "Kevin De Bruyne"], // Claudio Bravo, Fernandinho
-  ["Gerard Piqué", "Luka Modrić"], // Ivan Rakitić
-  ["Neymar Jr", "Gareth Bale"], // Keylor Navas
-  ["Zlatan Ibrahimović", "Luka Modrić"], // Rafael van der Vaart, Mateo Kovačić
-  ["Zinedine Zidane", "Ronaldinho"], // Ronaldo Nazário, Claude Makélélé
-  ["Zlatan Ibrahimović", "Manuel Neuer"], // Thiago Alcántara, Eric Maxim Choupo-Moting
-  ["Kaká", "Xavi Hernández"], // Ronaldinho, Zlatan Ibrahimović
-  ["Thiago Silva", "Luis Suárez"], // Marquinhos, Neymar
-  ["Wayne Rooney", "Andrés Iniesta"], // Gerard Piqué, Ángel Di María
-  ["Javier Pastore", "Juan Mata"], // Zlatan Ibrahimović, Edinson Cavani
-  ["Cristiano Ronaldo", "Neymar Jr"], // Di María, Keylor Navas, Casemiro, Arthur
-  ["Sergio Busquets", "Toni Kroos"], // Arturo Vidal, Thiago Alcántara
-  ["Zlatan Ibrahimović", "Sergio Agüero"], // Ángel Di María, Carlos Tevez
-  ["Virgil van Dijk", "Karim Benzema"], // Georginio Wijnaldum, Memphis Depay
-  ["Cristiano Ronaldo", "Cesc Fàbregas"], // Álvaro Morata, Gonzalo Higuaín
-  ["Frank Lampard", "Xavi Hernández"], // Deco, Cesc Fàbregas
-  ["David Beckham", "Pavel Nedvěd"], // Zinedine Zidane, Fabio Cannavaro
-  ["Arturo Vidal", "Kevin De Bruyne"], // Claudio Bravo, Kingsley Coman
+  { p1: "Sergio Ramos", p2: "Robert Lewandowski", comunes: ["Toni Kroos", "Xabi Alonso", "James Rodríguez"] },
+  { p1: "Paul Scholes", p2: "Xavi Hernández", comunes: ["Gerard Piqué"] },
+  { p1: "Giorgio Chiellini", p2: "Neymar Jr", comunes: ["Dani Alves", "Gianluigi Buffon"] },
+  { p1: "Bastian Schweinsteiger", p2: "Xavi Hernández", comunes: ["Thiago Alcántara"] },
+  { p1: "Gianluigi Buffon", p2: "Iker Casillas", comunes: ["Fabio Cannavaro", "Álvaro Morata"] },
+  { p1: "Jude Bellingham", p2: "Steven Gerrard", comunes: ["Jordan Henderson"] },
+  { p1: "Francesco Totti", p2: "Xavi Hernández", comunes: ["Bojan Krkić", "Seydou Keita"] },
+  { p1: "Ángel Di María", p2: "Gareth Bale", comunes: ["Cristiano Ronaldo", "Luka Modrić", "Pepe"] },
+  { p1: "David Silva", p2: "Andrés Iniesta", comunes: ["Yaya Touré", "Jesús Navas", "Nolito"] },
+  { p1: "Gerard Piqué", p2: "Sergio Agüero", comunes: ["Lionel Messi", "Gabriel Milito"] },
+  { p1: "Xavi Hernández", p2: "Karim Benzema", comunes: ["Thierry Henry (Sel. Francia)", "Lassana Diarra"] },
+  { p1: "Steven Gerrard", p2: "Andrés Iniesta", comunes: ["Javier Mascherano", "Luis Suárez", "Fernando Torres"] },
+  { p1: "Cesc Fàbregas", p2: "Luka Modrić", comunes: ["Thibaut Courtois", "Mateo Kovačić"] },
+  { p1: "Andrés Iniesta", p2: "Gareth Bale", comunes: ["Giovani dos Santos", "Luka Modrić"] },
+  { p1: "Pedri", p2: "Xavi Hernández", comunes: ["Sergio Busquets", "Jordi Alba"] },
+  { p1: "Cristiano Ronaldo", p2: "Sergio Agüero", comunes: ["Carlos Tevez", "Ángel Di María"] },
+  { p1: "Romelu Lukaku", p2: "Harry Kane", comunes: ["Christian Eriksen", "Jan Vertonghen"] },
+  { p1: "Alessandro Del Piero", p2: "Andrés Iniesta", comunes: ["Gianluca Zambrotta", "Lilian Thuram"] },
+  { p1: "Gabriel Batistuta", p2: "Alan Shearer", comunes: ["Hernán Crespo"] },
+  { p1: "Sergio Aguero", p2: "Luis Suarez", comunes: ["Lionel Messi", "Javier Mascherano"] },
+  { p1: "Alisson Becker", p2: "Antoine Griezmann", comunes: ["Philippe Coutinho", "Fabinho"] },
+  { p1: "Keylor Navas", p2: "Wayne Rooney", comunes: ["Ángel Di María", "Cristiano Ronaldo"] },
+  { p1: "Pepe", p2: "Zlatan Ibrahimović", comunes: ["Cristiano Ronaldo (Juve)", "Ángel Di María"] },
+  { p1: "Lionel Messi", p2: "Wayne Rooney", comunes: ["Gerard Piqué", "Ángel Di María", "Carlos Tevez"] },
+  { p1: "Aubameyang", p2: "Icardi", comunes: ["Ivan Perišić", "Ousmane Dembélé"] },
+  { p1: "Lionel Messi", p2: "Gianluigi Buffon", comunes: ["Dani Alves", "Arturo Vidal", "Arthur Melo"] },
+  { p1: "Cristiano Ronaldo", p2: "Franck Ribéry", comunes: ["Toni Kroos", "Xabi Alonso", "James Rodríguez"] },
+  { p1: "Andrea Pirlo", p2: "Luka Modrić", comunes: ["Álvaro Morata", "Mario Mandžukić"] },
+  { p1: "Neymar Jr", p2: "Karim Benzema", comunes: ["Keylor Navas", "Ángel Di María", "Casemiro"] },
+  { p1: "Olivier Giroud", p2: "Gonzalo Higuain", comunes: ["Mesut Özil", "Alexis Sánchez"] },
+  { p1: "Petr Čech", p2: "Karim Benzema", comunes: ["Thibaut Courtois", "Lassana Diarra"] },
+  { p1: "Cristiano Ronaldo", p2: "Luis Suárez", comunes: ["Arthur Melo"] },
+  { p1: "João Moutinho", p2: "Ivan Rakitić", comunes: ["Radamel Falcao", "James Rodríguez"] },
+  { p1: "Lucas Moura", p2: "Willian", comunes: ["Marquinhos", "Thiago Silva"] },
+  { p1: "Edin Dzeko", p2: "Radamel Falcao", comunes: ["Miralem Pjanić", "Sergio Agüero"] },
+  { p1: "Paulo Dybala", p2: "Antoine Griezmann", comunes: ["Cristiano Ronaldo", "Álvaro Morata"] },
+  { p1: "Rivaldo", p2: "Dennis Bergkamp", comunes: ["Patrick Kluivert", "Marc Overmars"] },
+  { p1: "Ronaldo Nazário", p2: "Thierry Henry", comunes: ["Zinedine Zidane", "Lilian Thuram"] },
+  { p1: "Gianluigi Buffon", p2: "Sergio Agüero", comunes: ["Carlos Tevez", "Ángel Di María"] },
+  { p1: "Raheem Sterling", p2: "Ousmane Dembele", comunes: ["Pierre-Emerick Aubameyang", "İlkay Gündoğan"] },
+  { p1: "Julian Draxler", p2: "Isco", comunes: ["Raúl González", "Jesé Rodríguez"] },
+  { p1: "Manuel Neuer", p2: "Luis Suárez", comunes: ["Thiago Alcántara", "Arturo Vidal"] },
+  { p1: "Thibaut Courtois", p2: "Zlatan Ibrahimović", comunes: ["Eden Hazard", "Romelu Lukaku"] },
+  { p1: "Lionel Messi", p2: "Frank Lampard", comunes: ["Deco", "Cesc Fàbregas", "Eidur Gudjohnsen"] },
+  { p1: "Sadio Mane", p2: "Son Heung-min", comunes: ["Roberto Firmino", "Hugo Lloris"] },
+  { p1: "Xherdan Shaqiri", p2: "Pedro Rodríguez", comunes: ["Thiago Alcántara", "Cesc Fàbregas"] },
+  { p1: "Lionel Messi", p2: "Didier Drogba", comunes: ["Deco", "Samuel Eto'o", "Cesc Fàbregas"] },
+  { p1: "Dani Alves", p2: "Iker Casillas", comunes: ["Sergio Ramos (PSG / Sel.)"] },
+  { p1: "Mario Mandzukic", p2: "Diego Costa", comunes: ["Luka Modrić", "Arda Turan"] },
+  { p1: "Thierry Henry", p2: "Sergio Ramos", comunes: ["Zinedine Zidane", "Iker Casillas (Sel. Francia/España)"] },
+  { p1: "Lionel Messi", p2: "Manuel Neuer", comunes: ["Thiago Alcántara", "Arturo Vidal", "Philippe Coutinho"] },
+  { p1: "Kylian Mbappé", p2: "Thierry Henry", comunes: ["Ousmane Dembélé", "Olivier Giroud"] },
+  { p1: "George Weah", p2: "Hristo Stoichkov", comunes: ["Roberto Baggio", "Demetrio Albertini"] },
+  { p1: "Javier Zanetti", p2: "Sergio Ramos", comunes: ["Wesley Sneijder", "Walter Samuel"] },
+  { p1: "Jordi Alba", p2: "Marcelo", comunes: ["Neymar Jr", "Dani Alves (Sel. Brasil / Barça)"] },
+  { p1: "Xabi Alonso", p2: "Toni Kroos", comunes: ["Cristiano Ronaldo", "Sergio Ramos"] },
+  { p1: "Zlatan Ibrahimović", p2: "Gareth Bale", comunes: ["Rafael van der Vaart", "Hakan Çalhanoğlu"] },
+  { p1: "Paolo Maldini", p2: "Carles Puyol", comunes: ["Demetrio Albertini", "Rivaldo"] },
+  { p1: "Ciro Immobile", p2: "Jamie Vardy", comunes: ["Luis Alberto", "Pedro"] },
+  { p1: "Mario Balotelli", p2: "Karim Benzema", comunes: ["Patrick Vieira", "Lassana Diarra"] },
+  { p1: "Neymar Jr", p2: "Sergio Agüero", comunes: ["Lionel Messi", "Ángel Di María"] },
+  { p1: "Vincent Kompany", p2: "Kylian Mbappé", comunes: ["Bernardo Silva", "Benjamin Mendy"] },
+  { p1: "Didier Drogba", p2: "Carles Puyol", comunes: ["Deco", "Eidur Gudjohnsen"] },
+  { p1: "Erling Haaland", p2: "Wayne Rooney", comunes: ["Jadon Sancho"] },
+  { p1: "Lionel Messi", p2: "Francesco Totti", comunes: ["Bojan Krkić", "Seydou Keita"] },
+  { p1: "Vinícius Júnior", p2: "Ronaldinho", comunes: ["Marcelo", "Casemiro"] },
+  { p1: "Cristiano Ronaldo", p2: "Robert Lewandowski", comunes: ["Toni Kroos", "Xabi Alonso", "James Rodríguez"] },
+  { p1: "Luis Figo", p2: "Ryan Giggs", comunes: ["Cristiano Ronaldo", "Carlos Tevez"] },
+  { p1: "Iker Casillas", p2: "Robert Lewandowski", comunes: ["Xabi Alonso", "Arjen Robben"] },
+  { p1: "Hatem Ben Arfa", p2: "Santi Cazorla", comunes: ["Samir Nasri", "Yohan Cabaye"] },
+  { p1: "Sergio Agüero", p2: "Karim Benzema", comunes: ["Ángel Di María", "Gonzalo Higuaín"] },
+  { p1: "Carles Puyol", p2: "Pepe", comunes: ["Cristiano Ronaldo (con Puyol nunca)", "Deco (con Pepe en Sel., con Puyol en FCB)"] },
+  { p1: "Mario Götze", p2: "Oscar", comunes: ["Robert Lewandowski", "André Schürrle"] },
+  { p1: "Phil Foden", p2: "Paul Scholes", comunes: ["Raheem Sterling"] },
+  { p1: "Cristiano Ronaldo", p2: "Zlatan Ibrahimović", comunes: ["Ángel Di María", "Paul Pogba", "Raphaël Varane"] },
+  { p1: "Lionel Messi", p2: "Alessandro Del Piero", comunes: ["Gianluca Zambrotta", "Lilian Thuram"] },
+  { p1: "Neymar Jr", p2: "Eden Hazard", comunes: ["Thibaut Courtois", "Thomas Meunier"] },
+  { p1: "Zlatan Ibrahimović", p2: "Toni Kroos", comunes: ["Arturo Vidal"] },
+  { p1: "Neymar Jr", p2: "Wayne Rooney", comunes: ["Ángel Di María", "Ander Herrera"] },
+  { p1: "Zlatan Ibrahimović", p2: "Karim Benzema", comunes: ["Paul Pogba", "Raphaël Varane"] },
+  { p1: "Neymar Jr", p2: "Robert Lewandowski", comunes: ["Philippe Coutinho", "Juan Bernat"] },
+  { p1: "Bukayo Saka", p2: "Thierry Henry", comunes: ["Pierre-Emerick Aubameyang"] },
+  { p1: "Neymar Jr", p2: "Kevin De Bruyne", comunes: ["Claudio Bravo", "Fernandinho"] },
+  { p1: "Gerard Piqué", p2: "Luka Modrić", comunes: ["Ivan Rakitić"] },
+  { p1: "Neymar Jr", p2: "Gareth Bale", comunes: ["Keylor Navas"] },
+  { p1: "Zlatan Ibrahimović", p2: "Luka Modrić", comunes: ["Rafael van der Vaart", "Mateo Kovačić"] },
+  { p1: "Zinedine Zidane", p2: "Ronaldinho", comunes: ["Ronaldo Nazário", "Claude Makélélé"] },
+  { p1: "Zlatan Ibrahimović", p2: "Manuel Neuer", comunes: ["Thiago Alcántara", "Eric Maxim Choupo-Moting"] },
+  { p1: "Kaká", p2: "Xavi Hernández", comunes: ["Ronaldinho", "Zlatan Ibrahimović"] },
+  { p1: "Thiago Silva", p2: "Luis Suárez", comunes: ["Marquinhos", "Neymar Jr"] },
+  { p1: "Wayne Rooney", p2: "Andrés Iniesta", comunes: ["Gerard Piqué", "Ángel Di María"] },
+  { p1: "Javier Pastore", p2: "Juan Mata", comunes: ["Zlatan Ibrahimović", "Edinson Cavani"] },
+  { p1: "Cristiano Ronaldo", p2: "Neymar Jr", comunes: ["Ángel Di María", "Keylor Navas", "Casemiro", "Arthur Melo"] },
+  { p1: "Sergio Busquets", p2: "Toni Kroos", comunes: ["Arturo Vidal", "Thiago Alcántara"] },
+  { p1: "Zlatan Ibrahimović", p2: "Sergio Agüero", comunes: ["Ángel Di María", "Carlos Tevez"] },
+  { p1: "Virgil van Dijk", p2: "Karim Benzema", comunes: ["Georginio Wijnaldum", "Memphis Depay"] },
+  { p1: "Cristiano Ronaldo", p2: "Cesc Fàbregas", comunes: ["Álvaro Morata", "Gonzalo Higuaín"] },
+  { p1: "Frank Lampard", p2: "Xavi Hernández", comunes: ["Deco", "Cesc Fàbregas"] },
+  { p1: "David Beckham", p2: "Pavel Nedvěd", comunes: ["Zinedine Zidane", "Fabio Cannavaro"] },
+  { p1: "Arturo Vidal", p2: "Kevin De Bruyne", comunes: ["Claudio Bravo", "Kingsley Coman"] }
 ];
 
 export default PARES_JUGADORES.map((pares, index) => ({
   id: `jug_${index + 1}`,
-  jugador1: pares[0],
-  jugador2: pares[1]
+  jugador1: pares.p1,
+  jugador2: pares.p2,
+  comunes: pares.comunes
 }));

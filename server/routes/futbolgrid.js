@@ -1,13 +1,16 @@
 // server/routes/futbolgrid.routes.js
 import express from 'express';
 import crypto from 'crypto';
-import GRIDS_PREESTABLECIDOS from '../data/seeds/futbolgrid/categorias.js';
+import GRIDS_VOL_1 from '../data/seeds/futbolgrid/categorias.js';
+import GRIDS_VOL_2 from '../data/seeds/futbolgrid/categorias1.js';
 
 const router = express.Router();
 
+const TODOS_LOS_GRIDS = [...GRIDS_VOL_1, ...GRIDS_VOL_2];
+
 const obtenerGridAleatorio = () => {
-  const indice = Math.floor(Math.random() * GRIDS_PREESTABLECIDOS.length);
-  return GRIDS_PREESTABLECIDOS[indice];
+  const indice = Math.floor(Math.random() * TODOS_LOS_GRIDS.length);
+  return TODOS_LOS_GRIDS[indice];
 };
 
 router.get('/grid', (req, res) => {
