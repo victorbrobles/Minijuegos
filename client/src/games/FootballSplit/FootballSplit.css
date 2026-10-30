@@ -120,3 +120,196 @@
   display: inline-block;
   margin: 0 auto;
 }
+
+/* client/src/games/FootballSplit/FootballSplit.css */
+
+.fs-split-container {
+  display: flex;
+  flex-direction: column;
+  width: 280px;
+  height: 270px;
+  margin: 1.5rem auto;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  background: #0f172a;
+  border: 3px solid #1e293b;
+  position: relative;
+}
+
+.fs-slice {
+  position: relative;
+  width: 100%;
+  height: 90px; /* 3 franjas de 90px = 270px */
+  border-bottom: 2px dashed rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+  background-color: #1e293b;
+}
+
+.fs-slice:last-child {
+  border-bottom: none;
+}
+
+.fs-slice.solved {
+  background: rgba(16, 185, 129, 0.2);
+}
+
+.fs-slice.solved img {
+  filter: brightness(0.6);
+}
+
+/* client/src/games/FootballSplit/FootballSplit.css */
+
+.fs-split-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 360px;
+  height: 360px; /* 3 franjas exactas de 120px = 360px */
+  margin: 1.5rem auto;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.35);
+  background: #ffffff;
+  border: 3px solid #1e293b;
+  position: relative;
+}
+
+.fs-slice {
+  position: relative;
+  width: 100%;
+  height: 120px; /* Cada tercio del rostro mide 120px */
+  border-bottom: 2px dashed rgba(15, 23, 42, 0.35);
+  overflow: hidden;
+  background-color: #ffffff;
+}
+
+.fs-slice:last-child {
+  border-bottom: none;
+}
+
+.fs-slice.solved {
+  background: #dcfce7;
+}
+
+.fs-slice.solved img {
+  filter: brightness(0.72);
+}
+
+/* Botón '?' interactivo en la esquina superior izquierda */
+.fs-slice-status {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  background: rgba(15, 23, 42, 0.82);
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 1rem;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  z-index: 15;
+  transition: transform 0.15s ease, background-color 0.15s ease;
+}
+
+.fs-slice-status:hover:not(:disabled) {
+  transform: scale(1.1);
+  background: #0ea5e9;
+}
+
+.fs-slice.solved .fs-slice-status {
+  background: #10b981;
+  cursor: default;
+}
+
+/* Botón opcional de Pista a la derecha */
+.fs-slice-hint {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(14, 165, 233, 0.92);
+  color: #fff;
+  border: none;
+  border-radius: 9999px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: transform 0.1s, background-color 0.15s;
+  z-index: 15;
+}
+
+.fs-slice-hint:hover {
+  background: #0284c7;
+}
+
+.fs-slice-hint:active {
+  transform: scale(0.95);
+}
+
+/* Cartel desplegable con la pista dentro de la franja */
+.fs-slice-pista-box {
+  position: absolute;
+  left: 52px;
+  right: 10px;
+  bottom: 8px;
+  background: rgba(15, 23, 42, 0.92);
+  color: #f8fafc;
+  padding: 0.45rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.25;
+  text-align: left;
+  border: 1px solid rgba(56, 189, 248, 0.6);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+  z-index: 14;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  animation: fadeInPista 0.2s ease-out;
+}
+
+@keyframes fadeInPista {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fs-solved-name {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #10b981;
+  color: #fff;
+  padding: 0.28rem 1rem;
+  border-radius: 14px;
+  font-weight: 900;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 16;
+}
+
+.fs-attempts {
+  background: #334155;
+  color: #f8fafc;
+  padding: 0.55rem 1.6rem;
+  border-radius: 20px;
+  font-weight: 800;
+  display: inline-block;
+  margin: 0 auto;
+}

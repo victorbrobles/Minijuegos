@@ -1,16 +1,15 @@
 // server/routes/footballsplit.routes.js
 import express from 'express';
 import crypto from 'crypto';
-import SPLIT_RETO from '../data/seeds/footballsplit/split.js';
+import SPLIT_RETO, { generarRetoAleatorio } from '../data/seeds/footballsplit/split.js';
 
 const router = express.Router();
 
 const normalizar = (texto) => 
-  typeof texto === 'string' ? texto.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim() : "";
+  typeof texto === 'string' ? texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() : "";
 
 const obtenerRetoAleatorio = () => {
-  const indice = Math.floor(Math.random() * SPLIT_RETO.length);
-  return SPLIT_RETO[indice];
+  return generarRetoAleatorio();
 };
 
 // ================= LOCAL =================
