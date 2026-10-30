@@ -12,7 +12,7 @@ export default function JugadoresLocal({ onVolver, onExit }) {
   const navigate = useNavigate();
   const [paso, setPaso] = useState('config'); 
   const [modalAyuda, setModalAyuda] = useState(false);
-  const [modalAsignar, setModalAsignar] = useState(null);
+  const [modalAsignar, setModalAsignar] = useState(null); // 'acierto' | 'fallo'
   const [modalRespuestas, setModalRespuestas] = useState(false);
 
   const [jugadores, setJugadores] = useState([
@@ -25,6 +25,7 @@ export default function JugadoresLocal({ onVolver, onExit }) {
   const [reto, setReto] = useState(null);
   const [ultimo, setUltimo] = useState(null);
   const [restante, setRestante] = useState(TIEMPO_S);
+  const [bloqueadosRonda, setBloqueadosRonda] = useState([]);
   
   const timerRef = useRef(null);
 
@@ -52,6 +53,7 @@ export default function JugadoresLocal({ onVolver, onExit }) {
         setUsados([...usados, data.reto.id]);
         setReto(data.reto);
         setRestante(TIEMPO_S);
+        setBloqueadosRonda([]);
         setPaso('jugando');
         iniciarTimer();
       }
@@ -66,6 +68,8 @@ export default function JugadoresLocal({ onVolver, onExit }) {
       setRestante((prev) => {
         if (prev <= 1) {
           clearInterval(timerRef.current);
+          setUltimo({ tipo: 'rendido' });
+          setPaso('resumen');
           return 0;
         }
         return prev - 1;
@@ -86,15 +90,27 @@ export default function JugadoresLocal({ onVolver, onExit }) {
   const asignarPunto = (jugadorId) => {
     const p = jugadores.find((j) => j.id === jugadorId);
     if (!p) return;
-    
-    if (timerRef.current) clearInterval(timerRef.current);
 
-    const puntosCambiados = modalAsignar === 'acierto' ? 3 : -1;
-    setPuntos((prev) => ({ ...prev, [p.id]: (prev[p.id] ?? 0) + puntosCambiados }));
-    
-    setUltimo({ tipo: modalAsignar, jugador: p.nombre, puntos: puntosCambiados });
-    setModalAsignar(null);
-    setPaso('resumen');
+    if (modalAsignar === 'acierto') {
+      if (timerRef.current) clearInterval(timerRef.current);
+      setPuntos((prev) => ({ ...prev, [p.id]: (prev[p.id] ?? 0) + 3 }));
+      setUltimo({ tipo: 'acierto', jugador: p.nombre, puntos: 3 });
+      setModalAsignar(null);
+      setPaso('resumen');
+    } else if (modalAsignar === 'fallo') {
+      // Restar 1 punto y bloquear al jugador para lo que queda de ronda
+      setPuntos((prev) => ({ ...prev, [p.id]: (prev[p.id] ?? 0) - 1 }));
+      const nuevosBloqueados = [...bloqueadosRonda, p.id];
+      setBloqueadosRonda(nuevosBloqueados);
+      setModalAsignar(null);
+
+      // Si todos los jugadores están bloqueados, se termina la ronda
+      if (nuevosBloqueados.length >= jugadores.length) {
+        if (timerRef.current) clearInterval(timerRef.current);
+        setUltimo({ tipo: 'todos_fallaron', jugador: 'Todos fallaron' });
+        setPaso('resumen');
+      }
+    }
   };
 
   const rendirse = () => {
@@ -116,6 +132,9 @@ export default function JugadoresLocal({ onVolver, onExit }) {
   const ranking = [...jugadores].sort((a, b) => (puntos[b.id] ?? 0) - (puntos[a.id] ?? 0));
   const maximo = ranking.length ? (puntos[ranking[0].id] ?? 0) : 0;
   
+  // Jugadores disponibles que aún no han fallado en esta ronda
+  const jugadoresDisponibles = jugadores.filter(j => !bloqueadosRonda.includes(j.id));
+
   return (
     <div className="rk-contenedor">
       {paso === 'config' && (
@@ -132,12 +151,11 @@ export default function JugadoresLocal({ onVolver, onExit }) {
                   <h3>¿Cómo se juega a ¿Con quién jugaste?</h3>
                 </div>
                 <div className="rk-modal-cuerpo">
-                  <p>Aparecerá en pantalla una dupla de jugadores de fútbol difíciles de relacionar. Solo comparten una cosa: <strong>han tenido al menos un compañero de equipo en común a lo largo de su carrera.</strong></p>
+                  <p>Aparecerá en pantalla una dupla de jugadores de fútbol[cite: 5]. Solo comparten una cosa: <strong>han tenido al menos un compañero en común a lo largo de su carrera[cite: 5].</strong></p>
                   <ul>
-                    <li>Tenéis 120 segundos en grupo para debatir y gritar compañeros en común.</li>
-                    <li>El juez (o la persona con el dispositivo) marcará el acierto o fallo para el que lo diga primero.</li>
-                    <li><strong>Acierto:</strong> +3 puntos.</li>
-                    <li><strong>Fallo:</strong> -1 punto.</li>
+                    <li>Tenéis 120 segundos en grupo para debatir y gritar compañeros[cite: 5].</li>
+                    <li><strong>Acierto:</strong> +3 puntos y fin de la ronda[cite: 5].</li>
+                    <li><strong>Fallo:</strong> -1 punto y bloqueo del jugador para esta ronda, pero la ronda continúa si quedan más participantes[cite: 5].</li>
                   </ul>
                 </div>
                 <div className="rg-modal-acciones">
@@ -203,7 +221,7 @@ export default function JugadoresLocal({ onVolver, onExit }) {
             <div className="rg-modal-fondo" onClick={() => setModalRespuestas(false)}>
               <div className="rg-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '400px' }}>
                 <h3 style={{ marginBottom: '1rem', color: '#1e1b4b' }}>Posibles Respuestas</h3>
-                <p className="hint small" style={{ marginBottom: '1rem', fontStyle: 'italic' }}>Aquí tienes algunos jugadores que han compartido vestuario con ambos. (Pueden existir otros no listados que también sean correctos).</p>
+                <p className="hint small" style={{ marginBottom: '1rem', fontStyle: 'italic' }}>Aquí tienes algunos jugadores que han compartido vestuario con ambos.</p>
                 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '300px', overflowY: 'auto', marginBottom: '1.5rem', background: '#f1f5f9', padding: '1rem', borderRadius: '12px', textAlign: 'left' }}>
                   {reto.comunes && reto.comunes.length > 0 ? (
@@ -226,13 +244,21 @@ export default function JugadoresLocal({ onVolver, onExit }) {
           {modalAsignar && (
             <div className="rg-modal-fondo" onClick={() => setModalAsignar(null)}>
               <div className="rg-modal" onClick={(e) => e.stopPropagation()}>
-                <h3>¿Quién {modalAsignar === 'acierto' ? 'ha acertado (+3)?' : 'ha fallado (-1)?'}</h3>
+                <h3>¿Quién {modalAsignar === 'acierto' ? 'ha acertado (+3)?' : 'ha fallado (-1 y bloqueado)?'}</h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginTop: '1rem' }}>
-                  {jugadores.map((j) => (
-                    <button key={j.id} className="secondary full" onClick={() => asignarPunto(j.id)}>
-                      {j.nombre}
-                    </button>
-                  ))}
+                  {modalAsignar === 'acierto' ? (
+                    jugadores.map((j) => (
+                      <button key={j.id} className="secondary full" onClick={() => asignarPunto(j.id)}>
+                        {j.nombre}
+                      </button>
+                    ))
+                  ) : (
+                    jugadoresDisponibles.map((j) => (
+                      <button key={j.id} className="secondary full" style={{ borderColor: '#ef4444', color: '#dc2626' }} onClick={() => asignarPunto(j.id)}>
+                        {j.nombre} ❌
+                      </button>
+                    ))
+                  )}
                 </div>
                 <button className="secondary danger full" style={{ marginTop: '1rem' }} onClick={() => setModalAsignar(null)}>Cancelar</button>
               </div>
@@ -248,9 +274,10 @@ export default function JugadoresLocal({ onVolver, onExit }) {
             <h1 className="title">Puntuaciones</h1>
             {ultimo && (
               <p className="reveal" style={{ fontSize: '1.2rem', margin: '1rem 0' }}>
-                {ultimo.tipo === 'rendido' ? 'Nadie lo adivinó. 0 puntos para todos.' :
+                {ultimo.tipo === 'rendido' ? 'Se acabó el tiempo o nadie lo adivinó. 0 puntos.' :
+                 ultimo.tipo === 'todos_fallaron' ? '¡Todos han fallado! Fin de la ronda.' :
                  ultimo.tipo === 'acierto' ? <><strong>{ultimo.jugador}</strong> acertó y suma <span style={{color: '#059669'}}>+3 pts</span>.</> :
-                 <><strong>{ultimo.jugador}</strong> falló y resta <span style={{color: '#dc2626'}}>-1 pt</span>.</>}
+                 <><strong>{ultimo.jugador}</strong> falló (-1 pt) y queda bloqueado.</>}
               </p>
             )}
             <div className="scoreboard">

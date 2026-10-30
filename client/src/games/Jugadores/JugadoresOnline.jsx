@@ -2,8 +2,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
 import '../Adivina/Adivina.css';
+import './Jugadores.css';
 
 const CLAVE_SESION_JUG = 'jugadores_online_session';
+const TIEMPO_S = 120;
 
 export default function JugadoresOnline({ onLocal, onSalir }) {
   const [vista, setVista] = useState('menu'); 
@@ -125,6 +127,8 @@ export default function JugadoresOnline({ onLocal, onSalir }) {
   const maximo = ranking.length ? ranking[0].puntos : 0;
   const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
 
+  const jugadoresDisponibles = sala?.jugadores ? sala.jugadores.filter(j => !(ronda?.bloqueados || []).includes(j.id)) : [];
+
   return (
     <div className="rk-contenedor">
       {mostrarAyuda && (
@@ -141,12 +145,11 @@ export default function JugadoresOnline({ onLocal, onSalir }) {
               <h3>¿Cómo se juega a ¿Con quién jugaste?</h3>
             </div>
             <div className="rk-modal-cuerpo">
-              <p>Aparecerá en pantalla una dupla de jugadores de fútbol que <strong>han tenido al menos un compañero en común a lo largo de su carrera.</strong></p>
+              <p>Aparecerá en pantalla una dupla de jugadores de fútbol[cite: 5].</p>
               <ul>
-                <li>El <strong>Anfitrión (👑)</strong> hace de juez y escucha las respuestas del grupo por voz durante los 120 segundos.</li>
-                <li>Si alguien lo adivina, el juez pulsa "Correcto" y le adjudica los puntos. Si alguien dice una locura, puede pulsar "Fallo" y restarle puntos.</li>
-                <li><strong>Acierto:</strong> +3 puntos.</li>
-                <li><strong>Fallo:</strong> -1 punto.</li>
+                <li>El <strong>Anfitrión (👑)</strong> hace de juez y escucha las respuestas del grupo por voz[cite: 5].</li>
+                <li><strong>Acierto:</strong> +3 puntos y fin de la ronda[cite: 5].</li>
+                <li><strong>Fallo:</strong> -1 punto y bloqueo del jugador en esta ronda. La ronda sigue si hay más participantes[cite: 5].</li>
               </ul>
             </div>
             <div className="rg-modal-acciones">
@@ -265,7 +268,6 @@ export default function JugadoresOnline({ onLocal, onSalir }) {
             <div style={{ marginTop: '2rem', background: '#f8fafc', padding: '1.5rem 1rem', borderRadius: '12px', border: '2px dashed #cbd5e1' }}>
               <p className="hint small" style={{ marginBottom: '1rem', textAlign: 'center' }}>👑 Eres el juez. Valida las respuestas en voz alta:</p>
               
-              {/* Botón revelar solo dentro del panel del Admin */}
               <button 
                 type="button" 
                 className="secondary full" 
@@ -287,12 +289,11 @@ export default function JugadoresOnline({ onLocal, onSalir }) {
             </div>
           )}
           
-          {/* Modal Respuestas Posibles (Solo Admin) */}
           {modalRespuestas && esAdmin && (
             <div className="rg-modal-fondo" onClick={() => setModalRespuestas(false)}>
               <div className="rg-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '400px' }}>
                 <h3 style={{ marginBottom: '1rem', color: '#1e1b4b' }}>Posibles Respuestas</h3>
-                <p className="hint small" style={{ marginBottom: '1rem', fontStyle: 'italic' }}>Aquí tienes algunos jugadores que han compartido vestuario con ambos. (Pueden existir otros no listados que también sean correctos).</p>
+                <p className="hint small" style={{ marginBottom: '1rem', fontStyle: 'italic' }}>Aquí tienes algunos jugadores que han compartido vestuario con ambos.</p>
                 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '300px', overflowY: 'auto', marginBottom: '1.5rem', background: '#f1f5f9', padding: '1rem', borderRadius: '12px', textAlign: 'left' }}>
                   {ronda.reto.comunes && ronda.reto.comunes.length > 0 ? (
@@ -311,15 +312,20 @@ export default function JugadoresOnline({ onLocal, onSalir }) {
             </div>
           )}
 
-          {/* Modal Asignar Admin */}
           {modalAsignar && (
             <div className="rg-modal-fondo" onClick={() => setModalAsignar(null)}>
               <div className="rg-modal" onClick={(e) => e.stopPropagation()}>
-                <h3>¿Quién {modalAsignar === 'acierto' ? 'ha acertado (+3)?' : 'ha fallado (-1)?'}</h3>
+                <h3>¿Quién {modalAsignar === 'acierto' ? 'ha acertado (+3)?' : 'ha fallado (-1 y bloqueado)?'}</h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginTop: '1rem' }}>
-                  {sala.jugadores.map((j) => (
-                    <button key={j.id} className="secondary full" onClick={() => handleAsignar(j.id)}>{j.nombre}</button>
-                  ))}
+                  {modalAsignar === 'acierto' ? (
+                    sala.jugadores.map((j) => (
+                      <button key={j.id} className="secondary full" onClick={() => handleAsignar(j.id)}>{j.nombre}</button>
+                    ))
+                  ) : (
+                    jugadoresDisponibles.map((j) => (
+                      <button key={j.id} className="secondary full" style={{ borderColor: '#ef4444', color: '#dc2626' }} onClick={() => handleAsignar(j.id)}>{j.nombre} ❌</button>
+                    ))
+                  )}
                 </div>
                 <button className="secondary danger full" style={{ marginTop: '1rem' }} onClick={() => setModalAsignar(null)}>Cancelar</button>
               </div>
@@ -336,7 +342,7 @@ export default function JugadoresOnline({ onLocal, onSalir }) {
             <h1 className="title">Puntuaciones</h1>
             {ronda.ultimo && (
               <p className="reveal" style={{ fontSize: '1.2rem', margin: '1rem 0' }}>
-                {ronda.ultimo.tipo === 'rendido' ? 'Nadie lo adivinó. 0 puntos.' :
+                {ronda.ultimo.tipo === 'rendido' ? 'Se acabó el tiempo o nadie lo adivinó. 0 puntos.' :
                  ronda.ultimo.tipo === 'acierto' ? <><strong>{ronda.ultimo.jugador}</strong> acertó y suma <span style={{color: '#059669'}}>+3 pts</span>.</> :
                  <><strong>{ronda.ultimo.jugador}</strong> falló y resta <span style={{color: '#dc2626'}}>-1 pt</span>.</>}
               </p>
@@ -353,8 +359,8 @@ export default function JugadoresOnline({ onLocal, onSalir }) {
           <div className="actions">
             {esAdmin ? (
               <>
-                <button className="big full" onClick={() => accionAdmin('siguiente-ronda')}><Icon name="play" size={20} /> {sala.rondaNum >= sala.maxRondas ? 'Ver Podio Final' : 'Siguiente ronda'}</button>
-                <button className="secondary danger full" onClick={() => accionAdmin('finalizar')}><Icon name="flagFinish" size={20} /> Terminar partida</button>
+                <button className="big full" onClick={() => accionSala('siguiente-ronda')}><Icon name="play" size={20} /> {sala.rondaNum >= sala.maxRondas ? 'Ver Podio Final' : 'Siguiente ronda'}</button>
+                <button className="secondary danger full" onClick={() => accionSala('finalizar')}><Icon name="flagFinish" size={20} /> Terminar partida</button>
               </>
             ) : (
               <p className="hint center">Esperando al anfitrión...</p>
