@@ -31,14 +31,17 @@ router.post('/online/crear', (req, res) => {
 
   salas.set(code, {
     code,
-    estado: 'lobby',
+    estado: 'lobby', // 'lobby' | 'jugando' | 'ronda_fin' | 'final_partida'
     adminId: 1,
     nextId: 2,
-    jugadores: [{ id: 1, nombre, token }],
+    jugadores: [{ id: 1, nombre, token, puntos: 0 }],
+    rondaActual: 1,
+    maxRondas: 15,
     retoActual: null,
     estadoReto: { top: false, middle: false, bottom: false },
-    intentos: 0,
-    turnoId: 1
+    pistasUsadas: { top: false, middle: false, bottom: false },
+    turnoId: 1,
+    primerTurnoRondaId: 1
   });
 
   res.json({ success: true, code, token });
@@ -52,7 +55,7 @@ router.post('/online/unirse', (req, res) => {
   if (sala.estado !== 'lobby') return res.status(400).json({ error: 'Partida en curso' });
 
   const token = generarToken();
-  sala.jugadores.push({ id: sala.nextId++, nombre, token });
+  sala.jugadores.push({ id: sala.nextId++, nombre, token, puntos: 0 });
   res.json({ success: true, code: sala.code, token });
 });
 
@@ -70,10 +73,12 @@ router.get('/online/sala/:code', (req, res) => {
     estado: sala.estado,
     esAdmin: sala.adminId === jugador.id,
     yoId: jugador.id,
-    jugadores: sala.jugadores.map(j => ({ id: j.id, nombre: j.nombre })),
+    rondaActual: sala.rondaActual,
+    maxRondas: sala.maxRondas,
+    jugadores: sala.jugadores.map(j => ({ id: j.id, nombre: j.nombre, puntos: j.puntos || 0 })),
     retoActual: sala.retoActual,
     estadoReto: sala.estadoReto,
-    intentos: sala.intentos,
+    pistasUsadas: sala.pistasUsadas,
     turnoId: sala.turnoId
   });
 });
@@ -90,67 +95,114 @@ router.post('/online/sala/:code/:accion', (req, res) => {
   const pasarTurno = () => {
     const idx = sala.jugadores.findIndex(j => j.id === sala.turnoId);
     const nextIdx = (idx + 1) % sala.jugadores.length;
-    sala.turnoId = sala.jugadores[nextIdx].id;
+    const siguienteId = sala.jugadores[nextIdx].id;
+
+    if (siguienteId === sala.primerTurnoRondaId) {
+      sala.estado = 'ronda_fin';
+    } else {
+      sala.turnoId = siguienteId;
+    }
   };
 
   if (accion === 'iniciar') {
     if (sala.adminId !== usuario.id) return res.status(403).json({ error: 'Solo admin' });
     sala.estado = 'jugando';
+    sala.rondaActual = 1;
     sala.retoActual = obtenerRetoAleatorio();
     sala.estadoReto = { top: false, middle: false, bottom: false };
-    sala.intentos = 0;
-    sala.turnoId = sala.jugadores[0].id;
+    sala.pistasUsadas = { top: false, middle: false, bottom: false };
+    
+    const randomIndex = Math.floor(Math.random() * sala.jugadores.length);
+    sala.turnoId = sala.jugadores[randomIndex].id;
+    sala.primerTurnoRondaId = sala.turnoId;
+    
+    sala.jugadores.forEach(j => { j.puntos = 0; });
     return res.json({ success: true });
   }
 
   if (accion === 'validar') {
-    if (sala.turnoId !== usuario.id && sala.adminId !== usuario.id) return res.status(403).json({ error: 'No es tu turno' });
+    if (sala.turnoId !== usuario.id) return res.status(403).json({ error: 'No es tu turno' });
+    if (!parte || sala.estadoReto[parte]) return res.status(400).json({ error: 'Parte no válida' });
     
-    sala.intentos += 1;
     let acierto = false;
     const inputNorm = normalizar(respuesta);
+    const parteObj = sala.retoActual.partes && sala.retoActual.partes[parte];
+    const nombreReal = parteObj ? normalizar(parteObj.jugador) : '';
 
-    // Revisar las 3 partes
-    ['top', 'middle', 'bottom'].forEach(p => {
-      if (!sala.estadoReto[p]) {
-        const nombreReal = normalizar(sala.retoActual.partes[p].jugador);
-        if (nombreReal === inputNorm || nombreReal.includes(inputNorm) || inputNorm.includes(nombreReal)) {
-          sala.estadoReto[p] = true;
-          acierto = true;
-        }
+    if (nombreReal && (nombreReal === inputNorm || (inputNorm.length >= 4 && nombreReal.includes(inputNorm)))) {
+      sala.estadoReto[parte] = true;
+      acierto = true;
+
+      const conPista = sala.pistasUsadas[parte];
+      const pts = conPista ? 1 : 5;
+      usuario.puntos = (usuario.puntos || 0) + pts;
+
+      if (sala.estadoReto.top && sala.estadoReto.middle && sala.estadoReto.bottom) {
+        sala.estado = 'ronda_fin';
       }
-    });
-
-    if (!acierto) pasarTurno();
-
-    // Comprobar victoria o derrota
-    if (sala.estadoReto.top && sala.estadoReto.middle && sala.estadoReto.bottom) {
-      sala.estado = 'victoria';
-    } else if (sala.intentos >= 20) {
-      sala.estado = 'derrota';
+    } else {
+      pasarTurno();
     }
 
-    return res.json({ success: true, acierto });
+    return res.json({ success: true, acierto, puntosGanados: acierto ? (sala.pistasUsadas[parte] ? 1 : 5) : 0 });
   }
 
-  if (accion === 'pista') {
-    sala.intentos += 1;
-    return res.json({ success: true, pista: sala.retoActual.partes[parte].pista });
-  }
-
-  if (accion === 'rendirse') {
-    sala.estado = 'derrota';
+  if (accion === 'pasar-turno') {
+    if (sala.turnoId !== usuario.id) return res.status(403).json({ error: 'No es tu turno' });
+    pasarTurno();
     return res.json({ success: true });
   }
 
-  if (accion === 'volver') {
+  if (accion === 'pista') {
+    if (!parte) return res.status(400).json({ error: 'Parte requerida' });
+    sala.pistasUsadas[parte] = true;
+    return res.json({ success: true, pista: sala.retoActual.partes[parte].pista });
+  }
+
+  if (accion === 'siguiente-ronda') {
+    if (sala.adminId !== usuario.id) return res.status(403).json({ error: 'Solo admin' });
+    if (sala.rondaActual >= sala.maxRondas) {
+      sala.estado = 'final_partida';
+      return res.json({ success: true });
+    }
+    sala.rondaActual += 1;
+    sala.estado = 'jugando';
+    sala.retoActual = obtenerRetoAleatorio();
+    sala.estadoReto = { top: false, middle: false, bottom: false };
+    sala.pistasUsadas = { top: false, middle: false, bottom: false };
+    
+    const idxActual = sala.jugadores.findIndex(j => j.id === sala.primerTurnoRondaId);
+    const siguienteIdx = (idxActual + 1) % sala.jugadores.length;
+    sala.turnoId = sala.jugadores[siguienteIdx].id;
+    sala.primerTurnoRondaId = sala.turnoId;
+
+    return res.json({ success: true });
+  }
+
+  if (accion === 'finalizar-partida') {
+    if (sala.adminId !== usuario.id) return res.status(403).json({ error: 'Solo admin' });
+    sala.estado = 'final_partida';
+    return res.json({ success: true });
+  }
+
+  if (accion === 'volver-lobby') {
+    if (sala.adminId !== usuario.id) return res.status(403).json({ error: 'Solo admin' });
     sala.estado = 'lobby';
     sala.retoActual = null;
+    sala.jugadores.forEach(j => { j.puntos = 0; });
     return res.json({ success: true });
   }
 
   if (accion === 'abandonar') {
-    salas.delete(code);
+    const idx = sala.jugadores.findIndex(j => j.token === token);
+    if (idx !== -1) {
+      sala.jugadores.splice(idx, 1);
+      if (sala.jugadores.length === 0) {
+        salas.delete(code);
+      } else if (sala.adminId === usuario.id) {
+        sala.adminId = sala.jugadores[0].id;
+      }
+    }
     return res.json({ success: true });
   }
 

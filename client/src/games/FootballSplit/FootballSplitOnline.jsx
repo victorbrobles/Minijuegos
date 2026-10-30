@@ -5,9 +5,10 @@ import './FootballSplit.css';
 import '../Adivina/Adivina.css';
 
 const CLAVE_SESION_FS = 'footballsplit_online_session';
+const TIEMPO_TURNO = 120;
 
 export default function FootballSplitOnline({ onLocal }) {
-  const [vista, setVista] = useState('menu');
+  const [vista, setVista] = useState('menu'); // 'menu' | 'crear' | 'unirse' | 'sala'
   const [nombre, setNombre] = useState('');
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -15,12 +16,17 @@ export default function FootballSplitOnline({ onLocal }) {
 
   const [inputStr, setInputStr] = useState('');
   const [feedback, setFeedback] = useState(null);
+  const [parteSeleccionada, setParteSeleccionada] = useState(null);
+  
   const [pistasTexto, setPistasTexto] = useState({ top: null, middle: null, bottom: null });
   const [pistasAbiertas, setPistasAbiertas] = useState({ top: false, middle: false, bottom: false });
 
   const [modalAyuda, setModalAyuda] = useState(false);
   const [modalSalir, setModalSalir] = useState(false);
   const [codigoCopiado, setCodigoCopiado] = useState(false);
+
+  const [tiempoRestante, setTiempoRestante] = useState(TIEMPO_TURNO);
+  const timerRef = useRef(null);
 
   const [sesion, setSesion] = useState(() => {
     try {
@@ -69,6 +75,7 @@ export default function FootballSplitOnline({ onLocal }) {
   useEffect(() => {
     setPistasTexto({ top: null, middle: null, bottom: null });
     setPistasAbiertas({ top: false, middle: false, bottom: false });
+    setParteSeleccionada(null);
   }, [sala?.retoActual?.id]);
 
   const apiFetch = async (endpoint, payload) => {
@@ -133,36 +140,87 @@ export default function FootballSplitOnline({ onLocal }) {
     setTimeout(() => setCodigoCopiado(false), 2000);
   };
 
+  const esAdmin = sala?.esAdmin;
+  const esMiTurno = sala?.turnoId === sala?.yoId;
+  const jugadorTurnoNombre = sala?.jugadores.find((j) => j.id === sala?.turnoId)?.nombre;
+
+  const handlePasarTurno = async () => {
+    if (!esMiTurno) return;
+    await accionSala('pasar-turno');
+    setParteSeleccionada(null);
+  };
+
+  const pasarTurnoRef = useRef();
+  useEffect(() => {
+    pasarTurnoRef.current = handlePasarTurno;
+  });
+
+  useEffect(() => {
+    const isJugando = sala?.estado === 'jugando';
+    if (!isJugando) {
+      if (timerRef.current) clearInterval(timerRef.current);
+      return;
+    }
+
+    setTiempoRestante(TIEMPO_TURNO);
+    if (timerRef.current) clearInterval(timerRef.current);
+
+    timerRef.current = setInterval(() => {
+      setTiempoRestante((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerRef.current);
+          if (esMiTurno && pasarTurnoRef.current) {
+            pasarTurnoRef.current();
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, [sala?.estado, sala?.turnoId, esMiTurno]);
+
   const validarRespuesta = async (e) => {
     e.preventDefault();
-    if (!inputStr.trim() || !esMiTurno) return;
+    if (!inputStr.trim() || !esMiTurno || !parteSeleccionada) return;
 
-    const response = await accionSala('validar', { respuesta: inputStr });
+    if (timerRef.current) clearInterval(timerRef.current);
+
+    const response = await accionSala('validar', { respuesta: inputStr, parte: parteSeleccionada });
     if (response.acierto) {
-      setFeedback({ tipo: 'success', msj: '¡Acierto!' });
+      setFeedback({ tipo: 'success', msj: `¡Acierto! +${response.puntosGanados} pts` });
     } else {
       setFeedback({ tipo: 'error', msj: 'Incorrecto. Cambio de turno.' });
     }
     setInputStr('');
+    setParteSeleccionada(null);
     setTimeout(() => setFeedback(null), 1500);
   };
 
-  const togglePista = async (parte) => {
+  const togglePista = async (parte, e) => {
+    e.stopPropagation();
     if (sala?.estadoReto?.[parte]) return;
 
-    // Si ya tenemos la pista cargada, alternamos su visibilidad sin gastar más intentos
     if (pistasTexto[parte]) {
       setPistasAbiertas((prev) => ({ ...prev, [parte]: !prev[parte] }));
       return;
     }
 
-    // Si la pista ya viene en retoActual, o la pedimos al servidor
     const res = await accionSala('pista', { parte });
     const texto = res?.pista || sala?.retoActual?.partes?.[parte]?.pista;
     if (texto) {
       setPistasTexto((prev) => ({ ...prev, [parte]: texto }));
       setPistasAbiertas((prev) => ({ ...prev, [parte]: true }));
     }
+  };
+
+  const seleccionarParte = (parte) => {
+    if (!esMiTurno || sala?.estadoReto?.[parte]) return;
+    setParteSeleccionada(parte);
+    setInputStr('');
   };
 
   const getEstiloImagen = (seccion) => {
@@ -184,11 +242,10 @@ export default function FootballSplitOnline({ onLocal }) {
     };
   };
 
-  const esAdmin = sala?.esAdmin;
-  const esMiTurno = sala?.turnoId === sala?.yoId;
-  const jugadorTurnoNombre = sala?.jugadores.find((j) => j.id === sala?.turnoId)?.nombre;
   const mostrarAyuda =
     vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
+
+  const ranking = sala?.jugadores ? [...sala.jugadores].sort((a, b) => (b.puntos || 0) - (a.puntos || 0)) : [];
 
   return (
     <div className="rk-contenedor">
@@ -206,11 +263,12 @@ export default function FootballSplitOnline({ onLocal }) {
               <h3>¿Cómo jugar a Football Split?</h3>
             </div>
             <div className="aprox-modal-cuerpo">
-              <p>Se mostrará una cara formada por <strong>3 futbolistas diferentes</strong> (pelo, ojos y barbilla).</p>
+              <p>Se mostrará una cara formada por <strong>3 futbolistas diferentes</strong> (a 15 rondas).</p>
               <ul>
-                <li>Jugáis <strong>en equipo</strong> y tenéis <strong>20 intentos</strong> en total.</li>
-                <li>En cada turno, el jugador activo debe escribir el nombre de uno de los 3 jugadores.</li>
-                <li>Pulsa el botón <strong>«?»</strong> de cualquier franja para desplegar su pista (consume 1 intento).</li>
+                <li>Se sortea el primer turno y se rota secuencialmente (120 s por turno).</li>
+                <li><strong>Pulsa sobre la parte de la imagen</strong> a la que quieres responder para habilitar el cajón de texto.</li>
+                <li>Acertar sin pista otorga <strong>5 puntos</strong>; con pista otorga <strong>1 punto</strong>.</li>
+                <li>La ronda finaliza automáticamente cuando todos han tenido su turno tras un fallo o pase.</li>
               </ul>
             </div>
             <div className="rg-modal-acciones">
@@ -226,8 +284,8 @@ export default function FootballSplitOnline({ onLocal }) {
             <span className="lb-luna chica">
               <Icon name="users" size={42} strokeWidth={1.6} />
             </span>
-            <h1 className="title">Football Split</h1>
-            <p className="hint">Adivina los 3 jugadores que forman la cara cooperando con tus amigos.</p>
+            <h1 className="title">Football Split Online</h1>
+            <p className="hint">Adivina los 3 jugadores que forman la cara compitiendo por turnos con tus amigos.</p>
             {errorMsg && <p className="error">{errorMsg}</p>}
             <div className="lb-menu">
               <button className="big full" onClick={() => { setVista('crear'); setErrorMsg(''); }}>
@@ -369,7 +427,7 @@ export default function FootballSplitOnline({ onLocal }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', marginTop: '1.2rem' }}>
             {esAdmin ? (
               <button className="big full" disabled={sala.jugadores.length < 2} onClick={() => accionSala('iniciar')}>
-                ¡Empezar Partida!
+                ¡Empezar Partida (15 Rondas)!
               </button>
             ) : (
               <p className="hint center">Esperando al anfitrión...</p>
@@ -385,30 +443,130 @@ export default function FootballSplitOnline({ onLocal }) {
         <section className="game">
           <div className="hud space-between">
             <span className="chip">
-              <Icon name="users" size={18} /> Turno: <strong>{jugadorTurnoNombre}</strong>
+              <Icon name="flagFinish" size={18} /> Ronda {sala.rondaActual}/{sala.maxRondas}
             </span>
-            {esAdmin && (
-              <button
-                className="secondary danger"
-                style={{ padding: '0.3rem 0.8rem', fontSize: '0.85rem' }}
-                onClick={() => accionSala('rendirse')}
-              >
-                Rendirse
-              </button>
-            )}
+            <span className="chip alt">
+              <Icon name="users" size={18} /> Turno de: <strong>{jugadorTurnoNombre}</strong>
+            </span>
+            <button
+              className="secondary danger"
+              style={{ padding: '0.3rem 0.8rem', fontSize: '0.85rem' }}
+              onClick={() => setModalSalir(true)}
+            >
+              Salir de la sala
+            </button>
           </div>
 
-          <form onSubmit={validarRespuesta} style={{ display: 'flex', gap: '0.5rem', margin: '1rem 0' }}>
+          <div className="scoreboard-container" style={{ justifyContent: 'center', marginBottom: '0.6rem' }}>
+            {sala.jugadores.map((j) => (
+              <div key={j.id} className={`score-pill ${j.id === sala.turnoId ? 'active' : ''}`} style={{ borderColor: j.id === sala.turnoId ? '#4f46e5' : undefined }}>
+                <span>{j.nombre}: <strong>{j.puntos ?? 0} pts</strong></span>
+              </div>
+            ))}
+          </div>
+
+          {/* Pantalla de transición evidente si no es tu turno o si quieres resaltar el turno */}
+          {!esMiTurno && (
+            <div style={{ background: '#f8fafc', border: '2px solid #e2e8f0', borderRadius: '16px', padding: '0.8rem', textAlign: 'center', marginBottom: '0.8rem' }}>
+              <p style={{ margin: 0, fontWeight: 'bold', color: '#475569' }}>⏳ Esperando tu turno. Turno actual de <strong>{jugadorTurnoNombre}</strong></p>
+            </div>
+          )}
+
+          {/* Temporizador de 120s */}
+          <div style={{ padding: '0 1rem', marginTop: '0.2rem' }}>
+            <div
+              className="timer"
+              role="timer"
+              style={{ margin: '0.4rem 0', background: '#e2e8f0', borderRadius: '9999px', height: '8px', overflow: 'hidden' }}
+            >
+              <div
+                className={`timer-bar ${tiempoRestante <= 15 ? 'low' : ''}`}
+                style={{
+                  width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%`,
+                  height: '100%',
+                  backgroundColor: tiempoRestante <= 15 ? '#ef4444' : '#16a34a',
+                  borderRadius: '9999px',
+                  transition: 'width 0.1s linear, background-color 0.3s ease'
+                }}
+              />
+            </div>
+            <p
+              className="timer-text"
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem',
+                color: tiempoRestante <= 15 ? '#dc2626' : '#64748b', fontSize: '0.9rem', fontWeight: 700, margin: '0 0 0.8rem'
+              }}
+            >
+              <Icon name="clock" size={16} />
+              {tiempoRestante} s
+            </p>
+          </div>
+
+          <p className="hint center" style={{ marginBottom: '0.6rem', fontWeight: 700 }}>
+            {parteSeleccionada ? `🎯 Respondiendo a la parte: ${parteSeleccionada === 'top' ? 'Pelo' : parteSeleccionada === 'middle' ? 'Ojos' : 'Barbilla'}` : '👉 Haz clic en una de las partes de la cara para responder'}
+          </p>
+
+          <div className="fs-split-container">
+            {['top', 'middle', 'bottom'].map((p) => (
+              <div
+                key={p}
+                className={`fs-slice ${sala.estadoReto[p] ? 'solved' : ''} ${parteSeleccionada === p ? 'selected-slice' : ''}`}
+                onClick={() => seleccionarParte(p)}
+                style={{ cursor: sala.estadoReto[p] ? 'default' : 'pointer', border: parteSeleccionada === p ? '3px solid #4f46e5' : undefined }}
+              >
+                {sala.retoActual.partes[p].img && (
+                  <img
+                    src={sala.retoActual.partes[p].img}
+                    alt={p}
+                    style={getEstiloImagen(p)}
+                  />
+                )}
+
+                <button
+                  type="button"
+                  className="fs-slice-status"
+                  disabled={sala.estadoReto[p]}
+                  onClick={(e) => togglePista(p, e)}
+                  title={sala.estadoReto[p] ? 'Acertado' : 'Ver pista'}
+                >
+                  {sala.estadoReto[p] ? <Icon name="check" size={16} /> : '?'}
+                </button>
+
+                {!sala.estadoReto[p] && pistasAbiertas[p] && pistasTexto[p] && (
+                  <div className="fs-slice-pista-box" onClick={(e) => e.stopPropagation()}>
+                    <span>💡 {pistasTexto[p]}</span>
+                  </div>
+                )}
+
+                {sala.estadoReto[p] && <div className="fs-solved-name">{sala.retoActual.partes[p].jugador}</div>}
+              </div>
+            ))}
+          </div>
+
+          {/* Botón de pasar turno debajo de la imagen */}
+          <div style={{ display: 'flex', justifyContent: 'center', margin: '0.8rem 0' }}>
+            <button
+              type="button"
+              className="secondary full"
+              disabled={!esMiTurno}
+              style={{ maxWidth: '360px', borderRadius: '14px', fontWeight: 'bold' }}
+              onClick={handlePasarTurno}
+            >
+              ⏭️ Pasar turno
+            </button>
+          </div>
+
+          <form onSubmit={validarRespuesta} style={{ display: 'flex', gap: '0.5rem', margin: '0.5rem 0 1rem' }}>
             <input
               type="text"
-              placeholder={esMiTurno ? 'Escribe un jugador...' : 'Espera tu turno...'}
+              placeholder={esMiTurno && parteSeleccionada ? '🔍 Escribe el nombre del jugador...' : '⚠️ Selecciona una parte de la cara arriba primero'}
               value={inputStr}
               onChange={(e) => setInputStr(e.target.value)}
-              disabled={!esMiTurno}
-              autoFocus={esMiTurno}
+              disabled={!esMiTurno || !parteSeleccionada}
+              autoFocus={esMiTurno && !!parteSeleccionada}
               style={{ flex: 1, padding: '0.8rem', borderRadius: '20px', border: '2px solid #cbd5e1' }}
             />
-            <button type="submit" className="ok" disabled={!esMiTurno || !inputStr.trim()}>
+            <button type="submit" className="ok" disabled={!esMiTurno || !parteSeleccionada || !inputStr.trim()}>
               Probar
             </button>
           </form>
@@ -428,70 +586,123 @@ export default function FootballSplitOnline({ onLocal }) {
               {feedback.msj}
             </div>
           )}
+        </section>
+      )}
 
-          <div className="fs-split-container">
-            {['top', 'middle', 'bottom'].map((p) => (
-              <div key={p} className={`fs-slice ${sala.estadoReto[p] ? 'solved' : ''}`}>
-                {sala.retoActual.partes[p].img && (
-                  <img
-                    src={sala.retoActual.partes[p].img}
-                    alt={p}
-                    style={getEstiloImagen(p)}
-                  />
-                )}
+      {vista === 'sala' && sala?.estado === 'ronda_fin' && (
+        <section className="game" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '2rem 1rem' }}>
+          <div style={{ background: '#ffffff', borderRadius: '24px', padding: '2rem', width: '100%', maxWidth: '500px', boxShadow: '0 10px 30px rgba(0,0,0,0.15)', textAlign: 'center', color: '#1e293b' }}>
+            <div style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>🏆</div>
+            <h1 style={{ fontSize: '1.8rem', fontWeight: '900', color: '#1e1b4b', marginBottom: '0.5rem' }}>Ronda {sala.rondaActual} Finalizada</h1>
+            <p style={{ color: '#64748b', fontSize: '1rem', marginBottom: '1.2rem' }}>Solución del reto:</p>
+            
+            <div style={{ margin: '1rem 0', background: '#f8fafc', padding: '1rem', borderRadius: '12px', textAlign: 'left', border: '1px solid #e2e8f0' }}>
+              <p style={{ margin: '0.3rem 0' }}><strong>Pelo:</strong> {sala.retoActual?.partes?.top?.jugador || '---'}</p>
+              <p style={{ margin: '0.3rem 0' }}><strong>Ojos:</strong> {sala.retoActual?.partes?.middle?.jugador || '---'}</p>
+              <p style={{ margin: '0.3rem 0' }}><strong>Barbilla:</strong> {sala.retoActual?.partes?.bottom?.jugador || '---'}</p>
+            </div>
 
-                <button
-                  type="button"
-                  className="fs-slice-status"
-                  disabled={sala.estadoReto[p]}
-                  onClick={() => togglePista(p)}
-                  title={sala.estadoReto[p] ? 'Acertado' : 'Ver pista (-1 intento)'}
-                >
-                  {sala.estadoReto[p] ? <Icon name="check" size={16} /> : '?'}
-                </button>
-
-                {!sala.estadoReto[p] && pistasAbiertas[p] && pistasTexto[p] && (
-                  <div className="fs-slice-pista-box" onClick={() => togglePista(p)}>
-                    <span>💡 {pistasTexto[p]}</span>
-                  </div>
-                )}
-
-                {sala.estadoReto[p] && <div className="fs-solved-name">{sala.retoActual.partes[p].jugador}</div>}
+            <div style={{ width: '100%', marginTop: '1.5rem', textAlign: 'left' }}>
+              <h3 style={{ margin: '0 0 0.8rem', textAlign: 'center', fontSize: '1.2rem', color: '#334155' }}>
+                Clasificación actual
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                {ranking.map((j, i) => {
+                  const pts = j.puntos ?? 0;
+                  return (
+                    <div key={j.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 1rem', borderRadius: '12px', background: i === 0 ? '#fef08a' : '#f1f5f9', fontWeight: 'bold' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span style={{ display: 'inline-grid', placeItems: 'center', width: '1.5rem', height: '1.5rem', borderRadius: '50%', background: i === 0 ? '#eab308' : '#cbd5e1', color: '#fff', fontSize: '0.8rem' }}>{i + 1}</span>
+                        {j.nombre}
+                      </span>
+                      <span>{pts} pts</span>
+                    </div>
+                  );
+                })}
               </div>
-            ))}
-          </div>
+            </div>
 
-          <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-            <div className="fs-attempts">Intentos {sala.intentos}/20</div>
+            <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+              {esAdmin ? (
+                <>
+                  {sala.rondaActual < sala.maxRondas ? (
+                    <button 
+                      style={{ width: '100%', padding: '1rem', borderRadius: '14px', background: '#4f46e5', color: '#fff', fontWeight: 'bold', border: 'none', cursor: 'pointer', fontSize: '1rem' }}
+                      onClick={() => accionSala('siguiente-ronda')}
+                    >
+                      ▶ Siguiente Ronda ({sala.rondaActual + 1}/{sala.maxRondas})
+                    </button>
+                  ) : (
+                    <button 
+                      style={{ width: '100%', padding: '1rem', borderRadius: '14px', background: '#16a34a', color: '#fff', fontWeight: 'bold', border: 'none', cursor: 'pointer', fontSize: '1rem' }}
+                      onClick={() => accionSala('finalizar-partida')}
+                    >
+                      🏆 Ver Podio Final
+                    </button>
+                  )}
+                  <button 
+                    style={{ width: '100%', padding: '0.8rem', borderRadius: '14px', background: '#ef4444', color: '#fff', fontWeight: 'bold', border: 'none', cursor: 'pointer', fontSize: '0.95rem' }}
+                    onClick={() => accionSala('finalizar-partida')}
+                  >
+                    🏁 Finalizar partida
+                  </button>
+                </>
+              ) : (
+                <p style={{ color: '#64748b', fontSize: '0.95rem' }}>Esperando a que el administrador elija la siguiente acción...</p>
+              )}
+              <button 
+                style={{ width: '100%', padding: '0.8rem', borderRadius: '14px', background: '#64748b', color: '#fff', fontWeight: 'bold', border: 'none', cursor: 'pointer', fontSize: '0.95rem' }}
+                onClick={() => setModalSalir(true)}
+              >
+                🚪 Salir de la sala
+              </button>
+            </div>
           </div>
         </section>
       )}
 
-      {vista === 'sala' && (sala?.estado === 'victoria' || sala?.estado === 'derrota') && (
-        <section className="game">
-          <div className="end-card">
-            <span className="end-icon">
-              <Icon name={sala.estado === 'victoria' ? 'trophy' : 'close'} size={48} />
-            </span>
-            <h1 className="title">{sala.estado === 'victoria' ? '¡Lo habéis logrado!' : '¡Fin del juego!'}</h1>
-            <p className="hint">Usasteis {sala.intentos} intentos.</p>
+      {vista === 'sala' && sala?.estado === 'final_partida' && (
+        <section className="game" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '2rem 1rem' }}>
+          <div style={{ background: '#ffffff', borderRadius: '24px', padding: '2rem', width: '100%', maxWidth: '500px', boxShadow: '0 10px 30px rgba(0,0,0,0.15)', textAlign: 'center', color: '#1e293b' }}>
+            <div style={{ fontSize: '3.5rem', marginBottom: '0.5rem' }}>👑</div>
+            <h1 style={{ fontSize: '1.8rem', fontWeight: '900', color: '#1e1b4b', marginBottom: '0.5rem' }}>¡Partida Finalizada!</h1>
+            <p style={{ color: '#64748b', fontSize: '1rem', marginBottom: '1.2rem' }}>Clasificación final:</p>
 
-            <div style={{ margin: '1.5rem 0', background: '#f1f5f9', padding: '1rem', borderRadius: '12px', textAlign: 'left', color: '#1e293b' }}>
-              <h3 style={{ marginBottom: '0.8rem' }}>La solución era:</h3>
-              <p><strong>Pelo:</strong> {sala.retoActual?.partes.top.jugador}</p>
-              <p><strong>Ojos:</strong> {sala.retoActual?.partes.middle.jugador}</p>
-              <p><strong>Barbilla:</strong> {sala.retoActual?.partes.bottom.jugador}</p>
+            <div className="scoreboard" style={{ width: '100%', marginTop: '1rem', textAlign: 'left' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                {ranking.map((j, i) => {
+                  const pts = j.puntos ?? 0;
+                  return (
+                    <div key={j.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 1rem', borderRadius: '12px', background: i === 0 ? '#fef08a' : '#f1f5f9', fontWeight: 'bold' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span style={{ display: 'inline-grid', placeItems: 'center', width: '1.5rem', height: '1.5rem', borderRadius: '50%', background: i === 0 ? '#eab308' : '#cbd5e1', color: '#fff', fontSize: '0.8rem' }}>{i + 1}</span>
+                        {j.nombre}
+                      </span>
+                      <span>{pts} pts</span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-          <div className="actions" style={{ marginTop: '1.5rem' }}>
-            {esAdmin && (
-              <button className="big full" onClick={() => accionSala('volver')}>
-                <Icon name="refresh" size={20} /> Volver al Lobby
+
+            <div style={{ marginTop: '2rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+              {esAdmin ? (
+                <button 
+                  style={{ width: '100%', padding: '1rem', borderRadius: '14px', background: '#4f46e5', color: '#fff', fontWeight: 'bold', border: 'none', cursor: 'pointer', fontSize: '1rem' }}
+                  onClick={() => accionSala('volver-lobby')}
+                >
+                  🔄 Jugar de nuevo (Volver al Lobby)
+                </button>
+              ) : (
+                <p style={{ color: '#64748b', fontSize: '0.95rem' }}>Esperando a que el administrador decida volver a jugar...</p>
+              )}
+              <button 
+                style={{ width: '100%', padding: '0.8rem', borderRadius: '14px', background: '#ef4444', color: '#fff', fontWeight: 'bold', border: 'none', cursor: 'pointer', fontSize: '0.95rem' }}
+                onClick={() => setModalSalir(true)}
+              >
+                🚪 Salir de la sala
               </button>
-            )}
-            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
-              <Icon name="door" size={20} /> Salir al menú
-            </button>
+            </div>
           </div>
         </section>
       )}
