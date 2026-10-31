@@ -46,7 +46,8 @@ function CampoJugada({ ronda }) {
     let acumulado = 0;
     const tiempos = frames.map((f, idx) => {
       if (idx === 0) return 0;
-      acumulado += f[0] || 800;
+      // Ralentizamos la animación multiplicando los ms por 1.5
+      acumulado += (f[0] || 800) * 1.5; 
       return acumulado;
     });
     const pausaFinalMs = 1100; // pausa antes de repetir en bucle
@@ -144,7 +145,7 @@ function CampoJugada({ ronda }) {
         <path d="M 98 0 A 2 2 0 0 0 100 2" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="0.5" />
         <path d="M 98 100 A 2 2 0 0 1 100 98" fill="none" stroke="rgba(255,255,255,0.8)" strokeWidth="0.5" />
 
-        {/* Jugadores (círculos con dorsales) */}
+        {/* Jugadores (Fichas MÁS GRANDES) */}
         {(ronda?.actores || []).map((codigo, i) => {
           const pos = coordsActores[i] || [50, 50];
           const esPorteroAtq = codigo.startsWith('PA');
@@ -160,16 +161,16 @@ function CampoJugada({ ronda }) {
           return (
             <g key={`${codigo}-${i}`} transform={`translate(${pos[0]}, ${pos[1]})`}>
               <circle
-                r="3.2"
+                r="4.5"
                 fill={bg}
                 stroke={esAtacante ? '#ffffff' : '#0f172a'}
                 strokeWidth="0.65"
               />
               <text
-                y="1.15"
+                y="1.5"
                 textAnchor="middle"
                 fill={fg}
-                fontSize="3.1"
+                fontSize="4.2"
                 fontWeight="800"
                 style={{ userSelect: 'none' }}
               >
@@ -179,10 +180,10 @@ function CampoJugada({ ronda }) {
           );
         })}
 
-        {/* Balón */}
+        {/* Balón MÁS GRANDE */}
         <g transform={`translate(${balon[0]}, ${balon[1]})`}>
-          <circle r="1.85" fill="#ffffff" stroke="#0f172a" strokeWidth="0.55" />
-          <circle r="0.65" fill="#0f172a" />
+          <circle r="2.6" fill="#ffffff" stroke="#0f172a" strokeWidth="0.55" />
+          <circle r="1.0" fill="#0f172a" />
         </g>
       </svg>
 
