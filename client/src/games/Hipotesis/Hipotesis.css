@@ -114,3 +114,49 @@
 }
 .hp-fila.gan { color: #78350f; }
 .hp-previa b, .hp-fila b { color: inherit; }
+
+/* ======================= v2: ritmo, eventos, cartas, reacciones, revelación ======================= */
+.hp-card, .hp-premio, .hp-carta { color: var(--ink); }
+
+/* eventos de ronda */
+.hp-evento { display: flex; align-items: center; gap: .8rem; padding: .7rem 1rem; border-radius: 18px; color: #fff; box-shadow: var(--shadow); animation: hp-pop .5s ease-out; background: linear-gradient(135deg, #2563eb, #1e3a8a); }
+.hp-evento.doble { background: linear-gradient(135deg, #f97316, #dc2626); }
+.hp-evento.rumor { background: linear-gradient(135deg, #8b5cf6, #4c1d95); }
+.hp-evento.cazador { background: linear-gradient(135deg, #16a34a, #14532d); }
+.hp-evento-emoji { font-size: 2rem; line-height: 1; }
+.hp-evento strong { display: block; font-size: 1.05rem; }
+.hp-evento span:not(.hp-evento-emoji) { display: block; font-size: .84rem; font-weight: 600; opacity: .95; }
+.hp-apura { padding: .5rem .9rem; border-radius: 14px; text-align: center; font-weight: 900; color: #fff; background: #dc2626; animation: hp-latido .8s ease-in-out infinite; }
+
+/* cartas de jugada rápida */
+.hp-cartas { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+.hp-carta { position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: .25rem; padding: .7rem .75rem !important; text-align: left; border-radius: 16px !important; color: var(--ink) !important; background: #fff !important; border: 3px solid #e2e8f0 !important; box-shadow: none !important; transition: transform .12s; }
+.hp-carta:active { transform: scale(.97); }
+.hp-carta.on { border-color: #2563eb !important; background: #eff6ff !important; transform: scale(1.02); box-shadow: 0 0 0 4px rgba(37, 99, 235, .25) !important; }
+.hp-carta-tag { padding: .05rem .5rem; border-radius: 99px; font-size: .68rem; font-weight: 900; letter-spacing: .5px; color: #fff; background: #64748b; }
+.hp-carta.verdad .hp-carta-tag { background: #16a34a; }
+.hp-carta.farol .hp-carta-tag { background: #dc2626; }
+.hp-carta.ciegas .hp-carta-tag { background: #f59e0b; }
+.hp-carta-txt { font-size: .92rem; font-weight: 800; line-height: 1.25; }
+.hp-carta small { font-weight: 700; color: var(--ink-soft); }
+@media (max-width: 380px) { .hp-cartas { grid-template-columns: 1fr; } }
+
+/* reacciones públicas */
+.hp-reacciones { display: flex; align-items: center; gap: .35rem; margin: .1rem 0 .55rem; }
+.hp-reacciones small { font-weight: 800; color: var(--ink-soft); margin-right: .2rem; }
+.hp-reacciones button { display: inline-flex; align-items: center; gap: .25rem; padding: .2rem .65rem !important; font-size: 1rem !important; border-radius: 99px !important; color: var(--ink) !important; background: #f1f5f9 !important; border: 2px solid #e2e8f0 !important; box-shadow: none !important; }
+.hp-reacciones button.on { background: #fef3c7 !important; border-color: #f59e0b !important; }
+.hp-reacciones button b { font-size: .8rem; color: #92400e; }
+
+/* revelación escalonada */
+.hp-aparece { animation: hp-pop .45s cubic-bezier(.2, 1.4, .4, 1); }
+.hp-saltar { display: block; margin: .7rem auto 0; padding: .3rem .9rem !important; font-size: .8rem !important; border-radius: 99px !important; color: var(--ink-soft) !important; background: #f1f5f9 !important; border: 2px solid #e2e8f0 !important; box-shadow: none !important; }
+.hp-res.falsa .hp-veredicto, .hp-res.cierta .hp-veredicto { font-size: .85rem; padding: .2rem .75rem; }
+.hp-res.falsa { animation: hp-sacudida .5s ease-out, hp-pop .45s ease-out; }
+.hp-premio { margin: .35rem 0; font-weight: 700; }
+.hp-hip .hp-pista { margin-right: .4rem; }
+
+@keyframes hp-pop { 0% { opacity: 0; transform: scale(.85) translateY(10px); } 100% { opacity: 1; transform: none; } }
+@keyframes hp-latido { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+@keyframes hp-sacudida { 0%, 100% { translate: 0; } 20% { translate: -6px; } 40% { translate: 6px; } 60% { translate: -4px; } 80% { translate: 4px; } }
+@media (prefers-reduced-motion: reduce) { .hp-aparece, .hp-res.falsa, .hp-apura, .hp-evento { animation: none; } }

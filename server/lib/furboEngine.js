@@ -12,9 +12,9 @@ import { PREGUNTAS } from '../data/seeds/furbo/preguntas.js';
 export const FASES = ['vestuario', 'rebote', 'quiniela', 'prorroga', 'penaltis'];
 
 export const DURACIONES = {
-  corto: { vestuario: 2, rebote: 3, quiniela: 3, prorroga: 3, penaltis: 1 },
-  normal: { vestuario: 3, rebote: 4, quiniela: 5, prorroga: 4, penaltis: 2 },
-  largo: { vestuario: 4, rebote: 6, quiniela: 8, prorroga: 6, penaltis: 3 }
+  corto: 1,
+  normal: 2,
+  largo: 3
 };
 
 // Tiempo límite (ms) de cada tipo de ronda
@@ -37,8 +37,6 @@ export const PUNTOS = {
   penaltiCentro: 1,
   penaltiEscuadra: 3
 };
-
-const MAX_TURNOS_PENALTIS = 12;
 
 // ---------------------------------------------------------------- utilidades
 function barajar(arr) {
@@ -163,22 +161,10 @@ function quitarTiempo(r) {
 
 // ----------------------------------------------------------------- creación
 function totalDeFase(p, fase) {
+  if (!FASES.includes(fase)) return 0;
   const n = presentes(p).length;
-  const d = DURACIONES[p.config.duracion] || DURACIONES.normal;
-  switch (fase) {
-    case 'vestuario':
-    case 'rebote':
-    case 'quiniela':
-      return d[fase];
-    case 'prorroga':
-      return Math.min(n, d.prorroga);
-    case 'penaltis': {
-      const patadas = Math.max(1, Math.min(d.penaltis, Math.floor(MAX_TURNOS_PENALTIS / n)));
-      return n * patadas;
-    }
-    default:
-      return 0;
-  }
+  const mult = DURACIONES[p.config.duracion] || DURACIONES.normal;
+  return n * mult;
 }
 
 function empezarFase(p) {

@@ -133,7 +133,7 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
 });
 
 // ---------------------------------------------------------------- Acciones
-// tipo: lupa | hipotesis | apostar | continuar
+// tipo: lupa | hipotesis | apostar | detectar | reaccion | continuar
 router.post('/online/sala/:code/accion', (req, res) => {
   const c = sala_y_jugador(req, res);
   if (!c) return;
@@ -146,6 +146,8 @@ router.post('/online/sala/:code/accion', (req, res) => {
     case 'lupa': r = E.usarLupa(p, id, Number(d.m)); break;
     case 'hipotesis': r = E.enviarHipotesis(p, id, d.hipotesis, t); break;
     case 'apostar': r = E.apostar(p, id, { posiciones: d.posiciones, doble: d.doble, censura: d.censura }, t); break;
+    case 'detectar': r = E.detectar(p, id, Number(d.a)); break;
+    case 'reaccion': r = E.reaccionar(p, id, Number(d.a), d.emoji); break;
     case 'continuar': r = E.continuar(p, id, t); break;
     default: return res.status(400).json({ error: 'Acción desconocida.' });
   }

@@ -63,9 +63,9 @@ export const FASES_INFO = {
 };
 
 export const DURACIONES_INFO = {
-  corto: { nombre: 'Corto', detalle: 'Pocas rondas por fase' },
-  normal: { nombre: 'Normal', detalle: 'Equilibrado' },
-  largo: { nombre: 'Largo', detalle: 'Partido completo' }
+  corto: { nombre: 'Corto', detalle: '1 ronda por jugador en cada fase' },
+  normal: { nombre: 'Normal', detalle: '2 rondas por jugador en cada fase' },
+  largo: { nombre: 'Largo', detalle: '3 rondas por jugador en cada fase' }
 };
 
 export const ORDEN_FASES = ['vestuario', 'rebote', 'quiniela', 'prorroga', 'penaltis'];

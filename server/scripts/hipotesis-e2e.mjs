@@ -12,7 +12,7 @@ const host = await post('/online/crear', { nombre: 'Host' }); const code = host.
 const js = [{ token: host.data.token }];
 for (let i = 2; i <= N; i++) js.push({ token: (await post('/online/unirse', { code, nombre: `P${i}` })).data.token });
 assert((await post(`/online/sala/${code}/iniciar`, { token: js[1].token })).status === 403, 'solo el anfitrión inicia');
-assert((await post(`/online/sala/${code}/config`, { token: host.data.token, rondas: 4 })).data.config.rondas === 4, 'config rondas');
+assert((await post(`/online/sala/${code}/config`, { token: host.data.token, rondas: 3 })).data.config.rondas === 3, 'config rondas');
 assert((await post(`/online/sala/${code}/iniciar`, { token: host.data.token })).status === 200, 'iniciar');
 const act = (j, b) => post(`/online/sala/${code}/accion`, { token: j.token, ...b });
 let filtrado = false, pasos = 0;
@@ -26,6 +26,9 @@ while (pasos++ < 2000) {
     if (v.fase === 'hipotesis' && !v.miHipotesis) { const c = v.conocimiento[0]; const r = await act(j, { tipo: 'hipotesis', hipotesis: { forma: 'tipo', i: c.m, t: Math.random() < 0.6 ? c.t : (c.t + 1) % 4, coartada: v.yo.instrumento.tipo === 'coartada' && !v.yo.instrumento.usado } }); assert(r.status === 200, 'hipótesis ' + JSON.stringify(r.data)); }
     else if (v.fase === 'apuestas' && !v.listo) {
       const ajenas = v.hipotesis.filter((h) => h.autorId !== v.yo.id); const pos = {}; ajenas.forEach((h) => { if (Math.random() < 0.7) pos[h.autorId] = Math.random() < 0.5 ? 'si' : 'no'; }); if (!Object.keys(pos).length) pos[ajenas[0].autorId] = 'si';
+      // poderes y reacciones nuevos
+      if (v.yo.instrumento.tipo === 'detector' && !v.yo.instrumento.usado) { const r0 = await act(j, { tipo: 'detectar', a: ajenas[0].autorId }); assert(r0.status === 200, 'detectar ' + JSON.stringify(r0.data)); }
+      const r1 = await act(j, { tipo: 'reaccion', a: ajenas[0].autorId, emoji: '🤥' }); assert(r1.status === 200, 'reaccion ' + JSON.stringify(r1.data));
       const body = { tipo: 'apostar', posiciones: pos }; if (v.yo.instrumento.tipo === 'doble' && !v.yo.instrumento.usado) body.doble = Number(Object.keys(pos)[0]);
       const r = await act(j, body); assert(r.status === 200, 'apuestas ' + JSON.stringify(r.data));
     } else if (v.fase === 'resolucion' && !v.listo) await act(j, { tipo: 'continuar' });
@@ -38,6 +41,7 @@ console.log('Ganadores:', fin.vista.fin.ganadores, '| rondas:', fin.vista.rondas
 assert((await post(`/online/sala/${code}/siguiente-partida`, { token: host.data.token })).status === 200, 'siguiente partida');
 const v1 = (await get(`/online/sala/${code}?token=${host.data.token}`)).data.vista;
 assert((await act(js[0], { tipo: 'apostar', posiciones: { 2: 'si' } })).status === 400, 'no se puede apostar en fase de formulación');
+assert((await act(js[0], { tipo: 'reaccion', a: 2, emoji: '🤥' })).status === 400, 'no se reacciona en fase de formulación');
 assert((await act(js[0], { tipo: 'hipotesis', hipotesis: { forma: 'igual', i: 1, j: 1 } })).status === 400, 'hipótesis inválida rechazada');
 await post(`/online/sala/${code}/salir`, { token: js[1].token });
 assert((await get(`/online/sala/${code}?token=${js[1].token}`)).status === 403, 'quien sale no puede mirar');

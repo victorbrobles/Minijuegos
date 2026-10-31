@@ -79,7 +79,7 @@ export default function HipotesisLocal({ onVolver }) {
     return (
       <div className="hp-wrap">
         <div className="hp-top"><span className="hp-chip"><Icon name="book" size={16} /> Ronda {v.ronda}/{v.rondas}</span></div>
-        <Resolucion v={vp} />
+        <Resolucion key={v.ronda} v={vp} />
         <Marcador v={vp} />
         <button type="button" className="big full" onClick={() => { E.forzar(est); setConfirmado(null); refrescar(); }}><Icon name="forward" size={22} /> {v.ronda >= v.rondas ? 'Ver resultado final' : 'Siguiente ronda'}</button>
       </div>
@@ -107,6 +107,8 @@ export default function HipotesisLocal({ onVolver }) {
     if (tipo === 'lupa') r = E.usarLupa(est, id, datos.m);
     else if (tipo === 'hipotesis') r = E.enviarHipotesis(est, id, datos.hipotesis);
     else if (tipo === 'apostar') r = E.apostar(est, id, { posiciones: datos.posiciones, doble: datos.doble, censura: datos.censura });
+    else if (tipo === 'detectar') r = E.detectar(est, id, datos.a);
+    else if (tipo === 'reaccion') r = E.reaccionar(est, id, datos.a, datos.emoji);
     setError(r && !r.ok ? r.error : '');
     // al enviar hipótesis/apuestas el jugador ya no tiene nada más que hacer: se pasa el móvil
     if (r?.ok && (tipo === 'hipotesis' || tipo === 'apostar')) setConfirmado(null);
