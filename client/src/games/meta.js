@@ -323,6 +323,14 @@ export const META = {
     etiquetas: 'futbol jugadores quiz clubes adivinar seleccion balon cara cabeza cuerpo',
     descripcion: 'Adivina de qué tres jugadores viene el híbrido que vas a ver por pantalla. Si eres buen futbolero lo sabrás a la primera, si no siempre puedes acudir a las pistas.',
     categorias: ['favoritos', 'dos_jugadores', 'futbol']
+  },
+  'jugadas': {
+    titulo: 'Qué jugadón!',
+    icono: 'soccer',
+    colores: ['#eab308', '#a16207'],
+    etiquetas: 'futbol jugadas quiz campo adivinar dorsales balon gol jugadon',
+    descripcion: 'Pon a prueba tu conocimiento futbolístico sobre el campo y averigua qué jugada se está recreando en cada momento.',
+    categorias: ['favoritos', 'dos_jugadores', 'futbol']
   }
 };
 

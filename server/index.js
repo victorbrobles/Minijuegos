@@ -52,6 +52,7 @@ import jugadoresRoutes from './routes/jugadores.js';
 import furboRoutes from './routes/furbo.js';
 import futbolgridRoutes from './routes/futbolgrid.js';
 import footballsplitRoutes from './routes/footballsplit.js';
+import jugadasRoutes from './routes/jugadas.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -131,6 +132,7 @@ app.use('/api/jugadores', jugadoresRoutes);
 app.use('/api/furbo', furboRoutes);
 app.use('/api/futbolgrid', futbolgridRoutes);
 app.use('/api/footballsplit', footballsplitRoutes);
+app.use('/api/jugadas', jugadasRoutes);
 
 // 5. Redirección para React Router (Single Page Application)
 app.get('*', (req, res) => {

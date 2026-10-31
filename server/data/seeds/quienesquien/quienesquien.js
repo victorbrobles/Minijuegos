@@ -81,7 +81,7 @@ export default {
     'Física o química', 'Los hombres de Paco', 'La que se avecina', 'Los serrano', 'Aída', 'Muertos SL', 'Machos Alfa', 'Los Juegos del Hambre', 'Crepusculo', 'Entrevías',
     'Rebelde way', 'High School Musical', 'Hannah Montana', 'Sky rojo', 'A3MSC', 'Mision Imposible', 'Fast and Furious', 'Transformers', 'Los Increibles', 'Ratatouille',
     'Cars', 'El diario de Noa', 'Todos los días de mi vida', 'Paranormal Activity', 'Expediente Warren', 'Insidious', 'Saw', 'Tiburón', 'Chucky: el muñeco diabólico', 'Viernes 13',
-    'Pesadilla en Elm Street', 'Ninos grandes', 'Resacón en Las Vegas', 'Borat', 'Scary Movie', 'American Pie', 'Jumanji'
+    'Pesadilla en Elm Street', 'Niños grandes', 'Resacón en Las Vegas', 'Borat', 'Scary Movie', 'American Pie', 'Jumanji'
   ],
   'Cantantes': [
     'Rosalia', 'Bad Bunny', 'Shakira', 'Taylor Swift', 'Quevedo', 'Aitana', 'David Bisbal', 'Dua Lipa', 'Justin Bieber', 'Ariana Grande',
@@ -91,7 +91,7 @@ export default {
     'Katy Perry', 'Miley Cyrus', 'Harry Styles', 'Olivia Rodrigo', 'Sabrina Carpenter', 'Chris Brown', 'Post Malone', 'Feid', 'Yandel', 'Wisin',
     'Zion y Lennox', 'Arcangel', 'De La Ghetto', 'Nengo Flow', 'Snoop Dogg', 'Eminem', '50 Cent', 'Juice Wrld', 'Kendrick Lamar', 'XXX Tentacion',
     'Nicki Minaj', 'Cardi B', 'Rosario Flores', 'Romeo Santos', 'Prince Royce', 'Justin Quiles', 'Dani Martín', 'Ricky Martin', 'Chayanne', 'One Direction',
-    'Tyga', 'Recycled J', 'Natos y Waor', 'Lucho RK y La Pantera', 'Hombres G', 'El Canto del Loco', 'Estopa', 'Fito y Fitipaldis', 'Extremoduro', 'ACDC',
+    'Tyga', 'Recycled J', 'Natos y Waor', 'Lucho RK', 'La Pantera', 'Hombres G', 'El Canto del Loco', 'Estopa', 'Fito y Fitipaldis', 'Extremoduro', 'ACDC',
     'Led Zeppelin', 'Duki', 'Nicki Nicole', 'María Becerra', 'Raphael', 'Julio Iglesias', 'Ana Mena', 'Manuel Turizo', 'Sebastián Yatra', 'Pitbull',
     'Delaossa', 'The Kid Laroy', 'Skrillex', 'Marshmellow', 'Martin Garrix', 'David Guetta', 'Mora', 'Eladio Carrión', 'Bizarrap', 'Barry B',
     'Carolina Durante', 'Judeline', 'Morat', 'Farruko', 'PSY', 'BTS', 'Young beef', 'Kaidy Cain', 'Cruz Cafuné', 'Sticky MA',

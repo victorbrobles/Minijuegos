@@ -232,5 +232,11 @@
     "name": "FrankensFootball",
     "description": "Adivina de qué tres jugadores viene el híbrido que vas a ver por pantalla. Si eres buen futbolero lo sabrás a la primera, si no siempre puedes acudir a las pistas.",
     "isNew": true
+  },
+  {
+    "id": "jugadas",
+    "name": "Qué jugadón!",
+    "description": "Pon a prueba tu conocimiento futbolístico sobre el campo y averigua qué jugada se está recreando en cada momento.",
+    "isNew": true
   }
 ]
