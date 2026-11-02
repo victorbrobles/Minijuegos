@@ -2728,5 +2728,3065 @@ export const RETOS_TRAYECTORIAS = [
       c("West Ham United", null, "1996 - 1997"),
       c("Atlético de Madrid", LOGOS.atletico, "1997 - 1998")
     ]
+  },
+  {
+    "id": 187,
+    "nombre": "David Villa",
+    "dificultad": "baja",
+    "pista": "Máximo goleador histórico de la selección española ('El Guaje'), campeón del mundo en 2010 y de la Champions con el Barça en Wembley.",
+    "alias": ["villa", "el guaje", "david villa"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Sporting de Gijón", "null", "2000 - 2003"),
+      ("Real Zaragoza", "null", "2003 - 2005"),
+      ("Valencia CF", "LOGOS.valencia", "2005 - 2010"),
+      ("FC Barcelona", "LOGOS.barca", "2010 - 2013"),
+      ("Atlético de Madrid", "LOGOS.atletico", "2013 - 2014"),
+      ("New York City FC", "null", "2014 - 2018"),
+      ("Melbourne City", "null", "2014"),
+      ("Vissel Kobe", "null", "2019")
+    ]
+  },
+  {
+    "id": 188,
+    "nombre": "David Beckham",
+    "dificultad": "baja",
+    "pista": "Icono mediático mundial y especialista en tiros libres; integró los Galácticos del Real Madrid y hoy es copropietario del Inter Miami.",
+    "alias": ["beckham"],
+    "nacionalidad": "Inglaterra",
+    "clubes": [
+      ("Manchester United", "LOGOS.manutd", "1992 - 2003"),
+      ("Preston North End", "null", "1995"),
+      ("Real Madrid", "LOGOS.madrid", "2003 - 2007"),
+      ("LA Galaxy", "null", "2007 - 2012"),
+      ("AC Milan", "LOGOS.milan", "2009 - 2010"),
+      ("Paris Saint-Germain", "LOGOS.psg", "2013")
+    ]
+  },
+  {
+    "id": 189,
+    "nombre": "Wayne Rooney",
+    "dificultad": "baja",
+    "pista": "Máximo goleador histórico del Manchester United ('El Niño Malcriado'), irrumpió como adolescente en el Everton antes de hacer época en Old Trafford.",
+    "alias": ["rooney"],
+    "nacionalidad": "Inglaterra",
+    "clubes": [
+      ("Everton FC", "null", "2002 - 2004"),
+      ("Manchester United", "LOGOS.manutd", "2004 - 2017"),
+      ("Everton FC", "null", "2017 - 2018"),
+      ("D.C. United", "null", "2018 - 2019"),
+      ("Derby County", "null", "2020 - 2021")
+    ]
+  },
+  {
+    "id": 190,
+    "nombre": "Didier Drogba",
+    "dificultad": "baja",
+    "pista": "Leyenda marfileña del Chelsea; empató en el minuto 88 y anotó el penalti definitivo para dar a los 'Blues' su primera Champions en Múnich.",
+    "alias": ["drogba"],
+    "nacionalidad": "Costa de Marfil",
+    "clubes": [
+      ("Le Mans", "null", "1998 - 2002"),
+      ("EA Guingamp", "null", "2002 - 2003"),
+      ("Olympique de Marsella", "LOGOS.marseille", "2003 - 2004"),
+      ("Chelsea FC", "LOGOS.chelsea", "2004 - 2012"),
+      ("Shanghai Shenhua", "null", "2012"),
+      ("Galatasaray", "null", "2013 - 2014"),
+      ("Chelsea FC", "LOGOS.chelsea", "2014 - 2015"),
+      ("Montreal Impact", "null", "2015 - 2016")
+    ]
+  },
+  {
+    "id": 191,
+    "nombre": "Samuel Eto'o",
+    "dificultad": "baja",
+    "pista": "Único futbolista capaz de ganar dos tripletes consecutivos en Europa con dos clubes distintos (Barça en 2009 e Inter en 2010).",
+    "alias": ["etoo", "samuel etoo"],
+    "nacionalidad": "Camerún",
+    "clubes": [
+      ("CD Leganés", "null", "1997 - 1998"),
+      ("Real Madrid", "LOGOS.madrid", "1998 - 2000"),
+      ("RCD Mallorca", "null", "2000 - 2004"),
+      ("FC Barcelona", "LOGOS.barca", "2004 - 2009"),
+      ("Inter de Milán", "LOGOS.inter", "2009 - 2011"),
+      ("Anzhi Makhachkala", "null", "2011 - 2013"),
+      ("Chelsea FC", "LOGOS.chelsea", "2013 - 2014"),
+      ("Everton FC", "null", "2014 - 2015"),
+      ("Sampdoria", "null", "2015")
+    ]
+  },
+  {
+    "id": 192,
+    "nombre": "Arjen Robben",
+    "dificultad": "baja",
+    "pista": "Extremo neerlandés famoso por su jugada patentada de recortar de derecha hacia el centro y clavar el balón al segundo palo con la zurda.",
+    "alias": ["robben"],
+    "nacionalidad": "Países Bajos",
+    "clubes": [
+      ("FC Groningen", "null", "2000 - 2002"),
+      ("PSV Eindhoven", "null", "2002 - 2004"),
+      ("Chelsea FC", "LOGOS.chelsea", "2004 - 2007"),
+      ("Real Madrid", "LOGOS.madrid", "2007 - 2009"),
+      ("Bayern Múnich", "LOGOS.bayern", "2009 - 2019"),
+      ("FC Groningen", "null", "2020 - 2021")
+    ]
+  },
+  {
+    "id": 193,
+    "nombre": "Franck Ribéry",
+    "dificultad": "baja",
+    "pista": "Extremo francés apodado 'Scarface', formó la mítica dupla 'Robbery' en el Bayern Múnich y fue tercero en el Balón de Oro 2013.",
+    "alias": ["ribery"],
+    "nacionalidad": "Francia",
+    "clubes": [
+      ("FC Metz", "null", "2004 - 2005"),
+      ("Galatasaray", "null", "2005"),
+      ("Olympique de Marsella", "LOGOS.marseille", "2005 - 2007"),
+      ("Bayern Múnich", "LOGOS.bayern", "2007 - 2019"),
+      ("Fiorentina", "null", "2019 - 2021"),
+      ("Salernitana", "null", "2021 - 2022")
+    ]
+  },
+  {
+    "id": 194,
+    "nombre": "Steven Gerrard",
+    "dificultad": "baja",
+    "pista": "Eterno capitán del Liverpool ('Stevie G'), lideró la remontada del Milagro de Estambul en la final de Champions de 2005.",
+    "alias": ["gerrard"],
+    "nacionalidad": "Inglaterra",
+    "clubes": [
+      ("Liverpool FC", "LOGOS.liverpool", "1998 - 2015"),
+      ("LA Galaxy", "null", "2015 - 2016")
+    ]
+  },
+  {
+    "id": 195,
+    "nombre": "Frank Lampard",
+    "dificultad": "baja",
+    "pista": "Máximo goleador de toda la historia del Chelsea pese a jugar como centrocampista llegador.",
+    "alias": ["lampard"],
+    "nacionalidad": "Inglaterra",
+    "clubes": [
+      ("West Ham United", "null", "1995 - 2001"),
+      ("Swansea City", "null", "1995 - 1996"),
+      ("Chelsea FC", "LOGOS.chelsea", "2001 - 2014"),
+      ("Manchester City", "LOGOS.mancity", "2014 - 2015"),
+      ("New York City FC", "null", "2015 - 2016")
+    ]
+  },
+  {
+    "id": 196,
+    "nombre": "Paolo Maldini",
+    "dificultad": "baja",
+    "pista": "'Il Capitano', mito de un solo club que disputó 25 temporadas en el AC Milan ganando 5 Copas de Europa.",
+    "alias": ["maldini"],
+    "nacionalidad": "Italia",
+    "clubes": [
+      ("AC Milan", "LOGOS.milan", "1984 - 2009")
+    ]
+  },
+  {
+    "id": 197,
+    "nombre": "Francesco Totti",
+    "dificultad": "baja",
+    "pista": "'Il Capitano' y emperador eterno de la Roma, rechazó al Real Madrid para vestir una única camiseta durante 25 temporadas.",
+    "alias": ["totti"],
+    "nacionalidad": "Italia",
+    "clubes": [
+      ("AS Roma", "LOGOS.roma", "1992 - 2017")
+    ]
+  },
+  {
+    "id": 198,
+    "nombre": "Alessandro Del Piero",
+    "dificultad": "baja",
+    "pista": "'Pinturicchio', máximo goleador e icono de la Juventus que permaneció fiel a la Vecchia Signora incluso cuando descendió a la Serie B.",
+    "alias": ["del piero"],
+    "nacionalidad": "Italia",
+    "clubes": [
+      ("Padova", "null", "1991 - 1993"),
+      ("Juventus", "LOGOS.juventus", "1993 - 2012"),
+      ("Sydney FC", "null", "2012 - 2014"),
+      ("Delhi Dynamos", "null", "2014")
+    ]
+  },
+  {
+    "id": 199,
+    "nombre": "Roberto Carlos",
+    "dificultad": "baja",
+    "pista": "Lateral izquierdo brasileño con muslos descomunales, famoso por su tiro libre imposible con efecto exterior ante Francia en 1997.",
+    "alias": ["roberto carlos"],
+    "nacionalidad": "Brasil",
+    "clubes": [
+      ("Palmeiras", "null", "1993 - 1995"),
+      ("Inter de Milán", "LOGOS.inter", "1995 - 1996"),
+      ("Real Madrid", "LOGOS.madrid", "1996 - 2007"),
+      ("Fenerbahçe", "null", "2007 - 2009"),
+      ("Corinthians", "null", "2010 - 2011"),
+      ("Anzhi Makhachkala", "null", "2011 - 2012")
+    ]
+  },
+  {
+    "id": 200,
+    "nombre": "Cafú",
+    "dificultad": "baja",
+    "pista": "Único futbolista en la historia que ha disputado tres finales de la Copa del Mundo consecutivas (1994, 1998 y 2002), ganando dos.",
+    "alias": ["cafu"],
+    "nacionalidad": "Brasil",
+    "clubes": [
+      ("São Paulo FC", "null", "1989 - 1994"),
+      ("Real Zaragoza", "null", "1995"),
+      ("Palmeiras", "null", "1995 - 1997"),
+      ("AS Roma", "LOGOS.roma", "1997 - 2003"),
+      ("AC Milan", "LOGOS.milan", "2003 - 2008")
+    ]
+  },
+  {
+    "id": 201,
+    "nombre": "Rivaldo",
+    "dificultad": "baja",
+    "pista": "Balón de Oro en 1999 con el Barça; firmó uno de los mejores hat-tricks de la historia cerrándolo de chilena desde fuera del área ante el Valencia.",
+    "alias": ["rivaldo"],
+    "nacionalidad": "Brasil",
+    "clubes": [
+      ("Palmeiras", "null", "1994 - 1996"),
+      ("Deportivo La Coruña", "LOGOS.depor", "1996 - 1997"),
+      ("FC Barcelona", "LOGOS.barca", "1997 - 2002"),
+      ("AC Milan", "LOGOS.milan", "2002 - 2004"),
+      ("Olympiacos", "null", "2004 - 2007"),
+      ("AEK Atenas", "null", "2007 - 2008")
+    ]
+  },
+  {
+    "id": 202,
+    "nombre": "Diego Maradona",
+    "dificultad": "baja",
+    "pista": "'El Pelusa', autor del Gol del Siglo y la Mano de Dios en México 86, e ídolo eterno del Nápoles.",
+    "alias": ["maradona", "el pelusa"],
+    "nacionalidad": "Argentina",
+    "clubes": [
+      ("Argentinos Juniors", "null", "1976 - 1981"),
+      ("Boca Juniors", "LOGOS.boca", "1981 - 1982"),
+      ("FC Barcelona", "LOGOS.barca", "1982 - 1984"),
+      ("SSC Napoli", "LOGOS.napoli", "1984 - 1991"),
+      ("Sevilla FC", "LOGOS.sevilla", "1992 - 1993"),
+      ("Newell's Old Boys", "null", "1993 - 1994"),
+      ("Boca Juniors", "LOGOS.boca", "1995 - 1997")
+    ]
+  },
+  {
+    "id": 203,
+    "nombre": "Pelé",
+    "dificultad": "baja",
+    "pista": "'O Rei', único futbolista de la historia en conquistar tres Copas del Mundo (1958, 1962 y 1970).",
+    "alias": ["pele", "o rei"],
+    "nacionalidad": "Brasil",
+    "clubes": [
+      ("Santos FC", "null", "1956 - 1974"),
+      ("New York Cosmos", "null", "1975 - 1977")
+    ]
+  },
+  {
+    "id": 204,
+    "nombre": "Johan Cruyff",
+    "dificultad": "baja",
+    "pista": "Líder de la 'Naranja Mecánica', ganador de tres Balones de Oro y padre de la filosofía moderna del Ajax y del FC Barcelona.",
+    "alias": ["cruyff"],
+    "nacionalidad": "Países Bajos",
+    "clubes": [
+      ("AFC Ajax", "LOGOS.ajax", "1964 - 1973"),
+      ("FC Barcelona", "LOGOS.barca", "1973 - 1978"),
+      ("Los Angeles Aztecs", "null", "1979"),
+      ("Levante UD", "null", "1981"),
+      ("AFC Ajax", "LOGOS.ajax", "1981 - 1983"),
+      ("Feyenoord", "null", "1983 - 1984")
+    ]
+  },
+  {
+    "id": 205,
+    "nombre": "Phil Foden",
+    "dificultad": "baja",
+    "pista": "Joya zurda de la cantera del Manchester City ('El Francotirador de Stockport'), elegido mejor jugador de la Premier League en 2024.",
+    "alias": ["foden"],
+    "nacionalidad": "Inglaterra",
+    "clubes": [
+      ("Manchester City", "LOGOS.mancity", "2017 - Presente")
+    ]
+  },
+  {
+    "id": 206,
+    "nombre": "Gavi",
+    "dificultad": "baja",
+    "pista": "Centrocampista andaluz de La Masía famoso por su garra, intensidad en los duelos y por jugar con los cordones desatados.",
+    "alias": ["gavi", "pablo gavi"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("FC Barcelona", "LOGOS.barca", "2021 - Presente")
+    ]
+  },
+  {
+    "id": 207,
+    "nombre": "Nico Williams",
+    "dificultad": "baja",
+    "pista": "Extremo eléctrico del Athletic Club y socio inseparable de Lamine Yamal; marcó en la final de la Eurocopa 2024 ante Inglaterra.",
+    "alias": ["nico williams"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Athletic Club", "LOGOS.athletic", "2021 - Presente")
+    ]
+  },
+  {
+    "id": 208,
+    "nombre": "Dani Olmo",
+    "dificultad": "baja",
+    "pista": "Mediapunta egarense que dio el salto formándose en Croacia antes de brillar en Alemania, ser máximo goleador de la Euro 2024 y volver al Barça.",
+    "alias": ["olmo", "dani olmo"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Dinamo Zagreb", "null", "2015 - 2020"),
+      ("RB Leipzig", "null", "2020 - 2024"),
+      ("FC Barcelona", "LOGOS.barca", "2024 - Presente")
+    ]
+  },
+  {
+    "id": 209,
+    "nombre": "Cole Palmer",
+    "dificultad": "baja",
+    "pista": "'Cold Palmer', estrella zurda inglesa famosa por su celebración frotándose los brazos de frío tras salir de la cantera del City rumbo a Stamford Bridge.",
+    "alias": ["palmer", "cole palmer"],
+    "nacionalidad": "Inglaterra",
+    "clubes": [
+      ("Manchester City", "LOGOS.mancity", "2020 - 2023"),
+      ("Chelsea FC", "LOGOS.chelsea", "2023 - Presente")
+    ]
+  },
+  {
+    "id": 210,
+    "nombre": "Jamal Musiala",
+    "dificultad": "baja",
+    "pista": "Apodado 'Bambi' por su increíble conducción y regate en espacios reducidos; pasó por las inferiores del Chelsea antes de liderar al Bayern y Alemania.",
+    "alias": ["musiala"],
+    "nacionalidad": "Alemania",
+    "clubes": [
+      ("Bayern Múnich", "LOGOS.bayern", "2020 - Presente")
+    ]
+  },
+  {
+    "id": 211,
+    "nombre": "Florian Wirtz",
+    "dificultad": "baja",
+    "pista": "Cerebro y MVP del histórico Bayer Leverkusen de Xabi Alonso que conquistó la primera Bundesliga invicta de la historia.",
+    "alias": ["wirtz"],
+    "nacionalidad": "Alemania",
+    "clubes": [
+      ("Bayer Leverkusen", "null", "2020 - Presente")
+    ]
+  },
+  {
+    "id": 212,
+    "nombre": "Martin Ødegaard",
+    "dificultad": "baja",
+    "pista": "Fichó por el Real Madrid con 16 años, enamoró a LaLiga en la Real Sociedad y hoy es el capitán y director de orquesta del Arsenal.",
+    "alias": ["odegaard"],
+    "nacionalidad": "Noruega",
+    "clubes": [
+      ("Strømsgodset", "null", "2014 - 2015"),
+      ("Real Madrid", "LOGOS.madrid", "2015 - 2021"),
+      ("SC Heerenveen", "null", "2017 - 2018"),
+      ("Vitesse Arnhem", "null", "2018 - 2019"),
+      ("Real Sociedad", "LOGOS.sociedad", "2019 - 2020"),
+      ("Arsenal FC", "LOGOS.arsenal", "2021 - Presente")
+    ]
+  },
+  {
+    "id": 213,
+    "nombre": "Declan Rice",
+    "dificultad": "baja",
+    "pista": "Centrocampista inglés que levantó la Conference League como capitán del West Ham antes de protagonizar un traspaso récord al Arsenal.",
+    "alias": ["rice", "declan rice"],
+    "nacionalidad": "Inglaterra",
+    "clubes": [
+      ("West Ham United", "null", "2017 - 2023"),
+      ("Arsenal FC", "LOGOS.arsenal", "2023 - Presente")
+    ]
+  },
+  {
+    "id": 214,
+    "nombre": "Marcus Rashford",
+    "dificultad": "baja",
+    "pista": "Atacante inglés criado en Old Trafford que tras una década en el Manchester United salió cedido al Aston Villa en 2025.",
+    "alias": ["rashford"],
+    "nacionalidad": "Inglaterra",
+    "clubes": [
+      ("Manchester United", "LOGOS.manutd", "2015 - Presente"),
+      ("Aston Villa", "null", "2025")
+    ]
+  },
+  {
+    "id": 215,
+    "nombre": "Trent Alexander-Arnold",
+    "dificultad": "baja",
+    "pista": "Lateral derecho con guante de mediocentro; famoso por su córner rápido ante el Barça en Anfield antes de fichar por el Real Madrid en 2025.",
+    "alias": ["alexander-arnold", "arnold", "taa"],
+    "nacionalidad": "Inglaterra",
+    "clubes": [
+      ("Liverpool FC", "LOGOS.liverpool", "2016 - 2025"),
+      ("Real Madrid", "LOGOS.madrid", "2025 - Presente")
+    ]
+  },
+  {
+    "id": 216,
+    "nombre": "Jack Grealish",
+    "dificultad": "baja",
+    "pista": "Extremo inglés inconfundible por llevar las medias bajas, sus potentes gemelos y su traspaso de 100 millones de libras del Aston Villa al City.",
+    "alias": ["grealish"],
+    "nacionalidad": "Inglaterra",
+    "clubes": [
+      ("Notts County", "null", "2013 - 2014"),
+      ("Aston Villa", "null", "2014 - 2021"),
+      ("Manchester City", "LOGOS.mancity", "2021 - Presente")
+    ]
+  },
+  {
+    "id": 217,
+    "nombre": "Kyle Walker",
+    "dificultad": "baja",
+    "pista": "Lateral derecho velocísimo que fue el antídoto habitual contra los extremos más rápidos de Europa en el Manchester City antes de pasar al Milan en 2025.",
+    "alias": ["walker", "kyle walker"],
+    "nacionalidad": "Inglaterra",
+    "clubes": [
+      ("Sheffield United", "null", "2008 - 2009"),
+      ("Tottenham Hotspur", "LOGOS.tottenham", "2009 - 2017"),
+      ("Aston Villa", "null", "2011"),
+      ("Manchester City", "LOGOS.mancity", "2017 - 2025"),
+      ("AC Milan", "LOGOS.milan", "2025 - Presente")
+    ]
+  },
+  {
+    "id": 218,
+    "nombre": "John Stones",
+    "dificultad": "baja",
+    "pista": "Defensa central inglés elegante con el balón al que Guardiola reconvirtió en mediocentro híbrido para ganar el Triplete con el City.",
+    "alias": ["stones"],
+    "nacionalidad": "Inglaterra",
+    "clubes": [
+      ("Barnsley FC", "null", "2011 - 2013"),
+      ("Everton FC", "null", "2013 - 2016"),
+      ("Manchester City", "LOGOS.mancity", "2016 - Presente")
+    ]
+  },
+  {
+    "id": 219,
+    "nombre": "Rúben Dias",
+    "dificultad": "baja",
+    "pista": "Mariscal defensivo portugués formado en el Benfica que se convirtió en el líder de la zaga del Manchester City desde su llegada en 2020.",
+    "alias": ["ruben dias"],
+    "nacionalidad": "Portugal",
+    "clubes": [
+      ("SL Benfica", "LOGOS.benfica", "2017 - 2020"),
+      ("Manchester City", "LOGOS.mancity", "2020 - Presente")
+    ]
+  },
+  {
+    "id": 220,
+    "nombre": "Ederson Moraes",
+    "dificultad": "baja",
+    "pista": "Portero brasileño del Manchester City famoso por su tatuaje de una rosa en el cuello y por tener uno de los saques en largo más precisos y potentes del mundo.",
+    "alias": ["ederson"],
+    "nacionalidad": "Brasil",
+    "clubes": [
+      ("Rio Ave", "null", "2012 - 2015"),
+      ("SL Benfica", "LOGOS.benfica", "2015 - 2017"),
+      ("Manchester City", "LOGOS.mancity", "2017 - Presente")
+    ]
+  },
+  {
+    "id": 221,
+    "nombre": "Gianluigi Donnarumma",
+    "dificultad": "baja",
+    "pista": "Debutó en la portería del AC Milan con solo 16 años y fue elegido MVP de la Eurocopa 2020 tras ser héroe en la tanda de penaltis de Wembley.",
+    "alias": ["donnarumma"],
+    "nacionalidad": "Italia",
+    "clubes": [
+      ("AC Milan", "LOGOS.milan", "2015 - 2021"),
+      ("Paris Saint-Germain", "LOGOS.psg", "2021 - Presente")
+    ]
+  },
+  {
+    "id": 222,
+    "nombre": "Emiliano Martínez",
+    "dificultad": "baja",
+    "pista": "'El Dibu', protagonista de la parada del siglo a Kolo Muani en el minuto 123 de la final de Qatar 2022 y especialista en tandas de penaltis.",
+    "alias": ["dibu martinez", "dibu", "emiliano martinez"],
+    "nacionalidad": "Argentina",
+    "clubes": [
+      ("Arsenal FC", "LOGOS.arsenal", "2012 - 2020"),
+      ("Getafe CF", "null", "2017 - 2018"),
+      ("Reading FC", "null", "2019"),
+      ("Aston Villa", "null", "2020 - Presente")
+    ]
+  },
+  {
+    "id": 223,
+    "nombre": "Antonio Rüdiger",
+    "dificultad": "baja",
+    "pista": "'El Loco', central alemán famoso por su peculiar forma de correr levantando las rodillas y su férreo marcaje a Haaland en Champions.",
+    "alias": ["rudiger"],
+    "nacionalidad": "Alemania",
+    "clubes": [
+      ("VfB Stuttgart", "null", "2012 - 2015"),
+      ("AS Roma", "LOGOS.roma", "2015 - 2017"),
+      ("Chelsea FC", "LOGOS.chelsea", "2017 - 2022"),
+      ("Real Madrid", "LOGOS.madrid", "2022 - Presente")
+    ]
+  },
+  {
+    "id": 224,
+    "nombre": "Éder Militão",
+    "dificultad": "baja",
+    "pista": "Central brasileño rapidísimo al corte que llegó al Real Madrid procedente del Oporto y ganó dos Champions como merengue.",
+    "alias": ["militao"],
+    "nacionalidad": "Brasil",
+    "clubes": [
+      ("São Paulo FC", "null", "2017 - 2018"),
+      ("FC Porto", "LOGOS.porto", "2018 - 2019"),
+      ("Real Madrid", "LOGOS.madrid", "2019 - Presente")
+    ]
+  },
+  {
+    "id": 225,
+    "nombre": "Eduardo Camavinga",
+    "dificultad": "baja",
+    "pista": "Todocampista zurdo francés que explotó siendo adolescente en el Rennes y revolucionó las remontadas de la 14ª Champions del Real Madrid.",
+    "alias": ["camavinga"],
+    "nacionalidad": "Francia",
+    "clubes": [
+      ("Stade Rennais", "null", "2019 - 2021"),
+      ("Real Madrid", "LOGOS.madrid", "2021 - Presente")
+    ]
+  },
+  {
+    "id": 226,
+    "nombre": "Aurélien Tchouaméni",
+    "dificultad": "baja",
+    "pista": "Mediocentro defensivo y central ocasional francés fichado por el Real Madrid procedente del Mónaco como relevo generacional de Casemiro.",
+    "alias": ["tchouameni"],
+    "nacionalidad": "Francia",
+    "clubes": [
+      ("Girondins de Burdeos", "null", "2018 - 2020"),
+      ("AS Mónaco", "LOGOS.monaco", "2020 - 2022"),
+      ("Real Madrid", "LOGOS.madrid", "2022 - Presente")
+    ]
+  },
+  {
+    "id": 227,
+    "nombre": "Jules Koundé",
+    "dificultad": "baja",
+    "pista": "Defensa francés conocido por sus llamativos looks de moda al llegar a los estadios; brilló como central en el Sevilla y como lateral en el Barça.",
+    "alias": ["kounde"],
+    "nacionalidad": "Francia",
+    "clubes": [
+      ("Girondins de Burdeos", "null", "2017 - 2019"),
+      ("Sevilla FC", "LOGOS.sevilla", "2019 - 2022"),
+      ("FC Barcelona", "LOGOS.barca", "2022 - Presente")
+    ]
+  },
+  {
+    "id": 228,
+    "nombre": "Ronald Araújo",
+    "dificultad": "baja",
+    "pista": "Poderoso defensa central uruguayo y uno de los capitanes del FC Barcelona, solía ser ubicado en el lateral derecho para frenar a Vinicius en los Clásicos.",
+    "alias": ["araujo"],
+    "nacionalidad": "Uruguay",
+    "clubes": [
+      ("Rentistas", "null", "2016 - 2017"),
+      ("Boston River", "null", "2017 - 2018"),
+      ("FC Barcelona", "LOGOS.barca", "2019 - Presente")
+    ]
+  },
+  {
+    "id": 229,
+    "nombre": "Rafael Leão",
+    "dificultad": "baja",
+    "pista": "Extremo portugués de zancada imparable que juega siempre sonriendo; fue el MVP de la Serie A cuando el Milan reconquistó el Scudetto en 2022.",
+    "alias": ["leao", "rafael leao"],
+    "nacionalidad": "Portugal",
+    "clubes": [
+      ("Sporting CP", "LOGOS.sporting", "2017 - 2018"),
+      ("Lille OSC", "null", "2018 - 2019"),
+      ("AC Milan", "LOGOS.milan", "2019 - Presente")
+    ]
+  },
+  {
+    "id": 230,
+    "nombre": "Theo Hernández",
+    "dificultad": "baja",
+    "pista": "Lateral izquierdo de potencia descomunal; tras pasar por Atlético y Real Madrid se convirtió en ídolo y capitán del AC Milan.",
+    "alias": ["theo hernandez", "theo"],
+    "nacionalidad": "Francia",
+    "clubes": [
+      ("Deportivo Alavés", "null", "2016 - 2017"),
+      ("Real Madrid", "LOGOS.madrid", "2017 - 2019"),
+      ("Real Sociedad", "LOGOS.sociedad", "2018 - 2019"),
+      ("AC Milan", "LOGOS.milan", "2019 - Presente")
+    ]
+  },
+  {
+    "id": 231,
+    "nombre": "Khvicha Kvaratskhelia",
+    "dificultad": "baja",
+    "pista": "Apodado 'Kvaradona' en el sur de Italia tras devolver el Scudetto al Nápoles 33 años después, antes de fichar por el PSG en enero de 2025.",
+    "alias": ["kvaratskhelia", "kvara"],
+    "nacionalidad": "Georgia",
+    "clubes": [
+      ("Rubin Kazán", "null", "2019 - 2022"),
+      ("Dinamo Batumi", "null", "2022"),
+      ("SSC Napoli", "LOGOS.napoli", "2022 - 2025"),
+      ("Paris Saint-Germain", "LOGOS.psg", "2025 - Presente")
+    ]
+  },
+  {
+    "id": 232,
+    "nombre": "Nicolò Barella",
+    "dificultad": "baja",
+    "pista": "Motor incansable sardo del centro del campo del Inter de Milán y campeón de la Eurocopa 2020 con la selección italiana.",
+    "alias": ["barella"],
+    "nacionalidad": "Italia",
+    "clubes": [
+      ("Cagliari", "null", "2014 - 2019"),
+      ("Como 1907", "null", "2016"),
+      ("Inter de Milán", "LOGOS.inter", "2019 - Presente")
+    ]
+  },
+  {
+    "id": 233,
+    "nombre": "João Félix",
+    "dificultad": "baja",
+    "pista": "Golden Boy 2019 por el que el Atlético pagó 127 millones al Benfica; luego encadenó etapas en Chelsea, FC Barcelona y AC Milan.",
+    "alias": ["joao felix"],
+    "nacionalidad": "Portugal",
+    "clubes": [
+      ("SL Benfica", "LOGOS.benfica", "2018 - 2019"),
+      ("Atlético de Madrid", "LOGOS.atletico", "2019 - 2024"),
+      ("Chelsea FC", "LOGOS.chelsea", "2023"),
+      ("FC Barcelona", "LOGOS.barca", "2023 - 2024"),
+      ("Chelsea FC", "LOGOS.chelsea", "2024 - 2025"),
+      ("AC Milan", "LOGOS.milan", "2025 - Presente")
+    ]
+  },
+  {
+    "id": 234,
+    "nombre": "João Cancelo",
+    "dificultad": "baja",
+    "pista": "Lateral portugués de enorme talento ofensivo que ha vestido las camisetas de Valencia, Inter, Juventus, Man City, Bayern y Barça antes de ir a Arabia.",
+    "alias": ["cancelo", "joao cancelo"],
+    "nacionalidad": "Portugal",
+    "clubes": [
+      ("SL Benfica", "LOGOS.benfica", "2014 - 2015"),
+      ("Valencia CF", "LOGOS.valencia", "2014 - 2018"),
+      ("Inter de Milán", "LOGOS.inter", "2017 - 2018"),
+      ("Juventus", "LOGOS.juventus", "2018 - 2019"),
+      ("Manchester City", "LOGOS.mancity", "2019 - 2024"),
+      ("Bayern Múnich", "LOGOS.bayern", "2023"),
+      ("FC Barcelona", "LOGOS.barca", "2023 - 2024"),
+      ("Al Hilal", "null", "2024 - Presente")
+    ]
+  },
+  {
+    "id": 235,
+    "nombre": "Koke Resurrección",
+    "dificultad": "baja",
+    "pista": "Capitán y futbolista con más partidos disputados en toda la historia del Atlético de Madrid.",
+    "alias": ["koke"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Atlético de Madrid", "LOGOS.atletico", "2009 - Presente")
+    ]
+  },
+  {
+    "id": 236,
+    "nombre": "Iñaki Williams",
+    "dificultad": "baja",
+    "pista": "Delantero del Athletic Club que batió el récord histórico de LaLiga jugando 251 partidos consecutivos sin perderse ni uno solo por lesión.",
+    "alias": ["inaki williams"],
+    "nacionalidad": "Ghana",
+    "clubes": [
+      ("Athletic Club", "LOGOS.athletic", "2014 - Presente")
+    ]
+  },
+  {
+    "id": 237,
+    "nombre": "Mikel Oyarzabal",
+    "dificultad": "baja",
+    "pista": "Capitán de la Real Sociedad y héroe de España al marcar en el minuto 86 el gol de la victoria ante Inglaterra en la final de la Eurocopa 2024.",
+    "alias": ["oyarzabal"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Real Sociedad", "LOGOS.sociedad", "2015 - Presente")
+    ]
+  },
+  {
+    "id": 238,
+    "nombre": "Unai Simón",
+    "dificultad": "baja",
+    "pista": "Portero titular de la selección española campeona de la Euro 2024 y ganador del Trofeo Zamora con el Athletic Club.",
+    "alias": ["unai simon"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Athletic Club", "LOGOS.athletic", "2018 - Presente")
+    ]
+  },
+  {
+    "id": 239,
+    "nombre": "Marc Cucurella",
+    "dificultad": "baja",
+    "pista": "Lateral izquierdo de inconfundible melena rizada; dio la asistencia del gol del título en la Eurocopa 2024 y milita en el Chelsea.",
+    "alias": ["cucurella"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("FC Barcelona", "LOGOS.barca", "2017 - 2020"),
+      ("SD Eibar", "null", "2018 - 2019"),
+      ("Getafe CF", "null", "2019 - 2021"),
+      ("Brighton & Hove Albion", "null", "2021 - 2022"),
+      ("Chelsea FC", "LOGOS.chelsea", "2022 - Presente")
+    ]
+  },
+  {
+    "id": 240,
+    "nombre": "Fabián Ruiz",
+    "dificultad": "baja",
+    "pista": "Centrocampista zurdo de Los Palacios criado en el Betis que brilló en el Nápoles, fichó por el PSG y fue pieza clave de España en la Euro 2024.",
+    "alias": ["fabian", "fabian ruiz"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Real Betis", "LOGOS.betis", "2014 - 2018"),
+      ("Elche CF", "null", "2017"),
+      ("SSC Napoli", "LOGOS.napoli", "2018 - 2022"),
+      ("Paris Saint-Germain", "LOGOS.psg", "2022 - Presente")
+    ]
+  },
+  {
+    "id": 241,
+    "nombre": "Pedro Rodríguez",
+    "dificultad": "media",
+    "pista": "Extremo tinerfeño que en 2009 se convirtió en el primer jugador de la historia en marcar en 6 competiciones oficiales distintas en un mismo año con el Barça.",
+    "alias": ["pedro", "pedrito"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("FC Barcelona", "LOGOS.barca", "2008 - 2015"),
+      ("Chelsea FC", "LOGOS.chelsea", "2015 - 2020"),
+      ("AS Roma", "LOGOS.roma", "2020 - 2021"),
+      ("Lazio", "null", "2021 - Presente")
+    ]
+  },
+  {
+    "id": 242,
+    "nombre": "Juan Mata",
+    "dificultad": "media",
+    "pista": "Mediapunta zurdo burgalés criado en Oviedo y Real Madrid; fue elegido dos veces mejor jugador del año en el Chelsea antes de fichar por el Manchester United.",
+    "alias": ["mata", "juan mata"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Valencia CF", "LOGOS.valencia", "2007 - 2011"),
+      ("Chelsea FC", "LOGOS.chelsea", "2011 - 2014"),
+      ("Manchester United", "LOGOS.manutd", "2014 - 2022"),
+      ("Galatasaray", "null", "2022 - 2023"),
+      ("Vissel Kobe", "null", "2023"),
+      ("Western Sydney Wanderers", "null", "2024 - Presente")
+    ]
+  },
+  {
+    "id": 243,
+    "nombre": "César Azpilicueta",
+    "dificultad": "media",
+    "pista": "Apodado 'Dave' por la afición del Chelsea, donde fue capitán y levantó la Champions de 2021 antes de pasar por el Atlético y el Sevilla.",
+    "alias": ["azpilicueta", "dave"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("CA Osasuna", "null", "2007 - 2010"),
+      ("Olympique de Marsella", "LOGOS.marseille", "2010 - 2012"),
+      ("Chelsea FC", "LOGOS.chelsea", "2012 - 2023"),
+      ("Atlético de Madrid", "LOGOS.atletico", "2023 - 2025"),
+      ("Sevilla FC", "LOGOS.sevilla", "2025 - Presente")
+    ]
+  },
+  {
+    "id": 244,
+    "nombre": "Marcos Alonso",
+    "dificultad": "media",
+    "pista": "Tercera generación de una dinastía de futbolistas internacionales españoles; carrilero zurdo con gran golpeo de falta que brilló en el Chelsea.",
+    "alias": ["marcos alonso"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Real Madrid", "LOGOS.madrid", "2010"),
+      ("Bolton Wanderers", "null", "2010 - 2013"),
+      ("Fiorentina", "null", "2013 - 2016"),
+      ("Sunderland", "null", "2014"),
+      ("Chelsea FC", "LOGOS.chelsea", "2016 - 2022"),
+      ("FC Barcelona", "LOGOS.barca", "2022 - 2024"),
+      ("Celta de Vigo", "LOGOS.celta", "2024 - Presente")
+    ]
+  },
+  {
+    "id": 245,
+    "nombre": "Saúl Ñíguez",
+    "dificultad": "media",
+    "pista": "Centrocampista ilicitano del Atlético de Madrid recordado por su golazo maradoniano slalomeando a toda la defensa del Bayern Múnich en semifinales de Champions.",
+    "alias": ["saul", "saul niguez"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Atlético de Madrid", "LOGOS.atletico", "2012 - Presente"),
+      ("Rayo Vallecano", "null", "2013 - 2014"),
+      ("Chelsea FC", "LOGOS.chelsea", "2021 - 2022"),
+      ("Sevilla FC", "LOGOS.sevilla", "2024 - 2025")
+    ]
+  },
+  {
+    "id": 246,
+    "nombre": "Marcos Llorente",
+    "dificultad": "media",
+    "pista": "Pasó de mediocentro defensivo en el Real Madrid a todocampista ofensivo en el Atlético tras su histórico doblete en Anfield en la prórroga de Champions.",
+    "alias": ["marcos llorente", "llorente"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Real Madrid", "LOGOS.madrid", "2015 - 2019"),
+      ("Deportivo Alavés", "null", "2016 - 2017"),
+      ("Atlético de Madrid", "LOGOS.atletico", "2019 - Presente")
+    ]
+  },
+  {
+    "id": 247,
+    "nombre": "Lucas Vázquez",
+    "dificultad": "media",
+    "pista": "'Cafucas', gallego reconvertido de extremo a lateral derecho que caminó hacia el punto de penalti dando toques con el dedo en la final de Milán 2016.",
+    "alias": ["lucas vazquez"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("RCD Espanyol", "LOGOS.espanyol", "2014 - 2015"),
+      ("Real Madrid", "LOGOS.madrid", "2015 - 2025")
+    ]
+  },
+  {
+    "id": 248,
+    "nombre": "Nacho Fernández",
+    "dificultad": "media",
+    "pista": "Defensa comodín criado desde niño en Valdebebas que se despidió del Real Madrid levantando la 15ª Champions y LaLiga como primer capitán.",
+    "alias": ["nacho"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Real Madrid", "LOGOS.madrid", "2011 - 2024"),
+      ("Al Qadsiah", "null", "2024 - Presente")
+    ]
+  },
+  {
+    "id": 249,
+    "nombre": "Joselu Mato",
+    "dificultad": "media",
+    "pista": "Delantero que asistió como aficionado a la final de París 2022 y dos años después metió al Real Madrid en la final de Wembley con un doblete al Bayern en 3 minutos.",
+    "alias": ["joselu"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Celta de Vigo", "LOGOS.celta", "2009 - 2010"),
+      ("TSG Hoffenheim", "null", "2012 - 2014"),
+      ("Stoke City", "null", "2015 - 2017"),
+      ("Deportivo La Coruña", "LOGOS.depor", "2016 - 2017"),
+      ("Newcastle United", "null", "2017 - 2019"),
+      ("Deportivo Alavés", "null", "2019 - 2022"),
+      ("RCD Espanyol", "LOGOS.espanyol", "2022 - 2023"),
+      ("Real Madrid", "LOGOS.madrid", "2023 - 2024"),
+      ("Al Gharafa", "null", "2024 - Presente")
+    ]
+  },
+  {
+    "id": 250,
+    "nombre": "Gerard Moreno",
+    "dificultad": "media",
+    "pista": "Máximo goleador de la historia del Villarreal CF y autor del gol en la final de Gdańsk que dio al Submarino Amarillo su primera Europa League.",
+    "alias": ["gerard moreno"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Villarreal CF", "LOGOS.villarreal", "2012 - 2015"),
+      ("RCD Mallorca", "null", "2013 - 2014"),
+      ("RCD Espanyol", "LOGOS.espanyol", "2015 - 2018"),
+      ("Villarreal CF", "LOGOS.villarreal", "2018 - Presente")
+    ]
+  },
+  {
+    "id": 251,
+    "nombre": "Dani Parejo",
+    "dificultad": "media",
+    "pista": "Director de orquesta de Coslada; levantó la Copa del Rey de 2019 como capitán del Valencia antes de pasar a dirigir la medular del Villarreal.",
+    "alias": ["parejo", "dani parejo"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Real Madrid", "LOGOS.madrid", "2008 - 2009"),
+      ("Queens Park Rangers", "null", "2008"),
+      ("Getafe CF", "null", "2009 - 2011"),
+      ("Valencia CF", "LOGOS.valencia", "2011 - 2020"),
+      ("Villarreal CF", "LOGOS.villarreal", "2020 - Presente")
+    ]
+  },
+  {
+    "id": 252,
+    "nombre": "Raúl Albiol",
+    "dificultad": "media",
+    "pista": "'El Chori', central valenciano campeón del mundo y dos veces de Europa con España, con largas etapas en Valencia, Real Madrid, Nápoles y Villarreal.",
+    "alias": ["albiol", "raul albiol"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Getafe CF", "null", "2004 - 2005"),
+      ("Valencia CF", "LOGOS.valencia", "2005 - 2009"),
+      ("Real Madrid", "LOGOS.madrid", "2009 - 2013"),
+      ("SSC Napoli", "LOGOS.napoli", "2013 - 2019"),
+      ("Villarreal CF", "LOGOS.villarreal", "2019 - 2025")
+    ]
+  },
+  {
+    "id": 253,
+    "nombre": "José María Callejón",
+    "dificultad": "media",
+    "pista": "Extremo motrileño canterano del Real Madrid que hizo carrera histórica en el Nápoles siendo el español con más goles en la Serie A.",
+    "alias": ["callejon"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("RCD Espanyol", "LOGOS.espanyol", "2008 - 2011"),
+      ("Real Madrid", "LOGOS.madrid", "2011 - 2013"),
+      ("SSC Napoli", "LOGOS.napoli", "2013 - 2020"),
+      ("Fiorentina", "null", "2020 - 2022"),
+      ("Granada CF", "null", "2022 - 2024"),
+      ("Marbella FC", "null", "2024 - 2025")
+    ]
+  },
+  {
+    "id": 254,
+    "nombre": "Pepe Reina",
+    "dificultad": "media",
+    "pista": "Carismático guardameta y alma del vestuario de la España campeona del mundo; superó los 1.000 partidos oficiales tras jugar en 4 grandes ligas.",
+    "alias": ["reina", "pepe reina"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("FC Barcelona", "LOGOS.barca", "2000 - 2002"),
+      ("Villarreal CF", "LOGOS.villarreal", "2002 - 2005"),
+      ("Liverpool FC", "LOGOS.liverpool", "2005 - 2014"),
+      ("SSC Napoli", "LOGOS.napoli", "2013 - 2014"),
+      ("Bayern Múnich", "LOGOS.bayern", "2014 - 2015"),
+      ("SSC Napoli", "LOGOS.napoli", "2015 - 2018"),
+      ("AC Milan", "LOGOS.milan", "2018 - 2020"),
+      ("Lazio", "null", "2020 - 2022"),
+      ("Villarreal CF", "LOGOS.villarreal", "2022 - 2024"),
+      ("Como 1907", "null", "2024 - 2025")
+    ]
+  },
+  {
+    "id": 255,
+    "nombre": "Víctor Valdés",
+    "dificultad": "media",
+    "pista": "El portero más laureado de la historia del FC Barcelona, ganador de 5 Trofeos Zamora y clave con sus paradas ante Henry en la final de París 2006.",
+    "alias": ["valdes", "victor valdes"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("FC Barcelona", "LOGOS.barca", "2002 - 2014"),
+      ("Manchester United", "LOGOS.manutd", "2015 - 2016"),
+      ("Standard de Lieja", "null", "2016"),
+      ("Middlesbrough FC", "null", "2016 - 2017")
+    ]
+  },
+  {
+    "id": 256,
+    "nombre": "Álvaro Arbeloa",
+    "dificultad": "media",
+    "pista": "'El Espartano', lateral defensivo campeón del mundo con España y de dos Champions con el Real Madrid tras curtirse en el Liverpool de Benítez.",
+    "alias": ["arbeloa"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Real Madrid", "LOGOS.madrid", "2004 - 2006"),
+      ("Deportivo La Coruña", "LOGOS.depor", "2006 - 2007"),
+      ("Liverpool FC", "LOGOS.liverpool", "2007 - 2009"),
+      ("Real Madrid", "LOGOS.madrid", "2009 - 2016"),
+      ("West Ham United", "null", "2016 - 2017")
+    ]
+  },
+  {
+    "id": 257,
+    "nombre": "Fernando Llorente",
+    "dificultad": "media",
+    "pista": "'El Rey León', imponente delantero centro riojano del Athletic Club que ganó títulos en la Juventus, conquistó la Europa League en el Sevilla y llevó al Tottenham a la final de Champions.",
+    "alias": ["fernando llorente"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Athletic Club", "LOGOS.athletic", "2005 - 2013"),
+      ("Juventus", "LOGOS.juventus", "2013 - 2015"),
+      ("Sevilla FC", "LOGOS.sevilla", "2015 - 2016"),
+      ("Swansea City", "null", "2016 - 2017"),
+      ("Tottenham Hotspur", "LOGOS.tottenham", "2017 - 2019"),
+      ("SSC Napoli", "LOGOS.napoli", "2019 - 2021"),
+      ("Udinese", "null", "2021"),
+      ("SD Eibar", "null", "2021 - 2022")
+    ]
+  },
+  {
+    "id": 258,
+    "nombre": "Javi Martínez",
+    "dificultad": "media",
+    "pista": "Mediocentro y central navarro por el que el Bayern Múnich pagó su cláusula récord al Athletic en 2012, ganando dos Tripletes en Baviera.",
+    "alias": ["javi martinez"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Athletic Club", "LOGOS.athletic", "2006 - 2012"),
+      ("Bayern Múnich", "LOGOS.bayern", "2012 - 2021"),
+      ("Qatar SC", "null", "2021 - Presente")
+    ]
+  },
+  {
+    "id": 259,
+    "nombre": "Ander Herrera",
+    "dificultad": "media",
+    "pista": "Centrocampista bilbaíno criado en el Real Zaragoza que brilló en el Athletic, Manchester United y PSG antes de cumplir su sueño de jugar en Boca Juniors.",
+    "alias": ["ander herrera", "herrera"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Real Zaragoza", "null", "2009 - 2011"),
+      ("Athletic Club", "LOGOS.athletic", "2011 - 2014"),
+      ("Manchester United", "LOGOS.manutd", "2014 - 2019"),
+      ("Paris Saint-Germain", "LOGOS.psg", "2019 - 2022"),
+      ("Athletic Club", "LOGOS.athletic", "2022 - 2025"),
+      ("Boca Juniors", "LOGOS.boca", "2025 - Presente")
+    ]
+  },
+  {
+    "id": 260,
+    "nombre": "Iker Muniain",
+    "dificultad": "media",
+    "pista": "histórico capitán del Athletic Club que tras levantar la ansiada Copa del Rey en la Gabarra después de 40 años puso rumbo a Argentina para jugar en San Lorenzo.",
+    "alias": ["muniain"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Athletic Club", "LOGOS.athletic", "2009 - 2024"),
+      ("San Lorenzo", "null", "2024 - 2025")
+    ]
+  },
+  {
+    "id": 261,
+    "nombre": "Álvaro Negredo",
+    "dificultad": "media",
+    "pista": "'La Bestia de Vallecas', potente delantero zurdo campeón de la Euro 2012 con España y de la Premier League con el Manchester City.",
+    "alias": ["negredo"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("UD Almería", "null", "2007 - 2009"),
+      ("Sevilla FC", "LOGOS.sevilla", "2009 - 2013"),
+      ("Manchester City", "LOGOS.mancity", "2013 - 2015"),
+      ("Valencia CF", "LOGOS.valencia", "2014 - 2017"),
+      ("Middlesbrough FC", "null", "2016 - 2017"),
+      ("Besiktas", "null", "2017 - 2018"),
+      ("Cádiz CF", "null", "2020 - 2024"),
+      ("Real Valladolid", "null", "2024")
+    ]
+  },
+  {
+    "id": 262,
+    "nombre": "Roberto Soldado",
+    "dificultad": "media",
+    "pista": "Goleador valenciano formado en La Fábrica del Real Madrid que firmó grandes cifras realizadoras en Getafe, Valencia y Villarreal además de pasar por el Tottenham.",
+    "alias": ["soldado"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Real Madrid", "LOGOS.madrid", "2005 - 2008"),
+      ("CA Osasuna", "null", "2006 - 2007"),
+      ("Getafe CF", "null", "2008 - 2010"),
+      ("Valencia CF", "LOGOS.valencia", "2010 - 2013"),
+      ("Tottenham Hotspur", "LOGOS.tottenham", "2013 - 2015"),
+      ("Villarreal CF", "LOGOS.villarreal", "2015 - 2017"),
+      ("Fenerbahçe", "null", "2017 - 2019"),
+      ("Granada CF", "null", "2019 - 2021"),
+      ("Levante UD", "null", "2021 - 2023")
+    ]
+  },
+  {
+    "id": 263,
+    "nombre": "Sergio Canales",
+    "dificultad": "media",
+    "pista": "Talentoso mediapunta cántabro que superó tres roturas de ligamento cruzado para ser campeón de Copa con el Betis y de la Nations League con España.",
+    "alias": ["canales"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Racing de Santander", "null", "2008 - 2010"),
+      ("Real Madrid", "LOGOS.madrid", "2010 - 2011"),
+      ("Valencia CF", "LOGOS.valencia", "2011 - 2014"),
+      ("Real Sociedad", "LOGOS.sociedad", "2014 - 2018"),
+      ("Real Betis", "LOGOS.betis", "2018 - 2023"),
+      ("CF Monterrey", "null", "2023 - Presente")
+    ]
+  },
+  {
+    "id": 264,
+    "nombre": "Pablo Sarabia",
+    "dificultad": "media",
+    "pista": "Extremo zurdo madrileño que tras salirse en el Sevilla fichó por el PSG, brilló cedido en el Sporting de Portugal y recaló en la Premier con los Wolves.",
+    "alias": ["sarabia"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Getafe CF", "null", "2011 - 2016"),
+      ("Sevilla FC", "LOGOS.sevilla", "2016 - 2019"),
+      ("Paris Saint-Germain", "LOGOS.psg", "2019 - 2023"),
+      ("Sporting CP", "LOGOS.sporting", "2021 - 2022"),
+      ("Wolverhampton", "null", "2023 - Presente")
+    ]
+  },
+  {
+    "id": 265,
+    "nombre": "Ferran Torres",
+    "dificultad": "media",
+    "pista": "'El Tiburón', atacante valenciano que dio el salto al Manchester City de Guardiola con 20 años antes de fichar por el FC Barcelona.",
+    "alias": ["ferran torres", "ferran"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Valencia CF", "LOGOS.valencia", "2017 - 2020"),
+      ("Manchester City", "LOGOS.mancity", "2020 - 2021"),
+      ("FC Barcelona", "LOGOS.barca", "2022 - Presente")
+    ]
+  },
+  {
+    "id": 266,
+    "nombre": "Aymeric Laporte",
+    "dificultad": "media",
+    "pista": "Central zurdo nacido en Francia pero formado en Lezama y nacionalizado español, titular indiscutible en el título de la Eurocopa 2024.",
+    "alias": ["laporte"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Athletic Club", "LOGOS.athletic", "2012 - 2018"),
+      ("Manchester City", "LOGOS.mancity", "2018 - 2023"),
+      ("Al Nassr", "null", "2023 - Presente")
+    ]
+  },
+  {
+    "id": 267,
+    "nombre": "Robin Le Normand",
+    "dificultad": "media",
+    "pista": "Defensa central bretón nacionalizado español que se consolidó en la Real Sociedad, ganó la Euro 2024 con España y fichó por el Atlético de Madrid.",
+    "alias": ["le normand"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Stade Brestois", "null", "2016"),
+      ("Real Sociedad", "LOGOS.sociedad", "2018 - 2024"),
+      ("Atlético de Madrid", "LOGOS.atletico", "2024 - Presente")
+    ]
+  },
+  {
+    "id": 268,
+    "nombre": "Mikel Merino",
+    "dificultad": "media",
+    "pista": "Autor del histórico cabezazo en el minuto 119 ante Alemania en cuartos de la Euro 2024 emulando la celebración de su padre alrededor del banderín en Stuttgart.",
+    "alias": ["mikel merino", "merino"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("CA Osasuna", "null", "2014 - 2016"),
+      ("Borussia Dortmund", "LOGOS.dortmund", "2016 - 2017"),
+      ("Newcastle United", "null", "2017 - 2018"),
+      ("Real Sociedad", "LOGOS.sociedad", "2018 - 2024"),
+      ("Arsenal FC", "LOGOS.arsenal", "2024 - Presente")
+    ]
+  },
+  {
+    "id": 269,
+    "nombre": "Martín Zubimendi",
+    "dificultad": "media",
+    "pista": "Mediocentro donostiarra que entró al descanso de la final de la Eurocopa 2024 por el lesionado Rodri y sostuvo con maestría a España hacia el título.",
+    "alias": ["zubimendi"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Real Sociedad", "LOGOS.sociedad", "2019 - Presente")
+    ]
+  },
+  {
+    "id": 270,
+    "nombre": "Álex Grimaldo",
+    "dificultad": "media",
+    "pista": "Carrilero izquierdo valenciano con guante a balón parado; tras formarse en La Masía y triunfar en el Benfica, explotó en el Leverkusen invicto de Xabi Alonso.",
+    "alias": ["grimaldo"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("SL Benfica", "LOGOS.benfica", "2016 - 2023"),
+      ("Bayer Leverkusen", "null", "2023 - Presente")
+    ]
+  },
+  {
+    "id": 271,
+    "nombre": "Pedro Porro",
+    "dificultad": "media",
+    "pista": "Lateral derecho extremeño de gran vocación ofensiva que despuntó en el Girona y el Sporting de Portugal antes de afianzarse en el Tottenham.",
+    "alias": ["pedro porro"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Girona FC", "null", "2017 - 2019"),
+      ("Real Valladolid", "null", "2019 - 2020"),
+      ("Sporting CP", "LOGOS.sporting", "2020 - 2023"),
+      ("Tottenham Hotspur", "LOGOS.tottenham", "2023 - Presente")
+    ]
+  },
+  {
+    "id": 272,
+    "nombre": "David Raya",
+    "dificultad": "media",
+    "pista": "Portero catalán que emigró de adolescente al fútbol inglés en el Blackburn y se consagró como Guante de Oro de la Premier League con el Arsenal.",
+    "alias": ["raya", "david raya"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Blackburn Rovers", "null", "2014 - 2019"),
+      ("Brentford FC", "null", "2019 - 2024"),
+      ("Arsenal FC", "LOGOS.arsenal", "2023 - Presente")
+    ]
+  },
+  {
+    "id": 273,
+    "nombre": "Kepa Arrizabalaga",
+    "dificultad": "media",
+    "pista": "Se convirtió en el guardameta más caro de la historia del fútbol cuando el Chelsea abonó los 80 millones de euros de su cláusula al Athletic Club.",
+    "alias": ["kepa"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Real Valladolid", "null", "2015 - 2016"),
+      ("Athletic Club", "LOGOS.athletic", "2016 - 2018"),
+      ("Chelsea FC", "LOGOS.chelsea", "2018 - Presente"),
+      ("Real Madrid", "LOGOS.madrid", "2023 - 2024"),
+      ("AFC Bournemouth", "null", "2024 - Presente")
+    ]
+  },
+  {
+    "id": 274,
+    "nombre": "Pau Torres",
+    "dificultad": "media",
+    "pista": "'El Xiquet del Poble', central zurdo nacido en Vila-real que levantó la Europa League con el club de su vida antes de reencontrarse con Unai Emery en el Aston Villa.",
+    "alias": ["pau torres"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Villarreal CF", "LOGOS.villarreal", "2017 - 2023"),
+      ("Málaga CF", "null", "2018 - 2019"),
+      ("Aston Villa", "null", "2023 - Presente")
+    ]
+  },
+  {
+    "id": 275,
+    "nombre": "Dani Ceballos",
+    "dificultad": "media",
+    "pista": "Talentoso centrocampista utrerano elegido MVP del Europeo Sub-21 de 2017; dio el salto del Betis al Real Madrid con una cesión intermedia en el Arsenal.",
+    "alias": ["ceballos"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Real Betis", "LOGOS.betis", "2014 - 2017"),
+      ("Real Madrid", "LOGOS.madrid", "2017 - Presente"),
+      ("Arsenal FC", "LOGOS.arsenal", "2019 - 2021")
+    ]
+  },
+  {
+    "id": 276,
+    "nombre": "Brahim Díaz",
+    "dificultad": "media",
+    "pista": "Mediapunta malagueño ambidiestro que llevó el '10' del AC Milan durante tres años antes de volver al Real Madrid y decidir representar a Marruecos.",
+    "alias": ["brahim", "brahim diaz"],
+    "nacionalidad": "Marruecos",
+    "clubes": [
+      ("Manchester City", "LOGOS.mancity", "2016 - 2019"),
+      ("Real Madrid", "LOGOS.madrid", "2019 - Presente"),
+      ("AC Milan", "LOGOS.milan", "2020 - 2023")
+    ]
+  },
+  {
+    "id": 277,
+    "nombre": "Ansu Fati",
+    "dificultad": "media",
+    "pista": "Irrumpió con 16 años batiendo récords de precocidad goleadora en el Barça y en la Champions y heredó el dorsal 10 de Leo Messi.",
+    "alias": ["ansu fati", "ansu"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("FC Barcelona", "LOGOS.barca", "2019 - Presente"),
+      ("Brighton & Hove Albion", "null", "2023 - 2024")
+    ]
+  },
+  {
+    "id": 278,
+    "nombre": "Bastian Schweinsteiger",
+    "dificultad": "media",
+    "pista": "Leyenda del mediocampo del Bayern Múnich y héroe ensangrentado de Alemania en la final del Mundial de Brasil 2014 en Maracaná.",
+    "alias": ["schweinsteiger"],
+    "nacionalidad": "Alemania",
+    "clubes": [
+      ("Bayern Múnich", "LOGOS.bayern", "2002 - 2015"),
+      ("Manchester United", "LOGOS.manutd", "2015 - 2017"),
+      ("Chicago Fire", "null", "2017 - 2019")
+    ]
+  },
+  {
+    "id": 279,
+    "nombre": "Philipp Lahm",
+    "dificultad": "media",
+    "pista": "Capitán de Alemania en el Mundial 2014 y del Bayern Múnich; se retiró sin haber recibido ni una sola tarjeta roja en toda su carrera profesional.",
+    "alias": ["lahm"],
+    "nacionalidad": "Alemania",
+    "clubes": [
+      ("Bayern Múnich", "LOGOS.bayern", "2002 - 2017"),
+      ("VfB Stuttgart", "null", "2003 - 2005")
+    ]
+  },
+  {
+    "id": 280,
+    "nombre": "Miroslav Klose",
+    "dificultad": "media",
+    "pista": "Máximo goleador histórico de las Copas del Mundo con 16 tantos, famoso por celebrar sus goles dando un salto mortal hacia adelante.",
+    "alias": ["klose"],
+    "nacionalidad": "Alemania",
+    "clubes": [
+      ("FC Kaiserslautern", "null", "1999 - 2004"),
+      ("Werder Bremen", "null", "2004 - 2007"),
+      ("Bayern Múnich", "LOGOS.bayern", "2007 - 2011"),
+      ("Lazio", "null", "2011 - 2016")
+    ]
+  },
+  {
+    "id": 281,
+    "nombre": "Michael Ballack",
+    "dificultad": "media",
+    "pista": "'El Káiser' alemán de los años 2000; vivió la maldición de 2002 perdiendo las finales de Champions, Mundial, Copa y la Bundesliga con el Leverkusen.",
+    "alias": ["ballack"],
+    "nacionalidad": "Alemania",
+    "clubes": [
+      ("FC Kaiserslautern", "null", "1997 - 1999"),
+      ("Bayer Leverkusen", "null", "1999 - 2002"),
+      ("Bayern Múnich", "LOGOS.bayern", "2002 - 2006"),
+      ("Chelsea FC", "LOGOS.chelsea", "2006 - 2010"),
+      ("Bayer Leverkusen", "null", "2010 - 2012")
+    ]
+  },
+  {
+    "id": 282,
+    "nombre": "Oliver Kahn",
+    "dificultad": "media",
+    "pista": "'El Titán', intimidante guardameta alemán del Bayern Múnich y único portero en la historia en ganar el Balón de Oro de un Mundial (2002).",
+    "alias": ["kahn", "oliver kahn"],
+    "nacionalidad": "Alemania",
+    "clubes": [
+      ("Karlsruher SC", "null", "1987 - 1994"),
+      ("Bayern Múnich", "LOGOS.bayern", "1994 - 2008")
+    ]
+  },
+  {
+    "id": 283,
+    "nombre": "Petr Čech",
+    "dificultad": "media",
+    "pista": "Legendario guardameta checo de la Premier League inconfundible por jugar con un casco protector de rugby desde 2006.",
+    "alias": ["cech", "petr cech"],
+    "nacionalidad": "República Checa",
+    "clubes": [
+      ("Sparta Praga", "null", "2001 - 2002"),
+      ("Stade Rennais", "null", "2002 - 2004"),
+      ("Chelsea FC", "LOGOS.chelsea", "2004 - 2015"),
+      ("Arsenal FC", "LOGOS.arsenal", "2015 - 2019")
+    ]
+  },
+  {
+    "id": 284,
+    "nombre": "John Terry",
+    "dificultad": "media",
+    "pista": "Eterno capitán y defensa central del Chelsea; resbaló en el penalti decisivo de Moscú 2008 pero levantó 5 títulos de Premier League en Stamford Bridge.",
+    "alias": ["terry", "john terry"],
+    "nacionalidad": "Inglaterra",
+    "clubes": [
+      ("Chelsea FC", "LOGOS.chelsea", "1998 - 2017"),
+      ("Nottingham Forest", "null", "2000"),
+      ("Aston Villa", "null", "2017 - 2018")
+    ]
+  },
+  {
+    "id": 285,
+    "nombre": "Rio Ferdinand",
+    "dificultad": "media",
+    "pista": "Elegante defensa central inglés que formó junto a Nemanja Vidić una de las parejas de centrales más dominantes de la historia en el Manchester United.",
+    "alias": ["ferdinand"],
+    "nacionalidad": "Inglaterra",
+    "clubes": [
+      ("West Ham United", "null", "1995 - 2000"),
+      ("Leeds United", "null", "2000 - 2002"),
+      ("Manchester United", "LOGOS.manutd", "2002 - 2014"),
+      ("Queens Park Rangers", "null", "2014 - 2015")
+    ]
+  },
+  {
+    "id": 286,
+    "nombre": "Paul Scholes",
+    "dificultad": "media",
+    "pista": "'El Colorado', cerebro pelirrojo de la Clase del 92 del Manchester United elogiado por Xavi y Zidane como el mejor centrocampista de su generación.",
+    "alias": ["scholes"],
+    "nacionalidad": "Inglaterra",
+    "clubes": [
+      ("Manchester United", "LOGOS.manutd", "1993 - 2013")
+    ]
+  },
+  {
+    "id": 287,
+    "nombre": "Ryan Giggs",
+    "dificultad": "media",
+    "pista": "Extremo zurdo galés y jugador con más partidos (963) y más títulos de Premier League (13) en toda la historia del Manchester United.",
+    "alias": ["giggs"],
+    "nacionalidad": "Gales",
+    "clubes": [
+      ("Manchester United", "LOGOS.manutd", "1990 - 2014")
+    ]
+  },
+  {
+    "id": 288,
+    "nombre": "Michael Owen",
+    "dificultad": "media",
+    "pista": "'El Niño Maravilla' inglés que ganó el Balón de Oro en 2001 con solo 22 años en el Liverpool antes de fichar por el Real Madrid de los Galácticos.",
+    "alias": ["owen", "michael owen"],
+    "nacionalidad": "Inglaterra",
+    "clubes": [
+      ("Liverpool FC", "LOGOS.liverpool", "1996 - 2004"),
+      ("Real Madrid", "LOGOS.madrid", "2004 - 2005"),
+      ("Newcastle United", "null", "2005 - 2009"),
+      ("Manchester United", "LOGOS.manutd", "2009 - 2012"),
+      ("Stoke City", "null", "2012 - 2013")
+    ]
+  },
+  {
+    "id": 289,
+    "nombre": "Alan Shearer",
+    "dificultad": "media",
+    "pista": "Máximo goleador histórico de la Premier League con 260 goles; ganó el título con el Blackburn Rovers antes de ser leyenda eterna de su amado Newcastle.",
+    "alias": ["shearer"],
+    "nacionalidad": "Inglaterra",
+    "clubes": [
+      ("Southampton FC", "null", "1988 - 1992"),
+      ("Blackburn Rovers", "null", "1992 - 1996"),
+      ("Newcastle United", "null", "1996 - 2006")
+    ]
+  },
+  {
+    "id": 290,
+    "nombre": "Patrick Vieira",
+    "dificultad": "media",
+    "pista": "Imponente mediocentro francés y capitán del histórico Arsenal de 'Los Invencibles' que ganó la Premier League 2003-04 sin perder un solo partido.",
+    "alias": ["vieira"],
+    "nacionalidad": "Francia",
+    "clubes": [
+      ("AS Cannes", "null", "1993 - 1995"),
+      ("AC Milan", "LOGOS.milan", "1995 - 1996"),
+      ("Arsenal FC", "LOGOS.arsenal", "1996 - 2005"),
+      ("Juventus", "LOGOS.juventus", "2005 - 2006"),
+      ("Inter de Milán", "LOGOS.inter", "2006 - 2010"),
+      ("Manchester City", "LOGOS.mancity", "2010 - 2011")
+    ]
+  },
+  {
+    "id": 291,
+    "nombre": "Dennis Bergkamp",
+    "dificultad": "media",
+    "pista": "Apodado 'The Non-Flying Dutchman' por su pánico a volar en avión; autor de controles orientados de otro planeta en el Arsenal y ante Argentina en 1998.",
+    "alias": ["bergkamp"],
+    "nacionalidad": "Países Bajos",
+    "clubes": [
+      ("AFC Ajax", "LOGOS.ajax", "1986 - 1993"),
+      ("Inter de Milán", "LOGOS.inter", "1993 - 1995"),
+      ("Arsenal FC", "LOGOS.arsenal", "1995 - 2006")
+    ]
+  },
+  {
+    "id": 292,
+    "nombre": "Ruud van Nistelrooy",
+    "dificultad": "media",
+    "pista": "'Van Gol', letal cazagoles neerlandés que logró ser máximo artillero de las ligas de Países Bajos, Inglaterra (Man Utd) y España (Real Madrid).",
+    "alias": ["van nistelrooy"],
+    "nacionalidad": "Países Bajos",
+    "clubes": [
+      ("SC Heerenveen", "null", "1997 - 1998"),
+      ("PSV Eindhoven", "null", "1998 - 2001"),
+      ("Manchester United", "LOGOS.manutd", "2001 - 2006"),
+      ("Real Madrid", "LOGOS.madrid", "2006 - 2010"),
+      ("Hamburgo SV", "null", "2010 - 2011"),
+      ("Málaga CF", "null", "2011 - 2012")
+    ]
+  },
+  {
+    "id": 293,
+    "nombre": "Clarence Seedorf",
+    "dificultad": "media",
+    "pista": "Único futbolista en toda la historia en ganar la Champions League con tres clubes diferentes: Ajax, Real Madrid y AC Milan (dos veces).",
+    "alias": ["seedorf"],
+    "nacionalidad": "Países Bajos",
+    "clubes": [
+      ("AFC Ajax", "LOGOS.ajax", "1992 - 1995"),
+      ("Sampdoria", "null", "1995 - 1996"),
+      ("Real Madrid", "LOGOS.madrid", "1996 - 1999"),
+      ("Inter de Milán", "LOGOS.inter", "2000 - 2002"),
+      ("AC Milan", "LOGOS.milan", "2002 - 2012"),
+      ("Botafogo", "null", "2012 - 2014")
+    ]
+  },
+  {
+    "id": 294,
+    "nombre": "Patrick Kluivert",
+    "dificultad": "media",
+    "pista": "Marcó con 18 años el gol que dio la Champions de 1995 al Ajax y luego fue durante seis temporadas el '9' de referencia del FC Barcelona.",
+    "alias": ["kluivert"],
+    "nacionalidad": "Países Bajos",
+    "clubes": [
+      ("AFC Ajax", "LOGOS.ajax", "1994 - 1997"),
+      ("AC Milan", "LOGOS.milan", "1997 - 1998"),
+      ("FC Barcelona", "LOGOS.barca", "1998 - 2004"),
+      ("Newcastle United", "null", "2004 - 2005"),
+      ("Valencia CF", "LOGOS.valencia", "2005 - 2006"),
+      ("PSV Eindhoven", "null", "2006 - 2007"),
+      ("Lille OSC", "null", "2007 - 2008")
+    ]
+  },
+  {
+    "id": 295,
+    "nombre": "Edwin van der Sar",
+    "dificultad": "media",
+    "pista": "Larguirucho portero neerlandés que ganó la Champions en 1995 con el Ajax y 13 años después detuvo a Anelka el penalti que dio la Champions de 2008 al Man Utd.",
+    "alias": ["van der sar"],
+    "nacionalidad": "Países Bajos",
+    "clubes": [
+      ("AFC Ajax", "LOGOS.ajax", "1990 - 1999"),
+      ("Juventus", "LOGOS.juventus", "1999 - 2001"),
+      ("Fulham FC", "null", "2001 - 2005"),
+      ("Manchester United", "LOGOS.manutd", "2005 - 2011")
+    ]
+  },
+  {
+    "id": 296,
+    "nombre": "Andriy Shevchenko",
+    "dificultad": "media",
+    "pista": "Delantero ucraniano ganador del Balón de Oro en 2004 y héroe del AC Milan antes de su multimillonario fichaje por el Chelsea de Abramóvich.",
+    "alias": ["shevchenko"],
+    "nacionalidad": "Ucrania",
+    "clubes": [
+      ("Dinamo de Kiev", "null", "1994 - 1999"),
+      ("AC Milan", "LOGOS.milan", "1999 - 2006"),
+      ("Chelsea FC", "LOGOS.chelsea", "2006 - 2009"),
+      ("AC Milan", "LOGOS.milan", "2008 - 2009"),
+      ("Dinamo de Kiev", "null", "2009 - 2012")
+    ]
+  },
+  {
+    "id": 297,
+    "nombre": "Pavel Nedvěd",
+    "dificultad": "media",
+    "pista": "'La Furia Checa', centrocampista de melena rubia y disparo demoledor con ambas piernas que ganó el Balón de Oro en 2003 con la Juventus.",
+    "alias": ["nedved"],
+    "nacionalidad": "República Checa",
+    "clubes": [
+      ("Sparta Praga", "null", "1992 - 1996"),
+      ("Lazio", "null", "1996 - 2001"),
+      ("Juventus", "LOGOS.juventus", "2001 - 2009")
+    ]
+  },
+  {
+    "id": 298,
+    "nombre": "Fabio Cannavaro",
+    "dificultad": "media",
+    "pista": "'Il Bello', último defensa en ganar el Balón de Oro (2006) tras levantar como capitán la Copa del Mundo en Berlín con Italia y fichar por el Real Madrid.",
+    "alias": ["cannavaro"],
+    "nacionalidad": "Italia",
+    "clubes": [
+      ("SSC Napoli", "LOGOS.napoli", "1992 - 1995"),
+      ("Parma Calcio", "null", "1995 - 2002"),
+      ("Inter de Milán", "LOGOS.inter", "2002 - 2004"),
+      ("Juventus", "LOGOS.juventus", "2004 - 2006"),
+      ("Real Madrid", "LOGOS.madrid", "2006 - 2009"),
+      ("Juventus", "LOGOS.juventus", "2009 - 2010")
+    ]
+  },
+  {
+    "id": 299,
+    "nombre": "Alessandro Nesta",
+    "dificultad": "media",
+    "pista": "Defensa central romano de elegancia inigualable; fue capitán de la Lazio campeona de Liga antes de formar una zaga histórica con Maldini en el AC Milan.",
+    "alias": ["nesta"],
+    "nacionalidad": "Italia",
+    "clubes": [
+      ("Lazio", "null", "1993 - 2002"),
+      ("AC Milan", "LOGOS.milan", "2002 - 2012"),
+      ("Montreal Impact", "null", "2012 - 2013")
+    ]
+  },
+  {
+    "id": 300,
+    "nombre": "Filippo Inzaghi",
+    "dificultad": "media",
+    "pista": "'Pippo', el hombre que vivía en la línea del fuera de juego; anotó los dos goles del AC Milan en la final de la Champions 2007 ante el Liverpool.",
+    "alias": ["inzaghi", "pippo inzaghi"],
+    "nacionalidad": "Italia",
+    "clubes": [
+      ("Parma Calcio", "null", "1995 - 1996"),
+      ("Atalanta", "null", "1996 - 1997"),
+      ("Juventus", "LOGOS.juventus", "1997 - 2001"),
+      ("AC Milan", "LOGOS.milan", "2001 - 2012")
+    ]
+  },
+  {
+    "id": 301,
+    "nombre": "Gennaro Gattuso",
+    "dificultad": "media",
+    "pista": "'Ringhio', el perro de presa incansable que escoltaba a Andrea Pirlo en el centro del campo del AC Milan y de la Italia campeona del mundo en 2006.",
+    "alias": ["gattuso"],
+    "nacionalidad": "Italia",
+    "clubes": [
+      ("Perugia", "null", "1995 - 1997"),
+      ("Rangers FC", "null", "1997 - 1998"),
+      ("Salernitana", "null", "1998 - 1999"),
+      ("AC Milan", "LOGOS.milan", "1999 - 2012"),
+      ("FC Sion", "null", "2012 - 2013")
+    ]
+  },
+  {
+    "id": 302,
+    "nombre": "Javier Zanetti",
+    "dificultad": "media",
+    "pista": "'El Pupi', incombustible capitán argentino del Inter de Milán que levantó la Champions en el Bernabéu en 2010 y disputó 858 partidos como nerazzurro.",
+    "alias": ["zanetti", "pupi zanetti"],
+    "nacionalidad": "Argentina",
+    "clubes": [
+      ("Talleres RE", "null", "1992 - 1993"),
+      ("Banfield", "null", "1993 - 1995"),
+      ("Inter de Milán", "LOGOS.inter", "1995 - 2014")
+    ]
+  },
+  {
+    "id": 303,
+    "nombre": "Gabriel Batistuta",
+    "dificultad": "media",
+    "pista": "'Batigol', el legendario 9 de melena al viento que fue rey de Florencia durante nueve años antes de ganar el Scudetto con la Roma.",
+    "alias": ["batistuta", "batigol"],
+    "nacionalidad": "Argentina",
+    "clubes": [
+      ("Newell's Old Boys", "null", "1988 - 1989"),
+      ("River Plate", "LOGOS.river", "1989 - 1990"),
+      ("Boca Juniors", "LOGOS.boca", "1990 - 1991"),
+      ("Fiorentina", "null", "1991 - 2000"),
+      ("AS Roma", "LOGOS.roma", "2000 - 2003"),
+      ("Inter de Milán", "LOGOS.inter", "2003"),
+      ("Al Arabi", "null", "2003 - 2005")
+    ]
+  },
+  {
+    "id": 304,
+    "nombre": "Diego Forlán",
+    "dificultad": "media",
+    "pista": "'Cachavacha', delantero uruguayo que ganó dos Botas de Oro en España (Villarreal y Atlético) y fue elegido Balón de Oro del Mundial de Sudáfrica 2010.",
+    "alias": ["forlan"],
+    "nacionalidad": "Uruguay",
+    "clubes": [
+      ("Independiente", "null", "1997 - 2002"),
+      ("Manchester United", "LOGOS.manutd", "2002 - 2004"),
+      ("Villarreal CF", "LOGOS.villarreal", "2004 - 2007"),
+      ("Atlético de Madrid", "LOGOS.atletico", "2007 - 2011"),
+      ("Inter de Milán", "LOGOS.inter", "2011 - 2012"),
+      ("Internacional", "null", "2012 - 2013"),
+      ("Peñarol", "null", "2015 - 2016")
+    ]
+  },
+  {
+    "id": 305,
+    "nombre": "Javier Mascherano",
+    "dificultad": "media",
+    "pista": "'El Jefecito', pasó de ser el mediocentro defensivo del Liverpool a central titular del Barça de Guardiola, donde solo marcó un gol (de penalti) en 334 partidos.",
+    "alias": ["mascherano", "el jefecito"],
+    "nacionalidad": "Argentina",
+    "clubes": [
+      ("River Plate", "LOGOS.river", "2003 - 2005"),
+      ("Corinthians", "null", "2005 - 2006"),
+      ("West Ham United", "null", "2006 - 2007"),
+      ("Liverpool FC", "LOGOS.liverpool", "2007 - 2010"),
+      ("FC Barcelona", "LOGOS.barca", "2010 - 2018"),
+      ("Hebei China Fortune", "null", "2018 - 2019"),
+      ("Estudiantes de La Plata", "null", "2020")
+    ]
+  },
+  {
+    "id": 306,
+    "nombre": "Yaya Touré",
+    "dificultad": "media",
+    "pista": "Todocampista marfileño que ganó el Sextete jugando hasta de central en la final de Roma con el Barça antes de convertirse en leyenda absoluta del Manchester City.",
+    "alias": ["yaya toure", "toure"],
+    "nacionalidad": "Costa de Marfil",
+    "clubes": [
+      ("Beveren", "null", "2001 - 2003"),
+      ("Metalurh Donetsk", "null", "2003 - 2005"),
+      ("Olympiacos", "null", "2005 - 2006"),
+      ("AS Mónaco", "LOGOS.monaco", "2006 - 2007"),
+      ("FC Barcelona", "LOGOS.barca", "2007 - 2010"),
+      ("Manchester City", "LOGOS.mancity", "2010 - 2018")
+    ]
+  },
+  {
+    "id": 307,
+    "nombre": "Vincent Kompany",
+    "dificultad": "media",
+    "pista": "Histórico capitán belga del Manchester City con estatua fuera del Etihad Stadium, hoy entrenador del Bayern Múnich.",
+    "alias": ["kompany"],
+    "nacionalidad": "Bélgica",
+    "clubes": [
+      ("Anderlecht", "null", "2003 - 2006"),
+      ("Hamburgo SV", "null", "2006 - 2008"),
+      ("Manchester City", "LOGOS.mancity", "2008 - 2019"),
+      ("Anderlecht", "null", "2019 - 2020")
+    ]
+  },
+  {
+    "id": 308,
+    "nombre": "Christian Eriksen",
+    "dificultad": "media",
+    "pista": "Talentoso mediapunta danés que volvió a la élite en la Premier League con un desfibrilador implantado tras sufrir un paro cardíaco en la Eurocopa 2020.",
+    "alias": ["eriksen"],
+    "nacionalidad": "Dinamarca",
+    "clubes": [
+      ("AFC Ajax", "LOGOS.ajax", "2010 - 2013"),
+      ("Tottenham Hotspur", "LOGOS.tottenham", "2013 - 2020"),
+      ("Inter de Milán", "LOGOS.inter", "2020 - 2021"),
+      ("Brentford FC", "null", "2022"),
+      ("Manchester United", "LOGOS.manutd", "2022 - 2025")
+    ]
+  },
+  {
+    "id": 309,
+    "nombre": "Philippe Coutinho",
+    "dificultad": "media",
+    "pista": "'El Pequeño Mago', protagonizó el fichaje más caro de la historia del FC Barcelona tras maravillar en el Liverpool, y luego le marcó un doblete al Barça estando cedido en el Bayern.",
+    "alias": ["coutinho"],
+    "nacionalidad": "Brasil",
+    "clubes": [
+      ("Vasco da Gama", "null", "2009 - 2010"),
+      ("Inter de Milán", "LOGOS.inter", "2010 - 2013"),
+      ("RCD Espanyol", "LOGOS.espanyol", "2012"),
+      ("Liverpool FC", "LOGOS.liverpool", "2013 - 2018"),
+      ("FC Barcelona", "LOGOS.barca", "2018 - 2022"),
+      ("Bayern Múnich", "LOGOS.bayern", "2019 - 2020"),
+      ("Aston Villa", "null", "2022 - 2024"),
+      ("Vasco da Gama", "null", "2024 - Presente")
+    ]
+  },
+  {
+    "id": 310,
+    "nombre": "Raphaël Varane",
+    "dificultad": "media",
+    "pista": "Elegante central francés que en 2018 conquistó la Champions League con el Real Madrid y el Mundial con Francia con apenas 25 años.",
+    "alias": ["varane"],
+    "nacionalidad": "Francia",
+    "clubes": [
+      ("RC Lens", "null", "2010 - 2011"),
+      ("Real Madrid", "LOGOS.madrid", "2011 - 2021"),
+      ("Manchester United", "LOGOS.manutd", "2021 - 2024"),
+      ("Como 1907", "null", "2024")
+    ]
+  },
+  {
+    "id": 311,
+    "nombre": "Kingsley Coman",
+    "dificultad": "media",
+    "pista": "Extremo francés que ganó ligas consecutivas desde su debut en PSG, Juventus y Bayern, y marcó de cabeza el gol que dio al Bayern la Champions de 2020 ante su exequipo.",
+    "alias": ["coman"],
+    "nacionalidad": "Francia",
+    "clubes": [
+      ("Paris Saint-Germain", "LOGOS.psg", "2013 - 2014"),
+      ("Juventus", "LOGOS.juventus", "2014 - 2015"),
+      ("Bayern Múnich", "LOGOS.bayern", "2015 - Presente")
+    ]
+  },
+  {
+    "id": 312,
+    "nombre": "Leroy Sané",
+    "dificultad": "media",
+    "pista": "Veloz extremo zurdo alemán que deslumbró al Bernabéu con el Schalke, brilló con Guardiola en el Manchester City y regresó a Alemania para jugar en el Bayern.",
+    "alias": ["sane", "leroy sane"],
+    "nacionalidad": "Alemania",
+    "clubes": [
+      ("Schalke 04", "null", "2014 - 2016"),
+      ("Manchester City", "LOGOS.mancity", "2016 - 2020"),
+      ("Bayern Múnich", "LOGOS.bayern", "2020 - 2025"),
+      ("Galatasaray", "null", "2025 - Presente")
+    ]
+  },
+  {
+    "id": 313,
+    "nombre": "Serge Gnabry",
+    "dificultad": "media",
+    "pista": "Atacante alemán famoso por su celebración 'removiendo la cazuela'; no cuajó de joven en Inglaterra pero volvió a Londres con el Bayern para endosarle 4 goles al Tottenham.",
+    "alias": ["gnabry"],
+    "nacionalidad": "Alemania",
+    "clubes": [
+      ("Arsenal FC", "LOGOS.arsenal", "2012 - 2016"),
+      ("West Bromwich Albion", "null", "2015 - 2016"),
+      ("Werder Bremen", "null", "2016 - 2017"),
+      ("TSG Hoffenheim", "null", "2017 - 2018"),
+      ("Bayern Múnich", "LOGOS.bayern", "2018 - Presente")
+    ]
+  },
+  {
+    "id": 314,
+    "nombre": "Kai Havertz",
+    "dificultad": "media",
+    "pista": "Mediapunta y falso 9 alemán que marcó el gol de la victoria del Chelsea ante el Manchester City en la final de la Champions 2021 antes de cambiar al Arsenal.",
+    "alias": ["havertz"],
+    "nacionalidad": "Alemania",
+    "clubes": [
+      ("Bayer Leverkusen", "null", "2016 - 2020"),
+      ("Chelsea FC", "LOGOS.chelsea", "2020 - 2023"),
+      ("Arsenal FC", "LOGOS.arsenal", "2023 - Presente")
+    ]
+  },
+  {
+    "id": 315,
+    "nombre": "Matthijs de Ligt",
+    "dificultad": "media",
+    "pista": "Fue el capitán más joven de la historia del Ajax llevando al club a semifinales de Champions en 2019 con 19 años antes de jugar en Juventus, Bayern y Man Utd.",
+    "alias": ["de ligt"],
+    "nacionalidad": "Países Bajos",
+    "clubes": [
+      ("AFC Ajax", "LOGOS.ajax", "2016 - 2019"),
+      ("Juventus", "LOGOS.juventus", "2019 - 2022"),
+      ("Bayern Múnich", "LOGOS.bayern", "2022 - 2024"),
+      ("Manchester United", "LOGOS.manutd", "2024 - Presente")
+    ]
+  },
+  {
+    "id": 316,
+    "nombre": "Marquinhos",
+    "dificultad": "media",
+    "pista": "Defensa central brasileño que tras un breve pero brillante paso por la Roma con 18 años se convirtió en el gran capitán y jugador con más partidos de la historia del PSG.",
+    "alias": ["marquinhos"],
+    "nacionalidad": "Brasil",
+    "clubes": [
+      ("Corinthians", "null", "2011 - 2012"),
+      ("AS Roma", "LOGOS.roma", "2012 - 2013"),
+      ("Paris Saint-Germain", "LOGOS.psg", "2013 - Presente")
+    ]
+  },
+  {
+    "id": 317,
+    "nombre": "Marco Verratti",
+    "dificultad": "media",
+    "pista": "'El Pequeño Búho', talentoso organizador italiano que pasó directamente de la Serie B con el Pescara a dominar la medular del PSG durante 11 temporadas sin debutar jamás en la Serie A.",
+    "alias": ["verratti"],
+    "nacionalidad": "Italia",
+    "clubes": [
+      ("Pescara", "null", "2008 - 2012"),
+      ("Paris Saint-Germain", "LOGOS.psg", "2012 - 2023"),
+      ("Al Arabi", "null", "2023 - Presente")
+    ]
+  },
+  {
+    "id": 318,
+    "nombre": "Jorginho",
+    "dificultad": "media",
+    "pista": "Mediocentro ítalo-brasileño famoso por su saltito antes de lanzar los penaltis; en 2021 ganó la Champions con el Chelsea y la Eurocopa con Italia siendo tercero en el Balón de Oro.",
+    "alias": ["jorginho"],
+    "nacionalidad": "Italia",
+    "clubes": [
+      ("Hellas Verona", "null", "2010 - 2014"),
+      ("SSC Napoli", "LOGOS.napoli", "2014 - 2018"),
+      ("Chelsea FC", "LOGOS.chelsea", "2018 - 2023"),
+      ("Arsenal FC", "LOGOS.arsenal", "2023 - 2025"),
+      ("Flamengo", "null", "2025 - Presente")
+    ]
+  },
+  {
+    "id": 319,
+    "nombre": "Federico Chiesa",
+    "dificultad": "media",
+    "pista": "Explosivo extremo italiano hijo de otro gran goleador de los 90; fue la gran estrella ofensiva de Italia en la Eurocopa 2020 antes de pasar por Juventus y Liverpool.",
+    "alias": ["chiesa"],
+    "nacionalidad": "Italia",
+    "clubes": [
+      ("Fiorentina", "null", "2016 - 2020"),
+      ("Juventus", "LOGOS.juventus", "2020 - 2024"),
+      ("Liverpool FC", "LOGOS.liverpool", "2024 - Presente")
+    ]
+  },
+  {
+    "id": 320,
+    "nombre": "Sandro Tonali",
+    "dificultad": "media",
+    "pista": "Centrocampista italiano comparado en sus inicios en el Brescia con Pirlo por su físico y estilo; ganó el Scudetto con el Milan antes de fichar por el Newcastle.",
+    "alias": ["tonali"],
+    "nacionalidad": "Italia",
+    "clubes": [
+      ("Brescia", "null", "2017 - 2020"),
+      ("AC Milan", "LOGOS.milan", "2020 - 2023"),
+      ("Newcastle United", "null", "2023 - Presente")
+    ]
+  },
+  {
+    "id": 321,
+    "nombre": "Alessandro Bastoni",
+    "dificultad": "media",
+    "pista": "Central zurdo italiano de exquisita salida de balón y centros precisos desde tres cuartos de campo en la defensa de tres del Inter de Milán.",
+    "alias": ["bastoni"],
+    "nacionalidad": "Italia",
+    "clubes": [
+      ("Atalanta", "null", "2016 - 2017"),
+      ("Parma Calcio", "null", "2018 - 2019"),
+      ("Inter de Milán", "LOGOS.inter", "2019 - Presente")
+    ]
+  },
+  {
+    "id": 322,
+    "nombre": "Hakan Çalhanoğlu",
+    "dificultad": "media",
+    "pista": "Especialista turco en golpeos a balón parado que protagonizó un polémico cambio directo del AC Milan al eterno rival, el Inter de Milán, donde se reconvirtió en pivote.",
+    "alias": ["calhanoglu"],
+    "nacionalidad": "Turquía",
+    "clubes": [
+      ("Karlsruher SC", "null", "2011 - 2013"),
+      ("Hamburgo SV", "null", "2013 - 2014"),
+      ("Bayer Leverkusen", "null", "2014 - 2017"),
+      ("AC Milan", "LOGOS.milan", "2017 - 2021"),
+      ("Inter de Milán", "LOGOS.inter", "2021 - Presente")
+    ]
+  },
+  {
+    "id": 323,
+    "nombre": "Henrikh Mkhitaryan",
+    "dificultad": "media",
+    "pista": "El mejor futbolista de la historia de Armenia; marcó un inolvidable gol de escorpión con el Manchester United y ha brillado en Alemania, Inglaterra e Italia.",
+    "alias": ["mkhitaryan"],
+    "nacionalidad": "Armenia",
+    "clubes": [
+      ("Shakhtar Donetsk", "null", "2010 - 2013"),
+      ("Borussia Dortmund", "LOGOS.dortmund", "2013 - 2016"),
+      ("Manchester United", "LOGOS.manutd", "2016 - 2018"),
+      ("Arsenal FC", "LOGOS.arsenal", "2018 - 2019"),
+      ("AS Roma", "LOGOS.roma", "2019 - 2022"),
+      ("Inter de Milán", "LOGOS.inter", "2022 - Presente")
+    ]
+  },
+  {
+    "id": 324,
+    "nombre": "Dušan Vlahović",
+    "dificultad": "media",
+    "pista": "Potente delantero centro zurdo serbio que explotó como goleador en la Fiorentina antes de fichar por la Juventus en mitad de temporada.",
+    "alias": ["vlahovic"],
+    "nacionalidad": "Serbia",
+    "clubes": [
+      ("Partizán de Belgrado", "null", "2016 - 2018"),
+      ("Fiorentina", "null", "2018 - 2022"),
+      ("Juventus", "LOGOS.juventus", "2022 - Presente")
+    ]
+  },
+  {
+    "id": 325,
+    "nombre": "Christian Pulisic",
+    "dificultad": "media",
+    "pista": "Apodado 'Capitán América', es la gran estrella de la selección de Estados Unidos tras formarse en el Dortmund, ganar la Champions en el Chelsea y brillar en el Milan.",
+    "alias": ["pulisic"],
+    "nacionalidad": "Estados Unidos",
+    "clubes": [
+      ("Borussia Dortmund", "LOGOS.dortmund", "2016 - 2019"),
+      ("Chelsea FC", "LOGOS.chelsea", "2019 - 2023"),
+      ("AC Milan", "LOGOS.milan", "2023 - Presente")
+    ]
+  },
+  {
+    "id": 326,
+    "nombre": "Mike Maignan",
+    "dificultad": "media",
+    "pista": "'Magic Mike', guardameta francés que arrebató la Ligue 1 al PSG con el Lille antes de relevar a Donnarumma en el AC Milan y a Lloris en la selección francesa.",
+    "alias": ["maignan"],
+    "nacionalidad": "Francia",
+    "clubes": [
+      ("Paris Saint-Germain", "LOGOS.psg", "2013 - 2015"),
+      ("Lille OSC", "null", "2015 - 2021"),
+      ("AC Milan", "LOGOS.milan", "2021 - Presente")
+    ]
+  },
+  {
+    "id": 327,
+    "nombre": "Yann Sommer",
+    "dificultad": "media",
+    "pista": "Guardameta suizo de grandes reflejos que detuvo el penalti a Mbappé en la Euro 2020 y batió récords de paradas ante el Bayern con el Gladbach antes de ganar el Scudetto con el Inter.",
+    "alias": ["sommer"],
+    "nacionalidad": "Suiza",
+    "clubes": [
+      ("FC Basilea", "null", "2009 - 2014"),
+      ("Borussia Mönchengladbach", "null", "2014 - 2023"),
+      ("Bayern Múnich", "LOGOS.bayern", "2023"),
+      ("Inter de Milán", "LOGOS.inter", "2023 - Presente")
+    ]
+  },
+  {
+    "id": 328,
+    "nombre": "Granit Xhaka",
+    "dificultad": "media",
+    "pista": "Centrocampista zurdo y capitán de Suiza que tras siete intensos años en el Arsenal lideró desde la medular al histórico Bayer Leverkusen campeón invicto.",
+    "alias": ["xhaka"],
+    "nacionalidad": "Suiza",
+    "clubes": [
+      ("FC Basilea", "null", "2010 - 2012"),
+      ("Borussia Mönchengladbach", "null", "2012 - 2016"),
+      ("Arsenal FC", "LOGOS.arsenal", "2016 - 2023"),
+      ("Bayer Leverkusen", "null", "2023 - Presente")
+    ]
+  },
+  {
+    "id": 329,
+    "nombre": "Xherdan Shaqiri",
+    "dificultad": "media",
+    "pista": "El 'Messi de los Alpes', bajito y musculoso zurdo suizo famoso por marcar golazos acrobáticos en casi todos los Mundiales y Eurocopas que disputó.",
+    "alias": ["shaqiri"],
+    "nacionalidad": "Suiza",
+    "clubes": [
+      ("FC Basilea", "null", "2009 - 2012"),
+      ("Bayern Múnich", "LOGOS.bayern", "2012 - 2015"),
+      ("Inter de Milán", "LOGOS.inter", "2015"),
+      ("Stoke City", "null", "2015 - 2018"),
+      ("Liverpool FC", "LOGOS.liverpool", "2018 - 2021"),
+      ("Olympique de Lyon", "LOGOS.lyon", "2021 - 2022"),
+      ("Chicago Fire", "null", "2022 - 2024"),
+      ("FC Basilea", "null", "2024 - Presente")
+    ]
+  },
+  {
+    "id": 330,
+    "nombre": "Ivan Perišić",
+    "dificultad": "media",
+    "pista": "Extremo y carrilero croata completamente ambidiestro que marcó en la final del Mundial 2018 y ganó el Triplete con el Bayern en 2020 antes de regresar al PSV.",
+    "alias": ["perisic"],
+    "nacionalidad": "Croacia",
+    "clubes": [
+      ("Club Brujas", "null", "2009 - 2011"),
+      ("Borussia Dortmund", "LOGOS.dortmund", "2011 - 2013"),
+      ("VfL Wolfsburg", "null", "2013 - 2015"),
+      ("Inter de Milán", "LOGOS.inter", "2015 - 2022"),
+      ("Bayern Múnich", "LOGOS.bayern", "2019 - 2020"),
+      ("Tottenham Hotspur", "LOGOS.tottenham", "2022 - 2024"),
+      ("Hajduk Split", "null", "2024"),
+      ("PSV Eindhoven", "null", "2024 - Presente")
+    ]
+  },
+  {
+    "id": 331,
+    "nombre": "Marcelo Brozović",
+    "dificultad": "media",
+    "pista": "'Epic Brozo', incansable mediocentro croata que popularizó tumbarse en el suelo detrás de la barrera como 'cocodrilo' para tapar tiros libres rasos.",
+    "alias": ["brozovic"],
+    "nacionalidad": "Croacia",
+    "clubes": [
+      ("Dinamo Zagreb", "null", "2012 - 2015"),
+      ("Inter de Milán", "LOGOS.inter", "2015 - 2023"),
+      ("Al Nassr", "null", "2023 - Presente")
+    ]
+  },
+  {
+    "id": 332,
+    "nombre": "Mateo Kovačić",
+    "dificultad": "media",
+    "pista": "Centrocampista croata de gran conducción en arrancada que ha ganado 4 Champions League repartidas entre el Real Madrid (3) y el Chelsea (1) antes de ir al City.",
+    "alias": ["kovacic"],
+    "nacionalidad": "Croacia",
+    "clubes": [
+      ("Dinamo Zagreb", "null", "2010 - 2013"),
+      ("Inter de Milán", "LOGOS.inter", "2013 - 2015"),
+      ("Real Madrid", "LOGOS.madrid", "2015 - 2019"),
+      ("Chelsea FC", "LOGOS.chelsea", "2018 - 2023"),
+      ("Manchester City", "LOGOS.mancity", "2023 - Presente")
+    ]
+  },
+  {
+    "id": 333,
+    "nombre": "Joško Gvardiol",
+    "dificultad": "media",
+    "pista": "Defensa croata que llamó la atención mundial jugando el Mundial de Qatar 2022 con una máscara negra antes de convertirse en el defensa más caro al fichar por el City.",
+    "alias": ["gvardiol"],
+    "nacionalidad": "Croacia",
+    "clubes": [
+      ("Dinamo Zagreb", "null", "2019 - 2021"),
+      ("RB Leipzig", "null", "2021 - 2023"),
+      ("Manchester City", "LOGOS.mancity", "2023 - Presente")
+    ]
+  },
+  {
+    "id": 334,
+    "nombre": "Mario Mandžukić",
+    "dificultad": "media",
+    "pista": "Guerrero croata del área que marcó en dos finales de Champions (con el Bayern en 2013 y de chilena con la Juve ante el Madrid en 2017) y en la final del Mundial 2018.",
+    "alias": ["mandzukic"],
+    "nacionalidad": "Croacia",
+    "clubes": [
+      ("Dinamo Zagreb", "null", "2007 - 2010"),
+      ("VfL Wolfsburg", "null", "2010 - 2012"),
+      ("Bayern Múnich", "LOGOS.bayern", "2012 - 2014"),
+      ("Atlético de Madrid", "LOGOS.atletico", "2014 - 2015"),
+      ("Juventus", "LOGOS.juventus", "2015 - 2019"),
+      ("Al Duhail", "null", "2020"),
+      ("AC Milan", "LOGOS.milan", "2021")
+    ]
+  },
+  {
+    "id": 335,
+    "nombre": "Davor Šuker",
+    "dificultad": "media",
+    "pista": "Zurdo de oro croata; brilló en el Sevilla, ganó la Séptima con el Real Madrid y fue Bota de Oro del Mundial de Francia 98.",
+    "alias": ["suker", "davor suker"],
+    "nacionalidad": "Croacia",
+    "clubes": [
+      ("Dinamo Zagreb", "null", "1989 - 1991"),
+      ("Sevilla FC", "LOGOS.sevilla", "1991 - 1996"),
+      ("Real Madrid", "LOGOS.madrid", "1996 - 1999"),
+      ("Arsenal FC", "LOGOS.arsenal", "1999 - 2000"),
+      ("West Ham United", "null", "2000 - 2001"),
+      ("1860 Múnich", "null", "2001 - 2003")
+    ]
+  },
+  {
+    "id": 336,
+    "nombre": "Predrag Mijatović",
+    "dificultad": "alta",
+    "pista": "'El Gomino', héroe montenegrino de la Séptima Copa de Europa del Real Madrid con su histórico gol a Peruzzi ante la Juventus en Ámsterdam 1998.",
+    "alias": ["mijatovic", "pedja mijatovic"],
+    "nacionalidad": "Montenegro",
+    "clubes": [
+      ("Partizán de Belgrado", "null", "1989 - 1993"),
+      ("Valencia CF", "LOGOS.valencia", "1993 - 1996"),
+      ("Real Madrid", "LOGOS.madrid", "1996 - 1999"),
+      ("Fiorentina", "null", "1999 - 2002"),
+      ("Levante UD", "null", "2002 - 2003")
+    ]
+  },
+  {
+    "id": 337,
+    "nombre": "Fernando Redondo",
+    "dificultad": "alta",
+    "pista": "'El Príncipe', mediocentro zurdo argentino inmortalizado por su taconazo de espaldas a Berg en Old Trafford en el año 2000.",
+    "alias": ["redondo", "fernando redondo"],
+    "nacionalidad": "Argentina",
+    "clubes": [
+      ("Argentinos Juniors", "null", "1985 - 1990"),
+      ("CD Tenerife", "null", "1990 - 1994"),
+      ("Real Madrid", "LOGOS.madrid", "1994 - 2000"),
+      ("AC Milan", "LOGOS.milan", "2000 - 2004")
+    ]
+  },
+  {
+    "id": 338,
+    "nombre": "Fernando Hierro",
+    "dificultad": "alta",
+    "pista": "Defensa central y mediocentro malagueño que llegó a anotar 21 goles en una sola Liga y levantó tres Champions con el Real Madrid.",
+    "alias": ["hierro", "fernando hierro"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Real Valladolid", "null", "1987 - 1989"),
+      ("Real Madrid", "LOGOS.madrid", "1989 - 2003"),
+      ("Al Rayyan", "null", "2003 - 2004"),
+      ("Bolton Wanderers", "null", "2004 - 2005")
+    ]
+  },
+  {
+    "id": 339,
+    "nombre": "Míchel González",
+    "dificultad": "alta",
+    "pista": "Interior derecho de la legendaria 'Quinta del Buitre' famoso por sus precisos centros desde la banda derecha y su '¡Me lo merezco!' con España en Italia 90.",
+    "alias": ["michel"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Real Madrid", "LOGOS.madrid", "1982 - 1996"),
+      ("Atlético Celaya", "null", "1996 - 1997")
+    ]
+  },
+  {
+    "id": 340,
+    "nombre": "Emilio Butragueño",
+    "dificultad": "alta",
+    "pista": "'El Buitre', líder de la mítica generación de canteranos del Real Madrid de los 80 y autor de cuatro goles a Dinamarca en el Mundial de Querétaro 86.",
+    "alias": ["butragueno", "el buitre"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Real Madrid", "LOGOS.madrid", "1984 - 1995"),
+      ("Atlético Celaya", "null", "1995 - 1998")
+    ]
+  },
+  {
+    "id": 341,
+    "nombre": "Hugo Sánchez",
+    "dificultad": "alta",
+    "pista": "'Pentapichichi' mexicano que celebraba con una voltereta cada uno de sus remates al primer toque y chilenas como 'Señor Gol' ante el Logroñés.",
+    "alias": ["hugo sanchez"],
+    "nacionalidad": "México",
+    "clubes": [
+      ("Pumas UNAM", "null", "1976 - 1981"),
+      ("Atlético de Madrid", "LOGOS.atletico", "1981 - 1985"),
+      ("Real Madrid", "LOGOS.madrid", "1985 - 1992"),
+      ("Club América", "null", "1992 - 1993"),
+      ("Rayo Vallecano", "null", "1993 - 1994")
+    ]
+  },
+  {
+    "id": 342,
+    "nombre": "Iván Zamorano",
+    "dificultad": "alta",
+    "pista": "'Bam Bam', rematador chileno de salto prodigioso que ganó el Pichichi en el Real Madrid de Valdano y lució el icónico dorsal '1+8' en el Inter de Milán.",
+    "alias": ["zamorano", "bam bam zamorano"],
+    "nacionalidad": "Chile",
+    "clubes": [
+      ("Cobresal", "null", "1985 - 1988"),
+      ("FC St. Gallen", "null", "1988 - 1990"),
+      ("Sevilla FC", "LOGOS.sevilla", "1990 - 1992"),
+      ("Real Madrid", "LOGOS.madrid", "1992 - 1996"),
+      ("Inter de Milán", "LOGOS.inter", "1996 - 2001"),
+      ("Club América", "null", "2001 - 2002"),
+      ("Colo-Colo", "null", "2003")
+    ]
+  },
+  {
+    "id": 343,
+    "nombre": "Pep Guardiola",
+    "dificultad": "alta",
+    "pista": "El mítico dorsal '4' y extensión de Johan Cruyff en el césped del Dream Team del Barça antes de revolucionar los banquillos como entrenador.",
+    "alias": ["guardiola", "pep guardiola"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("FC Barcelona", "LOGOS.barca", "1990 - 2001"),
+      ("Brescia", "null", "2001 - 2002"),
+      ("AS Roma", "LOGOS.roma", "2002 - 2003"),
+      ("Brescia", "null", "2003"),
+      ("Al Ahli", "null", "2003 - 2005"),
+      ("Dorados de Sinaloa", "null", "2005 - 2006")
+    ]
+  },
+  {
+    "id": 344,
+    "nombre": "Luis Enrique",
+    "dificultad": "alta",
+    "pista": "Todocampista asturiano de carácter indomable que tras cinco años en el Real Madrid fichó libre por el FC Barcelona, donde acabó siendo capitán e ídolo.",
+    "alias": ["luis enrique", "lucho"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Sporting de Gijón", "null", "1989 - 1991"),
+      ("Real Madrid", "LOGOS.madrid", "1991 - 1996"),
+      ("FC Barcelona", "LOGOS.barca", "1996 - 2004")
+    ]
+  },
+  {
+    "id": 345,
+    "nombre": "Ronald Koeman",
+    "dificultad": "alta",
+    "pista": "'Tintín', defensa con más goles en la historia del fútbol mundial y autor del misil de falta en Wembley que dio al Barça su primera Copa de Europa en 1992.",
+    "alias": ["koeman"],
+    "nacionalidad": "Países Bajos",
+    "clubes": [
+      ("FC Groningen", "null", "1980 - 1983"),
+      ("AFC Ajax", "LOGOS.ajax", "1983 - 1986"),
+      ("PSV Eindhoven", "null", "1986 - 1989"),
+      ("FC Barcelona", "LOGOS.barca", "1989 - 1995"),
+      ("Feyenoord", "null", "1995 - 1997")
+    ]
+  },
+  {
+    "id": 346,
+    "nombre": "Romário",
+    "dificultad": "alta",
+    "pista": "'O Baixinho', genio brasileño de los 30 goles prometidos en el Dream Team de Cruyff, autor de la 'cola de vaca' a Alkorta y campeón del mundo en USA 94.",
+    "alias": ["romario"],
+    "nacionalidad": "Brasil",
+    "clubes": [
+      ("Vasco da Gama", "null", "1985 - 1988"),
+      ("PSV Eindhoven", "null", "1988 - 1993"),
+      ("FC Barcelona", "LOGOS.barca", "1993 - 1995"),
+      ("Flamengo", "null", "1995 - 1996"),
+      ("Valencia CF", "LOGOS.valencia", "1996 - 1997"),
+      ("Vasco da Gama", "null", "2000 - 2002")
+    ]
+  },
+  {
+    "id": 347,
+    "nombre": "Bebeto",
+    "dificultad": "alta",
+    "pista": "Ídolo eterno del SuperDépor que dio al club su primer título (Copa del Rey 1995) e inmortalizó la celebración meciendo la cuna junto a Romário en el Mundial 94.",
+    "alias": ["bebeto"],
+    "nacionalidad": "Brasil",
+    "clubes": [
+      ("Flamengo", "null", "1983 - 1989"),
+      ("Vasco da Gama", "null", "1989 - 1992"),
+      ("Deportivo La Coruña", "LOGOS.depor", "1992 - 1996"),
+      ("Sevilla FC", "LOGOS.sevilla", "1996 - 1997"),
+      ("Botafogo", "null", "1998 - 1999")
+    ]
+  },
+  {
+    "id": 348,
+    "nombre": "Kiko Narváez",
+    "dificultad": "alta",
+    "pista": "Delantero jerezano que celebraba sus goles haciendo 'el arquero', pieza fundamental del histórico Doblete del Atlético de Madrid en 1996 y oro olímpico en Barcelona 92.",
+    "alias": ["kiko", "kiko narvaez"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Cádiz CF", "null", "1991 - 1993"),
+      ("Atlético de Madrid", "LOGOS.atletico", "1993 - 2001"),
+      ("CF Extremadura", "null", "2002")
+    ]
+  },
+  {
+    "id": 349,
+    "nombre": "Diego Simeone",
+    "dificultad": "alta",
+    "pista": "'El Cholo', aguerrido mediocentro argentino del Doblete rojiblanco del 96 que décadas después transformó la historia del Atlético desde el banquillo.",
+    "alias": ["simeone", "cholo simeone"],
+    "nacionalidad": "Argentina",
+    "clubes": [
+      ("Vélez Sarsfield", "null", "1987 - 1990"),
+      ("Pisa", "null", "1990 - 1992"),
+      ("Sevilla FC", "LOGOS.sevilla", "1992 - 1994"),
+      ("Atlético de Madrid", "LOGOS.atletico", "1994 - 1997"),
+      ("Inter de Milán", "LOGOS.inter", "1997 - 1999"),
+      ("Lazio", "null", "1999 - 2003"),
+      ("Atlético de Madrid", "LOGOS.atletico", "2003 - 2005"),
+      ("Racing Club", "null", "2005 - 2006")
+    ]
+  },
+  {
+    "id": 350,
+    "nombre": "Julen Guerrero",
+    "dificultad": "alta",
+    "pista": "'La Perla de Portugalete', primer gran fenómeno mediático del fútbol español en los 90 y 'One Club Man' del Athletic Club pese a las ofertas multimillonarias.",
+    "alias": ["julen guerrero", "guerrero"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Athletic Club", "LOGOS.athletic", "1992 - 2006")
+    ]
+  },
+  {
+    "id": 351,
+    "nombre": "Joseba Etxeberria",
+    "dificultad": "alta",
+    "pista": "'El Gallo', extremo derecho guipuzcoano que protagonizó un sonado traspaso de la Real Sociedad al Athletic Club y jugó su última temporada gratis para los leones.",
+    "alias": ["etxeberria"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Real Sociedad", "LOGOS.sociedad", "1994 - 1995"),
+      ("Athletic Club", "LOGOS.athletic", "1995 - 2010")
+    ]
+  },
+  {
+    "id": 352,
+    "nombre": "Alfonso Pérez",
+    "dificultad": "alta",
+    "pista": "Delantero getafense que jugaba siempre con botas blancas; dio a España la Euro 2000 en fase de grupos con su volea a Yugoslavia y da nombre al estadio del Getafe.",
+    "alias": ["alfonso", "alfonso perez"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Real Madrid", "LOGOS.madrid", "1991 - 1995"),
+      ("Real Betis", "LOGOS.betis", "1995 - 2000"),
+      ("FC Barcelona", "LOGOS.barca", "2000 - 2002"),
+      ("Olympique de Marsella", "LOGOS.marseille", "2002"),
+      ("Real Betis", "LOGOS.betis", "2002 - 2005")
+    ]
+  },
+  {
+    "id": 353,
+    "nombre": "Finidi George",
+    "dificultad": "alta",
+    "pista": "Extremo nigeriano campeón de Europa con el Ajax en 1995 que se convirtió en ídolo del Real Betis celebrando sus goles colocándose un sombrero cordobés.",
+    "alias": ["finidi"],
+    "nacionalidad": "Nigeria",
+    "clubes": [
+      ("AFC Ajax", "LOGOS.ajax", "1993 - 1996"),
+      ("Real Betis", "LOGOS.betis", "1996 - 2000"),
+      ("RCD Mallorca", "null", "2000 - 2001"),
+      ("Ipswich Town", "null", "2001 - 2003"),
+      ("RCD Mallorca", "null", "2003 - 2004")
+    ]
+  },
+  {
+    "id": 354,
+    "nombre": "Denilson",
+    "dificultad": "alta",
+    "pista": "Malabarista brasileño de las bicicletas que en 1998 se convirtió en el fichaje más caro de la historia del fútbol mundial cuando Lopera lo trajo al Real Betis.",
+    "alias": ["denilson"],
+    "nacionalidad": "Brasil",
+    "clubes": [
+      ("São Paulo FC", "null", "1994 - 1998"),
+      ("Real Betis", "LOGOS.betis", "1998 - 2005"),
+      ("Flamengo", "null", "2000"),
+      ("Girondins de Burdeos", "null", "2005 - 2006"),
+      ("Al Nassr", "null", "2006 - 2007"),
+      ("Palmeiras", "null", "2008")
+    ]
+  },
+  {
+    "id": 355,
+    "nombre": "Marcos Assunção",
+    "dificultad": "alta",
+    "pista": "Mediocentro brasileño del Real Betis a principios de los 2000 cuyas faltas desde 30 metros eran prácticamente medios penaltis y golpeaban una y otra vez en los palos.",
+    "alias": ["assuncao"],
+    "nacionalidad": "Brasil",
+    "clubes": [
+      ("Santos FC", "null", "1996 - 1997"),
+      ("Flamengo", "null", "1998"),
+      ("AS Roma", "LOGOS.roma", "1999 - 2002"),
+      ("Real Betis", "LOGOS.betis", "2002 - 2007"),
+      ("Palmeiras", "null", "2010 - 2012")
+    ]
+  },
+  {
+    "id": 356,
+    "nombre": "Frédéric Kanouté",
+    "dificultad": "alta",
+    "pista": "Elegante espigado delantero franco-maliense que marcó en todas las finales del Sevilla de Juande Ramos convirtiéndose en el mejor extranjero de la historia nervionense.",
+    "alias": ["kanoute"],
+    "nacionalidad": "Malí",
+    "clubes": [
+      ("Olympique de Lyon", "LOGOS.lyon", "1997 - 2000"),
+      ("West Ham United", "null", "2000 - 2003"),
+      ("Tottenham Hotspur", "LOGOS.tottenham", "2003 - 2005"),
+      ("Sevilla FC", "LOGOS.sevilla", "2005 - 2012"),
+      ("Beijing Guoan", "null", "2012 - 2013")
+    ]
+  },
+  {
+    "id": 357,
+    "nombre": "Luís Fabiano",
+    "dificultad": "alta",
+    "pista": "'O Fabuloso', delantero centro brasileño de Brasil en el Mundial 2010 que formó junto a Kanouté la delantera más letal del Sevilla FC bicampeón de la UEFA.",
+    "alias": ["luis fabiano"],
+    "nacionalidad": "Brasil",
+    "clubes": [
+      ("São Paulo FC", "null", "2001 - 2004"),
+      ("FC Porto", "LOGOS.porto", "2004 - 2005"),
+      ("Sevilla FC", "LOGOS.sevilla", "2005 - 2011"),
+      ("São Paulo FC", "null", "2011 - 2015"),
+      ("Vasco da Gama", "null", "2017")
+    ]
+  },
+  {
+    "id": 358,
+    "nombre": "Andrés Palop",
+    "dificultad": "alta",
+    "pista": "Guardameta valenciano que vivió a la sombra de Cañizares en Mestalla y se hizo inmortal en el Sevilla marcando un gol de cabeza en el descuento en Donetsk en la UEFA 2007.",
+    "alias": ["palop", "andres palop"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Villarreal CF", "LOGOS.villarreal", "1997 - 1999"),
+      ("Valencia CF", "LOGOS.valencia", "1999 - 2005"),
+      ("Sevilla FC", "LOGOS.sevilla", "2005 - 2013"),
+      ("Bayer Leverkusen", "null", "2013 - 2014")
+    ]
+  },
+  {
+    "id": 359,
+    "nombre": "Carlos Marchena",
+    "dificultad": "alta",
+    "pista": "Defensa central y mediocentro sevillano del Valencia campeón del Doblete y pareja de Puyol en la Euro 2008; ostentó el récord mundial de partidos seguidos sin perder con España.",
+    "alias": ["marchena"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Sevilla FC", "LOGOS.sevilla", "1997 - 2000"),
+      ("SL Benfica", "LOGOS.benfica", "2000 - 2001"),
+      ("Valencia CF", "LOGOS.valencia", "2001 - 2010"),
+      ("Villarreal CF", "LOGOS.villarreal", "2010 - 2012"),
+      ("Deportivo La Coruña", "LOGOS.depor", "2012 - 2014")
+    ]
+  },
+  {
+    "id": 360,
+    "nombre": "David Albelda",
+    "dificultad": "alta",
+    "pista": "Eterno capitán y mediocentro de contención del Valencia CF de Rafa Benítez que conquistó dos Ligas y una Copa de la UEFA.",
+    "alias": ["albelda"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Villarreal CF", "LOGOS.villarreal", "1996 - 1997"),
+      ("Valencia CF", "LOGOS.valencia", "1997 - 1998"),
+      ("Villarreal CF", "LOGOS.villarreal", "1998 - 1999"),
+      ("Valencia CF", "LOGOS.valencia", "1999 - 2013")
+    ]
+  },
+  {
+    "id": 361,
+    "nombre": "Rubén Baraja",
+    "dificultad": "alta",
+    "pista": "'El Pipo', centrocampista todoterreno vallisoletano que formó con Albelda el mejor doble pivote de la historia del Valencia CF y luego entrenó al club che.",
+    "alias": ["baraja", "pipo baraja"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Real Valladolid", "null", "1993 - 1996"),
+      ("Atlético de Madrid", "LOGOS.atletico", "1996 - 2000"),
+      ("Valencia CF", "LOGOS.valencia", "2000 - 2010")
+    ]
+  },
+  {
+    "id": 362,
+    "nombre": "Vicente Rodríguez",
+    "dificultad": "alta",
+    "pista": "'El Puñal de Benicalap', considerado en 2004 el mejor extremo izquierdo del mundo tras guiar al Valencia al Doblete de Liga y UEFA.",
+    "alias": ["vicente", "vicente rodriguez"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Levante UD", "null", "1997 - 2000"),
+      ("Valencia CF", "LOGOS.valencia", "2000 - 2011"),
+      ("Brighton & Hove Albion", "null", "2011 - 2013")
+    ]
+  },
+  {
+    "id": 363,
+    "nombre": "Mista",
+    "dificultad": "alta",
+    "pista": "Delantero murciano que fue el máximo goleador del Valencia campeón de Liga y UEFA en 2004 y dio la famosa rueda de prensa del 'robo en el Bernabéu'.",
+    "alias": ["mista"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("CD Tenerife", "null", "1999 - 2001"),
+      ("Valencia CF", "LOGOS.valencia", "2001 - 2006"),
+      ("Atlético de Madrid", "LOGOS.atletico", "2006 - 2008"),
+      ("Deportivo La Coruña", "LOGOS.depor", "2008 - 2010"),
+      ("Toronto FC", "null", "2010")
+    ]
+  },
+  {
+    "id": 364,
+    "nombre": "Claudio López",
+    "dificultad": "alta",
+    "pista": "'El Piojo', velocísimo delantero zurdo argentino que era la bestia negra absoluta del FC Barcelona de Van Gaal al contragolpe con el Valencia.",
+    "alias": ["piojo lopez", "claudio lopez"],
+    "nacionalidad": "Argentina",
+    "clubes": [
+      ("Racing Club", "null", "1992 - 1996"),
+      ("Valencia CF", "LOGOS.valencia", "1996 - 2000"),
+      ("Lazio", "null", "2000 - 2004"),
+      ("Club América", "null", "2004 - 2006"),
+      ("Racing Club", "null", "2007")
+    ]
+  },
+  {
+    "id": 365,
+    "nombre": "Roberto Ayala",
+    "dificultad": "alta",
+    "pista": "'El Ratón', central argentino de solo 1,77m pero con un salto de cabeza prodigioso, elegido mejor defensa de Europa con el Valencia CF.",
+    "alias": ["ayala", "raton ayala"],
+    "nacionalidad": "Argentina",
+    "clubes": [
+      ("River Plate", "LOGOS.river", "1994 - 1995"),
+      ("SSC Napoli", "LOGOS.napoli", "1995 - 1998"),
+      ("AC Milan", "LOGOS.milan", "1998 - 2000"),
+      ("Valencia CF", "LOGOS.valencia", "2000 - 2007"),
+      ("Real Zaragoza", "null", "2007 - 2010"),
+      ("Racing Club", "null", "2010")
+    ]
+  },
+  {
+    "id": 366,
+    "nombre": "Raúl Tamudo",
+    "dificultad": "alta",
+    "pista": "Máximo goleador de la historia del RCD Espanyol; dio una Copa del Rey arrebatándole el balón de saque a Toni Jiménez y protagonizó el famoso 'Tamudazo' en el Camp Nou.",
+    "alias": ["tamudo", "raul tamudo"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("RCD Espanyol", "LOGOS.espanyol", "1996 - 2010"),
+      ("Real Sociedad", "LOGOS.sociedad", "2010 - 2011"),
+      ("Rayo Vallecano", "null", "2011 - 2012"),
+      ("CE Sabadell", "null", "2013 - 2015")
+    ]
+  },
+  {
+    "id": 367,
+    "nombre": "Iván de la Peña",
+    "dificultad": "alta",
+    "pista": "'Lo Pelat' ('Pequeño Buda'), genial mediapunta cántabro de cabeza rapada y pases imposibles al hueco que deslumbró con Ronaldo en el Barça y fue leyenda del Espanyol.",
+    "alias": ["de la pena", "ivan de la pena", "lo pelat"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("FC Barcelona", "LOGOS.barca", "1995 - 1998"),
+      ("Lazio", "null", "1998 - 2002"),
+      ("Olympique de Marsella", "LOGOS.marseille", "1999 - 2000"),
+      ("FC Barcelona", "LOGOS.barca", "2000 - 2001"),
+      ("RCD Espanyol", "LOGOS.espanyol", "2002 - 2011")
+    ]
+  },
+  {
+    "id": 368,
+    "nombre": "Xabi Prieto",
+    "dificultad": "alta",
+    "pista": "'One Club Man' y eterno capitán de la Real Sociedad; marcó un hat-trick en el Bernabéu y se mantuvo fiel a los txuri-urdin incluso en Segunda División.",
+    "alias": ["xabi prieto"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Real Sociedad", "LOGOS.sociedad", "2003 - 2018")
+    ]
+  },
+  {
+    "id": 369,
+    "nombre": "Darko Kovačević",
+    "dificultad": "alta",
+    "pista": "Poderoso delantero centro serbio que formó junto al turco Nihat una pareja de ataque letal que dejó a la Real Sociedad a dos puntos de ganar LaLiga en 2003.",
+    "alias": ["kovacevic"],
+    "nacionalidad": "Serbia",
+    "clubes": [
+      ("Estrella Roja", "null", "1994 - 1996"),
+      ("Real Sociedad", "LOGOS.sociedad", "1996 - 1999"),
+      ("Juventus", "LOGOS.juventus", "1999 - 2001"),
+      ("Lazio", "null", "2001"),
+      ("Real Sociedad", "LOGOS.sociedad", "2002 - 2007"),
+      ("Olympiacos", "null", "2007 - 2009")
+    ]
+  },
+  {
+    "id": 370,
+    "nombre": "Nihat Kahveci",
+    "dificultad": "alta",
+    "pista": "Eléctrico delantero turco de potente disparo que fue subcampeón de Liga con la Real Sociedad en 2003 y luego también con el Villarreal CF en 2008.",
+    "alias": ["nihat"],
+    "nacionalidad": "Turquía",
+    "clubes": [
+      ("Besiktas", "null", "1997 - 2002"),
+      ("Real Sociedad", "LOGOS.sociedad", "2002 - 2006"),
+      ("Villarreal CF", "LOGOS.villarreal", "2006 - 2009"),
+      ("Besiktas", "null", "2009 - 2011")
+    ]
+  },
+  {
+    "id": 371,
+    "nombre": "Valeri Karpin",
+    "dificultad": "alta",
+    "pista": "Carismático interior derecho ruso de melena rubia que dejó huella imborrable en la Real Sociedad y formó parte del EuroCelta junto a Mostovoi.",
+    "alias": ["karpin"],
+    "nacionalidad": "Rusia",
+    "clubes": [
+      ("Spartak de Moscú", "null", "1990 - 1994"),
+      ("Real Sociedad", "LOGOS.sociedad", "1994 - 1996"),
+      ("Valencia CF", "LOGOS.valencia", "1996 - 1997"),
+      ("Celta de Vigo", "LOGOS.celta", "1997 - 2002"),
+      ("Real Sociedad", "LOGOS.sociedad", "2002 - 2005")
+    ]
+  },
+  {
+    "id": 372,
+    "nombre": "Aleksandr Mostovói",
+    "dificultad": "alta",
+    "pista": "Apodado 'El Zar de Balaídos', mediapunta ruso de temperamento volcánico y calidad suprema que lideró al mejor Celta de Vigo de finales de los 90.",
+    "alias": ["mostovoi", "el zar"],
+    "nacionalidad": "Rusia",
+    "clubes": [
+      ("Spartak de Moscú", "null", "1987 - 1991"),
+      ("SL Benfica", "LOGOS.benfica", "1992 - 1993"),
+      ("RC Estrasburgo", "null", "1994 - 1996"),
+      ("Celta de Vigo", "LOGOS.celta", "1996 - 2004"),
+      ("Deportivo Alavés", "null", "2005")
+    ]
+  },
+  {
+    "id": 373,
+    "nombre": "Bruno Soriano",
+    "dificultad": "alta",
+    "pista": "El eterno capitán de Artana y jugador con más partidos en la historia del Villarreal CF, zurdo de guante de seda que nunca vistió otra camiseta.",
+    "alias": ["bruno soriano"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Villarreal CF", "LOGOS.villarreal", "2006 - 2020")
+    ]
+  },
+  {
+    "id": 374,
+    "nombre": "Gabi Fernández",
+    "dificultad": "alta",
+    "pista": "El gran capitán del Atlético de Madrid de Diego Simeone; levantó la Liga de 2014 en el Camp Nou tras haberse curtido antes en el Getafe y en el Real Zaragoza.",
+    "alias": ["gabi", "gabi fernandez"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Atlético de Madrid", "LOGOS.atletico", "2004 - 2007"),
+      ("Getafe CF", "null", "2004 - 2005"),
+      ("Real Zaragoza", "null", "2007 - 2011"),
+      ("Atlético de Madrid", "LOGOS.atletico", "2011 - 2018"),
+      ("Al Sadd SC", "null", "2018 - 2020")
+    ]
+  },
+  {
+    "id": 375,
+    "nombre": "Juanfran Torres",
+    "dificultad": "alta",
+    "pista": "Canterano del Real Madrid como extremo derecho que salvó a Osasuna y se reconvirtió en el Atlético de Simeone en uno de los mejores laterales derechos de Europa.",
+    "alias": ["juanfran", "juanfran torres"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Real Madrid", "LOGOS.madrid", "2004 - 2005"),
+      ("RCD Espanyol", "LOGOS.espanyol", "2005 - 2006"),
+      ("CA Osasuna", "null", "2006 - 2011"),
+      ("Atlético de Madrid", "LOGOS.atletico", "2011 - 2019"),
+      ("São Paulo FC", "null", "2019 - 2021")
+    ]
+  },
+  {
+    "id": 376,
+    "nombre": "Filipe Luís",
+    "dificultad": "alta",
+    "pista": "Lateral izquierdo brasileño cerebral formado en el Deportivo que hizo época en el Atlético de Simeone y luego ganó dos Libertadores como jugador y otra como técnico en el Flamengo.",
+    "alias": ["filipe luis"],
+    "nacionalidad": "Brasil",
+    "clubes": [
+      ("Figueirense", "null", "2003 - 2004"),
+      ("Deportivo La Coruña", "LOGOS.depor", "2006 - 2010"),
+      ("Atlético de Madrid", "LOGOS.atletico", "2010 - 2014"),
+      ("Chelsea FC", "LOGOS.chelsea", "2014 - 2015"),
+      ("Atlético de Madrid", "LOGOS.atletico", "2015 - 2019"),
+      ("Flamengo", "null", "2019 - 2023")
+    ]
+  },
+  {
+    "id": 377,
+    "nombre": "Miranda",
+    "dificultad": "alta",
+    "pista": "Defensa central brasileño que formó pareja inexpugnable con Godín y marcó de cabeza en la prórroga del Bernabéu el gol que dio la Copa del Rey de 2013 al Atlético.",
+    "alias": ["miranda", "joao miranda"],
+    "nacionalidad": "Brasil",
+    "clubes": [
+      ("Coritiba", "null", "2004 - 2005"),
+      ("FC Sochaux", "null", "2005 - 2006"),
+      ("São Paulo FC", "null", "2006 - 2011"),
+      ("Atlético de Madrid", "LOGOS.atletico", "2011 - 2015"),
+      ("Inter de Milán", "LOGOS.inter", "2015 - 2019"),
+      ("São Paulo FC", "null", "2021 - 2022")
+    ]
+  },
+  {
+    "id": 378,
+    "nombre": "Arda Turan",
+    "dificultad": "alta",
+    "pista": "El mago turco de la barba frondosa; lanzó su bota a un juez de línea en Copa del Rey siendo ídolo del Calderón antes de fichar por el FC Barcelona.",
+    "alias": ["arda turan", "arda"],
+    "nacionalidad": "Turquía",
+    "clubes": [
+      ("Galatasaray", "null", "2005 - 2011"),
+      ("Atlético de Madrid", "LOGOS.atletico", "2011 - 2015"),
+      ("FC Barcelona", "LOGOS.barca", "2015 - 2020"),
+      ("Istanbul Basaksehir", "null", "2018 - 2020"),
+      ("Galatasaray", "null", "2020 - 2022")
+    ]
+  },
+  {
+    "id": 379,
+    "nombre": "Diego Costa",
+    "dificultad": "alta",
+    "pista": "'La Bestia de Lagarto', delantero hispano-brasileño de choque constante con los centrales que llevó al Atlético a ganar la Liga 2014 y al Chelsea dos Premier Leagues.",
+    "alias": ["diego costa"],
+    "nacionalidad": "España",
+    "clubes": [
+      ("Celta de Vigo", "LOGOS.celta", "2007 - 2008"),
+      ("Real Valladolid", "null", "2009 - 2010"),
+      ("Atlético de Madrid", "LOGOS.atletico", "2010 - 2014"),
+      ("Rayo Vallecano", "null", "2012"),
+      ("Chelsea FC", "LOGOS.chelsea", "2014 - 2017"),
+      ("Atlético de Madrid", "LOGOS.atletico", "2018 - 2020"),
+      ("Atlético Mineiro", "null", "2021"),
+      ("Wolverhampton", "null", "2022 - 2023"),
+      ("Grêmio", "null", "2024")
+    ]
+  },
+  {
+    "id": 380,
+    "nombre": "David Luiz",
+    "dificultad": "alta",
+    "pista": "Central brasileño de inconfundible melena rizada estilo 'Actor Secundario Bob', campeón de la Champions con el Chelsea y de la Libertadores con el Flamengo.",
+    "alias": ["david luiz"],
+    "nacionalidad": "Brasil",
+    "clubes": [
+      ("SL Benfica", "LOGOS.benfica", "2007 - 2011"),
+      ("Chelsea FC", "LOGOS.chelsea", "2011 - 2014"),
+      ("Paris Saint-Germain", "LOGOS.psg", "2014 - 2016"),
+      ("Chelsea FC", "LOGOS.chelsea", "2016 - 2019"),
+      ("Arsenal FC", "LOGOS.arsenal", "2019 - 2021"),
+      ("Flamengo", "null", "2021 - 2024"),
+      ("Fortaleza", "null", "2025 - Presente")
+    ]
+  },
+  {
+    "id": 381,
+    "nombre": "Willian",
+    "dificultad": "alta",
+    "pista": "Extremo brasileño de pelo afro y gran golpeo de falta que brilló durante siete temporadas en el Chelsea además de jugar en Arsenal, Fulham y Olympiacos.",
+    "alias": ["willian"],
+    "nacionalidad": "Brasil",
+    "clubes": [
+      ("Corinthians", "null", "2006 - 2007"),
+      ("Shakhtar Donetsk", "null", "2007 - 2013"),
+      ("Chelsea FC", "LOGOS.chelsea", "2013 - 2020"),
+      ("Arsenal FC", "LOGOS.arsenal", "2020 - 2021"),
+      ("Corinthians", "null", "2021 - 2022"),
+      ("Fulham FC", "null", "2022 - 2024"),
+      ("Olympiacos", "null", "2024"),
+      ("Fulham FC", "null", "2025 - Presente")
+    ]
+  },
+  {
+    "id": 382,
+    "nombre": "Oscar",
+    "dificultad": "alta",
+    "pista": "Talentoso mediapunta brasileño del Chelsea que marcó el único gol de Brasil en el 1-7 ante Alemania y sorprendió al mundo yéndose en plenitud a China durante ocho años.",
+    "alias": ["oscar"],
+    "nacionalidad": "Brasil",
+    "clubes": [
+      ("São Paulo FC", "null", "2008 - 2010"),
+      ("Internacional", "null", "2010 - 2012"),
+      ("Chelsea FC", "LOGOS.chelsea", "2012 - 2016"),
+      ("Shanghai Port", "null", "2017 - 2024"),
+      ("São Paulo FC", "null", "2025 - Presente")
+    ]
+  },
+  {
+    "id": 383,
+    "nombre": "Ramires",
+    "dificultad": "alta",
+    "pista": "Todocampista brasileño de pulmones infinitos que silenció el Camp Nou con una vaselina antológica a Valdés en las semifinales de la Champions 2012.",
+    "alias": ["ramires"],
+    "nacionalidad": "Brasil",
+    "clubes": [
+      ("Cruzeiro", "null", "2007 - 2009"),
+      ("SL Benfica", "LOGOS.benfica", "2009 - 2010"),
+      ("Chelsea FC", "LOGOS.chelsea", "2010 - 2016"),
+      ("Jiangsu Suning", "null", "2016 - 2019"),
+      ("Palmeiras", "null", "2019 - 2020")
+    ]
+  },
+  {
+    "id": 384,
+    "nombre": "Fernandinho",
+    "dificultad": "alta",
+    "pista": "Pivote táctico brasileño que tras ocho años en Ucrania fue durante casi una década el ancla indispensable y capitán del Manchester City de Pellegrini y Guardiola.",
+    "alias": ["fernandinho"],
+    "nacionalidad": "Brasil",
+    "clubes": [
+      ("Athletico Paranaense", "null", "2002 - 2005"),
+      ("Shakhtar Donetsk", "null", "2005 - 2013"),
+      ("Manchester City", "LOGOS.mancity", "2013 - 2022"),
+      ("Athletico Paranaense", "null", "2022 - 2024")
+    ]
+  },
+  {
+    "id": 385,
+    "nombre": "Fabinho",
+    "dificultad": "alta",
+    "pista": "Debutó un partido con el Real Madrid de Mourinho como lateral derecho, se reconvirtió en mediocentro en el Mónaco campeón y ganó todo en el Liverpool de Klopp.",
+    "alias": ["fabinho"],
+    "nacionalidad": "Brasil",
+    "clubes": [
+      ("Real Madrid", "LOGOS.madrid", "2012 - 2013"),
+      ("AS Mónaco", "LOGOS.monaco", "2013 - 2018"),
+      ("Liverpool FC", "LOGOS.liverpool", "2018 - 2023"),
+      ("Al Ittihad", "null", "2023 - Presente")
+    ]
+  },
+  {
+    "id": 386,
+    "nombre": "Ezequiel Lavezzi",
+    "dificultad": "alta",
+    "pista": "'El Pocho', eléctrico atacante argentino que enamoró al estadio San Paolo de Nápoles junto a Cavani y Hamsik antes de ser uno de los primeros fichajes estrella del PSG catarí.",
+    "alias": ["lavezzi", "pocho lavezzi"],
+    "nacionalidad": "Argentina",
+    "clubes": [
+      ("Estudiantes (BA)", "null", "2003 - 2004"),
+      ("San Lorenzo", "null", "2004 - 2007"),
+      ("SSC Napoli", "LOGOS.napoli", "2007 - 2012"),
+      ("Paris Saint-Germain", "LOGOS.psg", "2012 - 2016"),
+      ("Hebei China Fortune", "null", "2016 - 2019")
+    ]
+  },
+  {
+    "id": 387,
+    "nombre": "Javier Pastore",
+    "dificultad": "alta",
+    "pista": "'El Flaco', elegante mediapunta cordobés que deslumbró en el Palermo con Dybala y se convirtió en 2011 en el primer gran fichaje estrella de la era catarí del PSG.",
+    "alias": ["pastore", "flaco pastore"],
+    "nacionalidad": "Argentina",
+    "clubes": [
+      ("Huracán", "null", "2007 - 2009"),
+      ("Palermo", "null", "2009 - 2011"),
+      ("Paris Saint-Germain", "LOGOS.psg", "2011 - 2018"),
+      ("AS Roma", "LOGOS.roma", "2018 - 2021"),
+      ("Elche CF", "null", "2021 - 2022")
+    ]
+  },
+  {
+    "id": 388,
+    "nombre": "Marek Hamšík",
+    "dificultad": "alta",
+    "pista": "Leyenda eslovaca inconfundible por su cresta punky que superó a Maradona como jugador con más partidos y más goles (hasta Mertens) en la historia del Nápoles.",
+    "alias": ["hamsik"],
+    "nacionalidad": "Eslovaquia",
+    "clubes": [
+      ("Brescia", "null", "2004 - 2007"),
+      ("SSC Napoli", "LOGOS.napoli", "2007 - 2019"),
+      ("Dalian Pro", "null", "2019 - 2021"),
+      ("Trabzonspor", "null", "2021 - 2023")
+    ]
+  },
+  {
+    "id": 389,
+    "nombre": "Dries Mertens",
+    "dificultad": "alta",
+    "pista": "Apodado cariñosamente 'Ciro' por los napolitanos; extremo belga reconvertido por Sarri en falso 9 que acabó siendo el máximo goleador histórico absoluto del Nápoles.",
+    "alias": ["mertens"],
+    "nacionalidad": "Bélgica",
+    "clubes": [
+      ("FC Utrecht", "null", "2009 - 2011"),
+      ("PSV Eindhoven", "null", "2011 - 2013"),
+      ("SSC Napoli", "LOGOS.napoli", "2013 - 2022"),
+      ("Galatasaray", "null", "2022 - Presente")
+    ]
+  },
+  {
+    "id": 390,
+    "nombre": "Lorenzo Insigne",
+    "dificultad": "alta",
+    "pista": "Bajito extremo napolitano de nacimiento y ex capitán del Nápoles famoso por su golpeo con rosca al palo largo ('Tiraggiro') y campeón de la Euro 2020 con Italia.",
+    "alias": ["insigne"],
+    "nacionalidad": "Italia",
+    "clubes": [
+      ("Pescara", "null", "2011 - 2012"),
+      ("SSC Napoli", "LOGOS.napoli", "2012 - 2022"),
+      ("Toronto FC", "null", "2022 - Presente")
+    ]
+  },
+  {
+    "id": 391,
+    "nombre": "Radja Nainggolan",
+    "dificultad": "alta",
+    "pista": "'Il Ninja', todocampista belga lleno de tatuajes, cresta teñida y entradas al límite que fue ídolo de la Roma antes de pasar por el Inter de Milán.",
+    "alias": ["nainggolan"],
+    "nacionalidad": "Bélgica",
+    "clubes": [
+      ("Piacenza", "null", "2005 - 2010"),
+      ("Cagliari", "null", "2010 - 2014"),
+      ("AS Roma", "LOGOS.roma", "2014 - 2018"),
+      ("Inter de Milán", "LOGOS.inter", "2018 - 2021"),
+      ("Cagliari", "null", "2019 - 2021"),
+      ("Royal Antwerp", "null", "2021 - 2022")
+    ]
+  },
+  {
+    "id": 392,
+    "nombre": "Miralem Pjanić",
+    "dificultad": "alta",
+    "pista": "'Il Piccolo Principe', organizador bosnio especialista en faltas que brilló en Lyon, Roma y Juventus antes de protagonizar un trueque contable con Arthur Melo rumbo al Barça.",
+    "alias": ["pjanic"],
+    "nacionalidad": "Bosnia y Herzegovina",
+    "clubes": [
+      ("FC Metz", "null", "2007 - 2008"),
+      ("Olympique de Lyon", "LOGOS.lyon", "2008 - 2011"),
+      ("AS Roma", "LOGOS.roma", "2011 - 2016"),
+      ("Juventus", "LOGOS.juventus", "2016 - 2020"),
+      ("FC Barcelona", "LOGOS.barca", "2020 - 2022"),
+      ("Besiktas", "null", "2021 - 2022"),
+      ("CSKA Moscú", "null", "2024 - 2025")
+    ]
+  },
+  {
+    "id": 393,
+    "nombre": "Memphis Depay",
+    "dificultad": "alta",
+    "pista": "Atacante neerlandés que celebra tapándose los oídos con una cinta en la frente; tras brillar en Lyon y pasar por Barça y Atlético, fichó por el Corinthians brasileño.",
+    "alias": ["depay", "memphis", "memphis depay"],
+    "nacionalidad": "Países Bajos",
+    "clubes": [
+      ("PSV Eindhoven", "null", "2011 - 2015"),
+      ("Manchester United", "LOGOS.manutd", "2015 - 2017"),
+      ("Olympique de Lyon", "LOGOS.lyon", "2017 - 2021"),
+      ("FC Barcelona", "LOGOS.barca", "2021 - 2023"),
+      ("Atlético de Madrid", "LOGOS.atletico", "2023 - 2024"),
+      ("Corinthians", "null", "2024 - Presente")
+    ]
+  },
+  {
+    "id": 394,
+    "nombre": "Alexandre Lacazette",
+    "dificultad": "alta",
+    "pista": "'El General', prolífico goleador francés criado en la academia del Olympique de Lyon que tras cinco temporadas en el Arsenal regresó a casa para seguir marcando.",
+    "alias": ["lacazette"],
+    "nacionalidad": "Francia",
+    "clubes": [
+      ("Olympique de Lyon", "LOGOS.lyon", "2010 - 2017"),
+      ("Arsenal FC", "LOGOS.arsenal", "2017 - 2022"),
+      ("Olympique de Lyon", "LOGOS.lyon", "2022 - 2025")
+    ]
+  },
+  {
+    "id": 395,
+    "nombre": "Nabil Fekir",
+    "dificultad": "alta",
+    "pista": "Mago zurdo franco-argelino campeón del mundo en 2018 que sorprendió al cambiar el brazalete del Lyon por el Real Betis, donde dio una Copa del Rey.",
+    "alias": ["fekir", "nabil fekir"],
+    "nacionalidad": "Francia",
+    "clubes": [
+      ("Olympique de Lyon", "LOGOS.lyon", "2013 - 2019"),
+      ("Real Betis", "LOGOS.betis", "2019 - 2024"),
+      ("Al Jazira", "null", "2024 - Presente")
+    ]
+  },
+  {
+    "id": 396,
+    "nombre": "Dimitri Payet",
+    "dificultad": "alta",
+    "pista": "Virtuoso francés de los tiros libres y las rabonas que maravilló a la Premier en el West Ham antes de volver a su amado Olympique de Marsella y terminar en Brasil.",
+    "alias": ["payet"],
+    "nacionalidad": "Francia",
+    "clubes": [
+      ("FC Nantes", "null", "2005 - 2007"),
+      ("Saint-Étienne", "null", "2007 - 2011"),
+      ("Lille OSC", "null", "2011 - 2013"),
+      ("Olympique de Marsella", "LOGOS.marseille", "2013 - 2015"),
+      ("West Ham United", "null", "2015 - 2017"),
+      ("Olympique de Marsella", "LOGOS.marseille", "2017 - 2023"),
+      ("Vasco da Gama", "null", "2023 - 2025")
+    ]
+  },
+  {
+    "id": 397,
+    "nombre": "Wissam Ben Yedder",
+    "dificultad": "alta",
+    "pista": "Delantero ratonero francés procedente del fútbol sala que eliminó al Manchester United en Old Trafford con un doblete con el Sevilla antes de ser pichichi en el Mónaco.",
+    "alias": ["ben yedder"],
+    "nacionalidad": "Francia",
+    "clubes": [
+      ("Toulouse FC", "null", "2010 - 2016"),
+      ("Sevilla FC", "LOGOS.sevilla", "2016 - 2019"),
+      ("AS Mónaco", "LOGOS.monaco", "2019 - 2024")
+    ]
+  },
+  {
+    "id": 398,
+    "nombre": "Viktor Gyökeres",
+    "dificultad": "alta",
+    "pista": "Tanque goleador sueco famoso por celebrar sus goles entrelazando los dedos sobre la boca como la máscara de 'Bane' tras romper todos los registros en el Sporting CP.",
+    "alias": ["gyokeres"],
+    "nacionalidad": "Suecia",
+    "clubes": [
+      ("Brighton & Hove Albion", "null", "2018 - 2021"),
+      ("Coventry City", "null", "2021 - 2023"),
+      ("Sporting CP", "LOGOS.sporting", "2023 - 2025"),
+      ("Arsenal FC", "LOGOS.arsenal", "2025 - Presente")
+    ]
+  },
+  {
+    "id": 399,
+    "nombre": "Alexander Isak",
+    "dificultad": "alta",
+    "pista": "Espigado y elegante delantero sueco que destrozó al Real Madrid en Copa en el Bernabéu con la Real Sociedad antes de convertirse en el fichaje récord del Newcastle.",
+    "alias": ["isak", "alexander isak"],
+    "nacionalidad": "Suecia",
+    "clubes": [
+      ("AIK Estocolmo", "null", "2016"),
+      ("Borussia Dortmund", "LOGOS.dortmund", "2017 - 2019"),
+      ("Willem II", "null", "2019"),
+      ("Real Sociedad", "LOGOS.sociedad", "2019 - 2022"),
+      ("Newcastle United", "null", "2022 - Presente")
+    ]
+  },
+  {
+    "id": 400,
+    "nombre": "Omar Marmoush",
+    "dificultad": "alta",
+    "pista": "'El Nuevo Príncipe Egipcio', atacante que tras salirse en la Bundesliga con el Eintracht Frankfurt fichó en invierno de 2025 por el Manchester City de Guardiola.",
+    "alias": ["marmoush"],
+    "nacionalidad": "Egipto",
+    "clubes": [
+      ("VfL Wolfsburg", "null", "2020 - 2023"),
+      ("VfB Stuttgart", "null", "2021 - 2022"),
+      ("Eintracht Frankfurt", "null", "2023 - 2025"),
+      ("Manchester City", "LOGOS.mancity", "2025 - Presente")
+    ]
   }
 ];

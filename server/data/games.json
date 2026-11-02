@@ -238,5 +238,11 @@
     "name": "Qué jugadón!",
     "description": "Pon a prueba tu conocimiento futbolístico sobre el campo y averigua qué jugada se está recreando en cada momento.",
     "isNew": true
+  },
+  {
+    "id": "cuatroclubes",
+    "name": "El club de los cuatro",
+    "description": "Cuatro clubes, un jugador. Dedice qué jugador encaja en el mayor número posible de esos cuatro y a ver si consigues el pleno!",
+    "isNew": true
   }
 ]

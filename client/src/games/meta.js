@@ -319,7 +319,7 @@ export const META = {
   'footballsplit': {
     titulo: 'FrankensFootball',
     icono: 'soccer',
-    colores: ['#8b5cf6', '#b91c1c'],
+    colores: ['#1d4ed8', '#0f172a'],
     etiquetas: 'futbol jugadores quiz clubes adivinar seleccion balon cara cabeza cuerpo',
     descripcion: 'Adivina de qué tres jugadores viene el híbrido que vas a ver por pantalla. Si eres buen futbolero lo sabrás a la primera, si no siempre puedes acudir a las pistas.',
     categorias: ['favoritos', 'dos_jugadores', 'futbol']
@@ -331,6 +331,14 @@ export const META = {
     etiquetas: 'futbol jugadas quiz campo adivinar dorsales balon gol jugadon',
     descripcion: 'Pon a prueba tu conocimiento futbolístico sobre el campo y averigua qué jugada se está recreando en cada momento.',
     categorias: ['favoritos', 'dos_jugadores', 'futbol']
+  },
+  'cuatroclubes': {
+    titulo: 'El club de los cuatro',
+    icono: 'soccer',
+    colores: ['#ec4899', '#be185d'],
+    etiquetas: 'futbol clubes quiz enlazar jugadores trayectoria balon gol',
+    descripcion: 'Cuatro clubes, un jugador. Dedice qué jugador encaja en el mayor número posible de esos cuatro y a ver si consigues el pleno!',
+    categorias: ['dos_jugadores', 'futbol']
   }
 };
 
