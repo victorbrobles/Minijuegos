@@ -6,10 +6,12 @@ import { metaDe } from '../games/meta.js';
 
 export default function GameCard({ game }) {
   const [mostrarDesc, setMostrarDesc] = useState(false);
+  const [imgFallida, setImgFallida] = useState(false);
   const m = metaDe(game.id);
   const navigate = useNavigate();
 
   const descripcion = m?.descripcion || game?.description || 'Sin descripción disponible.';
+  const tienePortada = Boolean(m?.imagen) && !imgFallida;
 
   // Entrar al juego
   const entrarAlJuego = () => {
@@ -37,20 +39,18 @@ export default function GameCard({ game }) {
 
   return (
     <div
-      className="gc"
+      className={`gc${tienePortada ? ' con-portada' : ''}`}
       style={{ '--g1': m.colores[0], '--g2': m.colores[1], cursor: 'pointer' }}
       onClick={entrarAlJuego}
       role="button"
       tabIndex={0}
+      aria-label={m.titulo || game.name}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
           entrarAlJuego();
         }
       }}
     >
-      {/* Icono grande translúcido de fondo */}
-      <Icon name={m.icono} className="gc-bg" aria-hidden="true" />
-
       {/* Botón 'i' para abrir la descripción */}
       <button
         type="button"
@@ -64,11 +64,26 @@ export default function GameCard({ game }) {
         <span className="gc-info-btn-text">i</span>
       </button>
 
-      {/* Contenido principal de la tarjeta */}
-      <span className="gc-icon">
-        <Icon name={m.icono} size={44} />
-      </span>
-      <span className="gc-name">{m.titulo || game.name}</span>
+      {tienePortada ? (
+        /* Modo Portada Ilustrada (la imagen ya contiene el título del juego integrado) */
+        <img
+          src={m.imagen}
+          alt={m.titulo || game.name}
+          className="gc-cover-img"
+          loading="lazy"
+          draggable="false"
+          onError={() => setImgFallida(true)}
+        />
+      ) : (
+        /* Modo Icono + Degradado Único */
+        <>
+          <Icon name={m.icono} className="gc-bg" aria-hidden="true" />
+          <span className="gc-icon">
+            <Icon name={m.icono} size={44} />
+          </span>
+          <span className="gc-name">{m.titulo || game.name}</span>
+        </>
+      )}
 
       {/* Capa desplegada con la descripción completa */}
       {mostrarDesc && (
@@ -107,7 +122,7 @@ export default function GameCard({ game }) {
             onMouseDown={detenerInteraccion}
             onTouchStart={detenerInteraccion}
           >
-            Jugar
+            Jugar ahora
           </button>
         </div>
       )}

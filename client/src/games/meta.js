@@ -11,33 +11,38 @@ export const CATEGORIAS_PORTADA = [
   { id: 'dos_jugadores', titulo: '👥 Para dos jugadores', desc: 'Ideales para competir o cooperar frente a frente' }
 ];
 
+// Cada uno de los 36 minijuegos tiene un icono único y una combinación de colores (degradado) única
 export const META = {
   'bingoball': {
     titulo: 'Bingoball',
-    icono: 'soccer',
-    colores: ['#1d4ed8', '#0f172a'],
+    imagen: '/covers/bingoball.png',
+    icono: 'bingocard',
+    colores: ['#2563eb', '#0f172a'],
     etiquetas: 'futbol bingo cartones jugadores categorias online',
     descripcion: 'Rellena tu cartón de 4x5 relacionando futbolistas con categorías. Canta líneas y consigue el Bingo antes que nadie.',
     categorias: ['favoritos', 'futbol', 'chill']
   },
   'trayectoria': {
     titulo: 'Modo carrera',
-    icono: 'soccer',
-    colores: ['#22c55e', '#15803d'],
+    imagen: '/covers/trayectoria.png',
+    icono: 'careerpath',
+    colores: ['#22c55e', '#14532d'],
     etiquetas: 'futbol futbolista clubes deportes equipos jugador',
     descripcion: 'Descubre al deportista a través de los clubes en los que jugó.',
     categorias: ['futbol', 'prueba', 'dos_jugadores']
   },
   'traiciones': {
     titulo: 'Traiciones',
+    imagen: '/covers/traiciones.png',
     icono: 'dagger',
-    colores: ['#d97706', '#7c2d12'],
+    colores: ['#d97706', '#451a03'],
     etiquetas: 'traidores caravana desierto sabotaje mafia deduccion engano coartada votar roles online',
     descripcion: 'Una caravana cruza el desierto hacia el Oasis, pero hay traidores entre vosotros. Cumple tus tareas, vigila tus espaldas y descubre quién miente antes de que sea tarde.',
     categorias: ['favoritos', 'estrategia']
   },
   'fundadores': {
     titulo: 'Fundadores',
+    imagen: '/covers/fundadores.png',
     icono: 'landmark',
     colores: ['#ea580c', '#7c2d12'],
     etiquetas: 'pueblo construir oficios roles ocultos estrategia cartas edificios eleccion secreta online',
@@ -46,38 +51,43 @@ export const META = {
   },
   'coleccion': {
     titulo: 'Colecciona con cabeza',
+    imagen: '/covers/coleccion.png',
     icono: 'cards',
-    colores: ['#06b6d4', '#1d4ed8'],
+    colores: ['#06b6d4', '#1e40af'],
     etiquetas: 'cartas azar coleccion estrategia numeros baraja',
     descripcion: 'Consigue 5 cartas del mismo tipo antes que el resto. ¡Pero cuidado! Si acumulas 5 tipos distintos, quedarás eliminado.',
     categorias: ['favoritos', 'estrategia']
   },
   'cuentas': {
     titulo: 'Lleva la cuenta',
-    icono: 'cards',
-    colores: ['#0284c7', '#0369a1'],
+    imagen: '/covers/cuentas.png',
+    icono: 'numcards',
+    colores: ['#38bdf8', '#0369a1'],
     etiquetas: 'numeros orden cartas mayor menor cuenta deduccion cartas accion',
     descripcion: 'Colocad los números del 1 al 100 de menor a mayor sin conocer las cartas de los demás. Gestiona cartas de acción y sé el primero en vaciar tu mano.',
     categorias: ['estrategia', 'dos_jugadores']
   },
   'descarte': {
     titulo: '¡Descarta y Elimina!',
+    imagen: '/covers/descarte.png',
     icono: 'x',
-    colores: ['#06b6d4', '#0e7490'],
+    colores: ['#f43f5e', '#881337'],
     etiquetas: 'palabra ingenio velocidad letras categorias',
     descripcion: 'Elige categoría, di una palabra que empiece por una letra libre antes de 30s y elimínala del abecedario. ¡Sobrevive a 5 tableros!',
     categorias: ['dos_jugadores', 'prueba']
   },
   'lobos': {
     titulo: 'Luna de Sangre',
+    imagen: '/covers/lobos.png',
     icono: 'moon',
-    colores: ['#b91c1c', '#1e1b4b'],
+    colores: ['#dc2626', '#1e1b4b'],
     etiquetas: 'hombres lobo roles pueblo noche narrador mafia',
     descripcion: 'Lobos contra pueblo, con roles inéditos y caos. De 8 a 12 jugadores, pasándoos el dispositivo.',
     categorias: ['favoritos', 'estrategia']
   },
   'impostor': {
     titulo: 'Miente como puedas',
+    imagen: '/covers/impostor.png',
     icono: 'mask',
     colores: ['#9333ea', '#3b0764'],
     etiquetas: 'impostor mentir engano restriccion hablar sospechoso',
@@ -86,30 +96,34 @@ export const META = {
   },
   'conecta': {
     titulo: 'Conecta 4',
+    imagen: '/covers/conecta.png',
     icono: 'connect',
-    colores: ['#0ea5e9', '#0369a1'],
+    colores: ['#0284c7', '#1e3a8a'],
     etiquetas: 'conexiones grupos 16 elementos palabras relacionar',
     descripcion: 'Encuentra las 4 conexiones secretas entre los 16 elementos del tablero antes de quedarte sin vidas.',
     categorias: ['prueba', 'futbol']
   },
   'buscaminas': {
     titulo: 'Cuidado que explota',
+    imagen: '/covers/buscaminas.png',
     icono: 'bomb',
-    colores: ['#52525b', '#18181b'],
+    colores: ['#64748b', '#090d16'],
     etiquetas: 'minas bombas casillas explota tablero suerte',
     descripcion: 'Un tablero de 15 casillas con 10 aciertos y 5 bombas ocultas. Elige por turnos, suma puntos según la dificultad y evita pisar la mina para no quedar eliminado de la ronda.',
     categorias: ['prueba', 'futbol']
   },
   'quien-es-quien': {
     titulo: '¿Sabes quién soy?',
+    imagen: '/covers/quienesquien.png',
     icono: 'whois',
-    colores: ['#3b82f6', '#1d4ed8'],
+    colores: ['#3b82f6', '#6d28d9'],
     etiquetas: 'personajes adivinar descartar rasgos clasico tablero preguntas',
     descripcion: 'Adivina el personaje secreto descartando rasgos antes que tus rivales.',
     categorias: ['favoritos', 'famosos', 'chill']
   },
   'rasgos': {
     titulo: 'El paparazzi',
+    imagen: '/covers/rasgos.png',
     icono: 'zoomface',
     colores: ['#f97316', '#9a3412'],
     etiquetas: 'famosos cara facciones zoom foto celebridades',
@@ -118,142 +132,160 @@ export const META = {
   },
   'adivina': {
     titulo: 'Luces, Cámara... ¡Música!',
+    imagen: '/covers/adivina.png',
     icono: 'clapperboard',
-    colores: ['#ec4899', '#be185d'],
+    colores: ['#ec4899', '#831843'],
     etiquetas: 'peliculas cine canciones musica actores frases audio',
     descripcion: 'Identifica la película o la canción con frases, fragmentos de audio de 20s y actores.',
     categorias: ['famosos', 'chill']
   },
   'cancion': {
     titulo: 'Afina ese oído',
+    imagen: '/covers/cancion.png',
     icono: 'music',
-    colores: ['#a3e635', '#16a34a'],
+    colores: ['#a3e635', '#15803d'],
     etiquetas: 'musica canciones escuchar oido volumen adivinar tema',
     descripcion: 'Escucha la canción subiendo gradualmente de volumen. Pulsa el botón antes de los 30 segundos para adivinar el tema y sumar tantos puntos como segundos queden.',
     categorias: ['chill']
   },
   'frasescelebres': {
     titulo: 'Frases Célebres',
+    imagen: '/covers/frasescelebres.png',
     icono: 'quote',
-    colores: ['#06b6d4', '#0e7490'],
+    colores: ['#06b6d4', '#164e63'],
     etiquetas: 'citas autor quien dijo historia politica deporte famosos',
     descripcion: '¿Quién dijo qué? Adivina el autor de las frases más recordadas de la historia, la política, el deporte y el famoseo.',
     categorias: ['famosos', 'chill']
   },
   'colores': {
     titulo: 'La vida en colores',
+    imagen: '/covers/colores.png',
     icono: 'palette',
-    colores: ['#ec4899', '#f59e0b'],
+    colores: ['#f472b6', '#f59e0b'],
     etiquetas: 'colores marcas personajes logos combinacion',
     descripcion: 'Adivina la combinación exacta de colores de personajes, marcas y cosas míticas que todo el mundo ha visto.',
     categorias: ['favoritos', 'chill']
   },
   'siglas': {
     titulo: 'D.E.S.C.I.F.R.A',
+    imagen: '/covers/siglas.png',
     icono: 'letters',
-    colores: ['#6366f1', '#3730a3'],
+    colores: ['#6366f1', '#312e81'],
     etiquetas: 'siglas acronimos significado palabras cultura general',
     descripcion: 'Averigua el significado real de las siglas más conocidas.',
     categorias: ['prueba', 'dos_jugadores']
   },
   'rankings': {
     titulo: 'Ranking oculto',
+    imagen: '/covers/rankings.png',
     icono: 'podium',
-    colores: ['#eab308', '#a16207'],
+    colores: ['#facc15', '#a16207'],
     etiquetas: 'ranking ordenar puestos clasificacion mayor menor top',
     descripcion: 'Ordena de mayor a menor elementos de cultura, ciencia, cine y deportes.',
     categorias: ['prueba', 'favoritos']
   },
   'aproximacion': {
     titulo: 'Aproxímate',
+    imagen: '/covers/aproximacion.png',
     icono: 'target',
-    colores: ['#8b5cf6', '#5b21b6'],
+    colores: ['#8b5cf6', '#4c1d95'],
     etiquetas: 'numeros cifras calcular estimar aproximar cantidad',
     descripcion: 'Atrévete a calcular cifras astronómicas y llévate los puntos por ser el más cercano.',
     categorias: ['prueba', 'favoritos']
   },
   'velocidad': {
     titulo: 'Minuto de Infarto',
+    imagen: '/covers/velocidad.png',
     icono: 'stopwatch',
-    colores: ['#84cc16', '#4d7c0f'],
+    colores: ['#84cc16', '#365314'],
     etiquetas: 'contrarreloj rapido 60 segundos preguntas tiempo test',
     descripcion: '60 segundos de adrenalina pura. Acierta a contrarreloj y supera la pregunta especial.',
     categorias: ['prueba', 'dos_jugadores']
   },
   'rapidfire': {
     titulo: 'Rápido y certero',
+    imagen: '/covers/rapidfire.png',
     icono: 'zap',
-    colores: ['#ef4444', '#b91c1c'],
+    colores: ['#ef4444', '#7f1d1d'],
     etiquetas: 'retos categorias cronometro rebote rapido 60 segundos',
     descripcion: 'Retos de 60 segundos por categoría: di todos los elementos antes de que se acabe el tiempo o pasa el rebote.',
     categorias: ['prueba', 'chill', 'dos_jugadores']
   },
   'pistas': {
     titulo: 'No seas des(pista)do',
+    imagen: '/covers/pistas.png',
     icono: 'sleuth',
-    colores: ['#64748b', '#1e293b'],
+    colores: ['#475569', '#1e293b'],
     etiquetas: 'detective enigma misterio pistas vidas adivinar',
     descripcion: 'Resuelve el enigma con 6 pistas progresivas. Juega por puntos o sobrevive con 3 vidas.',
     categorias: ['prueba', 'chill']
   },
   'ubicacion': {
     titulo: 'Test del viajero',
+    imagen: '/covers/ubicacion.png',
     icono: 'pin',
-    colores: ['#10b981', '#047857'],
+    colores: ['#10b981', '#064e3b'],
     etiquetas: 'mapa lugares monumentos geografia mundo foto',
     descripcion: 'Ubica monumentos y lugares en el mapa mundial esquivando los señuelos de los demás.',
     categorias: ['prueba', 'favoritos']
   },
   'masmenos': {
     titulo: 'Entre dos aguas',
+    imagen: '/covers/masmenos.png',
     icono: 'scale',
-    colores: ['#2563eb', '#4f46e5'],
+    colores: ['#3b82f6', '#1d4ed8'],
     etiquetas: 'comparar mayor menor datos numericos racha',
     descripcion: 'Compara dos datos numéricos frente a frente y elige el más grande para encadenar la racha de aciertos más larga.',
     categorias: ['prueba', 'dos_jugadores']
   },
   'conoce': {
     titulo: 'Conoce a tus amigos',
-    icono: 'users',
-    colores: ['#4f46e5', '#312e81'],
+    imagen: '/covers/conoce.png',
+    icono: 'heartchat',
+    colores: ['#818cf8', '#3730a3'],
     etiquetas: 'amigos conocer preguntas cotidiano sinceridad votar deducir parejas',
     descripcion: 'Responded a preguntas cotidianas y adivinad qué escribió cada compañero. ¡Descubre quién te conoce de verdad a 15 rondas!',
     categorias: ['favoritos', 'chill']
   },
   'ciegas': {
     titulo: 'Top a Ciegas',
+    imagen: '/covers/ciegas.png',
     icono: 'eyeoff',
-    colores: ['#f59e0b', '#b45309'],
+    colores: ['#f59e0b', '#92400e'],
     etiquetas: 'ranking ordenar ciegas votar puntuar orden',
     descripcion: 'Ordena de 1 a 5 cada elemento sin saber qué saldrá después. Los rivales votan cuántos has acertado.',
     categorias: ['chill']
   },
   'unoadiez': {
     titulo: 'Del 1 al 10...',
-    icono: 'target',
-    colores: ['#8b5cf6', '#b91c1c'],
+    imagen: '/covers/unoadiez.png',
+    icono: 'dial10',
+    colores: ['#c084fc', '#9d174d'],
     etiquetas: 'numero conocer amigos pareja ranking',
     descripcion: 'Adivina el número secreto del 1 al 10 guiándote por las pistas y opiniones de tus amigos. ¡El que menos puntos sume gana!',
     categorias: ['chill', 'dos_jugadores']
   },
   'quienmas': {
     titulo: '¿De verdad os conocéis?',
+    imagen: '/covers/quienmas.png',
     icono: 'users',
-    colores: ['#f43f5e', '#be123c'],
+    colores: ['#fb7185', '#be123c'],
     etiquetas: 'amigos votar votacion preguntas picantes grupo conocer',
     descripcion: 'Votad quién encaja más con preguntas comprometidas o divertidas. Si votas al más votado te llevas punto, pero si hay empate... ¡cero puntos para todos!',
     categorias: ['chill']
   },
   'telepatia': {
     titulo: 'Telepatía',
-    icono: 'zap',
-    colores: ['#84cc16', '#4d7c0f'],
+    imagen: '/covers/telepatia.png',
+    icono: 'telepathy',
+    colores: ['#2dd4bf', '#115e59'],
     etiquetas: 'telepatia azar coincidir amigos conocerse',
     descripcion: 'Pensad la misma palabra a la vez. ¡Conectad vuestras mentes y aumentad la racha de coincidencias consecutivas!',
     categorias: ['chill']
   },
   'confianzaciega': {
     titulo: 'Confianza Ciega',
+    imagen: '/covers/confianzaciega.png',
     icono: 'dice',
     colores: ['#14b8a6', '#0f766e'],
     etiquetas: 'apuesta apostar consigna retos amigos 2 minutos',
@@ -262,6 +294,7 @@ export const META = {
   },
   'popular': {
     titulo: 'Sigue la moda',
+    imagen: '/covers/popular.png',
     icono: 'flame',
     colores: ['#fb923c', '#dc2626'],
     etiquetas: 'popular mayoria top 5 tendencia moda categorias encuesta',
@@ -270,74 +303,83 @@ export const META = {
   },
   'logos': {
     titulo: 'Logo Mania',
-    icono: 'cards',
-    colores: ['#06b6d4', '#0e7490'],
+    imagen: '/covers/logos.png',
+    icono: 'logobadge',
+    colores: ['#22d3ee', '#0284c7'],
     etiquetas: 'logos marcas empresas adivinar velocidad memoria simbolos',
     descripcion: 'Identifica la marca que se oculta tras el logo antes de que el cronómetro llegue a cero. Suma segundos al acertar y evita arriesgar si no estás seguro.',
     categorias: ['prueba', 'dos_jugadores']
   },
   'hipotesis': {
     titulo: 'La Hipótesis Ganadora',
+    imagen: '/covers/hipotesis.png',
     icono: 'bulb',
-    colores: ['#2563eb', '#1e3a8a'],
+    colores: ['#60a5fa', '#1e3a8a'],
     etiquetas: 'hipotesis farol engano deduccion apostar laboratorio ciencia muestras mentir online',
     descripcion: 'Cada ronda el laboratorio esconde una verdad y tú solo conoces un trocito. Formula una hipótesis (cierta o de farol), apuesta por las de los demás y descubre quién miente.',
     categorias: ['favoritos', 'estrategia']
   },
   'trescientosuno': {
     titulo: '301 goles',
-    icono: 'soccer',
-    colores: ['#10b981', '#047857'],
+    imagen: '/covers/trescientosuno.png',
+    icono: 'goal301',
+    colores: ['#34d399', '#047857'],
     etiquetas: 'futbol goles clubes goleadores asistencias partidos adivinar seleccion balon',
     descripcion: 'Llega al número objetivo de goles, asistencias o partidos y demuestra lo mucho que conoces al club escogido.',
     categorias: ['favoritos', 'futbol']
   },
   'jugadores': {
-    titulo: 'Con quién he jugado?',
-    icono: 'soccer',
-    colores: ['#fb923c', '#dc2626'],
+    titulo: '¿Con quién he jugado?',
+    imagen: '/covers/jugadores.png',
+    icono: 'teammates',
+    colores: ['#f97316', '#b91c1c'],
     etiquetas: 'futbol jugadores clubes compañero adivinar seleccion balon',
     descripcion: 'Sale una dupla de jugadores y tienes que encontrar un compañero común a ambos.',
     categorias: ['dos_jugadores', 'futbol']
   },
   'furbo': {
     titulo: 'Furbo!',
+    imagen: '/covers/furbo.png',
     icono: 'soccer',
-    colores: ['#2563eb', '#4f46e5'],
+    colores: ['#4ade80', '#166534'],
     etiquetas: 'futbol jugadores quiz clubes adivinar seleccion balon',
     descripcion: 'La prueba definitiva para poner a prueba tus conocimientos sobre fútbol. Explora las diversas categorías de este juego y humíllalos a todos!',
     categorias: ['favoritos', 'chill', 'futbol']
   },
   'futbolgrid': {
     titulo: 'Fútbol en raya',
-    icono: 'soccer',
-    colores: ['#8b5cf6', '#b91c1c'],
+    imagen: '/covers/futbolgrid.png',
+    icono: 'futbolgrid',
+    colores: ['#a855f7', '#b91c1c'],
     etiquetas: 'futbol jugadores quiz clubes adivinar seleccion balon',
     descripcion: 'Cuadra categorías que cumplan tus jugadores y crea una línea completa con ellos antes que tu rival. Para jugar individual o por equipos.',
     categorias: ['favoritos', 'dos_jugadores', 'futbol']
   },
   'footballsplit': {
     titulo: 'FrankensFootball',
-    icono: 'soccer',
-    colores: ['#1d4ed8', '#0f172a'],
+    imagen: '/covers/footballsplit.png',
+    icono: 'frankenstein',
+    colores: ['#818cf8', '#0f172a'],
     etiquetas: 'futbol jugadores quiz clubes adivinar seleccion balon cara cabeza cuerpo',
     descripcion: 'Adivina de qué tres jugadores viene el híbrido que vas a ver por pantalla. Si eres buen futbolero lo sabrás a la primera, si no siempre puedes acudir a las pistas.',
     categorias: ['favoritos', 'dos_jugadores', 'futbol']
   },
   'jugadas': {
-    titulo: 'Qué jugadón!',
-    icono: 'soccer',
-    colores: ['#eab308', '#a16207'],
+    titulo: '¡Qué jugadón!',
+    imagen: '/covers/jugadas.png',
+    icono: 'tacticboard',
+    colores: ['#fbbf24', '#b45309'],
     etiquetas: 'futbol jugadas quiz campo adivinar dorsales balon gol jugadon',
     descripcion: 'Pon a prueba tu conocimiento futbolístico sobre el campo y averigua qué jugada se está recreando en cada momento.',
     categorias: ['favoritos', 'dos_jugadores', 'futbol']
   },
   'cuatroclubes': {
     titulo: 'El club de los cuatro',
-    icono: 'soccer',
-    colores: ['#ec4899', '#be185d'],
+    imagen: '/covers/cuatroclubes.png',
+    icono: 'fourshields',
+    colores: ['#e879f9', '#9d174d'],
     etiquetas: 'futbol clubes quiz enlazar jugadores trayectoria balon gol',
-    descripcion: 'Cuatro clubes, un jugador. Dedice qué jugador encaja en el mayor número posible de esos cuatro y a ver si consigues el pleno!',
+    descripcion: 'Cuatro clubes, un jugador. Decide qué jugador encaja en el mayor número posible de esos cuatro y a ver si consigues el pleno!',
     categorias: ['dos_jugadores', 'futbol']
   }
 };

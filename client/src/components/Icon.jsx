@@ -1,3 +1,4 @@
+// client/src/components/Icon.jsx
 // Iconos SVG propios (dibujados a mano, sin copyright). Estilo de línea redondeada.
 import React from 'react';
 
@@ -64,13 +65,12 @@ const P = {
   fashion: <><path d="M6 3h12l3 6-9 12L3 9z" /><path d="M11 3 8 9l4 12 4-12-3-6" /></>,
   scale: <><path d="M12 3v18M6 8l6-2 6 2M6 8l-3 7h6L6 8zm12 0-3 7h6l-3-7z" /></>,
   dagger: <><path d="M20.500 3.500 10 14" /><path d="M8 12l4 4" /><path d="M10 14 5 19" /><path d="M3.500 20.500l1.500-1.500" /><path d="M20.500 3.500 21 3" /></>,
-  cards: <><rect x="4" y="6" width="12" height="15" rx="2" /><path d="M8 2h12v15" /></>
+  cards: <><rect x="4" y="6" width="12" height="15" rx="2" /><path d="M8 2h12v15" /></>,
+  close: <path d="M6 6l12 12M18 6 6 18" />
 };
 
-// Icono por nombre de categoría (Siglas y Quién es Quién)
 export const ICONO_CATEGORIA = {
   'Todas las categorías': 'star',
-  // Siglas
   'Instituciones': 'landmark',
   'Marcas y empresas': 'briefcase',
   'Ciencia y salud': 'flask',
@@ -81,7 +81,6 @@ export const ICONO_CATEGORIA = {
   'Economía y finanzas': 'chart',
   'Cine, TV y música': 'clapper',
   'Cultura general': 'bulb',
-  // Quién es Quién
   'Países': 'globe',
   'Futbolistas': 'soccer',
   'Animales': 'paw',
@@ -102,7 +101,6 @@ export const ICONO_CATEGORIA = {
   'Pokemon': 'orb'
 };
 
-// Pares de colores para los degradados de las tarjetas
 export const DEGRADADOS = [
   ['#ff6b6b', '#ff9f43'], ['#a855f7', '#6366f1'], ['#06b6d4', '#3b82f6'],
   ['#f43f5e', '#ec4899'], ['#22c55e', '#84cc16'], ['#3b82f6', '#8b5cf6'],
@@ -111,16 +109,13 @@ export const DEGRADADOS = [
 ];
 export const DEGRADADO_TODAS = ['#fbbf24', '#f97316'];
 
-// Iconos añadidos/redefinidos (tienen prioridad sobre los de P)
 const NUEVOS = {
-  // Juegos
   whois: <><circle cx="12" cy="8" r="5" /><path d="M10.500 7a1.500 1.500 0 1 1 2.100 1.400c-.4.200-.6.500-.6.900M12 10.600h.01" /><path d="M4 21a8 8 0 0 1 16 0" /></>,
   globe: <><circle cx="12" cy="12" r="10" /><path d="M2 12h20" /><path d="M12 2a15.300 15.300 0 0 1 4 10 15.300 15.300 0 0 1-4 10 15.300 15.300 0 0 1-4-10 15.300 15.300 0 0 1 4-10z" /></>,
   clapperboard: <><path d="M4 11v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8H4z" /><path d="m4 11 1.600-4.800A2 2 0 0 1 7.500 5h9a2 2 0 0 1 1.900 1.200L20 11H4z" /><path d="m9 5 2.500 6M14 5l2.500 6" /><circle cx="10" cy="16" r="1.500" /><path d="M11.500 16V13h3" /></>,
   detective: <><circle cx="11" cy="11" r="7" /><path d="m21 21-4.350-4.350" /><path d="M11 8a3 3 0 0 1 3 3" /></>,
   speedometer: <><path d="M12 2a10 10 0 0 0-10 10c0 4.400 2.800 8.100 6.800 9.500.4.100.7-.2.7-.6v-1.400c0-.3-.2-.6-.5-.7A7.500 7.500 0 1 1 19.500 12" /><circle cx="12" cy="12" r="2" /><path d="m13.400 10.600 3.600-3.600" /></>,
   target: <><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></>,
-  // Interfaz
   users: <><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 0 0-3-3.870M16 3.130a4 4 0 0 1 0 7.750" /></>,
   play: <polygon points="5 3 19 12 5 21 5 3" />,
   pause: <><rect x="6" y="4" width="4" height="16" rx="1" /><rect x="14" y="4" width="4" height="16" rx="1" /></>,
@@ -133,7 +128,7 @@ const NUEVOS = {
   zap: <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
 };
 
-// Iconos específicos de cada minijuego y de la portada (cada juego tiene el suyo, sin repetir)
+// Iconos exclusivos para que cada uno de los 36 minijuegos tenga un icono único sin repetir
 const EXTRA = {
   search: <><circle cx="11" cy="11" r="7" /><path d="m20 20-3.500-3.500" /></>,
   x: <path d="M6 6l12 12M18 6 6 18" />,
@@ -144,7 +139,21 @@ const EXTRA = {
   connect: <><circle cx="6" cy="6" r="2.500" /><circle cx="18" cy="6" r="2.500" /><circle cx="6" cy="18" r="2.500" /><circle cx="18" cy="18" r="2.500" /><path d="M8.500 6h7M8.500 18h7M6 8.500v7M18 8.500v7M7.800 7.800l8.400 8.400" /></>,
   quote: <><path d="M16 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z" /><path d="M5 3a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2 1 1 0 0 1 1 1v1a2 2 0 0 1-2 2 1 1 0 0 0-1 1v2a1 1 0 0 0 1 1 6 6 0 0 0 6-6V5a2 2 0 0 0-2-2z" /></>,
   palette: <><circle cx="13.500" cy="6.500" r=".8" /><circle cx="17.500" cy="10.500" r=".8" /><circle cx="8.500" cy="7.500" r=".8" /><circle cx="6.500" cy="12.500" r=".8" /><path d="M12 2C6.500 2 2 6.500 2 12s4.500 10 10 10c.9 0 1.600-.7 1.600-1.700 0-.4-.2-.8-.4-1.100-.3-.3-.4-.7-.4-1.100a1.600 1.600 0 0 1 1.700-1.700H16.500c3 0 5.500-2.500 5.500-5.500C22 6 17.500 2 12 2z" /></>,
-  zoomface: <><circle cx="10.500" cy="10.500" r="7.500" /><path d="m21 21-5.200-5.200" /><path d="M8 9h.01M13 9h.01M8 12.500a3 3 0 0 0 5 0" /></>
+  zoomface: <><circle cx="10.500" cy="10.500" r="7.500" /><path d="m21 21-5.200-5.200" /><path d="M8 9h.01M13 9h.01M8 12.500a3 3 0 0 0 5 0" /></>,
+  // Nuevos iconos diferenciados para cada minijuego:
+  bingocard: <><rect x="3" y="3" width="18" height="18" rx="3" /><path d="M3 9h18M3 15h18M9 3v18M15 3v18" /><circle cx="12" cy="12" r="1.6" fill="currentColor" /></>,
+  careerpath: <><path d="M4 19c3-6 5-6 8-2s5 4 8-6" /><polyline points="16 7 20 11 15 12" /><circle cx="4" cy="19" r="2" /><circle cx="12" cy="17" r="2" /></>,
+  numcards: <><rect x="3" y="5" width="11" height="15" rx="2" /><path d="M17 7h3a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-9" /><path d="M7 10h3v5M7 12.5h2.5" /></>,
+  dial10: <><circle cx="12" cy="12" r="9" /><path d="M9.5 9.5 11 8v8M14.5 8a1.8 1.8 0 0 1 1.8 2v4a1.8 1.8 0 0 1-3.6 0v-4a1.8 1.8 0 0 1 1.8-2z" /></>,
+  heartchat: <><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5z" /><path d="M12 14.5s-3.5-2.2-3.5-4.6a2 2 0 0 1 3.5-1.2 2 2 0 0 1 3.5 1.2c0 2.4-3.5 4.6-3.5 4.6z" /></>,
+  telepathy: <><path d="M9 18a6 6 0 1 1 6 0v2a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1v-2z" /><path d="M4 9a9 9 0 0 1 2.5-6M20 9a9 9 0 0 0-2.5-6M2 13c0-1.8.5-3.5 1.4-5M22 13c0-1.8-.5-3.5-1.4-5" /><circle cx="12" cy="11" r="1.5" /></>,
+  logobadge: <><polygon points="12 2 19 6 19 14 12 22 5 14 5 6 12 2" /><path d="m9 12 2 2 4-4" /></>,
+  goal301: <><path d="M3 19V7a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12" /><path d="M3 10h18M8 5v14M16 5v14" /><circle cx="12" cy="14.5" r="3" /></>,
+  teammates: <><circle cx="7.5" cy="7" r="3" /><circle cx="16.5" cy="7" r="3" /><path d="M2.5 19a5 5 0 0 1 10 0M11.5 19a5 5 0 0 1 10 0" /><path d="M10 13h4" /></>,
+  futbolgrid: <><rect x="3" y="3" width="18" height="18" rx="2.5" /><path d="M3 9h18M3 15h18M9 3v18M15 3v18" /><path d="m5 5 2 2M7 5 5 7M11 11l2 2M13 11l-2 2M17 17l2 2M19 17l-2 2" /></>,
+  frankenstein: <><rect x="5" y="4" width="14" height="16" rx="4" /><path d="M5 9h14M9 7v3M12 7v3M15 7v3M3 13h2M19 13h2" /><circle cx="9.5" cy="13.5" r="1" /><circle cx="14.5" cy="13.5" r="1" /><path d="M9.5 17h5" /></>,
+  tacticboard: <><rect x="3" y="4" width="18" height="16" rx="2" /><path d="M12 4v16M3 9h3v6H3M21 9h-3v6h3" /><circle cx="12" cy="12" r="2.5" /><path d="m8 15 5-5M11 10h2v2" /></>,
+  fourshields: <><path d="M7 3 3.5 4.5v3.5c0 2.5 1.5 4.5 3.5 5.5 2-1 3.5-3 3.5-5.5V4.5z" /><path d="M17 3l-3.5 1.5v3.5c0 2.5 1.5 4.5 3.5 5.5 2-1 3.5-3 3.5-5.5V4.5z" /><path d="M7 13.5 3.5 15v2.5c0 2 1.5 3.5 3.5 4.5 2-1 3.5-2.5 3.5-4.5V15z" /><path d="M17 13.5 13.5 15v2.5c0 2 1.5 3.5 3.5 4.5 2-1 3.5-2.5 3.5-4.5V15z" /></>
 };
 
 const ICONOS = { ...P, ...NUEVOS, ...EXTRA };
