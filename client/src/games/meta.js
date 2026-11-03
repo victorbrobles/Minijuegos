@@ -15,7 +15,7 @@ export const CATEGORIAS_PORTADA = [
 export const META = {
   'bingoball': {
     titulo: 'Bingoball',
-    imagen: '/covers/bingoball.png',
+    imagen: '/covers/bingoball.webp',
     icono: 'bingocard',
     colores: ['#2563eb', '#0f172a'],
     etiquetas: 'futbol bingo cartones jugadores categorias online',
@@ -24,7 +24,7 @@ export const META = {
   },
   'trayectoria': {
     titulo: 'Modo carrera',
-    imagen: '/covers/trayectoria.png',
+    imagen: '/covers/trayectoria.webp',
     icono: 'careerpath',
     colores: ['#22c55e', '#14532d'],
     etiquetas: 'futbol futbolista clubes deportes equipos jugador',
@@ -33,7 +33,7 @@ export const META = {
   },
   'traiciones': {
     titulo: 'Traiciones',
-    imagen: '/covers/traiciones.png',
+    imagen: '/covers/traiciones.webp',
     icono: 'dagger',
     colores: ['#d97706', '#451a03'],
     etiquetas: 'traidores caravana desierto sabotaje mafia deduccion engano coartada votar roles online',
@@ -42,7 +42,7 @@ export const META = {
   },
   'fundadores': {
     titulo: 'Fundadores',
-    imagen: '/covers/fundadores.png',
+    imagen: '/covers/fundadores.webp',
     icono: 'landmark',
     colores: ['#ea580c', '#7c2d12'],
     etiquetas: 'pueblo construir oficios roles ocultos estrategia cartas edificios eleccion secreta online',
@@ -51,7 +51,7 @@ export const META = {
   },
   'coleccion': {
     titulo: 'Colecciona con cabeza',
-    imagen: '/covers/coleccion.png',
+    imagen: '/covers/coleccion.webp',
     icono: 'cards',
     colores: ['#06b6d4', '#1e40af'],
     etiquetas: 'cartas azar coleccion estrategia numeros baraja',
@@ -60,7 +60,7 @@ export const META = {
   },
   'cuentas': {
     titulo: 'Lleva la cuenta',
-    imagen: '/covers/cuentas.png',
+    imagen: '/covers/cuentas.webp',
     icono: 'numcards',
     colores: ['#38bdf8', '#0369a1'],
     etiquetas: 'numeros orden cartas mayor menor cuenta deduccion cartas accion',
@@ -69,7 +69,7 @@ export const META = {
   },
   'descarte': {
     titulo: '¡Descarta y Elimina!',
-    imagen: '/covers/descarte.png',
+    imagen: '/covers/descarte.webp',
     icono: 'x',
     colores: ['#f43f5e', '#881337'],
     etiquetas: 'palabra ingenio velocidad letras categorias',
@@ -78,7 +78,7 @@ export const META = {
   },
   'lobos': {
     titulo: 'Luna de Sangre',
-    imagen: '/covers/lobos.png',
+    imagen: '/covers/lobos.webp',
     icono: 'moon',
     colores: ['#dc2626', '#1e1b4b'],
     etiquetas: 'hombres lobo roles pueblo noche narrador mafia',
@@ -87,7 +87,7 @@ export const META = {
   },
   'impostor': {
     titulo: 'Miente como puedas',
-    imagen: '/covers/impostor.png',
+    imagen: '/covers/impostor.webp',
     icono: 'mask',
     colores: ['#9333ea', '#3b0764'],
     etiquetas: 'impostor mentir engano restriccion hablar sospechoso',
@@ -96,7 +96,7 @@ export const META = {
   },
   'conecta': {
     titulo: 'Conecta 4',
-    imagen: '/covers/conecta.png',
+    imagen: '/covers/conecta.webp',
     icono: 'connect',
     colores: ['#0284c7', '#1e3a8a'],
     etiquetas: 'conexiones grupos 16 elementos palabras relacionar',
@@ -105,7 +105,7 @@ export const META = {
   },
   'buscaminas': {
     titulo: 'Cuidado que explota',
-    imagen: '/covers/buscaminas.png',
+    imagen: '/covers/buscaminas.webp',
     icono: 'bomb',
     colores: ['#64748b', '#090d16'],
     etiquetas: 'minas bombas casillas explota tablero suerte',
@@ -114,7 +114,7 @@ export const META = {
   },
   'quien-es-quien': {
     titulo: '¿Sabes quién soy?',
-    imagen: '/covers/quienesquien.png',
+    imagen: '/covers/quienesquien.webp',
     icono: 'whois',
     colores: ['#3b82f6', '#6d28d9'],
     etiquetas: 'personajes adivinar descartar rasgos clasico tablero preguntas',
@@ -123,7 +123,7 @@ export const META = {
   },
   'rasgos': {
     titulo: 'El paparazzi',
-    imagen: '/covers/rasgos.png',
+    imagen: '/covers/rasgos.webp',
     icono: 'zoomface',
     colores: ['#f97316', '#9a3412'],
     etiquetas: 'famosos cara facciones zoom foto celebridades',
@@ -132,7 +132,7 @@ export const META = {
   },
   'adivina': {
     titulo: 'Luces, Cámara... ¡Música!',
-    imagen: '/covers/adivina.png',
+    imagen: '/covers/adivina.webp',
     icono: 'clapperboard',
     colores: ['#ec4899', '#831843'],
     etiquetas: 'peliculas cine canciones musica actores frases audio',
@@ -141,7 +141,7 @@ export const META = {
   },
   'cancion': {
     titulo: 'Afina ese oído',
-    imagen: '/covers/cancion.png',
+    imagen: '/covers/cancion.webp',
     icono: 'music',
     colores: ['#a3e635', '#15803d'],
     etiquetas: 'musica canciones escuchar oido volumen adivinar tema',
@@ -150,7 +150,7 @@ export const META = {
   },
   'frasescelebres': {
     titulo: 'Frases Célebres',
-    imagen: '/covers/frasescelebres.png',
+    imagen: '/covers/frasescelebres.webp',
     icono: 'quote',
     colores: ['#06b6d4', '#164e63'],
     etiquetas: 'citas autor quien dijo historia politica deporte famosos',
@@ -159,7 +159,7 @@ export const META = {
   },
   'colores': {
     titulo: 'La vida en colores',
-    imagen: '/covers/colores.png',
+    imagen: '/covers/colores.webp',
     icono: 'palette',
     colores: ['#f472b6', '#f59e0b'],
     etiquetas: 'colores marcas personajes logos combinacion',
@@ -168,7 +168,7 @@ export const META = {
   },
   'siglas': {
     titulo: 'D.E.S.C.I.F.R.A',
-    imagen: '/covers/siglas.png',
+    imagen: '/covers/siglas.webp',
     icono: 'letters',
     colores: ['#6366f1', '#312e81'],
     etiquetas: 'siglas acronimos significado palabras cultura general',
@@ -177,7 +177,7 @@ export const META = {
   },
   'rankings': {
     titulo: 'Ranking oculto',
-    imagen: '/covers/rankings.png',
+    imagen: '/covers/rankings.webp',
     icono: 'podium',
     colores: ['#facc15', '#a16207'],
     etiquetas: 'ranking ordenar puestos clasificacion mayor menor top',
@@ -186,7 +186,7 @@ export const META = {
   },
   'aproximacion': {
     titulo: 'Aproxímate',
-    imagen: '/covers/aproximacion.png',
+    imagen: '/covers/aproximacion.webp',
     icono: 'target',
     colores: ['#8b5cf6', '#4c1d95'],
     etiquetas: 'numeros cifras calcular estimar aproximar cantidad',
@@ -195,7 +195,7 @@ export const META = {
   },
   'velocidad': {
     titulo: 'Minuto de Infarto',
-    imagen: '/covers/velocidad.png',
+    imagen: '/covers/velocidad.webp',
     icono: 'stopwatch',
     colores: ['#84cc16', '#365314'],
     etiquetas: 'contrarreloj rapido 60 segundos preguntas tiempo test',
@@ -204,7 +204,7 @@ export const META = {
   },
   'rapidfire': {
     titulo: 'Rápido y certero',
-    imagen: '/covers/rapidfire.png',
+    imagen: '/covers/rapidfire.webp',
     icono: 'zap',
     colores: ['#ef4444', '#7f1d1d'],
     etiquetas: 'retos categorias cronometro rebote rapido 60 segundos',
@@ -213,7 +213,7 @@ export const META = {
   },
   'pistas': {
     titulo: 'No seas des(pista)do',
-    imagen: '/covers/pistas.png',
+    imagen: '/covers/pistas.webp',
     icono: 'sleuth',
     colores: ['#475569', '#1e293b'],
     etiquetas: 'detective enigma misterio pistas vidas adivinar',
@@ -222,7 +222,7 @@ export const META = {
   },
   'ubicacion': {
     titulo: 'Test del viajero',
-    imagen: '/covers/ubicacion.png',
+    imagen: '/covers/ubicacion.webp',
     icono: 'pin',
     colores: ['#10b981', '#064e3b'],
     etiquetas: 'mapa lugares monumentos geografia mundo foto',
@@ -231,7 +231,7 @@ export const META = {
   },
   'masmenos': {
     titulo: 'Entre dos aguas',
-    imagen: '/covers/masmenos.png',
+    imagen: '/covers/masmenos.webp',
     icono: 'scale',
     colores: ['#3b82f6', '#1d4ed8'],
     etiquetas: 'comparar mayor menor datos numericos racha',
@@ -240,7 +240,7 @@ export const META = {
   },
   'conoce': {
     titulo: 'Conoce a tus amigos',
-    imagen: '/covers/conoce.png',
+    imagen: '/covers/conoce.webp',
     icono: 'heartchat',
     colores: ['#818cf8', '#3730a3'],
     etiquetas: 'amigos conocer preguntas cotidiano sinceridad votar deducir parejas',
@@ -249,7 +249,7 @@ export const META = {
   },
   'ciegas': {
     titulo: 'Top a Ciegas',
-    imagen: '/covers/ciegas.png',
+    imagen: '/covers/ciegas.webp',
     icono: 'eyeoff',
     colores: ['#f59e0b', '#92400e'],
     etiquetas: 'ranking ordenar ciegas votar puntuar orden',
@@ -258,7 +258,7 @@ export const META = {
   },
   'unoadiez': {
     titulo: 'Del 1 al 10...',
-    imagen: '/covers/unoadiez.png',
+    imagen: '/covers/unoadiez.webp',
     icono: 'dial10',
     colores: ['#c084fc', '#9d174d'],
     etiquetas: 'numero conocer amigos pareja ranking',
@@ -267,7 +267,7 @@ export const META = {
   },
   'quienmas': {
     titulo: '¿De verdad os conocéis?',
-    imagen: '/covers/quienmas.png',
+    imagen: '/covers/quienmas.webp',
     icono: 'users',
     colores: ['#fb7185', '#be123c'],
     etiquetas: 'amigos votar votacion preguntas picantes grupo conocer',
@@ -276,7 +276,7 @@ export const META = {
   },
   'telepatia': {
     titulo: 'Telepatía',
-    imagen: '/covers/telepatia.png',
+    imagen: '/covers/telepatia.webp',
     icono: 'telepathy',
     colores: ['#2dd4bf', '#115e59'],
     etiquetas: 'telepatia azar coincidir amigos conocerse',
@@ -285,7 +285,7 @@ export const META = {
   },
   'confianzaciega': {
     titulo: 'Confianza Ciega',
-    imagen: '/covers/confianzaciega.png',
+    imagen: '/covers/confianzaciega.webp',
     icono: 'dice',
     colores: ['#14b8a6', '#0f766e'],
     etiquetas: 'apuesta apostar consigna retos amigos 2 minutos',
@@ -294,7 +294,7 @@ export const META = {
   },
   'popular': {
     titulo: 'Sigue la moda',
-    imagen: '/covers/popular.png',
+    imagen: '/covers/popular.webp',
     icono: 'flame',
     colores: ['#fb923c', '#dc2626'],
     etiquetas: 'popular mayoria top 5 tendencia moda categorias encuesta',
@@ -303,7 +303,7 @@ export const META = {
   },
   'logos': {
     titulo: 'Logo Mania',
-    imagen: '/covers/logos.png',
+    imagen: '/covers/logos.webp',
     icono: 'logobadge',
     colores: ['#22d3ee', '#0284c7'],
     etiquetas: 'logos marcas empresas adivinar velocidad memoria simbolos',
@@ -312,7 +312,7 @@ export const META = {
   },
   'hipotesis': {
     titulo: 'La Hipótesis Ganadora',
-    imagen: '/covers/hipotesis.png',
+    imagen: '/covers/hipotesis.webp',
     icono: 'bulb',
     colores: ['#60a5fa', '#1e3a8a'],
     etiquetas: 'hipotesis farol engano deduccion apostar laboratorio ciencia muestras mentir online',
@@ -321,7 +321,7 @@ export const META = {
   },
   'trescientosuno': {
     titulo: '301 goles',
-    imagen: '/covers/trescientosuno.png',
+    imagen: '/covers/trescientosuno.webp',
     icono: 'goal301',
     colores: ['#34d399', '#047857'],
     etiquetas: 'futbol goles clubes goleadores asistencias partidos adivinar seleccion balon',
@@ -330,7 +330,7 @@ export const META = {
   },
   'jugadores': {
     titulo: '¿Con quién he jugado?',
-    imagen: '/covers/jugadores.png',
+    imagen: '/covers/jugadores.webp',
     icono: 'teammates',
     colores: ['#f97316', '#b91c1c'],
     etiquetas: 'futbol jugadores clubes compañero adivinar seleccion balon',
@@ -339,7 +339,7 @@ export const META = {
   },
   'furbo': {
     titulo: 'Furbo!',
-    imagen: '/covers/furbo.png',
+    imagen: '/covers/furbo.webp',
     icono: 'soccer',
     colores: ['#4ade80', '#166534'],
     etiquetas: 'futbol jugadores quiz clubes adivinar seleccion balon',
@@ -348,7 +348,7 @@ export const META = {
   },
   'futbolgrid': {
     titulo: 'Fútbol en raya',
-    imagen: '/covers/futbolgrid.png',
+    imagen: '/covers/futbolgrid.webp',
     icono: 'futbolgrid',
     colores: ['#a855f7', '#b91c1c'],
     etiquetas: 'futbol jugadores quiz clubes adivinar seleccion balon',
@@ -357,7 +357,7 @@ export const META = {
   },
   'footballsplit': {
     titulo: 'FrankensFootball',
-    imagen: '/covers/footballsplit.png',
+    imagen: '/covers/footballsplit.webp',
     icono: 'frankenstein',
     colores: ['#818cf8', '#0f172a'],
     etiquetas: 'futbol jugadores quiz clubes adivinar seleccion balon cara cabeza cuerpo',
@@ -366,7 +366,7 @@ export const META = {
   },
   'jugadas': {
     titulo: '¡Qué jugadón!',
-    imagen: '/covers/jugadas.png',
+    imagen: '/covers/jugadas.webp',
     icono: 'tacticboard',
     colores: ['#fbbf24', '#b45309'],
     etiquetas: 'futbol jugadas quiz campo adivinar dorsales balon gol jugadon',
@@ -375,7 +375,7 @@ export const META = {
   },
   'cuatroclubes': {
     titulo: 'El club de los cuatro',
-    imagen: '/covers/cuatroclubes.png',
+    imagen: '/covers/cuatroclubes.webp',
     icono: 'fourshields',
     colores: ['#e879f9', '#9d174d'],
     etiquetas: 'futbol clubes quiz enlazar jugadores trayectoria balon gol',

@@ -1309,3 +1309,36 @@ button.rebote { background: linear-gradient(135deg, #ff9f43, #ff4d6d); }
   border: 1.5px solid rgba(255, 255, 255, 0.25);
   box-shadow: 0 8px 0 rgba(15, 23, 42, 0.3), 0 18px 30px -12px var(--g2);
 }
+
+/* =====================================================================
+   Tarjetas más pequeñas en los carruseles de la portada
+   (5 por fila en escritorio, ~3 en móvil; iconos y botón "i" reducidos)
+   ===================================================================== */
+.home-carousel-item {
+  flex: 0 0 calc((100% - 4rem) / 5);
+  min-width: 150px;
+}
+.gc { min-height: 0; border-radius: 22px; padding: 1rem .6rem .9rem; gap: .5rem; }
+.gc.con-portada { aspect-ratio: 1; }
+.gc-cover-img { min-height: 0; border-radius: 20px; }
+
+/* Botón "i" más discreto */
+.gc-info-btn { top: 7px; right: 7px; width: 22px; height: 22px; }
+.gc-info-btn-text { font-size: .75rem; }
+
+/* Tarjetas sin portada (icono + degradado) */
+.gc-icon { width: 58px; height: 58px; border-radius: 18px; }
+.gc-icon svg { width: 32px; height: 32px; }
+.gc-name { font-size: .95rem; }
+
+@media (max-width: 680px) {
+  .home-carousel-item { flex: 0 0 calc((100% - 1.5rem) / 3.15); min-width: 112px; }
+  .gc { border-radius: 18px; }
+  .gc-cover-img { border-radius: 16px; }
+}
+@media (max-width: 420px) {
+  .home-carousel-item { flex: 0 0 calc((100% - 1.5rem) / 2.7); min-width: 104px; }
+  .gc-icon { width: 48px; height: 48px; }
+  .gc-icon svg { width: 28px; height: 28px; }
+  .gc-name { font-size: .85rem; }
+}
