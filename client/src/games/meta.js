@@ -19,7 +19,7 @@ export const META = {
     icono: 'bingocard',
     colores: ['#2563eb', '#0f172a'],
     etiquetas: 'futbol bingo cartones jugadores categorias online',
-    descripcion: 'Rellena tu cartón de 4x5 relacionando futbolistas con categorías. Canta líneas y consigue el Bingo antes que nadie.',
+    descripcion: 'Rellena tu cartón de 4x3 relacionando futbolistas con categorías. Canta líneas y consigue el Bingo antes que nadie.',
     categorias: ['favoritos', 'futbol', 'chill']
   },
   'trayectoria': {

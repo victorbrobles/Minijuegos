@@ -6,20 +6,22 @@ import Icon from '../components/Icon.jsx';
 import AdminPanel from '../components/AdminPanel.jsx';
 import { metaDe, CATEGORIAS_PORTADA as CATEGORIAS_EXPORTADAS } from '../games/meta.js';
 
+// Lista de categorías por defecto de respaldo
 const CATEGORIAS_DEFAULT = [
-  { id: 'favoritos', titulo: '⭐ Favoritos del Creador' },
-  { id: 'prueba', titulo: '🧠 Para ponerte a prueba' },
-  { id: 'estrategia', titulo: '♟️ Estratégicos y de deducción' },
-  { id: 'chill', titulo: '🌴 Para jugar de chill' },
-  { id: 'futbol', titulo: '⚽ Para amantes del fútbol' },
-  { id: 'famosos', titulo: '🌟 De famosos y cultura pop' },
-  { id: 'dos_jugadores', titulo: '👥 Para dos jugadores' }
+  { id: 'favoritos', titulo: '⭐ Favoritos del Creador', desc: 'Los juegos más destacados, adictivos y jugados' },
+  { id: 'prueba', titulo: '🧠 Para ponerte a prueba', desc: 'Retos de ingenio, cultura, velocidad y memoria' },
+  { id: 'estrategia', titulo: '♟️ Estratégicos y de deducción', desc: 'Roles ocultos, engaños, gestión de cartas y táctica' },
+  { id: 'chill', titulo: '🌴 Para jugar de chill', desc: 'Risas, amigos, preguntas y pura diversión sin estrés' },
+  { id: 'futbol', titulo: '⚽ Para amantes del fútbol', desc: 'Demuestra todo lo que sabes sobre el deporte rey' },
+  { id: 'famosos', titulo: '🌟 De famosos y cultura pop', desc: 'Celebridades, cine, música, frases y televisión' },
+  { id: 'dos_jugadores', titulo: '👥 Para dos jugadores', desc: 'Ideales para competir o cooperar frente a frente' }
 ];
 
 const CATEGORIAS_PORTADA = (Array.isArray(CATEGORIAS_EXPORTADAS) && CATEGORIAS_EXPORTADAS.length > 0)
   ? CATEGORIAS_EXPORTADAS
   : CATEGORIAS_DEFAULT;
 
+// Normalización de texto para búsquedas (sin tildes ni símbolos)
 const normalizar = (t) =>
   String(t ?? '')
     .toLowerCase()
@@ -29,6 +31,7 @@ const normalizar = (t) =>
     .replace(/\s+/g, ' ')
     .trim();
 
+// Extrae las categorías admitiendo arrays, strings o nombres separados por comas
 const obtenerCategorias = (g, m) => {
   const fuentes = [m?.categorias, m?.categoria, g?.categorias, g?.categoria].filter(Boolean);
   const lista = [];
@@ -44,6 +47,7 @@ const obtenerCategorias = (g, m) => {
   return lista.filter(Boolean);
 };
 
+// Compara categorías por ID corto ('favoritos') o título ('favoritos del creador')
 const coincideCategoria = (catDeseada, catPortada) => {
   const cNorm = normalizar(catDeseada);
   const idNorm = normalizar(catPortada.id);
@@ -55,6 +59,7 @@ const coincideCategoria = (catDeseada, catPortada) => {
   return false;
 };
 
+// Componente carrusel horizontal con soporte de rueda de ratón, arrastre y flechas
 function FilaCarrusel({ cat, juegos }) {
   const trackRef = useRef(null);
   const [arrastrando, setArrastrando] = useState(false);
@@ -63,9 +68,11 @@ function FilaCarrusel({ cat, juegos }) {
   const scrollLeftStart = useRef(0);
   const haMovido = useRef(false);
 
+  // Convierte el scroll de rueda vertical en horizontal
   useEffect(() => {
     const el = trackRef.current;
     if (!el) return;
+
     const handleWheel = (e) => {
       if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
         const maxScroll = el.scrollWidth - el.clientWidth;
@@ -76,6 +83,7 @@ function FilaCarrusel({ cat, juegos }) {
         }
       }
     };
+
     el.addEventListener('wheel', handleWheel, { passive: false });
     return () => el.removeEventListener('wheel', handleWheel);
   }, []);
@@ -128,8 +136,24 @@ function FilaCarrusel({ cat, juegos }) {
           <h2 className="home-categoria-titulo">{cat.titulo}</h2>
         </div>
         <div className="home-carousel-nav">
-          <button type="button" className="carousel-nav-btn" onClick={() => deslizar('izq')} aria-label="Anterior">‹</button>
-          <button type="button" className="carousel-nav-btn" onClick={() => deslizar('der')} aria-label="Siguiente">›</button>
+          <button
+            type="button"
+            className="carousel-nav-btn"
+            onClick={() => deslizar('izq')}
+            aria-label="Anterior"
+            title="Anterior"
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            className="carousel-nav-btn"
+            onClick={() => deslizar('der')}
+            aria-label="Siguiente"
+            title="Siguiente"
+          >
+            ›
+          </button>
         </div>
       </div>
 
@@ -143,7 +167,11 @@ function FilaCarrusel({ cat, juegos }) {
         onClickCapture={onClickCapture}
       >
         {juegos.map((g, i) => (
-          <li key={`${cat.id}-${g.id}`} className="home-carousel-item" style={{ '--i': Math.min(i, 8) }}>
+          <li
+            key={`${cat.id}-${g.id}`}
+            className="home-carousel-item"
+            style={{ '--i': Math.min(i, 8) }}
+          >
             <GameCard game={g} />
           </li>
         ))}
@@ -167,7 +195,7 @@ export default function Home() {
         return r.json();
       })
       .then(setGames)
-      .catch(() => setError('No se pudo cargar el catálogo.'))
+      .catch(() => setError('No se pudo cargar el catálogo. ¿Está arrancado el servidor?'))
       .finally(() => setCargando(false));
   }, []);
 
@@ -252,111 +280,143 @@ export default function Home() {
 
   return (
     <div className="home-view">
-      {/* Encabezado vistoso y llamativo con el buscador integrado dentro */}
-      <header className="home-head">
-        <div className="home-head-content">
-          <div className="home-head-brand" onClick={() => setBusqueda('')} role="button" tabIndex={0}>
-            <span className="home-logo"><Icon name="gamepad" size={30} strokeWidth={1.9} /></span>
-            <div>
-              <h1 className="home-title">Minigames Hub</h1>
-              <p className="home-sub">¡Elige un minijuego y a jugar!</p>
-            </div>
-          </div>
+      <header className="hub-head">
+        <Icon name="gamepad" className="hub-bg" aria-hidden="true" />
 
-          <div className="home-head-search" role="search">
-            <Icon name="search" size={18} className="home-head-search-icon" />
-            <input
-              ref={inputRef}
-              type="search"
-              className="home-head-search-input"
-              value={busqueda}
-              onChange={(e) => setBusqueda(e.target.value)}
-              onKeyDown={onKeyDown}
-              placeholder="Buscar juego..."
-              aria-label="Buscar juego"
-              autoComplete="off"
-            />
-            {hayBusqueda && (
-              <button type="button" className="home-head-search-clear" onClick={limpiar} aria-label="Borrar búsqueda">
-                <Icon name="x" size={16} strokeWidth={2.4} />
-              </button>
-            )}
+        <div className="hub-top">
+          <span className="hub-logo"><Icon name="gamepad" size={34} strokeWidth={1.9} /></span>
+          <div>
+            <h1 className="hub-title">Minigames Hub</h1>
+            <p className="hub-sub">¡Elige un minijuego y a jugar!</p>
           </div>
         </div>
+
+        <div className="hub-search" role="search">
+          <Icon name="search" size={22} className="hub-search-icon" />
+          <input
+            ref={inputRef}
+            type="search"
+            className="hub-input"
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            onKeyDown={onKeyDown}
+            placeholder="Buscar juego…"
+            aria-label="Buscar juego"
+            enterKeyHint="search"
+            autoComplete="off"
+            autoCorrect="off"
+            spellCheck="false"
+          />
+          {hayBusqueda && (
+            <button type="button" className="hub-clear" onClick={limpiar} aria-label="Borrar búsqueda">
+              <Icon name="x" size={18} strokeWidth={2.6} />
+            </button>
+          )}
+        </div>
+
+        {!cargando && !error && hayBusqueda && (
+          <p className="hub-count" aria-live="polite">{resultados.length} de {games.length} juegos</p>
+        )}
       </header>
 
-      <div className="container">
-        {error && <p className="error">{error}</p>}
-        {cargando && !error && <p className="loading">Cargando juegos…</p>}
+      {error && <p className="error">{error}</p>}
+      {cargando && !error && <p className="loading">Cargando juegos…</p>}
 
-        {!cargando && !error && hayBusqueda && resultados.length > 0 && (
-          <ul className="game-grid">
-            {resultados.map((g, i) => (
-              <li key={g.id} style={{ '--i': Math.min(i, 14) }}><GameCard game={g} /></li>
-            ))}
-          </ul>
-        )}
+      {/* Vista de resultados filtrados por búsqueda */}
+      {!cargando && !error && hayBusqueda && resultados.length > 0 && (
+        <ul className="game-grid">
+          {resultados.map((g, i) => (
+            <li key={g.id} style={{ '--i': Math.min(i, 14) }}><GameCard game={g} /></li>
+          ))}
+        </ul>
+      )}
 
-        {!cargando && !error && !hayBusqueda && (
-          <div className="home-categorias-contenedor">
-            {CATEGORIAS_PORTADA.map((cat) => {
-              const juegosCat = juegosPorCategoria[cat.id] || [];
-              if (juegosCat.length === 0) return null;
-              return <FilaCarrusel key={cat.id} cat={cat} juegos={juegosCat} />;
-            })}
-          </div>
-        )}
+      {/* Vista principal con carruseles horizontales por categoría */}
+      {!cargando && !error && !hayBusqueda && (
+        <div className="home-categorias-contenedor">
+          {CATEGORIAS_PORTADA.map((cat) => {
+            const juegosCat = juegosPorCategoria[cat.id] || [];
+            if (juegosCat.length === 0) return null;
 
-        {!cargando && !error && hayBusqueda && resultados.length === 0 && (
-          <div className="empty">
-            <span className="empty-icon"><Icon name="search" size={30} /></span>
-            <p className="empty-title">Ningún juego coincide con «{busqueda.trim()}»</p>
-            <button type="button" className="secondary" onClick={limpiar}>Borrar búsqueda</button>
-          </div>
-        )}
+            return <FilaCarrusel key={cat.id} cat={cat} juegos={juegosCat} />;
+          })}
+        </div>
+      )}
 
-        <AdminPanel />
+      {!cargando && !error && hayBusqueda && resultados.length === 0 && (
+        <div className="empty">
+          <span className="empty-icon"><Icon name="search" size={30} /></span>
+          <p className="empty-title">Ningún juego coincide con «{busqueda.trim()}»</p>
+          <p className="empty-text">Prueba con otra palabra: «música», «fútbol», «cartas»…</p>
+          <button type="button" className="secondary" onClick={limpiar}>Borrar búsqueda</button>
+        </div>
+      )}
 
-        {/* Pie de página conservado */}
-        <footer className="home-footer">
-          <div className="footer-content">
-            <div className="footer-col about">
-              <div className="footer-brand">
-                <span className="footer-logo">
-                  <Icon name="gamepad" size={24} strokeWidth={2} />
-                </span>
-                <h3>Minigames Hub</h3>
-              </div>
-              <p className="footer-text">
-                Tu plataforma definitiva de minijuegos sociales y de mesa interactivos. Diseñada para jugar en grupo, ya sea en un solo dispositivo pasando el móvil o cada uno desde el suyo con salas online en tiempo real.
-              </p>
+      <AdminPanel />
+
+      {/* Pie de página con información y contacto */}
+      <footer className="home-footer">
+        <Icon name="gamepad" className="foot-bg" aria-hidden="true" />
+        <div className="footer-content">
+          <div className="footer-col about">
+            <div className="footer-brand">
+              <span className="footer-logo">
+                <Icon name="gamepad" size={24} strokeWidth={2} />
+              </span>
+              <h3>Minigames Hub</h3>
             </div>
+            <p className="footer-text">
+              Tu plataforma definitiva de minijuegos sociales y de mesa interactivos. Diseñada para jugar en grupo, ya sea en un solo dispositivo pasando el móvil o cada uno desde el suyo con salas online en tiempo real.
+            </p>
+          </div>
 
-            <div className="footer-col contact">
-              <h4>Contacto y Redes</h4>
-              <p className="footer-subtext">¿Tienes sugerencias o ideas para un nuevo juego? ¡Hablemos!</p>
-              <div className="footer-links">
-                <a href="https://instagram.com" target="_blank" rel="noreferrer" className="footer-btn" title="Instagram">
-                  <span className="footer-btn-icon">📷</span>
-                  <span>Instagram</span>
-                </a>
-                <a href="https://x.com" target="_blank" rel="noreferrer" className="footer-btn" title="X (Twitter)">
-                  <span className="footer-btn-icon">𝕏</span>
-                  <span>X (Twitter)</span>
-                </a>
-                <a href="mailto:contacto@minigameshub.com" className="footer-btn email" title="Correo electrónico">
-                  <span className="footer-btn-icon">✉️</span>
-                  <span>contacto@minigameshub.com</span>
-                </a>
-              </div>
+          <div className="footer-col contact">
+            <h4>Contacto y Redes</h4>
+            <p className="footer-subtext">¿Tienes sugerencias o ideas para un nuevo juego? ¡Hablemos!</p>
+            <div className="footer-links">
+              <a
+                href="https://instagram.com"
+                target="_blank"
+                rel="noreferrer"
+                className="footer-btn"
+                title="Instagram"
+              >
+                <span className="footer-btn-icon">📷</span>
+                <span>Instagram</span>
+              </a>
+              <a
+                href="https://x.com"
+                target="_blank"
+                rel="noreferrer"
+                className="footer-btn"
+                title="X (Twitter)"
+              >
+                <span className="footer-btn-icon">𝕏</span>
+                <span>X (Twitter)</span>
+              </a>
+              <a
+                href="mailto:contacto@minigameshub.com"
+                className="footer-btn email"
+                title="Correo electrónico"
+              >
+                <span className="footer-btn-icon">✉️</span>
+                <span>contacto@minigameshub.com</span>
+              </a>
             </div>
           </div>
+        </div>
 
-          <div className="footer-bottom">
-            <p>© {new Date().getFullYear()} Minigames Hub · Hecho para jugar con amigos y familia.</p>
-          </div>
-        </footer>
-      </div>
+        <div className="footer-bottom">
+          <p>© {new Date().getFullYear()} Minigames Hub · Hecho para jugar con amigos y familia.</p>
+          <button
+            type="button"
+            className="footer-top-btn"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          >
+            <span aria-hidden="true">↑</span> Volver arriba
+          </button>
+        </div>
+      </footer>
     </div>
   );
 }
