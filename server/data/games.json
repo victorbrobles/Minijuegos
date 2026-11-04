@@ -2,85 +2,85 @@
   {
     "id": "siglas",
     "name": "D.E.S.C.I.F.R.A",
-    "description": "Adivina qué significan. Elige categoría, 20 segundos por sigla y sin fallar.",
+    "description": "Adivina el significado real de las siglas y acrónimos más conocidos del mundo. No falles y supera tu propio récord.",
     "isNew": true
   },
   {
     "id": "quien-es-quien",
     "name": "¿Sabes quién soy?",
-    "description": "El clásico juego de adivinar el personaje o elemento oculto. Elige jugadores, categoría y anota los aciertos.",
+    "description": "Una categoría conjunta, un elemento a adivinar para cada uno de los jugadores. Cada jugador sabe el elemento de todos los demás menos el suyo. Adivina tu elemento antes que nadie haciendo preguntas de 'sí' o 'no'.",
     "isNew": true
   },
   {
     "id": "rapidfire",
     "name": "Rápido y certero",
-    "description": "Retos de 60 segundos por categoría: di todos los elementos antes de que se acabe el tiempo o pasa el rebote.",
+    "description": "Elige una categoría y enfréntate al reto de enumerar determinados elementos sobre ella. Dilos todos o le dejarás el rebote al siguiente jugador para que complete ¡y se lleve todos los puntos!",
     "isNew": true
   },
   {
     "id": "trayectoria",
     "name": "Modo carrera",
-    "description": "Adivina el futbolista por los clubes en los que jugó",
+    "description": "Descubre al futbolista a través de los clubes en los que jugó durante su carrera. Cuantos menos clubes necesites, más puntos obtendrás.",
     "isNew": true
   },
   {
     "id": "rasgos",
     "name": "El paparazzi",
-    "description": "Adivina qué famoso es por un detalle de su cara. ¡Cuanto antes aciertes, más puntos!",
+    "description": "Reconoce a una persona famosa a través de un recorte que muestra uno de sus rasgos característicos. Pon a prueba tu conocimiento y fíjate en los pequeños detalles.",
     "isNew": true
   },
   {
     "id": "rankings",
     "name": "Ranking oculto",
-    "description": "Adivina los puestos ocultos de rankings reales con pistas, rebotes y contrarreloj.",
+    "description": "Para los amantes de los rankings. Un ranking real de 5 elementos con 2 de ellos ocultos aleatoriamente. Descubre los elementos que falten y completa el ranking. Podrás acceder a las pistas si no te ves capaz.",
     "isNew": true
   },
   {
     "id": "aproximacion",
     "name": "Aproxímate",
-    "description": "Aproxímate a la cantidad numérica real. Confía en las respuestas de los demás o arriésgate con la tuya.",
+    "description": "Una pregunta, una respuesta numérica. Trata de clavar la respuesta o aproximarte lo máximo posible a ello. Si no te atreves, confía en la respuesta de otro rival. Cuanto más te arriesgues más ganarás, pero más perderás en caso de fallo.",
     "isNew": true
   },
   {
     "id": "ubicacion",
     "name": "Test del viajero",
-    "description": "Memoriza la foto de un lugar famoso y colócalo en el mapa con un marcador real y dos señuelos.",
+    "description": "Coloca un lugar o monumento icónico en un mapa satélite del mundo. Coloca una marca real y varios señuelos para engañar a tus rivales. Cuanto más cerca de las coordenadas reales dejes tu marca, más puntos obtendrás.",
     "isNew": true
   },
   {
     "id": "adivina",
     "name": "Luces, Cámara... ¡Música!",
-    "description": "Adivina la película o la canción con hasta tres pistas: frases, acordes, actores o sinopsis.",
+    "description": "Adivina películas o canciones a través de una serie de pistas. Presta atención a las pistas, tales como actores o genero en caso de películas, cantante o reproducción en caso de canciones. Cuantas menos pistas necesites, más puntos te llevarás.",
     "isNew": true
   },
   {
     "id": "pistas",
     "name": "No seas des(pista)do",
-    "description": "Adivina cualquier enigma a través de 10 pistas progresivas. Enfréntate al modo Estándar o sobrevive con 3 vidas.",
+    "description": "Recibe hasta seis pistas diferentes para adivinar un elemento cualquiera. Las pistas irán aumentando de calidad, pero cuantas menos necesites mejor para tu puntuación.",
     "isNew": true
   },
   {
     "id": "velocidad",
     "name": "Minuto de Infarto",
-    "description": "Test contrarreloj de 60 segundos. Acierta el mayor número de preguntas y supera la pregunta especial para ganar 30s extra.",
+    "description": "Acierta todas las respuetas que puedas en 60 segundos. Sé el que más aciertos haya conseguido al finalizar el crono. Aprovecha la pregunta especial de mitad de ronda para sumar otros 30s extra.",
     "isNew": true
   },
   {
     "id": "quienmas",
-    "name": "¿De verdad os conocéis?",
-    "description": "Votad quién encaja más con cada pregunta. Si votas al más votado sumas punto, pero si hay empate nadie puntúa.",
+    "name": "Quién es más...",
+    "description": "Preguntas del estilo Quién es más...? Elige al compañero que mejor encaje en la descripción y llévate los puntos si coincides con la mayoría. Si tu opción no es la más votada, te quedas sin puntos.",
     "isNew": true
   },
   {
     "id": "confianzaciega",
     "name": "Confianza Ciega",
-    "description": "Elige una consigna en secreto, deja que tus amigos apuesten a ciegas sobre tu capacidad y demuestra cuántas puedes decir en 2 minutos.",
+    "description": "Dos categorías, un jugador selecciona una de las dos en secreto, el resto apuesta a los elementos que cree que podrá enumerar dicho jugador sobre la categoría elegida. ¡Demuestra lo que confías en tus compañeros y acierta tus apuestas!",
     "isNew": true
   },
   {
     "id": "lobos",
     "name": "Luna de Sangre",
-    "description": "Lobos contra pueblo con roles nuevos y caóticos. Composiciones recomendadas según el número de jugadores y consulta de rol en tu turno.",
+    "description": "Lobos contra el pueblo, con multitud de rol y caos infinito. El pueblo trata de destapar a los lobos, mientras que los lobos van matando al pueblo en secreto. ¡Descúbrelos antes de ser cazado!",
     "isNew": true
   },
   {
@@ -92,109 +92,109 @@
   {
     "id": "conecta",
     "name": "Conecta 4",
-    "description": "Encuentra las 4 conexiones secretas entre los 16 elementos del tablero antes de quedarte sin vidas.",
+    "description": "Encuentra las 4 conexiones que existen entre los 16 elementos del tablero (de 4 en 4). Descubre qué conexión les une y gana puntos extra.",
     "isNew": true
   },
   {
     "id": "impostor",
     "name": "Miente como puedas",
-    "description": "Descubre al impostor antes de que se salga con la suya, pero ojo a la restricción que todos debéis cumplir al hablar.",
+    "description": "Una palabra, un impostor que trata de engañar a los demás. Descubrid al impostor antes de que consiga que expulséis a un inocente en su lugar.",
     "isNew": true
   },
   {
     "id": "colores",
     "name": "La vida en colores",
-    "description": "Adivina la combinación exacta de colores de personajes, marcas y cosas míticas que todo el mundo ha visto.",
+    "description": "Algo que todo el mundo conoce, once colores disponibles. Adivina la combinación de colores presente en cada elemento.",
     "isNew": true
   },
   {
     "id": "buscaminas",
     "name": "Cuidado que explota",
-    "description": "Un tablero de 15 casillas con 10 aciertos y 5 bombas ocultas. Elige por turnos, suma puntos según la dificultad y evita pisar la mina para no quedar eliminado de la ronda.",
+    "description": "Un tablero, 10 respuestas correctas y 5 bombas. Elige una respuesta y evita topar con una de las bombas para no quedar eliminado de la ronda.",
     "isNew": true
   },
   {
     "id": "popular",
     "name": "Sigue la Moda",
-    "description": "¿Qué es lo que respondería la mayoría? Adivina los 5 elementos más populares de cada categoría y suma desde 1 hasta 5 puntos por acierto.",
+    "description": "Adivina las 5 cosas que más repsonde la gente sobre cuestiones típicas y cotidianas. Intenta averiguar primero las últimas, más difíciles pero más valiosas.",
     "isNew": true
   },
   {
     "id": "masmenos",
     "name": "Entre dos aguas",
-    "description": "Compara dos datos numéricos frente a frente y elige el más grande para encadenar la racha de aciertos más larga.",
+    "description": "Dos cantidades ocultas enfrentadas, elige la mayor de ellas. Si aciertas, una de las cantidades desaparecerá y será sustituida por otra. Encadena aciertos consecutivos y supera tu récord.",
     "isNew": true
   },
   {
     "id": "cancion",
     "name": "Afina ese oído",
-    "description": "Escucha la canción subiendo gradualmente de volumen. Pulsa el botón antes de los 30 segundos para adivinar el tema y sumar tantos puntos como segundos queden.",
+    "description": "Adivina una canción mediante su reproducción. La canción aumenta progresivamente de volumen, cuanto antes aciertes, más puntos podrás conseguir.",
     "isNew": true
   },
   {
     "id": "ciegas",
     "name": "Top a Ciegas",
-    "description": "Ordena de 1 a 5 cada elemento sin saber qué saldrá después. Los rivales votan cuántos has acertado.",
+    "description": "Coloca cinco elementos en orden de preferencia. Los elementos salen de uno en uno, por lo que tendrás que ir colocándolos sin saber qué viene detrás. ¡No te apresures y guárdate algún hueco para lo que pueda venir!",
     "isNew": true
   },
   {
     "id": "traiciones",
     "name": "Traiciones",
-    "description": "Una caravana cruza el desierto hacia el Oasis, pero hay traidores entre vosotros. Cumple tus tareas, sobrevive y descubre quién miente.",
+    "description": "Una caravana cruza el desierto hacia el Oasis, dos bandos: buenos y traidores. Los buenos deben completar misiones para llegar al objetivo, los traidores deben sabotear y matar a todos sin ser descubiertos.",
     "isNew": true
   },
   {
     "id": "coleccion",
     "name": "Colecciona con cabeza",
-    "description": "Consigue 5 cartas del mismo tipo antes que el resto. ¡Pero cuidado! Si acumulas 5 tipos distintos, quedarás eliminado.",
+    "description": "Una colección de cartas con 8 palos diferentes y muchas cartas de acción. Consigue cinco cartas del mismo palo y ganarás, pero ojo, si acumulas cinco diferentes perderás. ¡Usa bien las cartas de acción!",
     "isNew": true
   },
   {
     "id": "unoadiez",
     "name": "Del 1 al 10...",
-    "description": "Adivina el número secreto del 1 al 10 guiándote por las pistas y opiniones de tus amigos. ¡El que menos puntos sume gana!",
+    "description": "Adivina el número secreto del 1 al 10. Para ello tus compañeros opinarán sobre ciertas categorías dando ejemplos basados en ese número secreto. Guíate por tu intuición y los gustos de tus amigos, y acierta el número.",
     "isNew": true
   },
   {
     "id": "fundadores",
     "name": "Fundadores",
-    "description": "Levantad juntos un pueblo. Elige en secreto tu oficio cada ronda, adivina qué harán los demás y consigue el mejor pueblo antes de que se inaugure.",
+    "description": "Hay que levantar un pueblo. Cada día se escoge un rol oculto a los demás. Escoge bien el rol para cada momento, engaña y sabotea a los demás, y sé el que construya el mejor pueblo de todos.",
     "isNew": true
   },
   {
     "id": "telepatia",
     "name": "Telepatía",
-    "description": "Pensad la misma palabra a la vez. ¡Conectad vuestras mentes y aumentad la racha de coincidencias consecutivas!",
+    "description": "Una palabra sale en la pantalla, di la primera palabra que se te ocurra sobre ella. Si coincides con la de otro jugador, sumaréis puntos; si coincidís varias veces, multiplicaréis vuestros puntos.",
     "isNew": true
   },
   {
     "id": "descarte",
     "name": "¡Descarta y Elimina!",
-    "description": "Elige categoría, di una palabra que empiece por una letra libre antes de 30s y elimínala del abecedario. ¡Sobrevive a 5 tableros!",
+    "description": "Un tablero con todas las letras del abecedario, cada respuesta correcta elimina la letra elegida hasta que no quede ninguna. Elige categoría y rival, ¡y envíale un regalo envenenado!",
     "isNew": true
   },
   {
     "id": "bingoball",
     "name": "Bingoball",
-    "description": "Rellena tu cartón de 4x5 relacionando futbolistas con categorías. Canta líneas y consigue el Bingo antes que nadie.",
+    "description": "Una versión del bingo clásico pero con futbolistas. Coloca a los futbolistas en las categorias que encajen según vayan saliendo y completa el tablero antes que nadie.",
     "isNew": true
   },
   {
     "id": "cuentas",
     "name": "Lleva la cuenta",
-    "description": "Colocad los números del 1 al 100 de menor a mayor sin conocer las cartas de los demás. Gestiona cartas de acción y sé el primero en vaciar tu mano.",
+    "description": "Colocad números del 1 al 100 en orden ascendente sin comunicaros. Si colocas uno cuando no te toca, pierdes, pero si pasas demasiados turnos, también. Utiliza las cartas de acción para ser el primero en quedarse sin cartas.",
     "isNew": true
   },
   {
     "id": "conoce",
     "name": "Conoce a tus amigos",
-    "description": "Responded a preguntas cotidianas y adivinad qué escribió cada compañero. ¡Descubre quién te conoce de verdad a 15 rondas!",
+    "description": "Todos los jugadores responden a una pregunta común. Cuando todos responden, se muestran todas las respuestas y cada uno tendrá que adivinar las respuestas del resto de jugadores. ¿Cuánto conoces a tus amigos?",
     "isNew": true
   },
   {
     "id": "logos",
     "name": "Logo Mania",
-    "description": "Adivina a qué marca corresponde el logo antes de que termine el tiempo. Aciertos suman segundos, fallos restan.",
+    "description": "Identifica la marca que se oculta tras el logo antes de que el cronómetro llegue a cero. Suma segundos al acertar y evita arriesgar si no estás seguro.",
     "isNew": true
   },
   {
@@ -206,37 +206,37 @@
   {
     "id": "trescientosuno",
     "name": "301 Goles",
-    "description": "Llega al número objetivo de goles, asistencias o partidos y demuestra lo mucho que conoces al club escogido.",
+    "description": "Un club, un número objetivo y una estadística elegida (goles, asistencias o partidos). Di jugadores de ese club hasta llegar al número objetivo de la estadística elegida. Sé el primero en llegar a 0 o el que más cerca quede, pero ojo, no te pases de la cifra.",
     "isNew": true
   },
   {
     "id": "jugadores",
     "name": "Con quién he jugado?",
-    "description": "Sale una dupla de jugadores y tienes que encontrar un compañero común a ambos.",
+    "description": "Dos jugadores, un tercero que los conecta. Descubre al jugador que haya jugado con los dos jugadores que aparezcan en pantalla en algún momento de su carrera. No tienen por qué haber jugado los tres juntos, pero él debe haber coincidido con los dos.",
     "isNew": true
   },
   {
     "id": "furbo",
     "name": "Furbo!",
-    "description": "La prueba definitiva para poner a prueba tus conocimientos sobre fútbol. Explora las diversas categorías de este juego y humíllalos a todos!",
+    "description": "Un verdadero quiz de fútbol dividido en diversas fases. Calienta con el vestuario, ponte a punto con la quiniela o cierra el partido con los penaltis. No te desenganches de los primeros puestos y llega con opciones a la final.",
     "isNew": true
   },
   {
     "id": "futbolgrid",
     "name": "Fútbol en raya",
-    "description": "Cuadra categorías que cumplan tus jugadores y crea una línea completa con ellos antes que tu rival. Para jugar individual o por equipos.",
+    "description": "El típico juego de tres en raya versión fútbol. Cada fila y cada columna marcan una categoría. Coloca jugadores que encajen en las categorías de la fila y columna de la casilla elegida, y haz tres en raya antes que tu rival.",
     "isNew": true
   },
   {
     "id": "footballsplit",
     "name": "FrankensFootball",
-    "description": "Adivina de qué tres jugadores viene el híbrido que vas a ver por pantalla. Si eres buen futbolero lo sabrás a la primera, si no siempre puedes acudir a las pistas.",
+    "description": "Una cara híbrida formada por tres partes de diferentes futbolistas (pelo, cara y barbilla). Descubre a qué futbolista pertenece cada parte de la imagen antes de que acabe el tiempo.",
     "isNew": true
   },
   {
     "id": "jugadas",
     "name": "Qué jugadón!",
-    "description": "Pon a prueba tu conocimiento futbolístico sobre el campo y averigua qué jugada se está recreando en cada momento.",
+    "description": "Un campo de fútbol en dos dimensiones con fichas de dos equipos y los dorsales reales de los jugadores. Descubre qué jugada icónica del fútbol se está recreando sobre ese campo y adelántate al resto.",
     "isNew": true
   },
   {

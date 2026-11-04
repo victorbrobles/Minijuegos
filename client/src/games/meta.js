@@ -19,8 +19,8 @@ export const META = {
     icono: 'bingocard',
     colores: ['#2563eb', '#0f172a'],
     etiquetas: 'futbol bingo cartones jugadores categorias online',
-    descripcion: 'Rellena tu cartón de 4x3 relacionando futbolistas con categorías. Canta líneas y consigue el Bingo antes que nadie.',
-    categorias: ['favoritos', 'futbol', 'chill']
+    descripcion: 'Una versión del bingo clásico pero con futbolistas. Coloca a los futbolistas en las categorias que encajen según vayan saliendo y completa el tablero antes que nadie.',
+    categorias: ['futbol']
   },
   'trayectoria': {
     titulo: 'Modo carrera',
@@ -28,8 +28,8 @@ export const META = {
     icono: 'careerpath',
     colores: ['#22c55e', '#14532d'],
     etiquetas: 'futbol futbolista clubes deportes equipos jugador',
-    descripcion: 'Descubre al deportista a través de los clubes en los que jugó.',
-    categorias: ['futbol', 'prueba', 'dos_jugadores']
+    descripcion: 'Descubre al futbolista a través de los clubes en los que jugó durante su carrera. Cuantos menos clubes necesites, más puntos obtendrás.',
+    categorias: ['futbol']
   },
   'traiciones': {
     titulo: 'Traiciones',
@@ -37,8 +37,8 @@ export const META = {
     icono: 'dagger',
     colores: ['#d97706', '#451a03'],
     etiquetas: 'traidores caravana desierto sabotaje mafia deduccion engano coartada votar roles online',
-    descripcion: 'Una caravana cruza el desierto hacia el Oasis, pero hay traidores entre vosotros. Cumple tus tareas, vigila tus espaldas y descubre quién miente antes de que sea tarde.',
-    categorias: ['favoritos', 'estrategia']
+    descripcion: 'Una caravana cruza el desierto hacia el Oasis, dos bandos: buenos y traidores. Los buenos deben completar misiones para llegar al objetivo, los traidores deben sabotear y matar a todos sin ser descubiertos.',
+    categorias: ['estrategia', 'favoritos']
   },
   'fundadores': {
     titulo: 'Fundadores',
@@ -46,8 +46,8 @@ export const META = {
     icono: 'landmark',
     colores: ['#ea580c', '#7c2d12'],
     etiquetas: 'pueblo construir oficios roles ocultos estrategia cartas edificios eleccion secreta online',
-    descripcion: 'Levantad juntos un pueblo. Elige en secreto tu oficio cada ronda, adivina qué harán los demás y consigue el mejor barrio antes de que se inaugure.',
-    categorias: ['favoritos', 'estrategia']
+    descripcion: 'Hay que levantar un pueblo. Cada día se escoge un rol oculto a los demás. Escoge bien el rol para cada momento, engaña y sabotea a los demás, y sé el que construya el mejor pueblo de todos.',
+    categorias: ['estrategia']
   },
   'coleccion': {
     titulo: 'Colecciona con cabeza',
@@ -55,8 +55,8 @@ export const META = {
     icono: 'cards',
     colores: ['#06b6d4', '#1e40af'],
     etiquetas: 'cartas azar coleccion estrategia numeros baraja',
-    descripcion: 'Consigue 5 cartas del mismo tipo antes que el resto. ¡Pero cuidado! Si acumulas 5 tipos distintos, quedarás eliminado.',
-    categorias: ['favoritos', 'estrategia']
+    descripcion: 'Una colección de cartas con 8 palos diferentes y muchas cartas de acción. Consigue cinco cartas del mismo palo y ganarás, pero ojo, si acumulas cinco diferentes perderás. ¡Usa bien las cartas de acción!',
+    categorias: ['estrategia']
   },
   'cuentas': {
     titulo: 'Lleva la cuenta',
@@ -64,8 +64,8 @@ export const META = {
     icono: 'numcards',
     colores: ['#38bdf8', '#0369a1'],
     etiquetas: 'numeros orden cartas mayor menor cuenta deduccion cartas accion',
-    descripcion: 'Colocad los números del 1 al 100 de menor a mayor sin conocer las cartas de los demás. Gestiona cartas de acción y sé el primero en vaciar tu mano.',
-    categorias: ['estrategia', 'dos_jugadores']
+    descripcion: 'Colocad números del 1 al 100 en orden ascendente sin comunicaros. Si colocas uno cuando no te toca, pierdes, pero si pasas demasiados turnos, también. Utiliza las cartas de acción para ser el primero en quedarse sin cartas.',
+    categorias: ['estrategia']
   },
   'descarte': {
     titulo: '¡Descarta y Elimina!',
@@ -73,8 +73,8 @@ export const META = {
     icono: 'x',
     colores: ['#f43f5e', '#881337'],
     etiquetas: 'palabra ingenio velocidad letras categorias',
-    descripcion: 'Elige categoría, di una palabra que empiece por una letra libre antes de 30s y elimínala del abecedario. ¡Sobrevive a 5 tableros!',
-    categorias: ['dos_jugadores', 'prueba']
+    descripcion: 'Un tablero con todas las letras del abecedario, cada respuesta correcta elimina la letra elegida hasta que no quede ninguna. Elige categoría y rival, ¡y envíale un regalo envenenado!',
+    categorias: ['prueba']
   },
   'lobos': {
     titulo: 'Luna de Sangre',
@@ -82,8 +82,8 @@ export const META = {
     icono: 'moon',
     colores: ['#dc2626', '#1e1b4b'],
     etiquetas: 'hombres lobo roles pueblo noche narrador mafia',
-    descripcion: 'Lobos contra pueblo, con roles inéditos y caos. De 8 a 12 jugadores, pasándoos el dispositivo.',
-    categorias: ['favoritos', 'estrategia']
+    descripcion: 'Lobos contra el pueblo, con multitud de rol y caos infinito. El pueblo trata de destapar a los lobos, mientras que los lobos van matando al pueblo en secreto. ¡Descúbrelos antes de ser cazado!',
+    categorias: ['estrategia', 'favoritos']
   },
   'impostor': {
     titulo: 'Miente como puedas',
@@ -91,7 +91,7 @@ export const META = {
     icono: 'mask',
     colores: ['#9333ea', '#3b0764'],
     etiquetas: 'impostor mentir engano restriccion hablar sospechoso',
-    descripcion: 'Descubre al impostor antes de que se salga con la suya, pero ojo a la restricción que todos debéis cumplir al hablar.',
+    descripcion: 'Una palabra, un impostor que trata de engañar a los demás. Descubrid al impostor antes de que consiga que expulséis a un inocente en su lugar.',
     categorias: ['chill']
   },
   'conecta': {
@@ -100,8 +100,8 @@ export const META = {
     icono: 'connect',
     colores: ['#0284c7', '#1e3a8a'],
     etiquetas: 'conexiones grupos 16 elementos palabras relacionar',
-    descripcion: 'Encuentra las 4 conexiones secretas entre los 16 elementos del tablero antes de quedarte sin vidas.',
-    categorias: ['prueba', 'futbol']
+    descripcion: 'Encuentra las 4 conexiones que existen entre los 16 elementos del tablero (de 4 en 4). Descubre qué conexión les une y gana puntos extra.',
+    categorias: ['prueba', 'favoritos']
   },
   'buscaminas': {
     titulo: 'Cuidado que explota',
@@ -109,8 +109,8 @@ export const META = {
     icono: 'bomb',
     colores: ['#64748b', '#090d16'],
     etiquetas: 'minas bombas casillas explota tablero suerte',
-    descripcion: 'Un tablero de 15 casillas con 10 aciertos y 5 bombas ocultas. Elige por turnos, suma puntos según la dificultad y evita pisar la mina para no quedar eliminado de la ronda.',
-    categorias: ['prueba', 'futbol']
+    descripcion: 'Un tablero, 10 respuestas correctas y 5 bombas. Elige una respuesta y evita topar con una de las bombas para no quedar eliminado de la ronda.',
+    categorias: ['prueba', 'favoritos']
   },
   'quien-es-quien': {
     titulo: '¿Sabes quién soy?',
@@ -118,8 +118,8 @@ export const META = {
     icono: 'whois',
     colores: ['#3b82f6', '#6d28d9'],
     etiquetas: 'personajes adivinar descartar rasgos clasico tablero preguntas',
-    descripcion: 'Adivina el personaje secreto descartando rasgos antes que tus rivales.',
-    categorias: ['favoritos', 'famosos', 'chill']
+    descripcion: 'Una categoría conjunta, un elemento a adivinar para cada uno de los jugadores. Cada jugador sabe el elemento de todos los demás menos el suyo. Adivina tu elemento antes que nadie haciendo preguntas de \'sí\' o \'no\'.',
+    categorias: ['famosos', 'favoritos']
   },
   'rasgos': {
     titulo: 'El paparazzi',
@@ -127,8 +127,8 @@ export const META = {
     icono: 'zoomface',
     colores: ['#f97316', '#9a3412'],
     etiquetas: 'famosos cara facciones zoom foto celebridades',
-    descripcion: 'Reconoce al famoso descubriendo sus facciones paso a paso.',
-    categorias: ['famosos', 'chill']
+    descripcion: 'Reconoce a una persona famosa a través de un recorte que muestra uno de sus rasgos característicos. Pon a prueba tu conocimiento y fíjate en los pequeños detalles.',
+    categorias: ['famosos']
   },
   'adivina': {
     titulo: 'Luces, Cámara... ¡Música!',
@@ -136,8 +136,8 @@ export const META = {
     icono: 'clapperboard',
     colores: ['#ec4899', '#831843'],
     etiquetas: 'peliculas cine canciones musica actores frases audio',
-    descripcion: 'Identifica la película o la canción con frases, fragmentos de audio de 20s y actores.',
-    categorias: ['famosos', 'chill']
+    descripcion: 'Adivina películas o canciones a través de una serie de pistas. Presta atención a las pistas, tales como actores o genero en caso de películas, cantante o reproducción en caso de canciones. Cuantas menos pistas necesites, más puntos te llevarás.',
+    categorias: ['famosos']
   },
   'cancion': {
     titulo: 'Afina ese oído',
@@ -145,8 +145,8 @@ export const META = {
     icono: 'music',
     colores: ['#a3e635', '#15803d'],
     etiquetas: 'musica canciones escuchar oido volumen adivinar tema',
-    descripcion: 'Escucha la canción subiendo gradualmente de volumen. Pulsa el botón antes de los 30 segundos para adivinar el tema y sumar tantos puntos como segundos queden.',
-    categorias: ['chill']
+    descripcion: 'Adivina una canción mediante su reproducción. La canción aumenta progresivamente de volumen, cuanto antes aciertes, más puntos podrás conseguir.',
+    categorias: ['famosos', 'favoritos']
   },
   'frasescelebres': {
     titulo: 'Frases Célebres',
@@ -155,7 +155,7 @@ export const META = {
     colores: ['#06b6d4', '#164e63'],
     etiquetas: 'citas autor quien dijo historia politica deporte famosos',
     descripcion: '¿Quién dijo qué? Adivina el autor de las frases más recordadas de la historia, la política, el deporte y el famoseo.',
-    categorias: ['famosos', 'chill']
+    categorias: ['famosos']
   },
   'colores': {
     titulo: 'La vida en colores',
@@ -163,8 +163,8 @@ export const META = {
     icono: 'palette',
     colores: ['#f472b6', '#f59e0b'],
     etiquetas: 'colores marcas personajes logos combinacion',
-    descripcion: 'Adivina la combinación exacta de colores de personajes, marcas y cosas míticas que todo el mundo ha visto.',
-    categorias: ['favoritos', 'chill']
+    descripcion: 'Algo que todo el mundo conoce, once colores disponibles. Adivina la combinación de colores presente en cada elemento.',
+    categorias: ['chill', 'favoritos']
   },
   'siglas': {
     titulo: 'D.E.S.C.I.F.R.A',
@@ -172,8 +172,8 @@ export const META = {
     icono: 'letters',
     colores: ['#6366f1', '#312e81'],
     etiquetas: 'siglas acronimos significado palabras cultura general',
-    descripcion: 'Averigua el significado real de las siglas más conocidas.',
-    categorias: ['prueba', 'dos_jugadores']
+    descripcion: 'Adivina el significado real de las siglas y acrónimos más conocidos del mundo. No falles y supera tu propio récord.',
+    categorias: ['dos_jugadores']
   },
   'rankings': {
     titulo: 'Ranking oculto',
@@ -181,8 +181,8 @@ export const META = {
     icono: 'podium',
     colores: ['#facc15', '#a16207'],
     etiquetas: 'ranking ordenar puestos clasificacion mayor menor top',
-    descripcion: 'Ordena de mayor a menor elementos de cultura, ciencia, cine y deportes.',
-    categorias: ['prueba', 'favoritos']
+    descripcion: 'Para los amantes de los rankings. Un ranking real de 5 elementos con 2 de ellos ocultos aleatoriamente. Descubre los elementos que falten y completa el ranking. Podrás acceder a las pistas si no te ves capaz.',
+    categorias: ['prueba']
   },
   'aproximacion': {
     titulo: 'Aproxímate',
@@ -190,8 +190,8 @@ export const META = {
     icono: 'target',
     colores: ['#8b5cf6', '#4c1d95'],
     etiquetas: 'numeros cifras calcular estimar aproximar cantidad',
-    descripcion: 'Atrévete a calcular cifras astronómicas y llévate los puntos por ser el más cercano.',
-    categorias: ['prueba', 'favoritos']
+    descripcion: 'Una pregunta, una respuesta numérica. Trata de clavar la respuesta o aproximarte lo máximo posible a ello. Si no te atreves, confía en la respuesta de otro rival. Cuanto más te arriesgues más ganarás, pero más perderás en caso de fallo.',
+    categorias: ['chill']
   },
   'velocidad': {
     titulo: 'Minuto de Infarto',
@@ -199,8 +199,8 @@ export const META = {
     icono: 'stopwatch',
     colores: ['#84cc16', '#365314'],
     etiquetas: 'contrarreloj rapido 60 segundos preguntas tiempo test',
-    descripcion: '60 segundos de adrenalina pura. Acierta a contrarreloj y supera la pregunta especial.',
-    categorias: ['prueba', 'dos_jugadores']
+    descripcion: 'Acierta todas las respuetas que puedas en 60 segundos. Sé el que más aciertos haya conseguido al finalizar el crono. Aprovecha la pregunta especial de mitad de ronda para sumar otros 30s extra.',
+    categorias: ['dos_jugadores']
   },
   'rapidfire': {
     titulo: 'Rápido y certero',
@@ -208,8 +208,8 @@ export const META = {
     icono: 'zap',
     colores: ['#ef4444', '#7f1d1d'],
     etiquetas: 'retos categorias cronometro rebote rapido 60 segundos',
-    descripcion: 'Retos de 60 segundos por categoría: di todos los elementos antes de que se acabe el tiempo o pasa el rebote.',
-    categorias: ['prueba', 'chill', 'dos_jugadores']
+    descripcion: 'Elige una categoría y enfréntate al reto de enumerar determinados elementos sobre ella. Dilos todos o le dejarás el rebote al siguiente jugador para que complete ¡y se lleve todos los puntos!',
+    categorias: ['prueba']
   },
   'pistas': {
     titulo: 'No seas des(pista)do',
@@ -217,8 +217,8 @@ export const META = {
     icono: 'sleuth',
     colores: ['#475569', '#1e293b'],
     etiquetas: 'detective enigma misterio pistas vidas adivinar',
-    descripcion: 'Resuelve el enigma con 6 pistas progresivas. Juega por puntos o sobrevive con 3 vidas.',
-    categorias: ['prueba', 'chill']
+    descripcion: 'Recibe hasta seis pistas diferentes para adivinar un elemento cualquiera. Las pistas irán aumentando de calidad, pero cuantas menos necesites mejor para tu puntuación.',
+    categorias: ['prueba']
   },
   'ubicacion': {
     titulo: 'Test del viajero',
@@ -226,8 +226,8 @@ export const META = {
     icono: 'pin',
     colores: ['#10b981', '#064e3b'],
     etiquetas: 'mapa lugares monumentos geografia mundo foto',
-    descripcion: 'Ubica monumentos y lugares en el mapa mundial esquivando los señuelos de los demás.',
-    categorias: ['prueba', 'favoritos']
+    descripcion: 'Coloca un lugar o monumento icónico en un mapa satélite del mundo. Coloca una marca real y varios señuelos para engañar a tus rivales. Cuanto más cerca de las coordenadas reales dejes tu marca, más puntos obtendrás.',
+    categorias: ['chill', 'favoritos']
   },
   'masmenos': {
     titulo: 'Entre dos aguas',
@@ -235,8 +235,8 @@ export const META = {
     icono: 'scale',
     colores: ['#3b82f6', '#1d4ed8'],
     etiquetas: 'comparar mayor menor datos numericos racha',
-    descripcion: 'Compara dos datos numéricos frente a frente y elige el más grande para encadenar la racha de aciertos más larga.',
-    categorias: ['prueba', 'dos_jugadores']
+    descripcion: 'Dos cantidades ocultas enfrentadas, elige la mayor de ellas. Si aciertas, una de las cantidades desaparecerá y será sustituida por otra. Encadena aciertos consecutivos y supera tu récord.',
+    categorias: ['dos_jugadores']
   },
   'conoce': {
     titulo: 'Conoce a tus amigos',
@@ -244,8 +244,8 @@ export const META = {
     icono: 'heartchat',
     colores: ['#818cf8', '#3730a3'],
     etiquetas: 'amigos conocer preguntas cotidiano sinceridad votar deducir parejas',
-    descripcion: 'Responded a preguntas cotidianas y adivinad qué escribió cada compañero. ¡Descubre quién te conoce de verdad a 15 rondas!',
-    categorias: ['favoritos', 'chill']
+    descripcion: 'Todos los jugadores responden a una pregunta común. Cuando todos responden, se muestran todas las respuestas y cada uno tendrá que adivinar las respuestas del resto de jugadores. ¿Cuánto conoces a tus amigos?',
+    categorias: ['chill']
   },
   'ciegas': {
     titulo: 'Top a Ciegas',
@@ -253,7 +253,7 @@ export const META = {
     icono: 'eyeoff',
     colores: ['#f59e0b', '#92400e'],
     etiquetas: 'ranking ordenar ciegas votar puntuar orden',
-    descripcion: 'Ordena de 1 a 5 cada elemento sin saber qué saldrá después. Los rivales votan cuántos has acertado.',
+    descripcion: 'Coloca cinco elementos en orden de preferencia. Los elementos salen de uno en uno, por lo que tendrás que ir colocándolos sin saber qué viene detrás. ¡No te apresures y guárdate algún hueco para lo que pueda venir!',
     categorias: ['chill']
   },
   'unoadiez': {
@@ -262,16 +262,16 @@ export const META = {
     icono: 'dial10',
     colores: ['#c084fc', '#9d174d'],
     etiquetas: 'numero conocer amigos pareja ranking',
-    descripcion: 'Adivina el número secreto del 1 al 10 guiándote por las pistas y opiniones de tus amigos. ¡El que menos puntos sume gana!',
-    categorias: ['chill', 'dos_jugadores']
+    descripcion: 'Adivina el número secreto del 1 al 10. Para ello tus compañeros opinarán sobre ciertas categorías dando ejemplos basados en ese número secreto. Guíate por tu intuición y los gustos de tus amigos, y acierta el número.',
+    categorias: ['dos_jugadores']
   },
   'quienmas': {
-    titulo: '¿De verdad os conocéis?',
+    titulo: 'Quién es más...',
     imagen: '/covers/quienmas.webp',
     icono: 'users',
     colores: ['#fb7185', '#be123c'],
     etiquetas: 'amigos votar votacion preguntas picantes grupo conocer',
-    descripcion: 'Votad quién encaja más con preguntas comprometidas o divertidas. Si votas al más votado te llevas punto, pero si hay empate... ¡cero puntos para todos!',
+    descripcion: 'Preguntas del estilo Quién es más...? Elige al compañero que mejor encaje en la descripción y llévate los puntos si coincides con la mayoría. Si tu opción no es la más votada, te quedas sin puntos.',
     categorias: ['chill']
   },
   'telepatia': {
@@ -280,7 +280,7 @@ export const META = {
     icono: 'telepathy',
     colores: ['#2dd4bf', '#115e59'],
     etiquetas: 'telepatia azar coincidir amigos conocerse',
-    descripcion: 'Pensad la misma palabra a la vez. ¡Conectad vuestras mentes y aumentad la racha de coincidencias consecutivas!',
+    descripcion: 'Una palabra sale en la pantalla, di la primera palabra que se te ocurra sobre ella. Si coincides con la de otro jugador, sumaréis puntos; si coincidís varias veces, multiplicaréis vuestros puntos.',
     categorias: ['chill']
   },
   'confianzaciega': {
@@ -289,7 +289,7 @@ export const META = {
     icono: 'dice',
     colores: ['#14b8a6', '#0f766e'],
     etiquetas: 'apuesta apostar consigna retos amigos 2 minutos',
-    descripcion: 'Elige una consigna en secreto, deja que tus amigos apuesten a ciegas sobre tu capacidad y demuestra cuántas puedes decir en 2 minutos.',
+    descripcion: 'Dos categorías, un jugador selecciona una de las dos en secreto, el resto apuesta a los elementos que cree que podrá enumerar dicho jugador sobre la categoría elegida. ¡Demuestra lo que confías en tus compañeros y acierta tus apuestas!',
     categorias: ['chill']
   },
   'popular': {
@@ -298,8 +298,8 @@ export const META = {
     icono: 'flame',
     colores: ['#fb923c', '#dc2626'],
     etiquetas: 'popular mayoria top 5 tendencia moda categorias encuesta',
-    descripcion: '¿Qué es lo que respondería la mayoría? Adivina los 5 elementos más populares de cada categoría y suma desde 1 hasta 5 puntos por acierto.',
-    categorias: ['chill', 'dos_jugadores']
+    descripcion: 'Adivina las 5 cosas que más repsonde la gente sobre cuestiones típicas y cotidianas. Intenta averiguar primero las últimas, más difíciles pero más valiosas.',
+    categorias: ['chill']
   },
   'logos': {
     titulo: 'Logo Mania',
@@ -308,7 +308,7 @@ export const META = {
     colores: ['#22d3ee', '#0284c7'],
     etiquetas: 'logos marcas empresas adivinar velocidad memoria simbolos',
     descripcion: 'Identifica la marca que se oculta tras el logo antes de que el cronómetro llegue a cero. Suma segundos al acertar y evita arriesgar si no estás seguro.',
-    categorias: ['prueba', 'dos_jugadores']
+    categorias: ['dos_jugadores']
   },
   'hipotesis': {
     titulo: 'La Hipótesis Ganadora',
@@ -317,7 +317,7 @@ export const META = {
     colores: ['#60a5fa', '#1e3a8a'],
     etiquetas: 'hipotesis farol engano deduccion apostar laboratorio ciencia muestras mentir online',
     descripcion: 'Cada ronda el laboratorio esconde una verdad y tú solo conoces un trocito. Formula una hipótesis (cierta o de farol), apuesta por las de los demás y descubre quién miente.',
-    categorias: ['favoritos', 'estrategia']
+    categorias: ['estrategia']
   },
   'trescientosuno': {
     titulo: '301 goles',
@@ -325,8 +325,8 @@ export const META = {
     icono: 'goal301',
     colores: ['#34d399', '#047857'],
     etiquetas: 'futbol goles clubes goleadores asistencias partidos adivinar seleccion balon',
-    descripcion: 'Llega al número objetivo de goles, asistencias o partidos y demuestra lo mucho que conoces al club escogido.',
-    categorias: ['favoritos', 'futbol']
+    descripcion: 'Un club, un número objetivo y una estadística elegida (goles, asistencias o partidos). Di jugadores de ese club hasta llegar al número objetivo de la estadística elegida. Sé el primero en llegar a 0 o el que más cerca quede, pero ojo, no te pases de la cifra.',
+    categorias: ['futbol', 'favoritos']
   },
   'jugadores': {
     titulo: '¿Con quién he jugado?',
@@ -334,8 +334,8 @@ export const META = {
     icono: 'teammates',
     colores: ['#f97316', '#b91c1c'],
     etiquetas: 'futbol jugadores clubes compañero adivinar seleccion balon',
-    descripcion: 'Sale una dupla de jugadores y tienes que encontrar un compañero común a ambos.',
-    categorias: ['dos_jugadores', 'futbol']
+    descripcion: 'Dos jugadores, un tercero que los conecta. Descubre al jugador que haya jugado con los dos jugadores que aparezcan en pantalla en algún momento de su carrera. No tienen por qué haber jugado los tres juntos, pero él debe haber coincidido con los dos.',
+    categorias: ['futbol']
   },
   'furbo': {
     titulo: 'Furbo!',
@@ -343,8 +343,8 @@ export const META = {
     icono: 'soccer',
     colores: ['#4ade80', '#166534'],
     etiquetas: 'futbol jugadores quiz clubes adivinar seleccion balon',
-    descripcion: 'La prueba definitiva para poner a prueba tus conocimientos sobre fútbol. Explora las diversas categorías de este juego y humíllalos a todos!',
-    categorias: ['favoritos', 'chill', 'futbol']
+    descripcion: 'Un verdadero quiz de fútbol dividido en diversas fases. Calienta con el vestuario, ponte a punto con la quiniela o cierra el partido con los penaltis. No te desenganches de los primeros puestos y llega con opciones a la final.',
+    categorias: ['futbol', 'favoritos']
   },
   'futbolgrid': {
     titulo: 'Fútbol en raya',
@@ -352,8 +352,8 @@ export const META = {
     icono: 'futbolgrid',
     colores: ['#a855f7', '#b91c1c'],
     etiquetas: 'futbol jugadores quiz clubes adivinar seleccion balon',
-    descripcion: 'Cuadra categorías que cumplan tus jugadores y crea una línea completa con ellos antes que tu rival. Para jugar individual o por equipos.',
-    categorias: ['favoritos', 'dos_jugadores', 'futbol']
+    descripcion: 'El típico juego de tres en raya versión fútbol. Cada fila y cada columna marcan una categoría. Coloca jugadores que encajen en las categorías de la fila y columna de la casilla elegida, y haz tres en raya antes que tu rival.',
+    categorias: ['futbol']
   },
   'footballsplit': {
     titulo: 'FrankensFootball',
@@ -361,8 +361,8 @@ export const META = {
     icono: 'frankenstein',
     colores: ['#818cf8', '#0f172a'],
     etiquetas: 'futbol jugadores quiz clubes adivinar seleccion balon cara cabeza cuerpo',
-    descripcion: 'Adivina de qué tres jugadores viene el híbrido que vas a ver por pantalla. Si eres buen futbolero lo sabrás a la primera, si no siempre puedes acudir a las pistas.',
-    categorias: ['favoritos', 'dos_jugadores', 'futbol']
+    descripcion: 'Una cara híbrida formada por tres partes de diferentes futbolistas (pelo, cara y barbilla). Descubre a qué futbolista pertenece cada parte de la imagen antes de que acabe el tiempo.',
+    categorias: ['futbol']
   },
   'jugadas': {
     titulo: '¡Qué jugadón!',
@@ -370,8 +370,8 @@ export const META = {
     icono: 'tacticboard',
     colores: ['#fbbf24', '#b45309'],
     etiquetas: 'futbol jugadas quiz campo adivinar dorsales balon gol jugadon',
-    descripcion: 'Pon a prueba tu conocimiento futbolístico sobre el campo y averigua qué jugada se está recreando en cada momento.',
-    categorias: ['favoritos', 'dos_jugadores', 'futbol']
+    descripcion: 'Un campo de fútbol en dos dimensiones con fichas de dos equipos y los dorsales reales de los jugadores. Descubre qué jugada icónica del fútbol se está recreando sobre ese campo y adelántate al resto.',
+    categorias: ['futbol']
   },
   'cuatroclubes': {
     titulo: 'El club de los cuatro',
@@ -380,7 +380,7 @@ export const META = {
     colores: ['#e879f9', '#9d174d'],
     etiquetas: 'futbol clubes quiz enlazar jugadores trayectoria balon gol',
     descripcion: 'Cuatro clubes, un jugador. Decide qué jugador encaja en el mayor número posible de esos cuatro y a ver si consigues el pleno!',
-    categorias: ['dos_jugadores', 'futbol']
+    categorias: ['futbol']
   }
 };
 
