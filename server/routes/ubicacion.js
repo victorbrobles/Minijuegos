@@ -320,4 +320,25 @@ router.post('/online/sala/:code/finalizar', (req, res) => {
   res.json({ success: true });
 });
 
+// POST /api/ubicacion/online/sala/:code/salir
+router.post('/online/sala/:code/salir', (req, res) => {
+  const code = req.params.code?.toUpperCase();
+  const sala = salasOnline.get(code);
+  if (!sala) return res.json({ success: true });
+
+  const token = req.body?.token;
+  const idx = sala.jugadores.findIndex((j) => j.token === token);
+
+  if (idx !== -1) {
+    sala.jugadores.splice(idx, 1);
+    if (sala.jugadores.length === 0) {
+      salasOnline.delete(code);
+    } else if (sala.adminToken === token) {
+      sala.adminToken = sala.jugadores[0].token;
+    }
+  }
+
+  res.json({ success: true });
+});
+
 export default router;
