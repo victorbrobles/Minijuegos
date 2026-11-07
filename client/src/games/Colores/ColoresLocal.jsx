@@ -1,5 +1,6 @@
 // client/src/games/Colores/ColoresLocal.jsx
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import GameIntro from '../../components/GameIntro.jsx';
 import './Colores.css';
@@ -23,9 +24,23 @@ const PALETA_COLORES = [
   { id: 'rosa', nombre: 'Rosa', hex: '#ec4899', textoHex: '#ffffff' }
 ];
 
-export default function ColoresLocal({ onVolver, onExit }) {
+const COLORES = ['#ef4444', '#2563eb', '#16a34a', '#f59e0b', '#9333ea', '#ec4899', '#0d9488', '#ea580c', '#475569', '#65a30d'];
+
+function BotonVolver({ onClick, texto = 'Volver' }) {
+  return (
+    <button type="button" className="qq-link-volver" onClick={onClick}>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7" />
+      </svg>
+      <span>{texto}</span>
+    </button>
+  );
+}
+
+export default function ColoresLocal({ onVolver, onExit, onAbrirAyuda }) {
+  const navigate = useNavigate();
   const [fase, setFase] = useState('setup');
-  const [modalAyuda, setModalAyuda] = useState(false);
+  const [modalSalirPortada, setModalSalirPortada] = useState(false);
 
   const [numJugadores, setNumJugadores] = useState(4);
   const [jugadores, setJugadores] = useState([
@@ -45,7 +60,6 @@ export default function ColoresLocal({ onVolver, onExit }) {
   const [coloresSeleccionados, setColoresSeleccionados] = useState([]);
 
   const [resultadoRonda, setResultadoRonda] = useState(null);
-
   const [tiempoRestante, setTiempoRestante] = useState(TIEMPO_TURNO);
   const timerRef = useRef(null);
 
@@ -63,8 +77,21 @@ export default function ColoresLocal({ onVolver, onExit }) {
       });
   }, []);
 
-  const handleNumJugadoresChange = (e) => {
-    const num = parseInt(e.target.value, 10);
+  const handleSalirAPortada = () => {
+    setModalSalirPortada(false);
+    if (typeof onExit === 'function') {
+      onExit();
+    } else {
+      try {
+        navigate('/');
+      } catch {
+        window.location.href = '/';
+      }
+    }
+  };
+
+  const actualizarCantidadJugadores = (nuevoNum) => {
+    const num = Math.max(MIN_JUGADORES, Math.min(MAX_JUGADORES, nuevoNum));
     setNumJugadores(num);
     const nuevos = Array.from({ length: num }, (_, i) => ({
       id: i + 1,
@@ -85,11 +112,9 @@ export default function ColoresLocal({ onVolver, onExit }) {
       nombre: j.nombre.trim() || `Jugador ${j.id}`
     }));
     setJugadores(listaActualizada);
-
     const scores = {};
     listaActualizada.forEach((j) => { scores[j.id] = 0; });
     setPuntos(scores);
-
     setRondaActual(1);
     prepararRonda(1);
   };
@@ -122,9 +147,7 @@ export default function ColoresLocal({ onVolver, onExit }) {
 
   const confirmarRespuesta = (forzado = false) => {
     if (!forzado && coloresSeleccionados.length !== preguntaActual.numColores) return;
-
     if (timerRef.current) clearInterval(timerRef.current);
-
     const nuevasRespuestas = {
       ...respuestasRonda,
       [jugadorEnTurno.id]: coloresSeleccionados
@@ -150,21 +173,18 @@ export default function ColoresLocal({ onVolver, onExit }) {
       if (timerRef.current) clearInterval(timerRef.current);
       return;
     }
-
     setTiempoRestante(TIEMPO_TURNO);
     if (timerRef.current) clearInterval(timerRef.current);
-
     timerRef.current = setInterval(() => {
       setTiempoRestante((prev) => {
         if (prev <= 1) {
           clearInterval(timerRef.current);
-          if (confirmarRespuestaRef.current) confirmarRespuestaRef.current(true); // Envío forzado
+          if (confirmarRespuestaRef.current) confirmarRespuestaRef.current(true); 
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
-
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
@@ -178,21 +198,11 @@ export default function ColoresLocal({ onVolver, onExit }) {
     jugadores.forEach((j) => {
       const elegidos = respuestas[j.id] || [];
       let aciertosJugador = 0;
-
       elegidos.forEach((col) => {
-        if (correctosSet.has(col)) {
-          aciertosJugador += 1;
-        }
+        if (correctosSet.has(col)) aciertosJugador += 1;
       });
-
       puntosGanadosRonda[j.id] = aciertosJugador;
-
-      desglose.push({
-        jugador: j.nombre,
-        id: j.id,
-        elegidos,
-        aciertos: aciertosJugador
-      });
+      desglose.push({ jugador: j.nombre, id: j.id, elegidos, aciertos: aciertosJugador });
     });
 
     setPuntos((prev) => {
@@ -208,7 +218,6 @@ export default function ColoresLocal({ onVolver, onExit }) {
       coloresCorrectos: preguntaActual.colores,
       item: preguntaActual.item
     });
-
     setFase('resultados_ronda');
   };
 
@@ -225,134 +234,139 @@ export default function ColoresLocal({ onVolver, onExit }) {
   const ranking = [...jugadores].sort((a, b) => (puntos[b.id] ?? 0) - (puntos[a.id] ?? 0));
   const maximo = ranking.length ? (puntos[ranking[0].id] ?? 0) : 0;
   const ganadores = maximo > 0 ? ranking.filter((j) => (puntos[j.id] ?? 0) === maximo) : [];
+  const enPartidaActiva = fase !== 'setup';
 
   return (
-    <div className="aprox-contenedor">
-      {/* AYUDA */}
-      {fase === 'setup' && (
-        <>
-          <button
-            type="button"
-            className="aprox-btn-ayuda"
-            onClick={() => setModalAyuda(true)}
-            title="Reglas de La vida en colores"
-          >
-            <span className="aprox-btn-ayuda-signo">?</span>
-          </button>
-
-          {modalAyuda && (
-            <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
-              <div className="rg-modal aprox-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-                <div className="aprox-modal-header">
-                  <h3>¿Cómo se juega a La vida en colores?</h3>
-                </div>
-
-                <div className="aprox-modal-cuerpo">
-                  <p><strong>1. Dinámica del juego:</strong></p>
-                  <ul>
-                    <li>Participan de <strong>3 a 15 jugadores</strong>. La partida dura un máximo de <strong>25 rondas</strong>.</li>
-                    <li>Cada ronda muestra un elemento mítico y el <strong>número exacto de colores</strong> que debes adivinar.</li>
-                    <li>Todos los jugadores responden por turnos de forma privada en el mismo dispositivo.</li>
-                    <li>Tienes <strong>45 segundos</strong> para responder por turno.</li>
-                  </ul>
-                  <p><strong>2. Puntuación:</strong></p>
-                  <div className="aprox-tabla-puntos">
-                    <div className="aprox-puntos-fila acierto">
-                      <span>🎯 Color acertado</span>
-                      <strong>+1 punto por cada color correcto</strong>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="rg-modal-acciones">
-                  <button className="big full" onClick={() => setModalAyuda(false)}>
-                    Entendido
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </>
-      )}
+    <div className={`aprox-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
 
       {/* 1. SETUP DE JUGADORES */}
       {fase === 'setup' && (
         <section className="game">
-          <GameIntro gameId="colores" titulo="La vida en colores (Un solo dispositivo)" />
-
-          {errorCarga && <p className="error" role="alert">{errorCarga}</p>}
-
-          <div className="panel">
-            <div className="hud" style={{ marginBottom: '1rem' }}>
-              <button className="btn-back-inline" onClick={onVolver}>
-                &larr; Cambiar modo
+          <div className="panel qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver onClick={onVolver} />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
               </button>
             </div>
 
-            <h3 className="panel-title"><Icon name="users" size={22} /> Participantes</h3>
-            <label className="field-label" htmlFor="num-jugadores-col">
-              Número de jugadores ({MIN_JUGADORES} a {MAX_JUGADORES})
-            </label>
-            <select
-              id="num-jugadores-col"
-              value={numJugadores}
-              onChange={handleNumJugadoresChange}
-            >
-              {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => (
-                <option key={i + MIN_JUGADORES} value={i + MIN_JUGADORES}>
-                  {i + MIN_JUGADORES} jugadores
-                </option>
-              ))}
-            </select>
+            <div className="qq-config-header">
+              <div className="qq-hero-icono chico">
+                <Icon name="users" size={32} />
+              </div>
+              <div>
+                <h2 className="qq-config-titulo">Jugadores</h2>
+                <p className="qq-config-sub">
+                  Configura quiénes van a participar ({MIN_JUGADORES} a {MAX_JUGADORES} jugadores)
+                </p>
+              </div>
+            </div>
 
-            <span className="field-label">Nombres</span>
-            <div className="names-grid">
+            {errorCarga && <p className="error" role="alert" style={{ marginBottom: '1rem' }}>{errorCarga}</p>}
+
+            <div className="qq-selector-cantidad-box">
+              <label className="qq-label-destacado" htmlFor="num-jugadores-col">
+                Número de participantes
+              </label>
+              <div className="qq-stepper-row">
+                <button
+                  type="button"
+                  className="qq-stepper-btn"
+                  disabled={numJugadores <= MIN_JUGADORES}
+                  onClick={() => actualizarCantidadJugadores(numJugadores - 1)}
+                >
+                  &minus;
+                </button>
+                <select
+                  id="num-jugadores-col"
+                  className="qq-select-jugadores"
+                  value={numJugadores}
+                  onChange={(e) => actualizarCantidadJugadores(parseInt(e.target.value, 10))}
+                >
+                  {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => (
+                    <option key={i + MIN_JUGADORES} value={i + MIN_JUGADORES}>
+                      {i + MIN_JUGADORES} jugadores
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  className="qq-stepper-btn"
+                  disabled={numJugadores >= MAX_JUGADORES}
+                  onClick={() => actualizarCantidadJugadores(numJugadores + 1)}
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <span className="qq-label-destacado" style={{ marginTop: '1.2rem', display: 'block' }}>
+              Nombres de los jugadores
+            </span>
+            <div className="qq-nombres-grid">
               {jugadores.map((j, idx) => (
-                <input
-                  key={j.id}
-                  type="text"
-                  value={j.nombre}
-                  onChange={(e) => handleNombreChange(idx, e.target.value)}
-                  placeholder={`Jugador ${j.id}`}
-                  maxLength={30}
-                  required
-                />
+                <div key={j.id} className="qq-jugador-input-card">
+                  <span
+                    className="qq-jugador-badge"
+                    style={{ background: COLORES[idx % COLORES.length] }}
+                  >
+                    {idx + 1}
+                  </span>
+                  <input
+                    type="text"
+                    value={j.nombre}
+                    onChange={(e) => handleNombreChange(idx, e.target.value)}
+                    placeholder={`Jugador ${j.id}`}
+                    maxLength={30}
+                    required
+                  />
+                </div>
               ))}
             </div>
-          </div>
 
-          <button className="big full" onClick={iniciarPartida}>
-            <Icon name="play" size={24} /> ¡Empezar Partida (25 Rondas)!
-          </button>
+            <button
+              type="button"
+              className="big full qq-btn-principal"
+              style={{ marginTop: '1.5rem' }}
+              onClick={iniciarPartida}
+            >
+              <Icon name="play" size={22} /> ¡Empezar Partida (25 Rondas)!
+            </button>
+          </div>
         </section>
       )}
 
       {/* 2. PASO DE TURNO EN PRIVADO */}
       {fase === 'privacidad' && jugadorEnTurno && (
         <section className="game">
-          <div className="hud">
-            <span className="chip"><Icon name="flagFinish" size={18} />Ronda {rondaActual} de {MAX_RONDAS}</span>
-            <span className="chip alt"><Icon name="users" size={18} />Jugador {subTurno + 1} de {jugadores.length}</span>
-          </div>
+          <div className="panel qq-menu-panel" style={{ textAlign: 'center' }}>
+            <div className="qq-card-top" style={{ justifyContent: 'flex-start', marginBottom: '0.4rem', width: '100%' }}>
+              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
+            </div>
 
-          <div className="starter">
-            <Icon name="users" size={28} />
-            <p>Pasa el dispositivo a: <strong>{jugadorEnTurno.nombre}</strong></p>
-          </div>
+            <div className="qq-tablero-header">
+              <span className="qq-tablero-badge">
+                <Icon name="users" size={16} /> Turno de {jugadorEnTurno.nombre}
+              </span>
+              <div style={{ fontSize: '3.2rem', margin: '0.4rem 0' }}>📱</div>
+              <h2 className="qq-tablero-titulo">Pasad el móvil a: {jugadorEnTurno.nombre}</h2>
+              <p className="qq-tablero-sub">
+                Nadie más debe mirar la pantalla mientras seleccionas tus colores.
+              </p>
+            </div>
 
-          <div className="panel aprox-pregunta-card" style={{ padding: '2.5rem 1.5rem' }}>
-            <div style={{ fontSize: '3.5rem', marginBottom: '1rem' }}>🔒</div>
-            <h2 className="aprox-pregunta-texto">Turno de {jugadorEnTurno.nombre}</h2>
-            <p className="field-label" style={{ marginTop: '0.6rem' }}>
-              Nadie más debe mirar la pantalla mientras seleccionas tus colores.
-            </p>
             <button
               type="button"
-              className="big full"
-              style={{ marginTop: '1.5rem' }}
+              className="big full qq-btn-principal"
               onClick={() => setFase('turno')}
             >
-              <Icon name="check" size={22} /> Soy {jugadorEnTurno.nombre}, responder
+              <Icon name="check" size={22} strokeWidth={2.5} /> Soy {jugadorEnTurno.nombre}, responder
             </button>
           </div>
         </section>
@@ -361,46 +375,44 @@ export default function ColoresLocal({ onVolver, onExit }) {
       {/* 3. TURNO DE RESPUESTA CON LA PALETA */}
       {fase === 'turno' && jugadorEnTurno && (
         <section className="game">
-          <div className="hud">
-            <span className="chip"><Icon name="flagFinish" size={18} />Ronda {rondaActual} de {MAX_RONDAS}</span>
-            <span className="chip alt">
-              {coloresSeleccionados.length} / {preguntaActual.numColores} colores
-            </span>
-          </div>
-
-          <div className="starter">
-            <Icon name="star" size={28} />
-            <p>Turno de: <strong>{jugadorEnTurno.nombre}</strong></p>
-          </div>
-
-          <div className="panel aprox-pregunta-card" style={{ textAlign: 'center' }}>
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.6rem' }}>
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.45rem',
-                  padding: '0.45rem 1.3rem',
-                  borderRadius: '9999px',
-                  backgroundColor: '#fef3c7',
-                  border: '2px solid #f59e0b',
-                  color: '#b45309',
-                  fontSize: '1rem',
-                  fontWeight: 800,
-                  boxShadow: '0 2px 6px rgba(245, 158, 11, 0.2)'
-                }}
-              >
-                🎨 Debes elegir exactamente {preguntaActual.numColores} {preguntaActual.numColores === 1 ? 'color' : 'colores'}
-              </span>
+          <div className="panel qq-menu-panel">
+            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
+              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
+                  Ronda {rondaActual}/{MAX_RONDAS}
+                </span>
+                <span className="qq-tablero-badge" style={{ marginBottom: 0, background: '#f8fafc', color: '#1e293b', borderColor: '#e2e8f0' }}>
+                  <Icon name="check" size={14} /> {subTurno}/{jugadores.length} listos
+                </span>
+              </div>
             </div>
-            <h2 className="aprox-pregunta-texto" style={{ fontSize: '1.65rem', margin: '0.6rem 0' }}>
-              {preguntaActual.item}
-            </h2>
-            <p className="field-label">
-              Marca los {preguntaActual.numColores} colores característicos de este elemento:
-            </p>
 
-            {/* Temporizador de 45 segundos */}
+            <div className="aprox-pregunta-card" style={{ textAlign: 'center', padding: '1.4rem 1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.6rem' }}>
+                <span
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.45rem',
+                    padding: '0.45rem 1.3rem',
+                    borderRadius: '9999px',
+                    backgroundColor: '#fef3c7',
+                    border: '2px solid #f59e0b',
+                    color: '#b45309',
+                    fontSize: '1rem',
+                    fontWeight: 800,
+                    boxShadow: '0 2px 6px rgba(245, 158, 11, 0.2)'
+                  }}
+                >
+                  🎨 Debes elegir {preguntaActual.numColores} {preguntaActual.numColores === 1 ? 'color' : 'colores'}
+                </span>
+              </div>
+              <h2 className="aprox-pregunta-texto" style={{ fontSize: '1.65rem', margin: '0.6rem 0' }}>
+                {preguntaActual.item}
+              </h2>
+            </div>
+
             <div
               className="timer"
               role="timer"
@@ -427,9 +439,7 @@ export default function ColoresLocal({ onVolver, onExit }) {
               <Icon name="clock" size={16} />
               {tiempoRestante} s
             </p>
-          </div>
 
-          <div className="panel">
             <style>{`
               .colores-grid button.colores-tarjeta-solida {
                 background-image: none !important;
@@ -460,7 +470,7 @@ export default function ColoresLocal({ onVolver, onExit }) {
 
               .colores-grid button.colores-tarjeta-solida.seleccionado {
                 transform: scale(1.05) !important;
-                box-shadow: 0 0 0 3px #ffffff, 0 0 0 6px #2563eb, 0 6px 16px rgba(0, 0, 0, 0.35) !important;
+                box-shadow: 0 0 0 3px #ffffff, 0 0 0 6px #db2777, 0 6px 16px rgba(0, 0, 0, 0.35) !important;
               }
             `}</style>
             <div className="colores-grid">
@@ -477,20 +487,12 @@ export default function ColoresLocal({ onVolver, onExit }) {
                     {activo && (
                       <span
                         style={{
-                          position: 'absolute',
-                          top: '4px',
-                          right: '6px',
+                          position: 'absolute', top: '4px', right: '6px',
                           backgroundColor: col.id === 'blanco' || col.id === 'amarillo' ? '#0f172a' : '#ffffff',
                           color: col.id === 'blanco' || col.id === 'amarillo' ? '#ffffff' : '#0f172a',
-                          borderRadius: '9999px',
-                          width: '22px',
-                          height: '22px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '0.8rem',
-                          fontWeight: 900,
-                          boxShadow: '0 2px 5px rgba(0,0,0,0.35)'
+                          borderRadius: '9999px', width: '22px', height: '22px',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: '0.8rem', fontWeight: 900, boxShadow: '0 2px 5px rgba(0,0,0,0.35)'
                         }}
                       >
                         ✓
@@ -500,108 +502,114 @@ export default function ColoresLocal({ onVolver, onExit }) {
                 );
               })}
             </div>
-          </div>
 
-          <button
-            className="big full"
-            disabled={coloresSeleccionados.length !== preguntaActual.numColores}
-            onClick={() => confirmarRespuesta(false)}
-          >
-            <Icon name="check" size={22} />
-            {coloresSeleccionados.length === preguntaActual.numColores
-              ? 'Confirmar selección'
-              : `Selecciona ${preguntaActual.numColores - coloresSeleccionados.length} más`}
-          </button>
+            <button
+              className="big full qq-btn-principal"
+              style={{ marginTop: '1rem' }}
+              disabled={coloresSeleccionados.length !== preguntaActual.numColores}
+              onClick={() => confirmarRespuesta(false)}
+            >
+              <Icon name="check" size={22} />
+              {coloresSeleccionados.length === preguntaActual.numColores
+                ? 'Confirmar selección'
+                : `Falta ${preguntaActual.numColores - coloresSeleccionados.length}`}
+            </button>
+          </div>
         </section>
       )}
 
       {/* 4. RESULTADOS DE LA RONDA */}
       {fase === 'resultados_ronda' && resultadoRonda && (
         <section className="game">
-          <div className="end-card aprox-resolucion-card">
-            <span className="end-icon"><Icon name="trophy" size={44} /></span>
-            <p className="categoria">{resultadoRonda.item}</p>
-            <h1 className="title" style={{ fontSize: '1.35rem' }}>Colores correctos:</h1>
-
-            <div className="colores-resolucion-correctos">
-              {resultadoRonda.coloresCorrectos.map((colId) => {
-                const cObj = PALETA_COLORES.find((p) => p.id === colId);
-                return (
-                  <div key={colId} className="colores-pill-acierto">
-                    <span
-                      className="colores-circulo-mini"
-                      style={{ backgroundColor: cObj?.hex, border: cObj?.borde ? '1px solid #94a3b8' : 'none' }}
-                    />
-                    <span>{cObj?.nombre || colId}</span>
-                  </div>
-                );
-              })}
+          <div className="panel qq-menu-panel">
+            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
+              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
+              <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
+                Ronda {rondaActual} finalizada
+              </span>
             </div>
 
-            <div className="aprox-resolucion-lista" style={{ marginTop: '1.2rem', width: '100%' }}>
-              {resultadoRonda.desglose.map((d) => (
-                <div key={d.id} className="aprox-fila-resultado intermedia" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', alignItems: 'stretch' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <strong>{d.jugador}</strong>
-                    <span className="aprox-badge-pts" style={{ background: d.aciertos > 0 ? '#10b981' : '#64748b' }}>
-                      +{d.aciertos} {d.aciertos === 1 ? 'pt' : 'pts'}
-                    </span>
+            <div className="end-card aprox-resolucion-card" style={{ boxShadow: 'none', border: '1.5px solid #e2e8f0' }}>
+              <span className="end-icon"><Icon name="trophy" size={44} /></span>
+              <p className="categoria">{resultadoRonda.item}</p>
+              <h1 className="title" style={{ fontSize: '1.35rem' }}>Colores correctos:</h1>
+
+              <div className="colores-resolucion-correctos">
+                {resultadoRonda.coloresCorrectos.map((colId) => {
+                  const cObj = PALETA_COLORES.find((p) => p.id === colId);
+                  return (
+                    <div key={colId} className="colores-pill-acierto">
+                      <span
+                        className="colores-circulo-mini"
+                        style={{ backgroundColor: cObj?.hex, border: cObj?.borde ? '1px solid #94a3b8' : 'none' }}
+                      />
+                      <span>{cObj?.nombre || colId}</span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="aprox-resolucion-lista" style={{ marginTop: '1.2rem', width: '100%' }}>
+                {resultadoRonda.desglose.map((d) => (
+                  <div key={d.id} className="aprox-fila-resultado intermedia" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', alignItems: 'stretch' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <strong>{d.jugador}</strong>
+                      <span className="aprox-badge-pts" style={{ background: d.aciertos > 0 ? '#10b981' : '#64748b' }}>
+                        +{d.aciertos} {d.aciertos === 1 ? 'pt' : 'pts'}
+                      </span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                      {d.elegidos.map((colId) => {
+                        const esAcierto = resultadoRonda.coloresCorrectos.includes(colId);
+                        const cObj = PALETA_COLORES.find((p) => p.id === colId);
+                        return (
+                          <span key={colId} className={`colores-tag-elegido ${esAcierto ? 'acierto' : 'fallo'}`}>
+                            <span className="colores-circulo-micro" style={{ backgroundColor: cObj?.hex }} />
+                            {cObj?.nombre || colId} {esAcierto ? '✓' : '✗'}
+                          </span>
+                        );
+                      })}
+                    </div>
                   </div>
-                  <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
-                    {d.elegidos.map((colId) => {
-                      const esAcierto = resultadoRonda.coloresCorrectos.includes(colId);
-                      const cObj = PALETA_COLORES.find((p) => p.id === colId);
-                      return (
-                        <span key={colId} className={`colores-tag-elegido ${esAcierto ? 'acierto' : 'fallo'}`}>
-                          <span
-                            className="colores-circulo-micro"
-                            style={{ backgroundColor: cObj?.hex }}
-                          />
-                          {cObj?.nombre || colId} {esAcierto ? '✓' : '✗'}
-                        </span>
-                      );
-                    })}
-                  </div>
+                ))}
+              </div>
+
+              <div className="scoreboard" style={{ width: '100%', marginTop: '1.5rem' }}>
+                <h3 className="section-title" style={{ margin: '0 0 0.8rem', textAlign: 'center' }}>
+                  Marcador general
+                </h3>
+                {ranking.map((j, i) => {
+                  const pts = puntos[j.id] ?? 0;
+                  const primero = maximo > 0 && pts === maximo;
+                  return (
+                    <div key={j.id} className={`score-row${primero ? ' first' : ''}`}>
+                      <span className="score-name">
+                        {primero ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
+                        {j.nombre}
+                      </span>
+                      <span className="score-pts">{pts} pts</span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="round-finished-actions" style={{ marginTop: '1.5rem', width: '100%' }}>
+                {rondaActual < MAX_RONDAS ? (
+                  <button className="btn-start qq-btn-principal" style={{ color: 'white' }} onClick={avanzarSiguienteRonda}>
+                    Siguiente ronda ({rondaActual + 1} de {MAX_RONDAS}) ➔
+                  </button>
+                ) : (
+                  <button className="btn-start qq-btn-principal" style={{ color: 'white' }} onClick={() => setFase('final')}>
+                    Ver resultados finales 🏆
+                  </button>
+                )}
+                <div className="qq-tablero-footer" style={{ marginTop: '0.8rem', paddingTop: '0.8rem' }}>
+                  <button type="button" className="qq-link-otra-ronda" onClick={() => setFase('final')}>
+                    Finalizar juego anticipadamente
+                  </button>
                 </div>
-              ))}
+              </div>
             </div>
-
-            <div className="scoreboard" style={{ width: '100%', marginTop: '1.5rem' }}>
-              <h3 className="section-title" style={{ margin: '0 0 0.8rem', textAlign: 'center' }}>
-                Marcador general
-              </h3>
-              {ranking.map((j, i) => {
-                const pts = puntos[j.id] ?? 0;
-                const primero = maximo > 0 && pts === maximo;
-                return (
-                  <div key={j.id} className={`score-row${primero ? ' first' : ''}`}>
-                    <span className="score-name">
-                      {primero ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
-                      {j.nombre}
-                    </span>
-                    <span className="score-pts">{pts} pts</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="actions">
-            {rondaActual < MAX_RONDAS ? (
-              <button onClick={avanzarSiguienteRonda}>
-                <Icon name="play" size={20} />
-                Siguiente ronda ({rondaActual + 1} de {MAX_RONDAS})
-              </button>
-            ) : (
-              <button onClick={() => setFase('final')}>
-                <Icon name="trophy" size={20} />
-                Ver resultados finales (25 rondas)
-              </button>
-            )}
-            <button className="secondary danger" onClick={() => setFase('final')}>
-              <Icon name="flagFinish" size={20} />
-              Finalizar juego
-            </button>
           </div>
         </section>
       )}
@@ -637,15 +645,52 @@ export default function ColoresLocal({ onVolver, onExit }) {
             </div>
           </div>
 
-          <div className="actions">
-            <button onClick={() => setFase('setup')}>
+          <div className="actions" style={{ marginTop: '1.5rem' }}>
+            <button type="button" className="big full qq-btn-principal" onClick={() => setFase('setup')}>
               <Icon name="refresh" size={20} /> Nueva partida
             </button>
-            <button className="secondary danger" onClick={onVolver}>
-              <Icon name="door" size={20} /> Volver al menú
+            <button type="button" className="secondary danger full" onClick={() => setModalSalirPortada(true)}>
+              <Icon name="door" size={20} /> Volver a la portada
             </button>
           </div>
         </section>
+      )}
+
+      {/* MODAL: SALIR A LA PORTADA (MODO OFFLINE) */}
+      {modalSalirPortada && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalirPortada(false)}>
+          <div
+            className="rg-modal"
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
+          >
+            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
+            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
+              ¿Salir a la portada?
+            </h3>
+            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
+              Se cancelará la partida actual y volverás a la portada principal de juegos. ¿Estás seguro?
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+              <button
+                type="button"
+                className="secondary full"
+                onClick={() => setModalSalirPortada(false)}
+              >
+                No, continuar
+              </button>
+              <button
+                type="button"
+                className="secondary danger full"
+                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
+                onClick={handleSalirAPortada}
+              >
+                Sí, salir a portada
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
