@@ -171,11 +171,7 @@ function FormTema({ elementos, titulo, sub, onEnviar, onSaltar, textoSaltar = 'N
 }
 
 /**
- * - partida: vista del motor
- * - yoId: id del jugador en este dispositivo (online). null en local: juega quien tenga el turno.
- * - esAdmin: puede saltar turnos y terminar la ronda
- * - onAccion(tipo, datos) -> Promise<{ error? }>
- * - finRonda: contenido de botones al terminar la ronda
+ * Tablero de la partida (export por defecto)
  */
 export default function ConectaPartida({ partida, yoId = null, esAdmin, onAccion, onSalir, finRonda, local = false }) {
   const [seleccion, setSeleccion] = useState([]);
@@ -189,7 +185,6 @@ export default function ConectaPartida({ partida, yoId = null, esAdmin, onAccion
   const puedoJugar = Boolean(t) && (local || t.jugadorId === yoId);
   const yo = partida.jugadores.find((j) => j.id === yoId);
 
-  // Al cambiar de turno o de paso se limpia la selección
   useEffect(() => { setSeleccion([]); setError(''); }, [claveTurno, partida.tablero.length]);
 
   const accion = async (tipo, datos) => {
@@ -209,7 +204,6 @@ export default function ConectaPartida({ partida, yoId = null, esAdmin, onAccion
   const colorSiguiente = COLORES_GRUPO[Math.min(partida.resueltas.length, 3)];
   const esUltima = partida.fase === 'ultima';
 
-  // ---------- Cabecera común ----------
   const cabecera = (
     <header className="cnp-hero">
       <div className="cnp-hero-top">
@@ -250,7 +244,6 @@ export default function ConectaPartida({ partida, yoId = null, esAdmin, onAccion
     </div>
   );
 
-  // ---------- FIN DE RONDA ----------
   if (partida.fase === 'fin') {
     const ranking = [...partida.jugadores].sort((a, b) => b.puntos - a.puntos);
     const max = ranking[0]?.puntos ?? 0;
@@ -309,7 +302,6 @@ export default function ConectaPartida({ partida, yoId = null, esAdmin, onAccion
     );
   }
 
-  // ---------- TURNO: PANTALLA «LISTO» ----------
   if (t && t.paso === 'listo' && (puedoJugar || local)) {
     const j = partida.jugadores.find((x) => x.id === t.jugadorId);
     return (
@@ -339,7 +331,6 @@ export default function ConectaPartida({ partida, yoId = null, esAdmin, onAccion
     );
   }
 
-  // ---------- RESTO DE PASOS ----------
   const esperando = !puedoJugar;
   let banner = null;
   if (t && esperando) {
@@ -371,7 +362,6 @@ export default function ConectaPartida({ partida, yoId = null, esAdmin, onAccion
 
       <Resueltas resueltas={partida.resueltas} />
 
-      {/* Paso «tema»: adivinar qué une al grupo recién encontrado */}
       {t?.paso === 'tema' && t.grupo && (puedoJugar ? (
         <FormTema
           elementos={t.grupo.elementos}
@@ -387,7 +377,6 @@ export default function ConectaPartida({ partida, yoId = null, esAdmin, onAccion
         </div>
       ))}
 
-      {/* Última conexión */}
       {esUltima && partida.ultimaPendiente && (
         puedoJugar && t?.paso === 'adivinar' ? (
           <FormTema
@@ -414,7 +403,6 @@ export default function ConectaPartida({ partida, yoId = null, esAdmin, onAccion
         )
       )}
 
-      {/* Tablero */}
       {!esUltima && partida.tablero.length > 0 && t?.paso !== 'tema' && (
         <div
           className={`cnp-tablero${puedoJugar && t?.paso === 'elegir' ? ' activo' : ' bloqueado'}`}
@@ -460,6 +448,94 @@ export default function ConectaPartida({ partida, yoId = null, esAdmin, onAccion
         {pieAdmin}
       </div>
       {modalFin}
+    </section>
+  );
+}
+
+// -----------------------------------------------------------------------------
+// SELECTOR DE CATEGORÍAS (Exportado para los modos Local y Online)
+// -----------------------------------------------------------------------------
+
+const COLORES_CATEGORIA = [
+  ['#f97316', '#ef4444'], ['#8b5cf6', '#6366f1'], ['#06b6d4', '#3b82f6'], ['#ec4899', '#f43f5e'],
+  ['#22c55e', '#84cc16'], ['#3b82f6', '#8b5cf6'], ['#f59e0b', '#f97316'], ['#14b8a6', '#22c55e']
+];
+
+export function SelectorCategorias({ categorias, onElegir, onVolver, onAyuda, aviso, cargando, error, etiqueta = "Nueva ronda", titulo = "Elige la temática" }) {
+  const [filtro, setFiltro] = useState('');
+  const normalizar = (t) => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const visibles = filtro.trim()
+    ? categorias.filter((c) => normalizar(c.nombre).includes(normalizar(filtro.trim())))
+    : categorias;
+
+  return (
+    <section className="game cnp-escena">
+      <header className="cnp-hero">
+        <span className="cnp-hero-deco" aria-hidden="true" style={{ position: 'absolute', right: '-28px', bottom: '-34px', color: 'rgba(255, 255, 255, 0.12)', transform: 'rotate(-12deg)' }}>
+          <Icon name="connect" size={150} strokeWidth={1.4} />
+        </span>
+        <div className="cnp-hero-top">
+          {onVolver ? (
+            <button type="button" className="cnp-salir" onClick={onVolver}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+              </svg>
+              <span>Volver</span>
+            </button>
+          ) : <span />}
+          {onAyuda && (
+            <button type="button" className="cnp-ayuda" onClick={onAyuda} title="Cómo jugar" aria-label="Cómo jugar">?</button>
+          )}
+        </div>
+        <p className="cnp-etiqueta" style={{ color: 'rgba(255,255,255,0.9)' }}>{etiqueta}</p>
+        <h2 className="cnp-titulo" style={{ color: '#fff', fontSize: '2.1rem', marginBottom: 0, textShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>{titulo}</h2>
+        {aviso && <p className="cnp-hero-aviso">{aviso}</p>}
+
+        <label className="cnp-buscador">
+          <Icon name="search" size={18} />
+          <input
+            type="search"
+            value={filtro}
+            onChange={(e) => setFiltro(e.target.value)}
+            placeholder="Buscar temática…"
+            aria-label="Buscar temática"
+          />
+        </label>
+      </header>
+
+      {cargando && (
+        <p className="cnp-estado" role="status">
+          <span className="cnp-spinner" aria-hidden="true" /> Preparando tablero…
+        </p>
+      )}
+      {error && <p className="error" style={{ margin: 0 }}>{error}</p>}
+
+      {visibles.length ? (
+        <ul className={`cnp-categorias${cargando ? ' bloqueado' : ''}`}>
+          {visibles.map((cat, i) => {
+            const [c1, c2] = COLORES_CATEGORIA[i % COLORES_CATEGORIA.length];
+            return (
+              <li key={cat.id}>
+                <button
+                  type="button"
+                  className="cnp-categoria"
+                  style={{ '--c1': c1, '--c2': c2 }}
+                  onClick={() => onElegir(cat.id)}
+                  disabled={cargando}
+                >
+                  <span className="cnp-categoria-icono"><Icon name={cat.icono || 'star'} size={24} /></span>
+                  <span className="cnp-categoria-textos">
+                    <span className="cnp-categoria-nombre">{cat.nombre}</span>
+                    <span className="cnp-categoria-info">Toca para jugar</span>
+                  </span>
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <p className="cnp-vacio">No hay ninguna temática con «{filtro}».</p>
+      )}
     </section>
   );
 }

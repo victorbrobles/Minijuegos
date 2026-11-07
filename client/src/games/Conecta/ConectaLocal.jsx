@@ -2,10 +2,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import CategoryCard from '../../components/CategoryCard.jsx';
 import './Conecta.css';
 import * as E from './engine.js';
-import ConectaPartida from './ConectaPartida.jsx';
+import ConectaPartida, { SelectorCategorias } from './ConectaPartida.jsx';
 
 const MIN_JUGADORES = 3;
 const MAX_JUGADORES = 15;
@@ -265,43 +264,14 @@ export default function ConectaLocal({ onVolver, onExit, onAbrirAyuda }) {
 
       {/* 2. CATEGORÍA */}
       {fase === 'categoria' && (
-        <section className="game">
-          <div className="panel qq-menu-panel">
-            <div className="qq-card-top">
-              <BotonVolver onClick={() => setFase('setup')} />
-              <button
-                type="button"
-                className="qq-btn-ayuda"
-                onClick={onAbrirAyuda}
-                title="Cómo jugar"
-                aria-label="Cómo jugar"
-              >
-                ?
-              </button>
-            </div>
-
-            <div className="qq-section-header">
-              <h3 className="qq-section-title">Elige una temática</h3>
-              <p className="hint">
-                Al seleccionar una categoría se cargará el tablero de 16 elementos.
-              </p>
-            </div>
-
-            {errorCarga && <p className="error" style={{ marginBottom: '0.8rem' }}>{errorCarga}</p>}
-
-            <div className="rf-opciones conecta-categories-grid">
-              {CATEGORIAS_METADATA.map((cat, idx) => (
-                <CategoryCard
-                  key={cat.id}
-                  nombre={cat.nombre}
-                  icono={cat.icono}
-                  indice={idx}
-                  onClick={() => iniciarRondaConCategoria(cat.id)}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
+        <SelectorCategorias
+          categorias={CATEGORIAS_METADATA}
+          onElegir={iniciarRondaConCategoria}
+          onVolver={() => setFase('setup')}
+          onAyuda={onAbrirAyuda}
+          aviso="Al seleccionarla se cargará el tablero con 16 elementos mezclados."
+          error={errorCarga}
+        />
       )}
 
       {/* 3. RONDA POR TURNOS */}

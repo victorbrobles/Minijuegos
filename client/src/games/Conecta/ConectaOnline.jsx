@@ -2,9 +2,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import CategoryCard from '../../components/CategoryCard.jsx';
 import './Conecta.css';
-import ConectaPartida from './ConectaPartida.jsx';
+import ConectaPartida, { SelectorCategorias } from './ConectaPartida.jsx';
 
 const CLAVE_SESION_CONECTA = 'conecta_online_session';
 
@@ -159,6 +158,7 @@ export default function ConectaOnline({
 
   const esAdmin = Boolean(sala?.esAdmin);
   const yoId = sala?.yoId;
+  
   const handleCrear = async () => {
     if (!nombre.trim()) return;
     setErrorMsg('');
@@ -633,42 +633,40 @@ export default function ConectaOnline({
 
       {/* 5. SALA: SELECTOR DE CATEGORÍA */}
       {vista === 'sala' && sala && sala.estado === 'categoria' && (
-        <section className="game">
-          <div className="panel qq-menu-panel">
-            <div className="qq-card-top">
-              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
-              <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
-                Ronda {sala.rondaActual + 1}
+        esAdmin ? (
+          <SelectorCategorias
+            categorias={CATEGORIAS_METADATA}
+            onElegir={handleSeleccionarCategoria}
+            onVolver={() => setModalSalirPortada(true)}
+            onAyuda={onAbrirAyuda}
+            aviso="Al seleccionarla, aparecerá el tablero en todos los móviles."
+            etiqueta={`Ronda ${sala.rondaActual + 1}`}
+          />
+        ) : (
+          <section className="game cnp-escena">
+            <header className="cnp-hero">
+              <span className="cnp-hero-deco" aria-hidden="true" style={{ position: 'absolute', right: '-28px', bottom: '-34px', color: 'rgba(255, 255, 255, 0.12)', transform: 'rotate(-12deg)' }}>
+                <Icon name="connect" size={150} strokeWidth={1.4} />
               </span>
-            </div>
-
-            {esAdmin ? (
-              <>
-                <div className="qq-section-header">
-                  <h3 className="qq-section-title">Elige la categoría</h3>
-                  <p className="hint">Al seleccionarla, aparecerá el tablero en todos los móviles.</p>
-                </div>
-                <div className="rf-opciones conecta-categories-grid">
-                  {CATEGORIAS_METADATA.map((cat, idx) => (
-                    <CategoryCard
-                      key={cat.id}
-                      nombre={cat.nombre}
-                      icono={cat.icono}
-                      indice={idx}
-                      onClick={() => handleSeleccionarCategoria(cat.id)}
-                    />
-                  ))}
-                </div>
-              </>
-            ) : (
-              <div className="panel center" style={{ padding: '2.5rem 1.5rem' }}>
-                <span className="lb-luna chica"><Icon name="hourglass" size={40} /></span>
-                <h3>El anfitrión está eligiendo la categoría...</h3>
-                <p className="hint">En cuanto la seleccione, aparecerá el tablero en tu pantalla.</p>
+              <div className="cnp-hero-top">
+                <button type="button" className="cnp-salir" onClick={() => setModalSalirPortada(true)}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                  </svg>
+                  <span>Portada</span>
+                </button>
               </div>
-            )}
-          </div>
-        </section>
+              <p className="cnp-etiqueta" style={{ color: 'rgba(255,255,255,0.9)' }}>Ronda {sala.rondaActual + 1}</p>
+              <h2 className="cnp-titulo" style={{ color: '#fff', fontSize: '2.1rem', marginBottom: 0, textShadow: '0 2px 8px rgba(0,0,0,0.2)' }}>Esperando al anfitrión</h2>
+              <p className="cnp-hero-aviso">El anfitrión está eligiendo la temática de esta ronda.</p>
+            </header>
+            <div className="cnp-tarjeta" style={{ textAlign: 'center', padding: '3rem 1.5rem', marginTop: '1rem' }}>
+              <span className="lb-luna chica" style={{ margin: '0 auto 1rem' }}><Icon name="hourglass" size={40} /></span>
+              <h3>Eligiendo categoría...</h3>
+              <p className="hint">En cuanto la seleccione, aparecerá el tablero en tu pantalla.</p>
+            </div>
+          </section>
+        )
       )}
 
       {/* 6. SALA: JUGANDO ONLINE */}
