@@ -1,11 +1,15 @@
+// client/src/games/Trescientosuno/TrescientosunoOnline.jsx
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import './Trescientosuno.css';
+import '../Adivina/Adivina.css';
 
 const CLAVE_SESION_trescientosuno = 'trescientosuno_online_session';
+const TIEMPO_TURNO = 60;
 
 const ESCUDOS_MAP = {
-  // Clubes
+  // Clubes y selecciones de la BD (sin cambios)
   barcelona: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
   fcbarcelona: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
   madrid: "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg",
@@ -63,14 +67,10 @@ const ESCUDOS_MAP = {
   celta: "https://upload.wikimedia.org/wikipedia/en/1/12/RC_Celta_de_Vigo_logo.svg",
   celtadevigo: "https://upload.wikimedia.org/wikipedia/en/1/12/RC_Celta_de_Vigo_logo.svg",
   espanyol: "https://upload.wikimedia.org/wikipedia/en/d/d6/Rcd_espanyol_logo.svg",
-
-  // Clubes extraídos
   getafe: "https://upload.wikimedia.org/wikipedia/en/4/46/Getafe_logo.svg",
   getafecf: "https://upload.wikimedia.org/wikipedia/en/4/46/Getafe_logo.svg",
   zaragoza: "https://assets.football-logos.cc/logos/spain/512x512/zaragoza.966d5396.png",
   osasuna: "https://assets.football-logos.cc/logos/spain/512x512/osasuna.44c61200.png",
-
-  // Selecciones
   alemania: "https://upload.wikimedia.org/wikipedia/en/e/e3/DFBEagle.svg",
   seleccionalemana: "https://upload.wikimedia.org/wikipedia/en/e/e3/DFBEagle.svg",
   argentina: "https://assets.football-logos.cc/logos/argentina/512x512/argentina-national-team.5c235057.png",
@@ -94,29 +94,43 @@ const ESCUDOS_MAP = {
 const getLogoUrl = (eq) => {
   if (!eq) return null;
   const normalizar = (str) => String(str || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, '');
-  
   const idKey = normalizar(eq.id);
   const nameKey = normalizar(eq.nombre);
-  
   return ESCUDOS_MAP[idKey] || ESCUDOS_MAP[nameKey] || null;
 };
 
-export default function TrescientosunoOnline({ onLocal, onSalir }) {
-  const [vista, setVista] = useState('menu'); 
+function BotonVolver({ onClick, texto = 'Volver' }) {
+  return (
+    <button type="button" className="qq-link-volver" onClick={onClick}>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7" />
+      </svg>
+      <span>{texto}</span>
+    </button>
+  );
+}
+
+export default function TrescientosunoOnline({
+  tituloJuego = '301 Goles',
+  descripcionJuego,
+  onLocal,
+  onSalir,
+  onAbrirAyuda
+}) {
+  const navigate = useNavigate();
+  // Vistas previas
+  const [vista, setVista] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
+  
   const [nombre, setNombre] = useState('');
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
   
-  const [modalSalir, setModalSalir] = useState(false);
-  const [modalAyuda, setModalAyuda] = useState(false);
-  
+  const [modalSalirLobby, setModalSalirLobby] = useState(false);
+  const [modalSalirPortada, setModalSalirPortada] = useState(false);
+
   const [sesion, setSesion] = useState(() => {
-    try {
-      return JSON.parse(sessionStorage.getItem(CLAVE_SESION_trescientosuno));
-    } catch {
-      return null;
-    }
+    try { return JSON.parse(sessionStorage.getItem(CLAVE_SESION_trescientosuno)); } catch { return null; }
   });
 
   const [sala, setSala] = useState(null);
@@ -124,16 +138,16 @@ export default function TrescientosunoOnline({ onLocal, onSalir }) {
 
   const intervalRef = useRef(null);
 
+  // Configuración de la partida
   const [equipos, setEquipos] = useState([]);
   const [equipoSel, setEquipoSel] = useState(null);
   const [estadisticaSel, setEstadisticaSel] = useState('goles');
   const [objetivoSel, setObjetivoSel] = useState(301);
 
+  // Estado local durante el turno
   const [inputJugador, setInputJugador] = useState('');
   const [errorJuego, setErrorJuego] = useState('');
   const [enviando, setEnviando] = useState(false);
-
-  // Estados Comodines
   const [comodinActivo, setComodinActivo] = useState(null);
   const [opcionesReveladas, setOpcionesReveladas] = useState(null);
 
@@ -160,8 +174,8 @@ export default function TrescientosunoOnline({ onLocal, onSalir }) {
           sessionStorage.removeItem(CLAVE_SESION_trescientosuno);
           setSesion(null);
           setSala(null);
-          setVista('menu');
-          setErrorMsg('La sala se ha cerrado o se ha perdido la conexión.');
+          setVista('online_menu');
+          setErrorMsg('La sala se ha cerrado.');
         });
     };
 
@@ -197,6 +211,7 @@ export default function TrescientosunoOnline({ onLocal, onSalir }) {
   };
 
   const estadoSala = sala?.estado;
+  
   useEffect(() => {
     if (estadoSala !== 'configuracion' || equipos.length > 0) return;
     fetch('/api/trescientosuno/equipos')
@@ -243,7 +258,6 @@ export default function TrescientosunoOnline({ onLocal, onSalir }) {
       setOpcionesReveladas(null);
     } catch (err) {
       setErrorJuego(err.message);
-      // No reseteamos el comodín aquí para que puedan intentarlo de nuevo en el mismo turno
     } finally {
       setEnviando(false);
     }
@@ -272,6 +286,64 @@ export default function TrescientosunoOnline({ onLocal, onSalir }) {
       setErrorJuego(err.message);
     } finally {
       setEnviando(false);
+    }
+  };
+
+  const redirigirAPortada = () => {
+    if (typeof onSalir === 'function') {
+      onSalir();
+    } else {
+      try {
+        navigate('/');
+      } catch {
+        window.location.href = '/';
+      }
+    }
+  };
+
+  const handleCerrarSalaYSalirAPortada = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    const sesionActual = sesion;
+    sessionStorage.removeItem(CLAVE_SESION_trescientosuno);
+    setSesion(null);
+    setSala(null);
+    setModalSalirPortada(false);
+
+    if (sesionActual?.code && sesionActual?.token) {
+      fetch(`/api/trescientosuno/online/sala/${sesionActual.code}/salir`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: sesionActual.token }),
+        keepalive: true
+      }).catch(() => {});
+    }
+    redirigirAPortada();
+  };
+
+  const handleVolverMenuOnline = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    const sesionActual = sesion;
+    sessionStorage.removeItem(CLAVE_SESION_trescientosuno);
+    setSesion(null);
+    setSala(null);
+    setModalSalirLobby(false);
+    setVista('online_menu');
+
+    if (sesionActual?.code && sesionActual?.token) {
+      fetch(`/api/trescientosuno/online/sala/${sesionActual.code}/salir`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: sesionActual.token }),
+        keepalive: true
+      }).catch(() => {});
     }
   };
 
@@ -321,23 +393,6 @@ export default function TrescientosunoOnline({ onLocal, onSalir }) {
     }
   };
 
-  const handleSalir = async () => {
-    if (sesion) {
-      try {
-        await fetch(`/api/trescientosuno/online/sala/${sesion.code}/salir`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token: sesion.token })
-        });
-      } catch {
-      }
-    }
-    sessionStorage.removeItem(CLAVE_SESION_trescientosuno);
-    setSesion(null);
-    setSala(null);
-    setVista('menu');
-  };
-
   const copiarCodigo = () => {
     if (!sala?.code) return;
     navigator.clipboard?.writeText(sala.code);
@@ -347,81 +402,177 @@ export default function TrescientosunoOnline({ onLocal, onSalir }) {
 
   const esAdmin = Boolean(sala?.esAdmin);
   const yoId = sala?.yoId;
-  const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
+  const enPartidaActiva = vista === 'sala' && sala && sala.estado !== 'lobby';
 
   return (
-    <div className="tcu-contenedor">
-      {mostrarAyuda && (
-        <button type="button" className="btn-ayuda-flotante" onClick={() => setModalAyuda(true)} title="Reglas">
-          <span className="btn-ayuda-flotante-signo">?</span>
-        </button>
-      )}
+    <div className={`tcu-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
 
-      {modalAyuda && (
-        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
-          <div className="rg-modal modal-ayuda-juego" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-ayuda-header">
-              <span className="modal-ayuda-signo-title">?</span>
-              <h3>¿Cómo se juega a 301 Goles?</h3>
-            </div>
-            <div className="modal-ayuda-cuerpo">
-              <p><strong>1. Dinámica del juego:</strong></p>
-              <ul>
-                <li>Se selecciona un equipo y una estadística a restar (Goles, Asistencias o Partidos).</li>
-                <li>Por turnos, introduce el nombre de un jugador que haya estado en ese club.</li>
-                <li>Se restarán de tu marcador los puntos correspondientes a ese jugador.</li>
-                <li>Dispones de 4 comodines por equipo (x2, x3, x5 y Revelar). Úsalos sabiamente antes de escribir.</li>
-                <li>Si no lo aciertas o el jugador no existe, conservarás tu turno para seguir probando.</li>
-                <li>¡Cuidado! Si te pasas del 0 exacto, o nombras a alguien con 0 en esa estadística, quedas eliminado.</li>
-              </ul>
-            </div>
-            <div className="rg-modal-acciones">
-              <button className="btn-start" style={{ width: '100%' }} onClick={() => setModalAyuda(false)}>
-                Entendido
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
+      {/* 1. MENÚ PRINCIPAL */}
       {vista === 'menu' && (
         <section className="game">
-          <div className="panel center">
-            <span className="lb-luna chica"><span style={{ fontSize: '2.4rem' }}>🎯</span></span>
-            <h1 className="title">301 Goles Online</h1>
-            <p className="hint">Resta puntuación adivinando jugadores hasta llegar a cero sin pasarte.</p>
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top solo-derecha">
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
+
+            <div className="qq-hero-icono">
+              <span style={{ fontSize: '2.4rem' }}>🎯</span>
+            </div>
+            <h1 className="title qq-main-title">{tituloJuego}</h1>
+            <p className="hint qq-main-desc">{descripcionJuego}</p>
+
             {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
-            <div className="lb-menu">
-              <button className="btn-start" style={{ width: '100%', marginBottom: '0.5rem' }} onClick={() => { setVista('crear'); setErrorMsg(''); }}>
-                <Icon name="crown" size={22} /> Crear partida
+
+            <div className="qq-menu-opciones">
+              <button
+                type="button"
+                className="qq-opcion-card principal"
+                onClick={() => {
+                  setVista('online_menu');
+                  setErrorMsg('');
+                }}
+              >
+                <span className="qq-opcion-icono">
+                  <Icon name="globe" size={26} />
+                </span>
+                <div className="qq-opcion-textos">
+                  <strong>Jugar online</strong>
+                  <span>Cada jugador desde su propio móvil con código de sala</span>
+                </div>
               </button>
-              <button className="btn-start" style={{ width: '100%', marginBottom: '0.5rem' }} onClick={() => { setVista('unirse'); setErrorMsg(''); }}>
-                <Icon name="users" size={22} /> Unirse a partida
-              </button>
-              <button className="secondary full" onClick={onLocal}>
-                <Icon name="home" size={20} /> Jugar en un solo dispositivo
+
+              <button
+                type="button"
+                className="qq-opcion-card secundaria"
+                onClick={onLocal}
+              >
+                <span className="qq-opcion-icono">
+                  <Icon name="users" size={26} />
+                </span>
+                <div className="qq-opcion-textos">
+                  <strong>Jugar en un único dispositivo</strong>
+                  <span>Pasando el móvil por turnos entre los jugadores</span>
+                </div>
               </button>
             </div>
           </div>
         </section>
       )}
-      
+
+      {/* 1B. SUBMENÚ ONLINE */}
+      {vista === 'online_menu' && (
+        <section className="game">
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver
+                onClick={() => {
+                  setVista('menu');
+                  setErrorMsg('');
+                }}
+              />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
+
+            <div className="qq-hero-icono">
+              <Icon name="globe" size={40} strokeWidth={1.7} />
+            </div>
+            <h2 className="title qq-main-title">Modo Online</h2>
+            <p className="hint qq-main-desc">
+              Crea una sala nueva para compartir el código con tus amigos o únete a una ya creada.
+            </p>
+
+            <div className="qq-menu-opciones">
+              <button
+                type="button"
+                className="qq-opcion-card principal"
+                onClick={() => {
+                  setVista('crear');
+                  setErrorMsg('');
+                }}
+              >
+                <span className="qq-opcion-icono">
+                  <Icon name="crown" size={26} />
+                </span>
+                <div className="qq-opcion-textos">
+                  <strong>Crear partida</strong>
+                  <span>Sé el anfitrión, genera un código y administra el juego</span>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                className="qq-opcion-card secundaria"
+                onClick={() => {
+                  setVista('unirse');
+                  setErrorMsg('');
+                }}
+              >
+                <span className="qq-opcion-icono">
+                  <Icon name="users" size={26} />
+                </span>
+                <div className="qq-opcion-textos">
+                  <strong>Unirse con código</strong>
+                  <span>Introduce el código de 4 letras de tu anfitrión</span>
+                </div>
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 2. CREAR SALA */}
       {vista === 'crear' && (
         <section className="game">
-          <div className="panel center">
-            <span className="lb-luna chica">
-              <Icon name="crown" size={40} strokeWidth={1.6} />
-            </span>
-            <h2 className="title">Crear partida</h2>
-            <p className="hint">Introduce tu nombre para crear la sala y ser el anfitrión.</p>
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver
+                onClick={() => {
+                  setVista('online_menu');
+                  setErrorMsg('');
+                }}
+              />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
 
-            <div className="lb-form" style={{ marginTop: '1.2rem', textAlign: 'left' }}>
-              <label className="form-label" htmlFor="tcu-host-nombre">Tu nombre</label>
+            <div className="qq-hero-icono">
+              <Icon name="crown" size={40} strokeWidth={1.6} />
+            </div>
+            <h2 className="title qq-main-title">Crear partida</h2>
+            <p className="hint qq-main-desc">
+              Introduce tu nombre para abrir la sala y ser el anfitrión.
+            </p>
+
+            <div className="lb-form qq-form-estilizado">
+              <label className="field-label" htmlFor="tcu-host-nombre">Tu nombre</label>
               <input
                 id="tcu-host-nombre"
-                className="player-text-input"
+                className="qq-input-moderno"
                 type="text"
-                placeholder="Tu nombre"
+                placeholder="Ej. Alex"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
                 maxLength={20}
@@ -430,39 +581,53 @@ export default function TrescientosunoOnline({ onLocal, onSalir }) {
               {errorMsg && <p className="error">{errorMsg}</p>}
 
               <button
-                className="btn-start"
-                style={{ width: '100%', marginTop: '1rem' }}
+                type="button"
+                className="big full qq-btn-principal"
                 disabled={cargando || !nombre.trim()}
                 onClick={handleCrear}
               >
                 <Icon name="check" size={22} strokeWidth={2.5} /> Crear sala
-              </button>
-              <button
-                className="secondary full"
-                style={{ marginTop: '0.6rem' }}
-                onClick={() => { setVista('menu'); setErrorMsg(''); }}
-              >
-                Volver
               </button>
             </div>
           </div>
         </section>
       )}
 
+      {/* 3. UNIRSE A SALA */}
       {vista === 'unirse' && (
         <section className="game">
-          <div className="panel center">
-            <span className="lb-luna chica">
-              <Icon name="users" size={40} strokeWidth={1.6} />
-            </span>
-            <h2 className="title">Unirse a partida</h2>
-            <p className="hint">Introduce el código de 4 letras que te ha dado el anfitrión.</p>
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver
+                onClick={() => {
+                  setVista('online_menu');
+                  setErrorMsg('');
+                }}
+              />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
 
-            <div className="lb-form" style={{ marginTop: '1.2rem', textAlign: 'left' }}>
-              <label className="form-label" htmlFor="tcu-code-input">Código de la sala</label>
+            <div className="qq-hero-icono">
+              <Icon name="users" size={40} strokeWidth={1.6} />
+            </div>
+            <h2 className="title qq-main-title">Unirse a partida</h2>
+            <p className="hint qq-main-desc">
+              Introduce el código que te ha compartido el anfitrión y tu nombre.
+            </p>
+
+            <div className="lb-form qq-form-estilizado">
+              <label className="field-label" htmlFor="tcu-code-input">Código de la sala</label>
               <input
                 id="tcu-code-input"
-                className="player-text-input"
+                className="lb-input-codigo qq-input-moderno"
                 type="text"
                 placeholder="ABCD"
                 value={codigoInput}
@@ -472,10 +637,10 @@ export default function TrescientosunoOnline({ onLocal, onSalir }) {
                 autoFocus
               />
 
-              <label className="form-label" htmlFor="tcu-guest-nombre" style={{ marginTop: '1rem' }}>Tu nombre</label>
+              <label className="field-label" htmlFor="tcu-guest-nombre" style={{ marginTop: '1rem' }}>Tu nombre</label>
               <input
                 id="tcu-guest-nombre"
-                className="player-text-input"
+                className="qq-input-moderno"
                 type="text"
                 placeholder="Tu nombre"
                 value={nombre}
@@ -485,48 +650,36 @@ export default function TrescientosunoOnline({ onLocal, onSalir }) {
               {errorMsg && <p className="error">{errorMsg}</p>}
 
               <button
-                className="btn-start"
-                style={{ width: '100%', marginTop: '1rem' }}
+                type="button"
+                className="big full qq-btn-principal"
                 disabled={cargando || !nombre.trim() || codigoInput.trim().length < 4}
                 onClick={handleUnirse}
               >
                 <Icon name="check" size={22} strokeWidth={2.5} /> Entrar en la partida
-              </button>
-              <button
-                className="secondary full"
-                style={{ marginTop: '0.6rem' }}
-                onClick={() => { setVista('menu'); setErrorMsg(''); }}
-              >
-                Volver
               </button>
             </div>
           </div>
         </section>
       )}
 
+      {/* 4. SALA: LOBBY */}
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
         <section className="game">
-          <div className="panel center">
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.45rem',
-                  padding: '0.35rem 1.1rem',
-                  borderRadius: '9999px',
-                  border: '1.5px solid var(--g1)',
-                  backgroundColor: '#f0fdf4',
-                  color: 'var(--g2)',
-                  fontSize: '0.85rem',
-                  fontWeight: 600,
-                  lineHeight: 1
-                }}
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver onClick={() => setModalSalirLobby(true)} />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
               >
-                <Icon name="lock" size={15} />
-                Sala de espera
-              </span>
+                ?
+              </button>
             </div>
+
+            <p className="categoria"><Icon name="lock" size={16} /> Sala de espera</p>
             <p className="hint">Código de la partida</p>
             <button
               type="button"
@@ -546,9 +699,8 @@ export default function TrescientosunoOnline({ onLocal, onSalir }) {
             <div className="lb-lista">
               {sala.jugadores.map((j) => (
                 <div key={j.id} className={`lb-jug ${j.id === yoId ? 'yo' : ''}`}>
-                  <span className="lb-punto on" />
                   <span className="lb-jug-nombre">
-                    {j.nombre}{j.id === yoId ? ' (tú)' : ''}{j.esAdmin ? ' 👑' : ''}
+                    {j.nombre}{j.id === yoId ? ' (Tú)' : ''}{j.esAdmin ? ' 👑' : ''}
                   </span>
                 </div>
               ))}
@@ -562,41 +714,42 @@ export default function TrescientosunoOnline({ onLocal, onSalir }) {
 
           {esAdmin ? (
             <div style={{ marginTop: '1.2rem' }}>
-              {errorMsg && <p className="error">{errorMsg}</p>}
               <button
-                className="btn-start"
-                style={{ width: '100%' }}
-                disabled={cargando || sala.jugadores.length < 2}
+                className="big full qq-btn-principal"
+                disabled={sala.jugadores.length < 2}
                 onClick={() => accionAdmin('empezar')}
               >
                 <Icon name="play" size={22} />
-                {sala.jugadores.length < 2 ? 'Esperando jugadores...' : '¡Empezar juego!'}
+                {sala.jugadores.length < 2 ? 'Esperando jugadores...' : '¡Empezar Partida!'}
               </button>
             </div>
           ) : (
             <div className="panel center" style={{ padding: '2rem 1.5rem', marginTop: '1rem' }}>
               <span className="lb-luna chica"><Icon name="hourglass" size={40} /></span>
               <h3 style={{ margin: '0.5rem 0' }}>Esperando al anfitrión...</h3>
-              <p className="hint">El anfitrión empezará la partida cuando estéis todos.</p>
+              <p className="hint">El anfitrión elegirá la estadística de juego.</p>
             </div>
           )}
-
-          <div className="actions" style={{ marginTop: '1rem' }}>
-            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
-              <Icon name="door" size={20} /> Salir de la sala
-            </button>
-          </div>
         </section>
       )}
 
+      {/* 5. SELECTOR DE EQUIPO Y ESTADÍSTICA (CONFIGURACION ONLINE) */}
       {vista === 'sala' && sala && sala.estado === 'configuracion' && (
         <section className="game">
-          {esAdmin ? (
-            <>
-              <div className="panel">
-                <h2 className="title center">Elige equipo y reglas</h2>
-                <p className="hint center">Los jugadores tendrán que decir futbolistas de este equipo.</p>
+          <div className="panel qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
+            </div>
 
+            {esAdmin ? (
+              <>
+                <div className="qq-section-header">
+                  <h3 className="qq-section-title">Elige equipo y reglas</h3>
+                  <p className="hint">
+                    Los jugadores tendrán que nombrar futbolistas de este club/selección.
+                  </p>
+                </div>
+                
                 <div className="tcu-grid-equipos">
                   {equipos.map((eq) => {
                     const urlImagen = getLogoUrl(eq);
@@ -631,7 +784,7 @@ export default function TrescientosunoOnline({ onLocal, onSalir }) {
                   <div className="form-group">
                     <label className="form-label" htmlFor="tcu-stat">Estadística a restar</label>
                     <div className="select-wrapper">
-                      <select id="tcu-stat" className="game-select" value={estadisticaSel} onChange={(e) => setEstadisticaSel(e.target.value)}>
+                      <select id="tcu-stat" className="game-select qq-input-moderno" value={estadisticaSel} onChange={(e) => setEstadisticaSel(e.target.value)}>
                         <option value="goles">Goles</option>
                         <option value="asistencias">Asistencias</option>
                         <option value="partidos">Partidos jugados</option>
@@ -643,40 +796,36 @@ export default function TrescientosunoOnline({ onLocal, onSalir }) {
                     <input 
                       id="tcu-obj" 
                       type="number" 
-                      className="player-text-input" 
+                      className="player-text-input qq-input-moderno" 
                       value={objetivoSel} 
                       onChange={(e) => setObjetivoSel(Number(e.target.value))}
                       min="1"
                     />
                   </div>
                 </div>
-              </div>
 
-              {errorMsg && <p className="error">{errorMsg}</p>}
-              <button
-                className="big full btn-start"
-                style={{ marginTop: '1rem', width: '100%' }}
-                disabled={cargando || !equipoSel}
-                onClick={() => accionAdmin('configurar', { equipoId: equipoSel.id, estadistica: estadisticaSel, objetivo: objetivoSel })}
-              >
-                <Icon name="play" size={24} /> {equipoSel ? `¡Comenzar con ${equipoSel.nombre}!` : 'Elige un equipo'}
-              </button>
-            </>
-          ) : (
-            <div className="panel center" style={{ padding: '2rem 1.5rem' }}>
-              <span className="lb-luna chica"><Icon name="hourglass" size={40} /></span>
-              <h3 style={{ margin: '0.5rem 0' }}>El anfitrión está eligiendo equipo...</h3>
-              <p className="hint">La partida empezará en cuanto termine de configurarla.</p>
-            </div>
-          )}
-          <div className="actions" style={{ marginTop: '1rem' }}>
-            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
-              <Icon name="door" size={20} /> Salir de la sala
-            </button>
+                {errorMsg && <p className="error">{errorMsg}</p>}
+                <button
+                  className="big full qq-btn-principal"
+                  style={{ marginTop: '1.5rem', width: '100%' }}
+                  disabled={cargando || !equipoSel}
+                  onClick={() => accionAdmin('configurar', { equipoId: equipoSel.id, estadistica: estadisticaSel, objetivo: objetivoSel })}
+                >
+                  <Icon name="play" size={24} /> {equipoSel ? `¡Comenzar con ${equipoSel.nombre}!` : 'Elige un equipo'}
+                </button>
+              </>
+            ) : (
+              <div className="panel center" style={{ padding: '2.5rem 1.5rem', boxShadow: 'none' }}>
+                <span className="lb-luna chica"><Icon name="hourglass" size={40} /></span>
+                <h3 style={{ marginTop: '0.8rem' }}>El anfitrión está eligiendo equipo...</h3>
+                <p className="hint">La partida empezará en cuanto termine de configurarla.</p>
+              </div>
+            )}
           </div>
         </section>
       )}
 
+      {/* 6. TABLERO JUGANDO ONLINE */}
       {vista === 'sala' && sala && sala.estado === 'jugando' && (() => {
         const stat = sala.configuracion.estadistica;
         const jTurno = sala.jugadores.find((j) => j.id === sala.turnoActualId);
@@ -686,147 +835,147 @@ export default function TrescientosunoOnline({ onLocal, onSalir }) {
         
         return (
           <section className="game">
-            <div className="hud">
-              <span className="chip"><Icon name="shield" size={18} /> {sala.equipoSeleccionado?.nombre}</span>
-              <span className="chip alt">Objetivo: 0 {stat}</span>
-            </div>
-
-            <div className="tcu-marcador-grid">
-              {sala.jugadores.map((j) => (
-                <div
-                  key={j.id}
-                  className={`tcu-marcador-item ${j.id === sala.turnoActualId ? 'activo' : ''} ${j.estado}`}
-                >
-                  <div className="nombre">{j.nombre}{j.id === yoId ? ' (tú)' : ''}</div>
-                  <div className="puntos">{j.estado === 'eliminado' ? 'X' : j.puntuacionActual}</div>
-                  
-                  {ev && ev.jugadorId === j.id && (ev.tipo === 'acierto' || ev.tipo === 'ganador') && (
-                    <div className="floating-resta">- {ev.valor}</div>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            <div className="panel center tcu-turno-panel">
-              {ev ? (
-                <div className="tcu-evento-display">
-                  <span className="evento-icon">
-                     {ev.tipo === 'acierto' && '⚽'}
-                     {ev.tipo === 'ganador' && '🏆'}
-                     {ev.tipo === 'fallo' && '❌'}
-                     {ev.tipo === 'plantado' && '🛑'}
-                     {ev.tipo === 'eliminado' && '💀'}
-                  </span>
-                  <h3>{ev.mensaje}</h3>
-                </div>
-              ) : esMiTurno ? (
-                <>
-                  <h2 className="title">¡Es tu turno!</h2>
-                  
-                  {yoInfo.comodines && yoInfo.comodines.length > 0 && (
-                    <div className="tcu-comodines">
-                      {yoInfo.comodines.map(c => (
-                        <button 
-                          key={c} 
-                          type="button"
-                          className={`btn-comodin ${comodinActivo === c ? 'activo' : ''} ${c === 'revelar' && comodinActivo === 'revelar' ? 'revelar' : ''}`}
-                          onClick={() => {
-                            if (c === 'revelar') {
-                              if (comodinActivo === 'revelar') {
-                                setComodinActivo(null);
-                                setOpcionesReveladas(null);
-                              } else {
-                                activarRevelar();
-                              }
-                            } else {
-                              setComodinActivo(comodinActivo === c ? null : c);
-                            }
-                          }}
-                        >
-                          {c === 'revelar' ? '🔍 Revelar' : `⭐ ${c.toUpperCase()}`}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-
-                  <div className="timer-bar-container">
-                    <div
-                      className={`timer-bar ${sala.tiempoRestante <= 10 ? 'low' : ''}`}
-                      style={{ width: `${(sala.tiempoRestante / sala.tiempoTurno) * 100}%` }}
-                    />
-                  </div>
-                  <p className="timer-text">{sala.tiempoRestante} s</p>
-
-                  {comodinActivo === 'revelar' && opcionesReveladas ? (
-                    <div className="opciones-revelar-grid">
-                      {opcionesReveladas.length > 0 ? opcionesReveladas.map(op => (
-                        <button 
-                          key={op.nombre} 
-                          type="button"
-                          className="btn-opcion-revelada"
-                          onClick={() => enviarJugador(op.nombre)}
-                        >
-                          {op.nombre}
-                        </button>
-                      )) : <p className="hint">No quedan jugadores disponibles.</p>}
-                      <button 
-                        type="button" 
-                        className="secondary" 
-                        style={{marginTop: '0.5rem'}}
-                        onClick={() => { setComodinActivo(null); setOpcionesReveladas(null); }}
-                      >
-                        Ninguno (Volver)
-                      </button>
-                    </div>
-                  ) : (
-                    <form onSubmit={(e) => { e.preventDefault(); enviarJugador(inputJugador); }} className="tcu-form">
-                      <input
-                        type="text"
-                        value={inputJugador}
-                        onChange={(e) => { setInputJugador(e.target.value); setErrorJuego(''); }}
-                        placeholder={`Dime un jugador del ${sala.equipoSeleccionado?.nombre}...`}
-                        className="player-text-input"
-                        autoFocus
-                      />
-                      {errorJuego && <p className="error" style={{ marginBottom: '1rem' }}>{errorJuego}</p>}
-                      <div className="tcu-actions">
-                        <button type="submit" className="btn-start" style={{ width: '100%' }} disabled={enviando || !inputJugador.trim()}>Enviar</button>
-                        <button type="button" className="secondary" disabled={enviando} onClick={pasarTurno}>Pasar</button>
-                        <button type="button" className="secondary danger" disabled={enviando} onClick={plantarse}>Plantarse</button>
-                      </div>
-                    </form>
-                  )}
-                </>
-              ) : (
-                <>
-                  <h2 className="title">Turno de {jTurno?.nombre}</h2>
-                  <div className="timer-bar-container">
-                    <div
-                      className={`timer-bar ${sala.tiempoRestante <= 10 ? 'low' : ''}`}
-                      style={{ width: `${(sala.tiempoRestante / sala.tiempoTurno) * 100}%` }}
-                    />
-                  </div>
-                  <p className="timer-text">{sala.tiempoRestante} s</p>
-                  <p className="tcu-turno-aviso">Esperando su respuesta...</p>
-                </>
-              )}
-            </div>
-
-            {sala.jugadoresUsados.length > 0 && (
-              <div className="tcu-usados">
-                <strong>Ya dichos:</strong> {sala.jugadoresUsados.join(', ')}
+            <div className="panel qq-menu-panel">
+              <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
+                <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
               </div>
-            )}
 
-            <div className="actions" style={{ marginTop: '1rem' }}>
-              <button className="secondary danger full" onClick={() => setModalSalir(true)}>
-                <Icon name="door" size={20} /> Salir de la partida
-              </button>
-            </div>
-          </section>
-        );
-      })()}
+              <div className="hud">
+                <span className="chip"><Icon name="shield" size={18} /> {sala.equipoSeleccionado?.nombre}</span>
+                <span className="chip alt">Objetivo: 0 {stat}</span>
+              </div>
 
+              <div className="tcu-marcador-grid">
+                {sala.jugadores.map((j) => (
+                  <div
+                    key={j.id}
+                    className={`tcu-marcador-item ${j.id === sala.turnoActualId ? 'activo' : ''} ${j.estado}`}
+                  >
+                    <div className="nombre">{j.nombre}{j.id === yoId ? ' (tú)' : ''}</div>
+                    <div className="puntos">{j.estado === 'eliminado' ? 'X' : j.puntuacionActual}</div>
+                    
+                    {ev && ev.jugadorId === j.id && (ev.tipo === 'acierto' || ev.tipo === 'ganador') && (
+                      <div className="floating-resta">- {ev.valor}</div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <div className="panel center tcu-turno-panel" style={{ background: '#f8fafc', border: '1.5px solid #e2e8f0', boxShadow: 'none' }}>
+                {ev ? (
+                  <div className="tcu-evento-display">
+                    <span className="evento-icon">
+                       {ev.tipo === 'acierto' && '⚽'}
+                       {ev.tipo === 'ganador' && '🏆'}
+                       {ev.tipo === 'fallo' && '❌'}
+                       {ev.tipo === 'plantado' && '🛑'}
+                       {ev.tipo === 'eliminado' && '💀'}
+                    </span>
+                    <h3 style={{ color: '#0f172a' }}>{ev.mensaje}</h3>
+                  </div>
+                ) : esMiTurno ? (
+                  <>
+                    <h2 className="title">¡Es tu turno!</h2>
+                    
+                    {yoInfo.comodines && yoInfo.comodines.length > 0 && (
+                      <div className="tcu-comodines">
+                        {yoInfo.comodines.map(c => (
+                          <button 
+                            key={c} 
+                            type="button"
+                            className={`btn-comodin ${comodinActivo === c ? 'activo' : ''} ${c === 'revelar' && comodinActivo === 'revelar' ? 'revelar' : ''}`}
+                            onClick={() => {
+                              if (c === 'revelar') {
+                                if (comodinActivo === 'revelar') {
+                                  setComodinActivo(null);
+                                  setOpcionesReveladas(null);
+                                } else {
+                                  activarRevelar();
+                                }
+                              } else {
+                                setComodinActivo(comodinActivo === c ? null : c);
+                              }
+                            }}
+                          >
+                            {c === 'revelar' ? '🔍 Revelar' : `⭐ ${c.toUpperCase()}`}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="timer-bar-container">
+                      <div
+                        className={`timer-bar ${sala.tiempoRestante <= 10 ? 'low' : ''}`}
+                        style={{ width: `${(sala.tiempoRestante / sala.tiempoTurno) * 100}%` }}
+                      />
+                    </div>
+                    <p className="timer-text">{sala.tiempoRestante} s</p>
+
+                    {comodinActivo === 'revelar' && opcionesReveladas ? (
+                      <div className="opciones-revelar-grid">
+                        {opcionesReveladas.length > 0 ? opcionesReveladas.map(op => (
+                          <button 
+                            key={op.nombre} 
+                            type="button"
+                            className="btn-opcion-revelada"
+                            onClick={() => enviarJugador(op.nombre)}
+                          >
+                            {op.nombre}
+                          </button>
+                        )) : <p className="hint">No quedan jugadores disponibles.</p>}
+                        <button 
+                          type="button" 
+                          className="secondary" 
+                          style={{marginTop: '0.5rem'}}
+                          onClick={() => { setComodinActivo(null); setOpcionesReveladas(null); }}
+                        >
+                          Ninguno (Volver)
+                        </button>
+                      </div>
+                    ) : (
+                      <form onSubmit={(e) => { e.preventDefault(); enviarJugador(inputJugador); }} className="tcu-form">
+                        <input
+                          type="text"
+                          value={inputJugador}
+                          onChange={(e) => { setInputJugador(e.target.value); setErrorJuego(''); }}
+                          placeholder={`Dime un jugador del ${sala.equipoSeleccionado?.nombre}...`}
+                          className="player-text-input qq-input-moderno"
+                          autoFocus
+                        />
+                        {errorJuego && <p className="error" style={{ marginBottom: '1rem' }}>{errorJuego}</p>}
+                        <div className="tcu-actions">
+                          <button type="submit" className="qq-btn-principal" style={{ width: '100%', color: 'white' }} disabled={enviando || !inputJugador.trim()}>Enviar</button>
+                          <button type="button" className="secondary" disabled={enviando} onClick={pasarTurno}>Pasar</button>
+                          <button type="button" className="secondary danger" disabled={enviando} onClick={plantarse}>Plantarse</button>
+                        </div>
+                      </form>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <h2 className="title">Turno de {jTurno?.nombre}</h2>
+                    <div className="timer-bar-container">
+                      <div
+                        className={`timer-bar ${sala.tiempoRestante <= 10 ? 'low' : ''}`}
+                        style={{ width: `${(sala.tiempoRestante / sala.tiempoTurno) * 100}%` }}
+                      />
+                    </div>
+                    <p className="timer-text">{sala.tiempoRestante} s</p>
+                    <p className="tcu-turno-aviso">Esperando su respuesta...</p>
+                  </>
+                )}
+              </div>
+
+              {sala.jugadoresUsados.length > 0 && (
+                <div className="tcu-usados">
+                  <strong>Ya dichos:</strong> {sala.jugadoresUsados.join(', ')}
+                </div>
+              )}
+          </div>
+        </section>
+      );})()}
+
+      {/* 7. PODIO FINAL */}
       {vista === 'sala' && sala && sala.estado === 'resultados' && (() => {
         const ranking = [...sala.jugadores].sort(
           (a, b) => (a.estado === 'eliminado') - (b.estado === 'eliminado') || a.puntuacionActual - b.puntuacionActual
@@ -834,75 +983,88 @@ export default function TrescientosunoOnline({ onLocal, onSalir }) {
         const mejor = ranking.find((j) => j.estado !== 'eliminado');
         return (
           <section className="game">
-            <div className="end-card panel">
-              <span className="end-icon"><Icon name="trophy" size={48} /></span>
-              <h1 className="title">Fin de la partida</h1>
-              <p className="final-score">
-                {!mejor
-                  ? 'Todos han sido eliminados.'
-                  : mejor.estado === 'ganador'
-                    ? `Ganador: ${mejor.nombre} (¡clavó el 0!)`
-                    : `Ganador: ${mejor.nombre} (se quedó a ${mejor.puntuacionActual})`}
-              </p>
-              <div className="scoreboard">
-                {ranking.map((j) => (
-                  <div key={j.id} className="score-row">
-                    <span className="score-name">{j.nombre}{j.id === yoId ? ' (tú)' : ''} {j.estado === 'plantado' && '(Plantado)'}</span>
-                    <span className="score-pts">{j.estado === 'eliminado' ? 'Eliminado' : j.puntuacionActual}</span>
-                  </div>
-                ))}
+            <div className="panel qq-menu-panel">
+              <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
+                <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
               </div>
-            </div>
-            {errorMsg && <p className="error">{errorMsg}</p>}
-            <div className="actions" style={{ marginTop: '1.5rem' }}>
-              {esAdmin ? (
-                <button disabled={cargando || sala.jugadores.length < 2} onClick={() => accionAdmin('revancha')}>
-                  <Icon name="refresh" size={20} /> Jugar otro equipo
-                </button>
-              ) : (
-                <p className="hint center">Esperando a que el anfitrión elija el siguiente equipo...</p>
-              )}
-              <button className="secondary danger" onClick={() => setModalSalir(true)}>
-                <Icon name="door" size={20} /> Salir
-              </button>
+
+              <div className="end-card" style={{ border: 'none', boxShadow: 'none' }}>
+                <span className="end-icon"><Icon name="trophy" size={48} /></span>
+                <h1 className="title">Fin de la partida</h1>
+                <p className="final-score">
+                  {!mejor
+                    ? 'Todos han sido eliminados.'
+                    : mejor.estado === 'ganador'
+                      ? `Ganador: ${mejor.nombre} (¡clavó el 0!)`
+                      : `Ganador: ${mejor.nombre} (se quedó a ${mejor.puntuacionActual})`}
+                </p>
+                <div className="scoreboard">
+                  {ranking.map((j) => (
+                    <div key={j.id} className="score-row">
+                      <span className="score-name">{j.nombre}{j.id === yoId ? ' (tú)' : ''} {j.estado === 'plantado' && '(Plantado)'}</span>
+                      <span className="score-pts">{j.estado === 'eliminado' ? 'Eliminado' : j.puntuacionActual}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="actions" style={{ marginTop: '1.5rem' }}>
+                {esAdmin ? (
+                  <button className="big full qq-btn-principal" disabled={cargando || sala.jugadores.length < 2} onClick={() => accionAdmin('revancha')}>
+                    <Icon name="refresh" size={20} /> Jugar otro equipo
+                  </button>
+                ) : (
+                  <p className="hint center">Esperando a que el anfitrión elija el siguiente equipo...</p>
+                )}
+              </div>
             </div>
           </section>
         );
       })()}
 
-      {modalSalir && (
-        <div className="rg-modal-fondo" onClick={() => setModalSalir(false)}>
-          <div 
-            className="rg-modal" 
-            onClick={(e) => e.stopPropagation()} 
-            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
-          >
+      {/* MODALES DE SALIDA */}
+      {modalSalirLobby && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalirLobby(false)}>
+          <div className="rg-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}>
             <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
             <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
-              ¿Abandonar la partida?
+              ¿Salir de la sala?
             </h3>
             <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
-              Si sales de la sala perderás tu progreso actual en la partida. ¿Estás seguro de que deseas salir?
+              Si sales ahora abandonarás la sala de espera y volverás al menú anterior. ¿Estás seguro?
             </p>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
-              <button 
-                type="button" 
-                className="secondary full" 
-                onClick={() => setModalSalir(false)}
-              >
+              <button type="button" className="secondary full" onClick={() => setModalSalirLobby(false)}>
                 No, quedarme
               </button>
-              <button 
-                type="button" 
-                className="secondary danger full" 
-                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
-                onClick={() => {
-                  setModalSalir(false);
-                  handleSalir();
-                }}
-              >
+              <button type="button" className="secondary danger full" style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }} onClick={handleVolverMenuOnline}>
                 Sí, salir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {modalSalirPortada && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalirPortada(false)}>
+          <div className="rg-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}>
+            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
+            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
+              ¿Salir a la portada?
+            </h3>
+            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
+              {esAdmin
+                ? 'Se cerrará la sala y saldrás de la partida hacia la portada principal. ¿Estás seguro?'
+                : 'Abandonarás la sala y saldrás hacia la portada principal. ¿Estás seguro?'}
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+              <button type="button" className="secondary full" onClick={() => setModalSalirPortada(false)}>
+                No, continuar
+              </button>
+              <button type="button" className="secondary danger full" style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }} onClick={handleCerrarSalaYSalirAPortada}>
+                Sí, salir a portada
               </button>
             </div>
           </div>

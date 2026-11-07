@@ -1,11 +1,579 @@
 /* client/src/games/Furbo/Furbo.css */
 
+/* ========================================================
+   FONDO TEMÁTICO: FURBO! (VERDE CÉSPED / ESTADIO NOCTURNO)
+   ======================================================== */
+
+body:has(.furbo-contenedor) {
+  background:
+    radial-gradient(70% 460px at 50% 0%, rgba(22, 163, 74, 0.42) 0%, transparent 70%),
+    radial-gradient(45% 560px at 100% 20%, rgba(21, 128, 61, 0.28) 0%, transparent 70%),
+    radial-gradient(45% 560px at 0% 50%, rgba(34, 197, 94, 0.22) 0%, transparent 70%),
+    radial-gradient(45% 560px at 100% 76%, rgba(20, 83, 45, 0.25) 0%, transparent 70%),
+    radial-gradient(80% 520px at 50% 100%, rgba(22, 163, 74, 0.36) 0%, transparent 70%),
+    radial-gradient(rgba(255, 255, 255, 0.08) 1.3px, transparent 1.5px) 0 0 / 22px 22px,
+    linear-gradient(180deg, #07170e 0%, #0c2417 50%, #05120a 100%) !important;
+  background-attachment: scroll !important;
+}
+
+body:has(.qq-en-partida) .back:not(.qq-btn-volver-sala) {
+  display: none !important;
+}
+
 .furbo-contenedor {
+  --g1: #16a34a;
+  --g2: #15803d;
   width: 100%;
   position: relative;
+  min-height: 100vh;
+  padding-bottom: 2rem;
+  font-family: 'Figtree', system-ui, sans-serif !important;
+}
+
+.furbo-contenedor h1,
+.furbo-contenedor h2,
+.furbo-contenedor h3,
+.furbo-contenedor .title,
+.furbo-contenedor .qq-main-title,
+.furbo-contenedor .section-title {
+  font-family: 'Bricolage Grotesque', sans-serif !important;
+}
+
+.furbo-contenedor .qq-main-desc,
+.furbo-contenedor .qq-opcion-card,
+.furbo-contenedor .qq-opcion-textos strong,
+.furbo-contenedor .qq-opcion-textos span,
+.furbo-contenedor p,
+.furbo-contenedor button,
+.furbo-contenedor input,
+.furbo-contenedor select {
+  font-family: 'Figtree', system-ui, sans-serif !important;
+}
+
+.furbo-contenedor > .game {
   max-width: 960px;
   margin: 0 auto;
+  padding-top: 1rem;
 }
+
+/* ========================================================
+   MENÚS UNIFICADOS (TEMA VERDE FURBO)
+   ======================================================== */
+
+.qq-menu-panel {
+  position: relative;
+  padding: 1.6rem 1.6rem 2rem !important;
+  border-radius: 26px !important;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+  border: 1.5px solid #e2e8f0 !important;
+  box-shadow: 0 18px 38px -12px rgba(22, 163, 74, 0.28) !important;
+}
+
+.qq-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 0.6rem;
+}
+
+.qq-card-top.solo-derecha {
+  justify-content: flex-end;
+}
+
+.qq-link-volver {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0.3rem 0.5rem !important;
+  margin-left: -0.4rem;
+  font-size: 0.92rem !important;
+  font-weight: 700 !important;
+  color: #64748b !important;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 8px !important;
+  transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.qq-link-volver:hover {
+  color: var(--g1) !important;
+  background: #f0fdf4 !important;
+  transform: translateX(-2px);
+}
+
+.qq-btn-ayuda {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  background: #f0fdf4 !important;
+  border: 1.5px solid #bbf7d0 !important;
+  color: var(--g1) !important;
+  font-size: 1rem !important;
+  font-weight: 900 !important;
+  display: grid !important;
+  place-items: center !important;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.12);
+}
+
+.qq-btn-ayuda:hover {
+  background: var(--g1) !important;
+  color: #ffffff !important;
+  border-color: var(--g1) !important;
+  transform: scale(1.07);
+}
+
+.qq-hero-icono {
+  width: 76px;
+  height: 76px;
+  border-radius: 24px;
+  margin: 0 auto 0.9rem;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  color: var(--g1);
+  box-shadow: 0 8px 20px -6px rgba(22, 163, 74, 0.3);
+}
+
+.qq-hero-icono.chico {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.qq-main-title {
+  font-size: 1.85rem !important;
+  font-weight: 900 !important;
+  color: #0f172a !important;
+  margin: 0 0 0.45rem !important;
+  letter-spacing: -0.5px;
+}
+
+.qq-main-desc {
+  max-width: 440px;
+  margin: 0 auto 1.4rem !important;
+  font-size: 0.96rem !important;
+  line-height: 1.5 !important;
+  color: #64748b !important;
+}
+
+.qq-menu-opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  width: 100%;
+  margin-top: 0.6rem;
+}
+
+.qq-opcion-card {
+  display: flex !important;
+  align-items: center !important;
+  gap: 1rem !important;
+  width: 100% !important;
+  text-align: left !important;
+  padding: 1.15rem 1.25rem !important;
+  border-radius: 20px !important;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.qq-opcion-card.principal {
+  background: linear-gradient(135deg, var(--g1) 0%, var(--g2) 100%) !important;
+  border: 2px solid transparent !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 22px -6px rgba(22, 163, 74, 0.45) !important;
+}
+
+.qq-opcion-card.principal:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 26px -6px rgba(22, 163, 74, 0.6) !important;
+  filter: brightness(1.03);
+}
+
+.qq-opcion-card.secundaria {
+  background: #ffffff !important;
+  border: 2px solid #e2e8f0 !important;
+  color: #0f172a !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04) !important;
+}
+
+.qq-opcion-card.secundaria:hover {
+  border-color: var(--g1) !important;
+  background: #f8fafc !important;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px -6px rgba(22, 163, 74, 0.18) !important;
+}
+
+.qq-opcion-icono {
+  width: 50px;
+  height: 50px;
+  border-radius: 15px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.qq-opcion-card.principal .qq-opcion-icono {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+}
+
+.qq-opcion-card.secundaria .qq-opcion-icono {
+  background: #f0fdf4;
+  color: var(--g1);
+}
+
+.qq-opcion-textos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.qq-opcion-textos strong {
+  font-size: 1.12rem;
+  font-weight: 800;
+}
+
+.qq-opcion-card.principal .qq-opcion-textos span {
+  font-size: 0.86rem;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.35;
+}
+
+.qq-opcion-card.secundaria .qq-opcion-textos span {
+  font-size: 0.86rem;
+  color: #64748b;
+  line-height: 1.35;
+}
+
+.qq-form-estilizado {
+  margin-top: 1rem;
+  text-align: left;
+  gap: 0.4rem;
+}
+
+.qq-input-moderno {
+  width: 100%;
+  padding: 0.85rem 1rem !important;
+  border-radius: 14px !important;
+  border: 2px solid #e2e8f0 !important;
+  background: #f8fafc !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  color: #0f172a !important;
+  transition: all 0.18s ease;
+}
+
+.qq-input-moderno:focus {
+  outline: none !important;
+  border-color: var(--g1) !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.16) !important;
+}
+
+.qq-btn-principal {
+  margin-top: 1.1rem;
+  background: linear-gradient(135deg, var(--g1) 0%, var(--g2) 100%) !important;
+  border-radius: 18px !important;
+  font-weight: 800 !important;
+  box-shadow: 0 10px 22px -6px rgba(22, 163, 74, 0.45) !important;
+  color: white !important;
+}
+
+.qq-config-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0.2rem 0 1.3rem;
+  text-align: left;
+}
+
+.qq-config-titulo {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.qq-config-sub {
+  margin: 0.15rem 0 0;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.qq-label-destacado {
+  font-size: 0.88rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #475569;
+  margin-bottom: 0.55rem;
+  display: block;
+}
+
+.qq-selector-cantidad-box {
+  background: #f1f5f9;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 1rem 1.1rem;
+}
+
+.qq-stepper-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.qq-stepper-btn {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  padding: 0 !important;
+  border-radius: 13px !important;
+  background: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  color: #1e293b !important;
+  font-size: 1.35rem !important;
+  font-weight: 800 !important;
+  display: grid !important;
+  place-items: center !important;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.qq-stepper-btn:hover:not(:disabled) {
+  border-color: var(--g1) !important;
+  color: var(--g1) !important;
+  background: #f0fdf4 !important;
+}
+
+.qq-stepper-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.qq-select-jugadores {
+  flex: 1;
+  height: 44px;
+  border-radius: 13px !important;
+  border: 1.5px solid #cbd5e1 !important;
+  background: #ffffff !important;
+  font-weight: 800 !important;
+  font-size: 1rem !important;
+  color: #0f172a !important;
+  text-align: center;
+  padding: 0 0.8rem !important;
+}
+
+.qq-nombres-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.qq-jugador-input-card {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 15px;
+  padding: 0.4rem 0.7rem;
+  transition: all 0.18s ease;
+}
+
+.qq-jugador-input-card:focus-within {
+  border-color: var(--g1);
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.16);
+}
+
+.qq-jugador-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, var(--g1) 0%, var(--g2) 100%);
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.qq-jugador-input-card input {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0.45rem 0.2rem !important;
+  font-size: 0.96rem !important;
+  font-weight: 700 !important;
+  color: #1e293b !important;
+  width: 100%;
+}
+
+.qq-jugador-input-card input:focus {
+  outline: none !important;
+}
+
+.qq-tablero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #f0fdf4;
+  color: var(--g1);
+  border: 1.5px solid #bbf7d0;
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  margin-bottom: 0.6rem;
+}
+
+.qq-tablero-footer {
+  width: 100%;
+  margin-top: 1.1rem;
+  padding-top: 0.9rem;
+  border-top: 1.5px solid #f1f5f9;
+  display: flex;
+  justify-content: center;
+}
+
+.qq-link-otra-ronda {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0.4rem 0.8rem !important;
+  font-size: 0.92rem !important;
+  font-weight: 700 !important;
+  color: #64748b !important;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 10px !important;
+}
+
+.qq-link-otra-ronda:hover {
+  color: var(--g1) !important;
+  background: #f8fafc !important;
+}
+
+.aprox-modal-ayuda {
+  max-width: 480px !important;
+  max-height: 88vh !important;
+  overflow-y: auto !important;
+  padding: 1.8rem 1.5rem !important;
+  border-radius: 24px !important;
+  text-align: left !important;
+}
+
+.aprox-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1.2rem;
+}
+
+.aprox-modal-signo-title {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #f0fdf4;
+  border: 1.5px solid #bbf7d0;
+  color: var(--g1);
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.aprox-modal-header h3 {
+  margin: 0;
+  font-size: 1.45rem;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.aprox-modal-cuerpo {
+  font-size: 0.94rem;
+  color: #334155;
+  line-height: 1.5;
+  margin-bottom: 1.2rem;
+}
+
+.aprox-modal-cuerpo ul {
+  padding-left: 1.2rem;
+  margin: 0.7rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.aprox-tabla-puntos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin: 0.8rem 0 1rem;
+}
+
+.aprox-puntos-fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.55rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.aprox-puntos-fila.acierto {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.qq-codigo-btn {
+  background: #f0fdf4 !important;
+  border: 2.5px dashed var(--g1) !important;
+  border-radius: 18px !important;
+  padding: 0.5rem 1.8rem !important;
+  font-size: 3.2rem !important;
+  letter-spacing: 6px;
+  color: var(--g1) !important;
+  font-weight: 900 !important;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin: 0.6rem auto;
+  display: inline-block;
+}
+
+.qq-codigo-btn:hover {
+  transform: scale(1.03);
+  background: #dcfce7 !important;
+}
+
+.lb-luna.chica {
+  width: 68px;
+  height: 68px;
+  color: var(--g1);
+  background: #f0fdf4;
+  border-radius: 50%;
+}
+
+/* ========================================================
+   ESTILOS PROPIOS DEL PARTIDO (FURBO)
+   ======================================================== */
 
 .furbo-fase-emoji {
   display: block;
@@ -25,14 +593,13 @@
   margin-bottom: 0.4rem;
 }
 
-/* ---- Pregunta ---- */
 .furbo-pregunta {
   text-align: center;
   padding: 1.1rem 1rem;
   margin: 0 0 1rem;
   border-radius: 1rem;
-  background: rgba(99, 102, 241, 0.08);
-  border: 1.5px solid rgba(99, 102, 241, 0.3);
+  background: rgba(22, 163, 74, 0.08);
+  border: 1.5px solid rgba(22, 163, 74, 0.3);
 }
 .furbo-pregunta h2 {
   margin: 0.5rem 0 0;
@@ -48,10 +615,10 @@
   text-transform: uppercase;
   padding: 0.2rem 0.65rem;
   border-radius: 9999px;
-  background: rgba(99, 102, 241, 0.18);
+  background: rgba(22, 163, 74, 0.18);
+  color: #15803d;
 }
 
-/* ---- Reloj ---- */
 .furbo-reloj { margin: 0.4rem 0 1rem; }
 .furbo-reloj-barra { height: 8px; border-radius: 9999px; overflow: hidden; background: rgba(148, 163, 184, 0.35); }
 .furbo-reloj-fill {
@@ -67,7 +634,6 @@
 }
 .furbo-reloj-texto.low { color: #dc2626; }
 
-/* ---- Opciones (quiniela y penaltis) ---- */
 .furbo-opciones { display: grid; gap: 0.6rem; margin: 0.6rem 0 1rem; }
 .furbo-opcion-btn {
   display: flex; align-items: center; gap: 0.75rem;
@@ -79,19 +645,19 @@
   font-weight: 600; font-size: 1rem; cursor: pointer;
   transition: border-color 0.15s ease, background-color 0.15s ease, transform 0.1s ease;
 }
-.furbo-opcion-btn:hover:not(:disabled) { border-color: #6366f1; transform: translateY(-1px); }
+.furbo-opcion-btn:hover:not(:disabled) { border-color: #16a34a; transform: translateY(-1px); }
 .furbo-opcion-btn:disabled { cursor: default; opacity: 0.95; }
 .furbo-letra {
   flex: 0 0 auto; width: 2.1rem; height: 2.1rem; border-radius: 50%;
   display: grid; place-items: center; font-weight: 800;
-  background: rgba(99, 102, 241, 0.18);
+  background: rgba(22, 163, 74, 0.18);
+  color: #15803d;
 }
-.furbo-opcion-btn.elegida { border-color: #6366f1; background: rgba(99, 102, 241, 0.14); }
+.furbo-opcion-btn.elegida { border-color: #16a34a; background: rgba(22, 163, 74, 0.14); }
 .furbo-opcion-btn.correcta { border-color: #16a34a; background: rgba(22, 163, 74, 0.15); }
 .furbo-opcion-btn.incorrecta { border-color: #ef4444; background: rgba(239, 68, 68, 0.13); }
 .furbo-opcion-btn .furbo-quien { margin-left: auto; font-size: 0.8rem; font-weight: 700; opacity: 0.85; }
 
-/* ---- Penaltis: zonas ---- */
 .furbo-zonas { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin: 0.8rem 0 1rem; }
 .furbo-zona-btn {
   display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
@@ -115,7 +681,6 @@
 .furbo-banner-resultado.parada { background: rgba(239, 68, 68, 0.13); border: 2px solid #ef4444; }
 .furbo-banner-resultado small { display: block; font-size: 0.95rem; font-weight: 600; margin-top: 0.3rem; }
 
-/* ---- Prórroga ---- */
 .furbo-palabra-card {
   text-align: center; padding: 1.3rem 1rem; border-radius: 1rem; margin-bottom: 0.8rem;
   background: rgba(22, 163, 74, 0.1); border: 2px solid #16a34a;
@@ -129,12 +694,10 @@
 .furbo-prohibidas-titulo { text-align: center; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: #dc2626; margin: 0.4rem 0 0.4rem; }
 .furbo-acciones-grid { display: grid; grid-template-columns: 1fr; gap: 0.6rem; }
 .furbo-contadores { display: flex; justify-content: center; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.8rem; }
-.furbo-contador { padding: 0.3rem 0.8rem; border-radius: 9999px; font-weight: 700; font-size: 0.9rem; background: rgba(99, 102, 241, 0.12); }
+.furbo-contador { padding: 0.3rem 0.8rem; border-radius: 9999px; font-weight: 700; font-size: 0.9rem; background: rgba(22, 163, 74, 0.12); color: #15803d; }
 
-/* ---- Pasar el móvil (modo local) ---- */
 .furbo-gate { text-align: center; }
 
-/* ---- Revelado de Vestuario ---- */
 .furbo-grupo {
   padding: 0.7rem 0.9rem; border-radius: 0.9rem; margin-bottom: 0.6rem;
   border: 2px solid rgba(100, 116, 139, 0.4);
@@ -150,12 +713,9 @@
 
 .furbo-respuesta-real {
   text-align: center; font-size: 1.15rem; font-weight: 800; padding: 0.8rem; margin: 0.4rem 0 1rem;
-  border-radius: 0.9rem; background: rgba(99, 102, 241, 0.1); border: 1.5px solid rgba(99, 102, 241, 0.35);
+  border-radius: 0.9rem; background: rgba(22, 163, 74, 0.1); border: 1.5px solid rgba(22, 163, 74, 0.35); color: #15803d;
 }
 
-/* ========================================================
-   CONFIGURACIÓN DE PARTIDA (TARJETAS DE FASES Y DURACIÓN)
-   ======================================================== */
 .furbo-fases-config {
   display: flex;
   flex-direction: column;
@@ -180,20 +740,19 @@
 }
 
 .furbo-fase-check:hover:not(.solo-lectura) {
-  border-color: #6366f1;
+  border-color: #16a34a;
 }
 
 .furbo-fase-check.activa {
-  border-color: #6366f1;
-  background: #eef2ff;
-  color: #1e1b4b;
+  border-color: #16a34a;
+  background: #f0fdf4;
+  color: #14532d;
 }
 
 .furbo-fase-check.solo-lectura {
   cursor: default;
 }
 
-/* Evita que el input checkbox herede width: 100% de las reglas globales */
 .furbo-fase-check input[type="checkbox"] {
   width: 1.25rem !important;
   height: 1.25rem !important;
@@ -201,7 +760,7 @@
   margin: 0 !important;
   padding: 0 !important;
   flex: 0 0 1.25rem !important;
-  accent-color: #4f46e5;
+  accent-color: #16a34a;
   cursor: pointer;
 }
 
@@ -242,15 +801,12 @@
 }
 
 .furbo-duracion button.activa {
-  border-color: #4f46e5 !important;
-  background: #eef2ff !important;
-  color: #3730a3 !important;
-  outline: 2px solid #6366f1;
+  border-color: #16a34a !important;
+  background: #f0fdf4 !important;
+  color: #15803d !important;
+  outline: 2px solid #22c55e;
 }
 
-/* ========================================================
-   CLASIFICACIÓN Y NOMBRES DE JUGADORES (ALTO CONTRASTE)
-   ======================================================== */
 .furbo-contenedor .score-row {
   color: #1e293b !important;
 }
@@ -268,10 +824,6 @@
   color: #1e293b !important;
 }
 
-/* ========================================================
-   LOBBY ONLINE: TARJETAS CON EL COLOR TEMÁTICO DEL JUEGO
-   (Igual que en Buscaminas.css)
-   ======================================================== */
 .furbo-contenedor .lb-lista {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -285,7 +837,7 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.85rem 1.1rem;
-  background: var(--g1, var(--c, #4f46e5));
+  background: var(--g1, var(--c, #16a34a));
   border: 2px solid rgba(255, 255, 255, 0.35);
   border-radius: 16px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);

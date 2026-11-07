@@ -1,8 +1,9 @@
 // client/src/games/Furbo/FurboOnline.jsx
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import FurboPartida from './FurboPartida.jsx';
-import { AyudaFurbo, ConfigPartida } from './FurboComun.jsx';
+import { ConfigPartida } from './FurboComun.jsx';
 import './Furbo.css';
 import '../Adivina/Adivina.css';
 
@@ -17,13 +18,33 @@ const postJSON = (url, body) =>
     body: JSON.stringify(body)
   });
 
-export default function FurboOnline({ onLocal }) {
-  const [vista, setVista] = useState('menu'); // 'menu' | 'crear' | 'unirse' | 'sala'
+function BotonVolver({ onClick, texto = 'Volver' }) {
+  return (
+    <button type="button" className="qq-link-volver" onClick={onClick}>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7" />
+      </svg>
+      <span>{texto}</span>
+    </button>
+  );
+}
+
+export default function FurboOnline({
+  tituloJuego = 'Furbo!',
+  descripcionJuego,
+  onLocal,
+  onSalir,
+  onAbrirAyuda
+}) {
+  const navigate = useNavigate();
+  const [vista, setVista] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
   const [nombre, setNombre] = useState('');
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
-  const [modalSalir, setModalSalir] = useState(false);
+  
+  const [modalSalirLobby, setModalSalirLobby] = useState(false);
+  const [modalSalirPortada, setModalSalirPortada] = useState(false);
   const [codigoCopiado, setCodigoCopiado] = useState(false);
 
   const [sesion, setSesion] = useState(() => {
@@ -36,7 +57,6 @@ export default function FurboOnline({ onLocal }) {
   const [sala, setSala] = useState(null);
   const intervalRef = useRef(null);
 
-  // ---- Polling de sincronización (cada 500 ms, como el resto de juegos)
   useEffect(() => {
     if (!sesion) {
       if (intervalRef.current) clearInterval(intervalRef.current);
@@ -60,7 +80,7 @@ export default function FurboOnline({ onLocal }) {
           sessionStorage.removeItem(CLAVE_SESION_FURBO);
           setSesion(null);
           setSala(null);
-          setVista('menu');
+          setVista('online_menu');
           setErrorMsg('La sala se ha cerrado.');
         });
     };
@@ -78,9 +98,59 @@ export default function FurboOnline({ onLocal }) {
     setSesion(nueva);
   };
 
+  const redirigirAPortada = () => {
+    if (typeof onSalir === 'function') {
+      onSalir();
+    } else {
+      try {
+        navigate('/');
+      } catch {
+        window.location.href = '/';
+      }
+    }
+  };
+
+  const handleCerrarSalaYSalirAPortada = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    const sesionActual = sesion;
+    sessionStorage.removeItem(CLAVE_SESION_FURBO);
+    setSesion(null);
+    setSala(null);
+    setModalSalirPortada(false);
+
+    if (sesionActual?.code && sesionActual?.token) {
+      postJSON(`${API}/sala/${sesionActual.code}/salir`, { token: sesionActual.token }).catch(() => {});
+    }
+
+    redirigirAPortada();
+  };
+
+  const handleVolverMenuOnline = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    const sesionActual = sesion;
+    sessionStorage.removeItem(CLAVE_SESION_FURBO);
+    setSesion(null);
+    setSala(null);
+    setModalSalirLobby(false);
+    setVista('online_menu');
+
+    if (sesionActual?.code && sesionActual?.token) {
+      postJSON(`${API}/sala/${sesionActual.code}/salir`, { token: sesionActual.token }).catch(() => {});
+    }
+  };
+
   const handleCrear = async () => {
     if (!nombre.trim()) return;
     setCargando(true);
+    setErrorMsg('');
     try {
       const res = await postJSON(`${API}/crear`, { nombre: nombre.trim() });
       const data = await res.json();
@@ -96,6 +166,7 @@ export default function FurboOnline({ onLocal }) {
   const handleUnirse = async () => {
     if (!nombre.trim() || !codigoInput.trim()) return;
     setCargando(true);
+    setErrorMsg('');
     try {
       const res = await postJSON(`${API}/unirse`, { code: codigoInput.trim().toUpperCase(), nombre: nombre.trim() });
       const data = await res.json();
@@ -109,7 +180,6 @@ export default function FurboOnline({ onLocal }) {
   };
 
   const handleConfig = async (config) => {
-    // Cambio inmediato en pantalla; el servidor lo confirma en el siguiente sondeo
     setSala((s) => (s ? { ...s, config } : s));
     try {
       await postJSON(`${API}/sala/${sesion.code}/config`, { token: sesion.token, config });
@@ -147,19 +217,6 @@ export default function FurboOnline({ onLocal }) {
     }
   };
 
-  const handleSalir = async () => {
-    try {
-      await postJSON(`${API}/sala/${sesion.code}/salir`, { token: sesion.token });
-    } catch {
-      /* ignorado: se sale igualmente */
-    }
-    sessionStorage.removeItem(CLAVE_SESION_FURBO);
-    setSesion(null);
-    setSala(null);
-    setErrorMsg('');
-    setVista('menu');
-  };
-
   const copiarCodigo = () => {
     if (!sala?.code) return;
     navigator.clipboard?.writeText(sala.code);
@@ -169,34 +226,135 @@ export default function FurboOnline({ onLocal }) {
 
   const esAdmin = sala?.esAdmin;
   const yoId = sala?.yoId;
-  const enMenus = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
+  const enPartidaActiva = vista === 'sala' && sala && sala.estado !== 'lobby';
 
   return (
-    <div className="furbo-contenedor">
-      {enMenus && <AyudaFurbo online />}
-
-      {/* 1. MENÚ ONLINE */}
+    <div className={`furbo-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+      {/* 1. MENÚ PRINCIPAL */}
       {vista === 'menu' && (
         <section className="game">
-          <div className="panel center">
-            <span className="lb-luna chica">
-              <span style={{ fontSize: '2.4rem', lineHeight: 1 }}>⚽</span>
-            </span>
-            <h1 className="title">Furbo Online</h1>
-            <p className="hint">
-              Telepatía, rebotes, quinielas, palabras prohibidas y penaltis. ¡Un partido completo de preguntas de fútbol con tus amigos!
-            </p>
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top solo-derecha">
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
+
+            <div className="qq-hero-icono">
+              <span style={{ fontSize: '2.5rem', lineHeight: 1 }}>⚽</span>
+            </div>
+            <h1 className="title qq-main-title">{tituloJuego}</h1>
+            <p className="hint qq-main-desc">{descripcionJuego}</p>
+
             {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
 
-            <div className="lb-menu">
-              <button className="big full" onClick={() => { setVista('crear'); setErrorMsg(''); }}>
-                <Icon name="crown" size={22} /> Crear partida Online
+            <div className="qq-menu-opciones">
+              <button
+                type="button"
+                className="qq-opcion-card principal"
+                onClick={() => {
+                  setVista('online_menu');
+                  setErrorMsg('');
+                }}
+              >
+                <span className="qq-opcion-icono">
+                  <Icon name="globe" size={26} />
+                </span>
+                <div className="qq-opcion-textos">
+                  <strong>Jugar online</strong>
+                  <span>Cada jugador desde su propio móvil con código de sala</span>
+                </div>
               </button>
-              <button className="big full" onClick={() => { setVista('unirse'); setErrorMsg(''); }}>
-                <Icon name="users" size={22} /> Unirse con código
+
+              <button
+                type="button"
+                className="qq-opcion-card secundaria"
+                onClick={onLocal}
+              >
+                <span className="qq-opcion-icono">
+                  <Icon name="users" size={26} />
+                </span>
+                <div className="qq-opcion-textos">
+                  <strong>Jugar en un único dispositivo</strong>
+                  <span>Pasando el móvil por turnos entre los jugadores</span>
+                </div>
               </button>
-              <button className="secondary full" onClick={onLocal}>
-                <Icon name="home" size={20} /> Jugar en un solo dispositivo
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 1B. SUBMENÚ ONLINE */}
+      {vista === 'online_menu' && (
+        <section className="game">
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver
+                onClick={() => {
+                  setVista('menu');
+                  setErrorMsg('');
+                }}
+              />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
+
+            <div className="qq-hero-icono">
+              <Icon name="globe" size={40} strokeWidth={1.7} />
+            </div>
+            <h2 className="title qq-main-title">Modo Online</h2>
+            <p className="hint qq-main-desc">
+              Crea una sala nueva para compartir el código con tus amigos o únete a una ya creada.
+            </p>
+
+            {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
+
+            <div className="qq-menu-opciones">
+              <button
+                type="button"
+                className="qq-opcion-card principal"
+                onClick={() => {
+                  setVista('crear');
+                  setErrorMsg('');
+                }}
+              >
+                <span className="qq-opcion-icono">
+                  <Icon name="crown" size={26} />
+                </span>
+                <div className="qq-opcion-textos">
+                  <strong>Crear partida</strong>
+                  <span>Sé el anfitrión, genera un código y administra el partido</span>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                className="qq-opcion-card secundaria"
+                onClick={() => {
+                  setVista('unirse');
+                  setErrorMsg('');
+                }}
+              >
+                <span className="qq-opcion-icono">
+                  <Icon name="users" size={26} />
+                </span>
+                <div className="qq-opcion-textos">
+                  <strong>Unirse con código</strong>
+                  <span>Introduce el código de 4 letras de tu anfitrión</span>
+                </div>
               </button>
             </div>
           </div>
@@ -206,29 +364,54 @@ export default function FurboOnline({ onLocal }) {
       {/* 2. CREAR SALA */}
       {vista === 'crear' && (
         <section className="game">
-          <div className="panel center">
-            <h2 className="title">Crear sala Online</h2>
-            <p className="hint">Introduce tu nombre de anfitrión (hasta {MAX_JUGADORES} jugadores).</p>
-            {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
-            <div className="lb-form" style={{ marginTop: '1.2rem', textAlign: 'left' }}>
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver
+                onClick={() => {
+                  setVista('online_menu');
+                  setErrorMsg('');
+                }}
+              />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
+
+            <div className="qq-hero-icono">
+              <Icon name="crown" size={40} strokeWidth={1.6} />
+            </div>
+            <h2 className="title qq-main-title">Crear partida</h2>
+            <p className="hint qq-main-desc">
+              Introduce tu nombre para abrir la sala y ser el anfitrión (hasta {MAX_JUGADORES} jugadores).
+            </p>
+
+            <div className="lb-form qq-form-estilizado">
+              <label className="field-label" htmlFor="furbo-host-nombre">Tu nombre</label>
               <input
+                id="furbo-host-nombre"
+                className="qq-input-moderno"
                 type="text"
-                placeholder="Tu nombre"
+                placeholder="Ej. Alex"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
                 maxLength={20}
                 autoFocus
               />
+              {errorMsg && <p className="error">{errorMsg}</p>}
+
               <button
-                className="big full"
-                style={{ marginTop: '1rem' }}
+                type="button"
+                className="big full qq-btn-principal"
                 disabled={cargando || !nombre.trim()}
                 onClick={handleCrear}
               >
-                Crear sala
-              </button>
-              <button className="secondary full" style={{ marginTop: '0.6rem' }} onClick={() => { setVista('menu'); setErrorMsg(''); }}>
-                Volver
+                <Icon name="check" size={22} strokeWidth={2.5} /> Crear sala
               </button>
             </div>
           </div>
@@ -238,62 +421,97 @@ export default function FurboOnline({ onLocal }) {
       {/* 3. UNIRSE A SALA */}
       {vista === 'unirse' && (
         <section className="game">
-          <div className="panel center">
-            <h2 className="title">Unirse a partida</h2>
-            {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
-            <div className="lb-form" style={{ marginTop: '1.2rem', textAlign: 'left' }}>
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver
+                onClick={() => {
+                  setVista('online_menu');
+                  setErrorMsg('');
+                }}
+              />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
+
+            <div className="qq-hero-icono">
+              <Icon name="users" size={40} strokeWidth={1.6} />
+            </div>
+            <h2 className="title qq-main-title">Unirse a partida</h2>
+            <p className="hint qq-main-desc">
+              Introduce el código de 4 letras que te ha compartido el anfitrión.
+            </p>
+
+            <div className="lb-form qq-form-estilizado">
+              <label className="field-label" htmlFor="furbo-code-input">Código de la sala</label>
               <input
+                id="furbo-code-input"
+                className="lb-input-codigo qq-input-moderno"
                 type="text"
-                placeholder="CÓDIGO (4 LETRAS)"
+                placeholder="ABCD"
                 value={codigoInput}
                 onChange={(e) => setCodigoInput(e.target.value.toUpperCase())}
                 maxLength={4}
                 style={{ textTransform: 'uppercase', letterSpacing: '4px', textAlign: 'center', fontWeight: '800' }}
                 autoFocus
               />
+
+              <label className="field-label" htmlFor="furbo-guest-nombre" style={{ marginTop: '1rem' }}>Tu nombre</label>
               <input
+                id="furbo-guest-nombre"
+                className="qq-input-moderno"
                 type="text"
                 placeholder="Tu nombre"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
                 maxLength={20}
-                style={{ marginTop: '0.8rem' }}
               />
+              {errorMsg && <p className="error">{errorMsg}</p>}
+
               <button
-                className="big full"
-                style={{ marginTop: '1rem' }}
+                type="button"
+                className="big full qq-btn-principal"
                 disabled={cargando || !nombre.trim() || codigoInput.trim().length < 4}
                 onClick={handleUnirse}
               >
-                Entrar a la sala
-              </button>
-              <button className="secondary full" style={{ marginTop: '0.6rem' }} onClick={() => { setVista('menu'); setErrorMsg(''); }}>
-                Volver
+                <Icon name="check" size={22} strokeWidth={2.5} /> Entrar en la partida
               </button>
             </div>
           </div>
         </section>
       )}
 
-      {/* 4. LOBBY */}
+      {/* 4. SALA: LOBBY */}
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
         <section className="game">
-          <div className="panel center">
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
-              <span
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: '0.45rem',
-                  padding: '0.35rem 1.1rem', borderRadius: '9999px',
-                  border: '1.5px solid #22c55e', backgroundColor: '#f0fdf4', color: '#16a34a',
-                  fontSize: '0.85rem', fontWeight: 600, lineHeight: 1
-                }}
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver onClick={() => setModalSalirLobby(true)} />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
               >
-                <Icon name="lock" size={15} />
-                Sala de espera
-              </span>
+                ?
+              </button>
             </div>
+
+            <p className="categoria"><Icon name="lock" size={16} /> Sala de espera</p>
             <p className="hint">Código de la partida</p>
-            <button type="button" className="qq-codigo-btn" onClick={copiarCodigo} title="Copiar código">
+            <button
+              type="button"
+              className="qq-codigo-btn"
+              onClick={copiarCodigo}
+              title="Copiar código"
+            >
               {sala.code}
             </button>
             <p className="hint small">
@@ -307,11 +525,16 @@ export default function FurboOnline({ onLocal }) {
               {sala.jugadores.map((j, i) => (
                 <div key={j.id} className={`lb-jug ${j.id === yoId ? 'yo' : ''}`}>
                   <span className="lb-jug-nombre">
-                    {j.nombre}{j.id === yoId ? ' (Tú)' : ''}{i === 0 ? ' 👑' : ''}
+                    {j.nombre}{j.id === yoId ? ' (tú)' : ''}{i === 0 ? ' 👑' : ''}
                   </span>
                 </div>
               ))}
             </div>
+            {sala.jugadores.length < 2 && (
+              <p className="hint" style={{ marginTop: '0.8rem' }}>
+                Falta al menos 1 jugador más para poder empezar.
+              </p>
+            )}
           </div>
 
           <div className="panel" style={{ marginTop: '1rem' }}>
@@ -324,78 +547,127 @@ export default function FurboOnline({ onLocal }) {
 
           {esAdmin ? (
             <button
-              className="big full"
+              type="button"
+              className="big full qq-btn-principal"
               style={{ marginTop: '1.2rem' }}
               disabled={sala.jugadores.length < 2}
               onClick={handleIniciar}
             >
+              <Icon name="play" size={22} />
               {sala.jugadores.length < 2 ? 'Esperando rivales...' : '¡Pitido inicial!'}
             </button>
           ) : (
-            <div className="panel center" style={{ marginTop: '1rem' }}>
-              <p className="hint">Esperando a que el anfitrión comience la partida...</p>
+            <div className="panel center" style={{ padding: '2rem 1.5rem', marginTop: '1rem' }}>
+              <span className="lb-luna chica"><Icon name="hourglass" size={40} /></span>
+              <h3 style={{ margin: '0.5rem 0' }}>Esperando al anfitrión...</h3>
+              <p className="hint">El anfitrión iniciará el partido cuando estéis listos.</p>
             </div>
           )}
-
-          <button className="secondary danger full" style={{ marginTop: '1rem' }} onClick={() => setModalSalir(true)}>
-            Salir de la sala
-          </button>
         </section>
       )}
 
-      {/* 5. PARTIDA */}
-      {vista === 'sala' && sala && sala.estado === 'jugando' && sala.vista && (
-        <FurboPartida
-          vista={sala.vista}
-          viewerId={yoId}
-          esHost={Boolean(esAdmin)}
-          onAccion={enviarAccion}
-          pie={(
-            <button className="secondary danger full" style={{ marginTop: '1.2rem' }} onClick={() => setModalSalir(true)}>
-              Salir de la sala
-            </button>
-          )}
-          finalAcciones={(
-            <div className="actions">
-              {esAdmin ? (
-                <button onClick={handleReiniciar}>
-                  <Icon name="refresh" size={20} /> Volver a la sala
-                </button>
-              ) : (
-                <p className="hint center" style={{ width: '100%' }}>Esperando a que el anfitrión vuelva a la sala...</p>
-              )}
-              <button className="secondary danger" onClick={() => setModalSalir(true)}>
-                <Icon name="door" size={20} /> Salir
-              </button>
+      {/* 5. PARTIDA ACTIVA */}
+      {enPartidaActiva && sala?.vista && (
+        <section className="game">
+          <div className="panel qq-menu-panel" style={{ padding: '0.8rem 1.1rem', marginBottom: '1rem' }}>
+            <div className="qq-card-top" style={{ marginBottom: 0 }}>
+              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
             </div>
-          )}
-        />
+          </div>
+
+          <FurboPartida
+            vista={sala.vista}
+            viewerId={yoId}
+            esHost={Boolean(esAdmin)}
+            onAccion={enviarAccion}
+            finalAcciones={(
+              <div className="actions" style={{ marginTop: '1.5rem' }}>
+                {esAdmin ? (
+                  <button type="button" className="big full qq-btn-principal" onClick={handleReiniciar}>
+                    <Icon name="refresh" size={20} /> Volver a la sala
+                  </button>
+                ) : (
+                  <p className="hint center" style={{ width: '100%' }}>Esperando a que el anfitrión vuelva a la sala...</p>
+                )}
+                <button type="button" className="secondary danger full" onClick={() => setModalSalirPortada(true)}>
+                  <Icon name="door" size={20} /> Salir a la portada
+                </button>
+              </div>
+            )}
+          />
+        </section>
       )}
 
-      {/* MODAL DE CONFIRMACIÓN PARA SALIR */}
-      {modalSalir && (
-        <div className="rg-modal-fondo" onClick={() => setModalSalir(false)}>
-          <div
-            className="rg-modal"
-            onClick={(e) => e.stopPropagation()}
+      {/* MODAL DE CONFIRMACIÓN PARA SALIR DEL LOBBY AL SUBMENÚ */}
+      {modalSalirLobby && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalirLobby(false)}>
+          <div 
+            className="rg-modal" 
+            onClick={(e) => e.stopPropagation()} 
             style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
           >
             <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
-            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>¿Abandonar la partida?</h3>
+            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
+              ¿Salir de la sala?
+            </h3>
             <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
-              Si sales de la sala perderás tu progreso actual en la partida. ¿Estás seguro de que deseas salir?
+              Si sales ahora abandonarás la sala de espera y volverás al menú anterior. ¿Estás seguro?
             </p>
+
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
-              <button type="button" className="secondary full" onClick={() => setModalSalir(false)}>
+              <button 
+                type="button" 
+                className="secondary full" 
+                onClick={() => setModalSalirLobby(false)}
+              >
                 No, quedarme
               </button>
-              <button
-                type="button"
-                className="secondary danger full"
+              <button 
+                type="button" 
+                className="secondary danger full" 
                 style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
-                onClick={() => { setModalSalir(false); handleSalir(); }}
+                onClick={handleVolverMenuOnline}
               >
                 Sí, salir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE CERRAR SALA Y SALIR A PORTADA */}
+      {modalSalirPortada && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalirPortada(false)}>
+          <div 
+            className="rg-modal" 
+            onClick={(e) => e.stopPropagation()} 
+            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
+          >
+            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
+            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
+              ¿Salir a la portada?
+            </h3>
+            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
+              {esAdmin
+                ? 'Se cerrará la sala y saldrás de la partida hacia la portada principal. ¿Estás seguro?'
+                : 'Abandonarás la sala y saldrás hacia la portada principal. ¿Estás seguro?'}
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+              <button 
+                type="button" 
+                className="secondary full" 
+                onClick={() => setModalSalirPortada(false)}
+              >
+                No, continuar
+              </button>
+              <button 
+                type="button" 
+                className="secondary danger full" 
+                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
+                onClick={handleCerrarSalaYSalirAPortada}
+              >
+                Sí, salir a portada
               </button>
             </div>
           </div>

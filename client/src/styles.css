@@ -1565,3 +1565,24 @@ body:has(.home-view) {
 }
 @media (max-width: 680px) { .gc-caption { font-size: 1rem; } }
 @media (max-width: 420px) { .gc-caption { font-size: .95rem; } }
+
+/* ========================================================
+   UNIFICACIÓN TIPOGRÁFICA DE MENÚS (TODOS LOS MINIJUEGOS)
+   ======================================================== */
+
+.qq-main-title,
+.qq-section-title,
+.qq-config-titulo {
+  font-family: 'Bricolage Grotesque', sans-serif !important;
+  font-weight: 800 !important;
+}
+
+.qq-main-desc,
+.qq-config-sub,
+.qq-label-destacado,
+.qq-link-volver,
+.qq-opcion-card,
+.qq-opcion-textos strong,
+.qq-opcion-textos span {
+  font-family: 'Figtree', system-ui, sans-serif !important;
+}

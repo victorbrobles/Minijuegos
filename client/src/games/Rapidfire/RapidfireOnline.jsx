@@ -1,5 +1,6 @@
 // client/src/games/Rapidfire/RapidfireOnline.jsx
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import CategoryCard from '../../components/CategoryCard.jsx';
 import './Rapidfire.css';
@@ -8,14 +9,34 @@ import '../Adivina/Adivina.css';
 const CLAVE_SESION_RF = 'rapidfire_online_session';
 const TIEMPO_S = 60;
 
-export default function RapidfireOnline({ onLocal, onSalir }) {
+function BotonVolver({ onClick, texto = 'Volver' }) {
+  return (
+    <button type="button" className="qq-link-volver" onClick={onClick}>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7" />
+      </svg>
+      <span>{texto}</span>
+    </button>
+  );
+}
+
+export default function RapidfireOnline({
+  tituloJuego = 'Rápido y certero',
+  descripcionJuego,
+  onLocal,
+  onSalir,
+  onAbrirAyuda
+}) {
+  const navigate = useNavigate();
+  // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
   const [vista, setVista] = useState('menu');
   const [nombre, setNombre] = useState('');
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
-  const [modalSalir, setModalSalir] = useState(false);
-  const [modalAyuda, setModalAyuda] = useState(false);
+  
+  const [modalSalirLobby, setModalSalirLobby] = useState(false);
+  const [modalSalirPortada, setModalSalirPortada] = useState(false);
 
   const [sesion, setSesion] = useState(() => {
     try {
@@ -52,7 +73,7 @@ export default function RapidfireOnline({ onLocal, onSalir }) {
           sessionStorage.removeItem(CLAVE_SESION_RF);
           setSesion(null);
           setSala(null);
-          setVista('menu');
+          setVista('online_menu');
           setErrorMsg('La sala se ha cerrado.');
         });
     };
@@ -64,6 +85,44 @@ export default function RapidfireOnline({ onLocal, onSalir }) {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [sesion]);
+
+  const redirigirAPortada = () => {
+    if (typeof onSalir === 'function') {
+      onSalir();
+    } else {
+      try {
+        navigate('/');
+      } catch {
+        window.location.href = '/';
+      }
+    }
+  };
+
+  const handleCerrarSalaYSalirAPortada = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    sessionStorage.removeItem(CLAVE_SESION_RF);
+    setSesion(null);
+    setSala(null);
+    setModalSalirPortada(false);
+    redirigirAPortada();
+  };
+
+  const handleVolverMenuOnline = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    sessionStorage.removeItem(CLAVE_SESION_RF);
+    setSesion(null);
+    setSala(null);
+    setModalSalirLobby(false);
+    setVista('online_menu');
+  };
 
   const handleCrear = async () => {
     if (!nombre.trim()) return;
@@ -175,13 +234,6 @@ export default function RapidfireOnline({ onLocal, onSalir }) {
     }
   };
 
-  const handleSalir = () => {
-    sessionStorage.removeItem(CLAVE_SESION_RF);
-    setSesion(null);
-    setSala(null);
-    setVista('menu');
-  };
-
   const copiarCodigo = () => {
     if (!sala?.code) return;
     navigator.clipboard?.writeText(sala.code);
@@ -198,81 +250,133 @@ export default function RapidfireOnline({ onLocal, onSalir }) {
   const maximo = ranking.length ? ranking[0].puntos : 0;
   const ganadores = maximo > 0 ? ranking.filter((j) => j.puntos === maximo) : [];
 
-  const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
+  const enPartidaActiva = vista === 'sala' && sala && sala.estado !== 'lobby';
 
   return (
-    <div className="rf-contenedor">
-      {mostrarAyuda && (
-        <button
-          type="button"
-          className="btn-ayuda-flotante"
-          onClick={() => setModalAyuda(true)}
-          title="Reglas y puntuación"
-        >
-          <span className="btn-ayuda-flotante-signo">?</span>
-        </button>
-      )}
-
-      {modalAyuda && (
-        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
-          <div className="rg-modal modal-ayuda-juego" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-ayuda-header">
-              <span className="modal-ayuda-signo-title">?</span>
-              <h3>¿Cómo se juega a Rapidfire?</h3>
-            </div>
-            <div className="modal-ayuda-cuerpo">
-              <p><strong>1. Dinámica del juego:</strong></p>
-              <ul>
-                <li>Se mostrará un reto de enumerar varios elementos de una categoría.</li>
-                <li>Dispones de un cronómetro de <strong>60 segundos</strong>.</li>
-                <li>Debes decir en voz alta los elementos. <strong>El anfitrión actúa como juez</strong> para marcarlos como correctos.</li>
-                <li>Si no sabes más o se agota el tiempo, el anfitrión marca "Rebote" y el turno pasa al siguiente jugador.</li>
-                <li>El turno inicial de la siguiente ronda pasará siempre de forma secuencial al jugador que siga al que abrió la ronda actual, independientemente de quién acierte.</li>
-              </ul>
-              <p><strong>2. Puntuación:</strong></p>
-              <div className="tabla-ayuda-puntos">
-                <div className="fila-ayuda-puntos verde">
-                  <span>⏱️ Acierto Completo</span>
-                  <strong>X puntos según el reto</strong>
-                </div>
-                <div className="fila-ayuda-puntos amarillo">
-                  <span>🔄 Rebote</span>
-                  <strong>Mismos puntos para quien lo robe</strong>
-                </div>
-              </div>
-            </div>
-            <div className="rg-modal-acciones">
-              <button className="big full" onClick={() => setModalAyuda(false)}>
-                Entendido
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 1. MENÚ ONLINE */}
+    <div className={`rf-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+      {/* 1. MENÚ PRINCIPAL */}
       {vista === 'menu' && (
         <section className="game">
-          <div className="panel center">
-            <span className="lb-luna chica">
-              <Icon name="zap" size={42} strokeWidth={1.6} />
-            </span>
-            <h1 className="title">Rapidfire Online</h1>
-            <p className="hint">
-              Responde a contrarreloj en 60 segundos. En el modo online, el anfitrión actúa de juez y decide si cada respuesta es correcta o rebote.
-            </p>
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top solo-derecha">
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
+
+            <div className="qq-hero-icono">
+              <Icon name="zap" size={44} strokeWidth={1.7} />
+            </div>
+            <h1 className="title qq-main-title">{tituloJuego}</h1>
+            <p className="hint qq-main-desc">{descripcionJuego}</p>
 
             {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
 
-            <div className="lb-menu">
-              <button className="big full" onClick={() => { setVista('crear'); setErrorMsg(''); }}>
-                <Icon name="crown" size={22} /> Crear partida Online
+            <div className="qq-menu-opciones">
+              <button
+                type="button"
+                className="qq-opcion-card principal"
+                onClick={() => {
+                  setVista('online_menu');
+                  setErrorMsg('');
+                }}
+              >
+                <span className="qq-opcion-icono">
+                  <Icon name="globe" size={26} />
+                </span>
+                <div className="qq-opcion-textos">
+                  <strong>Jugar online</strong>
+                  <span>Cada jugador desde su propio móvil con código de sala</span>
+                </div>
               </button>
-              <button className="big full" onClick={() => { setVista('unirse'); setErrorMsg(''); }}>
-                <Icon name="users" size={22} /> Unirse con código
+
+              <button
+                type="button"
+                className="qq-opcion-card secundaria"
+                onClick={onLocal}
+              >
+                <span className="qq-opcion-icono">
+                  <Icon name="users" size={26} />
+                </span>
+                <div className="qq-opcion-textos">
+                  <strong>Jugar en un único dispositivo</strong>
+                  <span>Pasando el móvil por turnos entre los jugadores</span>
+                </div>
               </button>
-              <button className="secondary full" onClick={onLocal}>
-                <Icon name="home" size={20} /> Jugar en un solo dispositivo
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 1B. SUBMENÚ ONLINE */}
+      {vista === 'online_menu' && (
+        <section className="game">
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver
+                onClick={() => {
+                  setVista('menu');
+                  setErrorMsg('');
+                }}
+              />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
+
+            <div className="qq-hero-icono">
+              <Icon name="globe" size={40} strokeWidth={1.7} />
+            </div>
+            <h2 className="title qq-main-title">Modo Online</h2>
+            <p className="hint qq-main-desc">
+              Crea una sala nueva para compartir el código con tus amigos o únete a una ya creada.
+            </p>
+
+            <div className="qq-menu-opciones">
+              <button
+                type="button"
+                className="qq-opcion-card principal"
+                onClick={() => {
+                  setVista('crear');
+                  setErrorMsg('');
+                }}
+              >
+                <span className="qq-opcion-icono">
+                  <Icon name="crown" size={26} />
+                </span>
+                <div className="qq-opcion-textos">
+                  <strong>Crear partida</strong>
+                  <span>Sé el anfitrión y actúa como juez en los retos</span>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                className="qq-opcion-card secundaria"
+                onClick={() => {
+                  setVista('unirse');
+                  setErrorMsg('');
+                }}
+              >
+                <span className="qq-opcion-icono">
+                  <Icon name="users" size={26} />
+                </span>
+                <div className="qq-opcion-textos">
+                  <strong>Unirse con código</strong>
+                  <span>Introduce el código de 4 letras de tu anfitrión</span>
+                </div>
               </button>
             </div>
           </div>
@@ -282,29 +386,54 @@ export default function RapidfireOnline({ onLocal, onSalir }) {
       {/* 2. CREAR SALA */}
       {vista === 'crear' && (
         <section className="game">
-          <div className="panel center">
-            <h2 className="title">Crear sala Online</h2>
-            <p className="hint">Introduce tu nombre de anfitrión (serás el juez de las respuestas).</p>
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver
+                onClick={() => {
+                  setVista('online_menu');
+                  setErrorMsg('');
+                }}
+              />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
 
-            <div className="lb-form" style={{ marginTop: '1.2rem', textAlign: 'left' }}>
+            <div className="qq-hero-icono">
+              <Icon name="crown" size={40} strokeWidth={1.6} />
+            </div>
+            <h2 className="title qq-main-title">Crear partida</h2>
+            <p className="hint qq-main-desc">
+              Introduce tu nombre de anfitrión (serás el juez de las respuestas).
+            </p>
+
+            <div className="lb-form qq-form-estilizado">
+              <label className="field-label" htmlFor="rf-host-nombre">Tu nombre</label>
               <input
+                id="rf-host-nombre"
+                className="qq-input-moderno"
                 type="text"
-                placeholder="Tu nombre"
+                placeholder="Ej. Alex"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
                 maxLength={20}
                 autoFocus
               />
+              {errorMsg && <p className="error">{errorMsg}</p>}
+
               <button
-                className="big full"
-                style={{ marginTop: '1rem' }}
+                type="button"
+                className="big full qq-btn-principal"
                 disabled={cargando || !nombre.trim()}
                 onClick={handleCrear}
               >
-                Crear sala
-              </button>
-              <button className="secondary full" style={{ marginTop: '0.6rem' }} onClick={() => setVista('menu')}>
-                Volver
+                <Icon name="check" size={22} strokeWidth={2.5} /> Crear sala
               </button>
             </div>
           </div>
@@ -314,66 +443,90 @@ export default function RapidfireOnline({ onLocal, onSalir }) {
       {/* 3. UNIRSE A SALA */}
       {vista === 'unirse' && (
         <section className="game">
-          <div className="panel center">
-            <h2 className="title">Unirse a partida</h2>
-            <div className="lb-form" style={{ marginTop: '1.2rem', textAlign: 'left' }}>
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver
+                onClick={() => {
+                  setVista('online_menu');
+                  setErrorMsg('');
+                }}
+              />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
+
+            <div className="qq-hero-icono">
+              <Icon name="users" size={40} strokeWidth={1.6} />
+            </div>
+            <h2 className="title qq-main-title">Unirse a partida</h2>
+            <p className="hint qq-main-desc">
+              Introduce el código de 4 letras que te ha compartido el anfitrión.
+            </p>
+
+            <div className="lb-form qq-form-estilizado">
+              <label className="field-label" htmlFor="rf-code-input">Código de la sala</label>
               <input
+                id="rf-code-input"
+                className="lb-input-codigo qq-input-moderno"
                 type="text"
-                placeholder="CÓDIGO (4 LETRAS)"
+                placeholder="ABCD"
                 value={codigoInput}
                 onChange={(e) => setCodigoInput(e.target.value.toUpperCase())}
                 maxLength={4}
                 style={{ textTransform: 'uppercase', letterSpacing: '4px', textAlign: 'center', fontWeight: '800' }}
                 autoFocus
               />
+
+              <label className="field-label" htmlFor="rf-guest-nombre" style={{ marginTop: '1rem' }}>Tu nombre</label>
               <input
+                id="rf-guest-nombre"
+                className="qq-input-moderno"
                 type="text"
                 placeholder="Tu nombre"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
                 maxLength={20}
-                style={{ marginTop: '0.8rem' }}
               />
+              {errorMsg && <p className="error">{errorMsg}</p>}
+
               <button
-                className="big full"
-                style={{ marginTop: '1rem' }}
+                type="button"
+                className="big full qq-btn-principal"
                 disabled={cargando || !nombre.trim() || codigoInput.trim().length < 4}
                 onClick={handleUnirse}
               >
-                Entrar a la sala
-              </button>
-              <button className="secondary full" style={{ marginTop: '0.6rem' }} onClick={() => setVista('menu')}>
-                Volver
+                <Icon name="check" size={22} strokeWidth={2.5} /> Entrar en la partida
               </button>
             </div>
           </div>
         </section>
       )}
 
-      {/* 4. LOBBY */}
+      {/* 4. SALA: LOBBY */}
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
         <section className="game">
-          <div className="panel center">
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.45rem',
-                  padding: '0.35rem 1.1rem',
-                  borderRadius: '9999px',
-                  border: '1.5px solid #22c55e',
-                  backgroundColor: '#f0fdf4',
-                  color: '#16a34a',
-                  fontSize: '0.85rem',
-                  fontWeight: 600,
-                  lineHeight: 1
-                }}
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver onClick={() => setModalSalirLobby(true)} />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
               >
-                <Icon name="lock" size={15} />
-                Sala de espera
-              </span>
+                ?
+              </button>
             </div>
+
+            <p className="categoria"><Icon name="lock" size={16} /> Sala de espera</p>
             <p className="hint">Código de la partida</p>
             <button
               type="button"
@@ -384,7 +537,7 @@ export default function RapidfireOnline({ onLocal, onSalir }) {
               {sala.code}
             </button>
             <p className="hint small">
-              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Pulsa el código para copiarlo y compártelo con los demás.'}
+              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Comparte este código para que se unan (mínimo 2 jugadores).'}
             </p>
           </div>
 
@@ -393,197 +546,218 @@ export default function RapidfireOnline({ onLocal, onSalir }) {
             <div className="lb-lista">
               {sala.jugadores.map((j) => (
                 <div key={j.id} className={`lb-jug ${j.id === yoId ? 'yo' : ''}`}>
-                  <span className="lb-jug-nombre">{j.nombre}{j.id === yoId ? ' (Tú)' : ''}{j.id === 1 ? ' 👑' : ''}</span>
+                  <span className="lb-jug-nombre">{j.nombre}{j.id === yoId ? ' (tú)' : ''}{j.id === 1 ? ' 👑' : ''}</span>
                 </div>
               ))}
             </div>
+            {sala.jugadores.length < 2 && (
+              <p className="hint" style={{ marginTop: '0.8rem' }}>
+                Falta al menos 1 jugador más para poder empezar.
+              </p>
+            )}
           </div>
 
-          {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
-
           {esAdmin ? (
-            <button
-              className="big full"
-              style={{ marginTop: '1.2rem' }}
-              disabled={sala.jugadores.length < 2}
-              onClick={handleIniciarPartida}
-            >
-              {sala.jugadores.length < 2 ? 'Esperando rivales (mínimo 2)...' : '¡Empezar Partida!'}
-            </button>
+            <div style={{ marginTop: '1.2rem' }}>
+              <button
+                className="big full qq-btn-principal"
+                disabled={sala.jugadores.length < 2}
+                onClick={handleIniciarPartida}
+              >
+                <Icon name="play" size={22} />
+                {sala.jugadores.length < 2 ? 'Esperando rivales...' : '¡Empezar Partida!'}
+              </button>
+            </div>
           ) : (
-            <div className="panel center" style={{ marginTop: '1rem' }}>
-              <p className="hint">Esperando a que el anfitrión comience la partida...</p>
+            <div className="panel center" style={{ padding: '2rem 1.5rem', marginTop: '1rem' }}>
+              <span className="lb-luna chica"><Icon name="hourglass" size={40} /></span>
+              <h3 style={{ margin: '0.5rem 0' }}>Esperando al anfitrión...</h3>
+              <p className="hint">El anfitrión comenzará la partida cuando estéis todos listos.</p>
             </div>
           )}
-
-          <button className="secondary danger full" style={{ marginTop: '1rem' }} onClick={() => setModalSalir(true)}>
-            Salir de la sala
-          </button>
         </section>
       )}
 
       {/* 5. ELECCIÓN DE CATEGORÍA */}
       {vista === 'sala' && sala && sala.estado === 'categorias' && ronda && (
         <section className="game">
-          <p className="categoria"><Icon name="flagFinish" size={16} />Ronda {sala.rondaNum}</p>
-          <div className="starter">
-            <Icon name="dice" size={28} />
-            <p>
-              {esMiTurno
-                ? <strong>¡Es tu turno de elegir categoría!</strong>
-                : <>Abre la ronda <strong>{ronda.jugadorTurnoNombre}</strong></>}
-            </p>
+          <div className="panel qq-menu-panel">
+            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
+              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
+              <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
+                Ronda {sala.rondaNum}
+              </span>
+            </div>
+
+            <div className="starter" style={{ textAlign: 'center', marginBottom: '1.2rem' }}>
+              <Icon name="dice" size={28} />
+              <p style={{ margin: 0 }}>
+                {esMiTurno ? (
+                  <strong>¡Es tu turno de elegir categoría!</strong>
+                ) : (
+                  <>Abre la ronda <strong>{ronda.jugadorTurnoNombre}</strong></>
+                )}
+              </p>
+            </div>
+
+            <div className="qq-section-header">
+              <h3 className="qq-section-title">
+                {esMiTurno ? 'Selecciona una de las 3 opciones:' : `Esperando a que ${ronda.jugadorTurnoNombre} elija categoría...`}
+              </h3>
+            </div>
+
+            <div className="rf-opciones">
+              {ronda.opciones.map((c, idx) => (
+                <CategoryCard
+                  key={c.id}
+                  nombre={c.nombre}
+                  icono={c.icono}
+                  indice={idx}
+                  onClick={esMiTurno ? () => handleElegirCategoria(c.id) : undefined}
+                />
+              ))}
+            </div>
           </div>
-
-          <h3 className="section-title">
-            {esMiTurno ? 'Selecciona una de las 3 opciones:' : `Esperando a que ${ronda.jugadorTurnoNombre} elija categoría...`}
-          </h3>
-
-          <div className="rf-opciones">
-            {ronda.opciones.map((c, idx) => (
-              <CategoryCard
-                key={c.id}
-                nombre={c.nombre}
-                icono={c.icono}
-                indice={idx}
-                onClick={esMiTurno ? () => handleElegirCategoria(c.id) : undefined}
-              />
-            ))}
-          </div>
-
-          <button className="secondary danger full" style={{ marginTop: '1.5rem' }} onClick={() => setModalSalir(true)}>
-            Salir de la sala
-          </button>
         </section>
       )}
 
       {/* 6. TURNO EN JUEGO */}
       {vista === 'sala' && sala && sala.estado === 'turno' && ronda && (
         <section className="game">
-          {ronda.motivo && (
-            <p className="rf-aviso" role="status">
-              <Icon name={ronda.motivo === 'tiempo' ? 'hourglass' : 'refresh'} size={22} />
-              {ronda.motivo === 'tiempo' ? '¡Se acabó el tiempo!' : '¡Rebote!'} Le toca a <strong>{ronda.jugadorTurnoNombre}</strong>
-            </p>
-          )}
+          <div className="panel qq-menu-panel">
+            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
+              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
+                  {ronda.intento > 0 ? 'Rebote' : `Ronda ${sala.rondaNum}`}
+                </span>
+              </div>
+            </div>
 
-          <div className="hud">
-            <span className="chip">
-              <Icon name="users" size={18} />
-              {esMiTurno ? <strong>¡Es tu turno de hablar!</strong> : <>Turno: <strong>{ronda.jugadorTurnoNombre}</strong></>}
-            </span>
-            <span className="chip alt">{ronda.intento > 0 ? 'Rebote' : `Ronda ${sala.rondaNum}`}</span>
-          </div>
-
-          <p className="categoria"><Icon name={ronda.categoria.icono} size={16} />{ronda.categoria.nombre}</p>
-
-          <div className="sigla-card rf-reto">
-            <div className="rf-reto-numero" style={{ color: '#dc2626', fontSize: '3.5rem', fontWeight: '900', lineHeight: 1 }}>{ronda.reto.n}</div>
-            <div className="rf-reto-texto" style={{ color: '#1e293b', fontSize: '1.25rem', fontWeight: '600', marginTop: '0.5rem' }}>{ronda.reto.texto}</div>
-          </div>
-
-          <div className="timer" role="timer" aria-label="Tiempo restante">
-            <div
-              className={`timer-bar${ronda.segsPrep === 0 && ronda.segsTurno <= 10 ? ' low' : ''}`}
-              style={{ width: `${(ronda.segsTurno / TIEMPO_S) * 100}%` }}
-            />
-          </div>
-          <p className="timer-text">
-            <Icon name="clock" size={16} />
-            {ronda.segsPrep > 0 ? `Preparados… ${ronda.segsPrep}` : `${ronda.segsTurno} s`}
-          </p>
-
-          {esAdmin ? (
-            <div className="rf-panel-juez">
-              <span className="rf-badge-juez">👑 Panel de control del Juez</span>
-              <p className="hint small" style={{ margin: '0 0 0.8rem' }}>
-                Escucha las respuestas de <strong>{ronda.jugadorTurnoNombre}</strong> y pulsa según corresponda:
+            {ronda.motivo && (
+              <p className="rf-aviso" role="status" style={{ marginBottom: '1rem' }}>
+                <Icon name={ronda.motivo === 'tiempo' ? 'hourglass' : 'refresh'} size={22} />
+                {ronda.motivo === 'tiempo' ? '¡Se acabó el tiempo!' : '¡Rebote!'} Le toca a <strong>{ronda.jugadorTurnoNombre}</strong>
               </p>
-              <div className="rf-botones-juez">
+            )}
+
+            <div className="starter" style={{ textAlign: 'center', marginBottom: '1rem' }}>
+              <span>
+                {esMiTurno ? <strong>¡Es tu turno de hablar!</strong> : <>Turno de: <strong>{ronda.jugadorTurnoNombre}</strong></>}
+              </span>
+            </div>
+
+            <p className="categoria" style={{ display: 'inline-flex', margin: '0 auto 1rem', width: 'fit-content' }}>
+              <Icon name={ronda.categoria.icono} size={16} /> {ronda.categoria.nombre}
+            </p>
+
+            <div className="sigla-card rf-reto">
+              <div className="rf-reto-numero" style={{ color: '#dc2626', fontSize: '3.5rem', fontWeight: '900', lineHeight: 1 }}>{ronda.reto.n}</div>
+              <div className="rf-reto-texto" style={{ color: '#1e293b', fontSize: '1.25rem', fontWeight: '600', marginTop: '0.5rem' }}>{ronda.reto.texto}</div>
+            </div>
+
+            <div className="timer" role="timer" aria-label="Tiempo restante" style={{ marginTop: '0.5rem' }}>
+              <div
+                className={`timer-bar${ronda.segsPrep === 0 && ronda.segsTurno <= 10 ? ' low' : ''}`}
+                style={{ width: `${(ronda.segsTurno / TIEMPO_S) * 100}%` }}
+              />
+            </div>
+            <p className="timer-text">
+              <Icon name="clock" size={16} />
+              {ronda.segsPrep > 0 ? `Preparados… ${ronda.segsPrep}` : `${ronda.segsTurno} s`}
+            </p>
+
+            {esAdmin ? (
+              <div className="rf-panel-juez">
+                <span className="rf-badge-juez">👑 Panel de control del Juez</span>
+                <p className="hint small" style={{ margin: '0 0 0.8rem' }}>
+                  Escucha las respuestas de <strong>{ronda.jugadorTurnoNombre}</strong> y pulsa según corresponda:
+                </p>
+                <div className="rf-botones-juez">
+                  <button
+                    type="button"
+                    className="rf-btn-correcto"
+                    disabled={ronda.segsPrep > 0}
+                    onClick={() => handleAccionJuez('acierto')}
+                  >
+                    <Icon name="check" size={22} strokeWidth={2.5} /> Correcto
+                  </button>
+                  <button
+                    type="button"
+                    className="rf-btn-rebote"
+                    disabled={ronda.segsPrep > 0}
+                    onClick={() => handleAccionJuez('rebote')}
+                  >
+                    <Icon name="refresh" size={22} strokeWidth={2.5} /> Rebote
+                  </button>
+                </div>
                 <button
                   type="button"
-                  className="rf-btn-correcto"
-                  disabled={ronda.segsPrep > 0}
-                  onClick={() => handleAccionJuez('acierto')}
+                  className="secondary danger full"
+                  onClick={() => handleAccionJuez('rendirse')}
                 >
-                  <Icon name="check" size={22} strokeWidth={2.5} /> Correcto
-                </button>
-                <button
-                  type="button"
-                  className="rf-btn-rebote"
-                  disabled={ronda.segsPrep > 0}
-                  onClick={() => handleAccionJuez('rebote')}
-                >
-                  <Icon name="refresh" size={22} strokeWidth={2.5} /> Rebote
+                  <Icon name="flag" size={18} /> Rendirse (nadie puntúa)
                 </button>
               </div>
-              <button
-                type="button"
-                className="secondary danger full"
-                onClick={() => handleAccionJuez('rendirse')}
-              >
-                <Icon name="flag" size={18} /> Rendirse (nadie puntúa)
-              </button>
-            </div>
-          ) : (
-            <div className="status-alert info" style={{ textAlign: 'center', marginTop: '1rem' }}>
-              El anfitrión (👑) está juzgando las respuestas en directo...
-            </div>
-          )}
-
-          <button className="secondary danger full" style={{ marginTop: '1.2rem' }} onClick={() => setModalSalir(true)}>
-            Salir de la sala
-          </button>
+            ) : (
+              <div className="status-alert info" style={{ textAlign: 'center', marginTop: '1rem' }}>
+                El anfitrión (👑) está juzgando las respuestas en directo...
+              </div>
+            )}
+          </div>
         </section>
       )}
 
       {/* 7. PUNTUACIONES */}
       {vista === 'sala' && sala && sala.estado === 'puntuaciones' && (
         <section className="game">
-          <div className="end-card">
-            <span className="end-icon"><Icon name="trophy" size={44} /></span>
-            <h1 className="title">Puntuaciones</h1>
-            {ronda?.ultimo && (
-              <p className="reveal">
-                {ronda.ultimo.tipo === 'rendido'
-                  ? 'Ronda finalizada: nadie suma puntos en este turno.'
-                  : ronda.ultimo.tipo === 'rebote'
-                  ? <><strong>{ronda.ultimo.jugador}</strong> ha cogido el rebote y se lleva <strong>{ronda.ultimo.puntos} puntos</strong>.</>
-                  : <><strong>{ronda.ultimo.jugador}</strong> ha dicho todos los elementos y suma <strong>{ronda.ultimo.puntos} puntos</strong>.</>}
-              </p>
-            )}
-
-            <div className="scoreboard">
-              {ranking.map((j, i) => (
-                <div key={j.id} className={`score-row${i === 0 && j.puntos > 0 ? ' first' : ''}`}>
-                  <span className="score-name">
-                    {i === 0 && j.puntos > 0 ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
-                    {j.nombre}
-                  </span>
-                  <span className="score-pts">{j.puntos} pts</span>
-                </div>
-              ))}
+          <div className="panel qq-menu-panel">
+            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
+              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
             </div>
-          </div>
 
-          <div className="actions" style={{ marginTop: '1.2rem' }}>
-            {esAdmin ? (
-              <>
-                <button className="big full" onClick={handleContinuarRonda}>
-                  <Icon name="play" size={20} /> Siguiente ronda ({sala.rondaNum + 1})
-                </button>
-                <button className="secondary danger full" onClick={handleFinalizar}>
-                  <Icon name="flagFinish" size={20} /> Finalizar partida
-                </button>
-              </>
-            ) : (
-              <div className="panel center" style={{ width: '100%', padding: '1rem' }}>
-                <p className="hint">Esperando a que el anfitrión avance de ronda...</p>
-                <button className="secondary danger full" style={{ marginTop: '0.8rem' }} onClick={() => setModalSalir(true)}>
-                  Salir de la sala
-                </button>
+            <div className="end-card" style={{ border: 'none', boxShadow: 'none', padding: '0 0 1rem' }}>
+              <span className="end-icon"><Icon name="trophy" size={44} /></span>
+              <h1 className="title">Puntuaciones</h1>
+              {ronda?.ultimo && (
+                <p className="reveal">
+                  {ronda.ultimo.tipo === 'rendido'
+                    ? 'Ronda finalizada: nadie suma puntos en este turno.'
+                    : ronda.ultimo.tipo === 'rebote'
+                    ? <><strong>{ronda.ultimo.jugador}</strong> ha cogido el rebote y se lleva <strong>{ronda.ultimo.puntos} puntos</strong>.</>
+                    : <><strong>{ronda.ultimo.jugador}</strong> ha dicho todos los elementos y suma <strong>{ronda.ultimo.puntos} puntos</strong>.</>}
+                </p>
+              )}
+
+              <div className="scoreboard">
+                {ranking.map((j, i) => (
+                  <div key={j.id} className={`score-row${i === 0 && j.puntos > 0 ? ' first' : ''}`}>
+                    <span className="score-name">
+                      {i === 0 && j.puntos > 0 ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
+                      {j.nombre}
+                    </span>
+                    <span className="score-pts">{j.puntos} pts</span>
+                  </div>
+                ))}
               </div>
-            )}
+            </div>
+
+            <div style={{ marginTop: '1.2rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+              {esAdmin ? (
+                <>
+                  <button type="button" className="big full qq-btn-principal" onClick={handleContinuarRonda}>
+                    <Icon name="play" size={20} /> Siguiente ronda ({sala.rondaNum + 1})
+                  </button>
+                  <div className="qq-tablero-footer" style={{ marginTop: 0, paddingTop: '0.6rem', borderTop: 'none' }}>
+                    <button type="button" className="qq-link-otra-ronda" onClick={handleFinalizar}>
+                      Finalizar partida anticipadamente
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <p className="hint center">Esperando a que el anfitrión avance de ronda...</p>
+              )}
+            </div>
           </div>
         </section>
       )}
@@ -616,16 +790,16 @@ export default function RapidfireOnline({ onLocal, onSalir }) {
           </div>
 
           <div className="actions" style={{ marginTop: '1.5rem' }}>
-            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
-              <Icon name="door" size={20} /> Salir al menú
+            <button className="secondary danger full" onClick={() => setModalSalirPortada(true)}>
+              <Icon name="door" size={20} /> Salir a la portada
             </button>
           </div>
         </section>
       )}
 
-      {/* MODAL DE CONFIRMACIÓN PARA SALIR */}
-      {modalSalir && (
-        <div className="rg-modal-fondo" onClick={() => setModalSalir(false)}>
+      {/* MODAL SALIR DEL LOBBY */}
+      {modalSalirLobby && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalirLobby(false)}>
           <div 
             className="rg-modal" 
             onClick={(e) => e.stopPropagation()} 
@@ -633,17 +807,17 @@ export default function RapidfireOnline({ onLocal, onSalir }) {
           >
             <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
             <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
-              ¿Abandonar la partida?
+              ¿Salir de la sala?
             </h3>
             <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
-              Si sales de la sala perderás tu progreso actual en la partida. ¿Estás seguro de que deseas salir?
+              Si sales ahora abandonarás la sala de espera y volverás al menú anterior. ¿Estás seguro?
             </p>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
               <button 
                 type="button" 
                 className="secondary full" 
-                onClick={() => setModalSalir(false)}
+                onClick={() => setModalSalirLobby(false)}
               >
                 No, quedarme
               </button>
@@ -651,12 +825,48 @@ export default function RapidfireOnline({ onLocal, onSalir }) {
                 type="button" 
                 className="secondary danger full" 
                 style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
-                onClick={() => {
-                  setModalSalir(false);
-                  handleSalir();
-                }}
+                onClick={handleVolverMenuOnline}
               >
                 Sí, salir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL SALIR A PORTADA */}
+      {modalSalirPortada && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalirPortada(false)}>
+          <div 
+            className="rg-modal" 
+            onClick={(e) => e.stopPropagation()} 
+            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
+          >
+            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
+            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
+              ¿Salir a la portada?
+            </h3>
+            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
+              {esAdmin
+                ? 'Se cerrará la sala y saldrás de la partida hacia la portada principal. ¿Estás seguro?'
+                : 'Abandonarás la sala y saldrás hacia la portada principal. ¿Estás seguro?'}
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+              <button 
+                type="button" 
+                className="secondary full" 
+                onClick={() => setModalSalirPortada(false)}
+              >
+                No, continuar
+              </button>
+              <button 
+                type="button" 
+                className="secondary danger full" 
+                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
+                onClick={handleCerrarSalaYSalirAPortada}
+              >
+                Sí, salir a portada
               </button>
             </div>
           </div>

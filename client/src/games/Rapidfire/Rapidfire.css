@@ -1,11 +1,645 @@
 /* client/src/games/Rapidfire/Rapidfire.css */
 
-.rf-contenedor {
-  width: 100%;
-  max-width: 860px;
-  margin: 0 auto;
-  position: relative;
+/* ========================================================
+   FONDO TEMÁTICO: RÁPIDO Y CERTERO (ROJO VIBRANTE / ALERTA)
+   ======================================================== */
+
+body:has(.rf-contenedor) {
+  background:
+    radial-gradient(70% 460px at 50% 0%, rgba(239, 68, 68, 0.45) 0%, transparent 70%),
+    radial-gradient(45% 560px at 100% 20%, rgba(220, 38, 38, 0.28) 0%, transparent 70%),
+    radial-gradient(45% 560px at 0% 50%, rgba(248, 113, 113, 0.22) 0%, transparent 70%),
+    radial-gradient(45% 560px at 100% 76%, rgba(185, 28, 28, 0.25) 0%, transparent 70%),
+    radial-gradient(80% 520px at 50% 100%, rgba(239, 68, 68, 0.38) 0%, transparent 70%),
+    radial-gradient(rgba(255, 255, 255, 0.08) 1.3px, transparent 1.5px) 0 0 / 22px 22px,
+    linear-gradient(180deg, #18090b 0%, #240d10 50%, #120608 100%) !important;
+  background-attachment: scroll !important;
 }
+
+body:has(.qq-en-partida) .back:not(.qq-btn-volver-sala) {
+  display: none !important;
+}
+
+.rf-contenedor {
+  --g1: #ef4444;
+  --g2: #dc2626;
+  width: 100%;
+  position: relative;
+  min-height: 100vh;
+  padding-bottom: 2rem;
+  font-family: 'Figtree', system-ui, sans-serif !important;
+}
+
+.rf-contenedor h1,
+.rf-contenedor h2,
+.rf-contenedor h3,
+.rf-contenedor .title,
+.rf-contenedor .qq-main-title,
+.rf-contenedor .section-title {
+  font-family: 'Bricolage Grotesque', sans-serif !important;
+}
+
+.rf-contenedor .qq-main-desc,
+.rf-contenedor .qq-opcion-card,
+.rf-contenedor .qq-opcion-textos strong,
+.rf-contenedor .qq-opcion-textos span,
+.rf-contenedor p,
+.rf-contenedor button,
+.rf-contenedor input,
+.rf-contenedor select {
+  font-family: 'Figtree', system-ui, sans-serif !important;
+}
+
+.rf-contenedor > .game {
+  max-width: 960px;
+  margin: 0 auto;
+  padding-top: 1rem;
+}
+
+/* ========================================================
+   MENÚS UNIFICADOS (TEMA ROJO RÁPIDO Y CERTERO)
+   ======================================================== */
+
+.qq-menu-panel {
+  position: relative;
+  padding: 1.6rem 1.6rem 2rem !important;
+  border-radius: 26px !important;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+  border: 1.5px solid #e2e8f0 !important;
+  box-shadow: 0 18px 38px -12px rgba(239, 68, 68, 0.28) !important;
+}
+
+.qq-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 0.6rem;
+}
+
+.qq-card-top.solo-derecha {
+  justify-content: flex-end;
+}
+
+.qq-link-volver {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0.3rem 0.5rem !important;
+  margin-left: -0.4rem;
+  font-size: 0.92rem !important;
+  font-weight: 700 !important;
+  color: #64748b !important;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 8px !important;
+  transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.qq-link-volver:hover {
+  color: var(--g1) !important;
+  background: #fef2f2 !important;
+  transform: translateX(-2px);
+}
+
+.qq-btn-ayuda {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  background: #fef2f2 !important;
+  border: 1.5px solid #fecaca !important;
+  color: var(--g1) !important;
+  font-size: 1rem !important;
+  font-weight: 900 !important;
+  display: grid !important;
+  place-items: center !important;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.12);
+}
+
+.qq-btn-ayuda:hover {
+  background: var(--g1) !important;
+  color: #ffffff !important;
+  border-color: var(--g1) !important;
+  transform: scale(1.07);
+}
+
+.qq-hero-icono {
+  width: 76px;
+  height: 76px;
+  border-radius: 24px;
+  margin: 0 auto 0.9rem;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  color: var(--g1);
+  box-shadow: 0 8px 20px -6px rgba(239, 68, 68, 0.3);
+}
+
+.qq-hero-icono.chico {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.qq-main-title {
+  font-size: 1.85rem !important;
+  font-weight: 900 !important;
+  color: #0f172a !important;
+  margin: 0 0 0.45rem !important;
+  letter-spacing: -0.5px;
+}
+
+.qq-main-desc {
+  max-width: 440px;
+  margin: 0 auto 1.4rem !important;
+  font-size: 0.96rem !important;
+  line-height: 1.5 !important;
+  color: #64748b !important;
+}
+
+.qq-menu-opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  width: 100%;
+  margin-top: 0.6rem;
+}
+
+.qq-opcion-card {
+  display: flex !important;
+  align-items: center !important;
+  gap: 1rem !important;
+  width: 100% !important;
+  text-align: left !important;
+  padding: 1.15rem 1.25rem !important;
+  border-radius: 20px !important;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.qq-opcion-card.principal {
+  background: linear-gradient(135deg, var(--g1) 0%, var(--g2) 100%) !important;
+  border: 2px solid transparent !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 22px -6px rgba(239, 68, 68, 0.45) !important;
+}
+
+.qq-opcion-card.principal:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 26px -6px rgba(239, 68, 68, 0.6) !important;
+  filter: brightness(1.03);
+}
+
+.qq-opcion-card.secundaria {
+  background: #ffffff !important;
+  border: 2px solid #e2e8f0 !important;
+  color: #0f172a !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04) !important;
+}
+
+.qq-opcion-card.secundaria:hover {
+  border-color: var(--g1) !important;
+  background: #f8fafc !important;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px -6px rgba(239, 68, 68, 0.18) !important;
+}
+
+.qq-opcion-icono {
+  width: 50px;
+  height: 50px;
+  border-radius: 15px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.qq-opcion-card.principal .qq-opcion-icono {
+  background: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+}
+
+.qq-opcion-card.secundaria .qq-opcion-icono {
+  background: #fee2e2;
+  color: var(--g1);
+}
+
+.qq-opcion-textos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.qq-opcion-textos strong {
+  font-size: 1.12rem;
+  font-weight: 800;
+}
+
+.qq-opcion-card.principal .qq-opcion-textos span {
+  font-size: 0.86rem;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.35;
+}
+
+.qq-opcion-card.secundaria .qq-opcion-textos span {
+  font-size: 0.86rem;
+  color: #64748b;
+  line-height: 1.35;
+}
+
+.qq-form-estilizado {
+  margin-top: 1rem;
+  text-align: left;
+  gap: 0.4rem;
+}
+
+.qq-input-moderno {
+  width: 100%;
+  padding: 0.85rem 1rem !important;
+  border-radius: 14px !important;
+  border: 2px solid #e2e8f0 !important;
+  background: #f8fafc !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  color: #0f172a !important;
+  transition: all 0.18s ease;
+}
+
+.qq-input-moderno:focus {
+  outline: none !important;
+  border-color: var(--g1) !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.16) !important;
+}
+
+.qq-btn-principal {
+  margin-top: 1.1rem;
+  background: linear-gradient(135deg, var(--g1) 0%, var(--g2) 100%) !important;
+  border-radius: 18px !important;
+  font-weight: 800 !important;
+  box-shadow: 0 10px 22px -6px rgba(239, 68, 68, 0.45) !important;
+  color: white !important;
+}
+
+.qq-config-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0.2rem 0 1.3rem;
+  text-align: left;
+}
+
+.qq-config-titulo {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.qq-config-sub {
+  margin: 0.15rem 0 0;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.qq-label-destacado {
+  font-size: 0.88rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #475569;
+  margin-bottom: 0.55rem;
+  display: block;
+}
+
+.qq-selector-cantidad-box {
+  background: #f1f5f9;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 1rem 1.1rem;
+}
+
+.qq-stepper-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.qq-stepper-btn {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  padding: 0 !important;
+  border-radius: 13px !important;
+  background: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  color: #1e293b !important;
+  font-size: 1.35rem !important;
+  font-weight: 800 !important;
+  display: grid !important;
+  place-items: center !important;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.qq-stepper-btn:hover:not(:disabled) {
+  border-color: var(--g1) !important;
+  color: var(--g1) !important;
+  background: #fef2f2 !important;
+}
+
+.qq-stepper-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.qq-select-jugadores {
+  flex: 1;
+  height: 44px;
+  border-radius: 13px !important;
+  border: 1.5px solid #cbd5e1 !important;
+  background: #ffffff !important;
+  font-weight: 800 !important;
+  font-size: 1rem !important;
+  color: #0f172a !important;
+  text-align: center;
+  padding: 0 0.8rem !important;
+}
+
+.qq-nombres-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.qq-jugador-input-card {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 15px;
+  padding: 0.4rem 0.7rem;
+  transition: all 0.18s ease;
+}
+
+.qq-jugador-input-card:focus-within {
+  border-color: var(--g1);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.16);
+}
+
+.qq-jugador-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, var(--g1) 0%, var(--g2) 100%);
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.qq-jugador-input-card input {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0.45rem 0.2rem !important;
+  font-size: 0.96rem !important;
+  font-weight: 700 !important;
+  color: #1e293b !important;
+  width: 100%;
+}
+
+.qq-jugador-input-card input:focus {
+  outline: none !important;
+}
+
+.qq-section-header {
+  text-align: center;
+  margin-bottom: 1.2rem;
+}
+
+.qq-section-title {
+  margin: 0 0 0.3rem;
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.qq-tablero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #fef2f2;
+  color: var(--g1);
+  border: 1.5px solid #fecaca;
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  margin-bottom: 0.6rem;
+}
+
+.qq-tablero-footer {
+  width: 100%;
+  margin-top: 1.1rem;
+  padding-top: 0.9rem;
+  border-top: 1.5px solid #f1f5f9;
+  display: flex;
+  justify-content: center;
+}
+
+.qq-link-otra-ronda {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0.4rem 0.8rem !important;
+  font-size: 0.92rem !important;
+  font-weight: 700 !important;
+  color: #64748b !important;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 10px !important;
+}
+
+.qq-link-otra-ronda:hover {
+  color: var(--g1) !important;
+  background: #f8fafc !important;
+}
+
+.aprox-modal-ayuda {
+  max-width: 480px !important;
+  max-height: 88vh !important;
+  overflow-y: auto !important;
+  padding: 1.8rem 1.5rem !important;
+  border-radius: 24px !important;
+  text-align: left !important;
+}
+
+.aprox-modal-header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1.2rem;
+}
+
+.aprox-modal-signo-title {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #fef2f2;
+  border: 1.5px solid #fecaca;
+  color: var(--g1);
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.aprox-modal-header h3 {
+  margin: 0;
+  font-size: 1.45rem;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.aprox-modal-cuerpo {
+  font-size: 0.94rem;
+  color: #334155;
+  line-height: 1.5;
+  margin-bottom: 1.2rem;
+}
+
+.aprox-modal-cuerpo ul {
+  padding-left: 1.2rem;
+  margin: 0.7rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.aprox-tabla-puntos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin: 0.8rem 0 1rem;
+}
+
+.aprox-puntos-fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.55rem 0.8rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.aprox-puntos-fila.acierto {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.qq-codigo-btn {
+  background: #fef2f2 !important;
+  border: 2.5px dashed var(--g1) !important;
+  border-radius: 18px !important;
+  padding: 0.5rem 1.8rem !important;
+  font-size: 3.2rem !important;
+  letter-spacing: 6px;
+  color: var(--g1) !important;
+  font-weight: 900 !important;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin: 0.6rem auto;
+  display: inline-block;
+}
+
+.qq-codigo-btn:hover {
+  transform: scale(1.03);
+  background: #fee2e2 !important;
+}
+
+.lb-luna.chica {
+  width: 68px;
+  height: 68px;
+  color: var(--g1);
+  background: #fef2f2;
+  border-radius: 50%;
+}
+
+/* ========================================================
+   LOBBY ONLINE Y LISTAS
+   ======================================================== */
+
+.lb-lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.85rem;
+  margin-top: 1.1rem;
+  width: 100%;
+}
+
+.lb-jug {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.1rem;
+  background: var(--g1);
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  animation: popInJugador 0.3s ease-out;
+}
+
+.lb-jug:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  filter: brightness(1.05);
+}
+
+.lb-jug.yo {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.45), 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+
+.lb-jug-nombre {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #ffffff !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+@keyframes popInJugador {
+  0% { opacity: 0; transform: scale(0.9) translateY(8px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ========================================================
+   ESTILOS PROPIOS DE RÁPIDO Y CERTERO
+   ======================================================== */
 
 .rf-reto-card {
   background: #ffffff;
@@ -95,103 +729,8 @@
   gap: 0.5rem;
 }
 
-/* ========================================================
-   LOBBY ONLINE: TARJETAS CON EL COLOR TEMÁTICO DEL JUEGO
-   ======================================================== */
-
-.lb-lista {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 0.85rem;
-  margin-top: 1.1rem;
-  width: 100%;
-}
-
-.lb-jug {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.85rem 1.1rem;
-  /* Utiliza el color o degradado principal del juego actual con fallback a azul/índigo */
-  background: var(--g1, var(--c, #4f46e5));
-  border: 2px solid rgba(255, 255, 255, 0.35);
-  border-radius: 16px;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-  animation: popInJugador 0.3s ease-out;
-}
-
-.lb-jug:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-  filter: brightness(1.05);
-}
-
-/* Tarjeta destacada cuando eres tú: brillo blanco sutil y borde marcado */
-.lb-jug.yo {
-  border-color: #ffffff;
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.45), 0 6px 18px rgba(0, 0, 0, 0.18);
-}
-
-/* Punto indicador de conexión adaptado a fondo oscuro */
-.lb-punto {
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.6);
-}
-
-.lb-punto.on {
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.35);
-  animation: pulsoOnlineBlanco 1.8s infinite;
-}
-
-/* Texto del jugador en blanco de alto contraste */
-.lb-jug-nombre {
-  font-size: 1rem;
-  font-weight: 800;
-  color: #ffffff !important;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  flex: 1;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
-}
-
-/* Animaciones */
-@keyframes popInJugador {
-  0% {
-    opacity: 0;
-    transform: scale(0.9) translateY(8px);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-@keyframes pulsoOnlineBlanco {
-  0% {
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.6);
-  }
-  70% {
-    box-shadow: 0 0 0 7px rgba(255, 255, 255, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
-  }
-}
-
-.lb-punto {
-  display: none !important;
-}
-
 .rf-reto .rf-texto {
-  color: #1e293b; /* Color oscuro para que se lea perfectamente */
+  color: #1e293b;
   font-weight: 600;
   font-size: 1.2rem;
   margin-top: 0.5rem;

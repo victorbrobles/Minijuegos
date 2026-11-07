@@ -1,3 +1,4 @@
+// client/src/games/Trescientosuno/TrescientosunoLocal.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
@@ -9,7 +10,6 @@ const MAX_JUGADORES = 12;
 const TIEMPO_TURNO = 60;
 
 const ESCUDOS_MAP = {
-  // Clubes
   barcelona: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
   fcbarcelona: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
   madrid: "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg",
@@ -68,13 +68,11 @@ const ESCUDOS_MAP = {
   celtadevigo: "https://upload.wikimedia.org/wikipedia/en/1/12/RC_Celta_de_Vigo_logo.svg",
   espanyol: "https://upload.wikimedia.org/wikipedia/en/d/d6/Rcd_espanyol_logo.svg",
 
-  // Clubes extraídos
   getafe: "https://upload.wikimedia.org/wikipedia/en/4/46/Getafe_logo.svg",
   getafecf: "https://upload.wikimedia.org/wikipedia/en/4/46/Getafe_logo.svg",
   zaragoza: "https://assets.football-logos.cc/logos/spain/512x512/zaragoza.966d5396.png",
   osasuna: "https://assets.football-logos.cc/logos/spain/512x512/osasuna.44c61200.png",
 
-  // Selecciones
   alemania: "https://upload.wikimedia.org/wikipedia/en/e/e3/DFBEagle.svg",
   seleccionalemana: "https://upload.wikimedia.org/wikipedia/en/e/e3/DFBEagle.svg",
   argentina: "https://assets.football-logos.cc/logos/argentina/512x512/argentina-national-team.5c235057.png",
@@ -98,18 +96,27 @@ const ESCUDOS_MAP = {
 const getLogoUrl = (eq) => {
   if (!eq) return null;
   const normalizar = (str) => String(str || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, '');
-  
   const idKey = normalizar(eq.id);
   const nameKey = normalizar(eq.nombre);
-  
   return ESCUDOS_MAP[idKey] || ESCUDOS_MAP[nameKey] || null;
 };
 
-export default function TrescientosunoLocal({ onVolver, onExit }) {
+function BotonVolver({ onClick, texto = 'Volver' }) {
+  return (
+    <button type="button" className="qq-link-volver" onClick={onClick}>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7" />
+      </svg>
+      <span>{texto}</span>
+    </button>
+  );
+}
+
+export default function TrescientosunoLocal({ onVolver, onExit, onAbrirAyuda }) {
   const navigate = useNavigate();
 
   const [fase, setFase] = useState('setup');
-  const [modalAyuda, setModalAyuda] = useState(false);
+  const [modalSalirPortada, setModalSalirPortada] = useState(false);
 
   const [numJugadores, setNumJugadores] = useState(3);
   const [jugadores, setJugadores] = useState([
@@ -152,6 +159,19 @@ export default function TrescientosunoLocal({ onVolver, onExit }) {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, []);
+
+  const handleSalirAPortada = () => {
+    setModalSalirPortada(false);
+    if (typeof onExit === 'function') {
+      onExit();
+    } else {
+      try {
+        navigate('/');
+      } catch {
+        window.location.href = '/';
+      }
+    }
+  };
 
   const guardarJugadores = (lista) => { jugadoresRef.current = lista; setJugadores(lista); };
   const guardarTurno = (i) => { turnoRef.current = i; setTurnoIndex(i); };
@@ -382,140 +402,143 @@ export default function TrescientosunoLocal({ onVolver, onExit }) {
     return [...validos].sort((a, b) => a.puntos - b.puntos);
   };
   const rankingFinal = getGanador();
-
   const jActual = jugadores[turnoIndex];
 
   return (
     <div className="tcu-contenedor">
       {fase === 'setup' && (
-        <button type="button" className="btn-ayuda-flotante" onClick={() => setModalAyuda(true)} title="Reglas">
-          <span className="btn-ayuda-flotante-signo">?</span>
-        </button>
-      )}
-
-      {modalAyuda && (
-        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
-          <div className="rg-modal modal-ayuda-juego" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-ayuda-header">
-              <span className="modal-ayuda-signo-title">?</span>
-              <h3>¿Cómo se juega a 301 Goles?</h3>
-            </div>
-            <div className="modal-ayuda-cuerpo">
-              <p><strong>1. Dinámica del juego:</strong></p>
-              <ul>
-                <li>Se selecciona un equipo y una estadística a restar (Goles, Asistencias o Partidos).</li>
-                <li>Por turnos, introduce el nombre de un jugador que haya estado en ese club.</li>
-                <li>Se restarán de tu marcador los puntos correspondientes a ese jugador.</li>
-                <li>Dispones de 4 comodines por equipo (x2, x3, x5 y Revelar). Úsalos sabiamente antes de escribir.</li>
-                <li>Si no lo aciertas o el jugador no existe, conservarás tu turno para seguir probando.</li>
-                <li>¡Cuidado! Si te pasas del 0 exacto, o nombras a alguien con 0 en esa estadística, quedas eliminado.</li>
-              </ul>
-            </div>
-            <div className="rg-modal-acciones">
-              <button className="btn-start" style={{ width: '100%' }} onClick={() => setModalAyuda(false)}>
-                Entendido
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {fase === 'setup' && (
-        <>
-          <div className="game-intro-banner">
-            <div className="game-intro-icon-box">
-              <span style={{ fontSize: '2.2rem' }}>🎯</span>
-            </div>
-            <div className="game-intro-text">
-              <h2>301 Goles (Un dispositivo)</h2>
-              <p>Resta puntuación adivinando jugadores hasta llegar a cero sin pasarte.</p>
-            </div>
-          </div>
-
-          <div className="game-setup-white-card">
-            <div className="hud" style={{ marginBottom: '1rem' }}>
-              <button className="btn-back-inline" onClick={onVolver}>
-                &larr; Cambiar a modo Online
+        <section className="game">
+          <div className="panel qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver onClick={onVolver} />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
               </button>
             </div>
 
-            <div className="section-title">
-              <Icon name="users" size={22} />
-              <span>Participantes</span>
+            <div className="qq-config-header">
+              <div className="qq-hero-icono chico">
+                <Icon name="users" size={32} />
+              </div>
+              <div>
+                <h2 className="qq-config-titulo">Jugadores</h2>
+                <p className="qq-config-sub">
+                  Configura quiénes van a participar ({MIN_JUGADORES} a {MAX_JUGADORES} jugadores)
+                </p>
+              </div>
             </div>
 
-            <div className="form-group">
-              <label className="form-label">Número de jugadores ({MIN_JUGADORES} a {MAX_JUGADORES})</label>
-              <div className="select-wrapper">
-                <select
-                  className="game-select"
-                  value={numJugadores}
-                  onChange={(e) => handleNumJugadoresChange(Number(e.target.value))}
+            <div className="qq-selector-cantidad-box">
+              <label className="qq-label-destacado" htmlFor="num-jugadores-tcu">
+                Número de participantes
+              </label>
+              <div className="qq-stepper-row">
+                <button
+                  type="button"
+                  className="qq-stepper-btn"
+                  disabled={numJugadores <= MIN_JUGADORES}
+                  onClick={() => handleNumJugadoresChange(numJugadores - 1)}
                 >
-                  {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => i + MIN_JUGADORES).map((num) => (
-                    <option key={num} value={num}>
-                      {num} jugadores
+                  &minus;
+                </button>
+                <select
+                  id="num-jugadores-tcu"
+                  className="qq-select-jugadores"
+                  value={numJugadores}
+                  onChange={(e) => handleNumJugadoresChange(parseInt(e.target.value, 10))}
+                >
+                  {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => (
+                    <option key={i + MIN_JUGADORES} value={i + MIN_JUGADORES}>
+                      {i + MIN_JUGADORES} jugadores
                     </option>
                   ))}
                 </select>
+                <button
+                  type="button"
+                  className="qq-stepper-btn"
+                  disabled={numJugadores >= MAX_JUGADORES}
+                  onClick={() => handleNumJugadoresChange(numJugadores + 1)}
+                >
+                  +
+                </button>
               </div>
             </div>
 
-            <div className="form-group">
-              <label className="form-label">Nombres</label>
-              <div className="players-inputs-grid">
-                {jugadores.map((j) => (
+            <span className="qq-label-destacado" style={{ marginTop: '1.2rem', display: 'block' }}>
+              Nombres de los jugadores
+            </span>
+            <div className="qq-nombres-grid">
+              {jugadores.map((j) => (
+                <div key={j.id} className="qq-jugador-input-card">
+                  <span className="qq-jugador-badge">{j.id}</span>
                   <input
-                    key={j.id}
                     type="text"
-                    className="player-text-input"
                     value={j.nombre}
-                    placeholder={`Jugador ${j.id}`}
                     onChange={(e) => handleNombreJugador(j.id, e.target.value)}
+                    placeholder={`Jugador ${j.id}`}
+                    maxLength={30}
+                    required
                   />
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
 
-            <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
-              <button className="btn-start" onClick={() => setFase('equipo')}>
-                Siguiente
-              </button>
-            </div>
+            <button
+              type="button"
+              className="big full qq-btn-principal"
+              style={{ marginTop: '1.5rem' }}
+              onClick={() => setFase('equipo')}
+            >
+              <Icon name="play" size={22} /> Siguiente
+            </button>
           </div>
-        </>
+        </section>
       )}
 
       {fase === 'equipo' && (
         <section className="game">
-          <div className="hud"><span className="chip"><Icon name="shield" size={18} /> Selecciona un Equipo/Selección</span></div>
-          <div className="tcu-grid-equipos">
-            {equipos.map(eq => {
-              const urlImagen = getLogoUrl(eq);
-              return (
-                <div 
-                  key={eq.id} 
-                  className="tcu-equipo-card" 
-                  title={eq.nombre}
-                  onClick={() => { setEquipoSel(eq); setFase('config'); }}
-                >
-                  {urlImagen ? (
-                    <img 
-                      src={urlImagen} 
-                      alt={eq.nombre} 
-                      className="tcu-escudo-img" 
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                        if (e.currentTarget.nextSibling) e.currentTarget.nextSibling.style.display = 'block';
-                      }}
-                    />
-                  ) : null}
-                  <div className="tcu-escudo-texto" style={{ display: urlImagen ? 'none' : 'block' }}>
-                    {eq.nombre}
+          <div className="panel qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver onClick={() => setFase('setup')} />
+            </div>
+
+            <div className="qq-section-header">
+              <h3 className="qq-section-title">Selecciona un Equipo</h3>
+            </div>
+            <div className="tcu-grid-equipos">
+              {equipos.map(eq => {
+                const urlImagen = getLogoUrl(eq);
+                return (
+                  <div 
+                    key={eq.id} 
+                    className="tcu-equipo-card" 
+                    title={eq.nombre}
+                    onClick={() => { setEquipoSel(eq); setFase('config'); }}
+                  >
+                    {urlImagen ? (
+                      <img 
+                        src={urlImagen} 
+                        alt={eq.nombre} 
+                        className="tcu-escudo-img" 
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          if (e.currentTarget.nextSibling) e.currentTarget.nextSibling.style.display = 'block';
+                        }}
+                      />
+                    ) : null}
+                    <div className="tcu-escudo-texto" style={{ display: urlImagen ? 'none' : 'block' }}>
+                      {eq.nombre}
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </section>
       )}
@@ -524,7 +547,10 @@ export default function TrescientosunoLocal({ onVolver, onExit }) {
         const urlImagenSel = getLogoUrl(equipoSel);
         return (
           <section className="game">
-            <div className="panel">
+            <div className="panel qq-menu-panel">
+              <div className="qq-card-top">
+                <BotonVolver onClick={() => setFase('equipo')} />
+              </div>
               <h2 className="title center">Configuración de Partida</h2>
               <div className="tcu-equipo-sel center">
                 <div className="tcu-escudo-big">
@@ -550,175 +576,232 @@ export default function TrescientosunoLocal({ onVolver, onExit }) {
                 <h3>{equipoSel.nombre}</h3>
               </div>
               
-              <div className="form-group" style={{ marginTop: '1.5rem' }}>
-                <label className="form-label">Estadística a restar</label>
-                <div className="select-wrapper">
-                  <select className="game-select" value={estadistica} onChange={(e) => setEstadistica(e.target.value)}>
-                    <option value="goles">Goles</option>
-                    <option value="asistencias">Asistencias</option>
-                    <option value="partidos">Partidos Jugados</option>
-                  </select>
+              <div className="tcu-ajustes">
+                <div className="form-group">
+                  <label className="form-label">Estadística a restar</label>
+                  <div className="select-wrapper">
+                    <select className="game-select qq-input-moderno" value={estadistica} onChange={(e) => setEstadistica(e.target.value)}>
+                      <option value="goles">Goles</option>
+                      <option value="asistencias">Asistencias</option>
+                      <option value="partidos">Partidos Jugados</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Puntuación Objetivo</label>
+                  <input 
+                    type="number" 
+                    className="player-text-input qq-input-moderno" 
+                    value={objetivo} 
+                    onChange={(e) => setObjetivo(Number(e.target.value))}
+                    min="1"
+                  />
                 </div>
               </div>
-
-              <div className="form-group" style={{ marginTop: '1.5rem' }}>
-                <label className="form-label">Puntuación Objetivo</label>
-                <input 
-                  type="number" 
-                  className="player-text-input" 
-                  value={objetivo} 
-                  onChange={(e) => setObjetivo(Number(e.target.value))}
-                  min="1"
-                />
-              </div>
+              <button className="big full qq-btn-principal" style={{ marginTop: '1rem', width: '100%' }} onClick={iniciarJuego}>
+                <Icon name="play" size={24} /> ¡Comenzar!
+              </button>
             </div>
-            <button className="big full btn-start" style={{ marginTop: '1rem', width: '100%' }} onClick={iniciarJuego}>
-              <Icon name="play" size={24} /> ¡Comenzar!
-            </button>
           </section>
         );
       })()}
 
       {fase === 'jugando' && (
         <section className="game">
-          <div className="hud">
-            <span className="chip"><Icon name="shield" size={18} /> {equipoSel.nombre}</span>
-            <span className="chip alt">Objetivo: 0 {estadistica}</span>
-          </div>
+          <div className="panel qq-menu-panel">
+            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
+              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
+            </div>
 
-          <div className="tcu-marcador-grid">
-            {jugadores.map((j, i) => (
-              <div key={j.id} className={`tcu-marcador-item ${i === turnoIndex ? 'activo' : ''} ${j.estado}`}>
-                <div className="nombre">{j.nombre}</div>
-                <div className="puntos">{j.estado === 'eliminado' ? 'X' : j.puntos}</div>
-                
-                {ultimoAcierto && ultimoAcierto.jugadorId === j.id && (ultimoAcierto.tipo === 'acierto' || ultimoAcierto.tipo === 'ganador') && (
-                  <div className="floating-resta">- {ultimoAcierto.valor}</div>
-                )}
-              </div>
-            ))}
-          </div>
+            <div className="hud">
+              <span className="chip"><Icon name="shield" size={18} /> {equipoSel.nombre}</span>
+              <span className="chip alt">Objetivo: 0 {estadistica}</span>
+            </div>
 
-          <div className="panel center tcu-turno-panel">
-            {ultimoAcierto ? (
-              <div className="tcu-evento-display">
-                <span className="evento-icon">
-                   {ultimoAcierto.tipo === 'acierto' && '⚽'}
-                   {ultimoAcierto.tipo === 'ganador' && '🏆'}
-                   {ultimoAcierto.tipo === 'fallo' && '❌'}
-                   {ultimoAcierto.tipo === 'plantado' && '🛑'}
-                   {ultimoAcierto.tipo === 'eliminado' && '💀'}
-                </span>
-                <h3>{ultimoAcierto.msj}</h3>
-              </div>
-            ) : (
-              <>
-                <h2 className="title">Turno de {jActual.nombre}</h2>
-                
-                {jActual.comodines && jActual.comodines.length > 0 && (
-                  <div className="tcu-comodines">
-                    {jActual.comodines.map(c => (
-                      <button 
-                        key={c} 
-                        type="button"
-                        className={`btn-comodin ${comodinActivo === c ? 'activo' : ''} ${c === 'revelar' && comodinActivo === 'revelar' ? 'revelar' : ''}`}
-                        onClick={() => {
-                          if (c === 'revelar') {
-                            if (comodinActivo === 'revelar') {
-                              setComodinActivo(null);
-                              setOpcionesReveladas(null);
-                            } else {
-                              activarRevelar();
-                            }
-                          } else {
-                            setComodinActivo(comodinActivo === c ? null : c);
-                          }
-                        }}
-                      >
-                        {c === 'revelar' ? '🔍 Revelar' : `⭐ ${c.toUpperCase()}`}
-                      </button>
-                    ))}
-                  </div>
-                )}
-
-                <div className="timer-bar-container">
-                  <div className={`timer-bar ${tiempoRestante <= 10 ? 'low' : ''}`} style={{ width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%` }} />
+            <div className="tcu-marcador-grid">
+              {jugadores.map((j, i) => (
+                <div key={j.id} className={`tcu-marcador-item ${i === turnoIndex ? 'activo' : ''} ${j.estado}`}>
+                  <div className="nombre">{j.nombre}</div>
+                  <div className="puntos">{j.estado === 'eliminado' ? 'X' : j.puntos}</div>
+                  
+                  {ultimoAcierto && ultimoAcierto.jugadorId === j.id && (ultimoAcierto.tipo === 'acierto' || ultimoAcierto.tipo === 'ganador') && (
+                    <div className="floating-resta">- {ultimoAcierto.valor}</div>
+                  )}
                 </div>
-                <p className="timer-text">{tiempoRestante} s</p>
+              ))}
+            </div>
 
-                {comodinActivo === 'revelar' && opcionesReveladas ? (
-                  <div className="opciones-revelar-grid">
-                    {opcionesReveladas.length > 0 ? opcionesReveladas.map(op => (
-                      <button 
-                        key={op.nombre} 
-                        type="button"
-                        className="btn-opcion-revelada"
-                        onClick={() => validarJugador(op.nombre)}
-                      >
-                        {op.nombre}
-                      </button>
-                    )) : <p className="hint">No quedan jugadores disponibles.</p>}
-                    <button 
-                      type="button" 
-                      className="secondary" 
-                      style={{marginTop: '0.5rem'}}
-                      onClick={() => { setComodinActivo(null); setOpcionesReveladas(null); }}
-                    >
-                      Ninguno (Volver)
-                    </button>
-                  </div>
-                ) : (
-                  <form onSubmit={(e) => { e.preventDefault(); validarJugador(inputJugador); }} className="tcu-form">
-                    <input 
-                      type="text" 
-                      value={inputJugador} 
-                      onChange={(e) => { setInputJugador(e.target.value); setMensajeError(''); }} 
-                      placeholder={`Dime un jugador del ${equipoSel.nombre}...`}
-                      className="player-text-input"
-                      autoFocus 
-                    />
-                    {mensajeError && <p className="error" style={{ marginBottom: '1rem' }}>{mensajeError}</p>}
-                    <div className="tcu-actions">
-                      <button type="submit" className="btn-start" style={{ width: '100%' }}>Enviar</button>
-                      <button type="button" className="secondary" onClick={handlePasar}>Pasar</button>
-                      <button type="button" className="secondary danger" onClick={handlePlantarse}>Plantarse</button>
+            <div className="panel center tcu-turno-panel" style={{ background: '#f8fafc', border: '1.5px solid #e2e8f0', boxShadow: 'none' }}>
+              {ultimoAcierto ? (
+                <div className="tcu-evento-display">
+                  <span className="evento-icon">
+                     {ultimoAcierto.tipo === 'acierto' && '⚽'}
+                     {ultimoAcierto.tipo === 'ganador' && '🏆'}
+                     {ultimoAcierto.tipo === 'fallo' && '❌'}
+                     {ultimoAcierto.tipo === 'plantado' && '🛑'}
+                     {ultimoAcierto.tipo === 'eliminado' && '💀'}
+                  </span>
+                  <h3 style={{ color: '#0f172a' }}>{ultimoAcierto.msj}</h3>
+                </div>
+              ) : (
+                <>
+                  <h2 className="title">Turno de {jActual.nombre}</h2>
+                  
+                  {jActual.comodines && jActual.comodines.length > 0 && (
+                    <div className="tcu-comodines">
+                      {jActual.comodines.map(c => (
+                        <button 
+                          key={c} 
+                          type="button"
+                          className={`btn-comodin ${comodinActivo === c ? 'activo' : ''} ${c === 'revelar' && comodinActivo === 'revelar' ? 'revelar' : ''}`}
+                          onClick={() => {
+                            if (c === 'revelar') {
+                              if (comodinActivo === 'revelar') {
+                                setComodinActivo(null);
+                                setOpcionesReveladas(null);
+                              } else {
+                                activarRevelar();
+                              }
+                            } else {
+                              setComodinActivo(comodinActivo === c ? null : c);
+                            }
+                          }}
+                        >
+                          {c === 'revelar' ? '🔍 Revelar' : `⭐ ${c.toUpperCase()}`}
+                        </button>
+                      ))}
                     </div>
-                  </form>
-                )}
-              </>
+                  )}
+
+                  <div className="timer-bar-container">
+                    <div className={`timer-bar ${tiempoRestante <= 10 ? 'low' : ''}`} style={{ width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%` }} />
+                  </div>
+                  <p className="timer-text">{tiempoRestante} s</p>
+
+                  {comodinActivo === 'revelar' && opcionesReveladas ? (
+                    <div className="opciones-revelar-grid">
+                      {opcionesReveladas.length > 0 ? opcionesReveladas.map(op => (
+                        <button 
+                          key={op.nombre} 
+                          type="button"
+                          className="btn-opcion-revelada"
+                          onClick={() => validarJugador(op.nombre)}
+                        >
+                          {op.nombre}
+                        </button>
+                      )) : <p className="hint">No quedan jugadores disponibles.</p>}
+                      <button 
+                        type="button" 
+                        className="secondary" 
+                        style={{marginTop: '0.5rem'}}
+                        onClick={() => { setComodinActivo(null); setOpcionesReveladas(null); }}
+                      >
+                        Ninguno (Volver)
+                      </button>
+                    </div>
+                  ) : (
+                    <form onSubmit={(e) => { e.preventDefault(); validarJugador(inputJugador); }} className="tcu-form">
+                      <input 
+                        type="text" 
+                        value={inputJugador} 
+                        onChange={(e) => { setInputJugador(e.target.value); setMensajeError(''); }} 
+                        placeholder={`Dime un jugador del ${equipoSel.nombre}...`}
+                        className="player-text-input qq-input-moderno"
+                        autoFocus 
+                      />
+                      {mensajeError && <p className="error" style={{ marginBottom: '1rem' }}>{mensajeError}</p>}
+                      <div className="tcu-actions">
+                        <button type="submit" className="qq-btn-principal" style={{ width: '100%', color: 'white' }}>Enviar</button>
+                        <button type="button" className="secondary" onClick={handlePasar}>Pasar</button>
+                        <button type="button" className="secondary danger" onClick={handlePlantarse}>Plantarse</button>
+                      </div>
+                    </form>
+                  )}
+                </>
+              )}
+            </div>
+
+            {jugadoresUsados.length > 0 && (
+              <div className="tcu-usados">
+                <strong>Ya dichos:</strong> {jugadoresUsados.join(', ')}
+              </div>
             )}
           </div>
-
-          {jugadoresUsados.length > 0 && (
-            <div className="tcu-usados">
-              <strong>Ya dichos:</strong> {jugadoresUsados.join(', ')}
-            </div>
-          )}
         </section>
       )}
 
       {fase === 'resultados' && (
         <section className="game">
-          <div className="end-card panel">
-            <span className="end-icon"><Icon name="trophy" size={48} /></span>
-            <h1 className="title">Fin de la partida</h1>
-            <p className="final-score">
-              {!rankingFinal ? 'Todos han sido eliminados.' : `Ganador: ${rankingFinal[0].nombre} (se quedó a ${rankingFinal[0].puntos})`}
-            </p>
-            <div className="scoreboard">
-              {[...jugadores].sort((a, b) => (a.estado === 'eliminado') - (b.estado === 'eliminado') || a.puntos - b.puntos).map((j) => (
-                <div key={j.id} className="score-row">
-                  <span className="score-name">{j.nombre} {j.estado === 'plantado' && '(Plantado)'}</span>
-                  <span className="score-pts">{j.estado === 'eliminado' ? 'Eliminado' : j.puntos}</span>
-                </div>
-              ))}
+          <div className="panel qq-menu-panel">
+            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
+              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
+            </div>
+
+            <div className="end-card" style={{ border: 'none', boxShadow: 'none', padding: '0 0 1rem' }}>
+              <span className="end-icon"><Icon name="trophy" size={48} /></span>
+              <h1 className="title">Fin de la partida</h1>
+              <p className="final-score">
+                {!rankingFinal ? 'Todos han sido eliminados.' : `Ganador: ${rankingFinal[0].nombre} (se quedó a ${rankingFinal[0].puntos})`}
+              </p>
+              <div className="scoreboard">
+                {[...jugadores].sort((a, b) => (a.estado === 'eliminado') - (b.estado === 'eliminado') || a.puntos - b.puntos).map((j) => (
+                  <div key={j.id} className="score-row">
+                    <span className="score-name">{j.nombre} {j.estado === 'plantado' && '(Plantado)'}</span>
+                    <span className="score-pts">{j.estado === 'eliminado' ? 'Eliminado' : j.puntos}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="actions" style={{ marginTop: '1.5rem' }}>
+              <button className="big full qq-btn-principal" onClick={() => { setUltimoAcierto(null); setFase('equipo'); }}>
+                <Icon name="refresh" size={20} /> Jugar otro equipo
+              </button>
+              <div className="qq-tablero-footer" style={{ marginTop: 0, paddingTop: '0.6rem', borderTop: 'none' }}>
+                <button type="button" className="qq-link-otra-ronda" onClick={() => setModalSalirPortada(true)}>
+                  Salir a la portada
+                </button>
+              </div>
             </div>
           </div>
-          <div className="actions" style={{ marginTop: '1.5rem' }}>
-            <button onClick={() => { setUltimoAcierto(null); setFase('equipo'); }}><Icon name="refresh" size={20} /> Jugar otro equipo</button>
-            <button className="secondary danger" onClick={() => (onExit ? onExit() : navigate('/'))}><Icon name="door" size={20} /> Salir</button>
-          </div>
         </section>
+      )}
+
+      {/* MODAL: SALIR A LA PORTADA (MODO OFFLINE) */}
+      {modalSalirPortada && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalirPortada(false)}>
+          <div
+            className="rg-modal"
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
+          >
+            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
+            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
+              ¿Salir a la portada?
+            </h3>
+            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
+              Se cancelará la partida actual y volverás a la portada principal de juegos. ¿Estás seguro?
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+              <button
+                type="button"
+                className="secondary full"
+                onClick={() => setModalSalirPortada(false)}
+              >
+                No, continuar
+              </button>
+              <button
+                type="button"
+                className="secondary danger full"
+                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
+                onClick={handleSalirAPortada}
+              >
+                Sí, salir a portada
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

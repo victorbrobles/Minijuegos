@@ -2,7 +2,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import GameIntro from '../../components/GameIntro.jsx';
 import CategoryCard from '../../components/CategoryCard.jsx';
 import './Rapidfire.css';
 
@@ -10,6 +9,10 @@ const TIEMPO_S = 60;
 const PREPARACION_S = 3;
 const PUNTOS_POR_ACIERTO = 2;
 const NUM_OPCIONES = 3;
+const MIN_JUGADORES = 2;
+const MAX_JUGADORES = 10;
+
+const COLORES = ['#ef4444', '#2563eb', '#16a34a', '#f59e0b', '#9333ea', '#ec4899', '#0d9488', '#ea580c', '#475569', '#65a30d'];
 
 const aleatorio = (n) => Math.floor(Math.random() * n);
 
@@ -22,7 +25,18 @@ function barajar(lista) {
   return a;
 }
 
-function Turno({ jugador, ronda, esRebote, motivo, categoria, reto, onAcierto, onRebote, onTiempo, onRendirse }) {
+function BotonVolver({ onClick, texto = 'Volver' }) {
+  return (
+    <button type="button" className="qq-link-volver" onClick={onClick}>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7" />
+      </svg>
+      <span>{texto}</span>
+    </button>
+  );
+}
+
+function Turno({ jugador, ronda, esRebote, motivo, categoria, reto, onAcierto, onRebote, onTiempo, onRendirse, onSalirPortada }) {
   const [prep, setPrep] = useState(PREPARACION_S);
   const [restante, setRestante] = useState(TIEMPO_S);
   const alAcabarse = useRef(onTiempo);
@@ -58,58 +72,73 @@ function Turno({ jugador, ronda, esRebote, motivo, categoria, reto, onAcierto, o
 
   return (
     <section className="game">
-      {motivo && (
-        <p className="rf-aviso" role="status">
-          <Icon name={motivo === 'tiempo' ? 'hourglass' : 'refresh'} size={22} />
-          {motivo === 'tiempo' ? '¡Se acabó el tiempo!' : '¡Rebote!'} Le toca a <strong>{jugador.nombre}</strong>
+      <div className="panel qq-menu-panel">
+        <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
+          <BotonVolver texto="Volver a la portada" onClick={onSalirPortada} />
+          <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
+            {esRebote ? 'Rebote' : `Ronda ${ronda}`}
+          </span>
+        </div>
+
+        {motivo && (
+          <p className="rf-aviso" role="status" style={{ marginBottom: '1rem' }}>
+            <Icon name={motivo === 'tiempo' ? 'hourglass' : 'refresh'} size={22} />
+            {motivo === 'tiempo' ? '¡Se acabó el tiempo!' : '¡Rebote!'} Le toca a <strong>{jugador.nombre}</strong>
+          </p>
+        )}
+
+        <div className="starter" style={{ textAlign: 'center', marginBottom: '1rem' }}>
+          <span>Turno de: <strong>{jugador.nombre}</strong></span>
+        </div>
+
+        <p className="categoria" style={{ display: 'inline-flex', margin: '0 auto 1rem', width: 'fit-content' }}>
+          <Icon name={categoria.icono} size={16} /> {categoria.nombre}
         </p>
-      )}
 
-      <div className="hud">
-        <span className="chip"><Icon name="users" size={18} />{jugador.nombre}</span>
-        <span className="chip alt">{esRebote ? 'Rebote' : `Ronda ${ronda}`}</span>
+        <div className="sigla-card rf-reto">
+          <p className="rf-n" style={{ color: '#dc2626', fontSize: '3.5rem', fontWeight: '900', lineHeight: 1 }}>{reto.n}</p>
+          <p className="rf-texto" style={{ color: '#1e293b', fontSize: '1.25rem', fontWeight: '600', marginTop: '0.5rem' }}>{reto.texto}</p>
+        </div>
+
+        <div className="timer" role="timer" aria-label="Tiempo restante" style={{ marginTop: '0.5rem' }}>
+          <div
+            className={`timer-bar${!preparando && restante <= 10 ? ' low' : ''}`}
+            style={{ width: `${(restante / TIEMPO_S) * 100}%` }}
+          />
+        </div>
+        <p className="timer-text">
+          <Icon name="clock" size={16} />
+          {preparando ? `Preparados… ${prep}` : `${Math.ceil(restante)} s`}
+        </p>
+
+        <div className="rf-botones">
+          <button className="ok" disabled={preparando} onClick={onAcierto}>
+            <Icon name="check" size={22} strokeWidth={2.5} /> Correcto
+          </button>
+          <button className="rebote" disabled={preparando} onClick={onRebote}>
+            <Icon name="refresh" size={22} strokeWidth={2.5} /> Rebote
+          </button>
+        </div>
+
+        <div className="qq-tablero-footer">
+          <button type="button" className="qq-link-otra-ronda" onClick={onRendirse}>
+            Rendirse (nadie puntúa)
+          </button>
+        </div>
+        {esRebote && <p className="previa">Rebote: el jugador debe decir las que faltan.</p>}
       </div>
-
-      <p className="categoria"><Icon name={categoria.icono} size={16} />{categoria.nombre}</p>
-
-      <div className="sigla-card rf-reto">
-        <p className="rf-n" style={{ color: '#dc2626', fontSize: '3.5rem', fontWeight: '900', lineHeight: 1 }}>{reto.n}</p>
-        <p className="rf-texto" style={{ color: '#1e293b', fontSize: '1.25rem', fontWeight: '600', marginTop: '0.5rem' }}>{reto.texto}</p>
-      </div>
-
-      <div className="timer" role="timer" aria-label="Tiempo restante">
-        <div
-          className={`timer-bar${!preparando && restante <= 10 ? ' low' : ''}`}
-          style={{ width: `${(restante / TIEMPO_S) * 100}%` }}
-        />
-      </div>
-      <p className="timer-text">
-        <Icon name="clock" size={16} />
-        {preparando ? `Preparados… ${prep}` : `${Math.ceil(restante)} s`}
-      </p>
-
-      <div className="rf-botones">
-        <button className="ok" disabled={preparando} onClick={onAcierto}>
-          <Icon name="check" size={22} strokeWidth={2.5} />Correcto
-        </button>
-        <button className="rebote" disabled={preparando} onClick={onRebote}>
-          <Icon name="refresh" size={22} strokeWidth={2.5} />Rebote
-        </button>
-      </div>
-      <button className="secondary danger full" onClick={onRendirse}>
-        <Icon name="flag" size={20} />Rendirse (nadie puntúa)
-      </button>
-      {esRebote && <p className="previa">Rebote: el jugador debe decir las que faltan.</p>}
     </section>
   );
 }
 
-export default function RapidfireLocal({ onVolver, onExit }) {
+export default function RapidfireLocal({ onVolver, onExit, onAbrirAyuda }) {
   const navigate = useNavigate();
 
   const [paso, setPaso] = useState('config');
-  const [modalAyuda, setModalAyuda] = useState(false);
+  const [modalSalirPortada, setModalSalirPortada] = useState(false);
   const [categoriasTodas, setCategoriasTodas] = useState([]);
+  
+  const [numJugadores, setNumJugadores] = useState(2);
   const [jugadores, setJugadores] = useState([
     { id: 1, nombre: 'Jugador 1' },
     { id: 2, nombre: 'Jugador 2' }
@@ -137,8 +166,22 @@ export default function RapidfireLocal({ onVolver, onExit }) {
       .catch((err) => console.error('Error al cargar categorías de rapidfire:', err));
   }, []);
 
-  const handleNumJugadores = (e) => {
-    const num = parseInt(e.target.value, 10);
+  const handleSalirAPortada = () => {
+    setModalSalirPortada(false);
+    if (typeof onExit === 'function') {
+      onExit();
+    } else {
+      try {
+        navigate('/');
+      } catch {
+        window.location.href = '/';
+      }
+    }
+  };
+
+  const actualizarCantidadJugadores = (nuevoNum) => {
+    const num = Math.max(MIN_JUGADORES, Math.min(MAX_JUGADORES, nuevoNum));
+    setNumJugadores(num);
     setJugadores(Array.from({ length: num }, (_, i) => ({
       id: i + 1,
       nombre: jugadores[i]?.nombre ?? `Jugador ${i + 1}`
@@ -223,9 +266,7 @@ export default function RapidfireLocal({ onVolver, onExit }) {
     const ganados = reto.n * PUNTOS_POR_ACIERTO;
     setPuntos((p) => ({ ...p, [jugador.id]: (p[jugador.id] ?? 0) + ganados }));
 
-    // Siempre avanza de forma secuencial al que le sigue al que abrió la ronda actual
     setProximoInicialRonda((jugadorInicialRonda + 1) % jugadores.length);
-
     cerrarRonda({ tipo: intento > 0 ? 'rebote' : 'acierto', jugador: jugador.nombre, puntos: ganados });
   };
 
@@ -243,10 +284,6 @@ export default function RapidfireLocal({ onVolver, onExit }) {
     setIntento(0);
     sortearOpciones(categoriasTodas);
     setPaso('categorias');
-  };
-
-  const nuevaPartida = () => {
-    setPaso('config');
   };
 
   const ranking = [...jugadores].sort((a, b) => (puntos[b.id] ?? 0) - (puntos[a.id] ?? 0));
@@ -271,198 +308,265 @@ export default function RapidfireLocal({ onVolver, onExit }) {
     </div>
   );
 
-  if (paso === 'config') {
-    return (
-      <section className="game" style={{ position: 'relative' }}>
-        <button
-          type="button"
-          className="btn-ayuda-flotante"
-          onClick={() => setModalAyuda(true)}
-          title="Reglas y sistema de puntuación"
-        >
-          <span className="btn-ayuda-flotante-signo">?</span>
-        </button>
+  const enPartidaActiva = paso !== 'config';
 
-        {modalAyuda && (
-          <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
-            <div className="rg-modal modal-ayuda-juego" onClick={(e) => e.stopPropagation()}>
-              <div className="modal-ayuda-header">
-                <span className="modal-ayuda-signo-title">?</span>
-                <h3>¿Cómo se juega a Rapidfire?</h3>
+  return (
+    <div className={`rf-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+      {/* 1. CONFIGURACIÓN */}
+      {paso === 'config' && (
+        <section className="game">
+          <div className="panel qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver onClick={onVolver} />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
+
+            <div className="qq-config-header">
+              <div className="qq-hero-icono chico">
+                <Icon name="users" size={32} />
               </div>
+              <div>
+                <h2 className="qq-config-titulo">Jugadores</h2>
+                <p className="qq-config-sub">
+                  Configura quiénes van a participar ({MIN_JUGADORES} a {MAX_JUGADORES} jugadores)
+                </p>
+              </div>
+            </div>
 
-              <div className="modal-ayuda-cuerpo">
-                <p><strong>1. Dinámica del juego:</strong></p>
-                <ul>
-                  <li>Configura los jugadores y pulsa <em>¡Empezar!</em>. El primer turno de la primera ronda se sortea. En las siguientes será secuencial.</li>
-                  <li>El jugador en turno elige 1 de las 3 categorías temáticas sorteadas.</li>
-                  <li>Aparece un reto con el número de elementos requeridos (ej. <em>Di 5 películas de terror</em>).</li>
-                  <li>Hay <strong>3 segundos de preparación</strong> antes de que empiecen a correr los <strong>60 segundos</strong>.</li>
-                  <li>Si fallas o se agota el tiempo, el turno pasa por <strong>rebote</strong> al siguiente jugador de forma secuencial.</li>
-                  <li>La siguiente ronda siempre la abrirá el jugador siguiente al que empezó la ronda actual, independientemente de quién acierte o si hay rebotes.</li>
-                </ul>
+            <div className="qq-selector-cantidad-box">
+              <label className="qq-label-destacado" htmlFor="rf-num-jugadores">
+                Número de participantes
+              </label>
+              <div className="qq-stepper-row">
+                <button
+                  type="button"
+                  className="qq-stepper-btn"
+                  disabled={numJugadores <= MIN_JUGADORES}
+                  onClick={() => actualizarCantidadJugadores(numJugadores - 1)}
+                >
+                  &minus;
+                </button>
+                <select
+                  id="rf-num-jugadores"
+                  className="qq-select-jugadores"
+                  value={numJugadores}
+                  onChange={(e) => actualizarCantidadJugadores(parseInt(e.target.value, 10))}
+                >
+                  {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => (
+                    <option key={i + MIN_JUGADORES} value={i + MIN_JUGADORES}>
+                      {i + MIN_JUGADORES} jugadores
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  className="qq-stepper-btn"
+                  disabled={numJugadores >= MAX_JUGADORES}
+                  onClick={() => actualizarCantidadJugadores(numJugadores + 1)}
+                >
+                  +
+                </button>
+              </div>
+            </div>
 
-                <p><strong>2. Sistema de puntuación:</strong></p>
-                <div className="tabla-ayuda-puntos">
-                  <div className="fila-ayuda-puntos verde">
-                    <span>🎯 Reto completado con éxito</span>
-                    <strong>+2 puntos por cada elemento pedido (N × 2 pts)</strong>
-                  </div>
-                  <div className="fila-ayuda-puntos azul">
-                    <span>🔄 Reto completado en rebote</span>
-                    <strong>El jugador del rebote se lleva los puntos totales</strong>
-                  </div>
-                  <div className="fila-ayuda-puntos rojo">
-                    <span>🏳️ Rendirse / Ninguno lo logra</span>
-                    <strong>0 puntos para todos en la ronda</strong>
-                  </div>
+            <span className="qq-label-destacado" style={{ marginTop: '1.2rem', display: 'block' }}>
+              Nombres de los jugadores
+            </span>
+            <div className="qq-nombres-grid">
+              {jugadores.map((j, idx) => (
+                <div key={j.id} className="qq-jugador-input-card">
+                  <span
+                    className="qq-jugador-badge"
+                    style={{ background: COLORES[idx % COLORES.length] }}
+                  >
+                    {idx + 1}
+                  </span>
+                  <input
+                    type="text"
+                    value={j.nombre}
+                    onChange={(e) => handleNombre(idx, e.target.value)}
+                    placeholder={`Jugador ${j.id}`}
+                    maxLength={20}
+                    required
+                  />
                 </div>
-              </div>
+              ))}
+            </div>
 
-              <div className="rg-modal-acciones">
-                <button className="big full" onClick={() => setModalAyuda(false)}>
-                  Entendido
+            <button
+              type="button"
+              className="big full qq-btn-principal"
+              style={{ marginTop: '1.5rem' }}
+              onClick={empezar}
+            >
+              <Icon name="dice" size={24} /> ¡Iniciar juego!
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* 2. CATEGORÍAS */}
+      {paso === 'categorias' && (
+        <section className="game">
+          <div className="panel qq-menu-panel">
+            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
+              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
+              <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
+                Ronda {ronda}
+              </span>
+            </div>
+
+            <div className="starter" style={{ textAlign: 'center', marginBottom: '1.2rem' }}>
+              <Icon name="dice" size={28} />
+              <p style={{ margin: 0 }}>
+                {ronda === 1 ? 'Empieza al azar' : 'Abre la ronda'}: <strong>{jugadores[turno].nombre}</strong>
+              </p>
+            </div>
+
+            <div className="qq-section-header">
+              <h3 className="qq-section-title">{jugadores[turno].nombre}, elige una categoría:</h3>
+            </div>
+
+            <div className="rf-opciones">
+              {opciones.map((c, idx) => (
+                <CategoryCard
+                  key={c.id}
+                  nombre={c.nombre}
+                  icono={c.icono}
+                  indice={idx}
+                  onClick={() => elegirCategoria(c)}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 3. TURNO */}
+      {paso === 'turno' && categoria && reto && (
+        <Turno
+          key={intento}
+          jugador={jugadores[turno]}
+          ronda={ronda}
+          esRebote={intento > 0}
+          motivo={motivo}
+          categoria={categoria}
+          reto={reto}
+          onAcierto={acierto}
+          onRebote={() => pasarTurno('rebote')}
+          onTiempo={() => pasarTurno('tiempo')}
+          onRendirse={rendirse}
+          onSalirPortada={() => setModalSalirPortada(true)}
+        />
+      )}
+
+      {/* 4. PUNTUACIONES DE LA RONDA */}
+      {paso === 'puntuaciones' && (
+        <section className="game">
+          <div className="panel qq-menu-panel">
+            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
+              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
+            </div>
+
+            <div className="end-card" style={{ border: 'none', boxShadow: 'none', padding: '0 0 1rem' }}>
+              <span className="end-icon"><Icon name="trophy" size={44} /></span>
+              <h1 className="title">Puntuaciones</h1>
+              {ultimo && (
+                <p className="reveal">
+                  {ultimo.tipo === 'rendido'
+                    ? 'Os habéis rendido o nadie lo logró: nadie suma puntos esta ronda.'
+                    : ultimo.tipo === 'rebote'
+                      ? <><strong>{ultimo.jugador}</strong> ha cogido el rebote y se lleva <strong>{ultimo.puntos} puntos</strong>.</>
+                      : <><strong>{ultimo.jugador}</strong> lo ha dicho todo y suma <strong>{ultimo.puntos} puntos</strong>.</>}
+                </p>
+              )}
+              {tabla}
+            </div>
+
+            <div style={{ marginTop: '1.2rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+              <button type="button" className="big full qq-btn-principal" onClick={continuar}>
+                <Icon name="play" size={20} /> Continuar: ronda {ronda + 1}
+              </button>
+              <div className="qq-tablero-footer" style={{ marginTop: 0, paddingTop: '0.6rem', borderTop: 'none' }}>
+                <button type="button" className="qq-link-otra-ronda" onClick={() => setPaso('final')}>
+                  Finalizar juego
                 </button>
               </div>
             </div>
           </div>
-        )}
+        </section>
+      )}
 
-        <GameIntro gameId="rapidfire" titulo="Rapidfire" />
-
-        <div className="panel">
-          <div className="hud" style={{ marginBottom: '1rem' }}>
-            <button className="btn-back-inline" onClick={onVolver}>
-              &larr; Cambiar a modo Online
+      {/* 5. PODIO FINAL */}
+      {paso === 'final' && (
+        <section className="game">
+          <div className="end-card">
+            <span className="end-icon"><Icon name="crown" size={44} /></span>
+            <h1 className="title">Puntuaciones finales</h1>
+            <p className="final-score">
+              {ganadores.length === 0
+                ? 'Nadie ha sumado puntos'
+                : ganadores.length === 1
+                  ? <>¡Gana {ganadores[0].nombre}!</>
+                  : <>Empate entre {ganadores.map((g) => g.nombre).join(', ')}</>}
+            </p>
+            {tabla}
+          </div>
+          <div className="actions" style={{ marginTop: '1.5rem' }}>
+            <button type="button" className="big full qq-btn-principal" onClick={nuevaPartida}>
+              <Icon name="refresh" size={20} /> Nueva partida
+            </button>
+            <button type="button" className="secondary danger full" onClick={handleSalirAPortada}>
+              <Icon name="door" size={20} /> Volver a la portada
             </button>
           </div>
+        </section>
+      )}
 
-          <h3 className="panel-title"><Icon name="users" size={22} />Jugadores</h3>
-          <label className="field-label" htmlFor="rf-num-jugadores">Número de jugadores (2 a 10)</label>
-          <select id="rf-num-jugadores" value={jugadores.length} onChange={handleNumJugadores}>
-            {[...Array(9)].map((_, i) => (
-              <option key={i + 2} value={i + 2}>{i + 2} jugadores</option>
-            ))}
-          </select>
+      {/* MODAL: SALIR A LA PORTADA */}
+      {modalSalirPortada && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalirPortada(false)}>
+          <div
+            className="rg-modal"
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
+          >
+            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
+            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
+              ¿Salir a la portada?
+            </h3>
+            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
+              Se cancelará la partida actual y volverás a la portada principal. ¿Estás seguro?
+            </p>
 
-          <span className="field-label">Nombres</span>
-          <div className="names-grid">
-            {jugadores.map((j, idx) => (
-              <input
-                key={j.id}
-                type="text"
-                value={j.nombre}
-                onChange={(e) => handleNombre(idx, e.target.value)}
-                placeholder={`Jugador ${j.id}`}
-                aria-label={`Nombre del jugador ${j.id}`}
-              />
-            ))}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+              <button
+                type="button"
+                className="secondary full"
+                onClick={() => setModalSalirPortada(false)}
+              >
+                No, continuar
+              </button>
+              <button
+                type="button"
+                className="secondary danger full"
+                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
+                onClick={handleSalirAPortada}
+              >
+                Sí, salir a portada
+              </button>
+            </div>
           </div>
         </div>
-        <button className="big full" onClick={empezar}>
-          <Icon name="dice" size={24} />¡Empezar! Sortear primer turno
-        </button>
-      </section>
-    );
-  }
-
-  if (paso === 'categorias') {
-    const jugador = jugadores[turno];
-    return (
-      <section className="game">
-        <div className="hud">
-          <span className="chip"><Icon name="flagFinish" size={18} />Ronda {ronda}</span>
-          <span className="chip alt">Turno de: {jugador.nombre}</span>
-        </div>
-        <div className="starter">
-          <Icon name="dice" size={28} />
-          <p>{ronda === 1 ? 'Empieza al azar' : 'Abre la ronda'} <strong>{jugador.nombre}</strong></p>
-        </div>
-        <h3 className="section-title">{jugador.nombre}, elige una categoría</h3>
-        <div className="rf-opciones">
-          {opciones.map((c, idx) => (
-            <CategoryCard
-              key={c.id}
-              nombre={c.nombre}
-              icono={c.icono}
-              indice={idx}
-              onClick={() => elegirCategoria(c)}
-            />
-          ))}
-        </div>
-      </section>
-    );
-  }
-
-  if (paso === 'turno' && categoria && reto) {
-    return (
-      <Turno
-        key={intento}
-        jugador={jugadores[turno]}
-        ronda={ronda}
-        esRebote={intento > 0}
-        motivo={motivo}
-        categoria={categoria}
-        reto={reto}
-        onAcierto={acierto}
-        onRebote={() => pasarTurno('rebote')}
-        onTiempo={() => pasarTurno('tiempo')}
-        onRendirse={rendirse}
-      />
-    );
-  }
-
-  if (paso === 'puntuaciones') {
-    return (
-      <section className="game">
-        <div className="end-card">
-          <span className="end-icon"><Icon name="trophy" size={44} /></span>
-          <h1 className="title">Puntuaciones</h1>
-          {ultimo && (
-            <p className="reveal">
-              {ultimo.tipo === 'rendido'
-                ? 'Os habéis rendido o nadie lo logró: nadie suma puntos esta ronda.'
-                : ultimo.tipo === 'rebote'
-                  ? <><strong>{ultimo.jugador}</strong> ha cogido el rebote y se lleva <strong>{ultimo.puntos} puntos</strong>.</>
-                  : <><strong>{ultimo.jugador}</strong> lo ha dicho todo y suma <strong>{ultimo.puntos} puntos</strong>.</>}
-            </p>
-          )}
-          {tabla}
-        </div>
-        <div className="actions">
-          <button onClick={continuar}>
-            <Icon name="play" size={20} />Continuar: ronda {ronda + 1}
-          </button>
-          <button className="secondary" onClick={() => setPaso('final')}>
-            <Icon name="flagFinish" size={20} />Finalizar el juego
-          </button>
-        </div>
-      </section>
-    );
-  }
-
-  return (
-    <section className="game">
-      <div className="end-card">
-        <span className="end-icon"><Icon name="crown" size={44} /></span>
-        <h1 className="title">Puntuaciones finales</h1>
-        <p className="final-score">
-          {ganadores.length === 0
-            ? 'Nadie ha sumado puntos'
-            : ganadores.length === 1
-              ? <>¡Gana {ganadores[0].nombre}!</>
-              : <>Empate entre {ganadores.map((g) => g.nombre).join(', ')}</>}
-        </p>
-        {tabla}
-      </div>
-      <div className="actions">
-        <button onClick={nuevaPartida}>
-          <Icon name="refresh" size={20} />Nueva partida
-        </button>
-        <button className="secondary danger" onClick={() => (onExit ? onExit() : navigate('/'))}>
-          <Icon name="door" size={20} />Salir al menú principal
-        </button>
-      </div>
-    </section>
+      )}
+    </div>
   );
 }
