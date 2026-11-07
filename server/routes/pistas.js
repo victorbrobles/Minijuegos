@@ -89,7 +89,7 @@ router.post('/solucion', (req, res) => {
 });
 
 // ==========================================
-// SALAS ONLINE (MULTIDISPOSITIVO CON PULSADOR)
+// SALAS ONLINE (RESPUESTA SIMULTÁNEA Y PRIVADA)
 // ==========================================
 const salasOnline = {};
 
@@ -118,14 +118,40 @@ function iniciarNuevaRondaOnline(sala) {
     pistasReveladas: 1,
     segundosRestantes: 10,
     ultimaPistaTs: Date.now(),
-    estaPausado: false,
     bloqueados: [],
-    acertados: [],
-    pulsado: null, // { jugadorId, nombre, texto }
+    acertados: [], // [{ jugadorId, nombre, pistaNum, puntos, deltaVidas }]
     estadoRonda: 'activa', // 'activa' | 'resuelta'
-    solucion: null,
-    mensaje: null
+    solucion: null
   };
+}
+
+// Aplica los puntos y cambios de vidas al cerrar la ronda para no dar pistas en directo
+function resolverRondaOnline(sala) {
+  if (!sala?.ronda || sala.ronda.estadoRonda === 'resuelta') return;
+
+  const item = PISTAS_SEED.find((p) => p.id === sala.ronda.id);
+  sala.ronda.estadoRonda = 'resuelta';
+  sala.ronda.solucion = item ? item.nombre : '';
+  sala.ronda.segundosRestantes = 0;
+
+  // Sumar puntos o actualizar vidas de quienes acertaron
+  sala.ronda.acertados.forEach((a) => {
+    const j = sala.jugadores.find((x) => x.id === a.jugadorId);
+    if (!j) return;
+    if (sala.modo === 'estandar') {
+      j.puntos += a.puntos;
+    } else {
+      j.vidas = Math.min(3, Math.max(0, j.vidas + a.deltaVidas));
+    }
+  });
+
+  // En modo supervivencia, quienes fallaron pierden sus vidas al resolverse la ronda
+  if (sala.modo === 'supervivencia') {
+    sala.ronda.bloqueados.forEach((jId) => {
+      const j = sala.jugadores.find((x) => x.id === jId);
+      if (j) j.vidas = 0;
+    });
+  }
 }
 
 // 1. Crear sala online
@@ -183,7 +209,7 @@ router.post('/online/sala/:code/modo', (req, res) => {
   res.json({ success: true, modo: sala.modo });
 });
 
-// 4. Estado de la sala (sincroniza el tiempo y avanza pistas automáticamente)
+// 4. Estado de la sala (avanza pistas cada 10s sin pausas y oculta quién acertó hasta el final)
 router.get('/online/sala/:code', (req, res) => {
   const code = req.params.code.toUpperCase();
   const token = req.query.token;
@@ -196,35 +222,25 @@ router.get('/online/sala/:code', (req, res) => {
 
   const esAdmin = sala.adminToken === token;
 
-  // Lógica de avance de pistas cada 10 s cuando la ronda está activa
+  // Avance automático de pistas cada 10 s cuando la ronda está activa
   if (sala.estado === 'jugando' && sala.ronda && sala.ronda.estadoRonda === 'activa') {
-    if (!sala.ronda.estaPausado && !sala.ronda.pulsado) {
-      const ahora = Date.now();
-      const transcurrido = (ahora - sala.ronda.ultimaPistaTs) / 1000;
+    const ahora = Date.now();
+    const transcurrido = (ahora - sala.ronda.ultimaPistaTs) / 1000;
 
-      if (transcurrido >= 10) {
-        if (sala.ronda.pistasReveladas < 6) {
-          sala.ronda.pistasReveladas += 1;
-          sala.ronda.ultimaPistaTs = ahora;
-          sala.ronda.segundosRestantes = 10;
-        } else {
-          // Se agotan las 6 pistas
-          const item = PISTAS_SEED.find((p) => p.id === sala.ronda.id);
-          sala.ronda.estadoRonda = 'resuelta';
-          sala.ronda.solucion = item ? item.nombre : '';
-          sala.ronda.segundosRestantes = 0;
-          sala.ronda.mensaje = {
-            tipo: 'info',
-            texto: `¡Se acabaron las pistas! Nadie más ha acertado. Era: ${item?.nombre}`
-          };
-        }
+    if (transcurrido >= 10) {
+      if (sala.ronda.pistasReveladas < 6) {
+        sala.ronda.pistasReveladas += 1;
+        sala.ronda.ultimaPistaTs = ahora;
+        sala.ronda.segundosRestantes = 10;
       } else {
-        sala.ronda.segundosRestantes = Math.max(0, 10 - transcurrido);
+        resolverRondaOnline(sala);
       }
     } else {
-      sala.ronda.ultimaPistaTs = Date.now();
+      sala.ronda.segundosRestantes = Math.max(0, 10 - transcurrido);
     }
   }
+
+  const rondaActiva = sala.ronda?.estadoRonda === 'activa';
 
   res.json({
     success: true,
@@ -234,15 +250,34 @@ router.get('/online/sala/:code', (req, res) => {
     esAdmin,
     yoId: jugadorActual.id,
     rondaNum: sala.rondaNum,
-    jugadores: sala.jugadores.map((j) => ({
-      id: j.id,
-      nombre: j.nombre,
-      puntos: j.puntos,
-      vidas: j.vidas,
-      bloqueado: sala.ronda ? sala.ronda.bloqueados.includes(j.id) : false,
-      acerto: sala.ronda ? sala.ronda.acertados.some((a) => a.jugadorId === j.id) : false
-    })),
+    jugadores: sala.jugadores.map((j) => {
+      const bloqueadoReal = sala.ronda ? sala.ronda.bloqueados.includes(j.id) : false;
+      const acertoReal = sala.ronda ? sala.ronda.acertados.some((a) => a.jugadorId === j.id) : false;
+      const haRespondido = bloqueadoReal || acertoReal;
+      const esYo = j.id === jugadorActual.id;
+
+      return {
+        id: j.id,
+        nombre: j.nombre,
+        puntos: j.puntos,
+        vidas: j.vidas,
+        respondido: haRespondido,
+        // Mientras la ronda está activa, solo el propio jugador sabe si ha acertado o ha fallado
+        bloqueado: rondaActiva ? (esYo ? bloqueadoReal : false) : bloqueadoReal,
+        acerto: rondaActiva ? (esYo ? acertoReal : false) : acertoReal
+      };
+    }),
     ronda: sala.ronda
+      ? {
+          id: sala.ronda.id,
+          pistas: sala.ronda.pistas.slice(0, sala.ronda.pistasReveladas),
+          pistasReveladas: sala.ronda.pistasReveladas,
+          segundosRestantes: sala.ronda.segundosRestantes,
+          estadoRonda: sala.ronda.estadoRonda,
+          solucion: sala.ronda.estadoRonda === 'resuelta' ? sala.ronda.solucion : null,
+          acertados: sala.ronda.estadoRonda === 'resuelta' ? sala.ronda.acertados : []
+        }
+      : null
   });
 });
 
@@ -267,62 +302,28 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
   res.json({ success: true });
 });
 
-// 6. Pulsador rojo online: detiene el tiempo y asigna el turno a quien pulsó
-router.post('/online/sala/:code/pulsar', (req, res) => {
-  const code = req.params.code.toUpperCase();
-  const { token } = req.body || {};
-
-  const sala = salasOnline[code];
-  if (!sala || !sala.ronda) return res.status(404).json({ error: 'Partida no activa.' });
-
-  const jugador = sala.jugadores.find((j) => j.token === token);
-  if (!jugador) return res.status(403).json({ error: 'Jugador no válido.' });
-
-  if (sala.ronda.estadoRonda !== 'activa') return res.status(400).json({ error: 'La ronda ya terminó.' });
-  if (sala.ronda.pulsado !== null) return res.status(409).json({ error: 'Otro jugador ya ha pulsado el botón.' });
-  if (sala.ronda.bloqueados.includes(jugador.id)) return res.status(403).json({ error: 'Ya has fallado en esta ronda.' });
-  if (sala.ronda.acertados.some((a) => a.jugadorId === jugador.id)) return res.status(400).json({ error: 'Ya has acertado.' });
-  if (sala.modo === 'supervivencia' && jugador.vidas <= 0) return res.status(403).json({ error: 'No te quedan vidas.' });
-
-  sala.ronda.pulsado = {
-    jugadorId: jugador.id,
-    nombre: jugador.nombre,
-    texto: ''
-  };
-  sala.ronda.estaPausado = true;
-  sala.ronda.mensaje = {
-    tipo: 'info',
-    texto: `¡${jugador.nombre} ha pulsado el botón! Está respondiendo...`
-  };
-
-  res.json({ success: true });
-});
-
-// 7. Transmisión de tecleo en tiempo real
-router.post('/online/sala/:code/teclear', (req, res) => {
-  const code = req.params.code.toUpperCase();
-  const { token, texto } = req.body || {};
-
-  const sala = salasOnline[code];
-  if (!sala || !sala.ronda || !sala.ronda.pulsado) return res.json({ success: true });
-
-  const jugador = sala.jugadores.find((j) => j.token === token);
-  if (!jugador || sala.ronda.pulsado.jugadorId !== jugador.id) return res.json({ success: true });
-
-  sala.ronda.pulsado.texto = String(texto || '').slice(0, 80);
-  res.json({ success: true });
-});
-
-// 8. Responder y validar online
+// 6. Responder y validar online directamente en cualquier momento (sin detener el tiempo)
 router.post('/online/sala/:code/responder', (req, res) => {
   const code = req.params.code.toUpperCase();
   const { token, respuesta } = req.body || {};
 
   const sala = salasOnline[code];
-  if (!sala || !sala.ronda || !sala.ronda.pulsado) return res.status(400).json({ error: 'No hay turno para responder.' });
+  if (!sala || !sala.ronda || sala.ronda.estadoRonda !== 'activa') {
+    return res.status(400).json({ error: 'La ronda ya no está activa.' });
+  }
 
   const jugador = sala.jugadores.find((j) => j.token === token);
-  if (!jugador || sala.ronda.pulsado.jugadorId !== jugador.id) return res.status(403).json({ error: 'No es tu turno de responder.' });
+  if (!jugador) return res.status(403).json({ error: 'Jugador no válido.' });
+
+  const yaAcerto = sala.ronda.acertados.some((a) => a.jugadorId === jugador.id);
+  const yaFallo = sala.ronda.bloqueados.includes(jugador.id);
+  if (yaAcerto || yaFallo) {
+    return res.status(400).json({ error: 'Ya has enviado una respuesta en esta ronda.' });
+  }
+
+  if (sala.modo === 'supervivencia' && jugador.vidas <= 0) {
+    return res.status(403).json({ error: 'Estás eliminado.' });
+  }
 
   const item = PISTAS_SEED.find((p) => p.id === sala.ronda.id);
   const acierto = comprobarRespuesta(respuesta, item);
@@ -334,11 +335,9 @@ router.post('/online/sala/:code/responder', (req, res) => {
 
     if (sala.modo === 'estandar') {
       ptsGanados = 6 - pistaActual + 1;
-      jugador.puntos += ptsGanados;
     } else {
       if (pistaActual <= 2) deltaVidas = 1;
       else if (pistaActual >= 5) deltaVidas = -1;
-      jugador.vidas = Math.min(3, Math.max(0, jugador.vidas + deltaVidas));
     }
 
     sala.ronda.acertados.push({
@@ -348,82 +347,36 @@ router.post('/online/sala/:code/responder', (req, res) => {
       puntos: ptsGanados,
       deltaVidas
     });
-
-    sala.ronda.pulsado = null;
-    sala.ronda.estaPausado = false;
-    sala.ronda.ultimaPistaTs = Date.now();
-    sala.ronda.mensaje = {
-      tipo: 'success',
-      texto: `¡Correcto! ${jugador.nombre} acertó en la pista #${pistaActual}`
-    };
-
-    // Comprobar si todos los jugadores restantes ya han acertado o fallado
-    const activos = sala.jugadores.filter((j) => {
-      const yaAcerto = sala.ronda.acertados.some((a) => a.jugadorId === j.id);
-      const bloqueado = sala.ronda.bloqueados.includes(j.id);
-      const sinVidas = sala.modo === 'supervivencia' && j.vidas <= 0;
-      return !yaAcerto && !bloqueado && !sinVidas;
-    });
-
-    if (activos.length === 0) {
-      sala.ronda.estadoRonda = 'resuelta';
-      sala.ronda.solucion = item.nombre;
-    }
   } else {
-    // Respuesta incorrecta
-    if (sala.modo === 'estandar') {
-      sala.ronda.bloqueados.push(jugador.id);
-      sala.ronda.pulsado = null;
-      sala.ronda.estaPausado = false;
-      sala.ronda.ultimaPistaTs = Date.now();
-      sala.ronda.mensaje = {
-        tipo: 'error',
-        texto: `¡${jugador.nombre} ha fallado! Queda fuera de esta ronda.`
-      };
-    } else {
-      jugador.vidas = 0;
-      sala.ronda.bloqueados.push(jugador.id);
-      sala.ronda.pulsado = null;
-      sala.ronda.estaPausado = false;
-      sala.ronda.ultimaPistaTs = Date.now();
-      sala.ronda.mensaje = {
-        tipo: 'error',
-        texto: `¡${jugador.nombre} ha fallado y pierde todas sus vidas! 💀`
-      };
-    }
+    sala.ronda.bloqueados.push(jugador.id);
+  }
 
-    // Comprobar si todos han fallado
-    const activos = sala.jugadores.filter((j) => {
-      const yaAcerto = sala.ronda.acertados.some((a) => a.jugadorId === j.id);
-      const bloqueado = sala.ronda.bloqueados.includes(j.id);
-      const sinVidas = sala.modo === 'supervivencia' && j.vidas <= 0;
-      return !yaAcerto && !bloqueado && !sinVidas;
-    });
+  // Comprobar si todos los jugadores con vida ya han respondido en esta ronda
+  const pendientes = sala.jugadores.filter((j) => {
+    const acertoJ = sala.ronda.acertados.some((a) => a.jugadorId === j.id);
+    const bloqueadoJ = sala.ronda.bloqueados.includes(j.id);
+    const sinVidas = sala.modo === 'supervivencia' && j.vidas <= 0;
+    return !acertoJ && !bloqueadoJ && !sinVidas;
+  });
 
-    if (activos.length === 0) {
-      sala.ronda.estadoRonda = 'resuelta';
-      sala.ronda.solucion = item.nombre;
-    }
+  if (pendientes.length === 0) {
+    resolverRondaOnline(sala);
   }
 
   res.json({ success: true, acierto });
 });
 
-// 9. Finalizar ronda manualmente y ver solución
+// 7. Finalizar ronda manualmente y ver solución
 router.post('/online/sala/:code/solucion', (req, res) => {
   const code = req.params.code.toUpperCase();
   const sala = salasOnline[code];
   if (!sala || !sala.ronda) return res.status(404).json({ error: 'Ronda no activa.' });
 
-  const item = PISTAS_SEED.find((p) => p.id === sala.ronda.id);
-  sala.ronda.estadoRonda = 'resuelta';
-  sala.ronda.solucion = item ? item.nombre : '';
-  sala.ronda.pulsado = null;
-
-  res.json({ success: true, nombre: item ? item.nombre : '' });
+  resolverRondaOnline(sala);
+  res.json({ success: true, nombre: sala.ronda.solucion });
 });
 
-// 10. Siguiente ronda online
+// 8. Siguiente ronda online
 router.post('/online/sala/:code/siguiente-ronda', (req, res) => {
   const code = req.params.code.toUpperCase();
   const { token } = req.body || {};
@@ -445,7 +398,7 @@ router.post('/online/sala/:code/siguiente-ronda', (req, res) => {
   res.json({ success: true });
 });
 
-// 11. Finalizar partida y ver podio
+// 9. Finalizar partida y ver podio
 router.post('/online/sala/:code/finalizar', (req, res) => {
   const code = req.params.code.toUpperCase();
   const { token } = req.body || {};
@@ -457,7 +410,7 @@ router.post('/online/sala/:code/finalizar', (req, res) => {
   res.json({ success: true });
 });
 
-// 12. Reiniciar para nueva partida
+// 10. Reiniciar para nueva partida
 router.post('/online/sala/:code/reiniciar', (req, res) => {
   const code = req.params.code.toUpperCase();
   const { token } = req.body || {};
@@ -477,7 +430,7 @@ router.post('/online/sala/:code/reiniciar', (req, res) => {
   res.json({ success: true });
 });
 
-// 13. Salir
+// 11. Salir
 router.post('/online/sala/:code/salir', (req, res) => {
   const code = req.params.code.toUpperCase();
   const { token } = req.body || {};

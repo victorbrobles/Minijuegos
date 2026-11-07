@@ -5,9 +5,12 @@ import './Pistas.css';
 import { MenuInicioJuego, MenuModoOnline, FormCrearSala, FormUnirseSala, CabeceraSala } from '../../components/MenuJuego.jsx';
 
 const CLAVE_SESION_PISTAS = 'pistas_online_session';
+const COLORES_JUGADOR = ['#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316', '#84cc16', '#6366f1'];
+const colorJugador = (id) => COLORES_JUGADOR[(Number(id) - 1 + COLORES_JUGADOR.length * 10) % COLORES_JUGADOR.length];
+const inicial = (n = '?') => n.trim().charAt(0).toUpperCase() || '?';
 
 export default function PistasOnline({ onLocal, onSalir }) {
-  const [vista, setVista] = useState('menu'); // 'menu' | 'crear' | 'unirse' | 'sala'
+  const [vista, setVista] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
   const [nombre, setNombre] = useState('');
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -24,16 +27,11 @@ export default function PistasOnline({ onLocal, onSalir }) {
   });
 
   const [sala, setSala] = useState(null);
-  const [codigoCopiado, setCodigoCopiado] = useState(false);
   const [miTexto, setMiTexto] = useState('');
-  const [segundosRespuesta, setSegundosRespuesta] = useState(15);
+  const [enviandoRespuesta, setEnviandoRespuesta] = useState(false);
 
   const intervalRef = useRef(null);
-  const miTextoRef = useRef(miTexto);
-
-  useEffect(() => {
-    miTextoRef.current = miTexto;
-  }, [miTexto]);
+  const rondaIdRef = useRef(null);
 
   useEffect(() => {
     if (!sesion) {
@@ -71,54 +69,23 @@ export default function PistasOnline({ onLocal, onSalir }) {
     };
   }, [sesion]);
 
+  // Limpiar el input cuando cambia el número de ronda
+  useEffect(() => {
+    if (sala?.rondaNum && sala.rondaNum !== rondaIdRef.current) {
+      rondaIdRef.current = sala.rondaNum;
+      setMiTexto('');
+      setEnviandoRespuesta(false);
+    }
+  }, [sala?.rondaNum]);
+
   const ronda = sala?.ronda;
   const esAdmin = sala?.esAdmin;
   const yoId = sala?.yoId;
-  const soyElQueHaPulsado = Boolean(ronda?.pulsado && ronda.pulsado.jugadorId === yoId);
-  const alguienHaPulsado = Boolean(ronda?.pulsado);
   const miJugador = sala?.jugadores?.find((j) => j.id === yoId);
   const estoyBloqueado = Boolean(miJugador?.bloqueado);
   const yaHeAcertado = Boolean(miJugador?.acerto);
+  const yaHeRespondido = Boolean(miJugador?.respondido || estoyBloqueado || yaHeAcertado);
   const sinVidas = sala?.modo === 'supervivencia' && (miJugador?.vidas ?? 0) <= 0;
-
-  const handleTiempoAgotadoOnline = async () => {
-    if (!sesion) return;
-    const texto = miTextoRef.current.trim();
-    try {
-      await fetch(`/api/pistas/online/sala/${sesion.code}/responder`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion.token, respuesta: texto || ' ' })
-      });
-      setMiTexto('');
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  // Temporizador de 15 segundos para responder online
-  useEffect(() => {
-    if (!alguienHaPulsado) {
-      setSegundosRespuesta(15);
-      return;
-    }
-
-    setSegundosRespuesta(15);
-    const t = setInterval(() => {
-      setSegundosRespuesta((prev) => {
-        if (prev <= 0.1) {
-          clearInterval(t);
-          if (soyElQueHaPulsado) {
-            handleTiempoAgotadoOnline();
-          }
-          return 0;
-        }
-        return Math.max(0, prev - 0.1);
-      });
-    }, 100);
-
-    return () => clearInterval(t);
-  }, [alguienHaPulsado, soyElQueHaPulsado]);
 
   const handleCrear = async () => {
     if (!nombre.trim()) return;
@@ -192,56 +159,23 @@ export default function PistasOnline({ onLocal, onSalir }) {
     }
   };
 
-  const handlePulsarRojo = async () => {
-    if (!sesion) return;
-    try {
-      setMiTexto('');
-      setSegundosRespuesta(15);
-      await fetch(`/api/pistas/online/sala/${sesion.code}/pulsar`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion.token })
-      });
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleCambioTexto = (val) => {
-    setMiTexto(val);
-    if (!sesion) return;
-    fetch(`/api/pistas/online/sala/${sesion.code}/teclear`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: sesion.token, texto: val })
-    }).catch(() => {});
-  };
-
-  const handleEnviarRespuesta = async (e) => {
+  const handleEnviarRespuestaDirecta = async (e) => {
     if (e) e.preventDefault();
-    if (!miTexto.trim() || !sesion) return;
+    const textoLimpio = miTexto.trim();
+    if (!textoLimpio || !sesion || yaHeRespondido || sinVidas || enviandoRespuesta) return;
+
+    setEnviandoRespuesta(true);
     try {
       await fetch(`/api/pistas/online/sala/${sesion.code}/responder`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion.token, respuesta: miTexto })
+        body: JSON.stringify({ token: sesion.token, respuesta: textoLimpio })
       });
       setMiTexto('');
     } catch (err) {
       console.error(err);
-    }
-  };
-
-  const handleForzarSolucion = async () => {
-    if (!sesion) return;
-    try {
-      await fetch(`/api/pistas/online/sala/${sesion.code}/solucion`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion.token })
-      });
-    } catch (err) {
-      console.error(err);
+    } finally {
+      setEnviandoRespuesta(false);
     }
   };
 
@@ -291,7 +225,8 @@ export default function PistasOnline({ onLocal, onSalir }) {
         await fetch(`/api/pistas/online/sala/${sesion.code}/salir`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token: sesion.token })
+          body: JSON.stringify({ token: sesion.token }),
+          keepalive: true
         });
       } catch {
         /* ignorar */
@@ -303,51 +238,36 @@ export default function PistasOnline({ onLocal, onSalir }) {
     setVista('online_menu');
   };
 
-  const copiarCodigo = () => {
-    if (!sala?.code) return;
-    navigator.clipboard?.writeText(sala.code);
-    setCodigoCopiado(true);
-    setTimeout(() => setCodigoCopiado(false), 2000);
-  };
-
-  // Mostrar ayuda solo en menús y en la sala de espera (lobby)
+  const ranking = [...(sala?.jugadores || [])].sort((a, b) => (b.puntos ?? 0) - (a.puntos ?? 0));
+  const maximoPuntos = ranking.length ? (ranking[0].puntos ?? 0) : 0;
+  const enPartidaActiva = vista === 'sala' && sala && sala.estado !== 'lobby';
 
   return (
-    <div className="aprox-contenedor">
-      {/* ---------------- BOTÓN Y MODAL DE AYUDA ---------------- */}
-
+    <div className={`pts-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+      {/* MODAL DE AYUDA */}
       {modalAyuda && (
         <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
-          <div className="rg-modal modal-ayuda-juego" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-ayuda-header">
-              <span className="modal-ayuda-signo-title">?</span>
-              <h3>¿Cómo se juega a 6 Pistas?</h3>
+          <div className="rg-modal ptp-modal-ayuda" onClick={(e) => e.stopPropagation()}>
+            <div className="ptp-modal-ayuda-header">
+              <span className="ptp-ayuda-badge">❓ Cómo jugar</span>
+              <h3>6 Pistas</h3>
             </div>
 
-            <div className="modal-ayuda-cuerpo">
-              <p><strong>1. Dinámica del juego:</strong></p>
+            <div className="ptp-modal-ayuda-body">
+              <p>Descubre el personaje, película, lugar o canción secreta antes que los demás.</p>
               <ul>
-                <li>Se van descubriendo hasta 6 pistas de un enigma (canción, película, personaje, etc.).</li>
-                <li>Hay <strong>10 segundos</strong> por pista.</li>
-                <li><strong>Pulsa el botón rojo</strong> para parar el tiempo e introducir tu respuesta. Dispones de <strong>15 segundos</strong> para responder.</li>
-              </ul>
-              <p><strong>2. Puntuación (Estándar):</strong></p>
-              <ul>
-                <li>Pista 1: <strong>+6 pts</strong> | Pista 2: <strong>+5 pts</strong></li>
-                <li>Pistas 3 y 4: <strong>4 y 3 pts</strong> | Pistas 5 y 6: <strong>2 y 1 pt</strong></li>
-                <li>Si fallas o se te acaba el tiempo, quedas eliminado exclusivamente durante esa ronda.</li>
+                <li><strong>6 pistas progresivas:</strong> Se descubre una nueva pista cada <strong>10 segundos</strong>.</li>
+                <li><strong>Respuesta secreta en cualquier momento:</strong> Escribe y envía tu respuesta cuando quieras desde tu móvil. Los demás solo verán un icono de que ya has respondido (✅), pero no sabrán qué has puesto ni si has acertado hasta que termine la ronda.</li>
+                <li><strong>Fin de ronda automático:</strong> Cuando todos hayan respondido o se acabe el tiempo de la 6.ª pista, se mostrará la solución y las puntuaciones.</li>
               </ul>
             </div>
 
-            <div className="rg-modal-acciones">
-              <button className="big full" onClick={() => setModalAyuda(false)}>
-                Entendido
-              </button>
-            </div>
+            <button type="button" className="ptp-boton" onClick={() => setModalAyuda(false)}>
+              ¡Entendido!
+            </button>
           </div>
         </div>
       )}
-      {/* ---------------- FIN AYUDA ---------------- */}
 
       {/* 1. MENÚ PRINCIPAL */}
       {vista === 'menu' && (
@@ -465,23 +385,22 @@ export default function PistasOnline({ onLocal, onSalir }) {
               <p className="hint">En cuanto comience la partida, verás aparecer las pistas.</p>
             </div>
           )}
-
         </section>
       )}
 
       {/* 5. SALA: PODIO FINAL */}
       {vista === 'sala' && sala && sala.estado === 'final' && (
-        <section className="game">
+        <section className="game ptp-escena">
           <div className="end-card">
             <span className="end-icon"><Icon name="crown" size={44} /></span>
             <h1 className="title">Puntuaciones finales</h1>
-            <p className="categoria"><Icon name="flagFinish" size={16} />Partida finalizada</p>
+            <p className="categoria"><Icon name="flagFinish" size={16} /> Partida finalizada</p>
 
             <div className="scoreboard" style={{ marginTop: '1.2rem' }}>
-              {[...sala.jugadores].sort((a, b) => b.puntos - a.puntos).map((j, idx) => (
-                <div key={j.id} className={`score-row ${idx === 0 ? 'first' : ''}`}>
+              {ranking.map((j, idx) => (
+                <div key={j.id} className={`score-row ${idx === 0 && maximoPuntos > 0 ? 'first' : ''}`}>
                   <span className="score-name">
-                    {idx === 0 ? <Icon name="crown" size={22} /> : <span className="pos">{idx + 1}</span>}
+                    {idx === 0 && maximoPuntos > 0 ? <Icon name="crown" size={22} /> : <span className="pos">{idx + 1}</span>}
                     {j.nombre} {j.id === yoId ? '(Tú)' : ''}
                   </span>
                   <span className="score-pts">
@@ -492,289 +411,237 @@ export default function PistasOnline({ onLocal, onSalir }) {
             </div>
           </div>
 
-          <div className="actions" style={{ marginTop: '1.5rem' }}>
+          <div className="ptp-barra estatica">
             {esAdmin && (
-              <button className="big full" onClick={handleReiniciarPartida}>
+              <button type="button" className="ptp-boton grande" onClick={handleReiniciarPartida}>
                 <Icon name="refresh" size={20} /> Otra Partida (mismos jugadores)
               </button>
             )}
-            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
-              <Icon name="door" size={20} /> Salir al menú principal
+            <button type="button" className="ptp-boton secundario" onClick={() => setModalSalir(true)}>
+              <Icon name="door" size={20} /> Salir de la sala
             </button>
           </div>
         </section>
       )}
 
-      {/* 6. SALA: JUGANDO ONLINE */}
-      {vista === 'sala' && sala && sala.estado === 'jugando' && ronda && (
-        <section className="game">
-          <div className="hud">
-            <span className="chip"><Icon name="flagFinish" size={18} />Ronda {sala.rondaNum}</span>
-            <span className="chip alt">
-              {sala.modo === 'estandar'
-                ? `Pista ${ronda.pistasReveladas}/6 (${6 - ronda.pistasReveladas + 1} pts)`
-                : `Supervivencia · Pista ${ronda.pistasReveladas}/6`}
+      {/* 6A. SALA: JUGANDO ONLINE (RONDA ACTIVA) */}
+      {vista === 'sala' && sala && sala.estado === 'jugando' && ronda && ronda.estadoRonda === 'activa' && (
+        <section className="game ptp-escena">
+          <header className="ptp-hero">
+            <span className="ptp-hero-deco" aria-hidden="true">
+              <Icon name="detective" size={140} strokeWidth={1.3} />
+            </span>
+            <div className="ptp-hero-top">
+              <button type="button" className="ptp-salir" onClick={() => setModalSalir(true)}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                <span>Portada</span>
+              </button>
+              <div className="ptp-hero-chips">
+                <span className="ptp-chip"><Icon name="flagFinish" size={14} /> Ronda {sala.rondaNum}</span>
+                <span className="ptp-chip">
+                  {sala.modo === 'estandar'
+                    ? `Pista ${ronda.pistasReveladas}/6 · +${6 - ronda.pistasReveladas + 1} pts`
+                    : `Supervivencia · ${ronda.pistasReveladas}/6`}
+                </span>
+              </div>
+            </div>
+
+            <ol className="ptp-marcador" aria-label="Estado de los jugadores">
+              {sala.jugadores.map((j) => {
+                const haRespondido = Boolean(j.respondido || j.acerto || j.bloqueado);
+                const eliminadoSupervivencia = sala.modo === 'supervivencia' && j.vidas <= 0;
+                return (
+                  <li
+                    key={j.id}
+                    className={`ptp-jugador${haRespondido ? ' respondido' : ''}${j.id === yoId ? ' yo' : ''}${eliminadoSupervivencia ? ' eliminado' : ''}`}
+                    style={{ '--c': colorJugador(j.id) }}
+                  >
+                    <span className="ptp-jugador-avatar">{inicial(j.nombre)}</span>
+                    <span className="ptp-jugador-datos">
+                      <span className="ptp-jugador-nombre">
+                        {j.nombre}{j.id === yoId ? ' (tú)' : ''}
+                      </span>
+                      <span className="ptp-jugador-linea">
+                        <strong>
+                          {sala.modo === 'estandar'
+                            ? `${j.puntos} pts`
+                            : j.vidas > 0
+                            ? '♥'.repeat(j.vidas)
+                            : 'Eliminado'}
+                        </strong>
+                      </span>
+                    </span>
+                    <span
+                      className="ptp-jugador-estado"
+                      title={haRespondido ? 'Ya ha respondido' : 'Pendiente de responder'}
+                    >
+                      {haRespondido ? '✅' : '⏳'}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+          </header>
+
+          {/* Barra de tiempo */}
+          <div className={`ptp-tiempo ${ronda.segundosRestantes <= 3 ? 'critico' : ''}`} role="timer">
+            <div className="ptp-tiempo-barra">
+              <span style={{ width: `${(ronda.segundosRestantes / 10) * 100}%` }} />
+            </div>
+            <span className="ptp-tiempo-num">
+              <Icon name="clock" size={15} /> {Math.ceil(ronda.segundosRestantes)}s
             </span>
           </div>
 
-          <div className="timer" role="timer">
-            <div
-              className={`timer-bar ${ronda.segundosRestantes <= 3 ? 'low' : ''}`}
-              style={{ width: `${(ronda.segundosRestantes / 10) * 100}%` }}
-            />
-          </div>
-          <p className="timer-text" style={{ margin: '0.4rem 0 0.8rem' }}>
-            <Icon name="clock" size={16} />
-            {alguienHaPulsado
-              ? `Turno de ${ronda.pulsado.nombre}...`
-              : `${Math.ceil(ronda.segundosRestantes)} s para siguiente pista`}
-          </p>
-
-          <div className="scoreboard-container" style={{ justifyContent: 'center', marginBottom: '0.8rem' }}>
-            {sala.jugadores.map((j) => (
-              <div key={j.id} className={`score-pill ${j.bloqueado ? 'locked' : ''}`}>
-                <span>
-                  {j.nombre}: <strong>{sala.modo === 'estandar' ? `${j.puntos} pts` : j.vidas > 0 ? '❤️'.repeat(j.vidas) : '💀'}</strong>
-                </span>
-                {j.acerto && <span style={{ marginLeft: '4px' }}>✅</span>}
-                {j.bloqueado && <span style={{ marginLeft: '4px' }}>❌</span>}
-              </div>
-            ))}
-          </div>
-
-          <div className="panel pts-pistas-box">
-            <h3 className="panel-title">
-              <Icon name="eye" size={20} /> Pistas descubiertas ({ronda.pistasReveladas}/6)
-            </h3>
-            <div className="pts-pistas-lista">
+          {/* Pistas descubiertas */}
+          <div className="ptp-tarjeta">
+            <div className="ptp-tarjeta-cab">
+              <p className="ptp-etiqueta">Pistas descubiertas</p>
+              <span className="ptp-badge-pista">{ronda.pistasReveladas} de 6</span>
+            </div>
+            <div className="ptp-pistas-lista">
               {ronda.pistas.slice(0, ronda.pistasReveladas).map((pistaTexto, idx) => {
                 const esUltima = idx === ronda.pistasReveladas - 1;
                 return (
-                  <div key={idx} className={`pts-pista-item ${esUltima ? 'actual' : ''}`}>
-                    <span className="pts-pista-numero">#{idx + 1}</span>
-                    <p className="pts-pista-txt">{pistaTexto}</p>
+                  <div key={idx} className={`ptp-pista-item ${esUltima ? 'actual' : ''}`}>
+                    <span className="ptp-pista-numero">{idx + 1}</span>
+                    <p className="ptp-pista-txt">{pistaTexto}</p>
                   </div>
                 );
               })}
             </div>
           </div>
 
-          {ronda.estadoRonda === 'activa' ? (
-            <div className="interactive-controls" style={{ marginTop: '0.8rem' }}>
-              {!alguienHaPulsado && (
-                <div className="pulsador-container">
-                  <button
-                    type="button"
-                    className="btn-pulsador-rojo"
-                    onClick={handlePulsarRojo}
-                    disabled={estoyBloqueado || yaHeAcertado || sinVidas}
-                  >
-                    <span className="pulsador-icono">🔴</span>
-                    <span className="pulsador-texto">
-                      {estoyBloqueado
-                        ? 'BLOQUEADO EN ESTA RONDA'
-                        : yaHeAcertado
-                        ? '¡YA HAS ACERTADO!'
-                        : sinVidas
-                        ? 'SIN VIDAS 💀'
-                        : '¡PULSAR PARA RESPONDER!'}
-                    </span>
-                  </button>
-
-                  {ronda.pistasReveladas === 6 && (
-                    <button
-                      type="button"
-                      className="secondary danger full"
-                      style={{ marginTop: '0.6rem' }}
-                      onClick={handleForzarSolucion}
-                    >
-                      <Icon name="flag" size={18} /> Finalizar ronda y ver solución
-                    </button>
-                  )}
-                </div>
-              )}
-
-              {soyElQueHaPulsado && (
-                <form onSubmit={handleEnviarRespuesta} className="respuesta-pulsada-box">
-                  <div className="respuesta-pulsada-header">
-                    <span className="pulsado-badge">🔴 ¡Has pulsado! Tiempo detenido</span>
-                    <p className="hint small" style={{ margin: '0.3rem 0 0.4rem' }}>
-                      Escribe la respuesta. Los demás están viendo lo que escribes en directo:
-                    </p>
-
-                    {/* Temporizador de 15 segundos */}
-                    <div
-                      className="timer"
-                      role="timer"
-                      style={{
-                        margin: '0.6rem 0 0.3rem',
-                        background: '#e2e8f0',
-                        borderRadius: '9999px',
-                        height: '8px',
-                        overflow: 'hidden'
-                      }}
-                    >
-                      <div
-                        className={`timer-bar ${segundosRespuesta <= 4 ? 'low' : ''}`}
-                        style={{
-                          width: `${(segundosRespuesta / 15) * 100}%`,
-                          height: '100%',
-                          backgroundColor: segundosRespuesta <= 4 ? '#ef4444' : '#16a34a',
-                          borderRadius: '9999px',
-                          transition: 'width 0.1s linear, background-color 0.3s ease'
-                        }}
-                      />
-                    </div>
-                    <p
-                      className="timer-text"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '0.35rem',
-                        color: segundosRespuesta <= 4 ? '#dc2626' : '#64748b',
-                        fontSize: '0.9rem',
-                        fontWeight: 700,
-                        margin: '0 0 0.8rem'
-                      }}
-                    >
-                      <Icon name="clock" size={16} />
-                      {Math.ceil(segundosRespuesta)} s
-                    </p>
-                  </div>
-
-                  <div className="answer-form">
-                    <input
-                      autoFocus
-                      type="text"
-                      className="player-text-input respuesta-input-grande"
-                      placeholder="Película, canción, objeto, etc..."
-                      value={miTexto}
-                      onChange={(e) => handleCambioTexto(e.target.value)}
-                    />
-                    <button
-                      type="submit"
-                      className="btn-start"
-                      disabled={!miTexto.trim()}
-                    >
-                      Responder
-                    </button>
-                  </div>
-                </form>
-              )}
-
-              {alguienHaPulsado && !soyElQueHaPulsado && (
-                <div className="online-tecleo-preview-card">
-                  <div className="online-tecleo-header">
-                    <span className="pulsador-icono">🔴</span>
-                    <strong>¡{ronda.pulsado.nombre} ha pulsado el botón!</strong>
-                  </div>
-                  <p className="hint small" style={{ margin: '0.4rem 0 0.4rem' }}>
-                    Tiempo detenido. Está escribiendo su respuesta en directo:
+          {/* Caja de respuesta individual */}
+          <div className="ptp-tarjeta ptp-online-respuesta">
+            {!yaHeRespondido && !sinVidas ? (
+              <form onSubmit={handleEnviarRespuestaDirecta} className="ptp-form-online">
+                <label className="ptp-etiqueta" htmlFor="ptp-online-input">
+                  Tu respuesta (puedes enviarla en cualquier momento)
+                </label>
+                <input
+                  id="ptp-online-input"
+                  type="text"
+                  className="ptp-input"
+                  placeholder="Escribe el personaje, película, canción…"
+                  value={miTexto}
+                  onChange={(e) => setMiTexto(e.target.value)}
+                  disabled={enviandoRespuesta}
+                  autoComplete="off"
+                />
+                <button
+                  type="submit"
+                  className="ptp-boton"
+                  disabled={!miTexto.trim() || enviandoRespuesta}
+                >
+                  <Icon name="check" size={20} /> Enviar respuesta
+                </button>
+              </form>
+            ) : (
+              <div className={`ptp-estado-mi-respuesta ${yaHeAcertado ? 'acierto' : 'bloqueado'}`}>
+                <span className="ptp-estado-icono">
+                  {sinVidas ? '💀' : yaHeAcertado ? '🎉' : '❌'}
+                </span>
+                <div>
+                  <strong>
+                    {sinVidas
+                      ? 'Estás eliminado de la partida'
+                      : yaHeAcertado
+                      ? '¡Has acertado el enigma!'
+                      : 'Has fallado en esta ronda'}
+                  </strong>
+                  <p>
+                    {sinVidas
+                      ? 'Espera a que tus compañeros terminen la ronda.'
+                      : 'Los demás solo ven un ✅ junto a tu nombre. La ronda terminará cuando todos respondan o se agote el tiempo.'}
                   </p>
-
-                  {/* Temporizador de 15 segundos visible para los rivales */}
-                  <div
-                    className="timer"
-                    role="timer"
-                    style={{
-                      margin: '0.6rem 0 0.3rem',
-                      background: '#e2e8f0',
-                      borderRadius: '9999px',
-                      height: '8px',
-                      overflow: 'hidden'
-                    }}
-                  >
-                    <div
-                      className={`timer-bar ${segundosRespuesta <= 4 ? 'low' : ''}`}
-                      style={{
-                        width: `${(segundosRespuesta / 15) * 100}%`,
-                        height: '100%',
-                        backgroundColor: segundosRespuesta <= 4 ? '#ef4444' : '#16a34a',
-                        borderRadius: '9999px',
-                        transition: 'width 0.1s linear, background-color 0.3s ease'
-                      }}
-                    />
-                  </div>
-                  <p
-                    className="timer-text"
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '0.35rem',
-                      color: segundosRespuesta <= 4 ? '#dc2626' : '#64748b',
-                      fontSize: '0.9rem',
-                      fontWeight: 700,
-                      margin: '0 0 0.8rem'
-                    }}
-                  >
-                    <Icon name="clock" size={16} />
-                    {Math.ceil(segundosRespuesta)} s
-                  </p>
-
-                  <div className="online-tecleo-box">
-                    {ronda.pulsado.texto ? (
-                      <span className="online-tecleo-texto">{ronda.pulsado.texto}</span>
-                    ) : (
-                      <span className="online-tecleo-esperando">Escribiendo...</span>
-                    )}
-                  </div>
                 </div>
-              )}
-
-              {ronda.mensaje && (
-                <div className={`status-alert ${ronda.mensaje.tipo}`} style={{ marginTop: '1rem' }}>
-                  {ronda.mensaje.texto}
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="round-finished-box">
-              <p className="rg-nombre-famoso" style={{ fontSize: '1.4rem' }}>
-                Era: <strong>{ronda.solucion}</strong>
-              </p>
-
-              <div className="pts-resumen-aciertos" style={{ margin: '1rem 0' }}>
-                {ronda.acertados && ronda.acertados.length > 0 ? (
-                  ronda.acertados.map((a) => (
-                    <div key={a.jugadorId} className="pts-acierto-item">
-                      <span><strong>{a.nombre}</strong> acertó en la pista #{a.pistaNum}</span>
-                      <strong>
-                        {sala.modo === 'estandar'
-                          ? `+${a.puntos} pts`
-                          : a.deltaVidas > 0
-                          ? '+1 ❤️'
-                          : a.deltaVidas < 0
-                          ? '-1 ❤️'
-                          : 'Mantiene ❤️'}
-                      </strong>
-                    </div>
-                  ))
-                ) : (
-                  <p className="hint center">Nadie ha conseguido adivinar este enigma.</p>
-                )}
               </div>
+            )}
+          </div>
+        </section>
+      )}
 
-              {esAdmin ? (
-                <div className="round-finished-actions">
-                  <button className="btn-start" onClick={handleSiguienteRonda}>
-                    Siguiente Ronda ➔
-                  </button>
-                  <button className="btn-secondary-action" onClick={handleFinalizarPartida}>
-                    Finalizar Partida 🏆
-                  </button>
-                </div>
+      {/* 6B. SALA: FIN DE LA RONDA (AUTOMÁTICO CUANDO TODOS RESPONDEN O ACABA EL TIEMPO) */}
+      {vista === 'sala' && sala && sala.estado === 'jugando' && ronda && ronda.estadoRonda === 'resuelta' && (
+        <section className="game ptp-escena">
+          <header className="ptp-hero">
+            <span className="ptp-hero-deco" aria-hidden="true">
+              <Icon name="trophy" size={140} strokeWidth={1.3} />
+            </span>
+            <div className="ptp-hero-top">
+              <button type="button" className="ptp-salir" onClick={() => setModalSalir(true)}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                <span>Salir</span>
+              </button>
+              <span className="ptp-chip"><Icon name="flagFinish" size={14} /> Fin de la ronda {sala.rondaNum}</span>
+            </div>
+            <p className="ptp-etiqueta" style={{ color: 'rgba(255,255,255,0.85)' }}>La respuesta correcta era</p>
+            <h2 className="ptp-solucion-titulo">{ronda.solucion}</h2>
+          </header>
+
+          <div className="ptp-tarjeta">
+            <p className="ptp-etiqueta">Resumen de la ronda</p>
+            <div className="ptp-resumen-lista">
+              {ronda.acertados && ronda.acertados.length > 0 ? (
+                ronda.acertados.map((a) => (
+                  <div key={a.jugadorId} className="ptp-acierto-item">
+                    <span>🎉 <strong>{a.nombre}</strong> acertó en la pista #{a.pistaNum}</span>
+                    <strong>
+                      {sala.modo === 'estandar'
+                        ? `+${a.puntos} pts`
+                        : a.deltaVidas > 0
+                        ? '+1 ❤️'
+                        : a.deltaVidas < 0
+                        ? '-1 ❤️'
+                        : 'Mantiene ❤️'}
+                    </strong>
+                  </div>
+                ))
               ) : (
-                <p className="hint center">Esperando a que el anfitrión avance de ronda...</p>
+                <p className="hint" style={{ margin: '0.4rem 0' }}>Nadie ha conseguido adivinar este enigma.</p>
               )}
             </div>
-          )}
+          </div>
 
-          <div className="actions" style={{ marginTop: '1.2rem' }}>
-            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
-              <Icon name="door" size={20} /> Salir de la sala
-            </button>
+          <div className="ptp-tarjeta">
+            <p className="ptp-etiqueta">Clasificación general</p>
+            <ol className="ptp-ranking">
+              {ranking.map((j, i) => {
+                const pts = j.puntos ?? 0;
+                const v = j.vidas ?? 0;
+                const esLider = maximoPuntos > 0 && pts === maximoPuntos && sala.modo === 'estandar';
+                return (
+                  <li key={j.id} className={esLider ? 'lider' : ''} style={{ '--c': colorJugador(j.id) }}>
+                    <span className="ptp-ranking-pos">{esLider ? <Icon name="crown" size={18} /> : i + 1}</span>
+                    <span className="ptp-jugador-avatar">{inicial(j.nombre)}</span>
+                    <span className="ptp-ranking-nombre">
+                      {j.nombre}{j.id === yoId ? ' (tú)' : ''}
+                    </span>
+                    <strong>{sala.modo === 'estandar' ? `${pts} pts` : v > 0 ? '❤️'.repeat(v) : '💀 Eliminado'}</strong>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+
+          <div className="ptp-barra estatica">
+            {esAdmin ? (
+              <>
+                <button type="button" className="ptp-boton grande" onClick={handleSiguienteRonda}>
+                  <Icon name="play" size={20} /> Siguiente ronda ({sala.rondaNum + 1})
+                </button>
+                <button type="button" className="ptp-enlace" onClick={handleFinalizarPartida}>
+                  <Icon name="trophy" size={16} /> Finalizar partida
+                </button>
+              </>
+            ) : (
+              <p className="ptp-espera">Esperando a que el anfitrión inicie la siguiente ronda o finalice la partida…</p>
+            )}
           </div>
         </section>
       )}
@@ -782,31 +649,18 @@ export default function PistasOnline({ onLocal, onSalir }) {
       {/* MODAL DE CONFIRMACIÓN PARA SALIR */}
       {modalSalir && (
         <div className="rg-modal-fondo" onClick={() => setModalSalir(false)}>
-          <div 
-            className="rg-modal" 
-            onClick={(e) => e.stopPropagation()} 
-            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
-          >
-            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
-            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
-              ¿Abandonar la partida?
-            </h3>
-            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
-              Si sales de la sala perderás tu progreso actual en la partida. ¿Estás seguro de que deseas salir?
-            </p>
+          <div className="rg-modal ptp-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="ptp-modal-icono">🚪</div>
+            <h3>¿Salir de la sala?</h3>
+            <p className="hint">Si sales ahora abandonarás la partida en curso. ¿Estás seguro?</p>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
-              <button 
-                type="button" 
-                className="secondary full" 
-                onClick={() => setModalSalir(false)}
-              >
-                No, quedarme
+            <div className="ptp-fila-botones">
+              <button type="button" className="ptp-boton secundario" onClick={() => setModalSalir(false)}>
+                Quedarme
               </button>
-              <button 
-                type="button" 
-                className="secondary danger full" 
-                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
+              <button
+                type="button"
+                className="ptp-boton peligro"
                 onClick={() => {
                   setModalSalir(false);
                   handleSalir();
