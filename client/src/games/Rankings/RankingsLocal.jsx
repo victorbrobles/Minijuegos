@@ -5,6 +5,7 @@ import Icon from '../../components/Icon.jsx';
 import GameIntro from '../../components/GameIntro.jsx';
 import CategoryCard from '../../components/CategoryCard.jsx';
 import './Rankings.css';
+import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx';
 
 const TIEMPO_TURNO = 90;
 const PREPARACION_S = 3;
@@ -466,14 +467,6 @@ export default function RankingsLocal({ onVolver, onExit }) {
     <div className="rk-contenedor">
       {paso === 'selector' && (
         <>
-          <button
-            type="button"
-            className="rk-btn-ayuda"
-            onClick={() => setModalAyuda(true)}
-            title="Reglas y sistema de puntuación"
-          >
-            <span className="rk-btn-ayuda-signo">?</span>
-          </button>
 
           {modalAyuda && (
             <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
@@ -529,61 +522,30 @@ export default function RankingsLocal({ onVolver, onExit }) {
 
       {/* 1. SELECTOR PRINCIPAL */}
       {paso === 'selector' && (
-        <section className="game">
-          <GameIntro gameId="rankings" titulo="Completar Rankings" />
-
-          <div className="panel">
-            <div className="hud" style={{ marginBottom: '1rem' }}>
-              <button className="btn-back-inline" onClick={onVolver}>
-                &larr; Cambiar a modo Online
-              </button>
-            </div>
-
-            <h3 className="panel-title"><Icon name="users" size={22} />Jugadores</h3>
-            <label className="field-label" htmlFor="num-jugadores">
-              Número de jugadores ({MIN_JUGADORES} a {MAX_JUGADORES})
-            </label>
-            <select
-              id="num-jugadores"
-              value={jugadores.length}
-              onChange={handleNumJugadoresChange}
-            >
-              {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => (
-                <option key={i + MIN_JUGADORES} value={i + MIN_JUGADORES}>
-                  {i + MIN_JUGADORES} jugadores
-                </option>
-              ))}
-            </select>
-
-            <span className="field-label">Nombres</span>
-            <div className="names-grid">
-              {jugadores.map((j, idx) => (
-                <input
-                  key={j.id}
-                  type="text"
-                  value={j.nombre}
-                  onChange={(e) => handleNombreChange(idx, e.target.value)}
-                  placeholder={`Jugador ${j.id}`}
-                  aria-label={`Nombre del jugador ${j.id}`}
-                  maxLength={30}
+        <SelectorJugadores
+          onVolver={onVolver}
+          onAyuda={() => setModalAyuda(true)}
+          min={MIN_JUGADORES}
+          max={MAX_JUGADORES}
+          numJugadores={jugadores.length}
+          onCambiarNum={(n) => handleNumJugadoresChange({ target: { value: n } })}
+          nombres={jugadores}
+          onNombre={handleNombreChange}
+        >
+          <BloqueConfig titulo="Elige una categoría para empezar">
+            <div className="cat-grid">
+              <CategoryCard todas nombre="Todas las categorías" onClick={() => iniciarPartidaConCategoria(null)} />
+              {categoriasDatos.categorias.map((c, i) => (
+                <CategoryCard
+                  key={c.nombre}
+                  nombre={c.nombre}
+                  indice={i}
+                  onClick={() => iniciarPartidaConCategoria(c.nombre)}
                 />
               ))}
             </div>
-          </div>
-
-          <h3 className="section-title">Elige una categoría</h3>
-          <div className="cat-grid">
-            <CategoryCard todas nombre="Todas las categorías" onClick={() => iniciarPartidaConCategoria(null)} />
-            {categoriasDatos.categorias.map((c, i) => (
-              <CategoryCard
-                key={c.nombre}
-                nombre={c.nombre}
-                indice={i}
-                onClick={() => iniciarPartidaConCategoria(c.nombre)}
-              />
-            ))}
-          </div>
-        </section>
+          </BloqueConfig>
+        </SelectorJugadores>
       )}
 
       {/* 2. ELECCIÓN ENTRE RONDAS */}

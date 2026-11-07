@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
 import './Pistas.css';
+import { MenuInicioJuego, MenuModoOnline, FormCrearSala, FormUnirseSala, CabeceraSala } from '../../components/MenuJuego.jsx';
 
 const CLAVE_SESION_PISTAS = 'pistas_online_session';
 
@@ -57,7 +58,7 @@ export default function PistasOnline({ onLocal, onSalir }) {
           sessionStorage.removeItem(CLAVE_SESION_PISTAS);
           setSesion(null);
           setSala(null);
-          setVista('menu');
+          setVista('online_menu');
           setErrorMsg('La sala se ha cerrado o se ha perdido la conexión.');
         });
     };
@@ -299,7 +300,7 @@ export default function PistasOnline({ onLocal, onSalir }) {
     sessionStorage.removeItem(CLAVE_SESION_PISTAS);
     setSesion(null);
     setSala(null);
-    setVista('menu');
+    setVista('online_menu');
   };
 
   const copiarCodigo = () => {
@@ -310,21 +311,10 @@ export default function PistasOnline({ onLocal, onSalir }) {
   };
 
   // Mostrar ayuda solo en menús y en la sala de espera (lobby)
-  const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
 
   return (
     <div className="aprox-contenedor">
       {/* ---------------- BOTÓN Y MODAL DE AYUDA ---------------- */}
-      {mostrarAyuda && (
-        <button
-          type="button"
-          className="btn-ayuda-flotante"
-          onClick={() => setModalAyuda(true)}
-          title="Reglas y puntuación"
-        >
-          <span className="btn-ayuda-flotante-signo">?</span>
-        </button>
-      )}
 
       {modalAyuda && (
         <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
@@ -361,171 +351,60 @@ export default function PistasOnline({ onLocal, onSalir }) {
 
       {/* 1. MENÚ PRINCIPAL */}
       {vista === 'menu' && (
-        <section className="game">
-          <div className="panel center">
-            <span className="lb-luna chica">
-              <Icon name="letters" size={42} strokeWidth={1.6} />
-            </span>
-            <h1 className="title">6 Pistas</h1>
-            <p className="hint">
-              Adivina películas, canciones y enigmas por pistas progresivas. El anfitrión crea la sala y comparte el código.
-            </p>
+        <MenuInicioJuego
+          juegoId="pistas"
+          onOnline={() => { setVista('online_menu'); setErrorMsg(''); }}
+          onLocal={onLocal}
+          onAyuda={() => setModalAyuda(true)}
+          error={errorMsg}
+        />
+      )}
 
-            {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
-
-            <div className="lb-menu">
-              <button className="big full" onClick={() => { setVista('crear'); setErrorMsg(''); }}>
-                <Icon name="crown" size={22} /> Crear partida
-              </button>
-              <button className="big full" onClick={() => { setVista('unirse'); setErrorMsg(''); }}>
-                <Icon name="users" size={22} /> Unirse a partida
-              </button>
-              <button className="secondary full" onClick={onLocal}>
-                <Icon name="home" size={20} /> Jugar en un solo dispositivo
-              </button>
-            </div>
-          </div>
-        </section>
+      {vista === 'online_menu' && (
+        <MenuModoOnline
+          onVolver={() => { setVista('menu'); setErrorMsg(''); }}
+          onCrear={() => { setVista('crear'); setErrorMsg(''); }}
+          onUnirse={() => { setVista('unirse'); setErrorMsg(''); }}
+          onAyuda={() => setModalAyuda(true)}
+          error={errorMsg}
+        />
       )}
 
       {/* 2. CREAR SALA */}
       {vista === 'crear' && (
-        <section className="game">
-          <div className="panel center">
-            <span className="lb-luna chica">
-              <Icon name="crown" size={40} strokeWidth={1.6} />
-            </span>
-            <h2 className="title">Crear partida</h2>
-            <p className="hint">Introduce tu nombre para crear la sala y ser el anfitrión.</p>
-
-            <div className="lb-form" style={{ marginTop: '1.2rem', textAlign: 'left' }}>
-              <label className="field-label" htmlFor="pts-host-nombre">Tu nombre</label>
-              <input
-                id="pts-host-nombre"
-                type="text"
-                placeholder="Tu nombre"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                maxLength={20}
-                autoFocus
-              />
-              {errorMsg && <p className="error">{errorMsg}</p>}
-
-              <button
-                className="big full"
-                style={{ marginTop: '1rem' }}
-                disabled={cargando || !nombre.trim()}
-                onClick={handleCrear}
-              >
-                <Icon name="check" size={22} strokeWidth={2.5} /> Crear sala
-              </button>
-              <button
-                className="secondary full"
-                style={{ marginTop: '0.6rem' }}
-                onClick={() => { setVista('menu'); setErrorMsg(''); }}
-              >
-                Volver
-              </button>
-            </div>
-          </div>
-        </section>
+        <FormCrearSala
+          onVolver={() => { setVista('online_menu'); setErrorMsg(''); }}
+          onAyuda={() => setModalAyuda(true)}
+          nombre={nombre}
+          setNombre={setNombre}
+          onCrear={handleCrear}
+          cargando={cargando}
+          error={errorMsg}
+        />
       )}
 
       {/* 3. UNIRSE A SALA */}
       {vista === 'unirse' && (
-        <section className="game">
-          <div className="panel center">
-            <span className="lb-luna chica">
-              <Icon name="users" size={40} strokeWidth={1.6} />
-            </span>
-            <h2 className="title">Unirse a partida</h2>
-            <p className="hint">Introduce el código de 4 letras que te ha dado el anfitrión.</p>
-
-            <div className="lb-form" style={{ marginTop: '1.2rem', textAlign: 'left' }}>
-              <label className="field-label" htmlFor="pts-code-input">Código de la sala</label>
-              <input
-                id="pts-code-input"
-                className="lb-input-codigo"
-                type="text"
-                placeholder="ABCD"
-                value={codigoInput}
-                onChange={(e) => setCodigoInput(e.target.value.toUpperCase())}
-                maxLength={4}
-                style={{ textTransform: 'uppercase', letterSpacing: '4px', textAlign: 'center', fontWeight: '800' }}
-                autoFocus
-              />
-
-              <label className="field-label" htmlFor="pts-guest-nombre" style={{ marginTop: '1rem' }}>Tu nombre</label>
-              <input
-                id="pts-guest-nombre"
-                type="text"
-                placeholder="Tu nombre"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                maxLength={20}
-              />
-              {errorMsg && <p className="error">{errorMsg}</p>}
-
-              <button
-                className="big full"
-                style={{ marginTop: '1rem' }}
-                disabled={cargando || !nombre.trim() || codigoInput.trim().length < 4}
-                onClick={handleUnirse}
-              >
-                <Icon name="check" size={22} strokeWidth={2.5} /> Entrar en la partida
-              </button>
-              <button
-                className="secondary full"
-                style={{ marginTop: '0.6rem' }}
-                onClick={() => { setVista('menu'); setErrorMsg(''); }}
-              >
-                Volver
-              </button>
-            </div>
-          </div>
-        </section>
+        <FormUnirseSala
+          onVolver={() => { setVista('online_menu'); setErrorMsg(''); }}
+          onAyuda={() => setModalAyuda(true)}
+          codigo={codigoInput}
+          setCodigo={setCodigoInput}
+          nombre={nombre}
+          setNombre={setNombre}
+          onUnirse={handleUnirse}
+          cargando={cargando}
+          error={errorMsg}
+        />
       )}
 
       {/* 4. SALA: LOBBY */}
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
-        <section className="game">
-          <div className="panel center">
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.45rem',
-                  padding: '0.35rem 1.1rem',
-                  borderRadius: '9999px',
-                  border: '1.5px solid #22c55e',
-                  backgroundColor: '#f0fdf4',
-                  color: '#16a34a',
-                  fontSize: '0.85rem',
-                  fontWeight: 600,
-                  lineHeight: 1
-                }}
-              >
-                <Icon name="lock" size={15} />
-                Sala de espera
-              </span>
-            </div>
-            <p className="hint">Código de la partida</p>
-            <button
-              type="button"
-              className="qq-codigo-btn"
-              onClick={copiarCodigo}
-              title="Copiar código"
-            >
-              {sala.code}
-            </button>
-            <p className="hint small">
-              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Pulsa el código para copiarlo y compártelo con los demás.'}
-            </p>
-          </div>
+        <section className="game qq-pantalla">
+          <CabeceraSala codigo={sala.code} onVolver={() => setModalSalir(true)} onAyuda={() => setModalAyuda(true)} />
 
-          <div className="panel" style={{ marginTop: '1rem' }}>
-            <h3 className="panel-title"><Icon name="dice" size={20} /> Modo de juego</h3>
+          <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
+            <h3 className="qq-sala-titulo"><Icon name="dice" size={20} /> Modo de juego</h3>
             {esAdmin ? (
               <div className="pts-selector-modo">
                 <button
@@ -550,9 +429,9 @@ export default function PistasOnline({ onLocal, onSalir }) {
             )}
           </div>
 
-          <div className="panel" style={{ marginTop: '1rem' }}>
-            <h3 className="panel-title"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length})</h3>
-            <div className="lb-lista">
+          <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
+            <h3 className="qq-sala-titulo"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length})</h3>
+            <div className="lb-lista qq-sala-lista">
               {sala.jugadores.map((j) => (
                 <div key={j.id} className={`lb-jug ${j.id === yoId ? 'yo' : ''}`}>
                   <span className="lb-jug-nombre">
@@ -571,7 +450,7 @@ export default function PistasOnline({ onLocal, onSalir }) {
           {esAdmin ? (
             <div style={{ marginTop: '1.2rem' }}>
               <button
-                className="big full"
+                className="big full qq-btn-principal"
                 disabled={sala.jugadores.length < 2}
                 onClick={handleIniciarJuego}
               >
@@ -580,18 +459,13 @@ export default function PistasOnline({ onLocal, onSalir }) {
               </button>
             </div>
           ) : (
-            <div className="panel center" style={{ padding: '2rem 1.5rem', marginTop: '1rem' }}>
+            <div className="panel center qq-menu-panel" style={{ padding: '2rem 1.5rem', marginTop: '1rem' }}>
               <span className="lb-luna chica"><Icon name="hourglass" size={40} /></span>
               <h3 style={{ margin: '0.5rem 0' }}>Esperando al anfitrión...</h3>
               <p className="hint">En cuanto comience la partida, verás aparecer las pistas.</p>
             </div>
           )}
 
-          <div className="actions" style={{ marginTop: '1rem' }}>
-            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
-              <Icon name="door" size={20} /> Salir de la sala
-            </button>
-          </div>
         </section>
       )}
 

@@ -363,17 +363,6 @@
    MENÚS UNIFICADOS (TEMA ÍNDIGO: CUIDADO QUE EXPLOTA)
    ======================================================== */
 
-body:has(.bm-contenedor) {
-  background:
-    radial-gradient(70% 460px at 50% 0%, rgba(79, 70, 229, .45) 0%, transparent 70%),
-    radial-gradient(45% 560px at 100% 20%, rgba(67, 56, 202, .22) 0%, transparent 70%),
-    radial-gradient(45% 560px at 0% 50%, rgba(99, 102, 241, .22) 0%, transparent 70%),
-    radial-gradient(45% 560px at 100% 76%, rgba(55, 48, 163, .2) 0%, transparent 70%),
-    radial-gradient(80% 520px at 50% 100%, rgba(109, 40, 217, .36) 0%, transparent 70%),
-    radial-gradient(rgba(255, 255, 255, .06) 1.3px, transparent 1.5px) 0 0 / 22px 22px,
-    linear-gradient(180deg, #0f1024 0%, #15112e 50%, #0d0f24 100%) !important;
-  background-attachment: scroll !important;
-}
 
 body:has(.qq-en-partida) .back {
   display: none !important;
@@ -1247,17 +1236,6 @@ body:has(.qq-en-partida) .back {
   display: none !important;
 }
 
-body:has(.bm-contenedor) {
-  background:
-    radial-gradient(70% 460px at 50% 0%, rgba(79, 70, 229, .45) 0%, transparent 70%),
-    radial-gradient(45% 560px at 100% 20%, rgba(67, 56, 202, .22) 0%, transparent 70%),
-    radial-gradient(45% 560px at 0% 50%, rgba(99, 102, 241, .22) 0%, transparent 70%),
-    radial-gradient(45% 560px at 100% 76%, rgba(55, 48, 163, .2) 0%, transparent 70%),
-    radial-gradient(80% 520px at 50% 100%, rgba(109, 40, 217, .36) 0%, transparent 70%),
-    radial-gradient(rgba(255, 255, 255, .06) 1.3px, transparent 1.5px) 0 0 / 22px 22px,
-    linear-gradient(180deg, #0f1024 0%, #15112e 50%, #0d0f24 100%) !important;
-  background-attachment: scroll !important;
-}
 
 body:has(.qq-en-partida) .back {
   display: none !important;
@@ -1274,17 +1252,6 @@ body:has(.qq-en-partida) .back {
    FONDO TEMÁTICO: CUIDADO QUE EXPLOTA (GRAFITO CARBÓN / ANTRACITA)
    ======================================================== */
 
-body:has(.bm-contenedor) {
-  background:
-    radial-gradient(70% 460px at 50% 0%, rgba(71, 85, 105, 0.45) 0%, transparent 70%),
-    radial-gradient(45% 560px at 100% 20%, rgba(51, 65, 85, 0.32) 0%, transparent 70%),
-    radial-gradient(45% 560px at 0% 50%, rgba(100, 116, 139, 0.22) 0%, transparent 70%),
-    radial-gradient(45% 560px at 100% 76%, rgba(30, 41, 59, 0.35) 0%, transparent 70%),
-    radial-gradient(80% 520px at 50% 100%, rgba(51, 65, 85, 0.42) 0%, transparent 70%),
-    radial-gradient(rgba(255, 255, 255, 0.07) 1.3px, transparent 1.5px) 0 0 / 22px 22px,
-    linear-gradient(180deg, #0a0e17 0%, #111827 50%, #090d14 100%) !important;
-  background-attachment: scroll !important;
-}
 
 body:has(.qq-en-partida) .back:not(.qq-btn-volver-sala) {
   display: none !important;

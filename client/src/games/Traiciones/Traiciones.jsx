@@ -4,10 +4,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import TraicionesOnline from './TraicionesOnline.jsx';
 import './Traiciones.css';
+import { metaDe } from '../meta.js';
 
-const TITULO_JUEGO = 'Traiciones';
-const DESCRIPCION_JUEGO =
-  'Una caravana cruza el desierto hacia el Oasis, dos bandos: buenos y traidores. Los buenos deben completar misiones para llegar al objetivo, los traidores deben sabotear y matar a todos sin ser descubiertos.';
+// Título y descripción: siempre los de meta.js
+const { titulo: TITULO_JUEGO, descripcion: DESCRIPCION_JUEGO } = metaDe('traiciones');
 
 export default function Traiciones({ onExit }) {
   const [mostrarAyuda, setMostrarAyuda] = useState(false);

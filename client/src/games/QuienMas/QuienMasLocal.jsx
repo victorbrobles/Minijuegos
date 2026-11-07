@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import './QuienMas.css';
 import { useAdmin, adminHeaders } from '../../lib/admin.js';
 import Icon from '../../components/Icon.jsx';
-import GameIntro from '../../components/GameIntro.jsx';
+import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx';
 
 const MIN_JUGADORES = 3;
 const MAX_JUGADORES = 20;
@@ -181,14 +181,6 @@ export default function QuienMasLocal({ onVolver, onExit }) {
       {/* AYUDA */}
       {fase === 'setup' && (
         <>
-          <button
-            type="button"
-            className="btn-ayuda-flotante"
-            onClick={() => setModalAyuda(true)}
-            title="Reglas y funcionamiento"
-          >
-            <span className="btn-ayuda-flotante-signo">?</span>
-          </button>
 
           {modalAyuda && (
             <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
@@ -225,60 +217,28 @@ export default function QuienMasLocal({ onVolver, onExit }) {
 
       {/* 1. SETUP */}
       {fase === 'setup' && (
-        <section className="game" style={{ position: 'relative' }}>
-          <GameIntro gameId="quienmas" titulo="¿De verdad os conocéis? (Un solo dispositivo)" />
-
-          <div className="panel">
-            <div className="hud" style={{ marginBottom: '1rem' }}>
-              <button className="btn-back-inline" onClick={onVolver}>
-                &larr; Cambiar modo
-              </button>
-            </div>
-
-            <h3 className="panel-title"><Icon name="users" size={22} /> Participantes</h3>
-            <label className="field-label" htmlFor="num-jugadores-qm">
-              Número de jugadores ({MIN_JUGADORES} a {MAX_JUGADORES})
-            </label>
-            <select id="num-jugadores-qm" value={numJugadores} onChange={cambiarNumJugadores}>
-              {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => (
-                <option key={i + MIN_JUGADORES} value={i + MIN_JUGADORES}>
-                  {i + MIN_JUGADORES} jugadores
-                </option>
-              ))}
+        <SelectorJugadores
+          onVolver={onVolver}
+          onAyuda={() => setModalAyuda(true)}
+          min={MIN_JUGADORES}
+          max={MAX_JUGADORES}
+          numJugadores={numJugadores}
+          onCambiarNum={(n) => cambiarNumJugadores({ target: { value: n } })}
+          nombres={jugadores}
+          onNombre={cambiarNombre}
+          onEmpezar={empezarPartida}
+          textoBoton="¡Empezar Partida!"
+          iconoBoton="play"
+        >
+          <BloqueConfig>
+            <span className="qq-label-destacado qq-label-icono"><Icon name="lock" size={16} /> Preguntas (administrador)</span>
+            <label className="field-label" htmlFor="categoria-qm">Tipo de preguntas</label>
+            <select id="categoria-qm" value={categoria} onChange={(e) => setCategoria(e.target.value)}>
+              <option value="normal">Normal: para todos los públicos</option>
+              <option value="picante">Picante: incómodas y comprometidas</option>
             </select>
-
-            <span className="field-label">Nombres</span>
-            <div className="names-grid">
-              {nombres.map((nombre, idx) => (
-                <input
-                  key={idx}
-                  type="text"
-                  value={nombre}
-                  onChange={(e) => cambiarNombre(idx, e.target.value)}
-                  placeholder={`Jugador ${idx + 1}`}
-                  maxLength={30}
-                />
-              ))}
-            </div>
-          </div>
-
-          {esAdmin && (
-            <div className="panel" style={{ marginTop: '1rem' }}>
-              <h3 className="panel-title"><Icon name="lock" size={22} /> Preguntas (administrador)</h3>
-              <label className="field-label" htmlFor="categoria-qm">Tipo de preguntas</label>
-              <select id="categoria-qm" value={categoria} onChange={(e) => setCategoria(e.target.value)}>
-                <option value="normal">Normal: para todos los públicos</option>
-                <option value="picante">Picante: incómodas y comprometidas</option>
-              </select>
-            </div>
-          )}
-
-          {error && <p className="error" style={{ marginTop: '0.8rem' }}>{error}</p>}
-
-          <button className="big full" onClick={empezarPartida} style={{ marginTop: '1rem' }}>
-            <Icon name="play" size={24} /> ¡Empezar Partida!
-          </button>
-        </section>
+          </BloqueConfig>
+        </SelectorJugadores>
       )}
 
       {/* 2. CARGANDO */}

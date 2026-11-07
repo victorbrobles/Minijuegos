@@ -2,9 +2,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import GameIntro from '../../components/GameIntro.jsx';
 import '../Adivina/Adivina.css';
 import './CuatroClubes.css';
+import { SelectorJugadores } from '../../components/MenuJuego.jsx';
 
 const TIEMPO_S = 90; // 90 segundos por jugador en cada turno
 
@@ -209,9 +209,6 @@ export default function CuatroClubesLocal({ onVolver, onExit }) {
     <div className="rk-contenedor">
       {paso === 'config' && (
         <>
-          <button type="button" className="rk-btn-ayuda" onClick={() => setModalAyuda(true)} title="Reglas">
-            <span className="rk-btn-ayuda-signo">?</span>
-          </button>
 
           {modalAyuda && (
             <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
@@ -239,42 +236,19 @@ export default function CuatroClubesLocal({ onVolver, onExit }) {
             </div>
           )}
 
-          <section className="game">
-            <GameIntro gameId="cuatroclubes" titulo="El club de los cuatro" />
-
-            <div className="panel">
-              <div className="hud" style={{ marginBottom: '1rem' }}>
-                <button className="btn-back-inline" onClick={onVolver}>&larr; Cambiar a modo Online</button>
-              </div>
-              <h3 className="panel-title"><Icon name="users" size={22} />Jugadores (2 a 10)</h3>
-              <select
-                value={jugadores.length}
-                onChange={handleNumJugadores}
-                style={{ marginBottom: '1rem', width: '100%', padding: '0.8rem', borderRadius: '8px' }}
-              >
-                {[...Array(9)].map((_, i) => (
-                  <option key={i + 2} value={i + 2}>
-                    {i + 2} jugadores ({(i + 2) * 3} rondas)
-                  </option>
-                ))}
-              </select>
-              <div className="names-grid">
-                {jugadores.map((j, idx) => (
-                  <input
-                    key={j.id}
-                    type="text"
-                    value={j.nombre}
-                    onChange={(e) => handleNombre(idx, e.target.value)}
-                    placeholder={`Jugador ${j.id}`}
-                    maxLength={20}
-                  />
-                ))}
-              </div>
-            </div>
-            <button className="big full" onClick={empezar}>
-              <Icon name="play" size={24} /> Empezar Partida ({maxRondas} rondas)
-            </button>
-          </section>
+          <SelectorJugadores
+          onVolver={onVolver}
+          onAyuda={() => setModalAyuda(true)}
+          min={2}
+          max={10}
+          numJugadores={jugadores.length}
+          onCambiarNum={(n) => handleNumJugadores({ target: { value: n } })}
+          nombres={jugadores}
+          onNombre={handleNombre}
+          onEmpezar={empezar}
+          textoBoton={`Empezar Partida (${maxRondas} rondas)`}
+          iconoBoton="play"
+        />
         </>
       )}
 

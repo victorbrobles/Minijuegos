@@ -4,6 +4,7 @@ import Icon from '../../components/Icon.jsx';
 import CategoryCard from '../../components/CategoryCard.jsx';
 import './MasMenos.css';
 import '../Adivina/Adivina.css';
+import { MenuInicioJuego, MenuModoOnline, FormCrearSala, FormUnirseSala, CabeceraSala, EsperandoAnfitrion } from '../../components/MenuJuego.jsx';
 
 const CLAVE_SESION_MM = 'masmenos_online_session';
 const TIEMPO_TURNO = 30;
@@ -65,7 +66,7 @@ export default function MasMenosOnline({ onLocal, onSalir }) {
           sessionStorage.removeItem(CLAVE_SESION_MM);
           setSesion(null);
           setSala(null);
-          setVista('menu');
+          setVista('online_menu');
           setErrorMsg('La sala se ha cerrado.');
         });
     };
@@ -231,7 +232,7 @@ export default function MasMenosOnline({ onLocal, onSalir }) {
     sessionStorage.removeItem(CLAVE_SESION_MM);
     setSesion(null);
     setSala(null);
-    setVista('menu');
+    setVista('online_menu');
   };
 
   const copiarCodigo = () => {
@@ -250,21 +251,10 @@ export default function MasMenosOnline({ onLocal, onSalir }) {
   const maximo = ranking.length ? ranking[0].puntos : 0;
   const ganadores = maximo > 0 ? ranking.filter((j) => j.puntos === maximo) : [];
 
-  const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
 
   return (
     <div className="mm-contenedor">
       {/* ---------------- BOTÓN Y MODAL DE AYUDA ---------------- */}
-      {mostrarAyuda && (
-        <button
-          type="button"
-          className="btn-ayuda-flotante"
-          onClick={() => setModalAyuda(true)}
-          title="Reglas del juego"
-        >
-          <span className="btn-ayuda-flotante-signo">?</span>
-        </button>
-      )}
 
       {modalAyuda && (
         <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
@@ -296,145 +286,61 @@ export default function MasMenosOnline({ onLocal, onSalir }) {
 
       {/* 1. MENÚ ONLINE */}
       {vista === 'menu' && (
-        <section className="game">
-          <div className="panel center">
-            <span className="lb-luna chica">
-              <Icon name="scale" size={42} strokeWidth={1.6} />
-            </span>
-            <h1 className="title">Entre dos aguas Online</h1>
-            <p className="hint">
-              Compara dos cifras numéricas frente a frente y elige cuál es la más alta. Los demás verán tu racha en directo en sus pantallas.
-            </p>
+        <MenuInicioJuego
+          juegoId="masmenos"
+          onOnline={() => { setVista('online_menu'); setErrorMsg(''); }}
+          onLocal={onLocal}
+          onAyuda={() => setModalAyuda(true)}
+          error={errorMsg}
+        />
+      )}
 
-            {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
-
-            <div className="lb-menu">
-              <button className="big full" onClick={() => { setVista('crear'); setErrorMsg(''); }}>
-                <Icon name="crown" size={22} /> Crear partida Online
-              </button>
-              <button className="big full" onClick={() => { setVista('unirse'); setErrorMsg(''); }}>
-                <Icon name="users" size={22} /> Unirse con código
-              </button>
-              <button className="secondary full" onClick={onLocal}>
-                <Icon name="home" size={20} /> Jugar en un solo dispositivo
-              </button>
-            </div>
-          </div>
-        </section>
+      {vista === 'online_menu' && (
+        <MenuModoOnline
+          onVolver={() => { setVista('menu'); setErrorMsg(''); }}
+          onCrear={() => { setVista('crear'); setErrorMsg(''); }}
+          onUnirse={() => { setVista('unirse'); setErrorMsg(''); }}
+          onAyuda={() => setModalAyuda(true)}
+          error={errorMsg}
+        />
       )}
 
       {/* 2. CREAR SALA */}
       {vista === 'crear' && (
-        <section className="game">
-          <div className="panel center">
-            <h2 className="title">Crear sala Online</h2>
-            <p className="hint">Introduce tu nombre de anfitrión (de 2 a 10 jugadores).</p>
-
-            <div className="lb-form" style={{ marginTop: '1.2rem', textAlign: 'left' }}>
-              <input
-                type="text"
-                placeholder="Tu nombre"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                maxLength={20}
-                autoFocus
-              />
-              <button
-                className="big full"
-                style={{ marginTop: '1rem' }}
-                disabled={cargando || !nombre.trim()}
-                onClick={handleCrear}
-              >
-                Crear sala
-              </button>
-              <button className="secondary full" style={{ marginTop: '0.6rem' }} onClick={() => setVista('menu')}>
-                Volver
-              </button>
-            </div>
-          </div>
-        </section>
+        <FormCrearSala
+          onVolver={() => { setVista('online_menu'); setErrorMsg(''); }}
+          onAyuda={() => setModalAyuda(true)}
+          nombre={nombre}
+          setNombre={setNombre}
+          onCrear={handleCrear}
+          cargando={cargando}
+          error={errorMsg}
+        />
       )}
 
       {/* 3. UNIRSE A SALA */}
       {vista === 'unirse' && (
-        <section className="game">
-          <div className="panel center">
-            <h2 className="title">Unirse a partida</h2>
-            <div className="lb-form" style={{ marginTop: '1.2rem', textAlign: 'left' }}>
-              <input
-                type="text"
-                placeholder="CÓDIGO (4 LETRAS)"
-                value={codigoInput}
-                onChange={(e) => setCodigoInput(e.target.value.toUpperCase())}
-                maxLength={4}
-                style={{ textTransform: 'uppercase', letterSpacing: '4px', textAlign: 'center', fontWeight: '800' }}
-                autoFocus
-              />
-              <input
-                type="text"
-                placeholder="Tu nombre"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                maxLength={20}
-                style={{ marginTop: '0.8rem' }}
-              />
-              <button
-                className="big full"
-                style={{ marginTop: '1rem' }}
-                disabled={cargando || !nombre.trim() || codigoInput.trim().length < 4}
-                onClick={handleUnirse}
-              >
-                Entrar a la sala
-              </button>
-              <button className="secondary full" style={{ marginTop: '0.6rem' }} onClick={() => setVista('menu')}>
-                Volver
-              </button>
-            </div>
-          </div>
-        </section>
+        <FormUnirseSala
+          onVolver={() => { setVista('online_menu'); setErrorMsg(''); }}
+          onAyuda={() => setModalAyuda(true)}
+          codigo={codigoInput}
+          setCodigo={setCodigoInput}
+          nombre={nombre}
+          setNombre={setNombre}
+          onUnirse={handleUnirse}
+          cargando={cargando}
+          error={errorMsg}
+        />
       )}
 
       {/* 4. LOBBY */}
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
-        <section className="game">
-          <div className="panel center">
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.45rem',
-                  padding: '0.35rem 1.1rem',
-                  borderRadius: '9999px',
-                  border: '1.5px solid #22c55e',
-                  backgroundColor: '#f0fdf4',
-                  color: '#16a34a',
-                  fontSize: '0.85rem',
-                  fontWeight: 600,
-                  lineHeight: 1
-                }}
-              >
-                <Icon name="lock" size={15} />
-                Sala de espera
-              </span>
-            </div>
-            <p className="hint">Código de la partida</p>
-            <button
-              type="button"
-              className="qq-codigo-btn"
-              onClick={copiarCodigo}
-              title="Copiar código"
-            >
-              {sala.code}
-            </button>
-            <p className="hint small">
-              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Comparte este código para que se unan (mínimo 2 jugadores).'}
-            </p>
-          </div>
+        <section className="game qq-pantalla">
+          <CabeceraSala codigo={sala.code} onVolver={() => setModalSalir(true)} onAyuda={() => setModalAyuda(true)} />
 
-          <div className="panel" style={{ marginTop: '1rem' }}>
-            <h3 className="panel-title"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length}/10)</h3>
-            <div className="lb-lista">
+          <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
+            <h3 className="qq-sala-titulo"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length}/10)</h3>
+            <div className="lb-lista qq-sala-lista">
               {sala.jugadores.map((j) => (
                 <div key={j.id} className={`lb-jug ${j.id === yoId ? 'yo' : ''}`}>
                   <span className="lb-jug-nombre">{j.nombre}{j.id === yoId ? ' (Tú)' : ''}{j.id === 1 ? ' 👑' : ''}</span>
@@ -447,22 +353,17 @@ export default function MasMenosOnline({ onLocal, onSalir }) {
 
           {esAdmin ? (
             <button
-              className="big full"
+              className="big full qq-btn-principal"
               style={{ marginTop: '1.2rem' }}
               disabled={sala.jugadores.length < 2}
               onClick={handleIniciarPartida}
             >
-              {sala.jugadores.length < 2 ? 'Esperando rivales (mínimo 2)...' : '¡Elegir Categoría!'}
+              <Icon name="play" size={22} /> {sala.jugadores.length < 2 ? 'Esperando rivales (mínimo 2)...' : '¡Elegir Categoría!'}
             </button>
           ) : (
-            <div className="panel center" style={{ marginTop: '1rem' }}>
-              <p className="hint">Esperando a que el anfitrión comience la partida...</p>
-            </div>
+            <EsperandoAnfitrion />
           )}
 
-          <button className="secondary danger full" style={{ marginTop: '1rem' }} onClick={() => setModalSalir(true)}>
-            Salir de la sala
-          </button>
         </section>
       )}
 

@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
 import './Logos.css';
 import '../Adivina/Adivina.css';
+import { MenuInicioJuego, MenuModoOnline, FormCrearSala, FormUnirseSala, CabeceraSala, EsperandoAnfitrion } from '../../components/MenuJuego.jsx';
 
 const CLAVE_SESION_LOGOS = 'logos_online_session';
 
@@ -44,7 +45,7 @@ export default function LogosOnline({ onLocal, onSalir }) {
           sessionStorage.removeItem(CLAVE_SESION_LOGOS);
           setSesion(null);
           setSala(null);
-          setVista('menu');
+          setVista('online_menu');
         });
     };
 
@@ -98,7 +99,7 @@ export default function LogosOnline({ onLocal, onSalir }) {
     sessionStorage.removeItem(CLAVE_SESION_LOGOS);
     setSesion(null);
     setSala(null);
-    setVista('menu');
+    setVista('online_menu');
     setModalSalir(false);
   };
 
@@ -201,44 +202,28 @@ export default function LogosOnline({ onLocal, onSalir }) {
     return (
       <div className="lg-contenedor" style={{ position: 'relative' }}>
         <ModalAyuda />
-        <section className="game">
-          <div className="panel center" style={{ position: 'relative', padding: '2.4rem 1.6rem 2rem' }}>
-            <BotonAyudaCard />
-            <div
-              style={{
-                width: '76px',
-                height: '76px',
-                borderRadius: '50%',
-                backgroundColor: '#ecfeff',
-                color: 'var(--g1, #0891b2)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '0 auto 1.1rem auto',
-                boxShadow: '0 4px 14px rgba(8, 145, 178, 0.12)'
-              }}
-            >
-              <Icon name="cards" size={38} strokeWidth={2} />
-            </div>
+        <MenuInicioJuego
+            juegoId="logos"
+            onOnline={() => { setVista('online_menu'); setErrorMsg(''); }}
+            onLocal={onLocal}
+            onAyuda={() => setModalAyuda(true)}
+            error={errorMsg}
+          />
+      </div>
+    );
+  }
 
-            <h1 className="title" style={{ margin: '0 0 0.6rem 0' }}>Logo Mania</h1>
-            <p className="hint" style={{ maxWidth: '540px', margin: '0 auto 1.6rem auto', lineHeight: '1.45' }}>
-              Adivinad el logo antes de que se agote el tiempo. Los aciertos suman segundos y los fallos restan. (2 a 10 jugadores).
-            </p>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', width: '100%', maxWidth: '480px', margin: '0 auto' }}>
-              <button className="big full" onClick={() => { setVista('crear'); setErrorMsg(''); }}>
-                <Icon name="crown" size={20} /> Crear partida
-              </button>
-              <button className="big full" onClick={() => { setVista('unirse'); setErrorMsg(''); }}>
-                <Icon name="users" size={20} /> Unirse a partida
-              </button>
-              <button className="secondary full" onClick={onLocal}>
-                Modo en un dispositivo
-              </button>
-            </div>
-          </div>
-        </section>
+  if (vista === 'online_menu') {
+    return (
+      <div className="lg-contenedor" style={{ position: 'relative' }}>
+        <ModalAyuda />
+        <MenuModoOnline
+          onVolver={() => { setVista('menu'); setErrorMsg(''); }}
+          onCrear={() => { setVista('crear'); setErrorMsg(''); }}
+          onUnirse={() => { setVista('unirse'); setErrorMsg(''); }}
+          onAyuda={() => setModalAyuda(true)}
+          error={errorMsg}
+        />
       </div>
     );
   }
@@ -247,46 +232,31 @@ export default function LogosOnline({ onLocal, onSalir }) {
     return (
       <div className="lg-contenedor" style={{ position: 'relative' }}>
         <ModalAyuda />
-        <section className="game">
-          <div className="panel center">
-            <h2 className="title">{vista === 'crear' ? 'Crear partida' : 'Unirse a partida'}</h2>
-            <div className="lb-form" style={{ marginTop: '1.2rem', textAlign: 'left' }}>
-              {vista === 'unirse' && (
-                <>
-                  <label className="field-label">Código de la sala</label>
-                  <input
-                    className="lb-input-codigo"
-                    placeholder="ABCD"
-                    value={codigoInput}
-                    onChange={(e) => setCodigoInput(e.target.value.toUpperCase())}
-                    maxLength={4}
-                    style={{ textTransform: 'uppercase', letterSpacing: '4px', textAlign: 'center', fontWeight: '800' }}
-                  />
-                </>
-              )}
-              <label className="field-label" style={{ marginTop: '1rem' }}>Tu nombre</label>
-              <input
-                placeholder="Tu nombre"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                maxLength={15}
-                autoFocus
-              />
-              {errorMsg && <p className="error">{errorMsg}</p>}
-              <button
-                className="big full"
-                style={{ marginTop: '1rem' }}
-                disabled={cargando || !nombre.trim() || (vista === 'unirse' && codigoInput.length < 4)}
-                onClick={vista === 'crear' ? handleCrear : handleUnirse}
-              >
-                <Icon name="check" size={22} strokeWidth={2.5} /> Continuar
-              </button>
-              <button className="secondary full" style={{ marginTop: '.6rem' }} onClick={() => setVista('menu')}>
-                Volver
-              </button>
-            </div>
-          </div>
-        </section>
+        {vista === 'crear' ? (
+          <FormCrearSala
+            onVolver={() => { setVista('online_menu'); setErrorMsg(''); }}
+            onAyuda={() => setModalAyuda(true)}
+            nombre={nombre}
+            setNombre={setNombre}
+            onCrear={handleCrear}
+            cargando={cargando}
+            error={errorMsg}
+            maxLength={15}
+          />
+        ) : (
+          <FormUnirseSala
+            onVolver={() => { setVista('online_menu'); setErrorMsg(''); }}
+            onAyuda={() => setModalAyuda(true)}
+            codigo={codigoInput}
+            setCodigo={setCodigoInput}
+            nombre={nombre}
+            setNombre={setNombre}
+            onUnirse={handleUnirse}
+            cargando={cargando}
+            error={errorMsg}
+            maxLength={15}
+          />
+        )}
       </div>
     );
   }
@@ -299,43 +269,12 @@ export default function LogosOnline({ onLocal, onSalir }) {
 
       {/* 1. LOBBY */}
       {sala.estado === 'lobby' && (
-        <section className="game">
-          <div className="panel center" style={{ position: 'relative' }}>
-            <BotonAyudaCard />
+        <section className="game qq-pantalla">
+          <CabeceraSala codigo={sala.code} onVolver={() => setModalSalir(true)} onAyuda={() => setModalAyuda(true)} />
 
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.45rem',
-                  padding: '0.35rem 1.1rem',
-                  borderRadius: '9999px',
-                  border: '1.5px solid #22c55e',
-                  backgroundColor: '#f0fdf4',
-                  color: '#16a34a',
-                  fontSize: '0.85rem',
-                  fontWeight: 600,
-                  lineHeight: 1
-                }}
-              >
-                <Icon name="lock" size={15} />
-                Sala de espera
-              </span>
-            </div>
-
-            <p className="hint">Código de la partida</p>
-            <button type="button" className="qq-codigo-btn" onClick={copiarCodigo} title="Copiar código">
-              {sala.code}
-            </button>
-            <p className="hint small">
-              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Comparte este código para que se unan (2 a 10 jugadores).'}
-            </p>
-          </div>
-
-          <div className="panel" style={{ marginTop: '1rem' }}>
-            <h3 className="panel-title"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length}/10)</h3>
-            <div className="lb-lista">
+          <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
+            <h3 className="qq-sala-titulo"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length}/10)</h3>
+            <div className="lb-lista qq-sala-lista">
               {sala.jugadores.map((j) => (
                 <div key={j.id} className={`lb-jug ${j.esTu ? 'yo' : ''}`}>
                   <span className="lb-jug-nombre">{j.nombre} {j.esTu && '(tú)'} {j.esAdmin && '👑'}</span>
@@ -351,17 +290,16 @@ export default function LogosOnline({ onLocal, onSalir }) {
           <div className="actions" style={{ marginTop: '1rem' }}>
             {esAdmin && (
               <button
-                className="big full"
+                className="big full qq-btn-principal"
                 disabled={faltan > 0}
                 onClick={() => peticionPost(`sala/${sesion.code}/iniciar`)}
               >
                 <Icon name="play" size={22} /> Empezar Partida (30 rondas)
               </button>
             )}
-            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
-              <Icon name="door" size={20} /> Salir
-            </button>
           </div>
+
+          {!esAdmin && <EsperandoAnfitrion />}
         </section>
       )}
 

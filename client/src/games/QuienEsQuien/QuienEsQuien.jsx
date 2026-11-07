@@ -4,10 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import QuienEsQuienLocal from './QuienEsQuienLocal.jsx';
 import QuienEsQuienOnline from './QuienEsQuienOnline.jsx';
 import './QuienEsQuien.css';
+import { metaDe } from '../meta.js';
 
-const TITULO_JUEGO = '¿Sabes quién soy?';
-const DESCRIPCION_JUEGO =
-  "Una categoría conjunta, un elemento a adivinar para cada uno de los jugadores. Cada jugador sabe el elemento de todos los demás menos el suyo. Adivina tu elemento antes que nadie haciendo preguntas de 'sí' o 'no'.";
+// Título y descripción: siempre los de meta.js
+const { titulo: TITULO_JUEGO, descripcion: DESCRIPCION_JUEGO } = metaDe('quien-es-quien');
 
 export default function QuienEsQuien({ onExit }) {
   const [modo, setModo] = useState('online');

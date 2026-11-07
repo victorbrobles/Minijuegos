@@ -1083,17 +1083,6 @@ body:has(.qq-en-partida) .back {
   display: none !important;
 }
 
-body:has(.colores-contenedor) {
-  background:
-    radial-gradient(70% 460px at 50% 0%, rgba(219, 39, 119, .45) 0%, transparent 70%),
-    radial-gradient(45% 560px at 100% 20%, rgba(190, 24, 93, .22) 0%, transparent 70%),
-    radial-gradient(45% 560px at 0% 50%, rgba(157, 23, 77, .22) 0%, transparent 70%),
-    radial-gradient(45% 560px at 100% 76%, rgba(225, 29, 72, .2) 0%, transparent 70%),
-    radial-gradient(80% 520px at 50% 100%, rgba(236, 72, 153, .36) 0%, transparent 70%),
-    radial-gradient(rgba(255, 255, 255, .06) 1.3px, transparent 1.5px) 0 0 / 22px 22px,
-    linear-gradient(180deg, #1f0b18 0%, #2f1225 50%, #170712 100%) !important;
-  background-attachment: scroll !important;
-}
 
 body:has(.qq-en-partida) .back {
   display: none !important;
@@ -1105,17 +1094,6 @@ body:has(.qq-en-partida) .back {
   position: relative;
 }
 
-body:has(.colores-contenedor) {
-  background:
-    radial-gradient(70% 460px at 50% 0%, rgba(255, 122, 0, 0.48) 0%, transparent 70%),
-    radial-gradient(50% 560px at 100% 20%, rgba(249, 115, 22, 0.32) 0%, transparent 70%),
-    radial-gradient(45% 560px at 0% 50%, rgba(255, 77, 141, 0.24) 0%, transparent 70%),
-    radial-gradient(50% 560px at 100% 75%, rgba(255, 107, 0, 0.28) 0%, transparent 70%),
-    radial-gradient(80% 520px at 50% 100%, rgba(249, 115, 22, 0.42) 0%, transparent 70%),
-    radial-gradient(rgba(255, 255, 255, 0.08) 1.3px, transparent 1.5px) 0 0 / 22px 22px,
-    linear-gradient(180deg, #160c14 0%, #1c0e12 50%, #140809 100%) !important;
-  background-attachment: scroll !important;
-}
 
 body:has(.qq-en-partida) .back:not(.qq-btn-volver-sala) {
   display: none !important;

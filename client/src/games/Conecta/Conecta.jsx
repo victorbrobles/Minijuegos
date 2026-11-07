@@ -4,10 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import ConectaLocal from './ConectaLocal.jsx';
 import ConectaOnline from './ConectaOnline.jsx';
 import './Conecta.css';
+import { metaDe } from '../meta.js';
 
-const TITULO_JUEGO = 'Conecta 4';
-const DESCRIPCION_JUEGO =
-  'Encuentra las 4 conexiones que existen entre los 16 elementos del tablero (de 4 en 4). Descubre qué conexión les une y gana puntos extra.';
+// Título y descripción: siempre los de meta.js
+const { titulo: TITULO_JUEGO, descripcion: DESCRIPCION_JUEGO } = metaDe('conecta');
 
 export default function Conecta({ onExit }) {
   const [modo, setModo] = useState('online');

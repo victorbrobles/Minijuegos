@@ -381,26 +381,7 @@ export default function TraicionesOnline({
               </button>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.45rem',
-                  padding: '0.35rem 1.1rem',
-                  borderRadius: '9999px',
-                  border: '1.5px solid #22c55e',
-                  backgroundColor: '#f0fdf4',
-                  color: '#16a34a',
-                  fontSize: '0.85rem',
-                  fontWeight: 600,
-                  lineHeight: 1
-                }}
-              >
-                <Icon name="lock" size={15} />
-                Sala de espera
-              </span>
-            </div>
+            <span className="qq-badge-sala"><Icon name="lock" size={15} /> Sala de espera</span>
 
             <p className="hint">Código de la partida</p>
             <button
@@ -416,9 +397,9 @@ export default function TraicionesOnline({
             </p>
           </div>
 
-          <div className="panel" style={{ marginTop: '1rem' }}>
-            <h3 className="panel-title"><Icon name="users" size={20} /> Jugadores ({jugadores.length}/12)</h3>
-            <div className="lb-lista">
+          <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
+            <h3 className="qq-sala-titulo"><Icon name="users" size={20} /> Jugadores ({jugadores.length}/12)</h3>
+            <div className="lb-lista qq-sala-lista">
               {jugadores.map((j) => (
                 <div key={j.id} className={`lb-jug ${j.id === sala.yoId ? 'yo' : ''}`}>
                   <span className="lb-jug-nombre">

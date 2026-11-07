@@ -1,10 +1,10 @@
 // client/src/games/Logos/LogosLocal.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
-import GameIntro from '../../components/GameIntro.jsx';
 import { getLogoAleatorio, TODOS_LOS_LOGOS } from '../../../../server/data/seeds/logos/logosData.js';
 import './Logos.css';
 import '../Adivina/Adivina.css';
+import { SelectorJugadores } from '../../components/MenuJuego.jsx';
 
 const MIN_JUGADORES = 2;
 const MAX_JUGADORES = 10;
@@ -171,14 +171,6 @@ export default function LogosLocal({ onSalir }) {
       {/* 1. SETUP */}
       {paso === 'setup' && (
         <>
-          <button
-            type="button"
-            className="btn-ayuda-flotante"
-            onClick={() => setModalAyuda(true)}
-            title="Reglas del juego"
-          >
-            <span className="btn-ayuda-flotante-signo">?</span>
-          </button>
 
           {modalAyuda && (
             <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
@@ -217,39 +209,19 @@ export default function LogosLocal({ onSalir }) {
             </div>
           )}
 
-          <section className="game">
-            <GameIntro gameId="logos" titulo="Logo Mania (Un solo dispositivo)" />
-            <div className="panel">
-              <h3 className="panel-title"><Icon name="cards" size={22} /> Jugadores (2 a 10)</h3>
-              <label className="field-label" htmlFor="lg-num">Número de participantes</label>
-              <select id="lg-num" value={numJugadores} onChange={cambiarNumJugadores}>
-                {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => i + MIN_JUGADORES).map((k) => (
-                  <option key={k} value={k}>{k} jugadores</option>
-                ))}
-              </select>
-
-              <span className="field-label" style={{ marginTop: '1rem' }}>Nombres</span>
-              <div className="names-grid">
-                {nombres.map((nombre, i) => (
-                  <input
-                    key={i}
-                    type="text"
-                    value={nombre}
-                    maxLength={18}
-                    placeholder={`Jugador ${i + 1}`}
-                    onChange={(e) => handleNombre(i, e.target.value)}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <div className="actions">
-              <button className="big full" onClick={iniciarPartida}>
-                <Icon name="play" size={22} /> Empezar Partida (30 Rondas)
-              </button>
-              <button className="secondary full" onClick={onSalir}>Volver</button>
-            </div>
-          </section>
+          <SelectorJugadores
+          onVolver={onSalir}
+          onAyuda={() => setModalAyuda(true)}
+          min={MIN_JUGADORES}
+          max={MAX_JUGADORES}
+          numJugadores={numJugadores}
+          onCambiarNum={(n) => cambiarNumJugadores({ target: { value: n } })}
+          nombres={nombres}
+          onNombre={handleNombre}
+          onEmpezar={iniciarPartida}
+          textoBoton="Empezar Partida (30 Rondas)"
+          iconoBoton="play"
+        />
         </>
       )}
 

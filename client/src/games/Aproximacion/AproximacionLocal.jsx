@@ -2,8 +2,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import GameIntro from '../../components/GameIntro.jsx';
 import './Aproximacion.css';
+import { SelectorJugadores } from '../../components/MenuJuego.jsx';
 
 const MAX_RONDAS = 15;
 const MIN_JUGADORES = 4;
@@ -418,14 +418,6 @@ export default function AproximacionLocal({ onVolver, onExit }) {
     <div className="aprox-contenedor">
       {fase === 'setup' && (
         <>
-          <button
-            type="button"
-            className="aprox-btn-ayuda"
-            onClick={() => setModalAyuda(true)}
-            title="Reglas y sistema de puntuación"
-          >
-            <span className="aprox-btn-ayuda-signo">?</span>
-          </button>
 
           {modalAyuda && (
             <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
@@ -482,52 +474,18 @@ export default function AproximacionLocal({ onVolver, onExit }) {
 
       {/* 1. SETUP */}
       {fase === 'setup' && (
-        <section className="game">
-          <GameIntro gameId="aproximacion" titulo="Aproximación" />
-
-          <div className="panel">
-            <div className="hud" style={{ marginBottom: '1rem' }}>
-              <button className="btn-back-inline" onClick={onVolver}>
-                &larr; Cambiar a modo Online
-              </button>
-            </div>
-
-            <h3 className="panel-title"><Icon name="users" size={22} /> Jugadores</h3>
-            <label className="field-label" htmlFor="num-jugadores-aprox">
-              Número de jugadores ({MIN_JUGADORES} a {MAX_JUGADORES})
-            </label>
-            <select
-              id="num-jugadores-aprox"
-              value={numJugadores}
-              onChange={handleNumJugadoresChange}
-            >
-              {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => (
-                <option key={i + MIN_JUGADORES} value={i + MIN_JUGADORES}>
-                  {i + MIN_JUGADORES} jugadores
-                </option>
-              ))}
-            </select>
-
-            <span className="field-label">Nombres</span>
-            <div className="names-grid">
-              {jugadores.map((j, idx) => (
-                <input
-                  key={j.id}
-                  type="text"
-                  value={j.nombre}
-                  onChange={(e) => handleNombreChange(idx, e.target.value)}
-                  placeholder={`Jugador ${j.id}`}
-                  maxLength={30}
-                  required
-                />
-              ))}
-            </div>
-          </div>
-
-          <button className="big full" onClick={iniciarPartida}>
-            <Icon name="play" size={24} /> ¡Empezar Partida (15 Rondas)!
-          </button>
-        </section>
+        <SelectorJugadores
+          onVolver={onVolver}
+          onAyuda={() => setModalAyuda(true)}
+          min={MIN_JUGADORES}
+          max={MAX_JUGADORES}
+          numJugadores={numJugadores}
+          onCambiarNum={(n) => handleNumJugadoresChange({ target: { value: n } })}
+          nombres={jugadores}
+          onNombre={handleNombreChange}
+          onEmpezar={iniciarPartida}
+          textoBoton="¡Empezar Partida (15 Rondas)!"
+        />
       )}
 
       {/* 2. TURNO */}

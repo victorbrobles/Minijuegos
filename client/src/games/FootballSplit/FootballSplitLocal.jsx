@@ -1,9 +1,9 @@
 // client/src/games/FootballSplit/FootballSplitLocal.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
-import GameIntro from '../../components/GameIntro.jsx';
 import './FootballSplit.css';
 import '../Adivina/Adivina.css';
+import { SelectorJugadores } from '../../components/MenuJuego.jsx';
 
 const TIEMPO_TURNO = 120;
 
@@ -232,11 +232,6 @@ export default function FootballSplitLocal({ onVolver }) {
 
   return (
     <div className="rk-contenedor">
-      {paso === 'config' && (
-        <button type="button" className="aprox-btn-ayuda" onClick={() => setModalAyuda(true)} title="Reglas">
-          <span className="aprox-btn-ayuda-signo">?</span>
-        </button>
-      )}
 
       {modalAyuda && (
         <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
@@ -261,43 +256,19 @@ export default function FootballSplitLocal({ onVolver }) {
       )}
 
       {paso === 'config' && (
-        <section className="game">
-          <GameIntro gameId="footballsplit" titulo="Football Split" />
-          <div className="panel">
-            <div className="hud" style={{ marginBottom: '1rem' }}>
-              <button className="btn-back-inline" onClick={onVolver}>&larr; Cambiar a modo Online</button>
-            </div>
-            <h3 className="panel-title"><Icon name="users" size={22} /> Jugadores</h3>
-            <select
-              value={jugadores.length}
-              onChange={handleNumJugadores}
-              style={{ marginBottom: '1rem', width: '100%', padding: '0.8rem', borderRadius: '8px' }}
-            >
-              {[1, 2, 3, 4, 5, 6].map((n) => (
-                <option key={n} value={n}>{n} jugador{n > 1 ? 'es' : ''}</option>
-              ))}
-            </select>
-            <div className="names-grid">
-              {jugadores.map((j, idx) => (
-                <input
-                  key={j.id}
-                  type="text"
-                  value={j.nombre}
-                  onChange={(e) => {
-                    const nuevos = [...jugadores];
-                    nuevos[idx].nombre = e.target.value;
-                    setJugadores(nuevos);
-                  }}
-                  placeholder={`Jugador ${j.id}`}
-                  maxLength={20}
-                />
-              ))}
-            </div>
-          </div>
-          <button className="big full" onClick={iniciarPartida}>
-            <Icon name="play" size={24} /> Empezar Partida (15 Rondas)
-          </button>
-        </section>
+        <SelectorJugadores
+          onVolver={onVolver}
+          onAyuda={() => setModalAyuda(true)}
+          min={1}
+          max={6}
+          numJugadores={jugadores.length}
+          onCambiarNum={(n) => handleNumJugadores({ target: { value: n } })}
+          nombres={jugadores}
+          onNombre={(idx, valor) => setJugadores((prev) => prev.map((j, i) => (i === idx ? { ...j, nombre: valor } : j)))}
+          onEmpezar={iniciarPartida}
+          textoBoton="Empezar Partida (15 Rondas)"
+          iconoBoton="play"
+        />
       )}
 
       {paso === 'cambio_turno' && (

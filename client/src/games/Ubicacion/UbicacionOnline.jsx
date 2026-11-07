@@ -365,7 +365,7 @@ export default function UbicacionOnline({
             </div>
 
             <div className="qq-hero-icono">
-              <Icon name="globe" size={44} strokeWidth={1.7} />
+              <Icon name="pin" size={44} strokeWidth={1.7} />
             </div>
             <h1 className="title qq-main-title">{tituloJuego}</h1>
             <p className="hint qq-main-desc">{descripcionJuego}</p>
@@ -652,7 +652,7 @@ export default function UbicacionOnline({
               </button>
             </div>
 
-            <p className="categoria"><Icon name="lock" size={16} /> Sala de espera</p>
+            <span className="qq-badge-sala"><Icon name="lock" size={15} /> Sala de espera</span>
             <p className="hint">Código de la partida</p>
             <button
               type="button"
@@ -669,11 +669,11 @@ export default function UbicacionOnline({
             </p>
           </div>
 
-          <div className="panel" style={{ marginTop: '1rem' }}>
-            <h3 className="panel-title">
+          <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
+            <h3 className="qq-sala-titulo">
               <Icon name="users" size={20} /> Jugadores ({sala.jugadores.length}/10)
             </h3>
-            <div className="lb-lista">
+            <div className="lb-lista qq-sala-lista">
               {sala.jugadores.map((j) => (
                 <div key={j.id} className={`lb-jug ${j.id === yoId ? 'yo' : ''}`}>
                   <span className="ub-punto" style={{ background: j.color }} />

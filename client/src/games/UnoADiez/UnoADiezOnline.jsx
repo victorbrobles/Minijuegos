@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
 import './UnoADiez.css';
 import '../Adivina/Adivina.css';
+import { MenuInicioJuego, MenuModoOnline, FormCrearSala, FormUnirseSala, CabeceraSala, EsperandoAnfitrion } from '../../components/MenuJuego.jsx';
 
 const CLAVE_SESION_UAD = 'unoadiez_online_session';
 
@@ -42,7 +43,7 @@ export default function UnoADiezOnline({ onLocal, onSalir }) {
           sessionStorage.removeItem(CLAVE_SESION_UAD);
           setSesion(null);
           setSala(null);
-          setVista('menu');
+          setVista('online_menu');
         });
     };
 
@@ -89,7 +90,7 @@ export default function UnoADiezOnline({ onLocal, onSalir }) {
     sessionStorage.removeItem(CLAVE_SESION_UAD); 
     setSesion(null); 
     setSala(null);
-    setVista('menu'); 
+    setVista('online_menu'); 
     setModalSalir(false);
   };
 
@@ -100,18 +101,7 @@ export default function UnoADiezOnline({ onLocal, onSalir }) {
     setTimeout(() => setCodigoCopiado(false), 2000);
   };
 
-  const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
 
-  const BotonAyuda = () => mostrarAyuda ? (
-    <button
-      type="button"
-      className="btn-ayuda-flotante"
-      onClick={() => setModalAyuda(true)}
-      title="Reglas del juego"
-    >
-      <span className="btn-ayuda-flotante-signo">?</span>
-    </button>
-  ) : null;
 
   const ModalAyuda = () => modalAyuda ? (
     <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
@@ -159,29 +149,29 @@ export default function UnoADiezOnline({ onLocal, onSalir }) {
   if (vista === 'menu') {
     return (
       <div className="uad-contenedor" style={{ position: 'relative' }}>
-        <BotonAyuda />
         <ModalAyuda />
-        <section className="game">
-          <div className="panel center">
-            <span className="lb-luna chica"><Icon name="target" size={42} strokeWidth={1.6} /></span>
-            <h1 className="title">Del 1 al 10...</h1>
-            <p className="hint">Cada jugador en su propio móvil. Guiaros por opiniones para adivinar el número.</p>
+        <MenuInicioJuego
+            juegoId="unoadiez"
+            onOnline={() => { setVista('online_menu'); setErrorMsg(''); }}
+            onLocal={onLocal}
+            onAyuda={() => setModalAyuda(true)}
+            error={errorMsg}
+          />
+      </div>
+    );
+  }
 
-            {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
-
-            <div className="lb-menu">
-              <button className="big full" onClick={() => { setVista('crear'); setErrorMsg(''); }}>
-                <Icon name="crown" size={22} /> Crear partida
-              </button>
-              <button className="big full" onClick={() => { setVista('unirse'); setErrorMsg(''); }}>
-                <Icon name="users" size={22} /> Unirse a partida
-              </button>
-              <button className="secondary full" onClick={onLocal}>
-                <Icon name="home" size={20} /> Jugar en un dispositivo
-              </button>
-            </div>
-          </div>
-        </section>
+  if (vista === 'online_menu') {
+    return (
+      <div className="uad-contenedor" style={{ position: 'relative' }}>
+        <ModalAyuda />
+        <MenuModoOnline
+          onVolver={() => { setVista('menu'); setErrorMsg(''); }}
+          onCrear={() => { setVista('crear'); setErrorMsg(''); }}
+          onUnirse={() => { setVista('unirse'); setErrorMsg(''); }}
+          onAyuda={() => setModalAyuda(true)}
+          error={errorMsg}
+        />
       </div>
     );
   }
@@ -189,53 +179,32 @@ export default function UnoADiezOnline({ onLocal, onSalir }) {
   if (vista === 'crear' || vista === 'unirse') {
     return (
       <div className="uad-contenedor" style={{ position: 'relative' }}>
-        <BotonAyuda />
         <ModalAyuda />
-        <section className="game">
-          <div className="panel center">
-            <span className="lb-luna chica"><Icon name={vista === 'crear' ? 'crown' : 'users'} size={40} /></span>
-            <h2 className="title">{vista === 'crear' ? 'Crear partida' : 'Unirse a partida'}</h2>
-            
-            <div className="lb-form" style={{ marginTop: '1.2rem', textAlign: 'left' }}>
-              {vista === 'unirse' && (
-                <>
-                  <label className="field-label">Código de la sala</label>
-                  <input 
-                    className="lb-input-codigo" 
-                    placeholder="ABCD" 
-                    value={codigoInput} 
-                    onChange={(e) => setCodigoInput(e.target.value.toUpperCase())} 
-                    maxLength={4} 
-                    style={{ textTransform: 'uppercase', letterSpacing: '4px', textAlign: 'center', fontWeight: '800' }}
-                  />
-                </>
-              )}
-              
-              <label className="field-label" style={{ marginTop: '1rem' }}>Tu nombre</label>
-              <input 
-                placeholder="Tu nombre" 
-                value={nombre} 
-                onChange={(e) => setNombre(e.target.value)} 
-                maxLength={15} 
-                autoFocus
-              />
-
-              {errorMsg && <p className="error">{errorMsg}</p>}
-
-              <button 
-                className="big full" 
-                style={{ marginTop: '1rem' }} 
-                disabled={cargando || !nombre.trim() || (vista === 'unirse' && codigoInput.length < 4)}
-                onClick={vista === 'crear' ? handleCrear : handleUnirse}
-              >
-                <Icon name="check" size={22} strokeWidth={2.5} /> Continuar
-              </button>
-              <button className="secondary full" style={{ marginTop: '0.6rem' }} onClick={() => setVista('menu')}>
-                Volver
-              </button>
-            </div>
-          </div>
-        </section>
+        {vista === 'crear' ? (
+          <FormCrearSala
+            onVolver={() => { setVista('online_menu'); setErrorMsg(''); }}
+            onAyuda={() => setModalAyuda(true)}
+            nombre={nombre}
+            setNombre={setNombre}
+            onCrear={handleCrear}
+            cargando={cargando}
+            error={errorMsg}
+            maxLength={15}
+          />
+        ) : (
+          <FormUnirseSala
+            onVolver={() => { setVista('online_menu'); setErrorMsg(''); }}
+            onAyuda={() => setModalAyuda(true)}
+            codigo={codigoInput}
+            setCodigo={setCodigoInput}
+            nombre={nombre}
+            setNombre={setNombre}
+            onUnirse={handleUnirse}
+            cargando={cargando}
+            error={errorMsg}
+            maxLength={15}
+          />
+        )}
       </div>
     );
   }
@@ -255,45 +224,16 @@ export default function UnoADiezOnline({ onLocal, onSalir }) {
 
   return (
     <div className="uad-contenedor" style={{ position: 'relative' }}>
-      <BotonAyuda />
       <ModalAyuda />
 
       {/* 1. LOBBY */}
       {sala.estado === 'lobby' && (
-        <section className="game">
-          <div className="panel center">
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.45rem',
-                  padding: '0.35rem 1.1rem',
-                  borderRadius: '9999px',
-                  border: '1.5px solid #22c55e',
-                  backgroundColor: '#f0fdf4',
-                  color: '#16a34a',
-                  fontSize: '0.85rem',
-                  fontWeight: 600,
-                  lineHeight: 1
-                }}
-              >
-                <Icon name="lock" size={15} />
-                Sala de espera
-              </span>
-            </div>
-            <p className="hint">Código de la partida</p>
-            <button type="button" className="qq-codigo-btn" onClick={copiarCodigo} title="Copiar código">
-              {sala.code}
-            </button>
-            <p className="hint small">
-              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Compártelo con los demás para que se unan.'}
-            </p>
-          </div>
+        <section className="game qq-pantalla">
+          <CabeceraSala codigo={sala.code} onVolver={() => setModalSalir(true)} onAyuda={() => setModalAyuda(true)} />
 
-          <div className="panel" style={{ marginTop: '1rem' }}>
-            <h3 className="panel-title"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length}/10)</h3>
-            <div className="lb-lista">
+          <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
+            <h3 className="qq-sala-titulo"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length}/10)</h3>
+            <div className="lb-lista qq-sala-lista">
               {sala.jugadores.map((j) => (
                 <div key={j.id} className={`lb-jug ${j.esTu ? 'yo' : ''}`}>
                   <span className="lb-jug-nombre">{j.nombre} {j.esTu && '(tú)'} {j.id === 1 && '👑'}</span>
@@ -308,17 +248,16 @@ export default function UnoADiezOnline({ onLocal, onSalir }) {
           <div className="actions" style={{ marginTop: '1rem' }}>
             {esAdmin && (
               <button 
-                className="big full" 
+                className="big full qq-btn-principal" 
                 disabled={sala.jugadores.length < 2} 
                 onClick={() => peticionPost(`sala/${sesion.code}/iniciar`)}
               >
                 <Icon name="play" size={22} /> Empezar Partida
               </button>
             )}
-            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
-              <Icon name="door" size={20} /> Salir
-            </button>
           </div>
+
+          {!esAdmin && <EsperandoAnfitrion />}
         </section>
       )}
 

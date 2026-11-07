@@ -4,10 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import TrescientosunoLocal from './TrescientosunoLocal.jsx';
 import TrescientosunoOnline from './TrescientosunoOnline.jsx';
 import './Trescientosuno.css';
+import { metaDe } from '../meta.js';
 
-const TITULO_JUEGO = '301 Goles';
-const DESCRIPCION_JUEGO =
-  'Un club, un número objetivo y una estadística elegida (goles, asistencias o partidos). Di jugadores de ese club hasta llegar al número objetivo. Sé el primero en llegar a 0 o el que más cerca quede, pero ojo, no te pases.';
+// Título y descripción: siempre los de meta.js
+const { titulo: TITULO_JUEGO, descripcion: DESCRIPCION_JUEGO } = metaDe('trescientosuno');
 
 export default function Trescientosuno({ onExit }) {
   const [modo, setModo] = useState('online');

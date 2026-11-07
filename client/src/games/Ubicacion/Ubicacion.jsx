@@ -5,10 +5,10 @@ import UbicacionLocal from './UbicacionLocal.jsx';
 import UbicacionOnline from './UbicacionOnline.jsx';
 import { RANGOS_PUNTOS } from './geo.js';
 import './Ubicacion.css';
+import { metaDe } from '../meta.js';
 
-const TITULO_JUEGO = 'Test del viajero';
-const DESCRIPCION_JUEGO =
-  'Coloca un lugar o monumento icónico en un mapa satélite del mundo. Coloca una marca real y varios señuelos para engañar a tus rivales. Cuanto más cerca de las coordenadas reales dejes tu marca, más puntos obtendrás.';
+// Título y descripción: siempre los de meta.js
+const { titulo: TITULO_JUEGO, descripcion: DESCRIPCION_JUEGO } = metaDe('ubicacion');
 
 export default function Ubicacion({ onExit }) {
   const [modo, setModo] = useState('online');

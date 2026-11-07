@@ -629,7 +629,7 @@ export default function BuscaminasOnline({
               </button>
             </div>
 
-            <p className="categoria"><Icon name="lock" size={16} /> Sala de espera</p>
+            <span className="qq-badge-sala"><Icon name="lock" size={15} /> Sala de espera</span>
             <p className="hint">Código de la partida</p>
             <button
               type="button"
@@ -644,9 +644,9 @@ export default function BuscaminasOnline({
             </p>
           </div>
 
-          <div className="panel" style={{ marginTop: '1rem' }}>
-            <h3 className="panel-title"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length})</h3>
-            <div className="lb-lista">
+          <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
+            <h3 className="qq-sala-titulo"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length})</h3>
+            <div className="lb-lista qq-sala-lista">
               {sala.jugadores.map((j) => (
                 <div key={j.id} className={`lb-jug ${j.id === yoId ? 'yo' : ''}`}>
                   <span className="lb-jug-nombre">

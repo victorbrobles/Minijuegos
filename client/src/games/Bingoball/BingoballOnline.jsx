@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
 import './Bingoball.css';
 import '../Adivina/Adivina.css';
+import { MenuInicioJuego, FormCrearSala, FormUnirseSala, CabeceraSala, EsperandoAnfitrion } from '../../components/MenuJuego.jsx';
 
 const CLAVE_SESION_BB = 'bingoball_online_session';
 
@@ -204,23 +205,13 @@ export default function BingoballOnline({ onSalir }) {
     return (
       <div className="bb-contenedor" style={{ position: 'relative' }}>
         <ModalAyuda />
-        <section className="game">
-          <div className="panel center" style={{ position: 'relative' }}>
-            <BotonAyudaCard />
-            <span className="lb-luna chica"><Icon name="soccer" size={42} strokeWidth={1.6} /></span>
-            <h1 className="title">Bingoball</h1>
-            <p className="hint">Completa tu cartón de 4x3 relacionando futbolistas con categorías antes que tus rivales. (3 a 15 jugadores).</p>
-            {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
-            <div className="lb-menu">
-              <button className="big full" onClick={() => { setVista('crear'); setErrorMsg(''); }}>
-                <Icon name="crown" size={22} /> Crear partida Online
-              </button>
-              <button className="big full" onClick={() => { setVista('unirse'); setErrorMsg(''); }}>
-                <Icon name="users" size={22} /> Unirse a partida
-              </button>
-            </div>
-          </div>
-        </section>
+        <MenuInicioJuego
+            juegoId="bingoball"
+            onCrear={() => { setVista('crear'); setErrorMsg(''); }}
+            onUnirse={() => { setVista('unirse'); setErrorMsg(''); }}
+            onAyuda={() => setModalAyuda(true)}
+            error={errorMsg}
+          />
       </div>
     );
   }
@@ -229,47 +220,31 @@ export default function BingoballOnline({ onSalir }) {
     return (
       <div className="bb-contenedor" style={{ position: 'relative' }}>
         <ModalAyuda />
-        <section className="game">
-          <div className="panel center">
-            <span className="lb-luna chica"><Icon name={vista === 'crear' ? 'crown' : 'users'} size={40} /></span>
-            <h2 className="title">{vista === 'crear' ? 'Crear partida' : 'Unirse a partida'}</h2>
-            <div className="lb-form" style={{ marginTop: '1.2rem', textAlign: 'left' }}>
-              {vista === 'unirse' && (
-                <>
-                  <label className="field-label">Código de la sala</label>
-                  <input
-                    className="lb-input-codigo"
-                    placeholder="ABCD"
-                    value={codigoInput}
-                    onChange={(e) => setCodigoInput(e.target.value.toUpperCase())}
-                    maxLength={4}
-                    style={{ textTransform: 'uppercase', letterSpacing: '4px', textAlign: 'center', fontWeight: '800' }}
-                  />
-                </>
-              )}
-              <label className="field-label" style={{ marginTop: '1rem' }}>Tu nombre</label>
-              <input
-                placeholder="Tu nombre"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                maxLength={15}
-                autoFocus
-              />
-              {errorMsg && <p className="error">{errorMsg}</p>}
-              <button
-                className="big full"
-                style={{ marginTop: '1rem' }}
-                disabled={cargando || !nombre.trim() || (vista === 'unirse' && codigoInput.length < 4)}
-                onClick={vista === 'crear' ? handleCrear : handleUnirse}
-              >
-                <Icon name="check" size={22} strokeWidth={2.5} /> Continuar
-              </button>
-              <button className="secondary full" style={{ marginTop: '0.6rem' }} onClick={() => setVista('menu')}>
-                Volver
-              </button>
-            </div>
-          </div>
-        </section>
+        {vista === 'crear' ? (
+          <FormCrearSala
+            onVolver={() => { setVista('menu'); setErrorMsg(''); }}
+            onAyuda={() => setModalAyuda(true)}
+            nombre={nombre}
+            setNombre={setNombre}
+            onCrear={handleCrear}
+            cargando={cargando}
+            error={errorMsg}
+            maxLength={15}
+          />
+        ) : (
+          <FormUnirseSala
+            onVolver={() => { setVista('menu'); setErrorMsg(''); }}
+            onAyuda={() => setModalAyuda(true)}
+            codigo={codigoInput}
+            setCodigo={setCodigoInput}
+            nombre={nombre}
+            setNombre={setNombre}
+            onUnirse={handleUnirse}
+            cargando={cargando}
+            error={errorMsg}
+            maxLength={15}
+          />
+        )}
       </div>
     );
   }
@@ -282,40 +257,12 @@ export default function BingoballOnline({ onSalir }) {
 
       {/* 1. LOBBY */}
       {sala.estado === 'lobby' && (
-        <section className="game">
-          <div className="panel center" style={{ position: 'relative' }}>
-            <BotonAyudaCard />
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.45rem',
-                  padding: '0.35rem 1.1rem',
-                  borderRadius: '9999px',
-                  border: '1.5px solid #22c55e',
-                  backgroundColor: '#f0fdf4',
-                  color: '#16a34a',
-                  fontSize: '0.85rem',
-                  fontWeight: 600,
-                  lineHeight: 1
-                }}
-              >
-                <Icon name="lock" size={15} /> Sala de espera
-              </span>
-            </div>
-            <p className="hint">Código de la partida</p>
-            <button type="button" className="qq-codigo-btn" onClick={copiarCodigo} title="Copiar código">
-              {sala.code}
-            </button>
-            <p className="hint small">
-              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Comparte este código para que se unan (3 a 15 jugadores).'}
-            </p>
-          </div>
+        <section className="game qq-pantalla">
+          <CabeceraSala codigo={sala.code} onVolver={() => setModalSalir(true)} onAyuda={() => setModalAyuda(true)} />
 
-          <div className="panel" style={{ marginTop: '1rem' }}>
-            <h3 className="panel-title"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length}/15)</h3>
-            <div className="lb-lista">
+          <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
+            <h3 className="qq-sala-titulo"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length}/15)</h3>
+            <div className="lb-lista qq-sala-lista">
               {sala.jugadores.map((j) => (
                 <div key={j.id} className={`lb-jug ${j.esTu ? 'yo' : ''}`}>
                   <span className="lb-jug-nombre">{j.nombre} {j.esTu && '(tú)'} {j.esAdmin && '👑'}</span>
@@ -355,17 +302,16 @@ export default function BingoballOnline({ onSalir }) {
           <div className="actions" style={{ marginTop: '1rem' }}>
             {esAdmin && (
               <button
-                className="big full"
+                className="big full qq-btn-principal"
                 disabled={faltan > 0}
                 onClick={() => peticionPost(`sala/${sesion.code}/iniciar`)}
               >
                 <Icon name="play" size={22} /> Empezar Bingoball
               </button>
             )}
-            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
-              <Icon name="door" size={20} /> Salir
-            </button>
           </div>
+
+          {!esAdmin && <EsperandoAnfitrion />}
         </section>
       )}
 

@@ -4,10 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import RapidfireLocal from './RapidfireLocal.jsx';
 import RapidfireOnline from './RapidfireOnline.jsx';
 import './Rapidfire.css';
+import { metaDe } from '../meta.js';
 
-const TITULO_JUEGO = 'Rápido y certero';
-const DESCRIPCION_JUEGO =
-  'Elige una categoría y enfréntate al reto de enumerar determinados elementos sobre ella. Dilos todos o le dejarás el rebote al siguiente jugador para que complete ¡y se lleve todos los puntos!';
+// Título y descripción: siempre los de meta.js
+const { titulo: TITULO_JUEGO, descripcion: DESCRIPCION_JUEGO } = metaDe('rapidfire');
 
 export default function Rapidfire({ onExit }) {
   const [modo, setModo] = useState('online');

@@ -4,10 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import CancionLocal from './CancionLocal.jsx';
 import CancionOnline from './CancionOnline.jsx';
 import './Cancion.css';
+import { metaDe } from '../meta.js';
 
-const TITULO_JUEGO = 'Afina ese oído';
-const DESCRIPCION_JUEGO =
-  'Adivina una canción mediante su reproducción. La canción aumenta progresivamente de volumen, cuanto antes aciertes, más puntos podrás conseguir.';
+// Título y descripción: siempre los de meta.js
+const { titulo: TITULO_JUEGO, descripcion: DESCRIPCION_JUEGO } = metaDe('cancion');
 
 export default function Cancion({ onExit }) {
   const [modo, setModo] = useState('online');

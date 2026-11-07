@@ -10,15 +10,6 @@ export default function Siglas() {
   if (categoria === undefined) {
     return (
       <div style={{ position: 'relative', width: '100%' }}>
-        {/* Botón flotante de ayuda */}
-        <button
-          type="button"
-          className="btn-ayuda-flotante"
-          onClick={() => setModalAyuda(true)}
-          title="Reglas y sistema de puntuación"
-        >
-          <span className="btn-ayuda-flotante-signo">?</span>
-        </button>
 
         {/* Modal explicativo */}
         {modalAyuda && (
@@ -60,7 +51,7 @@ export default function Siglas() {
           </div>
         )}
 
-        <SelectorCategoria onElegir={setCategoria} />
+        <SelectorCategoria onElegir={setCategoria} onAyuda={() => setModalAyuda(true)} />
       </div>
     );
   }

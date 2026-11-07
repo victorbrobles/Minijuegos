@@ -4,25 +4,12 @@
    FONDO TEMÁTICO Y TIPOGRAFÍA UNIFICADA: 301 GOLES
    ======================================================== */
 
-body:has(.tcu-contenedor) {
-  background:
-    radial-gradient(70% 460px at 50% 0%, rgba(16, 185, 129, 0.45) 0%, transparent 70%),
-    radial-gradient(45% 560px at 100% 20%, rgba(5, 150, 105, 0.28) 0%, transparent 70%),
-    radial-gradient(45% 560px at 0% 50%, rgba(52, 211, 153, 0.22) 0%, transparent 70%),
-    radial-gradient(45% 560px at 100% 76%, rgba(4, 120, 87, 0.25) 0%, transparent 70%),
-    radial-gradient(80% 520px at 50% 100%, rgba(5, 150, 105, 0.38) 0%, transparent 70%),
-    radial-gradient(rgba(255, 255, 255, 0.08) 1.3px, transparent 1.5px) 0 0 / 22px 22px,
-    linear-gradient(180deg, #061f18 0%, #08281e 50%, #04120f 100%) !important;
-  background-attachment: scroll !important;
-}
 
 body:has(.qq-en-partida) .back:not(.qq-btn-volver-sala) {
   display: none !important;
 }
 
 .tcu-contenedor {
-  --g1: #10b981;
-  --g2: #047857;
   width: 100%;
   position: relative;
   min-height: 100vh;
@@ -590,25 +577,12 @@ body:has(.qq-en-partida) .back:not(.qq-btn-volver-sala) {
    FONDO TEMÁTICO: 301 GOLES (VERDE ESMERALDA / MAR)
    ======================================================== */
 
-body:has(.tcu-contenedor) {
-  background:
-    radial-gradient(70% 460px at 50% 0%, rgba(16, 185, 129, 0.45) 0%, transparent 70%),
-    radial-gradient(45% 560px at 100% 20%, rgba(5, 150, 105, 0.28) 0%, transparent 70%),
-    radial-gradient(45% 560px at 0% 50%, rgba(52, 211, 153, 0.22) 0%, transparent 70%),
-    radial-gradient(45% 560px at 100% 76%, rgba(4, 120, 87, 0.25) 0%, transparent 70%),
-    radial-gradient(80% 520px at 50% 100%, rgba(5, 150, 105, 0.38) 0%, transparent 70%),
-    radial-gradient(rgba(255, 255, 255, 0.08) 1.3px, transparent 1.5px) 0 0 / 22px 22px,
-    linear-gradient(180deg, #061f18 0%, #08281e 50%, #04120f 100%) !important;
-  background-attachment: scroll !important;
-}
 
 body:has(.qq-en-partida) .back:not(.qq-btn-volver-sala) {
   display: none !important;
 }
 
 .tcu-contenedor {
-  --g1: #10b981;
-  --g2: #047857;
   width: 100%;
   position: relative;
   min-height: 100vh;

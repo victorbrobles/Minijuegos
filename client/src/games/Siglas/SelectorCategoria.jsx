@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { leerRecord } from './records.js';
 import GameIntro from '../../components/GameIntro.jsx';
+import { PanelMenu, CabeceraJuego } from '../../components/MenuJuego.jsx';
 import CategoryCard from '../../components/CategoryCard.jsx';
 
-export default function SelectorCategoria({ onElegir }) {
+export default function SelectorCategoria({ onElegir, onAyuda }) {
   const [datos, setDatos] = useState(null);
   const [error, setError] = useState(false);
   const [intento, setIntento] = useState(0);
@@ -38,14 +39,17 @@ export default function SelectorCategoria({ onElegir }) {
   }
 
   return (
-    <section className="game">
-      <GameIntro gameId="siglas" titulo="Siglas y acrónimos" />
-      <div className="cat-grid">
-        <CategoryCard todas nombre="Todas las categorías" record={leerRecord(null)} onClick={() => onElegir(null)} />
-        {datos.categorias.map((c, i) => (
-          <CategoryCard key={c.nombre} nombre={c.nombre} indice={i} record={leerRecord(c.nombre)} onClick={() => onElegir(c.nombre)} />
-        ))}
-      </div>
+    <section className="game qq-pantalla">
+      <PanelMenu onAyuda={onAyuda}>
+        <CabeceraJuego juegoId="siglas" />
+        <span className="qq-label-destacado" style={{ marginTop: '0.4rem' }}>Elige una categoría</span>
+        <div className="cat-grid">
+          <CategoryCard todas nombre="Todas las categorías" record={leerRecord(null)} onClick={() => onElegir(null)} />
+          {datos.categorias.map((c, i) => (
+            <CategoryCard key={c.nombre} nombre={c.nombre} indice={i} record={leerRecord(c.nombre)} onClick={() => onElegir(c.nombre)} />
+          ))}
+        </div>
+      </PanelMenu>
     </section>
   );
 }

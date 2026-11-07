@@ -288,7 +288,7 @@ function Entrada({
           </div>
 
           <div className="qq-hero-icono">
-            <Icon name="moon" size={44} strokeWidth={1.6} />
+            <Icon name="moon" size={44} strokeWidth={1.7} />
           </div>
           <h1 className="title qq-main-title">{tituloJuego}</h1>
           <p className="hint qq-main-desc">{descripcionJuego}</p>
@@ -721,9 +721,7 @@ export function Lobby({ v, enviar, onAbrirModalSalir, onAbrirAyuda }) {
           </button>
         </div>
 
-        <p className="categoria">
-          <Icon name="lock" size={16} /> Sala de espera
-        </p>
+        <span className="qq-badge-sala"><Icon name="lock" size={15} /> Sala de espera</span>
         <p className="hint">Código de la partida</p>
         <button type="button" className="qq-codigo-btn" onClick={copiar} title="Copiar código">
           {v.code}
@@ -733,11 +731,11 @@ export function Lobby({ v, enviar, onAbrirModalSalir, onAbrirAyuda }) {
         </p>
       </div>
 
-      <div className="panel" style={{ marginTop: '1rem' }}>
-        <h3 className="panel-title">
+      <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
+        <h3 className="qq-sala-titulo">
           <Icon name="users" size={20} /> Jugadores ({n}/{v.limites.max})
         </h3>
-        <div className="lb-lista">
+        <div className="lb-lista qq-sala-lista">
           {v.jugadores.map((p) => (
             <div key={p.id} className={`lb-jug ${p.id === v.yo ? 'yo' : ''}`}>
               <span className="lb-jug-nombre">

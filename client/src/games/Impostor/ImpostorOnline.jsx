@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
 import './Impostor.css';
+import { MenuInicioJuego, MenuModoOnline, FormCrearSala, FormUnirseSala, CabeceraSala } from '../../components/MenuJuego.jsx';
 
 const CLAVE_SESION_IMP = 'impostor_online_session';
 
@@ -56,7 +57,7 @@ export default function ImpostorOnline({ onLocal, onSalir }) {
           sessionStorage.removeItem(CLAVE_SESION_IMP);
           setSesion(null);
           setSala(null);
-          setVista('menu');
+          setVista('online_menu');
           setErrorMsg('La sala se ha cerrado o se ha perdido la conexión.');
         });
     };
@@ -214,7 +215,7 @@ export default function ImpostorOnline({ onLocal, onSalir }) {
     sessionStorage.removeItem(CLAVE_SESION_IMP);
     setSesion(null);
     setSala(null);
-    setVista('menu');
+    setVista('online_menu');
   };
 
   const copiarCodigo = () => {
@@ -229,20 +230,9 @@ export default function ImpostorOnline({ onLocal, onSalir }) {
   const ranking = [...(sala?.jugadores || [])].sort((a, b) => b.puntos - a.puntos);
   const maximoPuntos = ranking.length ? ranking[0].puntos : 0;
   const ganadores = maximoPuntos > 0 ? ranking.filter((j) => j.puntos === maximoPuntos) : [];
-  const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
 
   return (
     <div className="aprox-contenedor">
-      {mostrarAyuda && (
-        <button
-          type="button"
-          className="btn-ayuda-flotante"
-          onClick={() => setModalAyuda(true)}
-          title="Reglas de Miente como puedas"
-        >
-          <span className="btn-ayuda-flotante-signo">?</span>
-        </button>
-      )}
 
       {modalAyuda && (
         <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
@@ -267,163 +257,58 @@ export default function ImpostorOnline({ onLocal, onSalir }) {
       )}
 
       {vista === 'menu' && (
-        <section className="game">
-          <div className="panel center">
-            <span className="lb-luna chica">
-              <Icon name="whois" size={42} strokeWidth={1.6} />
-            </span>
-            <h1 className="title">Miente como puedas</h1>
-            <p className="hint">
-              Uno de vosotros es el impostor. Hablad por turnos para cazarlo o engañar al resto. El anfitrión crea la sala.
-            </p>
+        <MenuInicioJuego
+          juegoId="impostor"
+          onOnline={() => { setVista('online_menu'); setErrorMsg(''); }}
+          onLocal={onLocal}
+          onAyuda={() => setModalAyuda(true)}
+          error={errorMsg}
+        />
+      )}
 
-            {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
-
-            <div className="lb-menu">
-              <button className="big full" onClick={() => { setVista('crear'); setErrorMsg(''); }}>
-                <Icon name="crown" size={22} /> Crear partida
-              </button>
-              <button className="big full" onClick={() => { setVista('unirse'); setErrorMsg(''); }}>
-                <Icon name="users" size={22} /> Unirse a partida
-              </button>
-              <button className="secondary full" onClick={onLocal}>
-                <Icon name="home" size={20} /> Jugar en un solo dispositivo
-              </button>
-            </div>
-          </div>
-        </section>
+      {vista === 'online_menu' && (
+        <MenuModoOnline
+          onVolver={() => { setVista('menu'); setErrorMsg(''); }}
+          onCrear={() => { setVista('crear'); setErrorMsg(''); }}
+          onUnirse={() => { setVista('unirse'); setErrorMsg(''); }}
+          onAyuda={() => setModalAyuda(true)}
+          error={errorMsg}
+        />
       )}
 
       {vista === 'crear' && (
-        <section className="game">
-          <div className="panel center">
-            <span className="lb-luna chica">
-              <Icon name="crown" size={40} strokeWidth={1.6} />
-            </span>
-            <h2 className="title">Crear partida</h2>
-            <p className="hint">Introduce tu nombre para crear la sala y ser el anfitrión.</p>
-
-            <div className="lb-form" style={{ marginTop: '1.2rem', textAlign: 'left' }}>
-              <label className="field-label" htmlFor="imp-host-nombre">Tu nombre</label>
-              <input
-                id="imp-host-nombre"
-                type="text"
-                placeholder="Tu nombre"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                maxLength={20}
-                autoFocus
-              />
-              {errorMsg && <p className="error">{errorMsg}</p>}
-
-              <button
-                className="big full"
-                style={{ marginTop: '1rem' }}
-                disabled={cargando || !nombre.trim()}
-                onClick={handleCrear}
-              >
-                <Icon name="check" size={22} strokeWidth={2.5} /> Crear sala
-              </button>
-              <button
-                className="secondary full"
-                style={{ marginTop: '0.6rem' }}
-                onClick={() => { setVista('menu'); setErrorMsg(''); }}
-              >
-                Volver
-              </button>
-            </div>
-          </div>
-        </section>
+        <FormCrearSala
+          onVolver={() => { setVista('online_menu'); setErrorMsg(''); }}
+          onAyuda={() => setModalAyuda(true)}
+          nombre={nombre}
+          setNombre={setNombre}
+          onCrear={handleCrear}
+          cargando={cargando}
+          error={errorMsg}
+        />
       )}
 
       {vista === 'unirse' && (
-        <section className="game">
-          <div className="panel center">
-            <span className="lb-luna chica">
-              <Icon name="users" size={40} strokeWidth={1.6} />
-            </span>
-            <h2 className="title">Unirse a partida</h2>
-            <p className="hint">Introduce el código de 4 letras que te ha dado el anfitrión.</p>
-
-            <div className="lb-form" style={{ marginTop: '1.2rem', textAlign: 'left' }}>
-              <label className="field-label" htmlFor="imp-code-input">Código de la sala</label>
-              <input
-                id="imp-code-input"
-                className="lb-input-codigo"
-                type="text"
-                placeholder="ABCD"
-                value={codigoInput}
-                onChange={(e) => setCodigoInput(e.target.value.toUpperCase())}
-                maxLength={4}
-                style={{ textTransform: 'uppercase', letterSpacing: '4px', textAlign: 'center', fontWeight: '800' }}
-                autoFocus
-              />
-
-              <label className="field-label" htmlFor="imp-guest-nombre" style={{ marginTop: '1rem' }}>Tu nombre</label>
-              <input
-                id="imp-guest-nombre"
-                type="text"
-                placeholder="Tu nombre"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                maxLength={20}
-              />
-              {errorMsg && <p className="error">{errorMsg}</p>}
-
-              <button
-                className="big full"
-                style={{ marginTop: '1rem' }}
-                disabled={cargando || !nombre.trim() || codigoInput.trim().length < 4}
-                onClick={handleUnirse}
-              >
-                <Icon name="check" size={22} strokeWidth={2.5} /> Entrar en la partida
-              </button>
-              <button
-                className="secondary full"
-                style={{ marginTop: '0.6rem' }}
-                onClick={() => { setVista('menu'); setErrorMsg(''); }}
-              >
-                Volver
-              </button>
-            </div>
-          </div>
-        </section>
+        <FormUnirseSala
+          onVolver={() => { setVista('online_menu'); setErrorMsg(''); }}
+          onAyuda={() => setModalAyuda(true)}
+          codigo={codigoInput}
+          setCodigo={setCodigoInput}
+          nombre={nombre}
+          setNombre={setNombre}
+          onUnirse={handleUnirse}
+          cargando={cargando}
+          error={errorMsg}
+        />
       )}
 
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
-        <section className="game">
-          <div className="panel center">
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.45rem',
-                  padding: '0.35rem 1.1rem',
-                  borderRadius: '9999px',
-                  border: '1.5px solid #22c55e',
-                  backgroundColor: '#f0fdf4',
-                  color: '#16a34a',
-                  fontSize: '0.85rem',
-                  fontWeight: 600,
-                  lineHeight: 1
-                }}
-              >
-                <Icon name="lock" size={15} /> Sala de espera
-              </span>
-            </div>
-            <p className="hint">Código de la partida</p>
-            <button type="button" className="qq-codigo-btn" onClick={copiarCodigo} title="Copiar código">
-              {sala.code}
-            </button>
-            <p className="hint small">
-              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Pulsa el código para copiarlo.'}
-            </p>
-          </div>
+        <section className="game qq-pantalla">
+          <CabeceraSala codigo={sala.code} onVolver={() => setModalSalir(true)} onAyuda={() => setModalAyuda(true)} />
 
-          <div className="panel" style={{ marginTop: '1rem' }}>
-            <h3 className="panel-title"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length})</h3>
-            <div className="lb-lista">
+          <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
+            <h3 className="qq-sala-titulo"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length})</h3>
+            <div className="lb-lista qq-sala-lista">
               {sala.jugadores.map((j) => (
                 <div key={j.id} className={`lb-jug ${j.id === sala.yoId ? 'yo' : ''}`}>
                   <span className="lb-jug-nombre">
@@ -458,7 +343,7 @@ export default function ImpostorOnline({ onLocal, onSalir }) {
               </div>
 
               <button
-                className="big full"
+                className="big full qq-btn-principal"
                 disabled={sala.jugadores.length < 3}
                 onClick={handleIniciarJuego}
               >
@@ -467,18 +352,13 @@ export default function ImpostorOnline({ onLocal, onSalir }) {
               </button>
             </div>
           ) : (
-            <div className="panel center" style={{ padding: '2rem 1.5rem', marginTop: '1rem' }}>
+            <div className="panel center qq-menu-panel" style={{ padding: '2rem 1.5rem', marginTop: '1rem' }}>
               <span className="lb-luna chica"><Icon name="hourglass" size={40} /></span>
               <h3 style={{ margin: '0.5rem 0' }}>Esperando al anfitrión...</h3>
               <p className="hint">En cuanto comience la partida, verás tu palabra secreta.</p>
             </div>
           )}
 
-          <div className="actions" style={{ marginTop: '1rem' }}>
-            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
-              <Icon name="door" size={20} /> Salir de la sala
-            </button>
-          </div>
         </section>
       )}
 

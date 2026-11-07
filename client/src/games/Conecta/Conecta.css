@@ -646,17 +646,6 @@
    MENÚS UNIFICADOS (TEMA AZUL / CYAN: CONECTA 4)
    ======================================================== */
 
-body:has(.cc-contenedor) {
-  background:
-    radial-gradient(70% 460px at 50% 0%, rgba(14, 165, 233, .45) 0%, transparent 70%),
-    radial-gradient(45% 560px at 100% 20%, rgba(56, 189, 248, .22) 0%, transparent 70%),
-    radial-gradient(45% 560px at 0% 50%, rgba(2, 132, 199, .22) 0%, transparent 70%),
-    radial-gradient(45% 560px at 100% 76%, rgba(2, 132, 199, .2) 0%, transparent 70%),
-    radial-gradient(80% 520px at 50% 100%, rgba(3, 105, 161, .36) 0%, transparent 70%),
-    radial-gradient(rgba(255, 255, 255, .06) 1.3px, transparent 1.5px) 0 0 / 22px 22px,
-    linear-gradient(180deg, #04101a 0%, #071e30 50%, #030c14 100%) !important;
-  background-attachment: scroll !important;
-}
 
 body:has(.qq-en-partida) .back {
   display: none !important;

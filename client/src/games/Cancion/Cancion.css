@@ -186,17 +186,6 @@
    MENÚS UNIFICADOS (TEMA NARANJA / ÁMBAR: AFINA ESE OÍDO)
    ======================================================== */
 
-body:has(.cancion-contenedor) {
-  background:
-    radial-gradient(70% 460px at 50% 0%, rgba(245, 158, 11, .45) 0%, transparent 70%),
-    radial-gradient(45% 560px at 100% 20%, rgba(217, 119, 6, .22) 0%, transparent 70%),
-    radial-gradient(45% 560px at 0% 50%, rgba(234, 88, 12, .22) 0%, transparent 70%),
-    radial-gradient(45% 560px at 100% 76%, rgba(194, 65, 12, .2) 0%, transparent 70%),
-    radial-gradient(80% 520px at 50% 100%, rgba(249, 115, 22, .36) 0%, transparent 70%),
-    radial-gradient(rgba(255, 255, 255, .06) 1.3px, transparent 1.5px) 0 0 / 22px 22px,
-    linear-gradient(180deg, #1b1207 0%, #2e160a 50%, #241108 100%) !important;
-  background-attachment: scroll !important;
-}
 
 body:has(.qq-en-partida) .back {
   display: none !important;
@@ -1011,17 +1000,6 @@ body:has(.qq-en-partida) .back {
   background: linear-gradient(90deg, #86efac, #22c55e);
 }
 
-body:has(.cancion-contenedor) {
-  background:
-    radial-gradient(70% 460px at 50% 0%, rgba(34, 197, 94, .35) 0%, transparent 70%),
-    radial-gradient(45% 560px at 100% 20%, rgba(21, 128, 61, .22) 0%, transparent 70%),
-    radial-gradient(45% 560px at 0% 50%, rgba(74, 222, 128, .2) 0%, transparent 70%),
-    radial-gradient(45% 560px at 100% 76%, rgba(22, 101, 52, .2) 0%, transparent 70%),
-    radial-gradient(80% 520px at 50% 100%, rgba(21, 128, 61, .32) 0%, transparent 70%),
-    radial-gradient(rgba(255, 255, 255, .06) 1.3px, transparent 1.5px) 0 0 / 22px 22px,
-    linear-gradient(180deg, #0f1a14 0%, #112519 50%, #0c1811 100%) !important;
-  background-attachment: scroll !important;
-}
 
 body:has(.qq-en-partida) .back {
   display: none !important;
@@ -1038,17 +1016,6 @@ body:has(.qq-en-partida) .back {
    FONDO TEMÁTICO: AFINA ESE OÍDO (VERDE LIMA VIBRANTE / PANTALLA COMPLETA)
    ======================================================== */
 
-body:has(.cancion-contenedor) {
-  background:
-    radial-gradient(70% 460px at 50% 0%, rgba(34, 197, 94, 0.48) 0%, transparent 70%),
-    radial-gradient(50% 560px at 100% 20%, rgba(22, 163, 74, 0.32) 0%, transparent 70%),
-    radial-gradient(45% 560px at 0% 50%, rgba(74, 222, 128, 0.28) 0%, transparent 70%),
-    radial-gradient(50% 560px at 100% 75%, rgba(21, 128, 61, 0.3) 0%, transparent 70%),
-    radial-gradient(80% 520px at 50% 100%, rgba(34, 197, 94, 0.42) 0%, transparent 70%),
-    radial-gradient(rgba(255, 255, 255, 0.08) 1.3px, transparent 1.5px) 0 0 / 22px 22px,
-    linear-gradient(180deg, #07150e 0%, #0c2016 50%, #06120b 100%) !important;
-  background-attachment: scroll !important;
-}
 
 body:has(.qq-en-partida) .back {
   display: none !important;

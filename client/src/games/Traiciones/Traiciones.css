@@ -4,17 +4,6 @@
    FONDO TEMÁTICO: TRAICIONES (ARENA / ÁMBAR NOCTURNO)
    ======================================================== */
 
-body:has(.tr-contenedor) {
-  background:
-    radial-gradient(70% 460px at 50% 0%, rgba(245, 158, 11, 0.42) 0%, transparent 70%),
-    radial-gradient(45% 560px at 100% 20%, rgba(217, 119, 6, 0.28) 0%, transparent 70%),
-    radial-gradient(45% 560px at 0% 50%, rgba(251, 191, 36, 0.2) 0%, transparent 70%),
-    radial-gradient(45% 560px at 100% 76%, rgba(180, 83, 9, 0.25) 0%, transparent 70%),
-    radial-gradient(80% 520px at 50% 100%, rgba(217, 119, 6, 0.35) 0%, transparent 70%),
-    radial-gradient(rgba(255, 255, 255, 0.08) 1.3px, transparent 1.5px) 0 0 / 22px 22px,
-    linear-gradient(180deg, #18110b 0%, #1e130c 50%, #120905 100%) !important;
-  background-attachment: scroll !important;
-}
 
 body:has(.qq-en-partida) .back:not(.qq-btn-volver-sala) {
   display: none !important;

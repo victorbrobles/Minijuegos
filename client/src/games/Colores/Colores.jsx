@@ -4,10 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import ColoresLocal from './ColoresLocal.jsx';
 import ColoresOnline from './ColoresOnline.jsx';
 import './Colores.css';
+import { metaDe } from '../meta.js';
 
-const TITULO_JUEGO = 'La vida en colores';
-const DESCRIPCION_JUEGO =
-  'Algo que todo el mundo conoce, once colores disponibles. Adivina la combinación de colores presente en cada elemento.';
+// Título y descripción: siempre los de meta.js
+const { titulo: TITULO_JUEGO, descripcion: DESCRIPCION_JUEGO } = metaDe('colores');
 
 export default function Colores({ onExit }) {
   const [modo, setModo] = useState('online');

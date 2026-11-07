@@ -1,0 +1,712 @@
+/* client/src/components/MenuJuego.css
+   ==========================================================================
+   MENÚS INICIALES UNIFICADOS DE TODOS LOS MINIJUEGOS
+   --------------------------------------------------------------------------
+   Todos los colores salen de --g1 / --g2, que GamePage toma de meta.js
+   (colores del juego). Así cada menú usa EXACTAMENTE el color asignado a su
+   juego, sin colores fijos que se pisen entre juegos.
+
+   Todos los CSS de los juegos se empaquetan juntos (son globales), así que
+   estas reglas van con el prefijo .game-shell para ganar en especificidad a
+   las copias antiguas que hay en los CSS de cada juego.
+   ========================================================================== */
+
+.game-shell {
+  /* Tonos derivados del color principal del juego */
+  --qq-suave: color-mix(in srgb, var(--g1) 8%, #ffffff);
+  --qq-suave-2: color-mix(in srgb, var(--g1) 16%, #ffffff);
+  --qq-borde: color-mix(in srgb, var(--g1) 32%, #ffffff);
+  --qq-sombra: color-mix(in srgb, var(--g1) 30%, transparent);
+  --qq-sombra-fuerte: color-mix(in srgb, var(--g1) 45%, transparent);
+  --qq-anillo: color-mix(in srgb, var(--g1) 18%, transparent);
+}
+
+/* ---------- Fondo de la página con los colores del juego ---------- */
+/* GamePage copia --g1/--g2 en <body> para poder pintar el fondo. */
+body:has(.game-shell) {
+  background:
+    radial-gradient(70% 460px at 50% 0%, color-mix(in srgb, var(--g1, #8b5cf6) 45%, transparent) 0%, transparent 70%),
+    radial-gradient(45% 560px at 100% 20%, color-mix(in srgb, var(--g2, #6366f1) 30%, transparent) 0%, transparent 70%),
+    radial-gradient(45% 560px at 0% 50%, color-mix(in srgb, var(--g1, #8b5cf6) 22%, transparent) 0%, transparent 70%),
+    radial-gradient(45% 560px at 100% 76%, color-mix(in srgb, var(--g2, #6366f1) 26%, transparent) 0%, transparent 70%),
+    radial-gradient(80% 520px at 50% 100%, color-mix(in srgb, var(--g1, #8b5cf6) 36%, transparent) 0%, transparent 70%),
+    radial-gradient(rgba(255, 255, 255, 0.07) 1.3px, transparent 1.5px) 0 0 / 22px 22px,
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--g2, #6366f1) 16%, #0b0b14) 0%,
+      color-mix(in srgb, var(--g1, #8b5cf6) 14%, #0d0d18) 50%,
+      color-mix(in srgb, var(--g2, #6366f1) 12%, #09090f) 100%
+    ) !important;
+  background-attachment: scroll !important;
+}
+
+/* Durante la partida se oculta el botón de portada de la cabecera
+   (cada juego muestra su propio "Volver a la portada" con confirmación). */
+body:has(.qq-en-partida) .game-shell > .back {
+  display: none !important;
+}
+
+/* ---------- Tipografía ---------- */
+.game-shell .qq-main-title,
+.game-shell .qq-section-title,
+.game-shell .qq-config-titulo {
+  font-family: 'Bricolage Grotesque', sans-serif !important;
+  font-weight: 800 !important;
+}
+
+.game-shell .qq-main-desc,
+.game-shell .qq-config-sub,
+.game-shell .qq-label-destacado,
+.game-shell .qq-link-volver,
+.game-shell .qq-opcion-card,
+.game-shell .qq-opcion-textos strong,
+.game-shell .qq-opcion-textos span,
+.game-shell .qq-input-moderno,
+.game-shell .qq-jugador-input-card input {
+  font-family: 'Figtree', system-ui, sans-serif !important;
+}
+
+.game-shell .qq-pantalla {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding-top: 1rem;
+  box-sizing: border-box;
+}
+
+/* ---------- Tarjeta del menú ---------- */
+.game-shell .qq-menu-panel {
+  position: relative;
+  padding: 1.6rem 1.6rem 2rem !important;
+  border-radius: 26px !important;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+  border: 1.5px solid #e2e8f0 !important;
+  box-shadow: 0 18px 38px -12px var(--qq-sombra) !important;
+}
+
+.game-shell .qq-menu-panel + .qq-menu-panel,
+.game-shell .qq-menu-panel + .panel,
+.game-shell .panel + .qq-menu-panel {
+  margin-top: 1rem;
+}
+
+.game-shell .qq-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  width: 100%;
+  margin-bottom: 0.6rem;
+}
+
+.game-shell .qq-card-top.solo-derecha {
+  justify-content: flex-end;
+}
+
+/* ---------- Botón "Volver" (texto) ---------- */
+.game-shell .qq-link-volver {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 0.35rem;
+  width: auto !important;
+  min-height: 0 !important;
+  margin: 0 0 0 -0.4rem !important;
+  padding: 0.3rem 0.5rem !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+  color: #64748b !important;
+  font-size: 0.92rem !important;
+  font-weight: 700 !important;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.game-shell .qq-link-volver:hover {
+  color: var(--g1) !important;
+  background: var(--qq-suave) !important;
+  transform: translateX(-2px);
+}
+
+/* ---------- Botón de ayuda "?" ---------- */
+.game-shell .qq-btn-ayuda {
+  display: grid !important;
+  place-items: center !important;
+  flex: none;
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  background: var(--qq-suave) !important;
+  border: 1.5px solid var(--qq-borde) !important;
+  color: var(--g1) !important;
+  font-size: 1rem !important;
+  font-weight: 900 !important;
+  box-shadow: 0 2px 6px var(--qq-anillo) !important;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.game-shell .qq-btn-ayuda:hover {
+  background: var(--g1) !important;
+  color: #ffffff !important;
+  border-color: var(--g1) !important;
+  transform: scale(1.07);
+}
+
+/* ---------- Icono principal ---------- */
+.game-shell .qq-hero-icono {
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 0.9rem;
+  border-radius: 24px;
+  background: linear-gradient(135deg, var(--qq-suave-2) 0%, var(--qq-borde) 100%) !important;
+  color: var(--g1) !important;
+  box-shadow: 0 8px 20px -6px var(--qq-sombra) !important;
+}
+
+.game-shell .qq-hero-icono.chico {
+  width: 56px;
+  height: 56px;
+  margin: 0;
+  border-radius: 18px;
+  flex-shrink: 0;
+}
+
+.game-shell .qq-main-title {
+  margin: 0 0 0.45rem !important;
+  font-size: 1.85rem !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.5px;
+  color: #0f172a !important;
+}
+
+.game-shell .qq-main-desc {
+  max-width: 440px;
+  margin: 0 auto 1.4rem !important;
+  font-size: 0.96rem !important;
+  line-height: 1.5 !important;
+  color: #64748b !important;
+}
+
+/* ---------- Opciones del menú ---------- */
+.game-shell .qq-menu-opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  width: 100%;
+  margin-top: 0.6rem;
+}
+
+.game-shell .qq-opcion-card {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 1rem !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 1.15rem 1.25rem !important;
+  text-align: left !important;
+  border-radius: 20px !important;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.game-shell .qq-opcion-card.principal {
+  background: linear-gradient(135deg, var(--g1) 0%, var(--g2) 100%) !important;
+  border: 2px solid transparent !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 22px -6px var(--qq-sombra-fuerte) !important;
+}
+
+.game-shell .qq-opcion-card.principal:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 26px -6px var(--qq-sombra-fuerte) !important;
+  filter: brightness(1.04);
+}
+
+.game-shell .qq-opcion-card.secundaria {
+  background: #ffffff !important;
+  border: 2px solid #e2e8f0 !important;
+  color: #0f172a !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04) !important;
+}
+
+.game-shell .qq-opcion-card.secundaria:hover {
+  border-color: var(--g1) !important;
+  background: #f8fafc !important;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px -6px var(--qq-sombra) !important;
+}
+
+.game-shell .qq-opcion-icono {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 50px;
+  height: 50px;
+  border-radius: 15px;
+}
+
+.game-shell .qq-opcion-card.principal .qq-opcion-icono {
+  background: rgba(255, 255, 255, 0.22) !important;
+  color: #ffffff !important;
+}
+
+.game-shell .qq-opcion-card.secundaria .qq-opcion-icono {
+  background: var(--qq-suave-2) !important;
+  color: var(--g1) !important;
+}
+
+.game-shell .qq-opcion-textos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.game-shell .qq-opcion-textos strong {
+  font-size: 1.12rem;
+  font-weight: 800;
+}
+
+.game-shell .qq-opcion-card.principal .qq-opcion-textos strong {
+  color: #ffffff !important;
+}
+
+.game-shell .qq-opcion-card.secundaria .qq-opcion-textos strong {
+  color: #0f172a !important;
+}
+
+.game-shell .qq-opcion-textos span {
+  font-size: 0.86rem;
+  line-height: 1.35;
+}
+
+.game-shell .qq-opcion-card.principal .qq-opcion-textos span {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.game-shell .qq-opcion-card.secundaria .qq-opcion-textos span {
+  color: #64748b !important;
+}
+
+/* ---------- Formularios (crear / unirse) ---------- */
+.game-shell .qq-form-estilizado {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 1rem;
+  text-align: left;
+}
+
+.game-shell .qq-form-estilizado .field-label {
+  margin: 0;
+  font-weight: 800;
+  color: #475569;
+}
+
+.game-shell .qq-input-moderno {
+  width: 100%;
+  padding: 0.85rem 1rem !important;
+  border-radius: 14px !important;
+  border: 2px solid #e2e8f0 !important;
+  background: #f8fafc !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  color: #0f172a !important;
+  box-shadow: none !important;
+  transition: all 0.18s ease;
+}
+
+.game-shell .qq-input-moderno:focus {
+  outline: none !important;
+  border-color: var(--g1) !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 4px var(--qq-anillo) !important;
+}
+
+.game-shell .qq-input-moderno.qq-input-codigo,
+.game-shell .lb-input-codigo.qq-input-moderno {
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  font-weight: 800 !important;
+}
+
+.game-shell .qq-btn-principal {
+  margin-top: 1.1rem;
+  background: linear-gradient(135deg, var(--g1) 0%, var(--g2) 100%) !important;
+  border: none !important;
+  border-radius: 18px !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  box-shadow: 0 10px 22px -6px var(--qq-sombra-fuerte) !important;
+}
+
+.game-shell .qq-btn-principal:disabled {
+  opacity: 0.55;
+  filter: grayscale(0.25);
+  cursor: not-allowed;
+}
+
+/* ---------- Cabecera de configuración (selector de jugadores) ---------- */
+.game-shell .qq-config-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0.2rem 0 1.3rem;
+  text-align: left;
+}
+
+.game-shell .qq-config-titulo {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #0f172a !important;
+}
+
+.game-shell .qq-config-sub {
+  margin: 0.15rem 0 0;
+  font-size: 0.9rem;
+  color: #64748b !important;
+}
+
+.game-shell .qq-label-destacado {
+  display: block;
+  margin-bottom: 0.55rem;
+  font-size: 0.88rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #475569 !important;
+}
+
+.game-shell .qq-bloque-config {
+  margin-top: 1.2rem;
+  text-align: left;
+}
+
+.game-shell .qq-selector-cantidad-box {
+  padding: 1rem 1.1rem;
+  background: #f1f5f9 !important;
+  border: 1.5px solid #e2e8f0 !important;
+  border-radius: 18px;
+  text-align: left;
+}
+
+.game-shell .qq-stepper-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.game-shell .qq-stepper-btn {
+  display: grid !important;
+  place-items: center !important;
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border-radius: 13px !important;
+  background: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  color: #1e293b !important;
+  font-size: 1.35rem !important;
+  font-weight: 800 !important;
+  box-shadow: none !important;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.game-shell .qq-stepper-btn:hover:not(:disabled) {
+  border-color: var(--g1) !important;
+  color: var(--g1) !important;
+  background: var(--qq-suave) !important;
+}
+
+.game-shell .qq-stepper-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.game-shell .qq-select-jugadores {
+  flex: 1;
+  height: 44px;
+  margin: 0 !important;
+  padding: 0 0.8rem !important;
+  border-radius: 13px !important;
+  border: 1.5px solid #cbd5e1 !important;
+  background: #ffffff !important;
+  font-size: 1rem !important;
+  font-weight: 800 !important;
+  color: #0f172a !important;
+  text-align: center;
+}
+
+.game-shell .qq-nombres-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.game-shell .qq-jugador-input-card {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 0.7rem;
+  background: #ffffff !important;
+  border: 2px solid #e2e8f0 !important;
+  border-radius: 15px;
+  transition: all 0.18s ease;
+}
+
+.game-shell .qq-jugador-input-card:focus-within {
+  border-color: var(--g1) !important;
+  box-shadow: 0 0 0 3px var(--qq-anillo);
+}
+
+.game-shell .qq-jugador-badge {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, var(--g1) 0%, var(--g2) 100%);
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.game-shell .qq-jugador-input-card input {
+  width: 100%;
+  margin: 0 !important;
+  padding: 0.45rem 0.2rem !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-size: 0.96rem !important;
+  font-weight: 700 !important;
+  color: #1e293b !important;
+}
+
+.game-shell .qq-jugador-input-card input:focus {
+  outline: none !important;
+}
+
+/* Opciones de configuración tipo "chips" (rondas, dificultad...) */
+.game-shell .qq-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.game-shell .qq-chip {
+  width: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0.55rem 1rem !important;
+  border-radius: 999px !important;
+  background: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  color: #334155 !important;
+  font-weight: 800 !important;
+  font-size: 0.92rem !important;
+  box-shadow: none !important;
+  cursor: pointer;
+}
+
+.game-shell .qq-chip:hover:not(:disabled) {
+  border-color: var(--g1) !important;
+  color: var(--g1) !important;
+}
+
+.game-shell .qq-chip.activo {
+  background: linear-gradient(135deg, var(--g1) 0%, var(--g2) 100%) !important;
+  border-color: transparent !important;
+  color: #ffffff !important;
+}
+
+/* ---------- Sala de espera ---------- */
+.game-shell .qq-badge-sala {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0 auto 0.8rem;
+  padding: 0.35rem 1.1rem;
+  border-radius: 999px;
+  border: 1.5px solid var(--qq-borde);
+  background: var(--qq-suave);
+  color: var(--g1);
+  font-size: 0.85rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.game-shell .qq-codigo-btn {
+  display: inline-block !important;
+  width: auto !important;
+  margin: 0.6rem auto !important;
+  padding: 0.5rem 1.8rem !important;
+  background: var(--qq-suave) !important;
+  border: 2.5px dashed var(--g1) !important;
+  border-radius: 18px !important;
+  box-shadow: none !important;
+  color: var(--g1) !important;
+  font-size: 3.2rem !important;
+  font-weight: 900 !important;
+  letter-spacing: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.game-shell .qq-codigo-btn:hover {
+  transform: scale(1.03);
+  background: var(--qq-suave-2) !important;
+}
+
+.game-shell .qq-sala-titulo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.2rem;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.game-shell .qq-sala-titulo .icon {
+  color: var(--g1);
+}
+
+.game-shell .qq-sala-lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.85rem;
+  width: 100%;
+  margin-top: 1.1rem;
+}
+
+.game-shell .qq-sala-lista .lb-jug {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0.85rem 1.1rem;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--g1) 0%, var(--g2) 100%) !important;
+  border: 2px solid rgba(255, 255, 255, 0.35) !important;
+  border-radius: 16px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: qqPopJugador 0.3s ease-out;
+}
+
+.game-shell .qq-sala-lista .lb-jug:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.game-shell .qq-sala-lista .lb-jug.yo {
+  border-color: #ffffff !important;
+  box-shadow: 0 0 0 3px var(--qq-borde), 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+
+.game-shell .qq-sala-lista .lb-jug-nombre {
+  flex: 1;
+  overflow: hidden;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #ffffff !important;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+
+@keyframes qqPopJugador {
+  0% { opacity: 0; transform: scale(0.9) translateY(8px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.game-shell .qq-espera-icono {
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  margin: 0 auto 0.4rem;
+  border-radius: 50%;
+  background: var(--qq-suave);
+  color: var(--g1);
+}
+
+.game-shell .lb-luna.chica {
+  color: var(--g1) !important;
+  background: var(--qq-suave) !important;
+}
+
+/* ---------- Modal de ayuda ---------- */
+.game-shell .aprox-modal-signo-title {
+  background: var(--qq-suave) !important;
+  border: 1.5px solid var(--qq-borde) !important;
+  color: var(--g1) !important;
+}
+
+@media (max-width: 520px) {
+  .game-shell .qq-menu-panel {
+    padding: 1.3rem 1.1rem 1.6rem !important;
+  }
+  .game-shell .qq-main-title {
+    font-size: 1.6rem !important;
+  }
+  .game-shell .qq-codigo-btn {
+    font-size: 2.6rem !important;
+  }
+}
+
+.game-shell .qq-label-icono {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.game-shell .qq-label-icono .icon {
+  color: var(--g1);
+}
+
+.game-shell .qq-bloque-config .field-label {
+  font-weight: 700;
+  color: #475569;
+}
+
+/* Desplegables y campos de las opciones extra (categoría, modo...) */
+.game-shell .qq-bloque-config select,
+.game-shell .qq-bloque-config input[type='text'],
+.game-shell .qq-bloque-config input[type='number'] {
+  width: 100%;
+  padding: 0.75rem 1rem !important;
+  border-radius: 14px !important;
+  border: 2px solid #e2e8f0 !important;
+  background: #f8fafc !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  color: #0f172a !important;
+  box-shadow: none !important;
+}
+
+.game-shell .qq-bloque-config select:focus,
+.game-shell .qq-bloque-config input:focus {
+  outline: none !important;
+  border-color: var(--g1) !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 4px var(--qq-anillo) !important;
+}

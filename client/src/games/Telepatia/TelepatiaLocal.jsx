@@ -1,9 +1,9 @@
 // client/src/games/Telepatia/TelepatiaLocal.jsx
 import React, { useState } from 'react';
 import Icon from '../../components/Icon.jsx';
-import GameIntro from '../../components/GameIntro.jsx';
 import './Telepatia.css';
 import '../Adivina/Adivina.css';
+import { SelectorJugadores } from '../../components/MenuJuego.jsx';
 
 const PALABRAS_BASE = [
   'PLAYA', 'FÚTBOL', 'PIZZA', 'VERANO', 'VIAJE', 'NOCHE', 'CINE', 'MÚSICA',
@@ -127,14 +127,6 @@ export default function TelepatiaLocal({ onSalir }) {
       {/* 1. SETUP */}
       {paso === 'setup' && (
         <>
-          <button
-            type="button"
-            className="btn-ayuda-flotante"
-            onClick={() => setModalAyuda(true)}
-            title="Reglas del juego"
-          >
-            <span className="btn-ayuda-flotante-signo">?</span>
-          </button>
 
           {modalAyuda && (
             <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
@@ -178,40 +170,19 @@ export default function TelepatiaLocal({ onSalir }) {
             </div>
           )}
 
-          <section className="game">
-            <GameIntro gameId="telepatia" titulo="Telepatía (Un solo dispositivo)" />
-
-            <div className="panel">
-              <h3 className="panel-title"><Icon name="users" size={22} /> Jugadores (4 a 20)</h3>
-              <label className="field-label" htmlFor="tel-num">Número de participantes</label>
-              <select id="tel-num" value={numJugadores} onChange={cambiarNumJugadores}>
-                {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => i + MIN_JUGADORES).map((k) => (
-                  <option key={k} value={k}>{k} jugadores</option>
-                ))}
-              </select>
-
-              <span className="field-label" style={{ marginTop: '1rem' }}>Nombres</span>
-              <div className="names-grid">
-                {nombres.map((nombre, i) => (
-                  <input
-                    key={i}
-                    type="text"
-                    value={nombre}
-                    maxLength={20}
-                    placeholder={`Jugador ${i + 1}`}
-                    onChange={(ev) => setNombres(p => p.map((x, k) => k === i ? ev.target.value : x))}
-                  />
-                ))}
-              </div>
-            </div>
-
-            <div className="actions">
-              <button className="big full" onClick={iniciarPartida}>
-                <Icon name="play" size={22} /> Empezar Partida (15 rondas)
-              </button>
-              <button className="secondary full" onClick={onSalir}>Volver</button>
-            </div>
-          </section>
+          <SelectorJugadores
+          onVolver={onSalir}
+          onAyuda={() => setModalAyuda(true)}
+          min={MIN_JUGADORES}
+          max={MAX_JUGADORES}
+          numJugadores={numJugadores}
+          onCambiarNum={(n) => cambiarNumJugadores({ target: { value: n } })}
+          nombres={nombres}
+          onNombre={(i, valor) => setNombres((p) => p.map((x, k) => (k === i ? valor : x)))}
+          onEmpezar={iniciarPartida}
+          textoBoton="Empezar Partida (15 rondas)"
+          iconoBoton="play"
+        />
         </>
       )}
 

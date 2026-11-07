@@ -5,6 +5,7 @@ import Icon from '../../components/Icon.jsx';
 import * as E from './engine.js';
 import { PantallaDeFase, PantallaFin, Ayuda, Marcador, Resolucion } from './Vistas.jsx';
 import './Hipotesis.css';
+import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx';
 
 export default function HipotesisLocal({ onVolver }) {
   const [paso, setPaso] = useState('config');
@@ -31,31 +32,30 @@ export default function HipotesisLocal({ onVolver }) {
   if (paso === 'config') {
     return (
       <div className="hp-wrap">
-        <button type="button" className="btn-ayuda-flotante" onClick={() => setAyuda(true)}><span className="btn-ayuda-flotante-signo">?</span></button>
         {ayuda && <Ayuda onCerrar={() => setAyuda(false)} />}
-        <div className="panel hp-centro">
-          <span className="hp-logo"><Icon name="bulb" size={44} strokeWidth={1.7} /></span>
-          <h1 className="title">La Hipótesis Ganadora · un dispositivo</h1>
-          <p className="hint">Pasaos el móvil para formular hipótesis y apostar en secreto. De 3 a 8 jugadores.</p>
-          <div className="hp-nombres" style={{ textAlign: 'left' }}>
-            {nombres.map((n, i) => (
-              <div key={i} className="hp-nombre-fila">
-                <input type="text" placeholder={`Jugador ${i + 1}`} value={n} maxLength={20} onChange={(e) => setNombres((l) => l.map((x, k) => (k === i ? e.target.value : x)))} />
-                {nombres.length > E.AJUSTES.min && <button type="button" className="secondary danger" onClick={() => setNombres((l) => l.filter((_, k) => k !== i))}><Icon name="x" size={16} /></button>}
-              </div>
-            ))}
-            {nombres.length < E.AJUSTES.max && <button type="button" className="secondary" onClick={() => setNombres((l) => [...l, ''])}><Icon name="users" size={18} /> Añadir jugador</button>}
-          </div>
-          <div style={{ textAlign: 'left', marginTop: '1rem' }}>
-            <span style={{ fontWeight: 700 }}>Número de rondas</span>
-            <div className="hp-opciones" style={{ marginTop: '.4rem' }}>{E.OPCIONES_RONDAS.map((r) => <button key={r} type="button" className={rondas === r ? 'on' : ''} onClick={() => setRondas(r)}>{r} rondas</button>)}</div>
-          </div>
-          {error && <p className="error" style={{ marginTop: '.8rem' }}>{error}</p>}
-          <div className="actions">
-            <button type="button" className="big full" onClick={empezar}><Icon name="play" size={22} /> ¡Empezar el congreso!</button>
-            <button type="button" className="secondary full" onClick={onVolver}>Volver</button>
-          </div>
-        </div>
+        <SelectorJugadores
+          onVolver={onVolver}
+          onAyuda={() => setAyuda(true)}
+          min={E.AJUSTES.min}
+          max={E.AJUSTES.max}
+          numJugadores={nombres.length}
+          onCambiarNum={(n) => setNombres((l) => (n > l.length ? [...l, ...Array(n - l.length).fill('')] : l.slice(0, n)))}
+          nombres={nombres}
+          onNombre={(i, valor) => setNombres((l) => l.map((x, k) => (k === i ? valor : x)))}
+          onEmpezar={empezar}
+          textoBoton="¡Empezar el congreso!"
+          error={error}
+        >
+          <BloqueConfig titulo="Número de rondas">
+            <div className="qq-chips">
+              {E.OPCIONES_RONDAS.map((r) => (
+                <button key={r} type="button" className={`qq-chip ${rondas === r ? 'activo' : ''}`} onClick={() => setRondas(r)}>
+                  {r} rondas
+                </button>
+              ))}
+            </div>
+          </BloqueConfig>
+        </SelectorJugadores>
       </div>
     );
   }

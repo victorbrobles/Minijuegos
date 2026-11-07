@@ -1,17 +1,18 @@
 // client/src/games/Jugadas/JugadasLocal.jsx
 import React, { useState, useRef, useCallback } from 'react';
 import Icon from '../../components/Icon.jsx';
-import GameIntro from '../../components/GameIntro.jsx';
 import JugadasPartida from './JugadasPartida.jsx';
 import { AyudaJugadas } from './JugadasComun.jsx';
 import './Jugadas.css';
 import '../Adivina/Adivina.css';
+import { SelectorJugadores } from '../../components/MenuJuego.jsx';
 
 const MIN_JUGADORES = 2;
 const MAX_JUGADORES = 12;
 
 export default function JugadasLocal({ onVolver, onExit }) {
   const [fase, setFase] = useState('setup'); // 'setup' | 'jugando'
+  const [modalAyuda, setModalAyuda] = useState(false);
 
   const [numJugadores, setNumJugadores] = useState(4);
   const [jugadores, setJugadores] = useState([
@@ -98,53 +99,24 @@ export default function JugadasLocal({ onVolver, onExit }) {
 
   return (
     <div className="furbo-contenedor">
-      {fase === 'setup' && <AyudaJugadas online={false} />}
+      <AyudaJugadas abierto={modalAyuda} onCerrar={() => setModalAyuda(false)} />
 
       {fase === 'setup' && (
-        <section className="game">
-          <GameIntro gameId="jugadas" titulo="Jugadas Icónicas" />
-
-          <div className="panel">
-            <div className="hud" style={{ marginBottom: '1rem' }}>
-              <button className="btn-back-inline" onClick={onVolver}>
-                &larr; Cambiar a modo Online
-              </button>
-            </div>
-
-            <h3 className="panel-title">
-              <Icon name="users" size={22} /> Participantes ({MIN_JUGADORES} a {MAX_JUGADORES})
-            </h3>
-            <label className="field-label" htmlFor="num-jugadores-jugadas">Número de jugadores</label>
-            <select id="num-jugadores-jugadas" value={numJugadores} onChange={handleNumChange}>
-              {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => (
-                <option key={i + MIN_JUGADORES} value={i + MIN_JUGADORES}>
-                  {i + MIN_JUGADORES} jugadores ({(i + MIN_JUGADORES) * 3} rondas)
-                </option>
-              ))}
-            </select>
-
-            <span className="field-label">Nombres (orden secuencial de turno)</span>
-            <div className="names-grid">
-              {jugadores.map((j, idx) => (
-                <input
-                  key={j.id}
-                  type="text"
-                  value={j.nombre}
-                  onChange={(e) => handleNombreChange(idx, e.target.value)}
-                  placeholder={`Jugador ${j.id}`}
-                  maxLength={25}
-                  required
-                />
-              ))}
-            </div>
-          </div>
-
-          {error && <p className="error" style={{ margin: '0.8rem 0' }}>{error}</p>}
-
-          <button className="big full" style={{ marginTop: '1rem' }} onClick={iniciarPartida} disabled={cargando}>
-            <Icon name="play" size={24} /> ¡Comenzar partido!
-          </button>
-        </section>
+        <SelectorJugadores
+          onVolver={onVolver}
+          onAyuda={() => setModalAyuda(true)}
+          min={MIN_JUGADORES}
+          max={MAX_JUGADORES}
+          numJugadores={numJugadores}
+          onCambiarNum={(n) => handleNumChange({ target: { value: n } })}
+          nombres={jugadores}
+          onNombre={handleNombreChange}
+          onEmpezar={iniciarPartida}
+          textoBoton="¡Comenzar partido!"
+          iconoBoton="play"
+          puedeEmpezar={!(cargando)}
+          error={error}
+        />
       )}
 
       {fase === 'jugando' && vista && (

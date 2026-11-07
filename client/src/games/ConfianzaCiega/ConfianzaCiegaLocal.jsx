@@ -1,8 +1,8 @@
 // client/src/games/ConfianzaCiega/ConfianzaCiegaLocal.jsx
 import React, { useState, useEffect } from 'react';
 import Icon from '../../components/Icon.jsx';
-import GameIntro from '../../components/GameIntro.jsx';
 import './ConfianzaCiega.css';
+import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx';
 
 const MIN_JUGADORES = 3;
 const MAX_JUGADORES = 15;
@@ -277,14 +277,6 @@ export default function ConfianzaCiegaLocal({ onVolver, onExit }) {
       {/* AYUDA */}
       {fase === 'setup' && (
         <>
-          <button
-            type="button"
-            className="aprox-btn-ayuda"
-            onClick={() => setModalAyuda(true)}
-            title="Reglas y puntuación"
-          >
-            <span className="aprox-btn-ayuda-signo">?</span>
-          </button>
 
           {modalAyuda && (
             <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
@@ -332,67 +324,34 @@ export default function ConfianzaCiegaLocal({ onVolver, onExit }) {
 
       {/* 1. SETUP */}
       {fase === 'setup' && (
-        <section className="game">
-          <GameIntro gameId="confianzaciega" titulo="Confianza Ciega (Un solo dispositivo)" />
-
-          {errorCarga && <p className="error" role="alert">{errorCarga}</p>}
-
-          <div className="panel">
-            <div className="hud" style={{ marginBottom: '1rem' }}>
-              <button className="btn-back-inline" onClick={onVolver}>
-                &larr; Cambiar modo
-              </button>
-            </div>
-
-            <h3 className="panel-title"><Icon name="users" size={22} /> Participantes</h3>
-            <label className="field-label" htmlFor="num-jugadores-cc">
-              Número de jugadores ({MIN_JUGADORES} a {MAX_JUGADORES})
-            </label>
-            <select
-              id="num-jugadores-cc"
-              value={numJugadores}
-              onChange={handleNumJugadoresChange}
-            >
-              {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => (
-                <option key={i + MIN_JUGADORES} value={i + MIN_JUGADORES}>
-                  {i + MIN_JUGADORES} jugadores
-                </option>
-              ))}
-            </select>
-
-            <span className="field-label">Nombres</span>
-            <div className="names-grid">
-              {jugadores.map((j, idx) => (
+        <SelectorJugadores
+          onVolver={onVolver}
+          onAyuda={() => setModalAyuda(true)}
+          min={MIN_JUGADORES}
+          max={MAX_JUGADORES}
+          numJugadores={numJugadores}
+          onCambiarNum={(n) => handleNumJugadoresChange({ target: { value: n } })}
+          nombres={jugadores}
+          onNombre={handleNombreChange}
+          onEmpezar={iniciarPartida}
+          textoBoton="¡Empezar Partida!"
+          iconoBoton="play"
+        >
+          <BloqueConfig>
+          {esAdmin && (
+            <div style={{ marginTop: '1rem', padding: '0.75rem', background: '#fdf2f8', borderRadius: '12px', border: '1.5px dashed #f472b6' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#db2777', fontWeight: '700', fontSize: '0.9rem', cursor: 'pointer' }}>
                 <input
-                  key={j.id}
-                  type="text"
-                  value={j.nombre}
-                  onChange={(e) => handleNombreChange(idx, e.target.value)}
-                  placeholder={`Jugador ${j.id}`}
-                  maxLength={30}
-                  required
+                  type="checkbox"
+                  checked={usarPicantes}
+                  onChange={(e) => setUsarPicantes(e.target.checked)}
                 />
-              ))}
+                <span>Habilitar Categorías Picantes / Ocultas (Modo Admin)</span>
+              </label>
             </div>
-
-            {esAdmin && (
-              <div style={{ marginTop: '1rem', padding: '0.75rem', background: '#fdf2f8', borderRadius: '12px', border: '1.5px dashed #f472b6' }}>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#db2777', fontWeight: '700', fontSize: '0.9rem', cursor: 'pointer' }}>
-                  <input
-                    type="checkbox"
-                    checked={usarPicantes}
-                    onChange={(e) => setUsarPicantes(e.target.checked)}
-                  />
-                  <span>Habilitar Categorías Picantes / Ocultas (Modo Admin)</span>
-                </label>
-              </div>
-            )}
-          </div>
-
-          <button className="big full" onClick={iniciarPartida}>
-            <Icon name="play" size={24} /> ¡Empezar Partida!
-          </button>
-        </section>
+          )}
+          </BloqueConfig>
+        </SelectorJugadores>
       )}
 
       {/* 2. ELECCIÓN SECRETA DE CONSIGNA */}

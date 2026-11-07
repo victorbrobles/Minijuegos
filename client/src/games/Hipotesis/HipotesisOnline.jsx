@@ -4,6 +4,7 @@ import Icon from '../../components/Icon.jsx';
 import { PantallaDeFase, PantallaFin, Ayuda } from './Vistas.jsx';
 import { AJUSTES, OPCIONES_RONDAS } from './engine.js';
 import './Hipotesis.css';
+import { MenuInicioJuego, MenuModoOnline, FormCrearSala, FormUnirseSala, CabeceraSala, ListaSala, EsperandoAnfitrion } from '../../components/MenuJuego.jsx';
 
 const CLAVE_SESION = 'hipotesis_online_session';
 const API = '/api/hipotesis/online';
@@ -31,7 +32,7 @@ export default function HipotesisOnline({ onLocal }) {
 
   const cerrarSesion = (mensaje) => {
     sessionStorage.removeItem(CLAVE_SESION);
-    setSesion(null); setSala(null); setVista('menu');
+    setSesion(null); setSala(null); setVista('online_menu');
     if (mensaje) setErrorMsg(mensaje);
   };
 
@@ -101,78 +102,84 @@ export default function HipotesisOnline({ onLocal }) {
 
   return (
     <div className="hp-wrap">
-      {(vista !== 'sala' || sala?.estado === 'lobby') && (
-        <button type="button" className="btn-ayuda-flotante" onClick={() => setModalAyuda(true)} title="Reglas"><span className="btn-ayuda-flotante-signo">?</span></button>
-      )}
       {modalAyuda && <Ayuda onCerrar={() => setModalAyuda(false)} />}
-      {errorMsg && vista !== 'crear' && vista !== 'unirse' && <p className="error">{errorMsg}</p>}
+      {errorMsg && vista === 'sala' && <p className="error">{errorMsg}</p>}
 
       {vista === 'menu' && (
-        <section className="game"><div className="panel hp-centro">
-          <span className="hp-logo"><Icon name="bulb" size={44} strokeWidth={1.7} /></span>
-          <h1 className="title">La Hipótesis Ganadora</h1>
-          <p className="hint">Cada ronda el laboratorio esconde una verdad y tú solo conoces un trocito. Formula una hipótesis (cierta o de farol), apuesta por las de los demás y descubre quién miente. De 3 a 8 jugadores.</p>
-          <div className="actions">
-            <button className="big full" onClick={() => { setVista('crear'); setErrorMsg(''); }}><Icon name="crown" size={22} /> Crear partida</button>
-            <button className="big full" onClick={() => { setVista('unirse'); setErrorMsg(''); }}><Icon name="users" size={22} /> Unirse a partida</button>
-            <button className="secondary full" onClick={onLocal}><Icon name="home" size={20} /> Jugar en un solo dispositivo</button>
-          </div>
-        </div></section>
+        <MenuInicioJuego
+          juegoId="hipotesis"
+          onOnline={() => { setVista('online_menu'); setErrorMsg(''); }}
+          onLocal={onLocal}
+          onAyuda={() => setModalAyuda(true)}
+          error={errorMsg}
+        />
       )}
 
-      {(vista === 'crear' || vista === 'unirse') && (
-        <section className="game"><div className="panel hp-centro">
-          <span className="hp-logo"><Icon name={vista === 'crear' ? 'crown' : 'users'} size={40} strokeWidth={1.7} /></span>
-          <h2 className="title">{vista === 'crear' ? 'Crear partida' : 'Unirse a partida'}</h2>
-          <div style={{ textAlign: 'left', marginTop: '1rem' }}>
-            {vista === 'unirse' && (<>
-              <label className="field-label" htmlFor="hp-code">Código de la sala</label>
-              <input id="hp-code" type="text" placeholder="ABCD" value={codigoInput} maxLength={4} autoFocus onChange={(e) => setCodigoInput(e.target.value.toUpperCase())}
-                style={{ textTransform: 'uppercase', letterSpacing: '4px', textAlign: 'center', fontWeight: 800 }} />
-            </>)}
-            <label className="field-label" htmlFor="hp-nombre">Tu nombre</label>
-            <input id="hp-nombre" type="text" placeholder="Tu nombre" value={nombre} maxLength={20} autoFocus={vista === 'crear'} onChange={(e) => setNombre(e.target.value)} />
-            {errorMsg && <p className="error" style={{ marginTop: '.8rem' }}>{errorMsg}</p>}
-            <button className="big full" style={{ marginTop: '1rem' }} disabled={cargando || !nombre.trim() || (vista === 'unirse' && codigoInput.trim().length < 4)}
-              onClick={() => (vista === 'crear' ? entrar('crear', { nombre: nombre.trim() }) : entrar('unirse', { code: codigoInput.trim().toUpperCase(), nombre: nombre.trim() }))}>
-              <Icon name="check" size={22} strokeWidth={2.5} /> {vista === 'crear' ? 'Crear sala' : 'Entrar en la partida'}
-            </button>
-            <button className="secondary full" style={{ marginTop: '.6rem' }} onClick={() => { setVista('menu'); setErrorMsg(''); }}>Volver</button>
-          </div>
-        </div></section>
+      {vista === 'online_menu' && (
+        <MenuModoOnline
+          onVolver={() => { setVista('menu'); setErrorMsg(''); }}
+          onCrear={() => { setVista('crear'); setErrorMsg(''); }}
+          onUnirse={() => { setVista('unirse'); setErrorMsg(''); }}
+          onAyuda={() => setModalAyuda(true)}
+          error={errorMsg}
+        />
+      )}
+
+      {vista === 'crear' && (
+        <FormCrearSala
+          onVolver={() => { setVista('online_menu'); setErrorMsg(''); }}
+          onAyuda={() => setModalAyuda(true)}
+          nombre={nombre}
+          setNombre={setNombre}
+          onCrear={() => entrar('crear', { nombre: nombre.trim() })}
+          cargando={cargando}
+          error={errorMsg}
+          descripcion="Introduce tu nombre para abrir la sala y ser el anfitrión (de 3 a 8 jugadores)."
+        />
+      )}
+
+      {vista === 'unirse' && (
+        <FormUnirseSala
+          onVolver={() => { setVista('online_menu'); setErrorMsg(''); }}
+          onAyuda={() => setModalAyuda(true)}
+          codigo={codigoInput}
+          setCodigo={setCodigoInput}
+          nombre={nombre}
+          setNombre={setNombre}
+          onUnirse={() => entrar('unirse', { code: codigoInput.trim().toUpperCase(), nombre: nombre.trim() })}
+          cargando={cargando}
+          error={errorMsg}
+        />
       )}
 
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
-        <section className="game">
-          <div className="panel hp-centro">
-            <p className="hint" style={{ marginBottom: '.2rem' }}>Código de la partida</p>
-            <button type="button" className="hp-codigo" onClick={copiar}>{sala.code}</button>
-            <p className="hint small">{copiado ? '¡Copiado!' : 'Pulsa el código para copiarlo y compártelo.'}</p>
-          </div>
-          <div className="panel" style={{ marginTop: '1rem' }}>
-            <h3 className="panel-title"><Icon name="users" size={20} /> Jugadores ({jugadores.length}/{AJUSTES.max})</h3>
-            <div className="hp-lista">
-              {jugadores.map((j) => (
-                <div key={j.id} className={`hp-lj ${j.id === sala.yoId ? 'yo' : ''}`}>
-                  <span><span className={`hp-punto ${j.conectado ? '' : 'off'}`} />{j.nombre}{j.id === sala.yoId ? ' (tú)' : ''}{j.id === 1 ? ' 👑' : ''}</span>
-                </div>
-              ))}
-            </div>
-            {jugadores.length < AJUSTES.min && <p className="hint" style={{ marginTop: '.8rem' }}>Faltan {AJUSTES.min - jugadores.length} jugadores (mínimo {AJUSTES.min}).</p>}
-          </div>
+        <section className="game qq-pantalla">
+          <CabeceraSala codigo={sala.code} onVolver={() => setModalSalir(true)} onAyuda={() => setModalAyuda(true)} />
+          <ListaSala
+            jugadores={jugadores}
+            yoId={sala.yoId}
+            max={AJUSTES.max}
+            min={AJUSTES.min}
+            renderExtra={(j) => <span className={`hp-punto ${j.conectado ? '' : 'off'}`} title={j.conectado ? 'Conectado' : 'Desconectado'} />}
+          />
           {esAdmin ? (
-            <div className="panel" style={{ marginTop: '1rem' }}>
-              <h3 className="panel-title"><Icon name="settings" size={20} /> Ajustes</h3>
-              <span style={{ fontWeight: 700 }}>Número de rondas</span>
-              <div className="hp-opciones" style={{ marginTop: '.4rem' }}>
-                {OPCIONES_RONDAS.map((r) => <button key={r} type="button" className={sala.config.rondas === r ? 'on' : ''} onClick={() => llamar('config', { rondas: r })}>{r} rondas</button>)}
+            <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
+              <h3 className="qq-sala-titulo"><Icon name="settings" size={20} /> Ajustes</h3>
+              <span className="qq-label-destacado" style={{ marginTop: '0.6rem' }}>Número de rondas</span>
+              <div className="qq-chips">
+                {OPCIONES_RONDAS.map((r) => (
+                  <button key={r} type="button" className={`qq-chip ${sala.config.rondas === r ? 'activo' : ''}`} onClick={() => llamar('config', { rondas: r })}>
+                    {r} rondas
+                  </button>
+                ))}
               </div>
+              <button type="button" className="big full qq-btn-principal" style={{ marginTop: '1.4rem' }} disabled={jugadores.length < AJUSTES.min} onClick={() => llamar('iniciar')}>
+                <Icon name="play" size={22} /> {jugadores.length < AJUSTES.min ? 'Esperando jugadores…' : '¡Empezar el congreso!'}
+              </button>
             </div>
-          ) : <div className="panel hp-centro" style={{ marginTop: '1rem' }}><p className="hint" style={{ margin: 0 }}>Rondas: {sala.config.rondas}. Esperando al anfitrión…</p></div>}
-          <div className="actions" style={{ marginTop: '1rem' }}>
-            {esAdmin && <button className="big full" disabled={jugadores.length < AJUSTES.min} onClick={() => llamar('iniciar')}><Icon name="play" size={22} /> {jugadores.length < AJUSTES.min ? 'Esperando jugadores…' : '¡Empezar el congreso!'}</button>}
-            <button className="secondary danger full" onClick={() => setModalSalir(true)}><Icon name="door" size={20} /> Salir de la sala</button>
-          </div>
+          ) : (
+            <EsperandoAnfitrion texto={`Rondas: ${sala.config.rondas}. El anfitrión comenzará la partida cuando estéis todos listos.`} />
+          )}
         </section>
       )}
 

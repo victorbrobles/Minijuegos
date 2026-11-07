@@ -1,9 +1,9 @@
 // client/src/games/Coleccion/ColeccionLocal.jsx
 import React, { useState } from 'react';
 import Icon from '../../components/Icon.jsx';
-import GameIntro from '../../components/GameIntro.jsx';
 import './Coleccion.css';
 import '../Adivina/Adivina.css';
+import { SelectorJugadores } from '../../components/MenuJuego.jsx';
 
 const PALOS = [
   { id: 'manzana', nombre: 'Manzana', icono: '🍎' },
@@ -281,14 +281,6 @@ export default function ColeccionLocal({ onSalir }) {
     return (
       <div className="col-contenedor" style={{ position: 'relative' }}>
         {/* Botón flotante de ayuda */}
-        <button
-          type="button"
-          className="btn-ayuda-flotante"
-          onClick={() => setModalAyuda(true)}
-          title="Reglas del juego"
-        >
-          <span className="btn-ayuda-flotante-signo">?</span>
-        </button>
 
         {/* Modal de ayuda */}
         {modalAyuda && (
@@ -343,25 +335,21 @@ export default function ColeccionLocal({ onSalir }) {
           </div>
         )}
 
-        <section className="game">
-          <GameIntro gameId="coleccion" titulo="Colecciona con Cabeza" />
-          <div className="panel">
-            <h3 className="panel-title"><Icon name="users" size={22} /> Jugadores (2-8)</h3>
-            <div className="names-grid" style={{ marginBottom: '1rem' }}>
-              {nombres.map((n, i) => (
-                <input key={i} value={n} onChange={(ev) => setNombres(prev => prev.map((x, k) => k === i ? ev.target.value : x))} maxLength={15} />
-              ))}
-            </div>
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button className="secondary full" disabled={nombres.length >= 8} onClick={() => setNombres([...nombres, `Jugador ${nombres.length + 1}`])}>+ Añadir</button>
-              <button className="secondary danger full" disabled={nombres.length <= 2} onClick={() => setNombres(nombres.slice(0, -1))}>- Quitar</button>
-            </div>
-          </div>
-          <div className="actions">
-            <button className="big full" onClick={iniciarPartida}><Icon name="play" size={22} /> Empezar Partida</button>
-            <button className="secondary full" onClick={onSalir}>Volver</button>
-          </div>
-        </section>
+        <SelectorJugadores
+          onVolver={onSalir}
+          onAyuda={() => setModalAyuda(true)}
+          min={2}
+          max={8}
+          numJugadores={nombres.length}
+          onCambiarNum={(n) => setNombres((prev) => (n > prev.length
+            ? [...prev, ...Array.from({ length: n - prev.length }, (_, i) => `Jugador ${prev.length + i + 1}`)]
+            : prev.slice(0, n)))}
+          nombres={nombres}
+          onNombre={(i, valor) => setNombres((prev) => prev.map((x, k) => (k === i ? valor : x)))}
+          onEmpezar={iniciarPartida}
+          textoBoton="Empezar Partida"
+          maxLength={15}
+        />
       </div>
     );
   }

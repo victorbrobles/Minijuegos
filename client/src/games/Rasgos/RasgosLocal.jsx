@@ -1,8 +1,8 @@
 // client/src/games/Rasgos/RasgosLocal.jsx
 import { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
-import GameIntro from '../../components/GameIntro.jsx';
 import './Rasgos.css';
+import { SelectorJugadores } from '../../components/MenuJuego.jsx';
 
 const TIEMPO_S = 60;
 const MIN_JUGADORES = 2;
@@ -501,15 +501,7 @@ export default function RasgosLocal({ onVolver, onExit }) {
   // 1. Configuración de jugadores
   if (paso === 'config') {
     return (
-      <section className="game" style={{ position: 'relative' }}>
-        <button
-          type="button"
-          className="btn-ayuda-flotante"
-          onClick={() => setModalAyuda(true)}
-          title="Reglas y puntuación"
-        >
-          <span className="btn-ayuda-flotante-signo">?</span>
-        </button>
+      <>
 
         {modalAyuda && (
           <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
@@ -547,44 +539,22 @@ export default function RasgosLocal({ onVolver, onExit }) {
           </div>
         )}
 
-        <GameIntro gameId="rasgos" titulo="Rasgos de famosos (Un solo dispositivo)" />
-
-        <div className="panel">
-          <div className="hud" style={{ marginBottom: '1rem' }}>
-            <button className="btn-back-inline" onClick={onVolver}>
-              &larr; Cambiar modo
-            </button>
-          </div>
-
-          <h3 className="panel-title"><Icon name="users" size={22} />Participantes</h3>
-          <label className="field-label" htmlFor="rg-num-jugadores">
-            Número de jugadores ({MIN_JUGADORES} a {MAX_JUGADORES})
-          </label>
-          <select id="rg-num-jugadores" value={jugadores.length} onChange={handleNumJugadores}>
-            {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => (
-              <option key={i + MIN_JUGADORES} value={i + MIN_JUGADORES}>{i + MIN_JUGADORES} jugadores</option>
-            ))}
-          </select>
-
-          <span className="field-label">Nombres</span>
-          <div className="names-grid">
-            {jugadores.map((j, idx) => (
-              <input
-                key={j.id}
-                type="text"
-                value={j.nombre}
-                onChange={(e) => handleNombre(idx, e.target.value)}
-                placeholder={`Jugador ${j.id}`}
-                maxLength={30}
-              />
-            ))}
-          </div>
-        </div>
-        {errorConfig && <p className="error" role="alert">{errorConfig}</p>}
-        <button className="big full" onClick={empezar} disabled={creando}>
-          <Icon name="play" size={24} />{creando ? 'Preparando…' : '¡Empezar!'}
-        </button>
-      </section>
+        <SelectorJugadores
+          onVolver={onVolver}
+          onAyuda={() => setModalAyuda(true)}
+          min={MIN_JUGADORES}
+          max={MAX_JUGADORES}
+          numJugadores={jugadores.length}
+          onCambiarNum={(n) => handleNumJugadores({ target: { value: n } })}
+          nombres={jugadores}
+          onNombre={handleNombre}
+          onEmpezar={empezar}
+          puedeEmpezar={!creando}
+          textoBoton={creando ? 'Preparando…' : '¡Empezar!'}
+          error={errorConfig}
+        />
+      </>
+      
     );
   }
 

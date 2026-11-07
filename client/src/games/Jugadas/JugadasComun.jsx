@@ -3,19 +3,23 @@ import React, { useState } from 'react';
 import './Jugadas.css';
 import '../Adivina/Adivina.css';
 
-export function AyudaJugadas({ online = false }) {
-  const [abierto, setAbierto] = useState(false);
+// Con `abierto`/`onCerrar` se controla desde fuera (botón "?" de los menús unificados) y no pinta botón propio.
+export function AyudaJugadas({ online = false, abierto: abiertoExterno, onCerrar }) {
+  const [abiertoInterno, setAbiertoInterno] = useState(false);
+  const controlado = abiertoExterno !== undefined;
+  const abierto = controlado ? abiertoExterno : abiertoInterno;
+  const setAbierto = (v) => (controlado ? (!v && onCerrar?.()) : setAbiertoInterno(v));
 
   return (
     <>
-      <button
+      {!controlado && <button
         type="button"
         className={online ? 'btn-ayuda-flotante' : 'aprox-btn-ayuda'}
         onClick={() => setAbierto(true)}
         title="Reglas del juego"
       >
         <span className={online ? 'btn-ayuda-flotante-signo' : 'aprox-btn-ayuda-signo'}>?</span>
-      </button>
+      </button>}
 
       {abierto && (
         <div className="rg-modal-fondo" onClick={() => setAbierto(false)}>

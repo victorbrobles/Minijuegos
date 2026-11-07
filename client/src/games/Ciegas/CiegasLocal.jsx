@@ -1,9 +1,9 @@
 // client/src/games/Ciegas/CiegasLocal.jsx
 import React, { useState, useEffect } from 'react';
 import Icon from '../../components/Icon.jsx';
-import GameIntro from '../../components/GameIntro.jsx';
 import './Ciegas.css';
 import '../Adivina/Adivina.css';
+import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx';
 
 const MIN_JUGADORES = 4;
 const MAX_JUGADORES = 10;
@@ -187,14 +187,6 @@ export default function CiegasLocal({ onVolver, onExit }) {
       {/* AYUDA */}
       {fase === 'setup' && (
         <>
-          <button
-            type="button"
-            className="btn-ayuda-flotante"
-            onClick={() => setModalAyuda(true)}
-            title="Reglas del juego"
-          >
-            <span className="btn-ayuda-flotante-signo">?</span>
-          </button>
 
           {modalAyuda && (
             <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
@@ -232,33 +224,21 @@ export default function CiegasLocal({ onVolver, onExit }) {
 
       {/* 1. SETUP */}
       {fase === 'setup' && (
-        <section className="game">
-          <GameIntro gameId="rankings" titulo="Ranking a Ciegas" />
-
-          <div className="panel">
-            <div className="hud" style={{ marginBottom: '1rem' }}>
-              <button className="btn-back-inline" onClick={onVolver}>
-                &larr; Cambiar a modo Online
-              </button>
-            </div>
-
-            <h3 className="panel-title"><Icon name="users" size={22} /> Participantes ({MIN_JUGADORES} a {MAX_JUGADORES})</h3>
-            <label className="field-label" htmlFor="num-jugadores-ciegas">
-              Número de jugadores
-            </label>
-            <select
-              id="num-jugadores-ciegas"
-              value={numJugadores}
-              onChange={handleNumChange}
-            >
-              {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => (
-                <option key={i + MIN_JUGADORES} value={i + MIN_JUGADORES}>
-                  {i + MIN_JUGADORES} jugadores
-                </option>
-              ))}
-            </select>
-
-            <label className="field-label" htmlFor="cat-ciegas" style={{ marginTop: '0.8rem' }}>
+        <SelectorJugadores
+          onVolver={onVolver}
+          onAyuda={() => setModalAyuda(true)}
+          min={MIN_JUGADORES}
+          max={MAX_JUGADORES}
+          numJugadores={numJugadores}
+          onCambiarNum={(n) => handleNumChange({ target: { value: n } })}
+          nombres={jugadores}
+          onNombre={handleNombreChange}
+          onEmpezar={iniciarPartida}
+          textoBoton="¡Empezar Partida!"
+          iconoBoton="play"
+        >
+          <BloqueConfig>
+            <label className="field-label" htmlFor="cat-ciegas">
               Categoría
             </label>
             <select
@@ -270,27 +250,8 @@ export default function CiegasLocal({ onVolver, onExit }) {
                 <option key={c.id} value={c.id}>{c.label}</option>
               ))}
             </select>
-
-            <span className="field-label" style={{ marginTop: '0.8rem' }}>Nombres</span>
-            <div className="names-grid">
-              {jugadores.map((j, idx) => (
-                <input
-                  key={j.id}
-                  type="text"
-                  value={j.nombre}
-                  onChange={(e) => handleNombreChange(idx, e.target.value)}
-                  placeholder={`Jugador ${j.id}`}
-                  maxLength={25}
-                  required
-                />
-              ))}
-            </div>
-          </div>
-
-          <button className="big full" onClick={iniciarPartida}>
-            <Icon name="play" size={24} /> ¡Empezar Partida!
-          </button>
-        </section>
+          </BloqueConfig>
+        </SelectorJugadores>
       )}
 
       {/* 2. CUENTA ATRÁS 5S */}

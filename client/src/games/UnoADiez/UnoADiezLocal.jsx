@@ -1,9 +1,9 @@
 // client/src/games/UnoADiez/UnoADiezLocal.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
-import GameIntro from '../../components/GameIntro.jsx';
 import './UnoADiez.css';
 import '../Adivina/Adivina.css';
+import { SelectorJugadores } from '../../components/MenuJuego.jsx';
 
 const CATEGORIAS_EJEMPLO = [
   "Nivel de dolor físico",
@@ -191,14 +191,6 @@ export default function UnoADiezLocal({ onSalir }) {
       {/* 1. SETUP */}
       {paso === 'setup' && (
         <>
-          <button
-            type="button"
-            className="btn-ayuda-flotante"
-            onClick={() => setModalAyuda(true)}
-            title="Reglas del juego"
-          >
-            <span className="btn-ayuda-flotante-signo">?</span>
-          </button>
 
           {modalAyuda && (
             <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
@@ -243,32 +235,19 @@ export default function UnoADiezLocal({ onSalir }) {
             </div>
           )}
 
-          <section className="game">
-            <GameIntro gameId="unoadiez" titulo="Del 1 al 10... (Un dispositivo)" />
-            <div className="panel">
-              <h3 className="panel-title"><Icon name="users" size={22} /> Jugadores (2-10)</h3>
-              <label className="field-label" htmlFor="uad-num">Número de participantes</label>
-              <select id="uad-num" value={numJugadores} onChange={handleNumJugadores}>
-                {Array.from({ length: 9 }, (_, i) => i + 2).map(n => (
-                  <option key={n} value={n}>{n} jugadores</option>
-                ))}
-              </select>
-
-              <span className="field-label" style={{ marginTop: '1rem' }}>Nombres</span>
-              <div className="names-grid">
-                {nombres.map((n, i) => (
-                  <input key={i} value={n} onChange={(e) => handleNombre(i, e.target.value)} maxLength={15} />
-                ))}
-              </div>
-            </div>
-
-            <div className="actions">
-              <button className="big full" onClick={iniciarPartida}>
-                <Icon name="play" size={22} /> Empezar Partida
-              </button>
-              <button className="secondary full" onClick={onSalir}>Volver</button>
-            </div>
-          </section>
+          <SelectorJugadores
+          onVolver={onSalir}
+          onAyuda={() => setModalAyuda(true)}
+          min={2}
+          max={10}
+          numJugadores={numJugadores}
+          onCambiarNum={(n) => handleNumJugadores({ target: { value: n } })}
+          nombres={nombres}
+          onNombre={handleNombre}
+          onEmpezar={iniciarPartida}
+          textoBoton="Empezar Partida"
+          iconoBoton="play"
+        />
         </>
       )}
 

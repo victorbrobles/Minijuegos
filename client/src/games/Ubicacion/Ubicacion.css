@@ -206,17 +206,6 @@
    MENÚS UNIFICADOS (TEMA VERDE: TEST DEL VIAJERO)
    ======================================================== */
 
-body:has(.ub-contenedor) {
-  background:
-    radial-gradient(70% 460px at 50% 0%, rgba(16, 185, 129, .35) 0%, transparent 70%),
-    radial-gradient(45% 560px at 100% 20%, rgba(5, 150, 105, .22) 0%, transparent 70%),
-    radial-gradient(45% 560px at 0% 50%, rgba(16, 185, 129, .2) 0%, transparent 70%),
-    radial-gradient(45% 560px at 100% 76%, rgba(5, 150, 105, .2) 0%, transparent 70%),
-    radial-gradient(80% 520px at 50% 100%, rgba(4, 120, 87, .32) 0%, transparent 70%),
-    radial-gradient(rgba(255, 255, 255, .06) 1.3px, transparent 1.5px) 0 0 / 22px 22px,
-    linear-gradient(180deg, #0a1715 0%, #0d1e1c 50%, #0c1824 100%) !important;
-  background-attachment: scroll !important;
-}
 
 body:has(.qq-en-partida) .back {
   display: none !important;

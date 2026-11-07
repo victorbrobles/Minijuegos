@@ -1,8 +1,8 @@
 // client/src/games/Velocidad/VelocidadLocal.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
-import GameIntro from '../../components/GameIntro.jsx';
 import './Velocidad.css';
+import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx';
 
 const TIEMPO_TURNO = 60;
 const TIEMPO_PREPARACION = 10;
@@ -249,14 +249,6 @@ export default function VelocidadLocal({ onVolver, onExit }) {
       {/* AYUDA */}
       {fase === 'setup' && (
         <>
-          <button
-            type="button"
-            className="btn-ayuda-flotante"
-            onClick={() => setModalAyuda(true)}
-            title="Reglas y funcionamiento"
-          >
-            <span className="btn-ayuda-flotante-signo">?</span>
-          </button>
 
           {modalAyuda && (
             <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
@@ -293,59 +285,26 @@ export default function VelocidadLocal({ onVolver, onExit }) {
 
       {/* 1. SETUP */}
       {fase === 'setup' && (
-        <section className="game" style={{ position: 'relative' }}>
-          <GameIntro gameId="velocidad" titulo="Test de Velocidad (Un solo dispositivo)" />
-
-          <div className="vel-record-badge">
-            <Icon name="trophy" size={20} />
-            <span>
-              Récord histórico: <strong>{record.puntos} aciertos</strong> ({record.jugador})
-            </span>
-          </div>
-
-          <div className="panel">
-            <div className="hud" style={{ marginBottom: '1rem' }}>
-              <button className="btn-back-inline" onClick={onVolver}>
-                &larr; Cambiar modo
-              </button>
-            </div>
-
-            <h3 className="panel-title"><Icon name="users" size={22} /> Participantes</h3>
-            <label className="field-label" htmlFor="num-jugadores-vel">
-              Número de jugadores ({MIN_JUGADORES} a {MAX_JUGADORES})
-            </label>
-            <select
-              id="num-jugadores-vel"
-              value={numJugadores}
-              onChange={handleNumJugadoresChange}
-            >
-              {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => (
-                <option key={i + MIN_JUGADORES} value={i + MIN_JUGADORES}>
-                  {i + MIN_JUGADORES} {i + MIN_JUGADORES === 1 ? 'jugador' : 'jugadores'}
-                </option>
-              ))}
-            </select>
-
-            <span className="field-label">Nombres</span>
-            <div className="names-grid">
-              {jugadores.map((j, idx) => (
-                <input
-                  key={j.id}
-                  type="text"
-                  value={j.nombre}
-                  onChange={(e) => handleNombreChange(idx, e.target.value)}
-                  placeholder={`Jugador ${j.id}`}
-                  maxLength={30}
-                  required
-                />
-              ))}
-            </div>
-          </div>
-
-          <button className="big full" onClick={empezarPartida}>
-            <Icon name="play" size={24} /> ¡Comenzar Desafío!
-          </button>
-        </section>
+        <SelectorJugadores
+          onVolver={onVolver}
+          onAyuda={() => setModalAyuda(true)}
+          min={MIN_JUGADORES}
+          max={MAX_JUGADORES}
+          numJugadores={numJugadores}
+          onCambiarNum={(n) => handleNumJugadoresChange({ target: { value: n } })}
+          nombres={jugadores}
+          onNombre={handleNombreChange}
+          onEmpezar={empezarPartida}
+          textoBoton="¡Comenzar Desafío!"
+          iconoBoton="play"
+        >
+          <BloqueConfig>
+          <Icon name="trophy" size={20} />
+          <span>
+            Récord histórico: <strong>{record.puntos} aciertos</strong> ({record.jugador})
+          </span>
+          </BloqueConfig>
+        </SelectorJugadores>
       )}
 
       {/* 2. CUENTA ATRÁS PREVIA */}

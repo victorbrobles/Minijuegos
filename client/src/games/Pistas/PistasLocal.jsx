@@ -1,8 +1,8 @@
 // client/src/games/Pistas/PistasLocal.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
-import GameIntro from '../../components/GameIntro.jsx';
 import './Pistas.css';
+import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx';
 
 const MAX_PISTAS = 6;
 const TIEMPO_PISTA_SEGUNDOS = 10;
@@ -419,14 +419,6 @@ export default function PistasLocal({ onVolver, onExit }) {
       {/* AYUDA */}
       {fase === 'setup' && (
         <>
-          <button
-            type="button"
-            className="btn-ayuda-flotante"
-            onClick={() => setModalAyuda(true)}
-            title="Reglas y puntuación"
-          >
-            <span className="btn-ayuda-flotante-signo">?</span>
-          </button>
 
           {modalAyuda && (
             <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
@@ -464,72 +456,39 @@ export default function PistasLocal({ onVolver, onExit }) {
 
       {/* 1. SETUP */}
       {fase === 'setup' && (
-        <section className="game" style={{ position: 'relative' }}>
-          <GameIntro gameId="pistas" titulo="6 Pistas (Un solo dispositivo)" />
-
-          <div className="panel">
-            <div className="hud" style={{ marginBottom: '1rem' }}>
-              <button className="btn-back-inline" onClick={onVolver}>
-                &larr; Cambiar modo
-              </button>
-            </div>
-
-            <h3 className="panel-title"><Icon name="dice" size={22} /> Modo de Juego</h3>
-            <div className="pts-selector-modo">
-              <button
-                type="button"
-                className={`pts-btn-modo ${modo === 'estandar' ? 'activo' : ''}`}
-                onClick={() => setModo('estandar')}
-              >
-                🏆 Estándar (Por Puntos)
-              </button>
-              <button
-                type="button"
-                className={`pts-btn-modo ${modo === 'supervivencia' ? 'activo' : ''}`}
-                onClick={() => setModo('supervivencia')}
-              >
-                💀 Supervivencia (Vidas ❤️)
-              </button>
-            </div>
-          </div>
-
-          <div className="panel">
-            <h3 className="panel-title"><Icon name="users" size={22} /> Participantes</h3>
-            <label className="field-label" htmlFor="num-jugadores-pts">
-              Número de jugadores ({MIN_JUGADORES} a {MAX_JUGADORES})
-            </label>
-            <select
-              id="num-jugadores-pts"
-              value={numJugadores}
-              onChange={handleNumJugadoresChange}
+        <SelectorJugadores
+          onVolver={onVolver}
+          onAyuda={() => setModalAyuda(true)}
+          min={MIN_JUGADORES}
+          max={MAX_JUGADORES}
+          numJugadores={numJugadores}
+          onCambiarNum={(n) => handleNumJugadoresChange({ target: { value: n } })}
+          nombres={jugadores}
+          onNombre={handleNombreChange}
+          onEmpezar={iniciarPartida}
+          textoBoton="¡Empezar Partida!"
+          iconoBoton="play"
+        >
+          <BloqueConfig>
+          <span className="qq-label-destacado qq-label-icono"><Icon name="dice" size={16} /> Modo de Juego</span>
+          <div className="pts-selector-modo">
+            <button
+              type="button"
+              className={`pts-btn-modo ${modo === 'estandar' ? 'activo' : ''}`}
+              onClick={() => setModo('estandar')}
             >
-              {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => (
-                <option key={i + MIN_JUGADORES} value={i + MIN_JUGADORES}>
-                  {i + MIN_JUGADORES} jugadores
-                </option>
-              ))}
-            </select>
-
-            <span className="field-label">Nombres</span>
-            <div className="names-grid">
-              {jugadores.map((j, idx) => (
-                <input
-                  key={j.id}
-                  type="text"
-                  value={j.nombre}
-                  onChange={(e) => handleNombreChange(idx, e.target.value)}
-                  placeholder={`Jugador ${j.id}`}
-                  maxLength={30}
-                  required
-                />
-              ))}
-            </div>
+              🏆 Estándar (Por Puntos)
+            </button>
+            <button
+              type="button"
+              className={`pts-btn-modo ${modo === 'supervivencia' ? 'activo' : ''}`}
+              onClick={() => setModo('supervivencia')}
+            >
+              💀 Supervivencia (Vidas ❤️)
+            </button>
           </div>
-
-          <button className="big full" onClick={iniciarPartida}>
-            <Icon name="play" size={24} /> ¡Empezar Partida!
-          </button>
-        </section>
+          </BloqueConfig>
+        </SelectorJugadores>
       )}
 
       {/* 2. JUEGO EN CURSO CON PULSADOR ROJO */}

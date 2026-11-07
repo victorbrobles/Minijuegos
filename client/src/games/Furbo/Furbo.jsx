@@ -5,10 +5,10 @@ import FurboLocal from './FurboLocal.jsx';
 import FurboOnline from './FurboOnline.jsx';
 import { FASES_INFO, ORDEN_FASES } from './FurboInfo.js';
 import './Furbo.css';
+import { metaDe } from '../meta.js';
 
-const TITULO_JUEGO = 'Furbo!';
-const DESCRIPCION_JUEGO =
-  'Un verdadero quiz de fútbol dividido en diversas fases. Calienta con el vestuario, ponte a punto con la quiniela o cierra el partido con los penaltis. No te desenganches de los primeros puestos y llega con opciones a la final.';
+// Título y descripción: siempre los de meta.js
+const { titulo: TITULO_JUEGO, descripcion: DESCRIPCION_JUEGO } = metaDe('furbo');
 
 export default function Furbo({ onExit }) {
   const [modo, setModo] = useState('online');

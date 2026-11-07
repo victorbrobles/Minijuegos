@@ -4,10 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import BuscaminasLocal from './BuscaminasLocal.jsx';
 import BuscaminasOnline from './BuscaminasOnline.jsx';
 import './Buscaminas.css';
+import { metaDe } from '../meta.js';
 
-const TITULO_JUEGO = 'Cuidado que explota';
-const DESCRIPCION_JUEGO =
-  'Un tablero, 10 respuestas correctas y 5 bombas. Elige una respuesta y evita topar con una de las bombas para no quedar eliminado de la ronda.';
+// Título y descripción: siempre los de meta.js
+const { titulo: TITULO_JUEGO, descripcion: DESCRIPCION_JUEGO } = metaDe('buscaminas');
 
 export default function Buscaminas({ onExit }) {
   const [modo, setModo] = useState('online');

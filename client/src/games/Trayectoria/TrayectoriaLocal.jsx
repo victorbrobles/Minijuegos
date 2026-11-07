@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
 import './Trayectoria.css';
+import { SelectorJugadores } from '../../components/MenuJuego.jsx';
 
 const llamar = async (ruta, cuerpo) => {
   const res = await fetch(`/api/trayectoria${ruta}`, {
@@ -321,15 +322,7 @@ export default function TrayectoriaLocal({ onVolver, onExit }) {
   // 1. Configuración
   if (fase === 'config') {
     return (
-      <div className="trayectoria-container" style={{ position: 'relative' }}>
-        <button
-          type="button"
-          className="btn-ayuda-flotante"
-          onClick={() => setModalAyuda(true)}
-          title="Reglas"
-        >
-          <span className="btn-ayuda-flotante-signo">?</span>
-        </button>
+      <div style={{ position: 'relative' }}>
 
         {modalAyuda && (
           <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
@@ -383,90 +376,19 @@ export default function TrayectoriaLocal({ onVolver, onExit }) {
           </div>
         )}
 
-        {/* Banner superior con el degradado verde de Trayectoria */}
-        <div
-          className="game-intro-banner"
-          style={{
-            background: 'linear-gradient(135deg, #16a34a, #059669)',
-            boxShadow: '0 8px 24px rgba(22, 163, 74, 0.28)'
-          }}
-        >
-          <div
-            className="game-intro-icon-box"
-            style={{
-              background: 'rgba(255, 255, 255, 0.2)',
-              border: '1px solid rgba(255, 255, 255, 0.3)'
-            }}
-          >
-            <span style={{ fontSize: '2rem' }}>⚽</span>
-          </div>
-          <div className="game-intro-text">
-            <h2>Trayectoria (Un solo dispositivo)</h2>
-            <p>Pulsad el botón rojo para parar el tiempo cuando sepáis el futbolista.</p>
-          </div>
-        </div>
-
-        <div className="game-setup-white-card">
-          <div className="hud" style={{ marginBottom: '1rem' }}>
-            <button className="btn-back-inline" onClick={onVolver}>
-              &larr; Cambiar modo
-            </button>
-          </div>
-
-          <div className="section-title" style={{ color: '#16a34a' }}>
-            <Icon name="users" size={22} />
-            <span>Participantes</span>
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Número de jugadores (2 a 15)</label>
-            <div className="select-wrapper">
-              <select
-                className="game-select"
-                value={numJugadores}
-                onChange={(e) => handleNumJugadoresChange(Number(e.target.value))}
-              >
-                {Array.from({ length: 14 }, (_, i) => i + 2).map((num) => (
-                  <option key={num} value={num}>
-                    {num} jugadores
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label className="form-label">Nombres</label>
-            <div className="players-inputs-grid">
-              {jugadores.map((j) => (
-                <input
-                  key={j.id}
-                  type="text"
-                  className="player-text-input"
-                  value={j.nombre}
-                  placeholder={`Jugador ${j.id}`}
-                  onChange={(e) => handleNombreJugador(j.id, e.target.value)}
-                />
-              ))}
-            </div>
-          </div>
-
-          <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
-            <button
-              className="btn-start"
-              style={{
-                background: 'linear-gradient(135deg, #16a34a, #15803d)',
-                boxShadow: '0 4px 14px rgba(22, 163, 74, 0.4)'
-              }}
-              onClick={iniciarPartida}
-            >
-              Comenzar Partida
-            </button>
-          </div>
-          {errorConfig && (
-            <div className="status-alert error" style={{ marginTop: '1rem' }}>{errorConfig}</div>
-          )}
-        </div>
+        <SelectorJugadores
+          onVolver={onVolver}
+          onAyuda={() => setModalAyuda(true)}
+          min={2}
+          max={15}
+          numJugadores={numJugadores}
+          onCambiarNum={handleNumJugadoresChange}
+          nombres={jugadores}
+          onNombre={(idx, valor) => handleNombreJugador(jugadores[idx].id, valor)}
+          onEmpezar={iniciarPartida}
+          textoBoton="Comenzar Partida"
+          error={errorConfig}
+        />
       </div>
     );
   }

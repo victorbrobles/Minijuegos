@@ -16,6 +16,14 @@ npm run dev
 3. Regístralo en `client/src/games/registry.js`.
 4. Si necesita lógica en servidor, añade rutas en `server/routes/`.
 
+## Menús iniciales unificados
+- Todos los juegos usan las piezas de `client/src/components/MenuJuego.jsx` (menú principal, modo online, crear partida,
+  unirse con código, sala de espera y selector de jugadores) y los estilos de `client/src/components/MenuJuego.css`.
+- El título, la descripción, el icono y los colores salen de `client/src/games/meta.js`: `GamePage` pasa los colores
+  como `--g1`/`--g2` (también al fondo de la página), así que no hay que poner colores fijos en el CSS de cada juego.
+- Juegos con modo local: menú principal → *Jugar online* (crear / unirse) o *Jugar en un único dispositivo* (selector de jugadores).
+  Juegos solo online (p. ej. Traiciones, Bingoball, Lleva la cuenta): el menú principal muestra directamente *Crear partida* / *Unirse con código*.
+
 ## Minijuego: Siglas y acrónimos
 - Al entrar se elige una categoría (o todas mezcladas); cada sigla tiene 20 segundos y la partida acaba al fallar.
 - Datos en SQLite (`server/data/minigames.db`, se crea solo). La fuente de verdad es `server/data/siglas.seed.js`,

@@ -4,10 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import LobosLocal from './LobosLocal.jsx';
 import LobosOnline from './LobosOnline.jsx';
 import './Lobos.css';
+import { metaDe } from '../meta.js';
 
-const TITULO_JUEGO = 'Luna de sangre';
-const DESCRIPCION_JUEGO =
-  'Lobos contra el pueblo, con multitud de rol y caos infinito. El pueblo trata de destapar a los lobos, mientras que los lobos van matando al pueblo en secreto. ¡Descúbrelos antes de ser cazado!';
+// Título y descripción: siempre los de meta.js
+const { titulo: TITULO_JUEGO, descripcion: DESCRIPCION_JUEGO } = metaDe('lobos');
 
 export default function Lobos({ onExit }) {
   const [modo, setModo] = useState('online');

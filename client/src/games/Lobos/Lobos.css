@@ -1,15 +1,4 @@
 /* Luna de Sangre — usa los estilos compartidos de styles.css; aquí solo lo propio */
-body:has(.lb-contenedor) {
-  background:
-    radial-gradient(70% 460px at 50% 0%, rgba(220, 38, 38, 0.38) 0%, transparent 70%),
-    radial-gradient(45% 560px at 100% 20%, rgba(153, 27, 27, 0.28) 0%, transparent 70%),
-    radial-gradient(45% 560px at 0% 50%, rgba(225, 29, 72, 0.22) 0%, transparent 70%),
-    radial-gradient(45% 560px at 100% 76%, rgba(127, 29, 29, 0.25) 0%, transparent 70%),
-    radial-gradient(80% 520px at 50% 100%, rgba(185, 28, 28, 0.35) 0%, transparent 70%),
-    radial-gradient(rgba(255, 255, 255, .06) 1.3px, transparent 1.5px) 0 0 / 22px 22px,
-    linear-gradient(180deg, #15060b 0%, #180718 50%, #0f0514 100%) !important;
-  background-attachment: scroll !important;
-}
 
 .lb-contenedor { position: relative; width: 100%; }
 .lb-contenedor .intro-title { padding-right: 2.8rem; }

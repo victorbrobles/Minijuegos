@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import GameIntro from '../../components/GameIntro.jsx';
 import { reproducir, pausarAudio, reanudarAudio, detenerReproduccion } from './audioPlayerCancion.js';
 import './Cancion.css';
 import '../Adivina/Adivina.css'; 
