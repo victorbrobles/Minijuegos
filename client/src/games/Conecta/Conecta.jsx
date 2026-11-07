@@ -59,15 +59,22 @@ export default function Conecta({ onExit }) {
 
             <div className="aprox-modal-cuerpo">
               <p>{DESCRIPCION_JUEGO}</p>
-              <p><strong>1. Dinámica del juego:</strong></p>
+              <p><strong>1. Por turnos:</strong></p>
               <ul>
-                <li>El tablero tiene <strong>16 elementos</strong> distribuidos en 4 conexiones secretas.</li>
-                <li><strong>Pulsa el botón rojo</strong> cuando sepas una conexión y marca 4 casillas. Dispondrás de <strong>30 segundos</strong> para responder.</li>
-                <li><strong>Ciclo de turnos:</strong> Tras responder (aciertes o falles), debes esperar a que respondan los demás jugadores vivos antes de poder volver a pulsar. Al responder todos, el turno se reinicia.</li>
-                <li>Si fallas, pierdes 1 vida (3 vidas por ronda).</li>
-                <li>Al acertar una conexión, puedes adivinar su temática para ganar <strong>+1 punto extra</strong>.</li>
+                <li>Se sortea quién empieza; después el turno pasa en orden.</li>
+                <li>Cuando es tu turno verás la pantalla <strong>«Turno de…»</strong>: pulsa <strong>Listo</strong> y tendrás <strong>90 segundos</strong>.</li>
+                <li>Elige <strong>4 elementos</strong> que creas que forman una conexión y pulsa <strong>Comprobar</strong>.</li>
+                <li>Si aciertas, sumas puntos y puedes adivinar <strong>qué los une</strong> (+1 punto extra).</li>
+                <li>Si fallas o se acaba el tiempo, pierdes una vida (<strong>3 vidas</strong> por ronda). Sin vidas quedas eliminado.</li>
+                <li>Aciertes o falles, el turno pasa al siguiente jugador.</li>
               </ul>
-              <p><strong>2. Puntuación por resolver:</strong></p>
+              <p><strong>2. La última conexión:</strong></p>
+              <ul>
+                <li>Con 3 conexiones descubiertas, solo queda adivinar qué une a los 4 últimos.</li>
+                <li>Lo intenta quien tenga el turno: si acierta gana <strong>+2 puntos</strong> y termina la ronda; si falla, pasa al siguiente.</li>
+                <li>Si nadie la adivina, la ronda termina y se muestran las soluciones.</li>
+              </ul>
+              <p><strong>3. Puntuación:</strong></p>
               <div className="aprox-tabla-puntos">
                 <div className="aprox-puntos-fila acierto">
                   <span>🥇 1ª conexión descubierta</span>
@@ -81,7 +88,18 @@ export default function Conecta({ onExit }) {
                   <span>🥉 3ª conexión descubierta</span>
                   <strong>+1 punto</strong>
                 </div>
+                <div className="aprox-puntos-fila intermedia" style={{ background: '#fef3c7', color: '#92400e' }}>
+                  <span>💡 Adivinar qué los une</span>
+                  <strong>+1 punto</strong>
+                </div>
+                <div className="aprox-puntos-fila intermedia" style={{ background: '#f3e8ff', color: '#6b21a8' }}>
+                  <span>🏁 Última conexión</span>
+                  <strong>+2 puntos</strong>
+                </div>
               </div>
+              <p className="hint small" style={{ marginTop: '0.6rem' }}>
+                El anfitrión (o en un solo dispositivo, cualquiera) puede terminar la ronda en cualquier momento con las puntuaciones actuales.
+              </p>
             </div>
 
             <button

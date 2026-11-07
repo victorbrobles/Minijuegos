@@ -4,10 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import CategoryCard from '../../components/CategoryCard.jsx';
 import './Conecta.css';
+import * as E from './engine.js';
+import ConectaPartida from './ConectaPartida.jsx';
 
 const MIN_JUGADORES = 3;
 const MAX_JUGADORES = 15;
-const TIEMPO_RESPUESTA_S = 30;
 
 const CATEGORIAS_METADATA = [
   { id: 'futbolistas', nombre: 'Futbolistas', icono: 'trophy' },
@@ -37,7 +38,7 @@ function BotonVolver({ onClick, texto = 'Volver' }) {
 
 export default function ConectaLocal({ onVolver, onExit, onAbrirAyuda }) {
   const navigate = useNavigate();
-  const [fase, setFase] = useState('setup');
+  const [fase, setFase] = useState('setup'); // 'setup' | 'categoria' | 'juego' | 'final'
   const [modalSalirPortada, setModalSalirPortada] = useState(false);
 
   const [numJugadores, setNumJugadores] = useState(4);
@@ -48,45 +49,22 @@ export default function ConectaLocal({ onVolver, onExit, onAbrirAyuda }) {
     { id: 4, nombre: 'Jugador 4' }
   ]);
   const [puntos, setPuntos] = useState({});
-  const [vidas, setVidas] = useState({});
+  const [rondaActual, setRondaActual] = useState(0);
+  const [errorCarga, setErrorCarga] = useState('');
 
-  const [categoriaElegida, setCategoriaElegida] = useState(null);
-  const [rondaActual, setRondaActual] = useState(1);
+  // Estado de la ronda (motor de reglas compartido con el servidor)
+  const rondaRef = useRef(null);
+  const [, setVersion] = useState(0);
+  const refrescar = () => setVersion((v) => v + 1);
 
-  const [tablero, setTablero] = useState([]);
-  const [grupos, setGrupos] = useState([]);
-  const [conexionesResueltas, setConexionesResueltas] = useState([]);
-
-  // Control de turnos por ciclo
-  const [jugadoresRespondieronTurno, setJugadoresRespondieronTurno] = useState([]);
-
-  // Pulsador rojo, temporizador de 30s y selección
-  const [pulsadorActivo, setPulsadorActivo] = useState(false);
-  const [jugadorPulsado, setJugadorPulsado] = useState(null);
-  const [segundosRespuesta, setSegundosRespuesta] = useState(TIEMPO_RESPUESTA_S);
-  const [seleccionados, setSeleccionados] = useState([]);
-  const [mensajeFeedback, setMensajeFeedback] = useState(null);
-
-  const [inputTema, setInputTema] = useState('');
-  const [grupoParaTema, setGrupoParaTema] = useState(null);
-  const [feedbackTema, setFeedbackTema] = useState(null);
-
-  const [ultimoGrupoPendiente, setUltimoGrupoPendiente] = useState(null);
-  const [jugadorPulsadoUltima, setJugadorPulsadoUltima] = useState(null);
-  const [inputTemaUltima, setInputTemaUltima] = useState('');
-  const [feedbackUltima, setFeedbackUltima] = useState(null);
-
-  const timerRespuestaRef = useRef(null);
-
-  const jugadorPulsadoRef = useRef(jugadorPulsado);
+  // Reloj: aplica el fin del tiempo de cada turno
   useEffect(() => {
-    jugadorPulsadoRef.current = jugadorPulsado;
-  }, [jugadorPulsado]);
-
-  const vidasRef = useRef(vidas);
-  useEffect(() => {
-    vidasRef.current = vidas;
-  }, [vidas]);
+    if (fase !== 'juego') return undefined;
+    const id = setInterval(() => {
+      if (rondaRef.current && E.tick(rondaRef.current, Date.now())) refrescar();
+    }, 250);
+    return () => clearInterval(id);
+  }, [fase]);
 
   const handleSalirAPortada = () => {
     setModalSalirPortada(false);
@@ -128,267 +106,58 @@ export default function ConectaLocal({ onVolver, onExit, onAbrirAyuda }) {
     listaActualizada.forEach((j) => { pts[j.id] = 0; });
     setPuntos(pts);
 
-    setRondaActual(1);
+    setRondaActual(0);
     setFase('categoria');
   };
 
   const iniciarRondaConCategoria = (catId) => {
-    setCategoriaElegida(catId);
-    const v = {};
-    jugadores.forEach((j) => { v[j.id] = 3; });
-    setVidas(v);
-    setConexionesResueltas([]);
-    setJugadoresRespondieronTurno([]);
-    setPulsadorActivo(false);
-    setJugadorPulsado(null);
-    setSegundosRespuesta(TIEMPO_RESPUESTA_S);
-    setSeleccionados([]);
-    setMensajeFeedback(null);
-    setFeedbackTema(null);
-    setUltimoGrupoPendiente(null);
-    setJugadorPulsadoUltima(null);
-    setFeedbackUltima(null);
-
+    setErrorCarga('');
+    const meta = CATEGORIAS_METADATA.find((c) => c.id === catId);
     fetch(`/api/conecta/tablero?categoria=${catId}`)
       .then((r) => r.json())
       .then((data) => {
-        if (data.success) {
-          setTablero(data.tablero);
-          setGrupos(data.grupos);
-          setFase('juego');
-        }
+        if (!data.success) throw new Error();
+        const numero = rondaActual + 1;
+        rondaRef.current = E.crearRonda(
+          jugadores.map((j) => ({ id: j.id, nombre: j.nombre, puntos: puntos[j.id] ?? 0 })),
+          { grupos: data.grupos },
+          { ronda: numero, categoria: meta?.nombre || data.categoria }
+        );
+        setRondaActual(numero);
+        setFase('juego');
+        refrescar();
       })
-      .catch((err) => console.error('Error al obtener tablero:', err));
+      .catch(() => setErrorCarga('No se pudo cargar el tablero. Inténtalo de nuevo.'));
   };
 
-  const registrarRespuestaJugador = (jugadorId, vidasActuales = vidas) => {
-    setJugadoresRespondieronTurno((prev) => {
-      const nuevo = prev.includes(jugadorId) ? prev : [...prev, jugadorId];
-      const vivos = jugadores.filter((j) => (vidasActuales[j.id] ?? 3) > 0);
-      const todosRespondieron = vivos.length === 0 || vivos.every((j) => nuevo.includes(j.id));
-      return todosRespondieron ? [] : nuevo;
-    });
+  // Pasa los puntos de la ronda al marcador general
+  const guardarPuntos = () => {
+    const r = rondaRef.current;
+    if (!r) return;
+    const pts = { ...puntos };
+    r.jugadores.forEach((j) => { pts[j.id] = j.puntos; });
+    setPuntos(pts);
   };
 
-  const handlePulsarBotonRojo = () => {
-    if (jugadoresDisponibles.length === 0) return;
-    setPulsadorActivo(true);
-    setJugadorPulsado(null);
-    setSeleccionados([]);
-    setMensajeFeedback(null);
-    setSegundosRespuesta(TIEMPO_RESPUESTA_S);
-  };
-
-  const cancelarPulsacion = () => {
-    setPulsadorActivo(false);
-    setJugadorPulsado(null);
-    setSeleccionados([]);
-  };
-
-  useEffect(() => {
-    if (!pulsadorActivo) {
-      setSegundosRespuesta(TIEMPO_RESPUESTA_S);
-      return;
-    }
-    setSegundosRespuesta(TIEMPO_RESPUESTA_S);
-    timerRespuestaRef.current = setInterval(() => {
-      setSegundosRespuesta((prev) => {
-        if (prev <= 0.1) {
-          clearInterval(timerRespuestaRef.current);
-          handleTiempoAgotadoLocal();
-          return 0;
-        }
-        return Math.max(0, prev - 0.1);
-      });
-    }, 100);
-    return () => clearInterval(timerRespuestaRef.current);
-  }, [pulsadorActivo]);
-
-  const handleTiempoAgotadoLocal = () => {
-    const jugador = jugadorPulsadoRef.current;
-    if (!jugador) {
-      cancelarPulsacion();
-    } else {
-      const vidasRestantes = (vidasRef.current[jugador.id] ?? 3) - 1;
-      const nuevasVidas = { ...vidasRef.current, [jugador.id]: vidasRestantes };
-      setVidas(nuevasVidas);
-      setMensajeFeedback(`¡Tiempo agotado para responder! (${jugador.nombre} pierde 1 ❤️)`);
-      registrarRespuestaJugador(jugador.id, nuevasVidas);
-
-      setTimeout(() => {
-        setPulsadorActivo(false);
-        setJugadorPulsado(null);
-        setSeleccionados([]);
-        setMensajeFeedback(null);
-        const quedanVivos = Object.values(nuevasVidas).some((v) => v > 0);
-        if (!quedanVivos) rendirseRonda();
-      }, 1800);
-    }
-  };
-
-  const toggleSeleccion = (item) => {
-    if (!jugadorPulsado) return;
-    if (seleccionados.some((s) => s.texto === item.texto)) {
-      setSeleccionados(seleccionados.filter((s) => s.texto !== item.texto));
-    } else {
-      if (seleccionados.length < 4) setSeleccionados([...seleccionados, item]);
-    }
-  };
-
-  const confirmarSeleccion = () => {
-    if (seleccionados.length !== 4 || !jugadorPulsado) return;
-    const cuentas = {};
-    seleccionados.forEach((s) => {
-      cuentas[s.grupoId] = (cuentas[s.grupoId] || 0) + 1;
-    });
-    const grupoAcertado = Object.entries(cuentas).find(([, cant]) => cant === 4);
-    const tresCorrectos = Object.entries(cuentas).find(([, cant]) => cant === 3);
-
-    if (grupoAcertado) {
-      const gId = parseInt(grupoAcertado[0], 10);
-      const grupoObj = grupos.find((g) => g.id === gId);
-      const numResueltas = conexionesResueltas.length;
-      let ptsGanados = 1;
-      if (numResueltas === 0) ptsGanados = 5;
-      else if (numResueltas === 1) ptsGanados = 3;
-
-      setPuntos((prev) => ({
-        ...prev,
-        [jugadorPulsado.id]: (prev[jugadorPulsado.id] || 0) + ptsGanados
-      }));
-
-      const textosEliminar = new Set(seleccionados.map((s) => s.texto));
-      setTablero((prev) => prev.filter((item) => !textosEliminar.has(item.texto)));
-
-      const nuevaResuelta = { ...grupoObj, resueltoPor: jugadorPulsado.nombre, puntosGanados: ptsGanados };
-      setConexionesResueltas((prev) => [...prev, nuevaResuelta]);
-      registrarRespuestaJugador(jugadorPulsado.id, vidas);
-      setGrupoParaTema(nuevaResuelta);
-      setInputTema('');
-      setFeedbackTema(null);
-      setPulsadorActivo(false);
-      setFase('resolucion_grupo');
-    } else {
-      const vidasRestantes = vidas[jugadorPulsado.id] - 1;
-      const nuevasVidas = { ...vidas, [jugadorPulsado.id]: vidasRestantes };
-      setVidas(nuevasVidas);
-      registrarRespuestaJugador(jugadorPulsado.id, nuevasVidas);
-
-      if (tresCorrectos) setMensajeFeedback('¡Tienes 3 correctos de una misma conexión! (-1 ❤️)');
-      else setMensajeFeedback('¡No forman una conexión! (-1 ❤️)');
-
-      setTimeout(() => {
-        setPulsadorActivo(false);
-        setJugadorPulsado(null);
-        setSeleccionados([]);
-        setMensajeFeedback(null);
-        const quedanVivos = Object.entries(nuevasVidas).some(([jId, v]) => parseInt(jId, 10) !== jugadorPulsado.id && v > 0);
-        if (!quedanVivos && vidasRestantes <= 0) rendirseRonda();
-      }, 1800);
-    }
-  };
-
-  const validarTemaConexion = (saltar = false) => {
-    let esAcierto = false;
-    if (!saltar && inputTema.trim() && grupoParaTema?.palabrasClave) {
-      const texto = inputTema.trim().toLowerCase();
-      esAcierto = grupoParaTema.palabrasClave.some((kw) => texto.includes(kw.toLowerCase()));
-      if (esAcierto) {
-        setPuntos((prev) => ({
-          ...prev,
-          [jugadorPulsado.id]: (prev[jugadorPulsado.id] || 0) + 1
-        }));
-      }
-    }
-    setFeedbackTema({ esCorrecto: esAcierto, saltado: saltar, temaReal: grupoParaTema.tema, jugadorNombre: jugadorPulsado.nombre });
-  };
-
-  const continuarTrasFeedbackTema = () => {
-    setFeedbackTema(null);
-    setGrupoParaTema(null);
-    setJugadorPulsado(null);
-    setSeleccionados([]);
-    setInputTema('');
-
-    if (conexionesResueltas.length === 3) {
-      const idsResueltos = new Set(conexionesResueltas.map((r) => r.id));
-      const cuarto = grupos.find((g) => !idsResueltos.has(g.id));
-      setUltimoGrupoPendiente(cuarto);
-      setJugadorPulsadoUltima(null);
-      setInputTemaUltima('');
-      setFeedbackUltima(null);
-      setFase('ultima_conexion');
-    } else if (conexionesResueltas.length >= 4) {
-      setFase('ronda_fin');
-    } else {
-      setFase('juego');
-    }
-  };
-
-  const validarTemaUltimaConexion = (e) => {
-    e.preventDefault();
-    if (!inputTemaUltima.trim() || !ultimoGrupoPendiente || !jugadorPulsadoUltima) return;
-
-    const texto = inputTemaUltima.trim().toLowerCase();
-    const esAcierto = ultimoGrupoPendiente.palabrasClave.some((kw) => texto.includes(kw.toLowerCase()));
-
-    if (esAcierto) {
-      setPuntos((prev) => ({
-        ...prev,
-        [jugadorPulsadoUltima.id]: (prev[jugadorPulsadoUltima.id] || 0) + 1
-      }));
-      setFeedbackUltima({ esCorrecto: true, jugadorNombre: jugadorPulsadoUltima.nombre, temaReal: ultimoGrupoPendiente.tema });
-    } else {
-      const vidasRestantes = vidas[jugadorPulsadoUltima.id] - 1;
-      const nuevasVidas = { ...vidas, [jugadorPulsadoUltima.id]: vidasRestantes };
-      setVidas(nuevasVidas);
-      registrarRespuestaJugador(jugadorPulsadoUltima.id, nuevasVidas);
-      setFeedbackUltima({ esCorrecto: false, jugadorNombre: jugadorPulsadoUltima.nombre, temaReal: ultimoGrupoPendiente.tema });
-    }
-  };
-
-  const continuarTrasFeedbackUltima = () => {
-    if (feedbackUltima?.esCorrecto) {
-      setConexionesResueltas((prev) => [
-        ...prev,
-        { ...ultimoGrupoPendiente, resueltoPor: jugadorPulsadoUltima ? jugadorPulsadoUltima.nombre : 'Adivinada', puntosGanados: 0 }
-      ]);
-      setTablero([]);
-      setFeedbackUltima(null);
-      setJugadorPulsadoUltima(null);
-      setFase('ronda_fin');
-    } else {
-      setFeedbackUltima(null);
-      setJugadorPulsadoUltima(null);
-      const quedanVivos = Object.values(vidas).some((v) => v > 0);
-      if (!quedanVivos) rendirseUltimaConexion();
-    }
-  };
-
-  const rendirseUltimaConexion = () => {
-    if (ultimoGrupoPendiente) {
-      setConexionesResueltas((prev) => [
-        ...prev,
-        { ...ultimoGrupoPendiente, resueltoPor: 'Nadie', puntosGanados: 0 }
-      ]);
-      setTablero([]);
-    }
-    setFase('ronda_fin');
-  };
-
-  const rendirseRonda = () => {
-    setFase('ronda_fin');
+  const accion = async (tipo, datos = {}) => {
+    const r = rondaRef.current;
+    if (!r) return { error: 'No hay ronda.' };
+    const ahora = Date.now();
+    const id = r.turno?.jugadorId;
+    let res;
+    if (tipo === 'listo') res = E.empezarTurno(r, id, ahora);
+    else if (tipo === 'confirmar') res = E.confirmarSeleccion(r, id, datos.ids, ahora);
+    else if (tipo === 'tema') res = E.adivinarTema(r, id, datos.texto, ahora);
+    else if (tipo === 'saltar-turno') res = E.saltarTurno(r);
+    else if (tipo === 'finalizar-ronda') res = E.finalizarRonda(r);
+    refrescar();
+    return res;
   };
 
   const ranking = [...jugadores].sort((a, b) => (puntos[b.id] ?? 0) - (puntos[a.id] ?? 0));
   const maximo = ranking.length ? (puntos[ranking[0].id] ?? 0) : 0;
   const ganadores = maximo > 0 ? ranking.filter((j) => (puntos[j.id] ?? 0) === maximo) : [];
-
-  const jugadoresVivos = jugadores.filter((j) => (vidas[j.id] ?? 3) > 0);
-  const cicloCompleto = jugadoresVivos.length === 0 || jugadoresVivos.every((j) => jugadoresRespondieronTurno.includes(j.id));
-  const respondieronEfectivos = cicloCompleto ? [] : jugadoresRespondieronTurno;
-  const jugadoresDisponibles = jugadoresVivos.filter((j) => !respondieronEfectivos.includes(j.id));
-  const enPartidaActiva = fase !== 'setup' && fase !== 'categoria';
+  const enPartidaActiva = fase === 'juego';
 
   return (
     <div className={`cc-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
@@ -494,7 +263,7 @@ export default function ConectaLocal({ onVolver, onExit, onAbrirAyuda }) {
         </section>
       )}
 
-      {/* 2. SELECTOR DE CATEGORÍA */}
+      {/* 2. CATEGORÍA */}
       {fase === 'categoria' && (
         <section className="game">
           <div className="panel qq-menu-panel">
@@ -518,6 +287,8 @@ export default function ConectaLocal({ onVolver, onExit, onAbrirAyuda }) {
               </p>
             </div>
 
+            {errorCarga && <p className="error" style={{ marginBottom: '0.8rem' }}>{errorCarga}</p>}
+
             <div className="rf-opciones conecta-categories-grid">
               {CATEGORIAS_METADATA.map((cat, idx) => (
                 <CategoryCard
@@ -533,464 +304,27 @@ export default function ConectaLocal({ onVolver, onExit, onAbrirAyuda }) {
         </section>
       )}
 
-      {/* 3. TABLERO DE JUEGO (OFFLINE CON PULSADOR) */}
-      {fase === 'juego' && (
-        <section className="game">
-          <div className="panel qq-menu-panel">
-            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
-              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
-              <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
-                Ronda {rondaActual} · {conexionesResueltas.length}/4
-              </span>
-            </div>
-
-            <div className="scoreboard-container" style={{ justifyContent: 'center', marginBottom: '0.8rem' }}>
-              {jugadores.map((j) => {
-                const v = vidas[j.id] ?? 3;
-                const yaRespondio = respondieronEfectivos.includes(j.id);
-                return (
-                  <div key={j.id} className={`score-pill ${v <= 0 ? 'locked' : ''}`}>
-                    <span>
-                      {j.nombre}: {v > 0 ? '❤️'.repeat(v) : '💀 Fuera'} {yaRespondio && v > 0 ? '· ⏳' : ''}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-
-            {conexionesResueltas.length > 0 && (
-              <div className="conecta-resueltos-lista">
-                {conexionesResueltas.map((r, idx) => (
-                  <div key={idx} className="conecta-grupo-resuelto-card">
-                    <div className="conecta-resuelto-header">
-                      <strong>{r.tema}</strong>
-                      <span>+{r.puntosGanados} pts ({r.resueltoPor})</span>
-                    </div>
-                    <div className="conecta-resuelto-items">{r.elementos.join(' • ')}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {tablero.length > 0 && (
-              <div className="conecta-grid-16">
-                {tablero.map((item, idx) => {
-                  const seleccionado = seleccionados.some((s) => s.texto === item.texto);
-                  return (
-                    <button
-                      key={idx}
-                      type="button"
-                      disabled={!jugadorPulsado}
-                      className={`conecta-item-btn ${seleccionado ? 'seleccionado' : ''}`}
-                      onClick={() => toggleSeleccion(item)}
-                    >
-                      <span>{item.texto}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-
-            {mensajeFeedback && (
-              <div className="conecta-feedback-banner">{mensajeFeedback}</div>
-            )}
-
-            <div className="interactive-controls" style={{ marginTop: '1.2rem' }}>
-              {!pulsadorActivo ? (
-                <div className="pulsador-container">
-                  <button
-                    type="button"
-                    className="btn-pulsador-rojo"
-                    onClick={handlePulsarBotonRojo}
-                    disabled={jugadoresVivos.length === 0}
-                  >
-                    <span className="pulsador-icono">🔴</span>
-                    <span className="pulsador-texto">¡PULSAR PARA RESPONDER!</span>
-                  </button>
-                  {respondieronEfectivos.length > 0 && (
-                    <p className="hint small center" style={{ marginTop: '0.5rem' }}>
-                      Turno en curso: {respondieronEfectivos.length}/{jugadoresVivos.length} ya han respondido en este ciclo.
-                    </p>
-                  )}
-                </div>
-              ) : (
-                <div className="respuesta-pulsada-box">
-                  <div className="respuesta-pulsada-header">
-                    <span className="pulsado-badge" style={{ background: '#dcfce7', color: '#166534' }}>
-                      🔴 Tiempo detenido para responder
-                    </span>
-                    <p className="hint small" style={{ margin: '0.5rem 0 0.4rem' }}>
-                      {!jugadorPulsado
-                        ? 'Selecciona el jugador que va a responder:'
-                        : `Turno de ${jugadorPulsado.nombre} (${seleccionados.length}/4 casillas). Selecciona 4 casillas del tablero:`}
-                    </p>
-
-                    <div
-                      className="timer"
-                      role="timer"
-                      style={{
-                        margin: '0.6rem 0 0.3rem',
-                        background: '#e2e8f0',
-                        borderRadius: '9999px',
-                        height: '8px',
-                        overflow: 'hidden'
-                      }}
-                    >
-                      <div
-                        className={`timer-bar ${segundosRespuesta <= 7 ? 'low' : ''}`}
-                        style={{
-                          width: `${(segundosRespuesta / TIEMPO_RESPUESTA_S) * 100}%`,
-                          height: '100%',
-                          backgroundColor: segundosRespuesta <= 7 ? '#ef4444' : '#16a34a',
-                          borderRadius: '9999px',
-                          transition: 'width 0.1s linear, background-color 0.3s ease'
-                        }}
-                      />
-                    </div>
-                    <p
-                      className="timer-text"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '0.35rem',
-                        color: segundosRespuesta <= 7 ? '#dc2626' : '#64748b',
-                        fontSize: '0.9rem',
-                        fontWeight: 700,
-                        margin: '0 0 0.8rem'
-                      }}
-                    >
-                      <Icon name="clock" size={16} />
-                      {Math.ceil(segundosRespuesta)} s
-                    </p>
-                  </div>
-
-                  {!jugadorPulsado ? (
-                    <>
-                      <div className="modal-players-grid">
-                        {jugadoresVivos.map((j) => {
-                          const yaRespondio = respondieronEfectivos.includes(j.id);
-                          return (
-                            <button
-                              key={j.id}
-                              type="button"
-                              className={`btn-modal-player ${yaRespondio ? 'locked' : ''}`}
-                              disabled={yaRespondio}
-                              onClick={() => setJugadorPulsado(j)}
-                            >
-                              {j.nombre} ({vidas[j.id]} ❤️) {yaRespondio ? '⏳' : ''}
-                            </button>
-                          );
-                        })}
-                      </div>
-                      {respondieronEfectivos.length > 0 && (
-                        <p className="hint small center" style={{ marginTop: '0.5rem' }}>
-                          Los jugadores con ⏳ deben esperar a que responda el resto para reiniciar turno.
-                        </p>
-                      )}
-                    </>
-                  ) : (
-                    <div style={{ display: 'flex', gap: '0.8rem', marginTop: '0.8rem' }}>
-                      <button
-                        type="button"
-                        className="big full qq-btn-principal"
-                        disabled={seleccionados.length !== 4}
-                        onClick={confirmarSeleccion}
-                      >
-                        <Icon name="check" size={20} /> Confirmar conexión
-                      </button>
-                      <button
-                        type="button"
-                        className="secondary full"
-                        onClick={cancelarPulsacion}
-                      >
-                        Cancelar
-                      </button>
-                    </div>
-                  )}
-
-                  {!jugadorPulsado && (
-                    <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-                      <button type="button" className="btn-modal-cancel" onClick={cancelarPulsacion}>
-                        Cancelar
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            <div className="qq-tablero-footer">
-              <button type="button" className="qq-link-otra-ronda" onClick={rendirseRonda}>
-                Rendirse y ver soluciones completas
+      {/* 3. RONDA POR TURNOS */}
+      {fase === 'juego' && rondaRef.current && (
+        <ConectaPartida
+          local
+          partida={E.vista(rondaRef.current, Date.now())}
+          onAccion={accion}
+          onSalir={() => setModalSalirPortada(true)}
+          finRonda={(
+            <>
+              <button type="button" className="cnp-boton grande" onClick={() => { guardarPuntos(); setFase('categoria'); }}>
+                <Icon name="play" size={20} /> Nueva ronda
               </button>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* 4. ADIVINAR LA CONEXIÓN */}
-      {fase === 'resolucion_grupo' && grupoParaTema && (
-        <section className="game">
-          <div className="panel qq-menu-panel">
-            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
-              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
-            </div>
-
-            <div className="starter" style={{ textAlign: 'center', marginBottom: '1.2rem' }}>
-              <Icon name="trophy" size={28} />
-              <p style={{ margin: 0 }}>¡Conexión acertada por <strong>{jugadorPulsado?.nombre}</strong>!</p>
-            </div>
-
-            <div className="panel aprox-pregunta-card">
-              <span className="aprox-badge-pregunta">Pregunta extra (+1 punto)</span>
-              <h2 className="aprox-pregunta-texto">¿Qué relación une a estos 4 elementos?</h2>
-              <div style={{ display: 'flex', gap: '0.6rem', justifyContent: 'center', flexWrap: 'wrap', margin: '1rem 0' }}>
-                {grupoParaTema.elementos.map((el, i) => (
-                  <span key={i} className="chip">{el}</span>
-                ))}
-              </div>
-            </div>
-
-            {!feedbackTema ? (
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  validarTemaConexion(false);
-                }}
-                className="panel aprox-formulario"
-                style={{ marginTop: '1rem' }}
-              >
-                <label className="field-label" htmlFor="input-tema-cc">
-                  Introduce la conexión (solo para {jugadorPulsado?.nombre}):
-                </label>
-                <input
-                  id="input-tema-cc"
-                  type="text"
-                  autoFocus
-                  placeholder="Ej: Campeones del mundo con España..."
-                  value={inputTema}
-                  onChange={(e) => setInputTema(e.target.value)}
-                />
-                <div style={{ display: 'flex', gap: '0.8rem', marginTop: '1rem' }}>
-                  <button type="submit" className="big full" style={{ flex: 2 }}>
-                    <Icon name="check" size={22} /> Validar (+1 pt)
-                  </button>
-                  <button
-                    type="button"
-                    className="secondary full"
-                    style={{ flex: 1 }}
-                    onClick={() => validarTemaConexion(true)}
-                  >
-                    Pasar
-                  </button>
-                </div>
-              </form>
-            ) : (
-              <div className="panel aprox-pregunta-card" style={{ padding: '1.8rem 1.4rem', marginTop: '1rem' }}>
-                <div
-                  className={
-                    feedbackTema.esCorrecto
-                      ? 'conecta-feedback-banner-acierto'
-                      : feedbackTema.saltado
-                      ? 'conecta-feedback-banner-info'
-                      : 'conecta-feedback-banner-fallo'
-                  }
-                >
-                  {feedbackTema.esCorrecto ? (
-                    <>🎯 ¡Correcto! <strong>+1 punto extra</strong> para {feedbackTema.jugadorNombre}.</>
-                  ) : feedbackTema.saltado ? (
-                    <>ℹ️ No se ha intentado adivinar la conexión.</>
-                  ) : (
-                    <>❌ ¡Incorrecto! La respuesta no era correcta.</>
-                  )}
-                </div>
-
-                <div style={{ marginTop: '1.4rem', fontSize: '1.15rem', color: '#1e1b4b' }}>
-                  La conexión era: <strong style={{ color: '#2563eb' }}>{feedbackTema.temaReal}</strong>
-                </div>
-
-                <button
-                  type="button"
-                  className="big full qq-btn-principal"
-                  style={{ marginTop: '1.5rem' }}
-                  onClick={continuarTrasFeedbackTema}
-                >
-                  <Icon name="play" size={20} /> Continuar
-                </button>
-              </div>
-            )}
-          </div>
-        </section>
-      )}
-
-      {/* 5. 4ª Y ÚLTIMA CONEXIÓN CON PULSADOR */}
-      {fase === 'ultima_conexion' && ultimoGrupoPendiente && (
-        <section className="game">
-          <div className="panel qq-menu-panel">
-            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
-              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
-            </div>
-
-            <div className="starter" style={{ textAlign: 'center', marginBottom: '1.2rem' }}>
-              <Icon name="target" size={28} />
-              <p style={{ margin: 0 }}>¡3 conexiones resueltas! Queda la última conexión:</p>
-            </div>
-
-            <div className="panel aprox-pregunta-card">
-              <span className="aprox-badge-pregunta" style={{ background: '#dbeafe', color: '#1d4ed8' }}>
-                Últimos 4 elementos
-              </span>
-              <h2 className="aprox-pregunta-texto">¿De qué trata esta última conexión?</h2>
-              <div style={{ display: 'flex', gap: '0.6rem', justifyContent: 'center', flexWrap: 'wrap', margin: '1rem 0' }}>
-                {ultimoGrupoPendiente.elementos.map((el, i) => (
-                  <span key={i} className="chip" style={{ fontSize: '1rem', padding: '0.6rem 1rem' }}>{el}</span>
-                ))}
-              </div>
-              <p className="field-label" style={{ marginTop: '0.6rem' }}>
-                Cualquiera puede pulsar el botón rojo para adivinar la temática (+1 pt extra / -1 vida):
-              </p>
-            </div>
-
-            {feedbackUltima && (
-              <div className="panel aprox-pregunta-card" style={{ padding: '1.6rem 1.4rem', marginTop: '1rem', marginBottom: '1rem' }}>
-                <div className={feedbackUltima.esCorrecto ? 'conecta-feedback-banner-acierto' : 'conecta-feedback-banner-fallo'}>
-                  {feedbackUltima.esCorrecto ? (
-                    <>🎯 ¡Correcto! <strong>+1 punto extra</strong> para {feedbackUltima.jugadorNombre}.</>
-                  ) : (
-                    <>❌ ¡Incorrecto! {feedbackUltima.jugadorNombre} pierde 1 vida.</>
-                  )}
-                </div>
-
-                {feedbackUltima.esCorrecto && (
-                  <div style={{ marginTop: '1.2rem', fontSize: '1.15rem', color: '#1e1b4b' }}>
-                    Conexión: <strong style={{ color: '#2563eb' }}>{feedbackUltima.temaReal}</strong>
-                  </div>
-                )}
-
-                <button
-                  type="button"
-                  className="big full qq-btn-principal"
-                  style={{ marginTop: '1.2rem' }}
-                  onClick={continuarTrasFeedbackUltima}
-                >
-                  {feedbackUltima.esCorrecto ? 'Ver resultados de la ronda' : 'Continuar turno'}
-                </button>
-              </div>
-            )}
-
-            {jugadorPulsadoUltima && !feedbackUltima && (
-              <form onSubmit={validarTemaUltimaConexion} className="panel aprox-formulario" style={{ marginTop: '1rem' }}>
-                <label className="field-label" htmlFor="input-tema-ultima">
-                  Respuesta de <strong>{jugadorPulsadoUltima.nombre}</strong> (+1 pt / -1 vida):
-                </label>
-                <input
-                  id="input-tema-ultima"
-                  type="text"
-                  autoFocus
-                  placeholder="Escribe la conexión que los une..."
-                  value={inputTemaUltima}
-                  onChange={(e) => setInputTemaUltima(e.target.value)}
-                  required
-                />
-                <div style={{ display: 'flex', gap: '0.8rem', marginTop: '1rem' }}>
-                  <button type="submit" className="big full" style={{ flex: 2 }}>
-                    <Icon name="check" size={22} /> Validar respuesta
-                  </button>
-                  <button
-                    type="button"
-                    className="secondary full"
-                    style={{ flex: 1 }}
-                    onClick={() => setJugadorPulsadoUltima(null)}
-                  >
-                    Cancelar
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {!feedbackUltima && !jugadorPulsadoUltima && (
-              <div className="pulsador-container" style={{ margin: '1rem 0' }}>
-                <button
-                  type="button"
-                  className="btn-pulsador-rojo"
-                  onClick={() => setJugadorPulsadoUltima(jugadoresDisponibles[0] || null)}
-                  disabled={jugadoresDisponibles.length === 0}
-                >
-                  <span className="pulsador-icono">🔴</span>
-                  <span className="pulsador-texto">¡PULSAR PARA ADIVINAR!</span>
-                </button>
-              </div>
-            )}
-
-            <div className="qq-tablero-footer">
-              <button type="button" className="qq-link-otra-ronda" onClick={rendirseUltimaConexion}>
-                Nadie la sabe / Ver soluciones
+              <button type="button" className="cnp-enlace" onClick={() => { guardarPuntos(); setFase('final'); }}>
+                <Icon name="trophy" size={16} /> Finalizar partida
               </button>
-            </div>
-          </div>
-        </section>
+            </>
+          )}
+        />
       )}
 
-      {/* 6. SOLUCIONES Y PUNTUACIÓN */}
-      {fase === 'ronda_fin' && (
-        <section className="game">
-          <div className="panel qq-menu-panel">
-            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
-              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
-              <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
-                Ronda {rondaActual} finalizada
-              </span>
-            </div>
-
-            <div className="starter" style={{ textAlign: 'center', marginBottom: '1rem' }}>
-              <Icon name="trophy" size={28} />
-              <p style={{ margin: 0 }}>Soluciones del Tablero</p>
-            </div>
-
-            <div className="conecta-resueltos-lista" style={{ margin: '1rem 0' }}>
-              {grupos.map((g, idx) => (
-                <div key={idx} className="conecta-grupo-resuelto-card">
-                  <div className="conecta-resuelto-header"><strong>{g.tema}</strong></div>
-                  <div className="conecta-resuelto-items">{g.elementos.join(' • ')}</div>
-                </div>
-              ))}
-            </div>
-
-            <div className="scoreboard" style={{ width: '100%', marginTop: '1.5rem' }}>
-              <h3 className="section-title" style={{ margin: '0 0 0.8rem', textAlign: 'center' }}>
-                Marcador general
-              </h3>
-              {ranking.map((j, i) => {
-                const pts = puntos[j.id] ?? 0;
-                const primero = maximo > 0 && pts === maximo;
-                return (
-                  <div key={j.id} className={`score-row${primero ? ' first' : ''}`}>
-                    <span className="score-name">
-                      {primero ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
-                      {j.nombre}
-                    </span>
-                    <span className="score-pts">{pts} pts</span>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-              <button type="button" className="big full qq-btn-principal" onClick={() => setFase('categoria')}>
-                <Icon name="play" size={20} /> Siguiente Ronda ({rondaActual + 1})
-              </button>
-              <div className="qq-tablero-footer" style={{ marginTop: 0, paddingTop: '0.6rem', borderTop: 'none' }}>
-                <button type="button" className="qq-link-otra-ronda" onClick={() => setFase('final')}>
-                  Finalizar partida 🏆
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* 7. PODIO FINAL */}
+      {/* 4. PODIO FINAL */}
       {fase === 'final' && (
         <section className="game">
           <div className="end-card">

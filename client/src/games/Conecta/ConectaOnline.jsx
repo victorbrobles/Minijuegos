@@ -4,9 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import CategoryCard from '../../components/CategoryCard.jsx';
 import './Conecta.css';
+import ConectaPartida from './ConectaPartida.jsx';
 
 const CLAVE_SESION_CONECTA = 'conecta_online_session';
-const TIEMPO_RESPUESTA_S = 30;
 
 const CATEGORIAS_METADATA = [
   { id: 'futbolistas', nombre: 'Futbolistas', icono: 'trophy' },
@@ -61,22 +61,7 @@ export default function ConectaOnline({
   const [sala, setSala] = useState(null);
   const [codigoCopiado, setCodigoCopiado] = useState(false);
 
-  // Estados locales durante la selección de casillas y temporizador
-  const [seleccionados, setSeleccionados] = useState([]);
-  const [inputTema, setInputTema] = useState('');
-  const [mensajeFeedback, setMensajeFeedback] = useState(null);
-  const [segundosRespuesta, setSegundosRespuesta] = useState(TIEMPO_RESPUESTA_S);
-
-  // Seguimiento de turnos por ciclo
-  const [jugadoresRespondieronTurno, setJugadoresRespondieronTurno] = useState([]);
-  const prevPulsadoRef = useRef(null);
-
   const intervalRef = useRef(null);
-  const seleccionadosRef = useRef(seleccionados);
-  useEffect(() => {
-    seleccionadosRef.current = seleccionados;
-  }, [seleccionados]);
-
   useEffect(() => {
     if (!sesion) {
       if (intervalRef.current) clearInterval(intervalRef.current);
@@ -174,64 +159,6 @@ export default function ConectaOnline({
 
   const esAdmin = Boolean(sala?.esAdmin);
   const yoId = sala?.yoId;
-  const soyElQueHaPulsado = Boolean(sala?.jugadorPulsado && sala.jugadorPulsado.jugadorId === yoId);
-  const alguienHaPulsado = Boolean(sala?.jugadorPulsado);
-  const miJugador = sala?.jugadores?.find((j) => j.id === yoId);
-  const sinVidas = (miJugador?.vidas ?? 3) <= 0;
-
-  useEffect(() => {
-    setJugadoresRespondieronTurno([]);
-  }, [sala?.rondaActual, sala?.estado === 'categoria']);
-
-  useEffect(() => {
-    const jugadorAnterior = prevPulsadoRef.current;
-    const jugadorActual = sala?.jugadorPulsado;
-    if (jugadorAnterior && (!jugadorActual || jugadorActual.jugadorId !== jugadorAnterior.jugadorId)) {
-      const pId = jugadorAnterior.jugadorId;
-      setJugadoresRespondieronTurno((prev) => {
-        const nuevo = prev.includes(pId) ? prev : [...prev, pId];
-        const vivos = (sala?.jugadores || []).filter((j) => (j.vidas ?? 3) > 0);
-        const todosRespondieron = vivos.length === 0 || vivos.every((j) => nuevo.includes(j.id));
-        return todosRespondieron ? [] : nuevo;
-      });
-    }
-    prevPulsadoRef.current = jugadorActual;
-  }, [sala?.jugadorPulsado, sala?.jugadores]);
-
-  const jugadoresVivos = (sala?.jugadores || []).filter((j) => (j.vidas ?? 3) > 0);
-  const respondieronLista = (sala?.respondieronIds && Array.isArray(sala.respondieronIds)) ? sala.respondieronIds : jugadoresRespondieronTurno;
-  const cicloCompleto = jugadoresVivos.length === 0 || jugadoresVivos.every((j) => respondieronLista.includes(j.id));
-  const respondieronEfectivos = cicloCompleto ? [] : respondieronLista;
-  const yaRespondioEnCiclo = respondieronEfectivos.includes(yoId);
-
-  useEffect(() => {
-    if (!alguienHaPulsado) {
-      setSegundosRespuesta(TIEMPO_RESPUESTA_S);
-      return;
-    }
-    setSegundosRespuesta(TIEMPO_RESPUESTA_S);
-    const t = setInterval(() => {
-      setSegundosRespuesta((prev) => {
-        if (prev <= 0.1) {
-          clearInterval(t);
-          if (soyElQueHaPulsado) handleTiempoAgotadoOnline();
-          return 0;
-        }
-        return Math.max(0, prev - 0.1);
-      });
-    }, 100);
-    return () => clearInterval(t);
-  }, [alguienHaPulsado, soyElQueHaPulsado]);
-
-  const handleTiempoAgotadoOnline = async () => {
-    if (!sesion) return;
-    if (seleccionadosRef.current && seleccionadosRef.current.length === 4) {
-      handleConfirmarSeleccionOnline();
-    } else {
-      handleCancelarTurno();
-    }
-  };
-
   const handleCrear = async () => {
     if (!nombre.trim()) return;
     setErrorMsg('');
@@ -291,116 +218,34 @@ export default function ConectaOnline({
 
   const handleSeleccionarCategoria = async (catId) => {
     if (!sesion) return;
-    setSeleccionados([]);
-    setMensajeFeedback(null);
     try {
-      await fetch(`/api/conecta/online/sala/${sesion.code}/seleccionar-categoria`, {
+      const res = await fetch(`/api/conecta/online/sala/${sesion.code}/seleccionar-categoria`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: sesion.token, categoriaId: catId })
       });
+      const data = await res.json();
+      if (res.ok && data.success) setSala(data);
     } catch (err) {
       console.error(err);
     }
   };
 
-  const handlePulsarRojo = async () => {
-    if (!sesion || yaRespondioEnCiclo) return;
-    setSeleccionados([]);
-    setMensajeFeedback(null);
-    setSegundosRespuesta(TIEMPO_RESPUESTA_S);
+  // Acciones de la ronda: listo · confirmar · tema · saltar-turno · finalizar-ronda
+  const handleAccion = async (tipo, datos = {}) => {
+    if (!sesion) return { error: 'Sin sesión.' };
     try {
-      await fetch(`/api/conecta/online/sala/${sesion.code}/pulsar`, {
+      const res = await fetch(`/api/conecta/online/sala/${sesion.code}/accion`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion.token })
-      });
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleCancelarTurno = async () => {
-    if (!sesion) return;
-    setSeleccionados([]);
-    try {
-      await fetch(`/api/conecta/online/sala/${sesion.code}/cancelar-turno`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion.token })
-      });
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const toggleSeleccionOnline = (item) => {
-    if (seleccionados.some((s) => s.texto === item.texto)) {
-      setSeleccionados(seleccionados.filter((s) => s.texto !== item.texto));
-    } else {
-      if (seleccionados.length < 4) {
-        setSeleccionados([...seleccionados, item]);
-      }
-    }
-  };
-
-  const handleConfirmarSeleccionOnline = async () => {
-    if (seleccionados.length !== 4 || !sesion) return;
-    try {
-      const res = await fetch(`/api/conecta/online/sala/${sesion.code}/confirmar-seleccion`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion.token, seleccionados })
+        body: JSON.stringify({ token: sesion.token, tipo, ...datos })
       });
       const data = await res.json();
-      if (!data.correcto) {
-        if (data.tresCorrectos) setMensajeFeedback('¡Tienes 3 correctos de una misma conexión! (-1 ❤️)');
-        else setMensajeFeedback('¡No forman una conexión! (-1 ❤️)');
-        setTimeout(() => setMensajeFeedback(null), 2000);
-      }
-      setSeleccionados([]);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleValidarTema = async (saltar = false) => {
-    if (!sesion) return;
-    try {
-      await fetch(`/api/conecta/online/sala/${sesion.code}/validar-tema`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion.token, inputTema, saltar })
-      });
-      setInputTema('');
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleContinuarTrasTema = async () => {
-    if (!sesion) return;
-    try {
-      await fetch(`/api/conecta/online/sala/${sesion.code}/continuar-tras-tema`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion.token })
-      });
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleRendirse = async () => {
-    if (!sesion) return;
-    try {
-      await fetch(`/api/conecta/online/sala/${sesion.code}/rendirse`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion.token })
-      });
-    } catch (err) {
-      console.error(err);
+      if (!res.ok) return { error: data.error || 'No se pudo completar la acción.' };
+      if (data.success) setSala(data);
+      return data.resultado || { ok: true };
+    } catch {
+      return { error: 'Se ha perdido la conexión con la sala.' };
     }
   };
 
@@ -793,7 +638,7 @@ export default function ConectaOnline({
             <div className="qq-card-top">
               <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
               <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
-                Ronda {sala.rondaActual}
+                Ronda {sala.rondaActual + 1}
               </span>
             </div>
 
@@ -827,611 +672,29 @@ export default function ConectaOnline({
       )}
 
       {/* 6. SALA: JUGANDO ONLINE */}
-      {vista === 'sala' && sala && sala.estado === 'juego' && (
-        <section className="game">
-          <div className="panel qq-menu-panel">
-            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
-              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
-              <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
-                Ronda {sala.rondaActual} · {sala.conexionesResueltas.length}/4
-              </span>
-            </div>
-
-            <div className="scoreboard-container" style={{ justifyContent: 'center', marginBottom: '0.8rem' }}>
-              {sala.jugadores.map((j) => {
-                const yaRespondio = respondieronEfectivos.includes(j.id);
-                return (
-                  <div key={j.id} className={`score-pill ${j.vidas <= 0 ? 'locked' : ''}`}>
-                    <span>
-                      {j.nombre}: {j.vidas > 0 ? '❤️'.repeat(j.vidas) : '💀 Fuera'} {yaRespondio && j.vidas > 0 ? '· ⏳' : ''}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-
-            {sala.conexionesResueltas.length > 0 && (
-              <div className="conecta-resueltos-lista">
-                {sala.conexionesResueltas.map((r, idx) => (
-                  <div key={idx} className="conecta-grupo-resuelto-card">
-                    <div className="conecta-resuelto-header">
-                      <strong>{r.tema}</strong>
-                      <span>+{r.puntosGanados} pts ({r.resueltoPor})</span>
-                    </div>
-                    <div className="conecta-resuelto-items">{r.elementos.join(' • ')}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {sala.tablero.length > 0 && (
-              <div className="conecta-grid-16">
-                {sala.tablero.map((item, idx) => {
-                  const seleccionado = seleccionados.some((s) => s.texto === item.texto);
-                  return (
-                    <button
-                      key={idx}
-                      type="button"
-                      disabled={!soyElQueHaPulsado}
-                      className={`conecta-item-btn ${seleccionado ? 'seleccionado' : ''}`}
-                      onClick={() => toggleSeleccionOnline(item)}
-                    >
-                      <span>{item.texto}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-
-            {mensajeFeedback && (
-              <div className="conecta-feedback-banner">{mensajeFeedback}</div>
-            )}
-
-            <div className="interactive-controls" style={{ marginTop: '1.2rem' }}>
-              {!alguienHaPulsado && (
-                <div className="pulsador-container">
-                  <button
-                    type="button"
-                    className="btn-pulsador-rojo"
-                    onClick={handlePulsarRojo}
-                    disabled={sinVidas || yaRespondioEnCiclo}
-                  >
-                    <span className="pulsador-icono">🔴</span>
-                    <span className="pulsador-texto">
-                      {sinVidas
-                        ? 'SIN VIDAS EN ESTA RONDA'
-                        : yaRespondioEnCiclo
-                        ? 'ESPERANDO A LOS DEMÁS...'
-                        : '¡PULSAR PARA RESPONDER!'}
-                    </span>
-                  </button>
-                  {yaRespondioEnCiclo && (
-                    <p className="hint small center" style={{ marginTop: '0.5rem' }}>
-                      Ya has respondido en esta ronda ({respondieronEfectivos.length}/{jugadoresVivos.length}). Podrás volver a pulsar cuando todos hayan participado.
-                    </p>
-                  )}
-                </div>
-              )}
-
-              {soyElQueHaPulsado && (
-                <div className="respuesta-pulsada-box">
-                  <div className="respuesta-pulsada-header">
-                    <span className="pulsado-badge" style={{ background: '#dcfce7', color: '#166534' }}>
-                      🔴 ¡Has pulsado! Selecciona 4 casillas ({seleccionados.length}/4)
-                    </span>
-
-                    <div
-                      className="timer"
-                      role="timer"
-                      style={{
-                        margin: '0.6rem 0 0.3rem',
-                        background: '#e2e8f0',
-                        borderRadius: '9999px',
-                        height: '8px',
-                        overflow: 'hidden'
-                      }}
-                    >
-                      <div
-                        className={`timer-bar ${segundosRespuesta <= 7 ? 'low' : ''}`}
-                        style={{
-                          width: `${(segundosRespuesta / TIEMPO_RESPUESTA_S) * 100}%`,
-                          height: '100%',
-                          backgroundColor: segundosRespuesta <= 7 ? '#ef4444' : '#16a34a',
-                          borderRadius: '9999px',
-                          transition: 'width 0.1s linear, background-color 0.3s ease'
-                        }}
-                      />
-                    </div>
-                    <p
-                      className="timer-text"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '0.35rem',
-                        color: segundosRespuesta <= 7 ? '#dc2626' : '#64748b',
-                        fontSize: '0.9rem',
-                        fontWeight: 700,
-                        margin: '0 0 0.8rem'
-                      }}
-                    >
-                      <Icon name="clock" size={16} />
-                      {Math.ceil(segundosRespuesta)} s
-                    </p>
-                  </div>
-
-                  <div style={{ display: 'flex', gap: '0.8rem', marginTop: '0.8rem' }}>
-                    <button
-                      type="button"
-                      className="big full"
-                      disabled={seleccionados.length !== 4}
-                      onClick={handleConfirmarSeleccionOnline}
-                    >
-                      <Icon name="check" size={20} /> Confirmar 4 casillas
-                    </button>
-                    <button
-                      type="button"
-                      className="secondary full"
-                      onClick={handleCancelarTurno}
-                    >
-                      Cancelar
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {alguienHaPulsado && !soyElQueHaPulsado && (
-                <div className="online-tecleo-preview-card">
-                  <div className="online-tecleo-header">
-                    <span className="pulsador-icono">🔴</span>
-                    <strong>¡{sala.jugadorPulsado.nombre} ha pulsado!</strong>
-                  </div>
-                  <p className="hint small" style={{ margin: '0.4rem 0 0.4rem' }}>
-                    Está seleccionando las 4 casillas en su pantalla...
-                  </p>
-
-                  <div
-                    className="timer"
-                    role="timer"
-                    style={{
-                      margin: '0.6rem 0 0.3rem',
-                      background: '#e2e8f0',
-                      borderRadius: '9999px',
-                      height: '8px',
-                      overflow: 'hidden'
-                    }}
-                  >
-                    <div
-                      className={`timer-bar ${segundosRespuesta <= 7 ? 'low' : ''}`}
-                      style={{
-                        width: `${(segundosRespuesta / TIEMPO_RESPUESTA_S) * 100}%`,
-                        height: '100%',
-                        backgroundColor: segundosRespuesta <= 7 ? '#ef4444' : '#16a34a',
-                        borderRadius: '9999px',
-                        transition: 'width 0.1s linear, background-color 0.3s ease'
-                      }}
-                    />
-                  </div>
-                  <p
-                    className="timer-text"
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '0.35rem',
-                      color: segundosRespuesta <= 7 ? '#dc2626' : '#64748b',
-                      fontSize: '0.9rem',
-                      fontWeight: 700,
-                      margin: '0'
-                    }}
-                  >
-                    <Icon name="clock" size={16} />
-                    {Math.ceil(segundosRespuesta)} s
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {esAdmin && (
-              <div className="qq-tablero-footer">
-                <button type="button" className="qq-link-otra-ronda" onClick={handleRendirse}>
-                  Rendirse y ver soluciones (Anfitrión)
-                </button>
-              </div>
-            )}
-          </div>
-        </section>
+      {vista === 'sala' && sala && (sala.estado === 'juego' || sala.estado === 'ronda_fin') && sala.partida && (
+        <ConectaPartida
+          partida={sala.partida}
+          yoId={yoId}
+          esAdmin={esAdmin}
+          onAccion={handleAccion}
+          onSalir={() => setModalSalirPortada(true)}
+          finRonda={esAdmin ? (
+            <>
+              <button type="button" className="cnp-boton grande" onClick={handleSiguienteRonda}>
+                <Icon name="play" size={20} /> Nueva ronda
+              </button>
+              <button type="button" className="cnp-enlace" onClick={handleFinalizarPartida}>
+                <Icon name="trophy" size={16} /> Finalizar partida
+              </button>
+            </>
+          ) : (
+            <p className="cnp-espera">Esperando a que el anfitrión empiece otra ronda o termine la partida…</p>
+          )}
+        />
       )}
 
-      {/* 7. SALA: ADIVINAR LA CONEXIÓN */}
-      {vista === 'sala' && sala && sala.estado === 'resolucion_grupo' && sala.grupoParaTema && (
-        <section className="game">
-          <div className="panel qq-menu-panel">
-            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
-              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
-            </div>
-
-            <div className="starter" style={{ marginBottom: '1.2rem', textAlign: 'center' }}>
-              <Icon name="trophy" size={28} />
-              <p>¡Conexión acertada por <strong>{sala.grupoParaTema.resueltoPor}</strong>!</p>
-            </div>
-
-            <div className="panel aprox-pregunta-card">
-              <span className="aprox-badge-pregunta">Pregunta extra (+1 punto)</span>
-              <h2 className="aprox-pregunta-texto">¿Qué relación une a estos 4 elementos?</h2>
-              <div style={{ display: 'flex', gap: '0.6rem', justifyContent: 'center', flexWrap: 'wrap', margin: '1rem 0' }}>
-                {sala.grupoParaTema.elementos.map((el, i) => (
-                  <span key={i} className="chip">{el}</span>
-                ))}
-              </div>
-            </div>
-
-            {!sala.feedbackTema ? (
-              soyElQueHaPulsado ? (
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    handleValidarTema(false);
-                  }}
-                  className="panel aprox-formulario"
-                  style={{ marginTop: '1rem' }}
-                >
-                  <label className="field-label" htmlFor="input-tema-online">
-                    Introduce la conexión:
-                  </label>
-                  <input
-                    id="input-tema-online"
-                    type="text"
-                    autoFocus
-                    placeholder="Ej: Campeones del mundo..."
-                    value={inputTema}
-                    onChange={(e) => setInputTema(e.target.value)}
-                  />
-                  <div style={{ display: 'flex', gap: '0.8rem', marginTop: '1rem' }}>
-                    <button type="submit" className="big full" style={{ flex: 2 }}>
-                      <Icon name="check" size={22} /> Validar (+1 pt)
-                    </button>
-                    <button
-                      type="button"
-                      className="secondary full"
-                      style={{ flex: 1 }}
-                      onClick={() => handleValidarTema(true)}
-                    >
-                      Pasar
-                    </button>
-                  </div>
-                </form>
-              ) : (
-                <div className="panel center" style={{ padding: '2rem 1rem', marginTop: '1rem' }}>
-                  <h3>{sala.grupoParaTema.resueltoPor} está adivinando la conexión...</h3>
-                  <p className="hint">Tiene la oportunidad de sumar +1 punto extra.</p>
-                </div>
-              )
-            ) : (
-              <div className="panel aprox-pregunta-card" style={{ padding: '1.8rem 1.4rem', marginTop: '1rem' }}>
-                <div
-                  className={
-                    sala.feedbackTema.esCorrecto
-                      ? 'conecta-feedback-banner-acierto'
-                      : sala.feedbackTema.saltado
-                      ? 'conecta-feedback-banner-info'
-                      : 'conecta-feedback-banner-fallo'
-                  }
-                >
-                  {sala.feedbackTema.esCorrecto ? (
-                    <>🎯 ¡Correcto! <strong>+1 punto extra</strong> para {sala.feedbackTema.jugadorNombre}.</>
-                  ) : sala.feedbackTema.saltado ? (
-                    <>ℹ️ No se ha intentado adivinar la temática.</>
-                  ) : (
-                    <>❌ ¡Incorrecto! La respuesta no era correcta.</>
-                  )}
-                </div>
-
-                <div style={{ marginTop: '1.2rem', fontSize: '1.15rem', color: '#1e1b4b' }}>
-                  La conexión era: <strong style={{ color: '#2563eb' }}>{sala.feedbackTema.temaReal}</strong>
-                </div>
-
-                {esAdmin ? (
-                  <button
-                    type="button"
-                    className="big full qq-btn-principal"
-                    style={{ marginTop: '1.5rem' }}
-                    onClick={handleContinuarTrasTema}
-                  >
-                    <Icon name="play" size={20} /> Continuar partida
-                  </button>
-                ) : (
-                  <p className="hint center" style={{ marginTop: '1.2rem' }}>
-                    Esperando a que el anfitrión continúe...
-                  </p>
-                )}
-              </div>
-            )}
-          </div>
-        </section>
-      )}
-
-      {/* 8. SALA: 4ª Y ÚLTIMA CONEXIÓN ONLINE */}
-      {vista === 'sala' && sala && sala.estado === 'ultima_conexion' && sala.ultimoGrupoPendiente && (
-        <section className="game">
-          <div className="panel qq-menu-panel">
-            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
-              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
-            </div>
-
-            <div className="starter" style={{ textAlign: 'center', marginBottom: '1.2rem' }}>
-              <Icon name="target" size={28} />
-              <p>¡3 conexiones resueltas! Queda la última conexión:</p>
-            </div>
-
-            <div className="panel aprox-pregunta-card">
-              <span className="aprox-badge-pregunta" style={{ background: '#dbeafe', color: '#1d4ed8' }}>
-                Últimos 4 elementos
-              </span>
-              <h2 className="aprox-pregunta-texto">¿De qué trata esta última conexión?</h2>
-              <div style={{ display: 'flex', gap: '0.6rem', justifyContent: 'center', flexWrap: 'wrap', margin: '1rem 0' }}>
-                {sala.ultimoGrupoPendiente.elementos.map((el, i) => (
-                  <span key={i} className="chip" style={{ fontSize: '1rem', padding: '0.6rem 1rem' }}>{el}</span>
-                ))}
-              </div>
-              <p className="field-label" style={{ marginTop: '0.6rem' }}>
-                Cualquiera puede pulsar el botón rojo para adivinar la temática (+1 pt extra / -1 vida):
-              </p>
-            </div>
-
-            {sala.feedbackTema && (
-              <div className="panel aprox-pregunta-card" style={{ padding: '1.6rem 1.4rem', marginTop: '1rem' }}>
-                <div className={sala.feedbackTema.esCorrecto ? 'conecta-feedback-banner-acierto' : 'conecta-feedback-banner-fallo'}>
-                  {sala.feedbackTema.esCorrecto ? (
-                    <>🎯 ¡Correcto! <strong>+1 punto extra</strong> para {sala.feedbackTema.jugadorNombre}.</>
-                  ) : (
-                    <>❌ ¡Incorrecto! {sala.feedbackTema.jugadorNombre} pierde 1 vida.</>
-                  )}
-                </div>
-
-                {sala.feedbackTema.esCorrecto && (
-                  <div style={{ marginTop: '1.2rem', fontSize: '1.15rem', color: '#1e1b4b' }}>
-                    Conexión: <strong style={{ color: '#2563eb' }}>{sala.feedbackTema.temaReal}</strong>
-                  </div>
-                )}
-
-                {esAdmin ? (
-                  <button
-                    type="button"
-                    className="big full qq-btn-principal"
-                    style={{ marginTop: '1.2rem' }}
-                    onClick={handleContinuarTrasTema}
-                  >
-                    Ver soluciones completas
-                  </button>
-                ) : (
-                  <p className="hint center" style={{ marginTop: '1.2rem' }}>
-                    Esperando a que el anfitrión continúe...
-                  </p>
-                )}
-              </div>
-            )}
-
-            {!sala.feedbackTema && (
-              <div className="interactive-controls" style={{ margin: '1.2rem 0' }}>
-                {!alguienHaPulsado && (
-                  <div className="pulsador-container">
-                    <button
-                      type="button"
-                      className="btn-pulsador-rojo"
-                      onClick={handlePulsarRojo}
-                      disabled={sinVidas || yaRespondioEnCiclo}
-                    >
-                      <span className="pulsador-icono">🔴</span>
-                      <span className="pulsador-texto">
-                        {sinVidas
-                          ? 'SIN VIDAS EN ESTA RONDA'
-                          : yaRespondioEnCiclo
-                          ? 'ESPERANDO A LOS DEMÁS...'
-                          : '¡PULSAR PARA ADIVINAR!'}
-                      </span>
-                    </button>
-                  </div>
-                )}
-
-                {soyElQueHaPulsado && (
-                  <form
-                    onSubmit={(e) => {
-                      e.preventDefault();
-                      handleValidarTema(false);
-                    }}
-                    className="panel aprox-formulario"
-                  >
-                    <label className="field-label" htmlFor="input-tema-u-on">
-                      Introduce la conexión:
-                    </label>
-                    <input
-                      id="input-tema-u-on"
-                      type="text"
-                      autoFocus
-                      placeholder="Escribe la conexión..."
-                      value={inputTema}
-                      onChange={(e) => setInputTema(e.target.value)}
-                      required
-                    />
-
-                    <div
-                      className="timer"
-                      role="timer"
-                      style={{
-                        margin: '0.6rem 0 0.3rem',
-                        background: '#e2e8f0',
-                        borderRadius: '9999px',
-                        height: '8px',
-                        overflow: 'hidden'
-                      }}
-                    >
-                      <div
-                        className={`timer-bar ${segundosRespuesta <= 7 ? 'low' : ''}`}
-                        style={{
-                          width: `${(segundosRespuesta / TIEMPO_RESPUESTA_S) * 100}%`,
-                          height: '100%',
-                          backgroundColor: segundosRespuesta <= 7 ? '#ef4444' : '#16a34a',
-                          borderRadius: '9999px',
-                          transition: 'width 0.1s linear, background-color 0.3s ease'
-                        }}
-                      />
-                    </div>
-                    <p
-                      className="timer-text"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '0.35rem',
-                        color: segundosRespuesta <= 7 ? '#dc2626' : '#64748b',
-                        fontSize: '0.9rem',
-                        fontWeight: 700,
-                        margin: '0 0 0.8rem'
-                      }}
-                    >
-                      <Icon name="clock" size={16} />
-                      {Math.ceil(segundosRespuesta)} s
-                    </p>
-
-                    <div style={{ display: 'flex', gap: '0.8rem', marginTop: '0.8rem' }}>
-                      <button type="submit" className="big full" style={{ flex: 2 }}>
-                        <Icon name="check" size={20} /> Validar (+1 pt)
-                      </button>
-                      <button type="button" className="secondary full" style={{ flex: 1 }} onClick={handleCancelarTurno}>
-                        Cancelar
-                      </button>
-                    </div>
-                  </form>
-                )}
-
-                {alguienHaPulsado && !soyElQueHaPulsado && (
-                  <div className="online-tecleo-preview-card">
-                    <div className="online-tecleo-header">
-                      <span className="pulsador-icono">🔴</span>
-                      <strong>¡{sala.jugadorPulsado.nombre} ha pulsado!</strong>
-                    </div>
-                    <p className="hint small" style={{ margin: '0.4rem 0 0.4rem' }}>
-                      Está respondiendo en su pantalla...
-                    </p>
-
-                    <div
-                      className="timer"
-                      role="timer"
-                      style={{
-                        margin: '0.6rem 0 0.3rem',
-                        background: '#e2e8f0',
-                        borderRadius: '9999px',
-                        height: '8px',
-                        overflow: 'hidden'
-                      }}
-                    >
-                      <div
-                        className={`timer-bar ${segundosRespuesta <= 7 ? 'low' : ''}`}
-                        style={{
-                          width: `${(segundosRespuesta / TIEMPO_RESPUESTA_S) * 100}%`,
-                          height: '100%',
-                          backgroundColor: segundosRespuesta <= 7 ? '#ef4444' : '#16a34a',
-                          borderRadius: '9999px',
-                          transition: 'width 0.1s linear, background-color 0.3s ease'
-                        }}
-                      />
-                    </div>
-                    <p
-                      className="timer-text"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: '0.35rem',
-                        color: segundosRespuesta <= 7 ? '#dc2626' : '#64748b',
-                        fontSize: '0.9rem',
-                        fontWeight: 700,
-                        margin: '0'
-                      }}
-                    >
-                      <Icon name="clock" size={16} />
-                      {Math.ceil(segundosRespuesta)} s
-                    </p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {esAdmin && !sala.feedbackTema && (
-              <div className="qq-tablero-footer">
-                <button type="button" className="qq-link-otra-ronda" onClick={handleRendirse}>
-                  Nadie la sabe / Ver soluciones (Anfitrión)
-                </button>
-              </div>
-            )}
-          </div>
-        </section>
-      )}
-
-      {/* 9. SALA: RONDA FIN */}
-      {vista === 'sala' && sala && sala.estado === 'ronda_fin' && (
-        <section className="game">
-          <div className="panel qq-menu-panel">
-            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
-              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
-              <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
-                Ronda {sala.rondaActual} finalizada
-              </span>
-            </div>
-
-            <div className="starter" style={{ textAlign: 'center', marginBottom: '1rem' }}>
-              <Icon name="trophy" size={28} />
-              <p style={{ margin: 0 }}>Soluciones del Tablero</p>
-            </div>
-
-            <div className="conecta-resueltos-lista">
-              {sala.grupos.map((g, idx) => (
-                <div key={idx} className="conecta-grupo-resuelto-card">
-                  <div className="conecta-resuelto-header"><strong>{g.tema}</strong></div>
-                  <div className="conecta-resuelto-items">{g.elementos.join(' • ')}</div>
-                </div>
-              ))}
-            </div>
-
-            <div className="scoreboard" style={{ width: '100%', marginTop: '1.5rem' }}>
-              <h3 className="section-title" style={{ margin: '0 0 0.8rem', textAlign: 'center' }}>
-                Marcador general
-              </h3>
-              {ranking.map((j, i) => {
-                const pts = j.puntos ?? 0;
-                const primero = maximoPuntos > 0 && pts === maximoPuntos;
-                return (
-                  <div key={j.id} className={`score-row${primero ? ' first' : ''}`}>
-                    <span className="score-name">
-                      {primero ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
-                      {j.nombre} {j.id === yoId ? '(Tú)' : ''}
-                    </span>
-                    <span className="score-pts">{pts} pts</span>
-                  </div>
-                );
-              })}
-            </div>
-
-            {esAdmin ? (
-              <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-                <button type="button" className="big full qq-btn-principal" onClick={handleSiguienteRonda}>
-                  <Icon name="play" size={20} /> Siguiente ronda ({sala.rondaActual + 1})
-                </button>
-                <div className="qq-tablero-footer" style={{ marginTop: 0, paddingTop: '0.6rem', borderTop: 'none' }}>
-                  <button type="button" className="qq-link-otra-ronda" onClick={handleFinalizarPartida}>
-                    Finalizar partida 🏆
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <p className="hint center" style={{ marginTop: '1.5rem' }}>Esperando a que el anfitrión avance...</p>
-            )}
-          </div>
-        </section>
-      )}
-
-      {/* 10. SALA: PODIO FINAL */}
+      {/* 7. SALA: PODIO FINAL */}
       {vista === 'sala' && sala && sala.estado === 'final' && (
         <section className="game">
           <div className="end-card">
