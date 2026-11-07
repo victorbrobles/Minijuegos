@@ -284,7 +284,7 @@ export default function QuienEsQuienOnline({
   const enPartidaActiva = vista === 'sala' && sala && sala.estado === 'jugando';
 
   return (
-    <div className={`aprox-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+    <div className={`qq-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
       {/* 1. MENÚ INICIAL */}
       {vista === 'menu' && (
         <section className="game">

@@ -456,7 +456,7 @@ export default function ConectaOnline({
   const enPartidaActiva = vista === 'sala' && sala && sala.estado !== 'lobby';
 
   return (
-    <div className={`aprox-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+    <div className={`cc-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
 
       {/* 1. MENÚ PRINCIPAL */}
       {vista === 'menu' && (

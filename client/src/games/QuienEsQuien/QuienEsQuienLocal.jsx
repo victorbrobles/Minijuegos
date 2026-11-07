@@ -173,7 +173,7 @@ export default function QuienEsQuienLocal({ onVolver, onExit, onAbrirAyuda }) {
   const enPartidaActiva = paso === 'interturno' || paso === 'turno';
 
   return (
-    <div className={`aprox-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+    <div className={`qq-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
       {/* 1. CONFIGURACIÓN */}
       {paso === 'config' && (
         <section className="game">

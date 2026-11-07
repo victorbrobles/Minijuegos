@@ -392,7 +392,7 @@ export default function ConectaLocal({ onVolver, onExit, onAbrirAyuda }) {
   const enPartidaActiva = fase !== 'setup' && fase !== 'categoria';
 
   return (
-    <div className={`aprox-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+    <div className={`cc-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
 
       {/* 1. SETUP DE JUGADORES */}
       {fase === 'setup' && (

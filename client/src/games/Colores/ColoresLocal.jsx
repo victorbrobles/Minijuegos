@@ -237,7 +237,7 @@ export default function ColoresLocal({ onVolver, onExit, onAbrirAyuda }) {
   const enPartidaActiva = fase !== 'setup';
 
   return (
-    <div className={`aprox-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+    <div className={`colores-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
 
       {/* 1. SETUP DE JUGADORES */}
       {fase === 'setup' && (

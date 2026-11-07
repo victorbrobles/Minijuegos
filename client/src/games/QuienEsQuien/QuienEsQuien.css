@@ -1345,17 +1345,26 @@ body:has(.qq-en-partida) .back {
    FONDO IDÉNTICO AL MENÚ PRINCIPAL Y CONTROL DE PORTADA
    ======================================================== */
 
-body:has(.aprox-contenedor) {
+body:has(.qq-contenedor) {
   background:
-    radial-gradient(70% 460px at 50% 0%, rgba(139, 92, 246, .45) 0%, transparent 70%),
-    radial-gradient(45% 560px at 100% 20%, rgba(219, 39, 119, .22) 0%, transparent 70%),
-    radial-gradient(45% 560px at 0% 50%, rgba(124, 77, 255, .22) 0%, transparent 70%),
-    radial-gradient(45% 560px at 100% 76%, rgba(219, 39, 119, .2) 0%, transparent 70%),
-    radial-gradient(80% 520px at 50% 100%, rgba(249, 115, 22, .36) 0%, transparent 70%),
+    radial-gradient(70% 460px at 50% 0%, rgba(59, 130, 246, .45) 0%, transparent 70%),
+    radial-gradient(45% 560px at 100% 20%, rgba(14, 165, 233, .22) 0%, transparent 70%),
+    radial-gradient(45% 560px at 0% 50%, rgba(99, 102, 241, .22) 0%, transparent 70%),
+    radial-gradient(45% 560px at 100% 76%, rgba(56, 189, 248, .2) 0%, transparent 70%),
+    radial-gradient(80% 520px at 50% 100%, rgba(37, 99, 235, .36) 0%, transparent 70%),
     radial-gradient(rgba(255, 255, 255, .06) 1.3px, transparent 1.5px) 0 0 / 22px 22px,
-    linear-gradient(180deg, #0e1024 0%, #130f2c 50%, #1a1026 100%) !important;
+    linear-gradient(180deg, #070b19 0%, #0d122e 50%, #080f24 100%) !important;
   background-attachment: scroll !important;
 }
+
+body:has(.qq-en-partida) .back:not(.qq-btn-volver-sala) {
+  display: none !important;
+}
+
+.qq-contenedor {
+  width: 100%;
+  position: relative;
+}   
 
 /* Oculta el botón externo de "Portada" cuando se está dentro de la partida */
 body:has(.qq-en-partida) .back:not(.qq-btn-volver-sala) {
@@ -2108,4 +2117,38 @@ body:has(.qq-en-partida) .back:not(.qq-btn-volver-sala) {
     opacity: 1;
     transform: scale(1) translateY(0);
   }
+}
+
+/* Oculta cualquier botón de portada exterior mientras se juega */
+.qq-en-partida .back:not(.qq-btn-volver-sala) {
+  display: none !important;
+}
+
+body:has(.qq-contenedor) {
+  background:
+    radial-gradient(70% 460px at 50% 0%, rgba(124, 58, 237, .35) 0%, transparent 70%),
+    radial-gradient(45% 560px at 100% 20%, rgba(99, 102, 241, .22) 0%, transparent 70%),
+    radial-gradient(45% 560px at 0% 50%, rgba(139, 92, 246, .22) 0%, transparent 70%),
+    radial-gradient(45% 560px at 100% 76%, rgba(79, 70, 229, .2) 0%, transparent 70%),
+    radial-gradient(80% 520px at 50% 100%, rgba(109, 40, 217, .36) 0%, transparent 70%),
+    radial-gradient(rgba(255, 255, 255, .06) 1.3px, transparent 1.5px) 0 0 / 22px 22px,
+    linear-gradient(180deg, #0b0a1f 0%, #130f2c 50%, #0d091a 100%) !important;
+  background-attachment: scroll !important;
+}
+
+body:has(.qq-en-partida) .back:not(.qq-btn-volver-sala) {
+  display: none !important;
+}
+
+.qq-contenedor {
+  width: 100%;
+  position: relative;
+  min-height: 100vh;
+  padding-bottom: 2rem;
+}
+
+.qq-contenedor > .game {
+  max-width: 960px;
+  margin: 0 auto;
+  padding-top: 1rem;
 }

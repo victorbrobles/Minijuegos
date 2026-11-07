@@ -1,17 +1,33 @@
+// client/src/games/Cancion/CancionLocal.jsx
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import GameIntro from '../../components/GameIntro.jsx';
 import { reproducir, pausarAudio, reanudarAudio, detenerReproduccion } from './audioPlayerCancion.js';
 import './Cancion.css';
-import '../Adivina/Adivina.css'; // Usamos estilos del reproductor de Adivina
+import '../Adivina/Adivina.css'; 
 
 const MIN_JUGADORES = 2;
 const MAX_JUGADORES = 20;
 const TIEMPO_RESPUESTA = 60;
 
-export default function CancionLocal({ onVolver, onExit }) {
+const COLORES = ['#ef4444', '#2563eb', '#16a34a', '#f59e0b', '#9333ea', '#ec4899', '#0d9488', '#ea580c', '#475569', '#65a30d'];
+
+function BotonVolver({ onClick, texto = 'Volver' }) {
+  return (
+    <button type="button" className="qq-link-volver" onClick={onClick}>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7" />
+      </svg>
+      <span>{texto}</span>
+    </button>
+  );
+}
+
+export default function CancionLocal({ onVolver, onExit, onAbrirAyuda }) {
+  const navigate = useNavigate();
   const [fase, setFase] = useState('setup');
-  const [modalAyuda, setModalAyuda] = useState(false);
+  const [modalSalirPortada, setModalSalirPortada] = useState(false);
 
   const [numJugadores, setNumJugadores] = useState(4);
   const [jugadores, setJugadores] = useState([
@@ -42,8 +58,21 @@ export default function CancionLocal({ onVolver, onExit }) {
     return () => detenerReproduccion();
   }, []);
 
-  const handleNumChange = (e) => {
-    const num = parseInt(e.target.value, 10);
+  const handleSalirAPortada = () => {
+    setModalSalirPortada(false);
+    if (typeof onExit === 'function') {
+      onExit();
+    } else {
+      try {
+        navigate('/');
+      } catch {
+        window.location.href = '/';
+      }
+    }
+  };
+
+  const actualizarCantidadJugadores = (nuevoNum) => {
+    const num = Math.max(MIN_JUGADORES, Math.min(MAX_JUGADORES, nuevoNum));
     setNumJugadores(num);
     const nuevos = Array.from({ length: num }, (_, i) => ({
       id: i + 1,
@@ -256,109 +285,133 @@ export default function CancionLocal({ onVolver, onExit }) {
   const ganadores = maximo > 0 ? ranking.filter((j) => (puntos[j.id] ?? 0) === maximo) : [];
   const jugadoresDisponibles = jugadores.filter((j) => !bloqueados.includes(j.id));
 
+  const enPartidaActiva = fase !== 'setup';
+
   return (
-    <div className="cancion-contenedor">
-      {fase === 'setup' && (
-        <>
-          <button type="button" className="btn-ayuda-flotante" onClick={() => setModalAyuda(true)} title="Reglas del juego">
-            <span className="btn-ayuda-flotante-signo">?</span>
-          </button>
-
-          {modalAyuda && (
-            <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
-              <div className="rg-modal modal-ayuda-juego" onClick={(e) => e.stopPropagation()}>
-                <div className="modal-ayuda-header">
-                  <span className="modal-ayuda-signo-title">?</span>
-                  <h3>¿Cómo se juega a Afina ese oído?</h3>
-                </div>
-
-                <div className="modal-ayuda-cuerpo">
-                  <p><strong>1. Dinámica musical:</strong></p>
-                  <ul>
-                    <li>Pulsa el reproductor para escuchar el tema. El volumen es progresivo.</li>
-                    <li>En cuanto reconozcas el tema, <strong>pulsa el botón rojo</strong> para detener el tiempo. Dispondrás de <strong>60 segundos para responder</strong>.</li>
-                    <li>Si cierras la ventana de respuesta, el audio se reanudará en lugar de empezar de 0.</li>
-                  </ul>
-                  <p><strong>2. Puntuación y rebote:</strong></p>
-                  <ul>
-                    <li>Si aciertas, sumas <strong>+10 puntos</strong>.</li>
-                    <li>Si fallas, restas <strong>-5 puntos</strong> y quedas bloqueado en esa ronda, reanudándose la canción para el resto.</li>
-                  </ul>
-                </div>
-
-                <div className="rg-modal-acciones">
-                  <button className="big full" onClick={() => setModalAyuda(false)}>
-                    Entendido
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-        </>
-      )}
+    <div className={`cancion-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
 
       {fase === 'setup' && (
         <section className="game">
-          <GameIntro gameId="cancion" titulo="Afina ese oído" />
-
-          <div className="panel">
-            <div className="hud" style={{ marginBottom: '1rem' }}>
-              <button className="btn-back-inline" onClick={onVolver}>
-                &larr; Cambiar a modo Online
+          <div className="panel qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver onClick={onVolver} />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
               </button>
             </div>
 
-            <h3 className="panel-title"><Icon name="users" size={22} /> Participantes ({MIN_JUGADORES} a {MAX_JUGADORES})</h3>
-            <label className="field-label" htmlFor="num-jugadores-can">
-              Número de jugadores
-            </label>
-            <select id="num-jugadores-can" value={numJugadores} onChange={handleNumChange}>
-              {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => (
-                <option key={i + MIN_JUGADORES} value={i + MIN_JUGADORES}>
-                  {i + MIN_JUGADORES} jugadores
-                </option>
-              ))}
-            </select>
+            <div className="qq-config-header">
+              <div className="qq-hero-icono chico">
+                <Icon name="users" size={32} />
+              </div>
+              <div>
+                <h2 className="qq-config-titulo">Jugadores</h2>
+                <p className="qq-config-sub">
+                  Configura quiénes van a participar ({MIN_JUGADORES} a {MAX_JUGADORES} jugadores)
+                </p>
+              </div>
+            </div>
 
-            <span className="field-label">Nombres</span>
-            <div className="names-grid">
+            <div className="qq-selector-cantidad-box">
+              <label className="qq-label-destacado" htmlFor="num-jugadores-can">
+                Número de participantes
+              </label>
+              <div className="qq-stepper-row">
+                <button
+                  type="button"
+                  className="qq-stepper-btn"
+                  disabled={numJugadores <= MIN_JUGADORES}
+                  onClick={() => actualizarCantidadJugadores(numJugadores - 1)}
+                >
+                  &minus;
+                </button>
+                <select
+                  id="num-jugadores-can"
+                  className="qq-select-jugadores"
+                  value={numJugadores}
+                  onChange={(e) => actualizarCantidadJugadores(parseInt(e.target.value, 10))}
+                >
+                  {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => (
+                    <option key={i + MIN_JUGADORES} value={i + MIN_JUGADORES}>
+                      {i + MIN_JUGADORES} jugadores
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  className="qq-stepper-btn"
+                  disabled={numJugadores >= MAX_JUGADORES}
+                  onClick={() => actualizarCantidadJugadores(numJugadores + 1)}
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <span className="qq-label-destacado" style={{ marginTop: '1.2rem', display: 'block' }}>
+              Nombres de los jugadores
+            </span>
+            <div className="qq-nombres-grid">
               {jugadores.map((j, idx) => (
-                <input
-                  key={j.id}
-                  type="text"
-                  value={j.nombre}
-                  onChange={(e) => handleNombreChange(idx, e.target.value)}
-                  placeholder={`Jugador ${j.id}`}
-                  maxLength={25}
-                  required
-                />
+                <div key={j.id} className="qq-jugador-input-card">
+                  <span
+                    className="qq-jugador-badge"
+                    style={{ background: COLORES[idx % COLORES.length] }}
+                  >
+                    {idx + 1}
+                  </span>
+                  <input
+                    type="text"
+                    value={j.nombre}
+                    onChange={(e) => handleNombreChange(idx, e.target.value)}
+                    placeholder={`Jugador ${j.id}`}
+                    maxLength={25}
+                    required
+                  />
+                </div>
               ))}
             </div>
-          </div>
 
-          <button className="big full" onClick={iniciarPartida}>
-            <Icon name="play" size={24} /> ¡Empezar Partida!
-          </button>
+            <button
+              type="button"
+              className="big full qq-btn-principal"
+              style={{ marginTop: '1.5rem' }}
+              onClick={iniciarPartida}
+            >
+              <Icon name="play" size={22} /> ¡Empezar Partida!
+            </button>
+          </div>
         </section>
       )}
 
       {fase === 'jugando' && cancionActual && (
         <section className="game">
-          <div className="hud">
-            <span className="chip"><Icon name="flagFinish" size={18} />Ronda {rondaNum}</span>
-          </div>
-
-          <div className="scoreboard-container" style={{ justifyContent: 'center', marginBottom: '0.8rem' }}>
-            {jugadores.map((j) => (
-              <div key={j.id} className={`score-pill ${bloqueados.includes(j.id) ? 'locked' : ''}`}>
-                <span>{j.nombre}: <strong>{puntos[j.id] ?? 0} pts</strong></span>
-                {bloqueados.includes(j.id) && <span style={{ marginLeft: '4px' }}>❌</span>}
+          <div className="panel qq-menu-panel">
+            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
+              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
+                  Ronda {rondaNum}
+                </span>
               </div>
-            ))}
-          </div>
+            </div>
 
-          <div className="panel" style={{ marginBottom: '1.2rem', padding: '1.2rem' }}>
-            <div className="adv-pista-caja activa" style={{ margin: 0, width: '100%' }}>
+            <div className="scoreboard-container" style={{ justifyContent: 'center', marginBottom: '0.8rem' }}>
+              {jugadores.map((j) => (
+                <div key={j.id} className={`score-pill ${bloqueados.includes(j.id) ? 'locked' : ''}`}>
+                  <span>{j.nombre}: <strong>{puntos[j.id] ?? 0} pts</strong></span>
+                  {bloqueados.includes(j.id) && <span style={{ marginLeft: '4px' }}>❌</span>}
+                </div>
+              ))}
+            </div>
+
+            <div className="adv-pista-caja activa" style={{ margin: 0, width: '100%', marginBottom: '1.2rem' }}>
               <span className="adv-pista-badge" style={{ marginBottom: '0.8rem' }}>
                 🎵 MÚSICA DEL TEMA (30S)
               </span>
@@ -388,152 +441,164 @@ export default function CancionLocal({ onVolver, onExit }) {
                 )}
               </div>
             </div>
-          </div>
 
-          {mensajeFeedback && (
-            <div className={`status-alert ${mensajeFeedback.tipo}`} style={{ marginBottom: '1rem' }}>
-              {mensajeFeedback.texto}
-            </div>
-          )}
-
-          <div className="cancion-pulsador-wrapper" style={{ marginTop: '0' }}>
-            {!pulsado ? (
-              <div className="pulsador-container">
-                <button
-                  type="button"
-                  className="btn-pulsador-rojo"
-                  onClick={handlePulsar}
-                  disabled={jugadoresDisponibles.length === 0}
-                >
-                  <span className="pulsador-icono">🔴</span>
-                  <span className="pulsador-texto">¡PULSAR PARA RESPONDER!</span>
-                </button>
-
-                <div className="adv-controles-ronda" style={{ width: '100%', marginTop: '0.8rem' }}>
-                  <button className="secondary danger full" onClick={() => revelarSolucion('rendicion')}>
-                    <Icon name="flag" size={18} /> Rendirse y ver solución
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="respuesta-pulsada-box" style={{ width: '100%' }}>
-                <div className="respuesta-pulsada-header">
-                  <span className="pulsado-badge">🔴 Tiempo de música congelado</span>
-                  <p className="hint small" style={{ margin: '0.4rem 0' }}>
-                    Escribe el título de la canción y pulsa en el nombre del jugador:
-                  </p>
-                </div>
-
-                <div style={{ padding: '0', marginTop: '0.5rem', marginBottom: '0.8rem' }}>
-                  <div
-                    className="timer"
-                    role="timer"
-                    style={{ margin: '0.4rem 0', background: '#e2e8f0', borderRadius: '9999px', height: '8px', overflow: 'hidden' }}
-                  >
-                    <div
-                      className={`timer-bar ${tiempoRespuesta <= 15 ? 'low' : ''}`}
-                      style={{
-                        width: `${(tiempoRespuesta / TIEMPO_RESPUESTA) * 100}%`,
-                        height: '100%',
-                        backgroundColor: tiempoRespuesta <= 15 ? '#ef4444' : '#16a34a',
-                        borderRadius: '9999px',
-                        transition: 'width 0.1s linear, background-color 0.3s ease'
-                      }}
-                    />
-                  </div>
-                  <p
-                    className="timer-text"
-                    style={{
-                      display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem',
-                      color: tiempoRespuesta <= 15 ? '#dc2626' : '#64748b', fontSize: '0.9rem', fontWeight: 700, margin: '0'
-                    }}
-                  >
-                    <Icon name="clock" size={16} />
-                    {tiempoRespuesta} s para responder
-                  </p>
-                </div>
-
-                <input
-                  autoFocus
-                  type="text"
-                  className="player-text-input respuesta-input-grande"
-                  placeholder="Título de la canción..."
-                  value={inputTexto}
-                  onChange={(e) => setInputTexto(e.target.value)}
-                />
-
-                <p className="form-label" style={{ marginTop: '0.8rem', textAlign: 'center' }}>
-                  ¿Quién responde? (+10 / -5 pts)
-                </p>
-
-                <div className="modal-players-grid">
-                  {jugadoresDisponibles.map((j) => (
-                    <button
-                      key={j.id}
-                      type="button"
-                      className="btn-modal-player"
-                      disabled={!inputTexto.trim()}
-                      onClick={() => confirmarRespuesta(j)}
-                    >
-                      {j.nombre}
-                    </button>
-                  ))}
-                </div>
-
-                <div style={{ textAlign: 'center', marginTop: '0.8rem' }}>
-                  <button type="button" className="btn-modal-cancel" onClick={cancelarPulsado}>
-                    Cancelar y reanudar audio
-                  </button>
-                </div>
+            {mensajeFeedback && (
+              <div className={`status-alert ${mensajeFeedback.tipo}`} style={{ marginBottom: '1rem' }}>
+                {mensajeFeedback.texto}
               </div>
             )}
+
+            <div className="cancion-pulsador-wrapper" style={{ marginTop: '0' }}>
+              {!pulsado ? (
+                <div className="pulsador-container">
+                  <button
+                    type="button"
+                    className="btn-pulsador-rojo"
+                    onClick={handlePulsar}
+                    disabled={jugadoresDisponibles.length === 0}
+                  >
+                    <span className="pulsador-icono">🔴</span>
+                    <span className="pulsador-texto">¡PULSAR PARA RESPONDER!</span>
+                  </button>
+
+                  <div className="qq-tablero-footer" style={{ marginTop: '0.8rem', width: '100%' }}>
+                    <button type="button" className="qq-link-otra-ronda" onClick={() => revelarSolucion('rendicion')}>
+                      Rendirse y ver solución
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="respuesta-pulsada-box" style={{ width: '100%' }}>
+                  <div className="respuesta-pulsada-header">
+                    <span className="pulsado-badge">🔴 Tiempo de música congelado</span>
+                    <p className="hint small" style={{ margin: '0.4rem 0' }}>
+                      Escribe el título de la canción y pulsa en el nombre del jugador:
+                    </p>
+                  </div>
+
+                  <div style={{ padding: '0', marginTop: '0.5rem', marginBottom: '0.8rem' }}>
+                    <div
+                      className="timer"
+                      role="timer"
+                      style={{ margin: '0.4rem 0', background: '#e2e8f0', borderRadius: '9999px', height: '8px', overflow: 'hidden' }}
+                    >
+                      <div
+                        className={`timer-bar ${tiempoRespuesta <= 15 ? 'low' : ''}`}
+                        style={{
+                          width: `${(tiempoRespuesta / TIEMPO_RESPUESTA) * 100}%`,
+                          height: '100%',
+                          backgroundColor: tiempoRespuesta <= 15 ? '#ef4444' : '#16a34a',
+                          borderRadius: '9999px',
+                          transition: 'width 0.1s linear, background-color 0.3s ease'
+                        }}
+                      />
+                    </div>
+                    <p
+                      className="timer-text"
+                      style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem',
+                        color: tiempoRespuesta <= 15 ? '#dc2626' : '#64748b', fontSize: '0.9rem', fontWeight: 700, margin: '0'
+                      }}
+                    >
+                      <Icon name="clock" size={16} />
+                      {tiempoRespuesta} s para responder
+                    </p>
+                  </div>
+
+                  <input
+                    autoFocus
+                    type="text"
+                    className="player-text-input respuesta-input-grande"
+                    placeholder="Título de la canción..."
+                    value={inputTexto}
+                    onChange={(e) => setInputTexto(e.target.value)}
+                  />
+
+                  <p className="form-label" style={{ marginTop: '0.8rem', textAlign: 'center' }}>
+                    ¿Quién responde? (+10 / -5 pts)
+                  </p>
+
+                  <div className="modal-players-grid">
+                    {jugadoresDisponibles.map((j) => (
+                      <button
+                        key={j.id}
+                        type="button"
+                        className="btn-modal-player"
+                        disabled={!inputTexto.trim()}
+                        onClick={() => confirmarRespuesta(j)}
+                      >
+                        {j.nombre}
+                      </button>
+                    ))}
+                  </div>
+
+                  <div style={{ textAlign: 'center', marginTop: '0.8rem' }}>
+                    <button type="button" className="btn-modal-cancel" onClick={cancelarPulsado}>
+                      Cancelar y reanudar audio
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </section>
       )}
 
       {fase === 'resolucion' && resultadoRonda && (
         <section className="game">
-          <div className="end-card">
-            <span className="end-icon">
-              <Icon name={resultadoRonda.tipo === 'acierto' ? 'trophy' : 'hourglass'} size={44} />
-            </span>
-            <h1 className="title">
-              {resultadoRonda.tipo === 'acierto' ? '¡Canción adivinada!' : 'Fin de la ronda'}
-            </h1>
-            <p className="reveal" style={{ fontSize: '1.4rem', margin: '0.8rem 0' }}>
-              🎵 <strong>{resultadoRonda.titulo}</strong>
-            </p>
-            <p className="categoria">
-              {resultadoRonda.tipo === 'acierto'
-                ? `¡${resultadoRonda.ganador.nombre} ha acertado y suma +${resultadoRonda.puntos} puntos!`
-                : resultadoRonda.tipo === 'todos_fallaron'
-                ? 'Todos los jugadores han fallado esta canción.'
-                : 'Se han rendido.'}
-            </p>
-
-            <div className="scoreboard">
-              {ranking.map((j, i) => {
-                const pts = puntos[j.id] ?? 0;
-                const lider = maximo > 0 && pts === maximo;
-                return (
-                  <div key={j.id} className={`score-row${lider ? ' first' : ''}`}>
-                    <span className="score-name">
-                      {lider ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
-                      {j.nombre}
-                    </span>
-                    <span className="score-pts">{pts} pts</span>
-                  </div>
-                );
-              })}
+          <div className="panel qq-menu-panel">
+            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
+              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
             </div>
-          </div>
-          <div className="actions">
-            <button onClick={siguienteRonda}>
-              <Icon name="play" size={20} /> Siguiente canción ({rondaNum + 1})
-            </button>
-            <button className="secondary danger" onClick={() => setFase('final')}>
-              <Icon name="flagFinish" size={20} /> Finalizar partida
-            </button>
+
+            <div className="end-card aprox-resolucion-card" style={{ border: 'none', boxShadow: 'none', padding: '0 0 1rem' }}>
+              <span className="end-icon">
+                <Icon name={resultadoRonda.tipo === 'acierto' ? 'trophy' : 'hourglass'} size={44} />
+              </span>
+              <h1 className="title">
+                {resultadoRonda.tipo === 'acierto' ? '¡Canción adivinada!' : 'Fin de la ronda'}
+              </h1>
+              <p className="reveal" style={{ fontSize: '1.4rem', margin: '0.8rem 0' }}>
+                🎵 <strong>{resultadoRonda.titulo}</strong>
+              </p>
+              <p className="categoria">
+                {resultadoRonda.tipo === 'acierto'
+                  ? `¡${resultadoRonda.ganador.nombre} ha acertado y suma +${resultadoRonda.puntos} puntos!`
+                  : resultadoRonda.tipo === 'todos_fallaron'
+                  ? 'Todos los jugadores han fallado esta canción.'
+                  : 'Se han rendido.'}
+              </p>
+
+              <div className="scoreboard" style={{ width: '100%', marginTop: '1.5rem' }}>
+                <h3 className="section-title" style={{ margin: '0 0 0.8rem', textAlign: 'center' }}>
+                  Marcador general
+                </h3>
+                {ranking.map((j, i) => {
+                  const pts = puntos[j.id] ?? 0;
+                  const lider = maximo > 0 && pts === maximo;
+                  return (
+                    <div key={j.id} className={`score-row${lider ? ' first' : ''}`}>
+                      <span className="score-name">
+                        {lider ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
+                        {j.nombre}
+                      </span>
+                      <span className="score-pts">{pts} pts</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div style={{ marginTop: '1.2rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+              <button type="button" className="big full qq-btn-principal" onClick={siguienteRonda}>
+                <Icon name="play" size={20} /> Siguiente canción ({rondaNum + 1})
+              </button>
+              <div className="qq-tablero-footer" style={{ marginTop: 0, paddingTop: '0.6rem', borderTop: 'none' }}>
+                <button type="button" className="qq-link-otra-ronda" onClick={() => setFase('final')}>
+                  Finalizar partida 🏆
+                </button>
+              </div>
+            </div>
           </div>
         </section>
       )}
@@ -568,15 +633,52 @@ export default function CancionLocal({ onVolver, onExit }) {
             </div>
           </div>
 
-          <div className="actions">
-            <button onClick={() => setFase('setup')}>
+          <div className="actions" style={{ marginTop: '1.5rem' }}>
+            <button type="button" className="big full qq-btn-principal" onClick={() => setFase('setup')}>
               <Icon name="refresh" size={20} /> Nueva partida
             </button>
-            <button className="secondary danger" onClick={onVolver}>
-              <Icon name="door" size={20} /> Salir al menú
+            <button type="button" className="secondary danger full" onClick={() => setModalSalirPortada(true)}>
+              <Icon name="door" size={20} /> Volver a la portada
             </button>
           </div>
         </section>
+      )}
+
+      {/* MODAL: SALIR A LA PORTADA (MODO OFFLINE) */}
+      {modalSalirPortada && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalirPortada(false)}>
+          <div
+            className="rg-modal"
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
+          >
+            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
+            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
+              ¿Salir a la portada?
+            </h3>
+            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
+              Se cancelará la partida actual y volverás a la portada principal de juegos. ¿Estás seguro?
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+              <button
+                type="button"
+                className="secondary full"
+                onClick={() => setModalSalirPortada(false)}
+              >
+                No, continuar
+              </button>
+              <button
+                type="button"
+                className="secondary danger full"
+                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
+                onClick={handleSalirAPortada}
+              >
+                Sí, salir a portada
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

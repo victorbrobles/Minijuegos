@@ -341,7 +341,7 @@ export default function ColoresOnline({
   const enPartidaActiva = vista === 'sala' && sala && sala.estado !== 'lobby';
 
   return (
-    <div className={`aprox-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+    <div className={`colores-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
       {/* 1. MENÚ PRINCIPAL */}
       {vista === 'menu' && (
         <section className="game">

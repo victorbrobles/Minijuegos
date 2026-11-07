@@ -1,5 +1,6 @@
 // client/src/games/Buscaminas/BuscaminasOnline.jsx
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import CategoryCard from '../../components/CategoryCard.jsx';
 import './Buscaminas.css';
@@ -10,15 +11,35 @@ const TOTAL_CORRECTOS = 10;
 const TOTAL_MINAS = 5;
 const TIEMPO_TURNO = 30;
 
-export default function BuscaminasOnline({ onLocal, onSalir }) {
-  const [vista, setVista] = useState('menu'); // 'menu' | 'crear' | 'unirse' | 'sala'
+function BotonVolver({ onClick, texto = 'Volver' }) {
+  return (
+    <button type="button" className="qq-link-volver" onClick={onClick}>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7" />
+      </svg>
+      <span>{texto}</span>
+    </button>
+  );
+}
+
+export default function BuscaminasOnline({
+  tituloJuego = 'Cuidado que explota',
+  descripcionJuego,
+  onLocal,
+  onSalir,
+  onAbrirAyuda
+}) {
+  const navigate = useNavigate();
+  const [vista, setVista] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
+  
   const [nombre, setNombre] = useState('');
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
-  const [modalSalir, setModalSalir] = useState(false);
-  const [modalAyuda, setModalAyuda] = useState(false);
-
+  
+  const [modalSalirLobby, setModalSalirLobby] = useState(false);
+  const [modalSalirPortada, setModalSalirPortada] = useState(false);
+  
   const [categorias, setCategorias] = useState([]);
   const [sesion, setSesion] = useState(() => {
     try {
@@ -35,7 +56,6 @@ export default function BuscaminasOnline({ onLocal, onSalir }) {
   const intervalRef = useRef(null);
   const timerRef = useRef(null);
 
-  // Cargar categorías
   useEffect(() => {
     fetch('/api/buscaminas/categorias')
       .then((r) => r.json())
@@ -45,7 +65,6 @@ export default function BuscaminasOnline({ onLocal, onSalir }) {
       .catch((err) => console.error(err));
   }, []);
 
-  // Polling de sincronización
   useEffect(() => {
     if (!sesion) {
       if (intervalRef.current) clearInterval(intervalRef.current);
@@ -69,8 +88,8 @@ export default function BuscaminasOnline({ onLocal, onSalir }) {
           sessionStorage.removeItem(CLAVE_SESION_BM);
           setSesion(null);
           setSala(null);
-          setVista('menu');
-          setErrorMsg('La sala se ha cerrado.');
+          setVista('online_menu');
+          setErrorMsg('La sala se ha cerrado o se ha perdido la conexión.');
         });
     };
 
@@ -82,9 +101,69 @@ export default function BuscaminasOnline({ onLocal, onSalir }) {
     };
   }, [sesion]);
 
+  const redirigirAPortada = () => {
+    if (typeof onSalir === 'function') {
+      onSalir();
+    } else {
+      try {
+        navigate('/');
+      } catch {
+        window.location.href = '/';
+      }
+    }
+  };
+
+  const handleCerrarSalaYSalirAPortada = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    const sesionActual = sesion;
+    sessionStorage.removeItem(CLAVE_SESION_BM);
+    setSesion(null);
+    setSala(null);
+    setModalSalirPortada(false);
+
+    if (sesionActual?.code && sesionActual?.token) {
+      fetch(`/api/buscaminas/online/sala/${sesionActual.code}/salir`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: sesionActual.token }),
+        keepalive: true
+      }).catch(() => {});
+    }
+
+    redirigirAPortada();
+  };
+
+  const handleVolverMenuOnline = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    const sesionActual = sesion;
+    sessionStorage.removeItem(CLAVE_SESION_BM);
+    setSesion(null);
+    setSala(null);
+    setModalSalirLobby(false);
+    setVista('online_menu');
+
+    if (sesionActual?.code && sesionActual?.token) {
+      fetch(`/api/buscaminas/online/sala/${sesionActual.code}/salir`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: sesionActual.token }),
+        keepalive: true
+      }).catch(() => {});
+    }
+  };
+
   const handleCrear = async () => {
     if (!nombre.trim()) return;
     setCargando(true);
+    setErrorMsg('');
     try {
       const res = await fetch('/api/buscaminas/online/crear', {
         method: 'POST',
@@ -107,6 +186,7 @@ export default function BuscaminasOnline({ onLocal, onSalir }) {
   const handleUnirse = async () => {
     if (!nombre.trim() || !codigoInput.trim()) return;
     setCargando(true);
+    setErrorMsg('');
     try {
       const res = await fetch('/api/buscaminas/online/unirse', {
         method: 'POST',
@@ -192,7 +272,6 @@ export default function BuscaminasOnline({ onLocal, onSalir }) {
   const esMiTurno = ronda?.jugadorActivoId === yoId;
   const yoEliminado = ronda?.eliminadosRonda?.includes(yoId);
 
-  // Temporizador sincronizado para todos durante el turno
   useEffect(() => {
     const isJugando = sala?.estado === 'jugando' && ronda?.faseRonda === 'jugando';
     if (!isJugando) {
@@ -208,7 +287,7 @@ export default function BuscaminasOnline({ onLocal, onSalir }) {
         if (prev <= 1) {
           clearInterval(timerRef.current);
           if (esMiTurno && !yoEliminado && perderTurnoRef.current) {
-            perderTurnoRef.current(); // Envía la señal al backend si somos nosotros
+            perderTurnoRef.current(); 
           }
           return 0;
         }
@@ -257,13 +336,6 @@ export default function BuscaminasOnline({ onLocal, onSalir }) {
     }
   };
 
-  const handleSalir = () => {
-    sessionStorage.removeItem(CLAVE_SESION_BM);
-    setSesion(null);
-    setSala(null);
-    setVista('menu');
-  };
-
   const copiarCodigo = () => {
     if (!sala?.code) return;
     navigator.clipboard?.writeText(sala.code);
@@ -278,90 +350,136 @@ export default function BuscaminasOnline({ onLocal, onSalir }) {
   const correctasDescubiertas = ronda?.casillas ? ronda.casillas.filter((c) => c.descubierta && c.correcto).length : 0;
   const minasExplotadas = ronda?.casillas ? ronda.casillas.filter((c) => c.descubierta && !c.correcto).length : 0;
 
-  const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
+  const enPartidaActiva = vista === 'sala' && sala && sala.estado !== 'lobby';
 
   return (
-    <div className="bm-contenedor">
-      {/* ---------------- BOTÓN Y MODAL DE AYUDA ---------------- */}
-      {mostrarAyuda && (
-        <button
-          type="button"
-          className="btn-ayuda-flotante"
-          onClick={() => setModalAyuda(true)}
-          title="Reglas del juego"
-        >
-          <span className="btn-ayuda-flotante-signo">?</span>
-        </button>
-      )}
+    <div className={`bm-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
 
-      {modalAyuda && (
-        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
-          <div className="rg-modal aprox-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-            <div className="aprox-modal-header">
-              <span className="aprox-modal-signo-title">?</span>
-              <h3>¿Cómo se juega a Cuidado que explota?</h3>
+      {/* 1. MENÚ PRINCIPAL */}
+      {vista === 'menu' && (
+        <section className="game">
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top solo-derecha">
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
             </div>
 
-            <div className="aprox-modal-cuerpo">
-              <p><strong>1. Dinámica del tablero (15 casillas):</strong></p>
-              <ul>
-                <li>Se muestra una consigna y un tablero de 15 elementos (3 filas x 5 columnas).</li>
-                <li>Exactamente <strong>10 casillas son correctas</strong> y <strong>5 son bombas</strong>.</li>
-                <li>Por turnos, cada jugador selecciona una casilla en menos de <strong>30 segundos</strong> o perderá su turno.</li>
-                <li>Si aciertas, ganas puntos y la casilla queda inhabilitada para los demás.</li>
-                <li>Si fallas, <strong>¡la bomba explota!</strong> y quedas eliminado por el resto de la ronda.</li>
-              </ul>
-
-              <p><strong>2. Puntuación según dificultad:</strong></p>
-              <div className="aprox-tabla-puntos">
-                <div className="aprox-puntos-fila acierto">
-                  <span>🟢 Elemento Fácil</span>
-                  <strong>+1 punto</strong>
-                </div>
-                <div className="aprox-puntos-fila intermedia" style={{ background: '#fef3c7', color: '#92400e' }}>
-                  <span>🟡 Elemento Medio</span>
-                  <strong>+2 puntos</strong>
-                </div>
-                <div className="aprox-puntos-fila acierto" style={{ background: '#ede9fe', color: '#5b21b6' }}>
-                  <span>🟣 Elemento Difícil</span>
-                  <strong>+3 puntos</strong>
-                </div>
-              </div>
+            <div className="qq-hero-icono">
+              <Icon name="bomb" size={44} strokeWidth={1.7} />
             </div>
+            <h1 className="title qq-main-title">{tituloJuego}</h1>
+            <p className="hint qq-main-desc">{descripcionJuego}</p>
 
-            <div className="rg-modal-acciones">
-              <button className="big full" onClick={() => setModalAyuda(false)}>
-                Entendido
+            {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
+
+            <div className="qq-menu-opciones">
+              <button
+                type="button"
+                className="qq-opcion-card principal"
+                onClick={() => {
+                  setVista('online_menu');
+                  setErrorMsg('');
+                }}
+              >
+                <span className="qq-opcion-icono">
+                  <Icon name="globe" size={26} />
+                </span>
+                <div className="qq-opcion-textos">
+                  <strong>Jugar online</strong>
+                  <span>Cada jugador desde su propio móvil con código de sala</span>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                className="qq-opcion-card secundaria"
+                onClick={onLocal}
+              >
+                <span className="qq-opcion-icono">
+                  <Icon name="users" size={26} />
+                </span>
+                <div className="qq-opcion-textos">
+                  <strong>Jugar en un único dispositivo</strong>
+                  <span>Pasando el móvil por turnos entre los jugadores</span>
+                </div>
               </button>
             </div>
           </div>
-        </div>
+        </section>
       )}
-      {/* ---------------- FIN AYUDA ---------------- */}
 
-      {/* 1. MENÚ ONLINE */}
-      {vista === 'menu' && (
+      {/* 1B. SUBMENÚ ONLINE */}
+      {vista === 'online_menu' && (
         <section className="game">
-          <div className="panel center">
-            <span className="lb-luna chica">
-              <Icon name="bomb" size={42} strokeWidth={1.6} />
-            </span>
-            <h1 className="title">Cuidado que explota Online</h1>
-            <p className="hint">
-              10 aciertos y 5 bombas en el tablero. Descubre casillas cuando sea tu turno y esquiva la mina para no caer eliminado.
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver
+                onClick={() => {
+                  setVista('menu');
+                  setErrorMsg('');
+                }}
+              />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
+
+            <div className="qq-hero-icono">
+              <Icon name="globe" size={40} strokeWidth={1.7} />
+            </div>
+            <h2 className="title qq-main-title">Modo Online</h2>
+            <p className="hint qq-main-desc">
+              Crea una sala nueva para compartir el código con tus amigos o únete a una ya creada.
             </p>
 
             {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
 
-            <div className="lb-menu">
-              <button className="big full" onClick={() => { setVista('crear'); setErrorMsg(''); }}>
-                <Icon name="crown" size={22} /> Crear partida Online
+            <div className="qq-menu-opciones">
+              <button
+                type="button"
+                className="qq-opcion-card principal"
+                onClick={() => {
+                  setVista('crear');
+                  setErrorMsg('');
+                }}
+              >
+                <span className="qq-opcion-icono">
+                  <Icon name="crown" size={26} />
+                </span>
+                <div className="qq-opcion-textos">
+                  <strong>Crear partida</strong>
+                  <span>Sé el anfitrión, genera un código y elige la temática</span>
+                </div>
               </button>
-              <button className="big full" onClick={() => { setVista('unirse'); setErrorMsg(''); }}>
-                <Icon name="users" size={22} /> Unirse con código
-              </button>
-              <button className="secondary full" onClick={onLocal}>
-                <Icon name="home" size={20} /> Jugar en un solo dispositivo
+
+              <button
+                type="button"
+                className="qq-opcion-card secundaria"
+                onClick={() => {
+                  setVista('unirse');
+                  setErrorMsg('');
+                }}
+              >
+                <span className="qq-opcion-icono">
+                  <Icon name="users" size={26} />
+                </span>
+                <div className="qq-opcion-textos">
+                  <strong>Unirse con código</strong>
+                  <span>Introduce el código de 4 letras de tu anfitrión</span>
+                </div>
               </button>
             </div>
           </div>
@@ -371,29 +489,54 @@ export default function BuscaminasOnline({ onLocal, onSalir }) {
       {/* 2. CREAR SALA */}
       {vista === 'crear' && (
         <section className="game">
-          <div className="panel center">
-            <h2 className="title">Crear sala Online</h2>
-            <p className="hint">Introduce tu nombre de anfitrión (de 3 a 8 jugadores).</p>
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver
+                onClick={() => {
+                  setVista('online_menu');
+                  setErrorMsg('');
+                }}
+              />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
 
-            <div className="lb-form" style={{ marginTop: '1.2rem', textAlign: 'left' }}>
+            <div className="qq-hero-icono">
+              <Icon name="crown" size={40} strokeWidth={1.6} />
+            </div>
+            <h2 className="title qq-main-title">Crear partida</h2>
+            <p className="hint qq-main-desc">
+              Introduce tu nombre para abrir la sala y ser el anfitrión.
+            </p>
+
+            <div className="lb-form qq-form-estilizado">
+              <label className="field-label" htmlFor="bm-host-nombre">Tu nombre</label>
               <input
+                id="bm-host-nombre"
+                className="qq-input-moderno"
                 type="text"
-                placeholder="Tu nombre"
+                placeholder="Ej. Alex"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
                 maxLength={20}
                 autoFocus
               />
+              {errorMsg && <p className="error">{errorMsg}</p>}
+
               <button
-                className="big full"
-                style={{ marginTop: '1rem' }}
+                type="button"
+                className="big full qq-btn-principal"
                 disabled={cargando || !nombre.trim()}
                 onClick={handleCrear}
               >
-                Crear sala
-              </button>
-              <button className="secondary full" style={{ marginTop: '0.6rem' }} onClick={() => setVista('menu')}>
-                Volver
+                <Icon name="check" size={22} strokeWidth={2.5} /> Crear sala
               </button>
             </div>
           </div>
@@ -403,66 +546,90 @@ export default function BuscaminasOnline({ onLocal, onSalir }) {
       {/* 3. UNIRSE A SALA */}
       {vista === 'unirse' && (
         <section className="game">
-          <div className="panel center">
-            <h2 className="title">Unirse a partida</h2>
-            <div className="lb-form" style={{ marginTop: '1.2rem', textAlign: 'left' }}>
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver
+                onClick={() => {
+                  setVista('online_menu');
+                  setErrorMsg('');
+                }}
+              />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
+
+            <div className="qq-hero-icono">
+              <Icon name="users" size={40} strokeWidth={1.6} />
+            </div>
+            <h2 className="title qq-main-title">Unirse a partida</h2>
+            <p className="hint qq-main-desc">
+              Introduce el código que te ha compartido el anfitrión y tu nombre.
+            </p>
+
+            <div className="lb-form qq-form-estilizado">
+              <label className="field-label" htmlFor="bm-code-input">Código de la sala</label>
               <input
+                id="bm-code-input"
+                className="lb-input-codigo qq-input-moderno"
                 type="text"
-                placeholder="CÓDIGO (4 LETRAS)"
+                placeholder="ABCD"
                 value={codigoInput}
                 onChange={(e) => setCodigoInput(e.target.value.toUpperCase())}
                 maxLength={4}
                 style={{ textTransform: 'uppercase', letterSpacing: '4px', textAlign: 'center', fontWeight: '800' }}
                 autoFocus
               />
+
+              <label className="field-label" htmlFor="bm-guest-nombre" style={{ marginTop: '1rem' }}>Tu nombre</label>
               <input
+                id="bm-guest-nombre"
+                className="qq-input-moderno"
                 type="text"
                 placeholder="Tu nombre"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
                 maxLength={20}
-                style={{ marginTop: '0.8rem' }}
               />
+              {errorMsg && <p className="error">{errorMsg}</p>}
+
               <button
-                className="big full"
-                style={{ marginTop: '1rem' }}
+                type="button"
+                className="big full qq-btn-principal"
                 disabled={cargando || !nombre.trim() || codigoInput.trim().length < 4}
                 onClick={handleUnirse}
               >
-                Entrar a la sala
-              </button>
-              <button className="secondary full" style={{ marginTop: '0.6rem' }} onClick={() => setVista('menu')}>
-                Volver
+                <Icon name="check" size={22} strokeWidth={2.5} /> Entrar en la partida
               </button>
             </div>
           </div>
         </section>
       )}
 
-      {/* 4. LOBBY */}
+      {/* 4. SALA DE ESPERA (LOBBY) */}
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
         <section className="game">
-          <div className="panel center">
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '0.8rem' }}>
-              <span
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '0.45rem',
-                  padding: '0.35rem 1.1rem',
-                  borderRadius: '9999px',
-                  border: '1.5px solid #22c55e',
-                  backgroundColor: '#f0fdf4',
-                  color: '#16a34a',
-                  fontSize: '0.85rem',
-                  fontWeight: 600,
-                  lineHeight: 1
-                }}
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver onClick={() => setModalSalirLobby(true)} />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
               >
-                <Icon name="lock" size={15} />
-                Sala de espera
-              </span>
+                ?
+              </button>
             </div>
+
+            <p className="categoria"><Icon name="lock" size={16} /> Sala de espera</p>
             <p className="hint">Código de la partida</p>
             <button
               type="button"
@@ -473,300 +640,312 @@ export default function BuscaminasOnline({ onLocal, onSalir }) {
               {sala.code}
             </button>
             <p className="hint small">
-              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Comparte este código para que se unan (mínimo 3 jugadores).'}
+              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Pulsa el código para copiarlo y compártelo con los demás.'}
             </p>
           </div>
 
           <div className="panel" style={{ marginTop: '1rem' }}>
-            <h3 className="panel-title"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length}/8)</h3>
+            <h3 className="panel-title"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length})</h3>
             <div className="lb-lista">
               {sala.jugadores.map((j) => (
                 <div key={j.id} className={`lb-jug ${j.id === yoId ? 'yo' : ''}`}>
-                  <span className="lb-jug-nombre">{j.nombre}{j.id === yoId ? ' (Tú)' : ''}{j.id === 1 ? ' 👑' : ''}</span>
+                  <span className="lb-jug-nombre">
+                    {j.nombre}{j.id === yoId ? ' (Tú)' : ''}{j.id === 1 ? ' 👑' : ''}
+                  </span>
                 </div>
               ))}
             </div>
+            {sala.jugadores.length < 3 && (
+              <p className="hint" style={{ marginTop: '0.8rem' }}>
+                Faltan al menos {3 - sala.jugadores.length} jugadores para poder empezar (mínimo 3).
+              </p>
+            )}
           </div>
 
-          {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
-
           {esAdmin ? (
-            <button
-              className="big full"
-              style={{ marginTop: '1.2rem' }}
-              disabled={sala.jugadores.length < 3}
-              onClick={handleIniciarPartida}
-            >
-              {sala.jugadores.length < 3 ? 'Esperando rivales (mínimo 3)...' : '¡Elegir Categoría!'}
-            </button>
+            <div style={{ marginTop: '1.2rem' }}>
+              <button
+                className="big full qq-btn-principal"
+                disabled={sala.jugadores.length < 3}
+                onClick={handleIniciarPartida}
+              >
+                <Icon name="play" size={22} />
+                {sala.jugadores.length < 3 ? 'Esperando jugadores...' : '¡Elegir Categoría!'}
+              </button>
+            </div>
           ) : (
-            <div className="panel center" style={{ marginTop: '1rem' }}>
-              <p className="hint">Esperando a que el anfitrión comience la partida...</p>
+            <div className="panel center" style={{ padding: '2rem 1.5rem', marginTop: '1rem' }}>
+              <span className="lb-luna chica"><Icon name="hourglass" size={40} /></span>
+              <h3 style={{ margin: '0.5rem 0' }}>Esperando al anfitrión...</h3>
+              <p className="hint">El anfitrión elegirá la categoría de la ronda.</p>
             </div>
           )}
-
-          <button className="secondary danger full" style={{ marginTop: '1rem' }} onClick={() => setModalSalir(true)}>
-            Salir de la sala
-          </button>
         </section>
       )}
 
       {/* 5. SELECTOR DE CATEGORÍA */}
       {vista === 'sala' && sala && sala.estado === 'categoria' && (
         <section className="game">
-          <div className="hud">
-            <span className="chip"><Icon name="flagFinish" size={18} />Ronda {sala.rondaNum} de {sala.maxRondas}</span>
-            <span className="chip alt"><Icon name="target" size={18} />Categoría del tablero</span>
-          </div>
-
-          {esAdmin ? (
-            <>
-              <h3 className="section-title" style={{ textAlign: 'center', marginBottom: '1rem' }}>
-                Elige la temática para este tablero:
-              </h3>
-              <div className="bm-categories-grid">
-                {categorias.map((cat, idx) => (
-                  <CategoryCard
-                    key={cat.id}
-                    nombre={cat.nombre}
-                    icono={cat.icono}
-                    indice={idx}
-                    onClick={() => handleElegirCategoria(cat.id)}
-                  />
-                ))}
-              </div>
-            </>
-          ) : (
-            <div className="panel center" style={{ padding: '2.5rem 1.5rem' }}>
-              <span className="end-icon"><Icon name="target" size={44} /></span>
-              <h2 className="title" style={{ marginTop: '0.8rem' }}>Seleccionando temática...</h2>
-              <p className="hint">El anfitrión está eligiendo la categoría del tablero para la Ronda {sala.rondaNum}.</p>
+          <div className="panel qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
+              <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
+                Ronda {sala.rondaNum} de {sala.maxRondas}
+              </span>
             </div>
-          )}
 
-          <button className="secondary danger full" style={{ marginTop: '1.5rem' }} onClick={() => setModalSalir(true)}>
-            Salir de la sala
-          </button>
+            {esAdmin ? (
+              <>
+                <div className="qq-section-header">
+                  <h3 className="qq-section-title">Elige la temática para este tablero:</h3>
+                </div>
+                <div className="bm-categories-grid">
+                  {categorias.map((cat, idx) => (
+                    <CategoryCard
+                      key={cat.id}
+                      nombre={cat.nombre}
+                      icono={cat.icono}
+                      indice={idx}
+                      onClick={() => handleElegirCategoria(cat.id)}
+                    />
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="panel center" style={{ padding: '2.5rem 1.5rem' }}>
+                <span className="end-icon"><Icon name="target" size={44} /></span>
+                <h2 className="title" style={{ marginTop: '0.8rem' }}>Seleccionando temática...</h2>
+                <p className="hint">El anfitrión está eligiendo la categoría del tablero para la Ronda {sala.rondaNum}.</p>
+              </div>
+            )}
+          </div>
         </section>
       )}
 
       {/* 6. TABLERO ONLINE EN JUEGO */}
       {vista === 'sala' && sala && sala.estado === 'jugando' && ronda && ronda.faseRonda === 'jugando' && (
         <section className="game">
-          <div className="hud">
-            <span className="chip"><Icon name="flagFinish" size={18} />Ronda {sala.rondaNum} de {sala.maxRondas}</span>
-            <span className="chip alt">Turno de: {ronda.jugadorActivoNombre}</span>
-          </div>
-
-          {/* Marcador superior */}
-          <div className="scoreboard-container" style={{ justifyContent: 'center', marginBottom: '0.8rem' }}>
-            {sala.jugadores.map((j) => {
-              const eliminado = ronda.eliminadosRonda.includes(j.id);
-              const esTurno = j.id === ronda.jugadorActivoId;
-              return (
-                <div key={j.id} className={`score-pill ${eliminado ? 'locked' : ''}`} style={{ borderColor: esTurno ? '#4f46e5' : undefined }}>
-                  <span>{j.nombre}: <strong>{j.puntos} pts</strong></span>
-                  {eliminado ? <span style={{ marginLeft: '4px' }}>💥</span> : esTurno ? <span style={{ marginLeft: '4px' }}>👉</span> : null}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Consigna */}
-          <div className="bm-consigna-card">
-            <span className="badge" style={{ background: '#e0e7ff', color: '#4338ca' }}>
-              {ronda.categoriaNombre}
-            </span>
-            <h2 className="bm-consigna-titulo">«{ronda.consigna}»</h2>
-            <p className="bm-consigna-sub">Encuentra los elementos que cumplen la consigna y esquiva las 5 bombas.</p>
-
-            <div className="bm-progreso-stats">
-              <span className="bm-stat-chip correctas">
-                ✅ Aciertos: {correctasDescubiertas} / {TOTAL_CORRECTOS}
-              </span>
-              <span className="bm-stat-chip minas">
-                💣 Minas pisadas: {minasExplotadas} / {TOTAL_MINAS}
-              </span>
-            </div>
-          </div>
-
-          {esMiTurno ? (
-            <div className="bm-starter-banner" style={{ background: 'linear-gradient(135deg, #10b981, #059669)' }}>
-              <span>👉 <strong>¡ES TU TURNO!</strong> Selecciona una casilla</span>
-            </div>
-          ) : (
-            <div className="bm-starter-banner">
-              <span>⏳ Esperando a: <strong>{ronda.jugadorActivoNombre}</strong></span>
-            </div>
-          )}
-
-          {/* Temporizador de 30 segundos */}
-          <div style={{ padding: '0 1rem', marginTop: '0.5rem' }}>
-            <div
-              className="timer"
-              role="timer"
-              style={{ margin: '0.4rem 0', background: '#e2e8f0', borderRadius: '9999px', height: '8px', overflow: 'hidden' }}
-            >
-              <div
-                className={`timer-bar ${tiempoRestante <= 10 ? 'low' : ''}`}
-                style={{
-                  width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%`,
-                  height: '100%',
-                  backgroundColor: tiempoRestante <= 10 ? '#ef4444' : '#16a34a',
-                  borderRadius: '9999px',
-                  transition: 'width 0.1s linear, background-color 0.3s ease'
-                }}
-              />
-            </div>
-            <p
-              className="timer-text"
-              style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem',
-                color: tiempoRestante <= 10 ? '#dc2626' : '#64748b', fontSize: '0.9rem', fontWeight: 700, margin: '0 0 1rem'
-              }}
-            >
-              <Icon name="clock" size={16} />
-              {tiempoRestante} s
-            </p>
-          </div>
-
-          <div className="bm-grid-15">
-            {ronda.casillas.map((c) => {
-              if (c.descubierta) {
-                if (c.correcto) {
-                  return (
-                    <button key={c.id} type="button" className="bm-casilla-btn acertada" disabled>
-                      <span>{c.texto}</span>
-                      <span className={`bm-badge-pts ${c.dificultad}`}>
-                        +{c.puntos} {c.puntos === 1 ? 'pt' : 'pts'}
-                      </span>
-                    </button>
-                  );
-                } else {
-                  return (
-                    <button key={c.id} type="button" className="bm-casilla-btn mina-explotada" disabled>
-                      <span>💣 {c.texto}</span>
-                    </button>
-                  );
-                }
-              }
-
-              return (
-                <button
-                  key={c.id}
-                  type="button"
-                  className="bm-casilla-btn"
-                  disabled={!esMiTurno || yoEliminado}
-                  onClick={() => handleSeleccionarCasilla(c.id)}
-                  style={{
-                    cursor: esMiTurno && !yoEliminado ? 'pointer' : 'default',
-                    opacity: esMiTurno && !yoEliminado ? 1 : 0.85
-                  }}
-                >
-                  <span>{c.texto}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          {ronda.explosionModal && (
-            <div className="bm-modal-explosion-fondo" onClick={esAdmin ? handleCerrarExplosion : undefined}>
-              <div className="bm-modal-explosion-card" onClick={(e) => e.stopPropagation()}>
-                <span className="bm-bomba-animada">💣💥</span>
-                <h2 className="bm-explosion-titulo">¡BOOM! ¡MINA PISADA!</h2>
-                <p className="bm-explosion-txt">
-                  <strong>{ronda.explosionModal.casillaTexto}</strong> no cumple la consigna.
-                  <br />
-                  <strong>{ronda.explosionModal.jugadorNombre}</strong> queda eliminado de esta ronda.
-                </p>
-                {esAdmin ? (
-                  <button type="button" className="big full" onClick={handleCerrarExplosion}>
-                    {ronda.motivoFinRonda ? 'Ver resultados de la ronda' : 'Continuar con el siguiente jugador'}
-                  </button>
-                ) : (
-                  <p className="hint small">Esperando a que el anfitrión continúe...</p>
-                )}
+          <div className="panel qq-menu-panel">
+            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
+              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
+                  Ronda {sala.rondaNum} de {sala.maxRondas}
+                </span>
               </div>
             </div>
-          )}
 
-          <button className="secondary danger full" style={{ marginTop: '1.2rem' }} onClick={() => setModalSalir(true)}>
-            Salir de la sala
-          </button>
+            {/* Marcador superior */}
+            <div className="scoreboard-container" style={{ justifyContent: 'center', marginBottom: '0.8rem' }}>
+              {sala.jugadores.map((j) => {
+                const eliminado = ronda.eliminadosRonda.includes(j.id);
+                const esTurno = j.id === ronda.jugadorActivoId;
+                return (
+                  <div key={j.id} className={`score-pill ${eliminado ? 'locked' : ''}`} style={{ borderColor: esTurno ? '#4f46e5' : undefined }}>
+                    <span>{j.nombre}: <strong>{j.puntos} pts</strong></span>
+                    {eliminado ? <span style={{ marginLeft: '4px' }}>💥</span> : esTurno ? <span style={{ marginLeft: '4px' }}>👉</span> : null}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Consigna */}
+            <div className="bm-consigna-card">
+              <span className="badge" style={{ background: '#e0e7ff', color: '#4338ca' }}>
+                {ronda.categoriaNombre}
+              </span>
+              <h2 className="bm-consigna-titulo">«{ronda.consigna}»</h2>
+              <p className="bm-consigna-sub">Encuentra los elementos que cumplen la consigna y esquiva las 5 bombas.</p>
+
+              <div className="bm-progreso-stats">
+                <span className="bm-stat-chip correctas">
+                  ✅ Aciertos: {correctasDescubiertas} / {TOTAL_CORRECTOS}
+                </span>
+                <span className="bm-stat-chip minas">
+                  💣 Minas pisadas: {minasExplotadas} / {TOTAL_MINAS}
+                </span>
+              </div>
+            </div>
+
+            {esMiTurno ? (
+              <div className="bm-starter-banner" style={{ background: 'linear-gradient(135deg, #10b981, #059669)' }}>
+                <span>👉 <strong>¡ES TU TURNO!</strong> Selecciona una casilla</span>
+              </div>
+            ) : (
+              <div className="bm-starter-banner">
+                <span>⏳ Esperando a: <strong>{ronda.jugadorActivoNombre}</strong></span>
+              </div>
+            )}
+
+            {/* Temporizador */}
+            <div style={{ padding: '0 1rem', marginTop: '0.5rem' }}>
+              <div
+                className="timer"
+                role="timer"
+                style={{ margin: '0.4rem 0', background: '#e2e8f0', borderRadius: '9999px', height: '8px', overflow: 'hidden' }}
+              >
+                <div
+                  className={`timer-bar ${tiempoRestante <= 10 ? 'low' : ''}`}
+                  style={{
+                    width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%`,
+                    height: '100%',
+                    backgroundColor: tiempoRestante <= 10 ? '#ef4444' : '#16a34a',
+                    borderRadius: '9999px',
+                    transition: 'width 0.1s linear, background-color 0.3s ease'
+                  }}
+                />
+              </div>
+              <p
+                className="timer-text"
+                style={{
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem',
+                  color: tiempoRestante <= 10 ? '#dc2626' : '#64748b', fontSize: '0.9rem', fontWeight: 700, margin: '0 0 1rem'
+                }}
+              >
+                <Icon name="clock" size={16} />
+                {tiempoRestante} s
+              </p>
+            </div>
+
+            <div className="bm-grid-15">
+              {ronda.casillas.map((c) => {
+                if (c.descubierta) {
+                  if (c.correcto) {
+                    return (
+                      <button key={c.id} type="button" className="bm-casilla-btn acertada" disabled>
+                        <span>{c.texto}</span>
+                        <span className={`bm-badge-pts ${c.dificultad}`}>
+                          +{c.puntos} {c.puntos === 1 ? 'pt' : 'pts'}
+                        </span>
+                      </button>
+                    );
+                  } else {
+                    return (
+                      <button key={c.id} type="button" className="bm-casilla-btn mina-explotada" disabled>
+                        <span>💣 {c.texto}</span>
+                      </button>
+                    );
+                  }
+                }
+
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    className="bm-casilla-btn"
+                    disabled={!esMiTurno || yoEliminado}
+                    onClick={() => handleSeleccionarCasilla(c.id)}
+                    style={{
+                      cursor: esMiTurno && !yoEliminado ? 'pointer' : 'default',
+                      opacity: esMiTurno && !yoEliminado ? 1 : 0.85
+                    }}
+                  >
+                    <span>{c.texto}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {ronda.explosionModal && (
+              <div className="bm-modal-explosion-fondo" onClick={esAdmin ? handleCerrarExplosion : undefined}>
+                <div className="bm-modal-explosion-card" onClick={(e) => e.stopPropagation()}>
+                  <span className="bm-bomba-animada">💣💥</span>
+                  <h2 className="bm-explosion-titulo">¡BOOM! ¡MINA PISADA!</h2>
+                  <p className="bm-explosion-txt">
+                    <strong>{ronda.explosionModal.casillaTexto}</strong> no cumple la consigna.
+                    <br />
+                    <strong>{ronda.explosionModal.jugadorNombre}</strong> queda eliminado de esta ronda.
+                  </p>
+                  {esAdmin ? (
+                    <button type="button" className="big full" onClick={handleCerrarExplosion}>
+                      {ronda.motivoFinRonda ? 'Ver resultados de la ronda' : 'Continuar con el siguiente jugador'}
+                    </button>
+                  ) : (
+                    <p className="hint small">Esperando a que el anfitrión continúe...</p>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         </section>
       )}
 
       {/* 7. FIN DE RONDA ONLINE */}
       {vista === 'sala' && sala && sala.estado === 'jugando' && ronda && ronda.faseRonda === 'ronda_fin' && (
         <section className="game">
-          <div className="end-card aprox-resolucion-card">
-            <span className="end-icon"><Icon name="trophy" size={44} /></span>
-            <p className="categoria">Ronda {sala.rondaNum} completada</p>
-            <h1 className="title">{ronda.motivoFinRonda || 'Fin de la ronda'}</h1>
-            <p className="reveal" style={{ fontSize: '1.2rem', margin: '0.6rem 0' }}>
-              Consigna: «{ronda.consigna}»
-            </p>
-
-            <div className="bm-grid-15" style={{ margin: '1.2rem 0' }}>
-              {ronda.casillas.map((c) => (
-                <div
-                  key={c.id}
-                  className={`bm-casilla-btn ${c.correcto ? 'acertada' : 'mina-explotada'}`}
-                  style={{ cursor: 'default' }}
-                >
-                  <span>{c.correcto ? '✓ ' : '💣 '}{c.texto}</span>
-                  {c.correcto && (
-                    <span className={`bm-badge-pts ${c.dificultad}`}>
-                      +{c.puntos} {c.puntos === 1 ? 'pt' : 'pts'}
-                    </span>
-                  )}
-                </div>
-              ))}
+          <div className="panel qq-menu-panel">
+            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
+              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
             </div>
 
-            <div className="scoreboard" style={{ width: '100%', marginTop: '1rem' }}>
-              <h3 className="section-title" style={{ margin: '0 0 0.8rem', textAlign: 'center' }}>
-                Clasificación general
-              </h3>
-              {ranking.map((j, i) => {
-                const lider = maximoPuntos > 0 && j.puntos === maximoPuntos;
-                return (
-                  <div key={j.id} className={`score-row ${lider ? 'first' : ''}`}>
-                    <span className="score-name">
-                      {lider ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
-                      {j.nombre}
-                    </span>
-                    <span className="score-pts">{j.puntos} pts</span>
+            <div className="end-card aprox-resolucion-card" style={{ border: 'none', boxShadow: 'none', padding: '0 0 1rem' }}>
+              <span className="end-icon"><Icon name="trophy" size={44} /></span>
+              <p className="categoria">Ronda {sala.rondaNum} completada</p>
+              <h1 className="title">{ronda.motivoFinRonda || 'Fin de la ronda'}</h1>
+              <p className="reveal" style={{ fontSize: '1.2rem', margin: '0.6rem 0' }}>
+                Consigna: «{ronda.consigna}»
+              </p>
+
+              <div className="bm-grid-15" style={{ margin: '1.2rem 0' }}>
+                {ronda.casillas.map((c) => (
+                  <div
+                    key={c.id}
+                    className={`bm-casilla-btn ${c.correcto ? 'acertada' : 'mina-explotada'}`}
+                    style={{ cursor: 'default' }}
+                  >
+                    <span>{c.correcto ? '✓ ' : '💣 '}{c.texto}</span>
+                    {c.correcto && (
+                      <span className={`bm-badge-pts ${c.dificultad}`}>
+                        +{c.puntos} {c.puntos === 1 ? 'pt' : 'pts'}
+                      </span>
+                    )}
                   </div>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="actions" style={{ marginTop: '1.2rem' }}>
-            {esAdmin ? (
-              <>
-                {sala.rondaNum < sala.maxRondas ? (
-                  <button className="big full" onClick={handleSiguienteRonda}>
-                    <Icon name="play" size={20} /> Elegir siguiente categoría (Ronda {sala.rondaNum + 1} de {sala.maxRondas})
-                  </button>
-                ) : (
-                  <button className="big full" onClick={handleFinalizar}>
-                    <Icon name="trophy" size={20} /> Ver podio final
-                  </button>
-                )}
-                <button className="secondary danger full" onClick={handleFinalizar}>
-                  <Icon name="flagFinish" size={20} /> Finalizar partida
-                </button>
-              </>
-            ) : (
-              <div className="panel center" style={{ width: '100%', padding: '1rem' }}>
-                <p className="hint">Esperando a que el anfitrión avance a la siguiente ronda...</p>
-                <button className="secondary danger full" style={{ marginTop: '0.8rem' }} onClick={() => setModalSalir(true)}>
-                  Salir de la sala
-                </button>
+                ))}
               </div>
-            )}
+
+              <div className="scoreboard" style={{ width: '100%', marginTop: '1rem' }}>
+                <h3 className="section-title" style={{ margin: '0 0 0.8rem', textAlign: 'center' }}>
+                  Clasificación general
+                </h3>
+                {ranking.map((j, i) => {
+                  const lider = maximoPuntos > 0 && j.puntos === maximoPuntos;
+                  return (
+                    <div key={j.id} className={`score-row ${lider ? 'first' : ''}`}>
+                      <span className="score-name">
+                        {lider ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
+                        {j.nombre}
+                      </span>
+                      <span className="score-pts">{j.puntos} pts</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="actions" style={{ marginTop: '1.2rem' }}>
+              {esAdmin ? (
+                <>
+                  {sala.rondaNum < sala.maxRondas ? (
+                    <button className="big full qq-btn-principal" onClick={handleSiguienteRonda}>
+                      <Icon name="play" size={20} /> Elegir siguiente categoría (Ronda {sala.rondaNum + 1} de {sala.maxRondas})
+                    </button>
+                  ) : (
+                    <button className="big full qq-btn-principal" onClick={handleFinalizar}>
+                      <Icon name="trophy" size={20} /> Ver podio final
+                    </button>
+                  )}
+                  <div className="qq-tablero-footer">
+                    <button type="button" className="qq-link-otra-ronda" onClick={handleFinalizar}>
+                      Finalizar partida anticipadamente
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="panel center" style={{ width: '100%', padding: '1rem' }}>
+                  <p className="hint">Esperando a que el anfitrión avance a la siguiente ronda...</p>
+                </div>
+              )}
+            </div>
           </div>
         </section>
       )}
@@ -802,16 +981,16 @@ export default function BuscaminasOnline({ onLocal, onSalir }) {
           </div>
 
           <div className="actions" style={{ marginTop: '1.5rem' }}>
-            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
+            <button className="secondary danger full" onClick={() => setModalSalirPortada(true)}>
               <Icon name="door" size={20} /> Salir al menú
             </button>
           </div>
         </section>
       )}
 
-      {/* MODAL DE CONFIRMACIÓN PARA SALIR */}
-      {modalSalir && (
-        <div className="rg-modal-fondo" onClick={() => setModalSalir(false)}>
+      {/* MODAL DE CONFIRMACIÓN PARA SALIR DEL LOBBY AL SUBMENÚ */}
+      {modalSalirLobby && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalirLobby(false)}>
           <div 
             className="rg-modal" 
             onClick={(e) => e.stopPropagation()} 
@@ -819,17 +998,17 @@ export default function BuscaminasOnline({ onLocal, onSalir }) {
           >
             <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
             <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
-              ¿Abandonar la partida?
+              ¿Salir de la sala?
             </h3>
             <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
-              Si sales de la sala perderás tu progreso actual en la partida. ¿Estás seguro de que deseas salir?
+              Si sales ahora abandonarás la sala de espera y volverás al menú anterior. ¿Estás seguro?
             </p>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
               <button 
                 type="button" 
                 className="secondary full" 
-                onClick={() => setModalSalir(false)}
+                onClick={() => setModalSalirLobby(false)}
               >
                 No, quedarme
               </button>
@@ -837,12 +1016,48 @@ export default function BuscaminasOnline({ onLocal, onSalir }) {
                 type="button" 
                 className="secondary danger full" 
                 style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
-                onClick={() => {
-                  setModalSalir(false);
-                  handleSalir();
-                }}
+                onClick={handleVolverMenuOnline}
               >
                 Sí, salir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE CERRAR SALA Y SALIR A PORTADA */}
+      {modalSalirPortada && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalirPortada(false)}>
+          <div 
+            className="rg-modal" 
+            onClick={(e) => e.stopPropagation()} 
+            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
+          >
+            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
+            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
+              ¿Salir a la portada?
+            </h3>
+            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
+              {esAdmin
+                ? 'Se cerrará la sala y saldrás de la partida hacia la portada principal. ¿Estás seguro?'
+                : 'Abandonarás la sala y saldrás hacia la portada principal. ¿Estás seguro?'}
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+              <button 
+                type="button" 
+                className="secondary full" 
+                onClick={() => setModalSalirPortada(false)}
+              >
+                No, continuar
+              </button>
+              <button 
+                type="button" 
+                className="secondary danger full" 
+                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
+                onClick={handleCerrarSalaYSalirAPortada}
+              >
+                Sí, salir a portada
               </button>
             </div>
           </div>
