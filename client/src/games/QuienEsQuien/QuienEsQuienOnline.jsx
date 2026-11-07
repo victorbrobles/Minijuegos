@@ -191,13 +191,15 @@ export default function QuienEsQuienOnline({
     }
   };
 
+  // Devuelve null si todo va bien o el mensaje de error
   const enviarInicioPartida = async (categoriaId, customParams = null) => {
-    if (!categoriaId || !sesion) return;
+    if (!categoriaId || !sesion) return null;
     setErrorMsg('');
     setCargando(true);
     try {
       const payload = { token: sesion.token, categoriaId };
       if (customParams) {
+        // Se envía el texto tal cual: el servidor lo valida y baraja (nunca se evalúa como código)
         payload.customName = customParams.nombre;
         payload.customData = customParams.datos;
       }
@@ -213,8 +215,10 @@ export default function QuienEsQuienOnline({
       setSala(data);
       setEligiendoCategoria(false);
       setCubiertaLevantada(false);
+      return null;
     } catch (err) {
-      setErrorMsg(err.message);
+      if (!customParams) setErrorMsg(err.message);
+      return err.message;
     } finally {
       setCargando(false);
     }
@@ -231,24 +235,23 @@ export default function QuienEsQuienOnline({
     }
   };
 
-  const iniciarPartidaCustom = () => {
+  const iniciarPartidaCustom = async () => {
     setErrorCustom('');
     if (!customNombre.trim()) {
       setErrorCustom('Debes introducir un nombre para la categoría.');
       return;
     }
-
-    let mazo;
-    try {
-      mazo = new Function('return ' + customDatos)();
-      if (!Array.isArray(mazo) || mazo.length === 0) throw new Error();
-    } catch {
-      setErrorCustom("Formato de datos inválido. Usa el formato: ['Dato 1', 'Dato 2']");
+    if (!customDatos.trim()) {
+      setErrorCustom("Introduce los datos con el formato: ['Dato 1', 'Dato 2']");
       return;
     }
 
-    setMostrarModalCustom(false);
-    enviarInicioPartida('custom', { nombre: customNombre.trim(), datos: mazo });
+    const error = await enviarInicioPartida('custom', { nombre: customNombre.trim(), datos: customDatos });
+    if (error) {
+      setErrorCustom(error);
+    } else {
+      setMostrarModalCustom(false);
+    }
   };
 
   const handleReiniciarPartida = async (irACategorias = false) => {
@@ -974,9 +977,10 @@ export default function QuienEsQuienOnline({
               <button
                 type="button"
                 className="big full"
+                disabled={cargando}
                 onClick={iniciarPartidaCustom}
               >
-                Jugar
+                {cargando ? 'Repartiendo…' : 'Jugar'}
               </button>
             </div>
           </div>

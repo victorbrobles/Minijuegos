@@ -1,6 +1,8 @@
 // server/routes/quienesquien.js
 import { Router } from 'express';
 import SEED_DATA from '../data/seeds/quienesquien/quienesquien.js';
+import { esAdmin } from '../lib/admin.js';
+import { validarCategoriaPersonalizada } from '../lib/listaPersonalizada.js';
 
 const router = Router();
 
@@ -94,6 +96,15 @@ router.get('/personajes', (req, res) => {
   });
 });
 
+// 2b. Categoría personalizada (solo modo administrador): valida y baraja los elementos.
+// Se usa en el modo local; el online hace lo mismo dentro de /sala/:code/iniciar.
+router.post('/personalizada', (req, res) => {
+  if (!esAdmin(req)) return res.status(403).json({ error: 'La categoría personalizada requiere el modo administrador.' });
+  const v = validarCategoriaPersonalizada(req.body?.nombre, req.body?.datos);
+  if (!v.ok) return res.status(400).json({ error: v.error });
+  res.json({ success: true, categoria: v.nombre, personajes: barajar(v.elementos), duplicados: v.duplicados });
+});
+
 // 3. Crear sala
 router.post('/crear', (req, res) => {
   const nombre = (req.body?.nombre || '').trim();
@@ -173,10 +184,27 @@ router.post('/sala/:code/iniciar', (req, res) => {
   if (!sala) return res.status(404).json({ error: 'La sala no existe.' });
   if (sala.adminToken !== token) return res.status(403).json({ error: 'Solo el anfitrión puede iniciar.' });
 
-  const cat = buscarCategoria(categoriaId);
-  const mazo = barajar(cat.personajes);
+  let mazo;
+  if (categoriaId === 'custom') {
+    // Categoría personalizada: solo con modo administrador y con los datos validados en el servidor
+    if (!esAdmin(req)) {
+      return res.status(403).json({ error: 'La categoría personalizada requiere el modo administrador.' });
+    }
+    const v = validarCategoriaPersonalizada(req.body?.customName, req.body?.customData);
+    if (!v.ok) return res.status(400).json({ error: v.error });
+    if (v.elementos.length < sala.jugadores.length) {
+      return res.status(400).json({
+        error: `Hay ${sala.jugadores.length} jugadores y solo ${v.elementos.length} elementos distintos: añade más elementos.`
+      });
+    }
+    mazo = barajar(v.elementos);
+    sala.categoria = { id: 'custom', nombre: v.nombre, icono: 'edit' };
+  } else {
+    const cat = buscarCategoria(categoriaId);
+    mazo = barajar(cat.personajes);
+    sala.categoria = { id: cat.id, nombre: cat.nombre, icono: cat.icono };
+  }
 
-  sala.categoria = { id: cat.id, nombre: cat.nombre, icono: cat.icono };
   sala.estado = 'jugando';
 
   sala.jugadores.forEach((j, idx) => {

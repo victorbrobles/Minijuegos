@@ -1,7 +1,7 @@
 // client/src/games/QuienEsQuien/QuienEsQuienLocal.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAdmin } from '../../lib/admin.js';
+import { useAdmin, adminHeaders } from '../../lib/admin.js';
 import Icon from '../../components/Icon.jsx';
 import CategoryCard from '../../components/CategoryCard.jsx';
 import './QuienEsQuien.css';
@@ -120,28 +120,44 @@ export default function QuienEsQuienLocal({ onVolver, onExit, onAbrirAyuda }) {
     }
   };
 
-  const iniciarPartidaCustom = () => {
+  // La lista se valida y se baraja en el servidor (el texto nunca se evalúa como código)
+  const iniciarPartidaCustom = async () => {
     setErrorCustom('');
     if (!customNombre.trim()) {
       setErrorCustom('Debes introducir un nombre para la categoría.');
       return;
     }
-
-    let mazo;
-    try {
-      mazo = new Function('return ' + customDatos)();
-      if (!Array.isArray(mazo) || mazo.length === 0) throw new Error();
-    } catch {
-      setErrorCustom("Formato de datos inválido. Usa el formato: ['Dato 1', 'Dato 2']");
+    if (!customDatos.trim()) {
+      setErrorCustom("Introduce los datos con el formato: ['Dato 1', 'Dato 2']");
       return;
     }
 
-    const catCustom = { id: 'custom', nombre: customNombre.trim(), icono: 'edit' };
-    setCategoriaElegida(catCustom);
+    let datos;
+    try {
+      const res = await fetch('/api/quienesquien/personalizada', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', ...adminHeaders() },
+        body: JSON.stringify({ nombre: customNombre.trim(), datos: customDatos })
+      });
+      datos = await res.json();
+      if (!res.ok) throw new Error(datos.error || 'No se pudo crear la categoría.');
+    } catch (err) {
+      setErrorCustom(err.message);
+      return;
+    }
 
+    const mazo = datos.personajes;
+    if (mazo.length < jugadores.length) {
+      setErrorCustom(`Hay ${jugadores.length} jugadores y solo ${mazo.length} elementos distintos: añade más elementos.`);
+      return;
+    }
+
+    setCategoriaElegida({ id: 'custom', nombre: datos.categoria, icono: 'edit' });
+
+    // El mazo ya viene barajado: cada jugador recibe un elemento distinto y aleatorio
     const asignados = jugadores.map((j, i) => ({
       ...j,
-      tarjeta: mazo[i % mazo.length]
+      tarjeta: mazo[i]
     }));
 
     setJugadores(asignados);
