@@ -381,6 +381,15 @@ export const META = {
     etiquetas: 'futbol clubes quiz enlazar jugadores trayectoria balon gol',
     descripcion: 'Cuatro clubes, un jugador. Decide qué jugador encaja en el mayor número posible de esos cuatro y a ver si consigues el pleno!',
     categorias: ['futbol']
+  },
+  'geoquiz': {
+    titulo: 'GeoQuiz',
+    imagen: '/covers/geoquiz.webp',
+    icono: 'geoquiz',
+    colores: ['#0ea5e9', '#047857'],
+    etiquetas: 'geografia paises capitales fronteras idiomas banderas monumentos rios montañas mapas quiz trivial',
+    descripcion: 'El quiz definitivo de geografía: capitales, fronteras, idiomas, banderas, ríos, monumentos y récords. Responde, enumera, ordena o deduce con pistas en cuatro modos de juego, ¡y demuestra quién conoce mejor el mundo!',
+    categorias: ['prueba']
   }
 };
 

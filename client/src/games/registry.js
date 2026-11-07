@@ -39,6 +39,7 @@ import FutbolGrid from './FutbolGrid/FutbolGrid.jsx';
 import FootballSplit from './FootballSplit/FootballSplit.jsx';
 import Jugadas from './Jugadas/Jugadas.jsx';
 import CuatroClubes from './CuatroClubes/CuatroClubes.jsx';
+import GeoQuiz from './GeoQuiz/GeoQuiz.jsx';
 
 // id del juego (el mismo que en server/data/games.json) -> componente React
 const registry = {
@@ -82,7 +83,8 @@ const registry = {
   'futbolgrid': FutbolGrid,
   'footballsplit': FootballSplit,
   'jugadas': Jugadas,
-  'cuatroclubes': CuatroClubes
+  'cuatroclubes': CuatroClubes,
+  'geoquiz': GeoQuiz
 };
 
 export default registry;

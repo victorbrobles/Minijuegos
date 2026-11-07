@@ -244,5 +244,11 @@
     "name": "El club de los cuatro",
     "description": "Cuatro clubes, un jugador. Dedice qué jugador encaja en el mayor número posible de esos cuatro y a ver si consigues el pleno!",
     "isNew": true
+  },
+  {
+    "id": "geoquiz",
+    "name": "GeoQuiz",
+    "description": "El quiz definitivo de geografía: capitales, fronteras, idiomas, banderas, ríos, monumentos y récords. Responde, enumera, ordena o deduce con pistas en cuatro modos de juego, ¡y demuestra quién conoce mejor el mundo!",
+    "isNew": true
   }
 ]

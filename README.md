@@ -66,3 +66,13 @@ npm run dev
 - Añadir un rol: definirlo en `roles.js`, implementar su acción en `TurnoNoche.jsx` y su efecto en `engine.js` (`resolverNoche`/`matar`).
 - Mecánicas globales opcionales (`engine.js`: `EVENTOS`, `OBJETOS`, `MODIFICADORES`, rumores): se activan en la pantalla de roles; todas desactivadas por defecto.
 - Las composiciones (`composiciones.js`) priorizan los roles nuevos; la «Clásica» es la única que solo usa roles clásicos.
+
+## Minijuego: GeoQuiz
+- Quiz de geografía por turnos (local en un dispositivo u online, de 1 a 12 jugadores). Se sortea quién empieza y luego se sigue el orden;
+  cada turno empieza con la pantalla «Turno de…» y el botón «Listo».
+- Modos: **GeoMix** (todo mezclado), **Especialista** (una categoría), **Contrarreloj** (60 s por turno con preguntas rápidas) y
+  **Supervivencia** (3 vidas, gana el último en pie).
+- Tipos de prueba: respuesta única, test de opciones, enumerar, pistas progresivas, ordenar y aproximación numérica.
+- Reglas en `server/geoquiz/engine.js`, con una **copia idéntica** en `client/src/games/GeoQuiz/engine.js` para el modo local (cambia las dos a la vez).
+- Preguntas en `server/data/seeds/geoquiz/` (un fichero por categoría; formato explicado en `_tipos.js`). Las respuestas admiten alias
+  separados por `|` (`'Países Bajos|Holanda'`); al comprobarlas se ignoran tildes, mayúsculas y artículos y se perdonan pequeñas erratas.

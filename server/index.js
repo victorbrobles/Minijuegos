@@ -54,6 +54,7 @@ import futbolgridRoutes from './routes/futbolgrid.js';
 import footballsplitRoutes from './routes/footballsplit.js';
 import jugadasRoutes from './routes/jugadas.js';
 import cuatroclubesRoutes from './routes/cuatroclubes.js';
+import geoquizRoutes from './routes/geoquiz.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -135,6 +136,7 @@ app.use('/api/futbolgrid', futbolgridRoutes);
 app.use('/api/footballsplit', footballsplitRoutes);
 app.use('/api/jugadas', jugadasRoutes);
 app.use('/api/cuatroclubes', cuatroclubesRoutes);
+app.use('/api/geoquiz', geoquizRoutes);
 
 // 5. Redirección para React Router (Single Page Application)
 app.get('*', (req, res) => {
