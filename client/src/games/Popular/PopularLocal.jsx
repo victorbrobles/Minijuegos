@@ -18,12 +18,16 @@ const PUNTOS_POR_PUESTO = {
   5: 10
 };
 
+const COLORES_JUGADOR = ['#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316', '#84cc16', '#6366f1'];
+const colorJugador = (id) => COLORES_JUGADOR[(Number(id) - 1 + COLORES_JUGADOR.length * 10) % COLORES_JUGADOR.length];
+const inicial = (n = '?') => n.trim().charAt(0).toUpperCase() || '?';
+
 export default function PopularLocal({ onVolver, onExit }) {
   const navigate = useNavigate();
 
-  const [fase, setFase] = useState('setup');
+  const [fase, setFase] = useState('setup'); // 'setup' | 'pasar_turno' | 'jugando' | 'resolucion' | 'final'
   const [modalAyuda, setModalAyuda] = useState(false);
-  const [modalPistas, setModalPistas] = useState(false);
+  const [modalSalirPortada, setModalSalirPortada] = useState(false);
 
   const [numJugadores, setNumJugadores] = useState(4);
   const [jugadores, setJugadores] = useState([
@@ -50,6 +54,19 @@ export default function PopularLocal({ onVolver, onExit }) {
 
   const [tiempoRestante, setTiempoRestante] = useState(TIEMPO_TURNO);
   const timerRef = useRef(null);
+
+  const handleSalirAPortada = () => {
+    setModalSalirPortada(false);
+    if (typeof onExit === 'function') {
+      onExit();
+    } else {
+      try {
+        navigate('/');
+      } catch {
+        window.location.href = '/';
+      }
+    }
+  };
 
   const handleNumJugadoresChange = (e) => {
     const num = parseInt(e.target.value, 10);
@@ -100,7 +117,6 @@ export default function PopularLocal({ onVolver, onExit }) {
         setInputTexto('');
         setFeedback(null);
         setSolucionFinal(null);
-        setModalPistas(false);
 
         const ids = listaJug.map((j) => j.id);
         const primerIdx = Math.floor(Math.random() * ids.length);
@@ -146,7 +162,7 @@ export default function PopularLocal({ onVolver, onExit }) {
       setTiempoRestante((prev) => {
         if (prev <= 1) {
           clearInterval(timerRef.current);
-          if (avanzarTurnoRef.current) avanzarTurnoRef.current(); // Pasa turno automáticamente
+          if (avanzarTurnoRef.current) avanzarTurnoRef.current();
           return 0;
         }
         return prev - 1;
@@ -158,8 +174,12 @@ export default function PopularLocal({ onVolver, onExit }) {
     };
   }, [fase, indiceTurno, feedback]);
 
-  const pedirPista = async (puesto, tipo) => {
-    if (!jugadorActivo || !preguntaData) return;
+  // Pide automáticamente la siguiente pista disponible para ese puesto (1.º longitud, 2.º letras)
+  const pedirSiguientePistaPuesto = async (puesto) => {
+    if (!jugadorActivo || !preguntaData || feedback !== null) return;
+    const actual = pistasJugadores[jugadorActivo.id]?.[puesto] || {};
+    const tipo = !actual.longitud ? 'longitud' : !actual.letras ? 'letras' : null;
+    if (!tipo) return;
 
     try {
       const res = await fetch('/api/popular/pista', {
@@ -186,8 +206,6 @@ export default function PopularLocal({ onVolver, onExit }) {
           userPistas[puesto] = puestoPistas;
           return { ...prev, [jugadorActivo.id]: userPistas };
         });
-
-        setModalPistas(false);
       }
     } catch {
       alert('Error al solicitar la pista.');
@@ -196,7 +214,7 @@ export default function PopularLocal({ onVolver, onExit }) {
 
   const enviarRespuesta = async (e) => {
     e.preventDefault();
-    if (!inputTexto.trim() || !preguntaData) return;
+    if (!inputTexto.trim() || !preguntaData || feedback !== null) return;
 
     try {
       const puestosDescubiertos = Object.keys(acertados).map(Number);
@@ -226,18 +244,17 @@ export default function PopularLocal({ onVolver, onExit }) {
           }
         };
         setAcertados(nuevosAcertados);
-
-        setFeedback({
-          tipo: 'acierto',
-          msg: `¡Acierto! Has encontrado el Top ${data.puesto}: «${data.texto}» (+${data.puntos} pts)`
-        });
         setInputTexto('');
 
-        if (Object.keys(nuevosAcertados).length === 5) {
-          setTimeout(() => {
-            terminarRonda('todos_acertados');
-          }, 1400);
+        if (Object.keys(nuevosAcertados).length >= 5) {
+          // Pasa directamente a la pantalla de fin de ronda con soluciones y puntuaciones
+          terminarRonda();
         } else {
+          setFeedback({
+            tipo: 'acierto',
+            msg: `🎉 ¡Acierto! Top #${data.puesto}: «${data.texto}» (+${data.puntos} pts)`
+          });
+
           setTimeout(() => {
             setFeedback(null);
             avanzarTurno();
@@ -246,7 +263,7 @@ export default function PopularLocal({ onVolver, onExit }) {
       } else {
         setFeedback({
           tipo: 'fallo',
-          msg: `«${inputTexto}» no está entre los 5 más populares. Pierdes el turno.`
+          msg: `❌ «${inputTexto}» no está en el Top 5. Turno para el siguiente jugador.`
         });
         setInputTexto('');
 
@@ -258,10 +275,6 @@ export default function PopularLocal({ onVolver, onExit }) {
     } catch {
       alert('Error validando respuesta.');
     }
-  };
-
-  const rendirseRonda = async () => {
-    terminarRonda('rendicion');
   };
 
   const terminarRonda = async () => {
@@ -276,7 +289,6 @@ export default function PopularLocal({ onVolver, onExit }) {
       if (data.success) {
         setSolucionFinal(data.respuestas);
         setFeedback(null);
-        setModalPistas(false);
         setFase('resolucion');
       }
     } catch {
@@ -299,69 +311,72 @@ export default function PopularLocal({ onVolver, onExit }) {
   const ganadores = maximo > 0 ? ranking.filter((j) => (puntos[j.id] ?? 0) === maximo) : [];
 
   const misPistas = (jugadorActivo && pistasJugadores[jugadorActivo.id]) || {};
+  const enPartidaActiva = fase === 'pasar_turno' || fase === 'jugando' || fase === 'resolucion';
+
+  const cabeceraHero = (
+    <header className="popp-hero">
+      <span className="popp-hero-deco" aria-hidden="true">
+        <Icon name="trophy" size={140} strokeWidth={1.3} />
+      </span>
+      <div className="popp-hero-top">
+        <button type="button" className="popp-salir" onClick={() => setModalSalirPortada(true)}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+          <span>Portada</span>
+        </button>
+        <div className="popp-hero-chips">
+          <span className="popp-chip"><Icon name="flagFinish" size={14} /> Ronda {rondaNum}</span>
+          <span className="popp-chip">{Object.keys(acertados).length} / 5 descubiertos</span>
+        </div>
+      </div>
+
+      <ol className="popp-marcador" aria-label="Jugadores">
+        {jugadores.map((j) => {
+          const activo = j.id === jugadorActivo?.id && fase !== 'resolucion';
+          return (
+            <li
+              key={j.id}
+              className={`popp-jugador${activo ? ' activo' : ''}`}
+              style={{ '--c': colorJugador(j.id) }}
+            >
+              <span className="popp-jugador-avatar">{inicial(j.nombre)}</span>
+              <span className="popp-jugador-datos">
+                <span className="popp-jugador-nombre">{j.nombre}</span>
+                <strong className="popp-jugador-pts">{puntos[j.id] ?? 0} pts</strong>
+              </span>
+            </li>
+          );
+        })}
+      </ol>
+    </header>
+  );
 
   return (
-    <div className="pop-contenedor">
-      {/* AYUDA */}
-      {fase === 'setup' && (
-        <>
-
-          {modalAyuda && (
-            <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
-              <div className="rg-modal aprox-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-                <div className="aprox-modal-header">
-                  <h3>¿Cómo se juega a Sigue la moda?</h3>
-                </div>
-
-                <div className="aprox-modal-cuerpo">
-                  <p><strong>1. Dinámica del juego:</strong></p>
-                  <ul>
-                    <li>Adivina <strong>las 5 respuestas más populares</strong> de la categoría propuesta.</li>
-                    <li>Por turnos y pasándose el teléfono, cada jugador escribe una respuesta antes de <strong>45 segundos</strong>.</li>
-                    <li>Puedes <strong>pasar turno</strong> en cualquier momento si no sabes qué responder o agotar el tiempo.</li>
-                    <li>Si aciertas, sumas los puntos de ese puesto. Si fallas, pierdes el turno.</li>
-                  </ul>
-
-                  <p><strong>2. Puntuación de los puestos:</strong></p>
-                  <div className="aprox-tabla-puntos">
-                    <div className="aprox-puntos-fila acierto">
-                      <span>🥇 Top 1</span>
-                      <strong>+2 puntos</strong>
-                    </div>
-                    <div className="aprox-puntos-fila acierto" style={{ background: '#eff6ff', color: '#1d4ed8' }}>
-                      <span>🥈 Top 2</span>
-                      <strong>+4 puntos</strong>
-                    </div>
-                    <div className="aprox-puntos-fila intermedia" style={{ background: '#fef3c7', color: '#92400e' }}>
-                      <span>🥉 Top 3</span>
-                      <strong>+6 puntos</strong>
-                    </div>
-                    <div className="aprox-puntos-fila acierto" style={{ background: '#ede9fe', color: '#5b21b6' }}>
-                      <span>🏅 Top 4</span>
-                      <strong>+8 puntos</strong>
-                    </div>
-                    <div className="aprox-puntos-fila acierto" style={{ background: '#fdf2f8', color: '#be185d' }}>
-                      <span>🏆 Top 5 (El más difícil)</span>
-                      <strong>+10 puntos</strong>
-                    </div>
-                  </div>
-
-                  <p><strong>3. Sistema de pistas (-1 punto cada una):</strong></p>
-                  <ul>
-                    <li><strong>1.ª Pista: Estructura de letras</strong> (-1 pt).</li>
-                    <li><strong>2.ª Pista: Revelar 20% de letras</strong> (-1 pt).</li>
-                  </ul>
-                </div>
-
-                <div className="rg-modal-acciones">
-                  <button className="big full" onClick={() => setModalAyuda(false)}>
-                    Entendido
-                  </button>
-                </div>
-              </div>
+    <div className={`pop-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+      {/* MODAL DE AYUDA */}
+      {modalAyuda && (
+        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
+          <div className="rg-modal popp-modal-ayuda" onClick={(e) => e.stopPropagation()}>
+            <div className="popp-modal-ayuda-header">
+              <span className="popp-ayuda-badge">❓ Cómo jugar</span>
+              <h3>Sigue la moda</h3>
             </div>
-          )}
-        </>
+
+            <div className="popp-modal-ayuda-body">
+              <p>Adivina <strong>las 5 respuestas más habituales</strong> que da la gente a cada situación cotidiana.</p>
+              <ul>
+                <li><strong>Por turnos (45 s):</strong> Escribe cualquier idea que creas que está en el Top 5. No hace falta decir la frase exacta: basta con la palabra clave o un sinónimo claro.</li>
+                <li><strong>Pistas en cada puesto (-1 pt):</strong> En cualquier fila oculta puedes pulsar el botón <strong>💡 Pista</strong> situado en ese mismo puesto para ver sus huecos de letras, y pulsarlo otra vez para revelar letras.</li>
+                <li><strong>Puntos crecientes:</strong> Top #1 (+2 pts), Top #2 (+4 pts), Top #3 (+6 pts), Top #4 (+8 pts) y Top #5 (+10 pts).</li>
+              </ul>
+            </div>
+
+            <button type="button" className="popp-boton" onClick={() => setModalAyuda(false)}>
+              ¡Entendido!
+            </button>
+          </div>
+        </div>
       )}
 
       {/* 1. SETUP */}
@@ -383,17 +398,22 @@ export default function PopularLocal({ onVolver, onExit }) {
 
       {/* 2. PASAR TURNO */}
       {fase === 'pasar_turno' && jugadorActivo && (
-        <section className="game center">
-          <div className="panel aprox-pregunta-card" style={{ padding: '3rem 1.5rem' }}>
-            <span className="chip alt">Ronda {rondaNum} · Turno en juego</span>
-            <h1 style={{ fontSize: '2.4rem', fontWeight: '900', color: '#4f46e5', margin: '0.5rem 0 1rem' }}>
-              ¡Turno de {jugadorActivo.nombre}!
-            </h1>
-            <p className="hint" style={{ fontSize: '1.05rem', marginBottom: '1.5rem' }}>
-              Pasad el teléfono a <strong>{jugadorActivo.nombre}</strong> para responder.
+        <section className="game popp-escena">
+          {cabeceraHero}
+          <div className="popp-tarjeta popp-listo">
+            <span className="popp-listo-avatar" style={{ '--c': colorJugador(jugadorActivo.id) }}>
+              {inicial(jugadorActivo.nombre)}
+            </span>
+            <p className="popp-etiqueta">Pasa el móvil a</p>
+            <h2 className="popp-listo-nombre">{jugadorActivo.nombre}</h2>
+            <p className="popp-texto">
+              Tendrás <strong>{TIEMPO_TURNO} segundos</strong> para intentar adivinar una de las 5 respuestas más populares o pedir pista en el puesto que prefieras.
             </p>
-            <button className="big full" onClick={() => setFase('jugando')}>
-              <Icon name="check" size={22} strokeWidth={2.5} /> Soy {jugadorActivo.nombre}, ¡estoy listo!
+          </div>
+
+          <div className="popp-barra">
+            <button type="button" className="popp-boton grande" onClick={() => setFase('jugando')}>
+              <Icon name="play" size={22} /> Soy {jugadorActivo.nombre}, ¡listo!
             </button>
           </div>
         </section>
@@ -401,254 +421,216 @@ export default function PopularLocal({ onVolver, onExit }) {
 
       {/* 3. JUGANDO */}
       {fase === 'jugando' && preguntaData && (
-        <section className="game">
-          <div className="hud">
-            <span className="chip"><Icon name="flagFinish" size={18} />Ronda {rondaNum}</span>
-            <span className="chip alt">
-              {Object.keys(acertados).length} / 5 descubiertos
-            </span>
-          </div>
+        <section className="game popp-escena">
+          {cabeceraHero}
 
-          <div className="scoreboard-container" style={{ justifyContent: 'center', marginBottom: '0.8rem' }}>
-            {jugadores.map((j) => (
-              <div
-                key={j.id}
-                className="score-pill"
-                style={{ borderColor: j.id === jugadorActivo?.id ? '#4f46e5' : undefined }}
-              >
-                <span>{j.nombre}: <strong>{puntos[j.id] ?? 0} pts</strong></span>
-                {j.id === jugadorActivo?.id && <span style={{ marginLeft: '4px' }}>👉</span>}
-              </div>
-            ))}
-          </div>
-
-          <div className="pop-pregunta-card">
-            <span className="badge" style={{ background: '#ede9fe', color: '#6d28d9' }}>
-              Lo más popular
-            </span>
-            <h2 className="pop-pregunta-titulo">«{preguntaData.pregunta}»</h2>
-          </div>
-
-          {/* Temporizador de 45 segundos */}
-          <div style={{ padding: '0 1rem', marginTop: '0.5rem' }}>
-            <div
-              className="timer"
-              role="timer"
-              style={{ margin: '0.4rem 0', background: '#e2e8f0', borderRadius: '9999px', height: '8px', overflow: 'hidden' }}
-            >
-              <div
-                className={`timer-bar ${tiempoRestante <= 10 ? 'low' : ''}`}
-                style={{
-                  width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%`,
-                  height: '100%',
-                  backgroundColor: tiempoRestante <= 10 ? '#ef4444' : '#16a34a',
-                  borderRadius: '9999px',
-                  transition: 'width 0.1s linear, background-color 0.3s ease'
-                }}
-              />
+          {/* Barra de tiempo */}
+          <div className={`popp-tiempo ${tiempoRestante <= 10 ? 'critico' : ''}`} role="timer">
+            <div className="popp-tiempo-barra">
+              <span style={{ width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%` }} />
             </div>
-            <p
-              className="timer-text"
-              style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem',
-                color: tiempoRestante <= 10 ? '#dc2626' : '#64748b', fontSize: '0.9rem', fontWeight: 700, margin: '0 0 1rem'
-              }}
-            >
-              <Icon name="clock" size={16} />
-              {tiempoRestante} s
-            </p>
+            <span className="popp-tiempo-num">
+              <Icon name="clock" size={15} /> {tiempoRestante}s
+            </span>
           </div>
 
-          <div className="pop-slots-lista">
+          {/* Tarjeta de la pregunta */}
+          <div className="popp-tarjeta popp-pregunta-box">
+            <span className="popp-badge-tema">Top 5 más popular</span>
+            <h2 className="popp-pregunta-titulo">«{preguntaData.pregunta}»</h2>
+          </div>
+
+          {feedback && (
+            <div className={`popp-feedback ${feedback.tipo}`} role="status">
+              {feedback.msg}
+            </div>
+          )}
+
+          {/* Lista de los 5 puestos con botón de pista integrado en cada puesto */}
+          <div className="popp-slots-lista">
             {[1, 2, 3, 4, 5].map((puesto) => {
               const descubierto = acertados[puesto];
               const pistaPuesto = misPistas[puesto];
+              const tieneLongitud = Boolean(pistaPuesto?.longitud);
+              const tieneLetras = Boolean(pistaPuesto?.letras);
               const esqueletoVisible = pistaPuesto?.letras || pistaPuesto?.longitud;
 
               return (
-                <div key={puesto} className={`pop-slot-item ${descubierto ? 'revelado' : ''}`}>
-                  <div className="pop-slot-posicion">
-                    <span className="pop-puesto-badge">#{puesto}</span>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                <div key={puesto} className={`popp-slot-card ${descubierto ? 'revelado' : ''}`}>
+                  <div className="popp-slot-main">
+                    <span className={`popp-puesto-num p-${puesto}`}>#{puesto}</span>
+
+                    <div className="popp-slot-contenido">
                       {descubierto ? (
-                        <span className="pop-slot-texto">{descubierto.texto}</span>
-                      ) : (
                         <>
-                          <span className="pop-slot-incognita">¿ ?</span>
-                          {esqueletoVisible && (
-                            <div className="pop-pista-ahorcado-container">
-                              {esqueletoVisible.split('   /   ').map((palabra, pIdx) => (
-                                <span key={pIdx} className="pop-palabra-bloque">
-                                  {palabra}
-                                </span>
-                              ))}
-                            </div>
-                          )}
+                          <span className="popp-slot-texto">{descubierto.texto}</span>
+                          <span className="popp-slot-autor">Acertado por {descubierto.jugador}</span>
                         </>
+                      ) : esqueletoVisible ? (
+                        <div className="popp-ahorcado-wrap">
+                          {esqueletoVisible.split('   /   ').map((palabra, pIdx) => (
+                            <span key={pIdx} className="popp-palabra-chip">
+                              {palabra}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="popp-slot-incognita">Respuesta oculta</span>
                       )}
                     </div>
                   </div>
-                  <span className="pop-puntos-tag">+{PUNTOS_POR_PUESTO[puesto]} pts</span>
+
+                  <div className="popp-slot-derecha">
+                    {!descubierto && !tieneLetras && (
+                      <button
+                        type="button"
+                        className={`popp-btn-pista-slot ${tieneLongitud ? 'fase2' : ''}`}
+                        onClick={() => pedirSiguientePistaPuesto(puesto)}
+                        disabled={feedback !== null}
+                        title={
+                          !tieneLongitud
+                            ? `Ver huecos de letras del Top #${puesto} (-1 pt)`
+                            : `Revelar letras del Top #${puesto} (-1 pt)`
+                        }
+                      >
+                        <span>{!tieneLongitud ? '💡 Pista' : '🔤 +Letras'}</span>
+                        <small>-1 pt</small>
+                      </button>
+                    )}
+                    <span className="popp-puntos-badge">+{PUNTOS_POR_PUESTO[puesto]} pts</span>
+                  </div>
                 </div>
               );
             })}
           </div>
 
-          {feedback && (
-            <div className={`pop-banner-feedback ${feedback.tipo}`}>
-              {feedback.msg}
-            </div>
-          )}
-
-          <form onSubmit={enviarRespuesta} className="pop-formulario-box">
-            <p className="field-label" style={{ textAlign: 'center', marginBottom: '0.6rem' }}>
-              Escribe una respuesta para cualquier puesto:
-            </p>
+          {/* Formulario limpio en la parte inferior */}
+          <form onSubmit={enviarRespuesta} className="popp-tarjeta popp-form-card">
+            <label className="popp-etiqueta" htmlFor="popp-input-local">
+              Tu respuesta para cualquier puesto del Top 5
+            </label>
             <input
+              id="popp-input-local"
               type="text"
               autoFocus
-              className="pop-input-grande"
-              placeholder="Escribe lo que diría la gente..."
+              className="popp-input"
+              placeholder="Escribe una palabra clave o respuesta…"
               value={inputTexto}
               onChange={(e) => setInputTexto(e.target.value)}
               disabled={feedback !== null}
+              autoComplete="off"
             />
 
-            <div className="pop-form-actions-row">
-              <button
-                type="submit"
-                className="big btn-validar-flex"
-                disabled={!inputTexto.trim() || feedback !== null}
-              >
-                <Icon name="check" size={20} /> Validar respuesta
-              </button>
-
+            <div className="popp-fila-botones">
               <button
                 type="button"
-                className="btn-pedir-pista"
-                onClick={() => setModalPistas(true)}
-                disabled={feedback !== null}
-              >
-                💡 Pedir pista (-1 pt)
-              </button>
-
-              <button
-                type="button"
-                className="btn-pasar-turno"
+                className="popp-boton secundario"
                 onClick={avanzarTurno}
                 disabled={feedback !== null}
               >
-                Pasar turno ➔
+                Pasar turno
+              </button>
+              <button
+                type="submit"
+                className="popp-boton"
+                disabled={!inputTexto.trim() || feedback !== null}
+              >
+                <Icon name="check" size={20} /> Comprobar
               </button>
             </div>
           </form>
 
-          <div className="actions">
-            <button className="secondary danger full" onClick={rendirseRonda}>
-              <Icon name="flag" size={18} /> Rendirse y ver los 5 puestos
+          <div className="popp-pie-acciones">
+            <button type="button" className="popp-enlace peligro" onClick={terminarRonda}>
+              <Icon name="flagFinish" size={16} /> Rendirse y resolver los 5 puestos
             </button>
           </div>
-
-          {modalPistas && (
-            <div className="rg-modal-fondo" onClick={() => setModalPistas(false)}>
-              <div className="rg-modal pop-modal-pistas" onClick={(e) => e.stopPropagation()}>
-                <div className="modal-ayuda-header">
-                  <h3>Pedir pista para un puesto (-1 punto)</h3>
-                </div>
-                <p className="hint small" style={{ margin: '0.4rem 0 1rem', textAlign: 'center' }}>
-                  Elige sobre qué puesto quieres la pista. Se aplicará a tu pantalla durante toda la ronda:
-                </p>
-
-                <div className="pop-pistas-selector-grid">
-                  {[1, 2, 3, 4, 5].map((puesto) => {
-                    const yaDescubierto = Boolean(acertados[puesto]);
-                    const yaTieneLongitud = Boolean(misPistas[puesto]?.longitud);
-                    const yaTieneLetras = Boolean(misPistas[puesto]?.letras);
-
-                    return (
-                      <div key={puesto} className={`pop-pista-row-card ${yaDescubierto ? 'bloqueado' : ''}`}>
-                        <div className="pop-pista-info-puesto">
-                          <span className="pop-puesto-badge">#{puesto}</span>
-                          <strong>{yaDescubierto ? '¡Ya descubierto!' : `Top ${puesto} (+${PUNTOS_POR_PUESTO[puesto]} pts)`}</strong>
-                        </div>
-
-                        {!yaDescubierto && (
-                          <div className="pop-pista-botones-accion">
-                            <button
-                              type="button"
-                              className="btn-subpista"
-                              disabled={yaTieneLongitud}
-                              onClick={() => pedirPista(puesto, 'longitud')}
-                            >
-                              {yaTieneLongitud ? '✓ N.º letras pedidas' : '📏 N.º letras (-1 pt)'}
-                            </button>
-
-                            <button
-                              type="button"
-                              className="btn-subpista"
-                              disabled={!yaTieneLongitud || yaTieneLetras}
-                              title={!yaTieneLongitud ? 'Debes pedir primero el número de letras' : ''}
-                              onClick={() => pedirPista(puesto, 'letras')}
-                            >
-                              {yaTieneLetras
-                                ? '✓ 20% revelado'
-                                : !yaTieneLongitud
-                                ? '🔒 Revelar 20% (Pide 1.º letras)'
-                                : '🔤 Revelar 20% (-1 pt)'}
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <div className="rg-modal-acciones" style={{ marginTop: '1.2rem' }}>
-                  <button className="secondary full" onClick={() => setModalPistas(false)}>
-                    Cerrar sin pedir pista
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
         </section>
       )}
 
-      {/* 4. RESOLUCIÓN */}
+      {/* 4. RESOLUCIÓN DE LA RONDA */}
       {fase === 'resolucion' && preguntaData && solucionFinal && (
-        <section className="game">
-          <div className="end-card aprox-resolucion-card">
-            <span className="end-icon"><Icon name="trophy" size={44} /></span>
-            <p className="categoria">Ronda {rondaNum} completada</p>
-            <h1 className="title">Los 5 más populares</h1>
-            <p className="reveal" style={{ fontSize: '1.25rem', margin: '0.4rem 0 1.2rem' }}>
-              «{preguntaData.pregunta}»
-            </p>
+        <section className="game popp-escena">
+          {cabeceraHero}
 
-            <div className="pop-slots-lista" style={{ width: '100%' }}>
+          <div className="popp-tarjeta">
+            <p className="popp-etiqueta">Soluciones · Ronda {rondaNum}</p>
+            <h3 className="popp-pregunta-resumen">«{preguntaData.pregunta}»</h3>
+
+            <div className="popp-slots-lista" style={{ marginTop: '0.8rem' }}>
               {solucionFinal.map((resp) => {
                 const acertador = acertados[resp.puesto];
                 return (
                   <div
                     key={resp.puesto}
-                    className={`pop-slot-item ${acertador ? 'revelado' : 'solucion-perdida'}`}
+                    className={`popp-slot-card ${acertador ? 'revelado' : 'no-acertado'}`}
                   >
-                    <div className="pop-slot-posicion">
-                      <span className="pop-puesto-badge">#{resp.puesto}</span>
-                      <span className="pop-slot-texto">
-                        {resp.texto} {acertador && <em style={{ fontSize: '0.85rem', color: '#15803d' }}>({acertador.jugador})</em>}
-                      </span>
+                    <div className="popp-slot-main">
+                      <span className={`popp-puesto-num p-${resp.puesto}`}>#{resp.puesto}</span>
+                      <div className="popp-slot-contenido">
+                        <span className="popp-slot-texto">{resp.texto}</span>
+                        <span className="popp-slot-autor">
+                          {acertador ? `🎉 Acertado por ${acertador.jugador}` : 'Sin descubrir'}
+                        </span>
+                      </div>
                     </div>
-                    <span className="pop-puntos-tag">+{resp.puntos} pts</span>
+                    <span className="popp-puntos-badge">+{resp.puntos} pts</span>
                   </div>
                 );
               })}
             </div>
+          </div>
 
-            <div className="scoreboard" style={{ width: '100%', marginTop: '1.2rem' }}>
-              <h3 className="section-title" style={{ margin: '0 0 0.8rem', textAlign: 'center' }}>
-                Clasificación general
-              </h3>
+          <div className="popp-tarjeta">
+            <p className="popp-etiqueta">Clasificación general</p>
+            <ol className="popp-ranking">
+              {ranking.map((j, i) => {
+                const pts = puntos[j.id] ?? 0;
+                const lider = maximo > 0 && pts === maximo;
+                return (
+                  <li key={j.id} className={lider ? 'lider' : ''} style={{ '--c': colorJugador(j.id) }}>
+                    <span className="popp-ranking-pos">{lider ? <Icon name="crown" size={18} /> : i + 1}</span>
+                    <span className="popp-jugador-avatar">{inicial(j.nombre)}</span>
+                    <span className="popp-ranking-nombre">{j.nombre}</span>
+                    <strong>{pts} pts</strong>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+
+          <div className="popp-barra estatica">
+            {rondaNum < MAX_RONDAS ? (
+              <button type="button" className="popp-boton grande" onClick={siguienteRonda}>
+                <Icon name="play" size={20} /> Siguiente ronda ({rondaNum + 1})
+              </button>
+            ) : (
+              <button type="button" className="popp-boton grande" onClick={() => setFase('final')}>
+                <Icon name="trophy" size={20} /> Ver podio final
+              </button>
+            )}
+            <button type="button" className="popp-enlace" onClick={() => setFase('final')}>
+              <Icon name="flagFinish" size={16} /> Finalizar partida
+            </button>
+          </div>
+        </section>
+      )}
+
+      {/* 5. PODIO FINAL */}
+      {fase === 'final' && (
+        <section className="game popp-escena">
+          <div className="end-card">
+            <span className="end-icon"><Icon name="crown" size={48} /></span>
+            <h1 className="title">Clasificación Final</h1>
+            <p className="final-score">
+              {ganadores.length === 0
+                ? 'Nadie ha conseguido puntos'
+                : ganadores.length === 1
+                ? <>¡Victoria para {ganadores[0].nombre} con {maximo} puntos!</>
+                : <>Empate entre {ganadores.map((g) => g.nombre).join(', ')} con {maximo} puntos</>}
+            </p>
+
+            <div className="scoreboard">
               {ranking.map((j, i) => {
                 const pts = puntos[j.id] ?? 0;
                 const lider = maximo > 0 && pts === maximo;
@@ -665,62 +647,34 @@ export default function PopularLocal({ onVolver, onExit }) {
             </div>
           </div>
 
-          <div className="actions">
-            {rondaNum < MAX_RONDAS ? (
-              <button className="big full" onClick={siguienteRonda}>
-                <Icon name="play" size={20} /> Siguiente ronda ({rondaNum + 1})
-              </button>
-            ) : (
-              <button className="big full" onClick={() => setFase('final')}>
-                <Icon name="trophy" size={20} /> Ver podio final
-              </button>
-            )}
-            <button className="secondary danger full" onClick={() => setFase('final')}>
-              <Icon name="flagFinish" size={20} /> Finalizar partida
+          <div className="popp-barra estatica">
+            <button type="button" className="popp-boton grande" onClick={() => setFase('setup')}>
+              <Icon name="refresh" size={20} /> Nueva partida
+            </button>
+            <button type="button" className="popp-boton secundario" onClick={handleSalirAPortada}>
+              <Icon name="door" size={20} /> Volver a la portada
             </button>
           </div>
         </section>
       )}
 
-      {/* 5. PODIO FINAL */}
-      {fase === 'final' && (
-        <section className="game">
-          <div className="end-card">
-            <span className="end-icon"><Icon name="crown" size={48} /></span>
-            <h1 className="title">Clasificación Final</h1>
-            <p className="final-score">
-              {ganadores.length === 0
-                ? 'Nadie ha conseguido puntos'
-                : ganadores.length === 1
-                ? <>¡Victoria para {ganadores[0].nombre} con {maximo} puntos!</>
-                : <>Empate entre {ganadores.map((g) => g.nombre).join(', ')} con {maximo} puntos</>}
-            </p>
-
-            <div className="scoreboard">
-              {ranking.map((j, i) => {
-                const lider = maximo > 0 && j.puntos === maximo;
-                return (
-                  <div key={j.id} className={`score-row ${lider ? 'first' : ''}`}>
-                    <span className="score-name">
-                      {lider ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
-                      {j.nombre}
-                    </span>
-                    <span className="score-pts">{j.puntos} pts</span>
-                  </div>
-                );
-              })}
+      {/* MODAL SALIR A PORTADA */}
+      {modalSalirPortada && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalirPortada(false)}>
+          <div className="rg-modal popp-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="popp-modal-icono">🚪</div>
+            <h3>¿Salir a la portada?</h3>
+            <p className="hint">Se cancelará la partida actual y volverás a la portada principal.</p>
+            <div className="popp-fila-botones">
+              <button type="button" className="popp-boton secundario" onClick={() => setModalSalirPortada(false)}>
+                Continuar
+              </button>
+              <button type="button" className="popp-boton peligro" onClick={handleSalirAPortada}>
+                Salir a portada
+              </button>
             </div>
           </div>
-
-          <div className="actions" style={{ marginTop: '1.5rem' }}>
-            <button onClick={() => setFase('setup')}>
-              <Icon name="refresh" size={20} /> Nueva partida
-            </button>
-            <button className="secondary danger" onClick={() => (onExit ? onExit() : navigate('/'))}>
-              <Icon name="door" size={20} /> Salir al menú principal
-            </button>
-          </div>
-        </section>
+        </div>
       )}
     </div>
   );

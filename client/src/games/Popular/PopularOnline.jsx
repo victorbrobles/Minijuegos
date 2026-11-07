@@ -2,7 +2,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
 import './Popular.css';
-import '../Adivina/Adivina.css';
 import { MenuInicioJuego, MenuModoOnline, FormCrearSala, FormUnirseSala, CabeceraSala, EsperandoAnfitrion } from '../../components/MenuJuego.jsx';
 
 const CLAVE_SESION_POPULAR = 'popular_online_session';
@@ -16,8 +15,12 @@ const PUNTOS_POR_PUESTO = {
   5: 10
 };
 
+const COLORES_JUGADOR = ['#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316', '#84cc16', '#6366f1'];
+const colorJugador = (id) => COLORES_JUGADOR[(Number(id) - 1 + COLORES_JUGADOR.length * 10) % COLORES_JUGADOR.length];
+const inicial = (n = '?') => n.trim().charAt(0).toUpperCase() || '?';
+
 export default function PopularOnline({ onLocal, onSalir }) {
-  const [vista, setVista] = useState('menu'); // 'menu' | 'crear' | 'unirse' | 'sala'
+  const [vista, setVista] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
   const [nombre, setNombre] = useState('');
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -34,16 +37,12 @@ export default function PopularOnline({ onLocal, onSalir }) {
   });
 
   const [sala, setSala] = useState(null);
-  const [codigoCopiado, setCodigoCopiado] = useState(false);
-
   const [inputTexto, setInputTexto] = useState('');
-  const [modalPistas, setModalPistas] = useState(false);
   const [tiempoRestante, setTiempoRestante] = useState(TIEMPO_TURNO);
 
   const intervalRef = useRef(null);
   const timerRef = useRef(null);
 
-  // Polling continuo
   useEffect(() => {
     if (!sesion) {
       if (intervalRef.current) clearInterval(intervalRef.current);
@@ -180,7 +179,7 @@ export default function PopularOnline({ onLocal, onSalir }) {
   const esMiTurno = ronda?.jugadorActivoId === yoId;
   const misPistas = ronda?.misPistas || {};
 
-  // Temporizador sincronizado para todos durante el turno
+  // Temporizador sincronizado durante el turno
   useEffect(() => {
     const isJugando = sala?.estado === 'jugando' && ronda?.faseRonda === 'jugando';
     if (!isJugando || ronda?.feedback !== null) {
@@ -196,7 +195,7 @@ export default function PopularOnline({ onLocal, onSalir }) {
         if (prev <= 1) {
           clearInterval(timerRef.current);
           if (esMiTurno && handlePasarTurnoRef.current) {
-            handlePasarTurnoRef.current(); // Pasa turno automáticamente si somos nosotros
+            handlePasarTurnoRef.current();
           }
           return 0;
         }
@@ -209,7 +208,13 @@ export default function PopularOnline({ onLocal, onSalir }) {
     };
   }, [sala?.estado, ronda?.faseRonda, ronda?.jugadorActivoId, esMiTurno, ronda?.feedback]);
 
-  const handlePedirPista = async (puesto, tipo) => {
+  // Pide directamente desde la fila del puesto la siguiente pista disponible
+  const handlePedirPistaPuesto = async (puesto) => {
+    if (!esMiTurno || ronda?.feedback !== null) return;
+    const actual = misPistas[puesto] || {};
+    const tipo = !actual.longitud ? 'longitud' : !actual.letras ? 'letras' : null;
+    if (!tipo) return;
+
     try {
       const res = await fetch(`/api/popular/online/sala/${sesion.code}/pista`, {
         method: 'POST',
@@ -218,7 +223,6 @@ export default function PopularOnline({ onLocal, onSalir }) {
       });
       const d = await res.json();
       if (!res.ok) throw new Error(d.error);
-      setModalPistas(false);
     } catch (err) {
       console.error(err);
     }
@@ -267,79 +271,78 @@ export default function PopularOnline({ onLocal, onSalir }) {
     setVista('online_menu');
   };
 
-  const copiarCodigo = () => {
-    if (!sala?.code) return;
-    navigator.clipboard?.writeText(sala.code);
-    setCodigoCopiado(true);
-    setTimeout(() => setCodigoCopiado(false), 2000);
-  };
-
   const ranking = sala?.jugadores ? [...sala.jugadores].sort((a, b) => b.puntos - a.puntos) : [];
   const maximo = ranking.length ? ranking[0].puntos : 0;
   const ganadores = maximo > 0 ? ranking.filter((j) => j.puntos === maximo) : [];
+  const enPartidaActiva = vista === 'sala' && sala && sala.estado !== 'lobby';
 
+  const cabeceraOnline = sala && ronda && (
+    <header className="popp-hero">
+      <span className="popp-hero-deco" aria-hidden="true">
+        <Icon name="trophy" size={140} strokeWidth={1.3} />
+      </span>
+      <div className="popp-hero-top">
+        <button type="button" className="popp-salir" onClick={() => setModalSalir(true)}>
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+          <span>Portada</span>
+        </button>
+        <div className="popp-hero-chips">
+          <span className="popp-chip"><Icon name="flagFinish" size={14} /> Ronda {sala.rondaNum}/{sala.maxRondas}</span>
+          <span className="popp-chip">{Object.keys(ronda.acertados || {}).length} / 5 descubiertos</span>
+        </div>
+      </div>
+
+      <ol className="popp-marcador" aria-label="Jugadores">
+        {sala.jugadores.map((j) => {
+          const activo = j.id === ronda.jugadorActivoId && ronda.faseRonda === 'jugando';
+          return (
+            <li
+              key={j.id}
+              className={`popp-jugador${activo ? ' activo' : ''}`}
+              style={{ '--c': colorJugador(j.id) }}
+            >
+              <span className="popp-jugador-avatar">{inicial(j.nombre)}</span>
+              <span className="popp-jugador-datos">
+                <span className="popp-jugador-nombre">
+                  {j.nombre}{j.id === yoId ? ' (tú)' : ''}
+                </span>
+                <strong className="popp-jugador-pts">{j.puntos} pts</strong>
+              </span>
+            </li>
+          );
+        })}
+      </ol>
+    </header>
+  );
 
   return (
-    <div className="pop-contenedor">
-      {/* ---------------- BOTÓN Y MODAL DE AYUDA ---------------- */}
-
+    <div className={`pop-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+      {/* MODAL DE AYUDA */}
       {modalAyuda && (
         <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
-          <div className="rg-modal aprox-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-            <div className="aprox-modal-header">
-              <span className="aprox-modal-signo-title">?</span>
-              <h3>¿Cómo se juega a Sigue la moda?</h3>
+          <div className="rg-modal popp-modal-ayuda" onClick={(e) => e.stopPropagation()}>
+            <div className="popp-modal-ayuda-header">
+              <span className="popp-ayuda-badge">❓ Cómo jugar</span>
+              <h3>Sigue la moda</h3>
             </div>
 
-            <div className="aprox-modal-cuerpo">
-              <p><strong>1. Dinámica del juego:</strong></p>
+            <div className="popp-modal-ayuda-body">
+              <p>Adivina <strong>las 5 respuestas más populares</strong> de cada categoría propuesta.</p>
               <ul>
-                <li>Adivina <strong>las 5 respuestas más populares</strong> de la categoría propuesta.</li>
-                <li>Por turnos, cada jugador escribe una respuesta antes de <strong>45 segundos</strong>.</li>
-                <li>Puedes <strong>pasar turno</strong> en cualquier momento si no sabes qué responder o agotar el tiempo.</li>
-                <li>Si aciertas, sumas los puntos de ese puesto. Si fallas, pierdes el turno.</li>
-              </ul>
-
-              <p><strong>2. Puntuación de los puestos:</strong></p>
-              <div className="aprox-tabla-puntos">
-                <div className="aprox-puntos-fila acierto">
-                  <span>🥇 Top 1</span>
-                  <strong>+2 puntos</strong>
-                </div>
-                <div className="aprox-puntos-fila acierto" style={{ background: '#eff6ff', color: '#1d4ed8' }}>
-                  <span>🥈 Top 2</span>
-                  <strong>+4 puntos</strong>
-                </div>
-                <div className="aprox-puntos-fila intermedia" style={{ background: '#fef3c7', color: '#92400e' }}>
-                  <span>🥉 Top 3</span>
-                  <strong>+6 puntos</strong>
-                </div>
-                <div className="aprox-puntos-fila acierto" style={{ background: '#ede9fe', color: '#5b21b6' }}>
-                  <span>🏅 Top 4</span>
-                  <strong>+8 puntos</strong>
-                </div>
-                <div className="aprox-puntos-fila acierto" style={{ background: '#fdf2f8', color: '#be185d' }}>
-                  <span>🏆 Top 5 (El más difícil)</span>
-                  <strong>+10 puntos</strong>
-                </div>
-              </div>
-
-              <p><strong>3. Sistema de pistas (-1 punto cada una):</strong></p>
-              <ul>
-                <li><strong>1.ª Pista: Estructura de letras</strong> (-1 pt).</li>
-                <li><strong>2.ª Pista: Revelar 20% de letras</strong> (-1 pt).</li>
+                <li><strong>Por turnos (45 s):</strong> Cuando sea tu turno, escribe una respuesta o palabra clave para cualquiera de los 5 puestos.</li>
+                <li><strong>Pistas en cada fila (-1 pt):</strong> Pulsa el botón <strong>💡 Pista</strong> a la derecha del puesto que quieras desbloquear.</li>
+                <li><strong>Puntuación:</strong> Top #1 (+2 pts), Top #2 (+4 pts), Top #3 (+6 pts), Top #4 (+8 pts) y Top #5 (+10 pts).</li>
               </ul>
             </div>
 
-            <div className="rg-modal-acciones">
-              <button className="big full" onClick={() => setModalAyuda(false)}>
-                Entendido
-              </button>
-            </div>
+            <button type="button" className="popp-boton" onClick={() => setModalAyuda(false)}>
+              ¡Entendido!
+            </button>
           </div>
         </div>
       )}
-      {/* ---------------- FIN AYUDA ---------------- */}
 
       {/* 1. MENÚ ONLINE */}
       {vista === 'menu' && (
@@ -420,325 +423,232 @@ export default function PopularOnline({ onLocal, onSalir }) {
           ) : (
             <EsperandoAnfitrion />
           )}
-
         </section>
       )}
 
       {/* 5. JUGANDO ONLINE */}
       {vista === 'sala' && sala && sala.estado === 'jugando' && ronda && ronda.faseRonda === 'jugando' && (
-        <section className="game">
-          <div className="hud">
-            <span className="chip"><Icon name="flagFinish" size={18} />Ronda {sala.rondaNum} de {sala.maxRondas}</span>
-            <span className="chip alt">
-              {Object.keys(ronda.acertados || {}).length} / 5 descubiertos
-            </span>
-          </div>
+        <section className="game popp-escena">
+          {cabeceraOnline}
 
-          {/* Marcador superior */}
-          <div className="scoreboard-container" style={{ justifyContent: 'center', marginBottom: '0.8rem' }}>
-            {sala.jugadores.map((j) => (
-              <div
-                key={j.id}
-                className="score-pill"
-                style={{ borderColor: j.id === ronda.jugadorActivoId ? '#4f46e5' : undefined }}
-              >
-                <span>{j.nombre}: <strong>{j.puntos} pts</strong></span>
-                {j.id === ronda.jugadorActivoId && <span style={{ marginLeft: '4px' }}>👉</span>}
-              </div>
-            ))}
-          </div>
-
-          {/* Pregunta */}
-          <div className="pop-pregunta-card">
-            <span className="badge" style={{ background: '#ede9fe', color: '#6d28d9' }}>
-              Lo más popular
-            </span>
-            <h2 className="pop-pregunta-titulo">«{ronda.pregunta}»</h2>
-          </div>
-
-          {/* Banner indicador de turno */}
-          {esMiTurno ? (
-            <div className="status-alert acierto" style={{ textAlign: 'center', marginBottom: '1rem', fontWeight: 800 }}>
-              👉 ¡ES TU TURNO! Escribe una respuesta o pide pista
+          {/* Banner de quién tiene el turno */}
+          <div
+            className={`popp-turno-banner ${esMiTurno ? 'mio' : ''}`}
+            style={{ '--c': colorJugador(ronda.jugadorActivoId || 1) }}
+          >
+            <span className="popp-jugador-avatar">{inicial(ronda.jugadorActivoNombre)}</span>
+            <div className="popp-turno-textos">
+              <span className="popp-etiqueta">{esMiTurno ? '¡Te toca a ti!' : 'Turno en curso'}</span>
+              <strong>
+                {esMiTurno
+                  ? 'Escribe una respuesta o pide pista en un puesto'
+                  : `${ronda.jugadorActivoNombre} está pensando una respuesta…`}
+              </strong>
             </div>
-          ) : (
-            <div className="status-alert info" style={{ textAlign: 'center', marginBottom: '1rem' }}>
-              ⏳ Turno de <strong>{ronda.jugadorActivoNombre}</strong>. Espera tu turno...
+          </div>
+
+          {/* Barra de tiempo */}
+          <div className={`popp-tiempo ${tiempoRestante <= 10 ? 'critico' : ''}`} role="timer">
+            <div className="popp-tiempo-barra">
+              <span style={{ width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%` }} />
+            </div>
+            <span className="popp-tiempo-num">
+              <Icon name="clock" size={15} /> {tiempoRestante}s
+            </span>
+          </div>
+
+          {/* Tarjeta de la pregunta */}
+          <div className="popp-tarjeta popp-pregunta-box">
+            <span className="popp-badge-tema">Top 5 más popular</span>
+            <h2 className="popp-pregunta-titulo">«{ronda.pregunta}»</h2>
+          </div>
+
+          {ronda.feedback && (
+            <div className={`popp-feedback ${ronda.feedback.tipo}`} role="status">
+              {ronda.feedback.msg}
             </div>
           )}
 
-          {/* Temporizador de 45 segundos */}
-          <div style={{ padding: '0 1rem', marginTop: '0.5rem' }}>
-            <div
-              className="timer"
-              role="timer"
-              style={{ margin: '0.4rem 0', background: '#e2e8f0', borderRadius: '9999px', height: '8px', overflow: 'hidden' }}
-            >
-              <div
-                className={`timer-bar ${tiempoRestante <= 10 ? 'low' : ''}`}
-                style={{
-                  width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%`,
-                  height: '100%',
-                  backgroundColor: tiempoRestante <= 10 ? '#ef4444' : '#16a34a',
-                  borderRadius: '9999px',
-                  transition: 'width 0.1s linear, background-color 0.3s ease'
-                }}
-              />
-            </div>
-            <p
-              className="timer-text"
-              style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem',
-                color: tiempoRestante <= 10 ? '#dc2626' : '#64748b', fontSize: '0.9rem', fontWeight: 700, margin: '0 0 1rem'
-              }}
-            >
-              <Icon name="clock" size={16} />
-              {tiempoRestante} s
-            </p>
-          </div>
-
-          {/* Los 5 puestos en vivo */}
-          <div className="pop-slots-lista">
+          {/* Los 5 puestos con botón de pista integrado en cada puesto */}
+          <div className="popp-slots-lista">
             {[1, 2, 3, 4, 5].map((puesto) => {
               const descubierto = ronda.acertados?.[puesto];
               const pistaPuesto = misPistas[puesto];
+              const tieneLongitud = Boolean(pistaPuesto?.longitud);
+              const tieneLetras = Boolean(pistaPuesto?.letras);
               const esqueletoVisible = pistaPuesto?.letras || pistaPuesto?.longitud;
 
               return (
-                <div key={puesto} className={`pop-slot-item ${descubierto ? 'revelado' : ''}`}>
-                  <div className="pop-slot-posicion">
-                    <span className="pop-puesto-badge">#{puesto}</span>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                <div key={puesto} className={`popp-slot-card ${descubierto ? 'revelado' : ''}`}>
+                  <div className="popp-slot-main">
+                    <span className={`popp-puesto-num p-${puesto}`}>#{puesto}</span>
+
+                    <div className="popp-slot-contenido">
                       {descubierto ? (
-                        <span className="pop-slot-texto">
-                          {descubierto.texto}{' '}
-                          <em style={{ fontSize: '0.85rem', color: '#15803d' }}>({descubierto.jugador})</em>
-                        </span>
-                      ) : (
                         <>
-                          <span className="pop-slot-incognita">¿ ?</span>
-                          {esqueletoVisible && (
-                            <div className="pop-pista-ahorcado-container">
-                              {esqueletoVisible.split('   /   ').map((palabra, pIdx) => (
-                                <span key={pIdx} className="pop-palabra-bloque">
-                                  {palabra}
-                                </span>
-                              ))}
-                            </div>
-                          )}
+                          <span className="popp-slot-texto">{descubierto.texto}</span>
+                          <span className="popp-slot-autor">Acertado por {descubierto.jugador}</span>
                         </>
+                      ) : esqueletoVisible ? (
+                        <div className="popp-ahorcado-wrap">
+                          {esqueletoVisible.split('   /   ').map((palabra, pIdx) => (
+                            <span key={pIdx} className="popp-palabra-chip">
+                              {palabra}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="popp-slot-incognita">Respuesta oculta</span>
                       )}
                     </div>
                   </div>
-                  <span className="pop-puntos-tag">+{PUNTOS_POR_PUESTO[puesto]} pts</span>
+
+                  <div className="popp-slot-derecha">
+                    {!descubierto && !tieneLetras && esMiTurno && (
+                      <button
+                        type="button"
+                        className={`popp-btn-pista-slot ${tieneLongitud ? 'fase2' : ''}`}
+                        onClick={() => handlePedirPistaPuesto(puesto)}
+                        disabled={ronda.feedback !== null}
+                        title={
+                          !tieneLongitud
+                            ? `Ver huecos de letras del Top #${puesto} (-1 pt)`
+                            : `Revelar letras del Top #${puesto} (-1 pt)`
+                        }
+                      >
+                        <span>{!tieneLongitud ? '💡 Pista' : '🔤 +Letras'}</span>
+                        <small>-1 pt</small>
+                      </button>
+                    )}
+                    <span className="popp-puntos-badge">+{PUNTOS_POR_PUESTO[puesto]} pts</span>
+                  </div>
                 </div>
               );
             })}
           </div>
 
-          {/* Feedback interactivo en vivo */}
-          {ronda.feedback && (
-            <div className={`pop-banner-feedback ${ronda.feedback.tipo}`}>
-              {ronda.feedback.msg}
-            </div>
+          {/* Formulario (solo visible cuando es tu turno) */}
+          {esMiTurno && (
+            <form onSubmit={handleValidarRespuesta} className="popp-tarjeta popp-form-card">
+              <label className="popp-etiqueta" htmlFor="popp-input-online">
+                Tu respuesta para cualquier puesto del Top 5
+              </label>
+              <input
+                id="popp-input-online"
+                type="text"
+                autoFocus
+                className="popp-input"
+                placeholder="Escribe una palabra clave o respuesta…"
+                value={inputTexto}
+                onChange={(e) => setInputTexto(e.target.value)}
+                disabled={ronda.feedback !== null}
+                autoComplete="off"
+              />
+
+              <div className="popp-fila-botones">
+                <button
+                  type="button"
+                  className="popp-boton secundario"
+                  onClick={handlePasarTurno}
+                  disabled={ronda.feedback !== null}
+                >
+                  Pasar turno
+                </button>
+                <button
+                  type="submit"
+                  className="popp-boton"
+                  disabled={!inputTexto.trim() || ronda.feedback !== null}
+                >
+                  <Icon name="check" size={20} /> Comprobar
+                </button>
+              </div>
+            </form>
           )}
-
-          {/* Formulario (solo activo para el jugador de turno) */}
-          <form onSubmit={handleValidarRespuesta} className="pop-formulario-box">
-            <p className="field-label" style={{ textAlign: 'center', marginBottom: '0.6rem' }}>
-              {esMiTurno ? 'Escribe tu respuesta:' : `Observando respuestas de ${ronda.jugadorActivoNombre}...`}
-            </p>
-            <input
-              type="text"
-              autoFocus={esMiTurno}
-              className="pop-input-grande"
-              placeholder={esMiTurno ? 'Escribe lo que diría la gente...' : 'No es tu turno'}
-              value={inputTexto}
-              onChange={(e) => setInputTexto(e.target.value)}
-              disabled={!esMiTurno || ronda.feedback !== null}
-            />
-
-            <div className="pop-form-actions-row">
-              <button
-                type="submit"
-                className="big btn-validar-flex"
-                disabled={!esMiTurno || !inputTexto.trim() || ronda.feedback !== null}
-              >
-                <Icon name="check" size={20} /> Validar respuesta
-              </button>
-
-              <button
-                type="button"
-                className="btn-pedir-pista"
-                onClick={() => setModalPistas(true)}
-                disabled={!esMiTurno || ronda.feedback !== null}
-              >
-                💡 Pedir pista (-1 pt)
-              </button>
-
-              <button
-                type="button"
-                className="btn-pasar-turno"
-                onClick={handlePasarTurno}
-                disabled={!esMiTurno || ronda.feedback !== null}
-              >
-                Pasar turno ➔
-              </button>
-            </div>
-          </form>
 
           {esAdmin && (
-            <div className="actions" style={{ marginTop: '0.8rem' }}>
-              <button className="secondary danger full" onClick={handleRendirse}>
-                <Icon name="flag" size={18} /> Rendirse y ver soluciones
+            <div className="popp-pie-acciones">
+              <button type="button" className="popp-enlace peligro" onClick={handleRendirse}>
+                <Icon name="flagFinish" size={16} /> Rendirse y resolver los 5 puestos
               </button>
             </div>
           )}
-
-          {/* MODAL DE PISTAS ONLINE */}
-          {modalPistas && esMiTurno && (
-            <div className="rg-modal-fondo" onClick={() => setModalPistas(false)}>
-              <div className="rg-modal pop-modal-pistas" onClick={(e) => e.stopPropagation()}>
-                <div className="modal-ayuda-header">
-                  <h3>Pedir pista para un puesto (-1 punto)</h3>
-                </div>
-                <p className="hint small" style={{ margin: '0.4rem 0 1rem', textAlign: 'center' }}>
-                  Elige sobre qué puesto quieres la pista. Se aplicará a tu pantalla durante toda la ronda:
-                </p>
-
-                <div className="pop-pistas-selector-grid">
-                  {[1, 2, 3, 4, 5].map((puesto) => {
-                    const yaDescubierto = Boolean(ronda.acertados?.[puesto]);
-                    const yaTieneLongitud = Boolean(misPistas[puesto]?.longitud);
-                    const yaTieneLetras = Boolean(misPistas[puesto]?.letras);
-
-                    return (
-                      <div key={puesto} className={`pop-pista-row-card ${yaDescubierto ? 'bloqueado' : ''}`}>
-                        <div className="pop-pista-info-puesto">
-                          <span className="pop-puesto-badge">#{puesto}</span>
-                          <strong>{yaDescubierto ? '¡Ya descubierto!' : `Top ${puesto} (+${PUNTOS_POR_PUESTO[puesto]} pts)`}</strong>
-                        </div>
-
-                        {!yaDescubierto && (
-                          <div className="pop-pista-botones-accion">
-                            <button
-                              type="button"
-                              className="btn-subpista"
-                              disabled={yaTieneLongitud}
-                              onClick={() => handlePedirPista(puesto, 'longitud')}
-                            >
-                              {yaTieneLongitud ? '✓ N.º letras pedidas' : '📏 N.º letras (-1 pt)'}
-                            </button>
-
-                            <button
-                              type="button"
-                              className="btn-subpista"
-                              disabled={!yaTieneLongitud || yaTieneLetras}
-                              title={!yaTieneLongitud ? 'Debes pedir primero el número de letras' : ''}
-                              onClick={() => handlePedirPista(puesto, 'letras')}
-                            >
-                              {yaTieneLetras
-                                ? '✓ 20% revelado'
-                                : !yaTieneLongitud
-                                ? '🔒 Revelar 20% (Pide 1.º letras)'
-                                : '🔤 Revelar 20% (-1 pt)'}
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <div className="rg-modal-acciones" style={{ marginTop: '1.2rem' }}>
-                  <button className="secondary full" onClick={() => setModalPistas(false)}>
-                    Cerrar sin pedir pista
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <button className="secondary danger full" style={{ marginTop: '1.2rem' }} onClick={() => setModalSalir(true)}>
-            Salir de la sala
-          </button>
         </section>
       )}
 
-      {/* 6. RESOLUCIÓN DE RONDA ONLINE */}
-      {vista === 'sala' && sala && sala.estado === 'jugando' && ronda && ronda.faseRonda === 'resolucion' && ronda.solucionFinal && (
-        <section className="game">
-          <div className="end-card aprox-resolucion-card">
-            <span className="end-icon"><Icon name="trophy" size={44} /></span>
-            <p className="categoria">Ronda {sala.rondaNum} completada</p>
-            <h1 className="title">Los 5 más populares</h1>
-            <p className="reveal" style={{ fontSize: '1.25rem', margin: '0.4rem 0 1.2rem' }}>
-              «{ronda.pregunta}»
-            </p>
+      {/* 6. RESOLUCIÓN DE RONDA ONLINE (Se abre automáticamente al acertar los 5 o al rendirse) */}
+      {vista === 'sala' && sala && sala.estado === 'jugando' && ronda && ronda.faseRonda === 'resolucion' && (
+        <section className="game popp-escena">
+          {cabeceraOnline}
 
-            <div className="pop-slots-lista" style={{ width: '100%' }}>
-              {ronda.solucionFinal.map((resp) => {
+          <div className="popp-tarjeta">
+            <p className="popp-etiqueta">Soluciones · Ronda {sala.rondaNum}</p>
+            <h3 className="popp-pregunta-resumen">«{ronda.pregunta}»</h3>
+
+            <div className="popp-slots-lista" style={{ marginTop: '0.8rem' }}>
+              {(ronda.solucionFinal || [1, 2, 3, 4, 5].map((p) => ({
+                puesto: p,
+                texto: ronda.acertados?.[p]?.texto || '',
+                puntos: PUNTOS_POR_PUESTO[p]
+              }))).map((resp) => {
                 const acertador = ronda.acertados?.[resp.puesto];
                 return (
                   <div
                     key={resp.puesto}
-                    className={`pop-slot-item ${acertador ? 'revelado' : 'solucion-perdida'}`}
+                    className={`popp-slot-card ${acertador ? 'revelado' : 'no-acertado'}`}
                   >
-                    <div className="pop-slot-posicion">
-                      <span className="pop-puesto-badge">#{resp.puesto}</span>
-                      <span className="pop-slot-texto">
-                        {resp.texto}{' '}
-                        {acertador && <em style={{ fontSize: '0.85rem', color: '#15803d' }}>({acertador.jugador})</em>}
-                      </span>
+                    <div className="popp-slot-main">
+                      <span className={`popp-puesto-num p-${resp.puesto}`}>#{resp.puesto}</span>
+                      <div className="popp-slot-contenido">
+                        <span className="popp-slot-texto">{resp.texto}</span>
+                        <span className="popp-slot-autor">
+                          {acertador ? `🎉 Acertado por ${acertador.jugador}` : 'Sin descubrir'}
+                        </span>
+                      </div>
                     </div>
-                    <span className="pop-puntos-tag">+{resp.puntos} pts</span>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="scoreboard" style={{ width: '100%', marginTop: '1.2rem' }}>
-              <h3 className="section-title" style={{ margin: '0 0 0.8rem', textAlign: 'center' }}>
-                Clasificación general
-              </h3>
-              {ranking.map((j, i) => {
-                const lider = maximo > 0 && j.puntos === maximo;
-                return (
-                  <div key={j.id} className={`score-row ${lider ? 'first' : ''}`}>
-                    <span className="score-name">
-                      {lider ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
-                      {j.nombre}
-                    </span>
-                    <span className="score-pts">{j.puntos} pts</span>
+                    <span className="popp-puntos-badge">+{resp.puntos} pts</span>
                   </div>
                 );
               })}
             </div>
           </div>
 
-          <div className="actions" style={{ marginTop: '1.2rem' }}>
+          <div className="popp-tarjeta">
+            <p className="popp-etiqueta">Clasificación general</p>
+            <ol className="popp-ranking">
+              {ranking.map((j, i) => {
+                const lider = maximo > 0 && j.puntos === maximo;
+                return (
+                  <li key={j.id} className={lider ? 'lider' : ''} style={{ '--c': colorJugador(j.id) }}>
+                    <span className="popp-ranking-pos">{lider ? <Icon name="crown" size={18} /> : i + 1}</span>
+                    <span className="popp-jugador-avatar">{inicial(j.nombre)}</span>
+                    <span className="popp-ranking-nombre">
+                      {j.nombre}{j.id === yoId ? ' (tú)' : ''}
+                    </span>
+                    <strong>{j.puntos} pts</strong>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+
+          <div className="popp-barra estatica">
             {esAdmin ? (
               <>
                 {sala.rondaNum < sala.maxRondas ? (
-                  <button className="big full" onClick={handleSiguienteRonda}>
-                    <Icon name="play" size={20} /> Siguiente ronda ({sala.rondaNum + 1} de {sala.maxRondas})
+                  <button type="button" className="popp-boton grande" onClick={handleSiguienteRonda}>
+                    <Icon name="play" size={20} /> Siguiente ronda ({sala.rondaNum + 1})
                   </button>
                 ) : (
-                  <button className="big full" onClick={handleFinalizar}>
+                  <button type="button" className="popp-boton grande" onClick={handleFinalizar}>
                     <Icon name="trophy" size={20} /> Ver podio final
                   </button>
                 )}
-                <button className="secondary danger full" onClick={handleFinalizar}>
-                  <Icon name="flagFinish" size={20} /> Finalizar partida
+                <button type="button" className="popp-enlace" onClick={handleFinalizar}>
+                  <Icon name="flagFinish" size={16} /> Finalizar partida
                 </button>
               </>
             ) : (
-              <div className="panel center" style={{ width: '100%', padding: '1rem' }}>
-                <p className="hint">Esperando a que el anfitrión avance a la siguiente ronda...</p>
-                <button className="secondary danger full" style={{ marginTop: '0.8rem' }} onClick={() => setModalSalir(true)}>
-                  Salir de la sala
-                </button>
-              </div>
+              <p className="popp-espera">Esperando a que el anfitrión inicie la siguiente ronda o finalice la partida…</p>
             )}
           </div>
         </section>
@@ -746,7 +656,7 @@ export default function PopularOnline({ onLocal, onSalir }) {
 
       {/* 7. PODIO FINAL ONLINE */}
       {vista === 'sala' && sala && sala.estado === 'final' && (
-        <section className="game">
+        <section className="game popp-escena">
           <div className="end-card">
             <span className="end-icon"><Icon name="crown" size={48} /></span>
             <h1 className="title">Clasificación Final</h1>
@@ -774,8 +684,8 @@ export default function PopularOnline({ onLocal, onSalir }) {
             </div>
           </div>
 
-          <div className="actions" style={{ marginTop: '1.5rem' }}>
-            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
+          <div className="popp-barra estatica">
+            <button type="button" className="popp-boton secundario" onClick={() => setModalSalir(true)}>
               <Icon name="door" size={20} /> Salir al menú
             </button>
           </div>
@@ -785,31 +695,18 @@ export default function PopularOnline({ onLocal, onSalir }) {
       {/* MODAL DE CONFIRMACIÓN PARA SALIR */}
       {modalSalir && (
         <div className="rg-modal-fondo" onClick={() => setModalSalir(false)}>
-          <div 
-            className="rg-modal" 
-            onClick={(e) => e.stopPropagation()} 
-            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
-          >
-            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
-            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
-              ¿Abandonar la partida?
-            </h3>
-            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
-              Si sales de la sala perderás tu progreso actual en la partida. ¿Estás seguro de que deseas salir?
-            </p>
+          <div className="rg-modal popp-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="popp-modal-icono">🚪</div>
+            <h3>¿Salir de la sala?</h3>
+            <p className="hint">Si sales de la sala perderás tu progreso actual en la partida. ¿Estás seguro?</p>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
-              <button 
-                type="button" 
-                className="secondary full" 
-                onClick={() => setModalSalir(false)}
-              >
-                No, quedarme
+            <div className="popp-fila-botones">
+              <button type="button" className="popp-boton secundario" onClick={() => setModalSalir(false)}>
+                Quedarme
               </button>
-              <button 
-                type="button" 
-                className="secondary danger full" 
-                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
+              <button
+                type="button"
+                className="popp-boton peligro"
                 onClick={() => {
                   setModalSalir(false);
                   handleSalir();
