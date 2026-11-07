@@ -3,8 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin, adminHeaders } from '../../lib/admin.js';
 import Icon from '../../components/Icon.jsx';
-import CategoryCard from '../../components/CategoryCard.jsx';
 import './QuienEsQuien.css';
+import { PantallaPasarMovil, PantallaTablero, BotonPrincipal, EnlaceSecundario, SelectorCategorias, colorJugador } from './TableroPartida.jsx';
 
 const MIN_JUGADORES = 2;
 const MAX_JUGADORES = 15;
@@ -294,212 +294,46 @@ export default function QuienEsQuienLocal({ onVolver, onExit, onAbrirAyuda }) {
 
       {/* 2. CATEGORÍAS */}
       {paso === 'categorias' && (
-        <section className="game">
-          <div className="panel qq-menu-panel">
-            <div className="qq-card-top">
-              <button
-                type="button"
-                className="qq-link-volver"
-                onClick={() => setPaso('config')}
-              >
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M19 12H5M12 19l-7-7 7-7"/>
-                </svg>
-                <span>Volver</span>
-              </button>
-              <button
-                type="button"
-                className="qq-btn-ayuda"
-                onClick={onAbrirAyuda}
-                title="Cómo jugar"
-                aria-label="Cómo jugar"
-              >
-                ?
-              </button>
-            </div>
-
-            <div className="qq-section-header">
-              <h3 className="qq-section-title">Elige una temática para los personajes</h3>
-              <p className="hint">Pulsa sobre una categoría para repartir los personajes y comenzar.</p>
-            </div>
-
-            <div className="conecta-categories-grid">
-              {categoriasAMostrar.map((cat, idx) => (
-                <CategoryCard
-                  key={cat.id}
-                  nombre={cat.nombre}
-                  icono={cat.icono}
-                  indice={idx}
-                  onClick={() => seleccionarCategoria(cat)}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
+        <SelectorCategorias
+          categorias={categoriasAMostrar}
+          onElegir={seleccionarCategoria}
+          onVolver={() => setPaso('config')}
+          onAyuda={onAbrirAyuda}
+          aviso="Al tocar una categoría se reparte un personaje secreto a cada jugador."
+        />
       )}
 
       {/* 3. INTERTURNO */}
       {paso === 'interturno' && jugadorActual && (
-        <section className="game">
-          <div className="panel qq-menu-panel qq-tablero-panel" style={{ textAlign: 'center' }}>
-            <div className="qq-card-top" style={{ justifyContent: 'flex-start', marginBottom: '0.4rem', width: '100%' }}>
-              <button
-                type="button"
-                className="qq-link-volver"
-                onClick={() => setModalSalirPortada(true)}
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M19 12H5M12 19l-7-7 7-7" />
-                </svg>
-                <span>Volver a la portada</span>
-              </button>
-            </div>
-
-            <div className="qq-tablero-header">
-              <span className="qq-tablero-badge">
-                <Icon name="users" size={16} /> Turno de {jugadorActual.nombre}
-              </span>
-              <div style={{ fontSize: '3.2rem', margin: '0.4rem 0' }}>📱</div>
-              <h2 className="qq-tablero-titulo">Pasad el móvil a: {jugadorActual.nombre}</h2>
-              <p className="qq-tablero-sub">
-                En tu turno podrás ver los personajes de todos tus compañeros manteniendo pulsada la cubierta. Tu propio personaje permanecerá 100% oculto.
-              </p>
-            </div>
-
-            <button
-              type="button"
-              className="big full qq-btn-principal"
-              onClick={empezarTurnoJugador}
-            >
-              <Icon name="eye" size={22} /> Soy {jugadorActual.nombre}, tomar el dispositivo
-            </button>
-          </div>
-        </section>
+        <PantallaPasarMovil
+          jugadores={jugadores}
+          turnoIdx={turnoIdx}
+          categoria={categoriaElegida}
+          onEmpezar={empezarTurnoJugador}
+          onSalir={() => setModalSalirPortada(true)}
+        />
       )}
 
       {/* 4. TURNO ACTIVO */}
       {paso === 'turno' && jugadorActual && (
-        <section className="game">
-          <div className="panel qq-menu-panel qq-tablero-panel">
-            <div className="qq-card-top" style={{ justifyContent: 'flex-start', marginBottom: '0.4rem', width: '100%' }}>
-              <button
-                type="button"
-                className="qq-link-volver"
-                onClick={() => setModalSalirPortada(true)}
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M19 12H5M12 19l-7-7 7-7" />
-                </svg>
-                <span>Volver a la portada</span>
-              </button>
-            </div>
-
-            <div className="qq-tablero-header">
-              <span className="qq-tablero-badge">
-                <Icon name="users" size={16} /> Turno de {jugadorActual.nombre}
-              </span>
-              <h2 className="qq-tablero-titulo">Tarjetas del grupo</h2>
-              <p className="qq-tablero-sub">
-                Tu elemento está oculto para ti. Haz preguntas de «Sí» o «No» al grupo para adivinar quién eres.
-              </p>
-            </div>
-
-            <div className="qq-cubierta-wrapper">
-              <div
-                className={`qq-cubierta-cortina ${cubiertaLevantada ? 'levantada' : ''}`}
-                onMouseDown={() => setCubiertaLevantada(true)}
-                onMouseUp={() => setCubiertaLevantada(false)}
-                onMouseLeave={() => setCubiertaLevantada(false)}
-                onTouchStart={() => setCubiertaLevantada(true)}
-                onTouchEnd={() => setCubiertaLevantada(false)}
-                onTouchCancel={() => setCubiertaLevantada(false)}
-                onContextMenu={(e) => e.preventDefault()}
-              >
-                <div className="qq-cubierta-icono">
-                  <Icon name={cubiertaLevantada ? 'eye' : 'lock'} size={44} strokeWidth={1.8} />
-                </div>
-                <h3 className="qq-cubierta-titulo">
-                  {cubiertaLevantada ? '¡Soltar para tapar!' : 'MANTÉN PULSADO PARA MIRAR'}
-                </h3>
-                <p className="qq-cubierta-sub">
-                  {cubiertaLevantada
-                    ? 'Viendo a los demás jugadores...'
-                    : 'Pulsa sin soltar para levantar la cubierta y ver a tus compañeros.'}
-                </p>
-              </div>
-
-              <div className="qq-tarjeta-grupal-interior">
-                <div className="qq-grupal-header">
-                  <span className="aprox-badge-pregunta">Personajes de tus rivales</span>
-                  <p className="hint small" style={{ margin: '0.35rem 0 0' }}>
-                    Responde con Sí o No cuando te pregunten sobre sus identidades:
-                  </p>
-                </div>
-
-                <div className="qq-filas-rivales-lista">
-                  {rivales.map((j) => (
-                    <div key={j.id} className="qq-fila-rival-item">
-                      <span className="qq-rival-nombre-label">{j.nombre}</span>
-                      <strong className="qq-rival-tarjeta-badge">{j.tarjeta}</strong>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              className="big full qq-btn-pulsador-mirar"
-              onMouseDown={() => setCubiertaLevantada(true)}
-              onMouseUp={() => setCubiertaLevantada(false)}
-              onMouseLeave={() => setCubiertaLevantada(false)}
-              onTouchStart={() => setCubiertaLevantada(true)}
-              onTouchEnd={() => setCubiertaLevantada(false)}
-              onTouchCancel={() => setCubiertaLevantada(false)}
-              onContextMenu={(e) => e.preventDefault()}
-            >
-              <Icon name="eye" size={22} />
-              {cubiertaLevantada ? 'Soltar para ocultar' : 'Mantén presionado aquí para ver los nombres'}
-            </button>
-
-            <button
-              type="button"
-              className="secondary full"
-              style={{ marginTop: '0.85rem' }}
-              onClick={pasarSiguienteTurno}
-            >
-              <Icon name="check" size={20} /> Pasar turno al siguiente jugador
-            </button>
-
-            <div className="qq-tablero-footer">
-              <button
-                type="button"
-                className="qq-link-otra-ronda"
-                onClick={() => setModalOtraRonda(true)}
-              >
-                <Icon name="refresh" size={16} /> Jugar otra ronda (cambiar categoría)
-              </button>
-            </div>
-          </div>
-        </section>
+        <PantallaTablero
+          etiqueta={`Turno ${turnoIdx + 1} de ${jugadores.length}`}
+          titulo={jugadorActual.nombre}
+          colorTitulo={colorJugador(turnoIdx)}
+          rivales={rivales}
+          categoria={categoriaElegida}
+          onSalir={() => setModalSalirPortada(true)}
+          acciones={(
+            <BotonPrincipal onClick={pasarSiguienteTurno}>
+              Pasar a {jugadores[(turnoIdx + 1) % jugadores.length].nombre} <Icon name="forward" size={20} />
+            </BotonPrincipal>
+          )}
+          pie={(
+            <EnlaceSecundario onClick={() => setModalOtraRonda(true)}>
+              <Icon name="refresh" size={16} /> Otra ronda (cambiar categoría)
+            </EnlaceSecundario>
+          )}
+        />
       )}
 
       {/* MODAL: SALIR A LA PORTADA */}

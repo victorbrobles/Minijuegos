@@ -3,8 +3,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin, adminHeaders } from '../../lib/admin.js';
 import Icon from '../../components/Icon.jsx';
-import CategoryCard from '../../components/CategoryCard.jsx';
 import './QuienEsQuien.css';
+import { PantallaTablero, EnlaceSecundario, SelectorCategorias, colorJugador } from './TableroPartida.jsx';
 
 const CLAVE_SESION_QQ = 'qq_online_session';
 
@@ -647,174 +647,34 @@ export default function QuienEsQuienOnline({
 
       {/* 4B. SELECTOR DE CATEGORÍAS ONLINE (SOLO ADMIN) */}
       {vista === 'sala' && sala && sala.estado === 'lobby' && eligiendoCategoria && (
-        <section className="game">
-          <div className="panel qq-menu-panel">
-            <div className="qq-card-top">
-              <button
-                type="button"
-                className="qq-link-volver"
-                onClick={() => setEligiendoCategoria(false)}
-              >
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M19 12H5M12 19l-7-7 7-7"/>
-                </svg>
-                <span>Volver</span>
-              </button>
-              <button
-                type="button"
-                className="qq-btn-ayuda"
-                onClick={onAbrirAyuda}
-                title="Cómo jugar"
-                aria-label="Cómo jugar"
-              >
-                ?
-              </button>
-            </div>
-
-            <div className="qq-section-header">
-              <h3 className="qq-section-title">Elige una temática</h3>
-              <p className="hint">
-                Al pulsar una categoría se repartirán los personajes y comenzará la partida en todos los móviles.
-              </p>
-            </div>
-
-            {cargando && (
-              <p className="hint ok center" style={{ fontWeight: 800, marginBottom: '0.8rem' }}>
-                ⏳ Repartiendo tarjetas y comenzando partida...
-              </p>
-            )}
-
-            {errorMsg && <p className="error" style={{ marginBottom: '0.8rem' }}>{errorMsg}</p>}
-
-            <div className="conecta-categories-grid">
-              {categoriasAMostrar.map((cat, idx) => (
-                <CategoryCard
-                  key={cat.id}
-                  nombre={cat.nombre}
-                  icono={cat.icono}
-                  indice={idx}
-                  onClick={() => handleSeleccionarCat(cat)}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
+        <SelectorCategorias
+          categorias={categoriasAMostrar}
+          onElegir={handleSeleccionarCat}
+          onVolver={() => setEligiendoCategoria(false)}
+          onAyuda={onAbrirAyuda}
+          aviso="Al tocar una categoría se reparten los personajes y empieza la partida en todos los móviles."
+          cargando={cargando && !mostrarModalCustom}
+          error={errorMsg}
+        />
       )}
 
       {/* 5. JUGANDO ONLINE */}
       {enPartidaActiva && (
-        <section className="game">
-          <div className="panel qq-menu-panel qq-tablero-panel">
-            {/* Botón integrado en la tarjeta blanca para salir a la portada */}
-            <div className="qq-card-top" style={{ justifyContent: 'flex-start', marginBottom: '0.4rem', width: '100%' }}>
-              <button
-                type="button"
-                className="qq-link-volver"
-                onClick={() => setModalSalirPortada(true)}
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M19 12H5M12 19l-7-7 7-7" />
-                </svg>
-                <span>Volver a la portada</span>
-              </button>
-            </div>
-
-            <div className="qq-tablero-header">
-              <span className="qq-tablero-badge">
-                <Icon name="whois" size={16} /> Identidad secreta
-              </span>
-              <h2 className="qq-tablero-titulo">Tarjetas del grupo</h2>
-              <p className="qq-tablero-sub">
-                Tu elemento está oculto para ti. Haz preguntas de «Sí» o «No» al grupo para adivinar quién eres.
-              </p>
-            </div>
-
-            <div className="qq-cubierta-wrapper">
-              <div
-                className={`qq-cubierta-cortina ${cubiertaLevantada ? 'levantada' : ''}`}
-                onMouseDown={() => setCubiertaLevantada(true)}
-                onMouseUp={() => setCubiertaLevantada(false)}
-                onMouseLeave={() => setCubiertaLevantada(false)}
-                onTouchStart={() => setCubiertaLevantada(true)}
-                onTouchEnd={() => setCubiertaLevantada(false)}
-                onTouchCancel={() => setCubiertaLevantada(false)}
-                onContextMenu={(e) => e.preventDefault()}
-              >
-                <div className="qq-cubierta-icono">
-                  <Icon name={cubiertaLevantada ? 'eye' : 'lock'} size={44} strokeWidth={1.8} />
-                </div>
-                <h3 className="qq-cubierta-titulo">
-                  {cubiertaLevantada ? '¡Soltar para tapar!' : 'MANTÉN PULSADO PARA MIRAR'}
-                </h3>
-                <p className="qq-cubierta-sub">
-                  {cubiertaLevantada
-                    ? 'Viendo a tus compañeros...'
-                    : 'Mantén presionado para levantar la cubierta y ver qué personaje tiene cada jugador.'}
-                </p>
-              </div>
-
-              <div className="qq-tarjeta-grupal-interior">
-                <div className="qq-grupal-header">
-                  <span className="aprox-badge-pregunta">Personajes de tus compañeros</span>
-                  <p className="hint small" style={{ margin: '0.35rem 0 0' }}>
-                    Responde con Sí o No cuando te pregunten sobre su identidad:
-                  </p>
-                </div>
-
-                <div className="qq-filas-rivales-lista">
-                  {rivales.length > 0 ? (
-                    rivales.map((j) => (
-                      <div key={j.id} className="qq-fila-rival-item">
-                        <span className="qq-rival-nombre-label">{j.nombre}</span>
-                        <strong className="qq-rival-tarjeta-badge">{j.tarjeta}</strong>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="hint center" style={{ margin: '1rem 0' }}>
-                      Esperando a que otros jugadores tengan asignado su personaje...
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              className="big full qq-btn-pulsador-mirar"
-              onMouseDown={() => setCubiertaLevantada(true)}
-              onMouseUp={() => setCubiertaLevantada(false)}
-              onMouseLeave={() => setCubiertaLevantada(false)}
-              onTouchStart={() => setCubiertaLevantada(true)}
-              onTouchEnd={() => setCubiertaLevantada(false)}
-              onTouchCancel={() => setCubiertaLevantada(false)}
-              onContextMenu={(e) => e.preventDefault()}
-            >
-              <Icon name="eye" size={22} />
-              {cubiertaLevantada ? 'Soltar para tapar' : 'Mantén presionado aquí para mirar'}
-            </button>
-
-            {sala.esAdmin && (
-              <div className="qq-tablero-footer">
-                <button
-                  type="button"
-                  className="qq-link-otra-ronda"
-                  onClick={() => setModalOtraRonda(true)}
-                >
-                  <Icon name="refresh" size={16} /> Jugar otra ronda (cambiar categoría)
-                </button>
-              </div>
-            )}
-          </div>
-        </section>
+        <PantallaTablero
+          etiqueta="Tu identidad es secreta"
+          titulo={sala.jugadores.find((j) => j.esTu)?.nombre || 'Tu turno'}
+          colorTitulo={colorJugador((sala.jugadores.find((j) => j.esTu)?.id ?? 1) - 1)}
+          rivales={rivales}
+          categoria={sala.categoria}
+          onSalir={() => setModalSalirPortada(true)}
+          chips={<span className="qqp-chip"><Icon name="users" size={14} /> <span>{sala.jugadores.length}</span></span>}
+          vacio="Esperando a que los demás tengan asignado su personaje..."
+          pie={sala.esAdmin ? (
+            <EnlaceSecundario onClick={() => setModalOtraRonda(true)}>
+              <Icon name="refresh" size={16} /> Otra ronda (cambiar categoría)
+            </EnlaceSecundario>
+          ) : null}
+        />
       )}
 
       {/* MODAL: SALIR DE LA SALA DE ESPERA (LOBBY) */}
