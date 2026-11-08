@@ -1,0 +1,120 @@
+/* client/src/games/Guardian/Guardian.css */
+.gd-contenedor { width: 100%; }
+
+.gd-objetivo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.7rem;
+  padding: 0.55rem 0.9rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #0f172a;
+  font-weight: 800;
+}
+
+.gd-objetivo strong {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--g2);
+}
+
+.gd-puente {
+  position: relative;
+  padding: 0.5rem 0.6rem 0;
+}
+
+.gd-carga {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.2rem;
+  min-height: 44px;
+  font-size: 1.9rem;
+  transition: transform 0.9s ease-in;
+}
+
+.gd-carga em {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  font-style: normal;
+  font-weight: 700;
+  align-self: center;
+}
+
+.gd-carga span { animation: gdCaer 0.25s ease-out; }
+
+@keyframes gdCaer {
+  from { transform: translateY(-14px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+.gd-tablero {
+  height: 16px;
+  border-radius: 6px;
+  background: repeating-linear-gradient(90deg, #a16207 0 22px, #854d0e 22px 26px);
+  box-shadow: 0 5px 0 #422006;
+}
+
+.gd-puente.abierto .gd-carga { transform: translateX(120%); }
+
+.gd-objetos {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.gd-objeto {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  width: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0.6rem 0.3rem !important;
+  border: 3px solid transparent !important;
+  border-radius: 20px !important;
+  background: #ffffff !important;
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.22) !important;
+  color: #0f172a !important;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.gd-objeto.activo {
+  border-color: var(--g1) !important;
+  background: color-mix(in srgb, var(--g1) 14%, #ffffff) !important;
+  transform: translateY(3px);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.22) !important;
+}
+
+.gd-emoji { font-size: 2rem; line-height: 1.1; }
+.gd-nombre { font-size: 0.82rem; font-weight: 700; text-align: center; line-height: 1.15; }
+
+.gd-peso {
+  margin-top: 0.15rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.gd-objeto.globo .gd-peso { background: #0ea5e9; }
+
+.gd-reglas ul {
+  margin: 0.2rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.gd-reglas li {
+  margin: 0.3rem 0;
+  font-weight: 600;
+  line-height: 1.35;
+}

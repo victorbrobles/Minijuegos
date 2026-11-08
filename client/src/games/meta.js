@@ -8,10 +8,11 @@ export const CATEGORIAS_PORTADA = [
   { id: 'chill', titulo: '🌴 Para jugar de chill', desc: 'Risas, amigos, preguntas y pura diversión sin estrés' },
   { id: 'futbol', titulo: '⚽ Para amantes del fútbol', desc: 'Demuestra todo lo que sabes sobre el deporte rey' },
   { id: 'famosos', titulo: '🌟 De famosos y cultura pop', desc: 'Celebridades, cine, música, frases y televisión' },
-  { id: 'dos_jugadores', titulo: '👥 Para dos jugadores', desc: 'Ideales para competir o cooperar frente a frente' }
+  { id: 'dos_jugadores', titulo: '👥 Para dos jugadores', desc: 'Ideales para competir o cooperar frente a frente' },
+  { id: 'un_jugador', titulo: '🎯 Para un jugador', desc: 'Retos en solitario: lógica, memoria, estrategia y reflejos' }
 ];
 
-// Cada uno de los 36 minijuegos tiene un icono único y una combinación de colores (degradado) única
+// Cada uno de los minijuegos tiene un icono único y una combinación de colores (degradado) única
 export const META = {
   'bingoball': {
     titulo: 'Bingoball',
@@ -390,6 +391,78 @@ export const META = {
     etiquetas: 'geografia paises capitales fronteras idiomas banderas monumentos rios montañas mapas quiz trivial',
     descripcion: 'El quiz definitivo de geografía: capitales, fronteras, idiomas, banderas, ríos, monumentos y récords. Responde, enumera, ordena o deduce con pistas en cuatro modos de juego, ¡y demuestra quién conoce mejor el mundo!',
     categorias: ['prueba']
+  },
+  'verdaderofalso': {
+    titulo: '¿Verdadero o falso? Exprés',
+    imagen: '/covers/verdaderofalso.webp',
+    icono: 'verdaderofalso',
+    colores: ['#22c55e', '#be123c'],
+    etiquetas: 'verdadero falso rapido mitos cultura general reflejos un jugador solitario racha',
+    descripcion: 'Tres segundos por afirmación y el reloj nunca se detiene. ¿Verdadero o falso? Un solo fallo y se acabó: ¿hasta dónde llega tu racha?',
+    categorias: ['un_jugador']
+  },
+  'catador': {
+    titulo: 'El Catador de Mentiras',
+    imagen: '/covers/catador.webp',
+    icono: 'catador',
+    colores: ['#a855f7', '#1e1b4b'],
+    etiquetas: 'logica deduccion mentiras sospechosos culpable acertijo detective un jugador solitario',
+    descripcion: 'Cada sospechoso hace una declaración y sabes cuántos dicen la verdad. Razona, descarta y señala al único culpable posible.',
+    categorias: ['un_jugador']
+  },
+  'guardian': {
+    titulo: 'El Guardián del Puente',
+    imagen: '/covers/guardian.webp',
+    icono: 'guardian',
+    colores: ['#ca8a04', '#3f6212'],
+    etiquetas: 'peso exacto puente objetos calculo logica reglas acertijo un jugador solitario',
+    descripcion: 'El puente solo se abre con el peso exacto. Elige qué objetos cruzan… pero cuidado con sus peculiaridades: hay quien se empapa, quien se come al vecino y quien flota.',
+    categorias: ['un_jugador']
+  },
+  'pecera': {
+    titulo: '¿Qué sobra en la pecera?',
+    imagen: '/covers/pecera.webp',
+    icono: 'pecera',
+    colores: ['#67e8f9', '#1d4ed8'],
+    etiquetas: 'intruso sobra criterio oculto trampa observacion cultura un jugador solitario',
+    descripcion: 'Seis cosas en la pecera, cinco comparten un criterio secreto. Encuentra al intruso sin caer en la trampa: el que parece sobrar casi nunca es.',
+    categorias: ['un_jugador']
+  },
+  'criptohacker': {
+    titulo: 'Cripto-Hacker',
+    imagen: '/covers/criptohacker.webp',
+    icono: 'criptohacker',
+    colores: ['#4ade80', '#020617'],
+    etiquetas: 'codigo hacker deduccion mastermind rastreo logica servidores un jugador solitario',
+    descripcion: 'Descifra el código de cada servidor con pura deducción antes de que el rastreo de seguridad llegue al 100 %. Cada intento te delata un poco más.',
+    categorias: ['un_jugador']
+  },
+  'anomalias': {
+    titulo: 'Inspector de Anomalías',
+    imagen: '/covers/anomalias.webp',
+    icono: 'anomalias',
+    colores: ['#f59e0b', '#27272a'],
+    etiquetas: 'camara vigilancia diferencias memoria observacion anomalia habitacion un jugador solitario',
+    descripcion: 'Vigilas una habitación con una cámara fija. Memoriza la escena: cuando vuelva la señal, algo habrá cambiado. Tócalo antes de que acabe el tiempo.',
+    categorias: ['un_jugador']
+  },
+  'trinchera': {
+    titulo: 'Trinchera 1914',
+    imagen: '/covers/trinchera.webp',
+    icono: 'trinchera',
+    colores: ['#a3a380', '#3f2d1c'],
+    etiquetas: 'gestion recursos cartas decisiones moral guerra historia supervivencia un jugador solitario',
+    descripcion: 'Invierno de 1914. Gestiona la moral, la comida, la munición y la salud de tu compañía decisión a decisión. ¿Llegaréis vivos a Navidad?',
+    categorias: ['un_jugador']
+  },
+  'cronocourier': {
+    titulo: 'Crono-Courier',
+    imagen: '/covers/cronocourier.webp',
+    icono: 'cronocourier',
+    colores: ['#fb923c', '#0f766e'],
+    etiquetas: 'trafico ciudad semaforos programar puzle reparto tiempo choques un jugador solitario',
+    descripcion: 'Programa las salidas y los semáforos de la ciudad, pulsa Play y reza: tu furgoneta tiene que entregar a tiempo sin que nadie choque.',
+    categorias: ['un_jugador']
   }
 };
 

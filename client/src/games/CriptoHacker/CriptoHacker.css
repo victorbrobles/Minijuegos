@@ -1,0 +1,197 @@
+/* client/src/games/CriptoHacker/CriptoHacker.css */
+.ch-contenedor { width: 100%; }
+
+.ch-config {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.6rem;
+}
+
+.ch-config span {
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.ch-rastreo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.ch-rastreo-tit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: #e2e8f0;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.ch-terminal {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  max-height: 38vh;
+  min-height: 120px;
+  overflow-y: auto;
+  padding: 0.75rem;
+  border: 2px solid rgba(74, 222, 128, 0.35);
+  border-radius: 20px;
+  background: #020617;
+  box-shadow: inset 0 0 30px rgba(34, 197, 94, 0.12), 0 6px 0 rgba(0, 0, 0, 0.3);
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+}
+
+.ch-vacio {
+  margin: auto 0;
+  color: #4ade80;
+  font-size: 0.9rem;
+}
+
+.ch-intento {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  animation: chLinea 0.25s ease-out;
+}
+
+@keyframes chLinea {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: none; }
+}
+
+.ch-num {
+  color: #4ade80;
+  font-size: 0.78rem;
+  opacity: 0.7;
+}
+
+.ch-fila {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.ch-fila.centrada { justify-content: center; margin: 0.4rem 0; }
+
+.ch-celda {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 2px solid var(--c, #334155);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--c, #334155) 18%, #020617);
+  color: var(--c, #94a3b8);
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  font-size: 1.15rem;
+  font-weight: 800;
+  text-shadow: 0 0 8px color-mix(in srgb, var(--c, transparent) 70%, transparent);
+}
+
+.ch-celda.vacia {
+  border-style: dashed;
+  color: #475569;
+}
+
+.ch-celda.pista small {
+  color: #facc15;
+  font-size: 0.8rem;
+  opacity: 0.85;
+}
+
+.ch-leds {
+  display: grid;
+  grid-template-columns: repeat(3, 12px);
+  gap: 4px;
+  margin-left: auto;
+}
+
+.ch-led {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #1e293b;
+  border: 1px solid #334155;
+}
+
+.ch-led.ok { background: #22c55e; box-shadow: 0 0 8px #22c55e; border-color: #22c55e; }
+.ch-led.medio { background: #facc15; box-shadow: 0 0 8px #facc15; border-color: #facc15; }
+
+.ch-ayuda-led {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  vertical-align: middle;
+}
+
+.ch-ayuda-led.ok { background: #22c55e; }
+.ch-ayuda-led.medio { background: #facc15; }
+
+.ch-consola {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.8rem;
+  border-radius: 24px;
+  background: #0f172a;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.3);
+}
+
+.ch-actual {
+  justify-content: center;
+}
+
+.ch-actual .ch-celda {
+  width: 48px;
+  height: 48px;
+  font-size: 1.4rem;
+}
+
+.ch-teclado {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.45rem;
+}
+
+.ch-teclado.n6 { grid-template-columns: repeat(3, 1fr); }
+
+.ch-tecla {
+  width: 100% !important;
+  min-height: 52px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 2px solid var(--c) !important;
+  border-radius: 14px !important;
+  background: color-mix(in srgb, var(--c) 20%, #0f172a) !important;
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--c) 45%, #000000) !important;
+  color: var(--c) !important;
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace !important;
+  font-size: 1.35rem !important;
+  font-weight: 800 !important;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.ch-tecla:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--c) 45%, #000000) !important;
+}
+
+.ch-controles {
+  display: grid;
+  grid-template-columns: 1.2fr 0.6fr 1.2fr;
+  gap: 0.45rem;
+}
+
+.ch-controles .uj-boton { min-height: 48px; padding: 0.5rem !important; font-size: 0.95rem !important; }
+
+.ch-exito { text-align: center; border-top: 6px solid #22c55e; }
+.ch-exito h3 { margin: 0.2rem 0 0.4rem; }
+.ch-exito .uj-boton { margin-top: 0.6rem !important; }

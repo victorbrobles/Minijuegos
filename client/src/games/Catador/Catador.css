@@ -1,0 +1,136 @@
+/* client/src/games/Catador/Catador.css */
+.ct-contenedor { width: 100%; }
+
+.ct-pista {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.6rem 0 0;
+  padding: 0.45rem 0.8rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #0f172a;
+  font-weight: 800;
+}
+
+.ct-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.ct-sospechoso {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.7rem;
+  border: 3px solid transparent;
+  border-radius: 22px;
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 5px 0 rgba(0, 0, 0, 0.22);
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.ct-sospechoso.elegido {
+  border-color: #ef4444;
+  transform: translateY(-2px);
+}
+
+.ct-sospechoso.culpable {
+  border-color: #f59e0b;
+  background: #fffbeb;
+}
+
+.ct-persona {
+  display: flex !important;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: none !important;
+  box-shadow: none !important;
+  color: inherit !important;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ct-persona:disabled { cursor: default; opacity: 1; }
+
+.ct-avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--g1) 14%, #ffffff);
+  font-size: 1.8rem;
+}
+
+.ct-sospechoso.elegido .ct-avatar { background: #fee2e2; }
+
+.ct-nombre {
+  display: flex;
+  flex-direction: column;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.ct-nombre small {
+  color: #64748b;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.ct-bocadillo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 16px;
+  background: #f1f5f9;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.ct-nota {
+  flex: none;
+  width: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0.35rem 0.65rem !important;
+  border: 1.5px dashed #94a3b8 !important;
+  border-radius: 999px !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+  color: #64748b !important;
+  font-size: 0.78rem !important;
+  font-weight: 800 !important;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.ct-nota.verdad {
+  border: 1.5px solid #22c55e !important;
+  background: #dcfce7 !important;
+  color: #15803d !important;
+}
+
+.ct-nota.mentira {
+  border: 1.5px solid #ef4444 !important;
+  background: #fee2e2 !important;
+  color: #b91c1c !important;
+}
+
+span.ct-nota { display: inline-block; }
+
+.ct-veredicto { border-top: 6px solid #22c55e; text-align: center; }
+.ct-veredicto.mal { border-top-color: #ef4444; }
+.ct-veredicto h3 { margin: 0.2rem 0; font-size: 1.25rem; }

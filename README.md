@@ -68,7 +68,7 @@ npm run dev
 - Las composiciones (`composiciones.js`) priorizan los roles nuevos; la «Clásica» es la única que solo usa roles clásicos.
 
 ## Minijuego: GeoQuiz
-- Quiz de geografía por turnos (local en un dispositivo u online, de 1 a 12 jugadores). Se sortea quién empieza y luego se sigue el orden;
+- Quiz de geografía por turnos (local en un dispositivo u online, de 2 a 12 jugadores). Se sortea quién empieza y luego se sigue el orden;
   cada turno empieza con la pantalla «Turno de…» y el botón «Listo».
 - Modos: **GeoMix** (todo mezclado), **Especialista** (una categoría), **Contrarreloj** (60 s por turno con preguntas rápidas) y
   **Supervivencia** (3 vidas, gana el último en pie).
@@ -76,3 +76,16 @@ npm run dev
 - Reglas en `server/geoquiz/engine.js`, con una **copia idéntica** en `client/src/games/GeoQuiz/engine.js` para el modo local (cambia las dos a la vez).
 - Preguntas en `server/data/seeds/geoquiz/` (un fichero por categoría; formato explicado en `_tipos.js`). Las respuestas admiten alias
   separados por `|` (`'Países Bajos|Holanda'`); al comprobarlas se ignoran tildes, mayúsculas y artículos y se perdonan pequeñas erratas.
+
+## Juegos para un jugador (categoría «🎯 Para un jugador»)
+- Son solo frontend y guardan el récord en el navegador (`localStorage`, clave `minijuegos_record_<id>`).
+- Piezas comunes en `client/src/components/UnJugador.jsx` (+ `UnJugador.css`): portada con récord (`PortadaUnJugador`), cabecera de partida,
+  pantalla final, ayuda, confirmar salida, avisos, barra de tiempo y `useRecord`. Usan los colores de cada juego de `meta.js`.
+- **¿Verdadero o falso? Exprés** (`VerdaderoFalso/`): 3 s por afirmación sin pausa; un fallo termina la partida. Afirmaciones en `afirmaciones.js` (`[texto, esVerdadera, explicación]`).
+- **El Catador de Mentiras** (`Catador/`): `motor.js` genera casos aleatorios y los resuelve por fuerza bruta para que solo haya un culpable posible.
+- **El Guardián del Puente** (`Guardian/`): `motor.js` genera 6 objetos y reglas (incompatibles, obligatorios, pesa el doble, no pesa, globo que resta, máximo/mínimo de objetos) y elige un peso con una única combinación válida.
+- **¿Qué sobra en la pecera?** (`Pecera/`): retos escritos a mano en `retos.js` (6 elementos, intruso, trampa y explicaciones).
+- **Cripto-Hacker** (`CriptoHacker/`): deducción tipo Mastermind; cada intento y el tiempo suben el rastreo hasta el 100 %.
+- **Inspector de Anomalías** (`Anomalias/`): salas y objetos en `salas.js`; los cambios son más sutiles cuanto más alto es el nivel.
+- **Trinchera 1914** (`Trinchera/`): cartas en `cartas.js` (efectos `m`/`c`/`u`/`s`, con historias encadenadas mediante `activa`/`requiere`) y reglas en `motor.js`.
+- **Crono-Courier** (`CronoCourier/`): `motor.js` genera la ciudad, simula salidas y semáforos y solo acepta niveles que chocan sin programar y tienen solución.

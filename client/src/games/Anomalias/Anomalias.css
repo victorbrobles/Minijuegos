@@ -1,0 +1,158 @@
+/* client/src/games/Anomalias/Anomalias.css */
+.an-contenedor { width: 100%; }
+
+.an-camara {
+  position: relative;
+  overflow: hidden;
+  border: 4px solid #0f172a;
+  border-radius: 22px;
+  background: #0f172a;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.35);
+  container-type: inline-size;
+}
+
+.an-sala {
+  --ancho: 100cqw;
+  position: relative;
+  aspect-ratio: 4 / 3.4;
+  background:
+    linear-gradient(180deg, var(--pared1) 0%, var(--pared2) 60%, transparent 60%),
+    repeating-linear-gradient(90deg, var(--suelo1) 0 12%, var(--suelo2) 12% 12.6%);
+}
+
+.an-sala::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 60%;
+  height: 3%;
+  background: rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+}
+
+.an-ventana {
+  position: absolute;
+  border: 5px solid #ffffff;
+  border-radius: 6px;
+  background:
+    linear-gradient(#ffffff, #ffffff) center / 4px 100% no-repeat,
+    linear-gradient(#ffffff, #ffffff) center / 100% 4px no-repeat,
+    linear-gradient(180deg, #38bdf8, #bae6fd);
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.08);
+}
+
+.an-obj {
+  position: absolute;
+  display: grid !important;
+  place-items: center;
+  width: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0.12em !important;
+  border: none !important;
+  border-radius: 30% !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  line-height: 1;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  filter: drop-shadow(0 3px 2px rgba(0, 0, 0, 0.25));
+}
+
+.an-obj span { display: block; line-height: 1; }
+.an-obj:disabled { cursor: default; opacity: 1; }
+
+/* Objeto desaparecido: sigue siendo tocable donde estaba */
+.an-obj.oculto span { visibility: hidden; }
+
+.an-obj.objetivo {
+  outline: 4px solid #22c55e;
+  outline-offset: 2px;
+  background: rgba(34, 197, 94, 0.25) !important;
+  animation: anParpadeo 0.8s ease-in-out infinite;
+}
+
+.an-obj.objetivo.oculto span { visibility: visible; opacity: 0.35; }
+
+.an-obj.fallo {
+  outline: 4px solid #ef4444;
+  outline-offset: 2px;
+  background: rgba(239, 68, 68, 0.25) !important;
+}
+
+@keyframes anParpadeo {
+  50% { outline-color: rgba(34, 197, 94, 0.3); }
+}
+
+.an-hud {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.4rem;
+  padding: 0.45rem 0.6rem;
+  color: #ffffff;
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-shadow: 0 1px 2px #000000;
+  pointer-events: none;
+}
+
+.an-hud.abajo { top: auto; bottom: 0; }
+
+.an-rec {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 3px;
+  border-radius: 50%;
+  background: #ef4444;
+  animation: anRec 1s steps(2) infinite;
+}
+
+@keyframes anRec { 50% { opacity: 0; } }
+
+.an-camara::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(180deg, rgba(0, 0, 0, 0.05) 0 2px, transparent 2px 4px);
+  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.35);
+}
+
+.an-camara.fase-buscar { border-color: #f59e0b; }
+
+.an-ruido {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background:
+    repeating-radial-gradient(circle at 17% 32%, #ffffff 0 1px, #111111 1px 3px),
+    repeating-linear-gradient(0deg, #444444 0 2px, #999999 2px 3px);
+  background-size: 7px 7px, 100% 5px;
+  animation: anRuido 0.12s steps(3) infinite;
+}
+
+@keyframes anRuido {
+  0% { background-position: 0 0, 0 0; }
+  50% { background-position: 3px 5px, 0 2px; }
+  100% { background-position: -4px 2px, 0 4px; }
+}
+
+.an-resultado { text-align: center; border-top: 6px solid #22c55e; }
+.an-resultado.mal { border-top-color: #ef4444; }
+
+.an-cambio {
+  margin: 0.2rem 0 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .an-ruido, .an-obj.objetivo, .an-rec { animation: none; }
+}

@@ -168,14 +168,14 @@ export default function GeoQuizOnline({ onLocal, onSalir, onAbrirAyuda }) {
       {vista === 'sala' && sala?.estado === 'lobby' && (
         <section className="game qq-pantalla">
           <CabeceraSala codigo={sala.code} onVolver={() => setModalSalir(true)} onAyuda={ayuda} />
-          <ListaSala jugadores={sala.jugadores} yoId={sala.yoId} max={MAX_JUGADORES} min={1} />
+          <ListaSala jugadores={sala.jugadores} yoId={sala.yoId} max={MAX_JUGADORES} min={2} />
 
           {sala.esAdmin ? (
             <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
               <h3 className="qq-sala-titulo"><Icon name="settings" size={20} /> Partida</h3>
               <GeoQuizConfig config={sala.config} categorias={categorias} onCambiar={(config) => llamar('config', { config })} />
-              <button type="button" className="big full qq-btn-principal" style={{ marginTop: '1.4rem' }} onClick={() => llamar('iniciar')}>
-                <Icon name="play" size={22} /> ¡Empezar GeoQuiz!
+              <button type="button" className="big full qq-btn-principal" style={{ marginTop: '1.4rem' }} disabled={sala.jugadores.length < 2} onClick={() => llamar('iniciar')}>
+                <Icon name="play" size={22} /> {sala.jugadores.length < 2 ? 'Esperando jugadores…' : '¡Empezar GeoQuiz!'}
               </button>
             </div>
           ) : (

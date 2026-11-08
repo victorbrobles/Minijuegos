@@ -1,0 +1,188 @@
+/* client/src/games/Trinchera/Trinchera.css */
+.tn-contenedor { width: 100%; }
+
+.tn-progreso {
+  position: relative;
+  height: 10px;
+  margin: 0.7rem 1.4rem 0.1rem 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.tn-progreso span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #ffffff;
+  transition: width 0.4s ease;
+}
+
+.tn-progreso em {
+  position: absolute;
+  right: -1.5rem;
+  top: 50%;
+  font-style: normal;
+  transform: translateY(-55%);
+}
+
+.tn-recursos {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.tn-recurso {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.2rem 0.4rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #0f172a;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.25);
+}
+
+.tn-medidor {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 56px;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #e2e8f0;
+}
+
+.tn-medidor span {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, #84cc16, #4d7c0f);
+  transition: height 0.45s ease;
+}
+
+.tn-recurso.peligro .tn-medidor span { background: linear-gradient(180deg, #f87171, #b91c1c); }
+.tn-recurso.peligro { animation: tnLatir 1s ease-in-out infinite; }
+
+@keyframes tnLatir { 50% { box-shadow: 0 4px 0 rgba(0, 0, 0, 0.25), 0 0 0 3px #ef4444; } }
+
+.tn-medidor b {
+  position: relative;
+  font-size: 1.5rem;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.3));
+}
+
+.tn-nombre {
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.tn-cambio {
+  position: absolute;
+  top: -0.5rem;
+  right: 0.1rem;
+  padding: 0.05rem 0.4rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 900;
+  color: #ffffff;
+  animation: tnFlotar 1.6s ease-out forwards;
+}
+
+.tn-cambio.sube { background: #16a34a; }
+.tn-cambio.baja { background: #dc2626; }
+
+@keyframes tnFlotar {
+  0% { transform: translateY(6px) scale(0.6); opacity: 0; }
+  15% { transform: none; opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translateY(-8px); opacity: 0; }
+}
+
+.tn-carta {
+  background: linear-gradient(180deg, #fefce8 0%, #fef3c7 100%);
+  border: 2px solid #d6c08d;
+  animation: tnCarta 0.3s ease-out;
+}
+
+@keyframes tnCarta {
+  from { transform: translateY(14px) rotate(-1.5deg); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+.tn-quien {
+  margin: 0 0 0.4rem;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+
+.tn-texto {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.45;
+  color: #3f3a2a;
+}
+
+.tn-opciones {
+  display: grid;
+  gap: 0.55rem;
+  padding-bottom: calc(0.6rem + env(safe-area-inset-bottom));
+}
+
+.tn-opcion {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  width: 100% !important;
+  min-height: 60px;
+  margin: 0 !important;
+  padding: 0.75rem 1rem !important;
+  border: none !important;
+  border-radius: 18px !important;
+  background: linear-gradient(135deg, var(--g1), var(--g2)) !important;
+  box-shadow: 0 5px 0 color-mix(in srgb, var(--g2) 55%, #000000) !important;
+  color: #ffffff !important;
+  font-size: 1rem !important;
+  font-weight: 800 !important;
+  text-align: left;
+  cursor: pointer;
+}
+
+.tn-opcion.b {
+  background: #ffffff !important;
+  color: #1e293b !important;
+  box-shadow: 0 5px 0 #cbd5e1 !important;
+}
+
+.tn-opcion:active {
+  transform: translateY(4px);
+}
+
+.tn-puntos {
+  display: inline-flex;
+  flex: none;
+  gap: 0.15rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.tn-opcion.b .tn-puntos { background: #f1f5f9; }
+
+.tn-punto { font-size: 0.75rem; opacity: 0.9; }
+.tn-punto.grande { font-size: 1.05rem; }
+
+.tn-final {
+  margin: 0.8rem 0 0;
+  color: #334155;
+  line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tn-recurso.peligro, .tn-carta, .tn-cambio { animation: none; }
+}
