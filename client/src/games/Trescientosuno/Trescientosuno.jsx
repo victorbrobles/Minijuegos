@@ -14,6 +14,7 @@ export default function Trescientosuno({ onExit }) {
   const [mostrarAyuda, setMostrarAyuda] = useState(false);
   const navigate = useNavigate();
 
+  // Redirección infalible a la portada
   const irAPortada = () => {
     if (typeof onExit === 'function') {
       onExit();
@@ -44,51 +45,46 @@ export default function Trescientosuno({ onExit }) {
         />
       )}
 
-      {/* MODAL DE AYUDA GLOBAL */}
+      {/* MODAL DE AYUDA UNIFICADO */}
       {mostrarAyuda && (
         <div className="rg-modal-fondo" onClick={() => setMostrarAyuda(false)}>
           <div
-            className="rg-modal aprox-modal-ayuda"
+            className="rg-modal qq-modal-ayuda"
             onClick={(e) => e.stopPropagation()}
-            style={{ maxWidth: '560px', textAlign: 'left', padding: '1.4rem' }}
           >
-            <div className="aprox-modal-header" style={{ marginBottom: '1rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.6rem' }}>
-              <span className="aprox-modal-signo-title">?</span>
-              <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#1e1b4b' }}>¿Cómo se juega a 301 Goles?</h3>
+            <div className="qq-modal-ayuda-header">
+              <span className="qq-ayuda-badge">❓ Cómo jugar</span>
+              <h3>{TITULO_JUEGO}</h3>
             </div>
 
-            <div className="aprox-modal-cuerpo" style={{ fontSize: '0.92rem', lineHeight: '1.5', color: '#334155' }}>
-              <p style={{ marginTop: 0, marginBottom: '1rem' }}>{DESCRIPCION_JUEGO}</p>
-              
-              <div style={{ marginBottom: '1.1rem' }}>
-                <h4 style={{ color: '#0f172a', margin: '0 0 0.3rem', fontSize: '1rem' }}>⚽ Dinámica</h4>
-                <ul style={{ paddingLeft: '1.2rem', margin: '0.3rem 0' }}>
-                  <li style={{ marginBottom: '0.35rem' }}>Se selecciona un equipo y una estadística a restar (Goles, Asistencias o Partidos jugados).</li>
-                  <li style={{ marginBottom: '0.35rem' }}>Por turnos, introduce el nombre de un jugador que haya estado en ese club. Se restará su cifra histórica de tu marcador.</li>
-                  <li style={{ marginBottom: '0.35rem' }}>Dispones de <strong>60 segundos</strong> por turno. Si no lo aciertas o el jugador no existe, conservarás tu turno para seguir probando.</li>
-                </ul>
-              </div>
+            <div className="qq-modal-ayuda-body">
+              <p>{DESCRIPCION_JUEGO}</p>
+              <ul>
+                <li>
+                  <strong>Dinámica (60 s):</strong> Elige un club o selección y una estadística (Goles, Asistencias o Partidos). Por turnos, nombra futbolistas que hayan jugado en ese equipo para restar su cifra de tu marcador.
+                </li>
+                <li>
+                  <strong>Comodines:</strong> Dispones de 4 comodines por partida (<strong>x2</strong>, <strong>x3</strong>, <strong>x5</strong> y <strong>🔍 Revelar</strong>) para multiplicar tu resta o elegir entre respuestas sugeridas.
+                </li>
+                <li>
+                  <strong>Plantarse o eliminación:</strong> Puedes plantarte en cualquier turno para asegurar tu puntuación. Si te pasas de 0 o nombras a un jugador con 0 en esa estadística, quedas eliminado.
+                </li>
+              </ul>
 
-              <div style={{ marginBottom: '1.1rem' }}>
-                <h4 style={{ color: '#0f172a', margin: '0 0 0.3rem', fontSize: '1rem' }}>⭐ Comodines</h4>
-                <ul style={{ paddingLeft: '1.2rem', margin: '0.3rem 0' }}>
-                  <li style={{ marginBottom: '0.35rem' }}>Tienes 4 comodines (x2, x3, x5 y Revelar). Úsalos antes de escribir un jugador para multiplicar su valor o revelar una respuesta válida.</li>
-                </ul>
-              </div>
-
-              <div>
-                <h4 style={{ color: '#0f172a', margin: '0 0 0.3rem', fontSize: '1rem' }}>❌ Eliminación</h4>
-                <ul style={{ paddingLeft: '1.2rem', margin: '0.3rem 0' }}>
-                  <li>¡Cuidado! Si te pasas del 0 exacto, o nombras a un jugador con 0 en esa estadística, quedas eliminado.</li>
-                </ul>
+              <div className="tcu-ayuda-chips">
+                <span className="tcu-ayuda-chip ok">🎯 Objetivo: clavar el 0</span>
+                <span className="tcu-ayuda-chip warn">🛑 Plantarse: conserva puntos</span>
+                <span className="tcu-ayuda-chip danger">💀 &lt; 0 o estadística 0: eliminado</span>
               </div>
             </div>
 
-            <div className="rg-modal-acciones" style={{ marginTop: '1.2rem' }}>
-              <button type="button" className="big full qq-btn-principal" onClick={() => setMostrarAyuda(false)}>
-                Entendido
-              </button>
-            </div>
+            <button
+              type="button"
+              className="big full qq-btn-principal"
+              onClick={() => setMostrarAyuda(false)}
+            >
+              ¡Entendido!
+            </button>
           </div>
         </div>
       )}

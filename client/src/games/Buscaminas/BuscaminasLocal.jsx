@@ -25,7 +25,6 @@ const COLORES_CATEGORIA = [
    COMPONENTES DE TABLERO COMPARTIDOS
    ========================================================================== */
 
-// Aviso flotante idéntico al de ConectaPartida.jsx
 export function Aviso({ evento }) {
   const [visible, setVisible] = useState(null);
   const ultimo = useRef(evento?.n ?? 0);
@@ -256,7 +255,6 @@ export default function BuscaminasLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [explosionModal, setExplosionModal] = useState(null);
   const [motivoFinRonda, setMotivoFinRonda] = useState('');
 
-  // Estado para el aviso flotante de éxito (estilo Conecta)
   const [eventoAviso, setEventoAviso] = useState(null);
   const avisoSeqRef = useRef(0);
 
@@ -365,8 +363,6 @@ export default function BuscaminasLocal({ onVolver, onExit, onAbrirAyuda }) {
       proxIndice = (proxIndice + 1) % ordenTurnoRonda.length;
     }
 
-    // Si solo queda 1 jugador vivo y ya tiene el turno en pantalla,
-    // no mostramos la pantalla intermedia de "Pasad el móvil": solo reiniciamos su tiempo.
     if (proxIndice === indiceTurno && fase === 'jugando') {
       setTurnoTick((t) => t + 1);
       return;
@@ -425,7 +421,6 @@ export default function BuscaminasLocal({ onVolver, onExit, onAbrirAyuda }) {
         [jugadorActivo.id]: (prev[jugadorActivo.id] || 0) + casilla.puntos
       }));
 
-      // Mostrar mensaje de éxito en pantalla (imitando a Conecta)
       avisoSeqRef.current += 1;
       setEventoAviso({
         n: avisoSeqRef.current,
@@ -484,10 +479,9 @@ export default function BuscaminasLocal({ onVolver, onExit, onAbrirAyuda }) {
 
   return (
     <div className={`bm-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
-      {/* Aviso flotante de acierto (estilo Conecta) */}
       <Aviso evento={eventoAviso} />
 
-      {/* 1. CONFIGURACIÓN DE JUGADORES */}
+      {/* 1. CONFIGURACIÓN DE JUGADORES (Con botón de ayuda) */}
       {fase === 'setup' && (
         <section className="game">
           <div className="panel qq-menu-panel">
@@ -592,7 +586,7 @@ export default function BuscaminasLocal({ onVolver, onExit, onAbrirAyuda }) {
         </section>
       )}
 
-      {/* 2. SELECTOR DE CATEGORÍA */}
+      {/* 2. SELECTOR DE CATEGORÍA (Última pantalla con botón de ayuda) */}
       {fase === 'categoria' && (
         <SelectorCategorias
           categorias={categorias}
@@ -605,12 +599,11 @@ export default function BuscaminasLocal({ onVolver, onExit, onAbrirAyuda }) {
         />
       )}
 
-      {/* 3. PANTALLA PASAR EL MÓVIL */}
+      {/* 3. PANTALLA PASAR EL MÓVIL (Sin botón de ayuda) */}
       {fase === 'pasar_turno' && jugadorActivo && (
         <section className="game qqp-escena">
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
-            onAyuda={onAbrirAyuda}
             categoria={categoriaElegida}
             etiqueta={`Ronda ${rondaActual} de ${MAX_RONDAS}`}
             titulo="Pasad el móvil"
@@ -640,12 +633,11 @@ export default function BuscaminasLocal({ onVolver, onExit, onAbrirAyuda }) {
         </section>
       )}
 
-      {/* 4. TABLERO EN JUEGO */}
+      {/* 4. TABLERO EN JUEGO (Sin botón de ayuda) */}
       {fase === 'jugando' && jugadorActivo && (
         <section className="game qqp-escena">
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
-            onAyuda={onAbrirAyuda}
             categoria={categoriaElegida}
             etiqueta={`Ronda ${rondaActual} de ${MAX_RONDAS} · Turno activo`}
             titulo={jugadorActivo.nombre}
@@ -744,7 +736,7 @@ export default function BuscaminasLocal({ onVolver, onExit, onAbrirAyuda }) {
         </section>
       )}
 
-      {/* 5. FIN DE RONDA */}
+      {/* 5. FIN DE RONDA (Sin botón de ayuda) */}
       {fase === 'ronda_fin' && (
         <section className="game qqp-escena">
           <Cabecera
@@ -819,7 +811,7 @@ export default function BuscaminasLocal({ onVolver, onExit, onAbrirAyuda }) {
         </section>
       )}
 
-      {/* 6. PODIO FINAL */}
+      {/* 6. PODIO FINAL (Sin botón de ayuda) */}
       {fase === 'final' && (
         <section className="game qqp-escena">
           <Cabecera

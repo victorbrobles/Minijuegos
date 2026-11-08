@@ -3,101 +3,22 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import './Trescientosuno.css';
-import '../Adivina/Adivina.css';
+import {
+  Aviso,
+  BotonPortada,
+  Cabecera,
+  Avatar,
+  EscudoEquipo,
+  OrdenTurnos,
+  TarjetaEquipo,
+  BotonPrincipal,
+  EnlaceSecundario,
+  colorJugador,
+  indiceColor
+} from './TrescientosunoLocal.jsx';
 
 const CLAVE_SESION_trescientosuno = 'trescientosuno_online_session';
 const TIEMPO_TURNO = 60;
-
-const ESCUDOS_MAP = {
-  // Clubes y selecciones de la BD (sin cambios)
-  barcelona: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
-  fcbarcelona: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
-  madrid: "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg",
-  realmadrid: "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg",
-  atletico: "https://assets.football-logos.cc/logos/spain/512x512/atletico-madrid.0e6714cc.png",
-  atleticomadrid: "https://assets.football-logos.cc/logos/spain/512x512/atletico-madrid.0e6714cc.png",
-  atleticodemadrid: "https://assets.football-logos.cc/logos/spain/512x512/atletico-madrid.0e6714cc.png",
-  manutd: "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg",
-  manunited: "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg",
-  manchesterunited: "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg",
-  mancity: "https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg",
-  manchestercity: "https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg",
-  liverpool: "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg",
-  chelsea: "https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg",
-  arsenal: "https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg",
-  tottenham: "https://upload.wikimedia.org/wikipedia/en/b/b4/Tottenham_Hotspur.svg",
-  spurs: "https://upload.wikimedia.org/wikipedia/en/b/b4/Tottenham_Hotspur.svg",
-  psg: "https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg",
-  parissaintgermain: "https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg",
-  bayern: "https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg",
-  bayernmunchen: "https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg",
-  dortmund: "https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_logo.svg",
-  juventus: "https://assets.football-logos.cc/logos/italy/512x512/juventus.4efced70.png",
-  inter: "https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg",
-  milan: "https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg",
-  roma: "https://upload.wikimedia.org/wikipedia/en/f/f7/AS_Roma_logo_%282017%29.svg",
-  napoli: "https://assets.football-logos.cc/logos/italy/512x512/napoli.cbf9f0a6.png",
-  napoles: "https://assets.football-logos.cc/logos/italy/512x512/napoli.cbf9f0a6.png",
-  sevilla: "https://upload.wikimedia.org/wikipedia/en/3/3b/Sevilla_FC_logo.svg",
-  valencia: "https://upload.wikimedia.org/wikipedia/en/c/ce/Valenciacf.svg",
-  villarreal: "https://assets.football-logos.cc/logos/spain/512x512/villarreal.dca647c8.png",
-  sociedad: "https://upload.wikimedia.org/wikipedia/en/f/f1/Real_Sociedad_logo.svg",
-  realsociedad: "https://upload.wikimedia.org/wikipedia/en/f/f1/Real_Sociedad_logo.svg",
-  betis: "https://assets.football-logos.cc/logos/spain/512x512/real-betis.ff95aa03.png",
-  realbetis: "https://assets.football-logos.cc/logos/spain/512x512/real-betis.ff95aa03.png",
-  athletic: "https://upload.wikimedia.org/wikipedia/en/9/98/Club_Athletic_Bilbao_logo.svg",
-  athleticbilbao: "https://upload.wikimedia.org/wikipedia/en/9/98/Club_Athletic_Bilbao_logo.svg",
-  athleticclub: "https://upload.wikimedia.org/wikipedia/en/9/98/Club_Athletic_Bilbao_logo.svg",
-  porto: "https://upload.wikimedia.org/wikipedia/en/f/f1/FC_Porto.svg",
-  benfica: "https://upload.wikimedia.org/wikipedia/en/a/a2/SL_Benfica_logo.svg",
-  sporting: "https://upload.wikimedia.org/wikipedia/en/e/e1/Sporting_Clube_de_Portugal_%28Logo%29.svg",
-  ajax: "https://upload.wikimedia.org/wikipedia/en/7/79/Ajax_Amsterdam.svg",
-  miami: "https://upload.wikimedia.org/wikipedia/en/5/5c/Inter_Miami_CF_logo.svg",
-  intermiami: "https://upload.wikimedia.org/wikipedia/en/5/5c/Inter_Miami_CF_logo.svg",
-  monaco: "https://upload.wikimedia.org/wikipedia/en/b/ba/AS_Monaco_FC.svg",
-  lyon: "https://upload.wikimedia.org/wikipedia/en/c/c6/Olympique_Lyonnais.svg",
-  marseille: "https://upload.wikimedia.org/wikipedia/commons/d/d8/Olympique_Marseille_logo.svg",
-  river: "https://upload.wikimedia.org/wikipedia/commons/a/ac/Escudo_del_C_A_River_Plate.svg",
-  riverplate: "https://upload.wikimedia.org/wikipedia/commons/a/ac/Escudo_del_C_A_River_Plate.svg",
-  boca: "https://upload.wikimedia.org/wikipedia/commons/4/41/CABJ_escudo.svg",
-  bocajuniors: "https://upload.wikimedia.org/wikipedia/commons/4/41/CABJ_escudo.svg",
-  depor: "https://assets.football-logos.cc/logos/spain/512x512/deportivo-la-coruna.2a147b0c.png",
-  deportivo: "https://assets.football-logos.cc/logos/spain/512x512/deportivo-la-coruna.2a147b0c.png",
-  deportivodelacoruna: "https://assets.football-logos.cc/logos/spain/512x512/deportivo-la-coruna.2a147b0c.png",
-  celta: "https://upload.wikimedia.org/wikipedia/en/1/12/RC_Celta_de_Vigo_logo.svg",
-  celtadevigo: "https://upload.wikimedia.org/wikipedia/en/1/12/RC_Celta_de_Vigo_logo.svg",
-  espanyol: "https://upload.wikimedia.org/wikipedia/en/d/d6/Rcd_espanyol_logo.svg",
-  getafe: "https://upload.wikimedia.org/wikipedia/en/4/46/Getafe_logo.svg",
-  getafecf: "https://upload.wikimedia.org/wikipedia/en/4/46/Getafe_logo.svg",
-  zaragoza: "https://assets.football-logos.cc/logos/spain/512x512/zaragoza.966d5396.png",
-  osasuna: "https://assets.football-logos.cc/logos/spain/512x512/osasuna.44c61200.png",
-  alemania: "https://upload.wikimedia.org/wikipedia/en/e/e3/DFBEagle.svg",
-  seleccionalemana: "https://upload.wikimedia.org/wikipedia/en/e/e3/DFBEagle.svg",
-  argentina: "https://assets.football-logos.cc/logos/argentina/512x512/argentina-national-team.5c235057.png",
-  seleccionargentina: "https://assets.football-logos.cc/logos/argentina/512x512/argentina-national-team.5c235057.png",
-  brasil: "https://assets.football-logos.cc/logos/brazil/512x512/brazil-national-team.004213f2.png",
-  seleccionbrasilena: "https://assets.football-logos.cc/logos/brazil/512x512/brazil-national-team.004213f2.png",
-  espana: "https://assets.football-logos.cc/logos/spain/512x512/spain-national-team.4ad85efc.png",
-  seleccionespanola: "https://assets.football-logos.cc/logos/spain/512x512/spain-national-team.4ad85efc.png",
-  francia: "https://assets.football-logos.cc/logos/france/512x512/france-national-team.a17f83af.png",
-  seleccionfrancesa: "https://assets.football-logos.cc/logos/france/512x512/france-national-team.a17f83af.png",
-  holanda: "https://upload.wikimedia.org/wikipedia/en/7/78/Netherlands_national_football_team_logo.svg",
-  seleccionholandesa: "https://upload.wikimedia.org/wikipedia/en/7/78/Netherlands_national_football_team_logo.svg",
-  inglaterra: "https://assets.football-logos.cc/logos/england/512x512/england-national-team.daba5ba0.png",
-  seleccioninglesa: "https://assets.football-logos.cc/logos/england/512x512/england-national-team.daba5ba0.png",
-  italia: "https://assets.football-logos.cc/logos/italy/512x512/italy-national-team.2d467c1f.png",
-  seleccionitaliana: "https://assets.football-logos.cc/logos/italy/512x512/italy-national-team.2d467c1f.png",
-  portugal: "https://assets.football-logos.cc/logos/portugal/512x512/portuguese-football-federation.1a0b6707.png",
-  seleccionportuguesa: "https://assets.football-logos.cc/logos/portugal/512x512/portuguese-football-federation.1a0b6707.png"
-};
-
-const getLogoUrl = (eq) => {
-  if (!eq) return null;
-  const normalizar = (str) => String(str || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, '');
-  const idKey = normalizar(eq.id);
-  const nameKey = normalizar(eq.nombre);
-  return ESCUDOS_MAP[idKey] || ESCUDOS_MAP[nameKey] || null;
-};
 
 function BotonVolver({ onClick, texto = 'Volver' }) {
   return (
@@ -110,6 +31,31 @@ function BotonVolver({ onClick, texto = 'Volver' }) {
   );
 }
 
+// Construye el mensaje completo con la cifra y la estadística restada
+function formatearTextoEvento(ev, sala) {
+  if (!ev || !ev.mensaje) return '';
+  const stat = sala?.configuracion?.estadistica || 'puntos';
+  const jEvento = sala?.jugadores?.find((j) => j.id === ev.jugadorId);
+
+  if ((ev.tipo === 'acierto' || ev.tipo === 'ganador') && ev.valor != null) {
+    const baseLimpia = String(ev.mensaje).replace(/[¡!]/g, '').trim();
+    const yaIncluyeValor = String(ev.mensaje).includes(String(ev.valor));
+
+    if (ev.tipo === 'ganador') {
+      return yaIncluyeValor
+        ? ev.mensaje
+        : `¡DIANA! ${baseLimpia} resta ${ev.valor} ${stat}. ¡${jEvento ? jEvento.nombre : 'Jugador'} ha clavado el 0!`;
+    }
+
+    const restoTxt = jEvento != null ? ` (quedan ${jEvento.puntuacionActual})` : '';
+    return yaIncluyeValor
+      ? `${ev.mensaje}${restoTxt}`
+      : `¡${baseLimpia} resta ${ev.valor} ${stat}!${restoTxt}`;
+  }
+
+  return ev.mensaje;
+}
+
 export default function TrescientosunoOnline({
   tituloJuego = '301 Goles',
   descripcionJuego,
@@ -118,14 +64,13 @@ export default function TrescientosunoOnline({
   onAbrirAyuda
 }) {
   const navigate = useNavigate();
-  // Vistas previas
   const [vista, setVista] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
-  
+
   const [nombre, setNombre] = useState('');
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
-  
+
   const [modalSalirLobby, setModalSalirLobby] = useState(false);
   const [modalSalirPortada, setModalSalirPortada] = useState(false);
 
@@ -138,8 +83,10 @@ export default function TrescientosunoOnline({
 
   const intervalRef = useRef(null);
 
-  // Configuración de la partida
+  // Configuración de la partida en 2 pasos (igual que en modo local): 'equipo' | 'reglas'
+  const [pasoConfig, setPasoConfig] = useState('equipo');
   const [equipos, setEquipos] = useState([]);
+  const [filtroEquipo, setFiltroEquipo] = useState('');
   const [equipoSel, setEquipoSel] = useState(null);
   const [estadisticaSel, setEstadisticaSel] = useState('goles');
   const [objetivoSel, setObjetivoSel] = useState(301);
@@ -150,6 +97,11 @@ export default function TrescientosunoOnline({
   const [enviando, setEnviando] = useState(false);
   const [comodinActivo, setComodinActivo] = useState(null);
   const [opcionesReveladas, setOpcionesReveladas] = useState(null);
+
+  // Aviso flotante estilo Conecta
+  const [eventoAviso, setEventoAviso] = useState(null);
+  const avisoSeqRef = useRef(0);
+  const ultimoEventoKeyRef = useRef('');
 
   useEffect(() => {
     if (!sesion) {
@@ -187,6 +139,21 @@ export default function TrescientosunoOnline({
     };
   }, [sesion]);
 
+  // Sincroniza el evento de la sala con el aviso flotante superior incluyendo los goles/asistencias/partidos restados
+  useEffect(() => {
+    const ev = sala?.evento;
+    if (!ev || !ev.mensaje) return;
+    const key = `${ev.tipo}-${ev.jugadorId}-${ev.mensaje}-${ev.valor ?? ''}`;
+    if (key === ultimoEventoKeyRef.current) return;
+    ultimoEventoKeyRef.current = key;
+    avisoSeqRef.current += 1;
+    setEventoAviso({
+      n: avisoSeqRef.current,
+      tipo: ev.tipo,
+      texto: formatearTextoEvento(ev, sala)
+    });
+  }, [sala]);
+
   const llamar = async (ruta, body = {}) => {
     const res = await fetch(`/api/trescientosuno/online/sala/${sesion.code}/${ruta}`, {
       method: 'POST',
@@ -211,20 +178,26 @@ export default function TrescientosunoOnline({
   };
 
   const estadoSala = sala?.estado;
-  
+
   useEffect(() => {
-    if (estadoSala !== 'configuracion' || equipos.length > 0) return;
-    fetch('/api/trescientosuno/equipos')
-      .then((r) => r.json())
-      .then((d) => { if (d.success) setEquipos(d.equipos); })
-      .catch(() => setErrorMsg('No se han podido cargar los equipos.'));
+    if (estadoSala === 'configuracion') {
+      setPasoConfig('equipo');
+      setFiltroEquipo('');
+      setErrorMsg('');
+      if (equipos.length === 0) {
+        fetch('/api/trescientosuno/equipos')
+          .then((r) => r.json())
+          .then((d) => { if (d.success) setEquipos(d.equipos); })
+          .catch(() => setErrorMsg('No se han podido cargar los equipos.'));
+      }
+    }
   }, [estadoSala, equipos.length]);
 
   const turnoId = sala?.turnoActualId;
-  useEffect(() => { 
-    setInputJugador(''); 
-    setErrorJuego(''); 
-    setComodinActivo(null); 
+  useEffect(() => {
+    setInputJugador('');
+    setErrorJuego('');
+    setComodinActivo(null);
     setOpcionesReveladas(null);
   }, [turnoId, estadoSala]);
 
@@ -242,7 +215,7 @@ export default function TrescientosunoOnline({
       } else {
         setErrorJuego(data.error || 'Error al obtener opciones');
       }
-    } catch (err) {
+    } catch {
       setErrorJuego('Error de conexión.');
     }
   };
@@ -400,12 +373,18 @@ export default function TrescientosunoOnline({
     setTimeout(() => setCodigoCopiado(false), 2000);
   };
 
+  const normalizar = (t) => String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const equiposVisibles = filtroEquipo.trim()
+    ? equipos.filter((eq) => normalizar(eq.nombre).includes(normalizar(filtroEquipo.trim())))
+    : equipos;
+
   const esAdmin = Boolean(sala?.esAdmin);
   const yoId = sala?.yoId;
   const enPartidaActiva = vista === 'sala' && sala && sala.estado !== 'lobby';
 
   return (
     <div className={`tcu-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+      <Aviso evento={eventoAviso} />
 
       {/* 1. MENÚ PRINCIPAL */}
       {vista === 'menu' && (
@@ -496,6 +475,8 @@ export default function TrescientosunoOnline({
             <p className="hint qq-main-desc">
               Crea una sala nueva para compartir el código con tus amigos o únete a una ya creada.
             </p>
+
+            {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
 
             <div className="qq-menu-opciones">
               <button
@@ -624,7 +605,7 @@ export default function TrescientosunoOnline({
             </p>
 
             <div className="lb-form qq-form-estilizado">
-              <label className="field-label" htmlFor="tcu-code-input">Código de la sala</label>
+              <label className="field-label" htmlFor="tcu-code-input">Código de la partida</label>
               <input
                 id="tcu-code-input"
                 className="lb-input-codigo qq-input-moderno"
@@ -633,11 +614,12 @@ export default function TrescientosunoOnline({
                 value={codigoInput}
                 onChange={(e) => setCodigoInput(e.target.value.toUpperCase())}
                 maxLength={4}
-                style={{ textTransform: 'uppercase', letterSpacing: '4px', textAlign: 'center', fontWeight: '800' }}
                 autoFocus
               />
 
-              <label className="field-label" htmlFor="tcu-guest-nombre" style={{ marginTop: '1rem' }}>Tu nombre</label>
+              <label className="field-label" htmlFor="tcu-guest-nombre" style={{ marginTop: '1rem' }}>
+                Tu nombre
+              </label>
               <input
                 id="tcu-guest-nombre"
                 className="qq-input-moderno"
@@ -662,7 +644,7 @@ export default function TrescientosunoOnline({
         </section>
       )}
 
-      {/* 4. SALA: LOBBY */}
+      {/* 4. SALA DE ESPERA (LOBBY - Última pantalla online con botón de ayuda) */}
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
         <section className="game">
           <div className="panel center qq-menu-panel">
@@ -695,12 +677,14 @@ export default function TrescientosunoOnline({
           </div>
 
           <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
-            <h3 className="qq-sala-titulo"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length})</h3>
+            <h3 className="qq-sala-titulo">
+              <Icon name="users" size={20} /> Jugadores ({sala.jugadores.length})
+            </h3>
             <div className="lb-lista qq-sala-lista">
               {sala.jugadores.map((j) => (
                 <div key={j.id} className={`lb-jug ${j.id === yoId ? 'yo' : ''}`}>
                   <span className="lb-jug-nombre">
-                    {j.nombre}{j.id === yoId ? ' (Tú)' : ''}{j.esAdmin ? ' 👑' : ''}
+                    {j.nombre}{j.id === yoId ? ' (tú)' : ''}{j.esAdmin ? ' 👑' : ''}
                   </span>
                 </div>
               ))}
@@ -713,175 +697,250 @@ export default function TrescientosunoOnline({
           </div>
 
           {esAdmin ? (
-            <div style={{ marginTop: '1.2rem' }}>
-              <button
-                className="big full qq-btn-principal"
-                disabled={sala.jugadores.length < 2}
-                onClick={() => accionAdmin('empezar')}
-              >
-                <Icon name="play" size={22} />
-                {sala.jugadores.length < 2 ? 'Esperando jugadores...' : '¡Empezar Partida!'}
-              </button>
-            </div>
+            <button
+              type="button"
+              className="big full qq-btn-principal"
+              style={{ marginTop: '1rem' }}
+              disabled={sala.jugadores.length < 2}
+              onClick={() => accionAdmin('empezar')}
+            >
+              <Icon name="play" size={22} />
+              {sala.jugadores.length < 2 ? 'Esperando jugadores...' : 'Iniciar juego'}
+            </button>
           ) : (
-            <div className="panel center" style={{ padding: '2rem 1.5rem', marginTop: '1rem' }}>
-              <span className="lb-luna chica"><Icon name="hourglass" size={40} /></span>
-              <h3 style={{ margin: '0.5rem 0' }}>Esperando al anfitrión...</h3>
-              <p className="hint">El anfitrión elegirá la estadística de juego.</p>
+            <div className="panel center" style={{ padding: '1.8rem 1.4rem', marginTop: '1rem' }}>
+              <span className="lb-luna chica"><Icon name="hourglass" size={36} /></span>
+              <h3 style={{ margin: '0.4rem 0' }}>Esperando al anfitrión...</h3>
+              <p className="hint">El anfitrión iniciará la partida y elegirá el equipo cuando estéis listos.</p>
             </div>
           )}
         </section>
       )}
 
-      {/* 5. SELECTOR DE EQUIPO Y ESTADÍSTICA (CONFIGURACION ONLINE) */}
+      {/* 5. CONFIGURACIÓN ONLINE EN 2 PASOS (1: EQUIPO -> 2: ESTADÍSTICA Y CIFRA) */}
       {vista === 'sala' && sala && sala.estado === 'configuracion' && (
-        <section className="game">
-          <div className="panel qq-menu-panel">
-            <div className="qq-card-top">
-              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
-            </div>
-
-            {esAdmin ? (
-              <>
-                <div className="qq-section-header">
-                  <h3 className="qq-section-title">Elige equipo y reglas</h3>
-                  <p className="hint">
-                    Los jugadores tendrán que nombrar futbolistas de este club/selección.
-                  </p>
+        esAdmin ? (
+          pasoConfig === 'equipo' || !equipoSel ? (
+            <section className="game qqp-escena">
+              <header className="qqp-hero">
+                <span className="qqp-hero-deco" aria-hidden="true">
+                  <Icon name="goal301" size={150} strokeWidth={1.4} />
+                </span>
+                <div className="qqp-hero-top">
+                  <BotonPortada texto="Portada" onClick={() => setModalSalirPortada(true)} />
+                  <div className="qqp-hero-chips">
+                    <span className="qqp-chip">
+                      <Icon name="users" size={14} /> <span>{sala.jugadores.length} jugadores</span>
+                    </span>
+                  </div>
                 </div>
-                
+                <p className="qqp-hero-etiqueta">Paso 1 de 2</p>
+                <h2 className="qqp-hero-titulo">Selecciona un equipo</h2>
+                <p className="qqp-hero-aviso">
+                  Toca el escudo del club o selección cuyos futbolistas tendréis que nombrar.
+                </p>
+
+                <label className="qqp-buscador">
+                  <Icon name="search" size={18} />
+                  <input
+                    type="search"
+                    value={filtroEquipo}
+                    onChange={(e) => setFiltroEquipo(e.target.value)}
+                    placeholder="Buscar club o selección…"
+                    aria-label="Buscar club o selección"
+                  />
+                </label>
+              </header>
+
+              {equipos.length === 0 ? (
+                <p className="qqp-estado">
+                  <span className="qqp-spinner" aria-hidden="true" /> Cargando equipos…
+                </p>
+              ) : equiposVisibles.length ? (
                 <div className="tcu-grid-equipos">
-                  {equipos.map((eq) => {
-                    const urlImagen = getLogoUrl(eq);
-                    return (
-                      <div
-                        key={eq.id}
-                        className={`tcu-equipo-card ${equipoSel?.id === eq.id ? 'sel' : ''}`}
-                        title={eq.nombre}
-                        onClick={() => setEquipoSel(eq)}
-                      >
-                        {urlImagen ? (
-                          <img 
-                            src={urlImagen} 
-                            alt={eq.nombre} 
-                            className="tcu-escudo-img" 
-                            onError={(e) => {
-                              e.currentTarget.style.display = 'none';
-                              if (e.currentTarget.nextSibling) e.currentTarget.nextSibling.style.display = 'block';
-                            }}
-                          />
-                        ) : null}
-                        <div className="tcu-escudo-texto" style={{ display: urlImagen ? 'none' : 'block' }}>
-                          {eq.nombre}
-                        </div>
-                      </div>
-                    );
-                  })}
+                  {equiposVisibles.map((eq) => (
+                    <TarjetaEquipo
+                      key={eq.id}
+                      equipo={eq}
+                      seleccionado={equipoSel?.id === eq.id}
+                      onClick={() => {
+                        setEquipoSel(eq);
+                        setPasoConfig('reglas');
+                      }}
+                    />
+                  ))}
                 </div>
-                {equipos.length === 0 && <p className="hint center" style={{ marginTop: '1rem' }}>Cargando equipos...</p>}
+              ) : (
+                <p className="qqp-vacio">No hay ningún equipo que coincida con «{filtroEquipo}».</p>
+              )}
 
+              {errorMsg && <p className="error" style={{ margin: 0 }}>{errorMsg}</p>}
+            </section>
+          ) : (
+            <section className="game qqp-escena">
+              <Cabecera
+                onSalir={() => setPasoConfig('equipo')}
+                textoSalir="Cambiar equipo"
+                etiqueta="Paso 2 de 2 · Reglas de la ronda"
+                titulo={equipoSel.nombre}
+                avatar={<EscudoEquipo equipo={equipoSel} size={64} />}
+                chips={
+                  <span className="qqp-chip">
+                    <Icon name="users" size={14} /> <span>{sala.jugadores.length} jugadores</span>
+                  </span>
+                }
+              />
+
+              <div className="qqp-tarjeta">
                 <div className="tcu-ajustes">
                   <div className="form-group">
-                    <label className="form-label" htmlFor="tcu-stat">Estadística a restar</label>
+                    <label className="qq-label-destacado" htmlFor="tcu-stat">
+                      Estadística a restar
+                    </label>
                     <div className="select-wrapper">
-                      <select id="tcu-stat" className="game-select qq-input-moderno" value={estadisticaSel} onChange={(e) => setEstadisticaSel(e.target.value)}>
-                        <option value="goles">Goles</option>
-                        <option value="asistencias">Asistencias</option>
-                        <option value="partidos">Partidos jugados</option>
+                      <select
+                        id="tcu-stat"
+                        className="game-select qq-input-moderno"
+                        value={estadisticaSel}
+                        onChange={(e) => setEstadisticaSel(e.target.value)}
+                      >
+                        <option value="goles">⚽ Goles históricos</option>
+                        <option value="asistencias">👟 Asistencias históricas</option>
+                        <option value="partidos">🏟️ Partidos jugados</option>
                       </select>
                     </div>
                   </div>
                   <div className="form-group">
-                    <label className="form-label" htmlFor="tcu-obj">Puntuación objetivo</label>
-                    <input 
-                      id="tcu-obj" 
-                      type="number" 
-                      className="player-text-input qq-input-moderno" 
-                      value={objetivoSel} 
-                      onChange={(e) => setObjetivoSel(Number(e.target.value))}
+                    <label className="qq-label-destacado" htmlFor="tcu-obj">
+                      Puntuación inicial (Objetivo: 0)
+                    </label>
+                    <input
+                      id="tcu-obj"
+                      type="number"
+                      className="player-text-input qq-input-moderno"
+                      value={objetivoSel}
+                      onChange={(e) => setObjetivoSel(Math.max(1, Number(e.target.value) || 1))}
                       min="1"
                     />
                   </div>
                 </div>
-
-                {errorMsg && <p className="error">{errorMsg}</p>}
-                <button
-                  className="big full qq-btn-principal"
-                  style={{ marginTop: '1.5rem', width: '100%' }}
-                  disabled={cargando || !equipoSel}
-                  onClick={() => accionAdmin('configurar', { equipoId: equipoSel.id, estadistica: estadisticaSel, objetivo: objetivoSel })}
-                >
-                  <Icon name="play" size={24} /> {equipoSel ? `¡Comenzar con ${equipoSel.nombre}!` : 'Elige un equipo'}
-                </button>
-              </>
-            ) : (
-              <div className="panel center" style={{ padding: '2.5rem 1.5rem', boxShadow: 'none' }}>
-                <span className="lb-luna chica"><Icon name="hourglass" size={40} /></span>
-                <h3 style={{ marginTop: '0.8rem' }}>El anfitrión está eligiendo equipo...</h3>
-                <p className="hint">La partida empezará en cuanto termine de configurarla.</p>
               </div>
-            )}
-          </div>
-        </section>
+
+              {errorMsg && <p className="error" style={{ margin: 0 }}>{errorMsg}</p>}
+
+              <div className="qqp-barra">
+                <BotonPrincipal
+                  disabled={cargando || !equipoSel}
+                  onClick={() =>
+                    accionAdmin('configurar', {
+                      equipoId: equipoSel.id,
+                      estadistica: estadisticaSel,
+                      objetivo: objetivoSel
+                    })
+                  }
+                >
+                  <Icon name="play" size={22} /> ¡Comenzar partida!
+                </BotonPrincipal>
+              </div>
+            </section>
+          )
+        ) : (
+          <section className="game qqp-escena">
+            <Cabecera
+              onSalir={() => setModalSalirPortada(true)}
+              etiqueta="Preparando partida"
+              titulo="Eligiendo equipo…"
+            />
+            <div className="qqp-tarjeta qqp-pasar">
+              <span className="lb-luna chica"><Icon name="hourglass" size={36} /></span>
+              <h3 className="qqp-pasar-nombre" style={{ fontSize: '1.5rem', marginTop: '0.4rem' }}>
+                Esperando al anfitrión
+              </h3>
+              <p className="qqp-texto">
+                El anfitrión está seleccionando el equipo y la estadística de la partida.
+              </p>
+            </div>
+          </section>
+        )
       )}
 
-      {/* 6. TABLERO JUGANDO ONLINE */}
+      {/* 6. TABLERO JUGANDO ONLINE (Sin botón de ayuda) */}
       {vista === 'sala' && sala && sala.estado === 'jugando' && (() => {
         const stat = sala.configuracion.estadistica;
         const jTurno = sala.jugadores.find((j) => j.id === sala.turnoActualId);
         const yoInfo = sala.jugadores.find((j) => j.id === yoId);
         const esMiTurno = sala.turnoActualId === yoId;
         const ev = sala.evento;
-        
+        const totalSegundos = sala.tiempoTurno || TIEMPO_TURNO;
+
         return (
-          <section className="game">
-            <div className="panel qq-menu-panel">
-              <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
-                <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
-              </div>
-
-              <div className="hud">
-                <span className="chip"><Icon name="shield" size={18} /> {sala.equipoSeleccionado?.nombre}</span>
-                <span className="chip alt">Objetivo: 0 {stat}</span>
-              </div>
-
-              <div className="tcu-marcador-grid">
-                {sala.jugadores.map((j) => (
-                  <div
-                    key={j.id}
-                    className={`tcu-marcador-item ${j.id === sala.turnoActualId ? 'activo' : ''} ${j.estado}`}
-                  >
-                    <div className="nombre">{j.nombre}{j.id === yoId ? ' (tú)' : ''}</div>
-                    <div className="puntos">{j.estado === 'eliminado' ? 'X' : j.puntuacionActual}</div>
-                    
-                    {ev && ev.jugadorId === j.id && (ev.tipo === 'acierto' || ev.tipo === 'ganador') && (
-                      <div className="floating-resta">- {ev.valor}</div>
+          <section className="game qqp-escena">
+            <Cabecera
+              onSalir={() => setModalSalirPortada(true)}
+              etiqueta={esMiTurno ? `¡Es tu turno! · Objetivo: 0 ${stat}` : `Objetivo: clavar 0 ${stat}`}
+              titulo={esMiTurno ? '¡Te toca jugar!' : `Turno de ${jTurno?.nombre || 'Jugador'}`}
+              avatar={<EscudoEquipo equipo={sala.equipoSeleccionado} size={54} />}
+              chips={
+                <span className="qqp-chip">
+                  <Icon name="shield" size={14} /> <span>{sala.equipoSeleccionado?.nombre}</span>
+                </span>
+              }
+            >
+              <div className="qqp-identidad tcu-hero-status">
+                <div className="tcu-hero-status-row">
+                  <span>
+                    {esMiTurno ? (
+                      <>Te quedan: <strong className="tcu-pts-destacado">{yoInfo?.puntuacionActual}</strong> {stat}</>
+                    ) : (
+                      <>Le quedan a {jTurno?.nombre}: <strong className="tcu-pts-destacado">{jTurno?.puntuacionActual}</strong> {stat}</>
                     )}
-                  </div>
-                ))}
+                  </span>
+                  <span className={`tcu-timer-pill${sala.tiempoRestante <= 10 ? ' low' : ''}`}>
+                    <Icon name="clock" size={14} /> {sala.tiempoRestante}s
+                  </span>
+                </div>
+                <div className="tcu-timer-track" role="timer">
+                  <div
+                    className={`tcu-timer-fill${sala.tiempoRestante <= 10 ? ' low' : ''}`}
+                    style={{ width: `${(sala.tiempoRestante / totalSegundos) * 100}%` }}
+                  />
+                </div>
               </div>
 
-              <div className="panel center tcu-turno-panel" style={{ background: '#f8fafc', border: '1.5px solid #e2e8f0', boxShadow: 'none' }}>
-                {ev ? (
-                  <div className="tcu-evento-display">
-                    <span className="evento-icon">
-                       {ev.tipo === 'acierto' && '⚽'}
-                       {ev.tipo === 'ganador' && '🏆'}
-                       {ev.tipo === 'fallo' && '❌'}
-                       {ev.tipo === 'plantado' && '🛑'}
-                       {ev.tipo === 'eliminado' && '💀'}
+              <OrdenTurnos
+                jugadores={sala.jugadores}
+                activoId={sala.turnoActualId}
+                yoId={yoId}
+                eventoResta={ev}
+              />
+            </Cabecera>
+
+            <div className="qqp-tarjeta tcu-turno-card">
+              {ev ? (
+                <div className="tcu-evento-display">
+                  <span className="evento-icon">
+                    {ev.tipo === 'acierto' && '⚽'}
+                    {ev.tipo === 'ganador' && '🏆'}
+                    {ev.tipo === 'fallo' && '❌'}
+                    {ev.tipo === 'plantado' && '🛑'}
+                    {ev.tipo === 'eliminado' && '💀'}
+                  </span>
+                  <h3>{formatearTextoEvento(ev, sala)}</h3>
+                  {(ev.tipo === 'acierto' || ev.tipo === 'ganador') && ev.valor != null && (
+                    <span className="tcu-ayuda-chip ok" style={{ fontSize: '1rem' }}>
+                      -{ev.valor} {stat}
                     </span>
-                    <h3 style={{ color: '#0f172a' }}>{ev.mensaje}</h3>
-                  </div>
-                ) : esMiTurno ? (
-                  <>
-                    <h2 className="title">¡Es tu turno!</h2>
-                    
-                    {yoInfo.comodines && yoInfo.comodines.length > 0 && (
+                  )}
+                </div>
+              ) : esMiTurno ? (
+                <>
+                  {yoInfo?.comodines && yoInfo.comodines.length > 0 && (
+                    <div className="tcu-comodines-bloque">
+                      <span className="qqp-carta-cara-titulo">Tus comodines</span>
                       <div className="tcu-comodines">
-                        {yoInfo.comodines.map(c => (
-                          <button 
-                            key={c} 
+                        {yoInfo.comodines.map((c) => (
+                          <button
+                            key={c}
                             type="button"
                             className={`btn-comodin ${comodinActivo === c ? 'activo' : ''} ${c === 'revelar' && comodinActivo === 'revelar' ? 'revelar' : ''}`}
                             onClick={() => {
@@ -901,122 +960,190 @@ export default function TrescientosunoOnline({
                           </button>
                         ))}
                       </div>
-                    )}
-
-                    <div className="timer-bar-container">
-                      <div
-                        className={`timer-bar ${sala.tiempoRestante <= 10 ? 'low' : ''}`}
-                        style={{ width: `${(sala.tiempoRestante / sala.tiempoTurno) * 100}%` }}
-                      />
                     </div>
-                    <p className="timer-text">{sala.tiempoRestante} s</p>
+                  )}
 
-                    {comodinActivo === 'revelar' && opcionesReveladas ? (
-                      <div className="opciones-revelar-grid">
-                        {opcionesReveladas.length > 0 ? opcionesReveladas.map(op => (
-                          <button 
-                            key={op.nombre} 
+                  {comodinActivo === 'revelar' && opcionesReveladas ? (
+                    <div className="opciones-revelar-grid">
+                      <p className="qqp-carta-cara-titulo" style={{ justifyContent: 'center' }}>
+                        Elige un futbolista revelado
+                      </p>
+                      {opcionesReveladas.length > 0 ? (
+                        opcionesReveladas.map((op) => (
+                          <button
+                            key={op.nombre}
                             type="button"
                             className="btn-opcion-revelada"
                             onClick={() => enviarJugador(op.nombre)}
                           >
-                            {op.nombre}
+                            ⚽ {op.nombre}
                           </button>
-                        )) : <p className="hint">No quedan jugadores disponibles.</p>}
-                        <button 
-                          type="button" 
-                          className="secondary" 
-                          style={{marginTop: '0.5rem'}}
-                          onClick={() => { setComodinActivo(null); setOpcionesReveladas(null); }}
-                        >
-                          Ninguno (Volver)
+                        ))
+                      ) : (
+                        <p className="hint">No quedan jugadores disponibles.</p>
+                      )}
+                      <button
+                        type="button"
+                        className="tcu-btn-sec"
+                        onClick={() => {
+                          setComodinActivo(null);
+                          setOpcionesReveladas(null);
+                        }}
+                      >
+                        Cancelar y escribir manualmente
+                      </button>
+                    </div>
+                  ) : (
+                    <form
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        enviarJugador(inputJugador);
+                      }}
+                      className="tcu-form"
+                    >
+                      <input
+                        type="text"
+                        value={inputJugador}
+                        onChange={(e) => {
+                          setInputJugador(e.target.value);
+                          setErrorJuego('');
+                        }}
+                        placeholder={`Futbolista del ${sala.equipoSeleccionado?.nombre}…`}
+                        className="player-text-input qq-input-moderno"
+                        autoFocus
+                      />
+                      {errorJuego && <p className="error" style={{ margin: '0 0 0.8rem' }}>{errorJuego}</p>}
+
+                      <BotonPrincipal type="submit" disabled={enviando || !inputJugador.trim()}>
+                        <Icon name="check" size={20} strokeWidth={2.5} /> Comprobar futbolista
+                      </BotonPrincipal>
+
+                      <div className="tcu-sub-actions">
+                        <button type="button" className="tcu-btn-sec" disabled={enviando} onClick={pasarTurno}>
+                          Pasar turno
+                        </button>
+                        <button type="button" className="tcu-btn-sec warn" disabled={enviando} onClick={plantarse}>
+                          🛑 Plantarse ({yoInfo?.puntuacionActual})
                         </button>
                       </div>
-                    ) : (
-                      <form onSubmit={(e) => { e.preventDefault(); enviarJugador(inputJugador); }} className="tcu-form">
-                        <input
-                          type="text"
-                          value={inputJugador}
-                          onChange={(e) => { setInputJugador(e.target.value); setErrorJuego(''); }}
-                          placeholder={`Dime un jugador del ${sala.equipoSeleccionado?.nombre}...`}
-                          className="player-text-input qq-input-moderno"
-                          autoFocus
-                        />
-                        {errorJuego && <p className="error" style={{ marginBottom: '1rem' }}>{errorJuego}</p>}
-                        <div className="tcu-actions">
-                          <button type="submit" className="qq-btn-principal" style={{ width: '100%', color: 'white' }} disabled={enviando || !inputJugador.trim()}>Enviar</button>
-                          <button type="button" className="secondary" disabled={enviando} onClick={pasarTurno}>Pasar</button>
-                          <button type="button" className="secondary danger" disabled={enviando} onClick={plantarse}>Plantarse</button>
-                        </div>
-                      </form>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <h2 className="title">Turno de {jTurno?.nombre}</h2>
-                    <div className="timer-bar-container">
-                      <div
-                        className={`timer-bar ${sala.tiempoRestante <= 10 ? 'low' : ''}`}
-                        style={{ width: `${(sala.tiempoRestante / sala.tiempoTurno) * 100}%` }}
-                      />
-                    </div>
-                    <p className="timer-text">{sala.tiempoRestante} s</p>
-                    <p className="tcu-turno-aviso">Esperando su respuesta...</p>
-                  </>
-                )}
-              </div>
-
-              {sala.jugadoresUsados.length > 0 && (
-                <div className="tcu-usados">
-                  <strong>Ya dichos:</strong> {sala.jugadoresUsados.join(', ')}
+                    </form>
+                  )}
+                </>
+              ) : (
+                <div className="qqp-pasar" style={{ padding: '0.6rem 0' }}>
+                  <Avatar
+                    nombre={jTurno?.nombre || '?'}
+                    color={colorJugador((jTurno?.id ?? 1) - 1)}
+                    grande
+                  />
+                  <p className="qqp-pasar-para">Pensando futbolista…</p>
+                  <h3 className="qqp-pasar-nombre" style={{ fontSize: '1.75rem' }}>
+                    {jTurno?.nombre}
+                  </h3>
+                  <p className="qqp-texto">
+                    Está buscando un futbolista del <strong>{sala.equipoSeleccionado?.nombre}</strong> para restar {stat}.
+                  </p>
                 </div>
               )}
-          </div>
-        </section>
-      );})()}
+            </div>
 
-      {/* 7. PODIO FINAL */}
+            {sala.jugadoresUsados.length > 0 && (
+              <div className="qqp-tarjeta tcu-usados-card">
+                <p className="qqp-carta-cara-titulo" style={{ marginBottom: '0.6rem' }}>
+                  Futbolistas ya dichos ({sala.jugadoresUsados.length})
+                </p>
+                <div className="tcu-usados-chips">
+                  {sala.jugadoresUsados.map((nom) => (
+                    <span key={nom} className="tcu-usado-pill">{nom}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </section>
+        );
+      })()}
+
+      {/* 7. PODIO FINAL ONLINE */}
       {vista === 'sala' && sala && sala.estado === 'resultados' && (() => {
+        const stat = sala.configuracion?.estadistica || 'pts';
         const ranking = [...sala.jugadores].sort(
           (a, b) => (a.estado === 'eliminado') - (b.estado === 'eliminado') || a.puntuacionActual - b.puntuacionActual
         );
         const mejor = ranking.find((j) => j.estado !== 'eliminado');
-        return (
-          <section className="game">
-            <div className="panel qq-menu-panel">
-              <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
-                <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
-              </div>
 
-              <div className="end-card" style={{ border: 'none', boxShadow: 'none' }}>
-                <span className="end-icon"><Icon name="trophy" size={48} /></span>
-                <h1 className="title">Fin de la partida</h1>
-                <p className="final-score">
+        return (
+          <section className="game qqp-escena">
+            <Cabecera
+              onSalir={() => setModalSalirPortada(true)}
+              etiqueta="Partida finalizada"
+              titulo="Clasificación Final"
+              avatar={<EscudoEquipo equipo={sala.equipoSeleccionado} size={54} />}
+            >
+              <div className="qqp-identidad">
+                <span className="qqp-identidad-icono"><Icon name="trophy" size={16} /></span>
+                <span>
                   {!mejor
-                    ? 'Todos han sido eliminados.'
-                    : mejor.estado === 'ganador'
-                      ? `Ganador: ${mejor.nombre} (¡clavó el 0!)`
-                      : `Ganador: ${mejor.nombre} (se quedó a ${mejor.puntuacionActual})`}
+                    ? 'Todos los jugadores han caído eliminados.'
+                    : mejor.estado === 'ganador' || mejor.puntuacionActual === 0
+                      ? <>¡Diana perfecta de <strong>{mejor.nombre}</strong> (clavó el 0)!</>
+                      : <>Ganador: <strong>{mejor.nombre}</strong> (se quedó a <strong>{mejor.puntuacionActual}</strong>)</>}
+                </span>
+              </div>
+            </Cabecera>
+
+            <div className="qqp-tarjeta">
+              <p className="qqp-carta-cara-titulo" style={{ marginBottom: '0.8rem' }}>
+                <Icon name="users" size={16} /> Marcador final ({stat})
+              </p>
+              <ul className="qqp-rivales">
+                {ranking.map((j, i) => {
+                  const esGanador = mejor && mejor.id === j.id && j.estado !== 'eliminado';
+                  return (
+                    <li key={j.id} className="qqp-rival" style={{ '--c': colorJugador(indiceColor(j, i)) }}>
+                      <span className="qqp-rival-avatar">
+                        {j.estado === 'eliminado' ? '💀' : esGanador ? '👑' : i + 1}
+                      </span>
+                      <span className="qqp-rival-datos">
+                        <span className="qqp-rival-nombre">
+                          {j.estado === 'eliminado'
+                            ? 'Eliminado'
+                            : j.estado === 'plantado'
+                              ? 'Plantado'
+                              : esGanador
+                                ? '¡Ganador!'
+                                : `Puesto ${i + 1}`}
+                        </span>
+                        <strong className="qqp-rival-tarjeta">
+                          {j.nombre}{j.id === yoId ? ' (tú)' : ''}
+                        </strong>
+                      </span>
+                      <span className="tcu-ranking-pts">
+                        {j.estado === 'eliminado' ? 'Eliminado' : `${j.puntuacionActual} ${stat}`}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+
+            <div className="qqp-barra">
+              {esAdmin ? (
+                <>
+                  <BotonPrincipal
+                    disabled={cargando || sala.jugadores.length < 2}
+                    onClick={() => accionAdmin('revancha')}
+                  >
+                    <Icon name="refresh" size={20} /> Jugar con otro equipo
+                  </BotonPrincipal>
+                  <EnlaceSecundario onClick={() => setModalSalirPortada(true)}>
+                    Salir a la portada principal
+                  </EnlaceSecundario>
+                </>
+              ) : (
+                <p className="qqp-estado">
+                  <span className="qqp-spinner" aria-hidden="true" /> Esperando a que el anfitrión elija otro equipo…
                 </p>
-                <div className="scoreboard">
-                  {ranking.map((j) => (
-                    <div key={j.id} className="score-row">
-                      <span className="score-name">{j.nombre}{j.id === yoId ? ' (tú)' : ''} {j.estado === 'plantado' && '(Plantado)'}</span>
-                      <span className="score-pts">{j.estado === 'eliminado' ? 'Eliminado' : j.puntuacionActual}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
-              <div className="actions" style={{ marginTop: '1.5rem' }}>
-                {esAdmin ? (
-                  <button className="big full qq-btn-principal" disabled={cargando || sala.jugadores.length < 2} onClick={() => accionAdmin('revancha')}>
-                    <Icon name="refresh" size={20} /> Jugar otro equipo
-                  </button>
-                ) : (
-                  <p className="hint center">Esperando a que el anfitrión elija el siguiente equipo...</p>
-                )}
-              </div>
+              )}
             </div>
           </section>
         );
