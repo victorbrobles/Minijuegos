@@ -10,6 +10,8 @@
 //
 // Para añadir un lugar basta con una línea nueva. El servidor valida el seed al arrancar.
 
+import { AMPLIACION } from './ampliacion.seed.js';
+
 export const l = (id, nombre, pais, lat, lng, wiki, imagen = null) => ({ id, nombre, pais, lat, lng, wiki, imagen });
 
 export const LUGARES = [
@@ -148,7 +150,10 @@ export const LUGARES = [
   l('bora-bora', 'Bora Bora', 'Polinesia Francesa', -16.5004, -151.7415, 'Bora_Bora'),
   l('doce-apostoles', 'Los Doce Apóstoles', 'Australia', -38.6622, 143.1044, 'Twelve_Apostles,_Victoria'),
   l('puente-bahia-sidney', 'Puente de la Bahía de Sídney', 'Australia', -33.8523, 151.2108, 'Sydney_Harbour_Bridge'),
-  l('aoraki', 'Aoraki / Monte Cook', 'Nueva Zelanda', -43.595, 170.1418, 'Aoraki_/_Mount_Cook')
+  l('aoraki', 'Aoraki / Monte Cook', 'Nueva Zelanda', -43.595, 170.1418, 'Aoraki_/_Mount_Cook'),
+
+  // Lugares añadidos en ampliacion.seed.js
+  ...AMPLIACION
 ];
 
 // Validación: avisa nada más arrancar si hay un id repetido o unas coordenadas imposibles.

@@ -1,146 +1,98 @@
 // client/src/games/Ubicacion/UbicacionOnline.jsx
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+// Modo online: todos sitúan su marcador a la vez desde su propio móvil.
+import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
+import {
+  MenuModoOnline, FormCrearSala, FormUnirseSala, CabeceraSala, ListaSala, EsperandoAnfitrion, BloqueConfig
+} from '../../components/MenuJuego.jsx';
 import MapaMundi from './MapaMundi.jsx';
-import { formatearKm, resolverImagenes } from './geo.js';
+import { resolverImagenes, OPCIONES_RONDAS } from './geo.js';
+import {
+  Hero, BarraTiempo, TarjetaFoto, BotonFoto, ModalFoto, TablaRonda, Clasificacion, Podio, ModalSalir, inicial
+} from './Pantallas.jsx';
 import './Ubicacion.css';
-import '../Adivina/Adivina.css';
 
-const CLAVE_SESION_UBICACION = 'ubicacion_online_session';
-const CANDIDATOS = 16;
+export const CLAVE_SESION_UBICACION = 'ubicacion_online_session';
+const SEGUNDOS_FOTO = 10;
 const SEGUNDOS_TURNO = 90;
 
-export default function UbicacionOnline({
-  tituloJuego = 'Test del viajero',
-  descripcionJuego,
-  onLocal,
-  onSalir,
-  onAbrirAyuda
-}) {
-  const navigate = useNavigate();
+const post = (url, body) => fetch(url, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(body)
+});
 
-  // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
-  const [vista, setVista] = useState('menu');
+export default function UbicacionOnline({ onVolver, onSalir, onAbrirAyuda }) {
   const [nombre, setNombre] = useState('');
   const [codigoInput, setCodigoInput] = useState('');
+  const [rondas, setRondas] = useState(10);
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
-
   const [modalSalirLobby, setModalSalirLobby] = useState(false);
-  const [modalSalirPortada, setModalSalirPortada] = useState(false);
+  const [modalSalirPartida, setModalSalirPartida] = useState(false);
 
   const [sesion, setSesion] = useState(() => {
-    try {
-      return JSON.parse(sessionStorage.getItem(CLAVE_SESION_UBICACION));
-    } catch {
-      return null;
-    }
+    try { return JSON.parse(sessionStorage.getItem(CLAVE_SESION_UBICACION)); } catch { return null; }
   });
-
+  // Si ya había una sala guardada (recarga de la página), se vuelve directamente a ella
+  const [vista, setVista] = useState(() => (sesion ? 'sala' : 'online_menu')); // online_menu | crear | unirse | sala
   const [sala, setSala] = useState(null);
-  const [codigoCopiado, setCodigoCopiado] = useState(false);
   const [verImagen, setVerImagen] = useState(false);
   const [enfoque, setEnfoque] = useState(null);
   const [miPosicionLocal, setMiPosicionLocal] = useState(null);
-
   const intervalRef = useRef(null);
 
+  const olvidarSesion = () => {
+    try { sessionStorage.removeItem(CLAVE_SESION_UBICACION); } catch { /* sin almacenamiento */ }
+  };
+
+  // Sondeo del estado de la sala
   useEffect(() => {
     if (!sesion) {
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      clearInterval(intervalRef.current);
       setSala(null);
-      return;
+      return undefined;
     }
-
-    const consultarEstado = () => {
+    const consultar = () => {
       fetch(`/api/ubicacion/online/sala/${sesion.code}?token=${sesion.token}`)
-        .then((r) => {
-          if (!r.ok) throw new Error('Sala no disponible');
-          return r.json();
-        })
-        .then((d) => {
-          if (d.success) {
-            setSala(d);
-            setVista('sala');
-          }
-        })
+        .then((r) => { if (!r.ok) throw new Error('Sala no disponible'); return r.json(); })
+        .then((d) => { if (d.success) { setSala(d); setVista('sala'); } })
         .catch(() => {
-          sessionStorage.removeItem(CLAVE_SESION_UBICACION);
+          olvidarSesion();
           setSesion(null);
           setSala(null);
           setVista('online_menu');
           setErrorMsg('La sala se ha cerrado.');
         });
     };
-
-    consultarEstado();
-    intervalRef.current = setInterval(consultarEstado, 500);
-
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
+    consultar();
+    intervalRef.current = setInterval(consultar, 500);
+    return () => clearInterval(intervalRef.current);
   }, [sesion]);
 
-  const redirigirAPortada = () => {
-    if (typeof onSalir === 'function') {
-      onSalir();
-    } else {
-      try {
-        navigate('/');
-      } catch {
-        window.location.href = '/';
-      }
-    }
-  };
+  // Arreglo: al cambiar de ronda se olvida el marcador local de la ronda anterior (antes solo
+  // lo hacía el anfitrión y los invitados arrastraban su marca a la ronda siguiente)
+  const rondaNum = sala?.rondaNum;
+  useEffect(() => {
+    setMiPosicionLocal(null);
+    setEnfoque(null);
+    setVerImagen(false);
+  }, [rondaNum]);
 
-  // Volver desde el lobby al submenú online
-  const handleVolverMenuOnline = () => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-
-    const sesionActual = sesion;
-    sessionStorage.removeItem(CLAVE_SESION_UBICACION);
+  const abandonarSala = () => {
+    clearInterval(intervalRef.current);
+    const actual = sesion;
+    olvidarSesion();
     setSesion(null);
     setSala(null);
-    setModalSalirLobby(false);
-    setVista('online_menu');
-
-    if (sesionActual?.code && sesionActual?.token) {
-      fetch(`/api/ubicacion/online/sala/${sesionActual.code}/salir`, {
+    if (actual?.code && actual?.token) {
+      fetch(`/api/ubicacion/online/sala/${actual.code}/salir`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesionActual.token }),
+        body: JSON.stringify({ token: actual.token }),
         keepalive: true
       }).catch(() => {});
     }
-  };
-
-  // Cerrar sala en partida y volver a la portada
-  const handleCerrarSalaYSalirAPortada = () => {
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
-
-    const sesionActual = sesion;
-    sessionStorage.removeItem(CLAVE_SESION_UBICACION);
-    setSesion(null);
-    setSala(null);
-    setModalSalirPortada(false);
-
-    if (sesionActual?.code && sesionActual?.token) {
-      fetch(`/api/ubicacion/online/sala/${sesionActual.code}/salir`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesionActual.token }),
-        keepalive: true
-      }).catch(() => {});
-    }
-
-    redirigirAPortada();
   };
 
   const handleCrear = async () => {
@@ -148,20 +100,13 @@ export default function UbicacionOnline({
     setCargando(true);
     setErrorMsg('');
     try {
-      const rLote = await fetch(`/api/ubicacion/lote?n=${CANDIDATOS}`);
-      if (!rLote.ok) throw new Error('Error al conectar con la base de datos de lugares.');
-      const candidatos = await rLote.json();
-      const lugaresConFoto = await resolverImagenes(candidatos);
-      if (!lugaresConFoto.length) throw new Error('No se pudieron descargar las fotos de los monumentos.');
-
-      const res = await fetch('/api/ubicacion/online/crear', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nombre: nombre.trim(), lugares: lugaresConFoto })
-      });
+      const rLote = await fetch(`/api/ubicacion/lote?n=${rondas + 8}`);
+      if (!rLote.ok) throw new Error('No se pudo conectar con el catálogo de lugares.');
+      const conFoto = await resolverImagenes(await rLote.json());
+      if (!conFoto.length) throw new Error('No se pudieron descargar las fotos de los lugares. Comprueba la conexión.');
+      const res = await post('/api/ubicacion/online/crear', { nombre: nombre.trim(), lugares: conFoto, rondas });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-
       const nueva = { code: data.code, token: data.token };
       sessionStorage.setItem(CLAVE_SESION_UBICACION, JSON.stringify(nueva));
       setSesion(nueva);
@@ -177,14 +122,9 @@ export default function UbicacionOnline({
     setCargando(true);
     setErrorMsg('');
     try {
-      const res = await fetch('/api/ubicacion/online/unirse', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: codigoInput.trim().toUpperCase(), nombre: nombre.trim() })
-      });
+      const res = await post('/api/ubicacion/online/unirse', { code: codigoInput.trim().toUpperCase(), nombre: nombre.trim() });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
-
       const nueva = { code: data.code, token: data.token };
       sessionStorage.setItem(CLAVE_SESION_UBICACION, JSON.stringify(nueva));
       setSesion(nueva);
@@ -195,868 +135,296 @@ export default function UbicacionOnline({
     }
   };
 
-  const handleIniciarPartida = async () => {
+  const accion = async (ruta, extra = {}) => {
     try {
-      const res = await fetch(`/api/ubicacion/online/sala/${sesion.code}/iniciar`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion.token })
-      });
+      const res = await post(`/api/ubicacion/online/sala/${sesion.code}/${ruta}`, { token: sesion.token, ...extra });
       const d = await res.json();
       if (!res.ok) throw new Error(d.error);
-      setMiPosicionLocal(null);
+      setErrorMsg('');
     } catch (err) {
       setErrorMsg(err.message);
     }
   };
 
-  const handleColocarMarcador = (lat, lng) => {
-    if (ronda?.miMarcador?.confirmado) return;
-    setMiPosicionLocal({ lat, lng });
-
-    fetch(`/api/ubicacion/online/sala/${sesion.code}/posicionar`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token: sesion.token, lat, lng })
-    }).catch(() => {});
-  };
-
-  const handleConfirmarMarcador = async () => {
-    if (!miPosicionLocal && !ronda?.miMarcador?.lat) return;
-    try {
-      await fetch(`/api/ubicacion/online/sala/${sesion.code}/confirmar`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion.token })
-      });
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleSiguienteRonda = async () => {
-    try {
-      setMiPosicionLocal(null);
-      await fetch(`/api/ubicacion/online/sala/${sesion.code}/siguiente-ronda`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion.token })
-      });
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleFinalizar = async () => {
-    try {
-      await fetch(`/api/ubicacion/online/sala/${sesion.code}/finalizar`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion.token })
-      });
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const copiarCodigo = () => {
-    if (!sala?.code) return;
-    navigator.clipboard?.writeText(sala.code);
-    setCodigoCopiado(true);
-    setTimeout(() => setCodigoCopiado(false), 2000);
-  };
-
   const ronda = sala?.ronda;
-  const esAdmin = sala?.esAdmin;
   const yoId = sala?.yoId;
+  const esAdmin = sala?.esAdmin;
   const miJugador = sala?.jugadores?.find((j) => j.id === yoId);
   const miColor = miJugador?.color || '#2563eb';
   const yaConfirmado = Boolean(ronda?.miMarcador?.confirmado);
+  const miPos = miPosicionLocal || (ronda?.miMarcador?.lat != null ? { lat: ronda.miMarcador.lat, lng: ronda.miMarcador.lng } : null);
 
-  const marcadoresMapa = [];
-  const miPos = miPosicionLocal || (ronda?.miMarcador?.lat ? { lat: ronda.miMarcador.lat, lng: ronda.miMarcador.lng } : null);
+  const colocarMarcador = (lat, lng) => {
+    if (yaConfirmado) return;
+    setMiPosicionLocal({ lat, lng });
+    post(`/api/ubicacion/online/sala/${sesion.code}/posicionar`, { token: sesion.token, lat, lng }).catch(() => {});
+  };
 
-  if (miPos) {
-    marcadoresMapa.push({
-      id: 'mi-marcador',
-      lat: miPos.lat,
-      lng: miPos.lng,
-      color: miColor,
-      glifo: '★',
-      grande: true,
-      arrastrable: !yaConfirmado,
-      etiqueta: yaConfirmado ? `${miJugador?.nombre} (Confirmado)` : `${miJugador?.nombre} (Tú)`
-    });
+  const volverMenu = () => { setErrorMsg(''); setVista('online_menu'); };
+
+  // ---------- Menús ----------
+  if (vista === 'online_menu') {
+    return (
+      <div className="ub-contenedor">
+        <MenuModoOnline
+          onVolver={onVolver}
+          onAyuda={onAbrirAyuda}
+          onCrear={() => { setErrorMsg(''); setVista('crear'); }}
+          onUnirse={() => { setErrorMsg(''); setVista('unirse'); }}
+          error={errorMsg}
+        />
+      </div>
+    );
   }
 
-  if (ronda?.destellosVisibles?.length) {
-    ronda.destellosVisibles.forEach((d) => {
-      marcadoresMapa.push({
-        id: d.id,
-        lat: d.lat,
-        lng: d.lng,
-        color: d.color,
-        glifo: '👁',
-        grande: false,
-        fantasma: true,
-        arrastrable: false,
-        etiqueta: `📍 ${d.nombre}`
-      });
-    });
-  }
-
-  const marcadoresResultado = ronda?.resultado
-    ? [
-        {
-          id: 'correcto',
-          lat: ronda.resultado.lugar.lat,
-          lng: ronda.resultado.lugar.lng,
-          color: '#111827',
-          glifo: '✓',
-          grande: true,
-          z: 1000,
-          etiqueta: ronda.resultado.lugar.nombre
-        },
-        ...ronda.resultado.filas
-          .filter((f) => f.real)
-          .map((f) => ({
-            id: `jugador-${f.jugadorId}`,
-            lat: f.real.lat,
-            lng: f.real.lng,
-            color: f.color,
-            glifo: (f.nombre[0] ?? '?').toUpperCase(),
-            etiqueta: f.nombre
-          }))
-      ]
-    : [];
-
-  const lineasResultado = ronda?.resultado
-    ? ronda.resultado.filas
-        .filter((f) => f.real)
-        .map((f) => ({
-          desde: f.real,
-          hasta: ronda.resultado.lugar,
-          color: f.color
-        }))
-    : [];
-
-  const ranking = sala?.jugadores ? [...sala.jugadores].sort((a, b) => b.puntos - a.puntos) : [];
-  const maximo = ranking.length ? ranking[0].puntos : 0;
-  const ganadores = maximo > 0 ? ranking.filter((j) => j.puntos === maximo) : [];
-
-  const enPartidaActiva = vista === 'sala' && sala && sala.estado !== 'lobby';
-
-  return (
-    <div className={`ub-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
-      {/* 1. MENÚ INICIAL (2 BOTONES: ONLINE / UN DISPOSITIVO) */}
-      {vista === 'menu' && (
-        <section className="game">
-          <div className="panel center qq-menu-panel">
-            <div className="qq-card-top solo-derecha">
-              <button
-                type="button"
-                className="qq-btn-ayuda"
-                onClick={onAbrirAyuda}
-                title="Cómo jugar"
-                aria-label="Cómo jugar"
-              >
-                ?
-              </button>
-            </div>
-
-            <div className="qq-hero-icono">
-              <Icon name="pin" size={44} strokeWidth={1.7} />
-            </div>
-            <h1 className="title qq-main-title">{tituloJuego}</h1>
-            <p className="hint qq-main-desc">{descripcionJuego}</p>
-
-            {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
-
-            <div className="qq-menu-opciones">
-              <button
-                type="button"
-                className="qq-opcion-card principal"
-                onClick={() => {
-                  setVista('online_menu');
-                  setErrorMsg('');
-                }}
-              >
-                <span className="qq-opcion-icono">
-                  <Icon name="globe" size={26} />
-                </span>
-                <div className="qq-opcion-textos">
-                  <strong>Jugar online</strong>
-                  <span>Cada jugador desde su propio dispositivo con código de sala</span>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                className="qq-opcion-card secundaria"
-                onClick={onLocal}
-              >
-                <span className="qq-opcion-icono">
-                  <Icon name="users" size={26} />
-                </span>
-                <div className="qq-opcion-textos">
-                  <strong>Jugar en un único dispositivo</strong>
-                  <span>Pasando el dispositivo por turnos colocando señuelos</span>
-                </div>
-              </button>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* 1B. SUBMENÚ ONLINE (CREAR PARTIDA / UNIRSE CON CÓDIGO) */}
-      {vista === 'online_menu' && (
-        <section className="game">
-          <div className="panel center qq-menu-panel">
-            <div className="qq-card-top">
-              <button
-                type="button"
-                className="qq-link-volver"
-                onClick={() => {
-                  setVista('menu');
-                  setErrorMsg('');
-                }}
-              >
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M19 12H5M12 19l-7-7 7-7" />
-                </svg>
-                <span>Volver</span>
-              </button>
-              <button
-                type="button"
-                className="qq-btn-ayuda"
-                onClick={onAbrirAyuda}
-                title="Cómo jugar"
-                aria-label="Cómo jugar"
-              >
-                ?
-              </button>
-            </div>
-
-            <div className="qq-hero-icono">
-              <Icon name="globe" size={40} strokeWidth={1.7} />
-            </div>
-            <h2 className="title qq-main-title">Modo Online</h2>
-            <p className="hint qq-main-desc">
-              Crea una sala nueva para compartir el código con tus amigos o únete a una ya creada.
-            </p>
-
-            {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
-
-            <div className="qq-menu-opciones">
-              <button
-                type="button"
-                className="qq-opcion-card principal"
-                onClick={() => {
-                  setVista('crear');
-                  setErrorMsg('');
-                }}
-              >
-                <span className="qq-opcion-icono">
-                  <Icon name="crown" size={26} />
-                </span>
-                <div className="qq-opcion-textos">
-                  <strong>Crear partida</strong>
-                  <span>Sé el anfitrión y genera un código para hasta 10 jugadores</span>
-                </div>
-              </button>
-
-              <button
-                type="button"
-                className="qq-opcion-card secundaria"
-                onClick={() => {
-                  setVista('unirse');
-                  setErrorMsg('');
-                }}
-              >
-                <span className="qq-opcion-icono">
-                  <Icon name="users" size={26} />
-                </span>
-                <div className="qq-opcion-textos">
-                  <strong>Unirse con código</strong>
-                  <span>Introduce el código de 4 letras de tu anfitrión</span>
-                </div>
-              </button>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* 2. CREAR SALA */}
-      {vista === 'crear' && (
-        <section className="game">
-          <div className="panel center qq-menu-panel">
-            <div className="qq-card-top">
-              <button
-                type="button"
-                className="qq-link-volver"
-                onClick={() => {
-                  setVista('online_menu');
-                  setErrorMsg('');
-                }}
-              >
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M19 12H5M12 19l-7-7 7-7" />
-                </svg>
-                <span>Volver</span>
-              </button>
-              <button
-                type="button"
-                className="qq-btn-ayuda"
-                onClick={onAbrirAyuda}
-                title="Cómo jugar"
-                aria-label="Cómo jugar"
-              >
-                ?
-              </button>
-            </div>
-
-            <div className="qq-hero-icono">
-              <Icon name="crown" size={40} strokeWidth={1.6} />
-            </div>
-            <h2 className="title qq-main-title">Crear partida</h2>
-            <p className="hint qq-main-desc">
-              Introduce tu nombre para abrir la sala y ser el anfitrión (de 2 a 10 jugadores).
-            </p>
-
-            <div className="lb-form qq-form-estilizado">
-              <label className="field-label" htmlFor="ub-host-nombre">Tu nombre</label>
-              <input
-                id="ub-host-nombre"
-                className="qq-input-moderno"
-                type="text"
-                placeholder="Ej. Alex"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                maxLength={20}
-                autoFocus
-              />
-              {errorMsg && <p className="error">{errorMsg}</p>}
-
-              <button
-                className="big full qq-btn-principal"
-                disabled={cargando || !nombre.trim()}
-                onClick={handleCrear}
-              >
-                <Icon name="check" size={22} strokeWidth={2.5} />{' '}
-                {cargando ? 'Descargando lugares…' : 'Crear sala'}
-              </button>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* 3. UNIRSE A SALA */}
-      {vista === 'unirse' && (
-        <section className="game">
-          <div className="panel center qq-menu-panel">
-            <div className="qq-card-top">
-              <button
-                type="button"
-                className="qq-link-volver"
-                onClick={() => {
-                  setVista('online_menu');
-                  setErrorMsg('');
-                }}
-              >
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M19 12H5M12 19l-7-7 7-7" />
-                </svg>
-                <span>Volver</span>
-              </button>
-              <button
-                type="button"
-                className="qq-btn-ayuda"
-                onClick={onAbrirAyuda}
-                title="Cómo jugar"
-                aria-label="Cómo jugar"
-              >
-                ?
-              </button>
-            </div>
-
-            <div className="qq-hero-icono">
-              <Icon name="users" size={40} strokeWidth={1.6} />
-            </div>
-            <h2 className="title qq-main-title">Unirse a partida</h2>
-            <p className="hint qq-main-desc">
-              Introduce el código que te ha compartido el anfitrión y tu nombre.
-            </p>
-
-            <div className="lb-form qq-form-estilizado">
-              <label className="field-label" htmlFor="ub-code-input">Código de la partida</label>
-              <input
-                id="ub-code-input"
-                className="lb-input-codigo qq-input-moderno"
-                type="text"
-                placeholder="ABCD"
-                value={codigoInput}
-                onChange={(e) => setCodigoInput(e.target.value.toUpperCase())}
-                maxLength={4}
-                autoFocus
-              />
-
-              <label className="field-label" htmlFor="ub-guest-nombre" style={{ marginTop: '1rem' }}>
-                Tu nombre
-              </label>
-              <input
-                id="ub-guest-nombre"
-                className="qq-input-moderno"
-                type="text"
-                placeholder="Tu nombre"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                maxLength={20}
-              />
-              {errorMsg && <p className="error">{errorMsg}</p>}
-
-              <button
-                className="big full qq-btn-principal"
-                disabled={cargando || !nombre.trim() || codigoInput.trim().length < 4}
-                onClick={handleUnirse}
-              >
-                <Icon name="check" size={22} strokeWidth={2.5} /> Entrar en la partida
-              </button>
-            </div>
-          </div>
-        </section>
-      )}
-
-      {/* 4. SALA DE ESPERA (LOBBY) */}
-      {vista === 'sala' && sala && sala.estado === 'lobby' && (
-        <section className="game">
-          <div className="panel center qq-menu-panel">
-            <div className="qq-card-top">
-              <button
-                type="button"
-                className="qq-link-volver"
-                onClick={() => setModalSalirLobby(true)}
-              >
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M19 12H5M12 19l-7-7 7-7" />
-                </svg>
-                <span>Volver</span>
-              </button>
-              <button
-                type="button"
-                className="qq-btn-ayuda"
-                onClick={onAbrirAyuda}
-                title="Cómo jugar"
-                aria-label="Cómo jugar"
-              >
-                ?
-              </button>
-            </div>
-
-            <span className="qq-badge-sala"><Icon name="lock" size={15} /> Sala de espera</span>
-            <p className="hint">Código de la partida</p>
-            <button
-              type="button"
-              className="qq-codigo-btn"
-              onClick={copiarCodigo}
-              title="Copiar código"
-            >
-              {sala.code}
-            </button>
-            <p className="hint small">
-              {codigoCopiado
-                ? '¡Copiado al portapapeles!'
-                : 'Pulsa el código para copiarlo y compártelo con los demás.'}
-            </p>
-          </div>
-
-          <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
-            <h3 className="qq-sala-titulo">
-              <Icon name="users" size={20} /> Jugadores ({sala.jugadores.length}/10)
-            </h3>
-            <div className="lb-lista qq-sala-lista">
-              {sala.jugadores.map((j) => (
-                <div key={j.id} className={`lb-jug ${j.id === yoId ? 'yo' : ''}`}>
-                  <span className="ub-punto" style={{ background: j.color }} />
-                  <span className="lb-jug-nombre">
-                    {j.nombre}{j.id === yoId ? ' (tú)' : ''}{j.id === 1 ? ' 👑' : ''}
-                  </span>
-                </div>
+  if (vista === 'crear') {
+    return (
+      <div className="ub-contenedor">
+        <FormCrearSala
+          onVolver={volverMenu}
+          onAyuda={onAbrirAyuda}
+          nombre={nombre}
+          setNombre={setNombre}
+          onCrear={handleCrear}
+          cargando={cargando}
+          error={errorMsg}
+          descripcion="Introduce tu nombre para abrir la sala y ser el anfitrión (de 2 a 10 jugadores)."
+        >
+          <BloqueConfig titulo="Número de rondas" style={{ marginTop: '1rem' }}>
+            <div className="ubp-pildoras">
+              {OPCIONES_RONDAS.map((n) => (
+                <button key={n} type="button" className={`ubp-pildora${rondas === n ? ' activo' : ''}`} onClick={() => setRondas(n)}>
+                  {n} rondas
+                </button>
               ))}
             </div>
-          </div>
+          </BloqueConfig>
+          {cargando && <p className="hint" style={{ marginTop: '0.8rem' }}>🌍 Buscando lugares y descargando fotos…</p>}
+        </FormCrearSala>
+      </div>
+    );
+  }
 
+  if (vista === 'unirse') {
+    return (
+      <div className="ub-contenedor">
+        <FormUnirseSala
+          onVolver={volverMenu}
+          onAyuda={onAbrirAyuda}
+          codigo={codigoInput}
+          setCodigo={setCodigoInput}
+          nombre={nombre}
+          setNombre={setNombre}
+          onUnirse={handleUnirse}
+          cargando={cargando}
+          error={errorMsg}
+        />
+      </div>
+    );
+  }
+
+  if (!sala) {
+    return (
+      <div className="ub-contenedor qq-en-partida">
+        <section className="game ubp-escena">
+          <div className="ubp-tarjeta ubp-cargando"><span className="ubp-globo">🌍</span><p>Conectando con la sala…</p></div>
+        </section>
+      </div>
+    );
+  }
+
+  // ---------- Sala de espera ----------
+  if (sala.estado === 'lobby') {
+    return (
+      <div className="ub-contenedor">
+        <section className="game qq-pantalla">
+          <CabeceraSala codigo={sala.code} onVolver={() => setModalSalirLobby(true)} onAyuda={onAbrirAyuda} />
+          <ListaSala
+            jugadores={sala.jugadores}
+            yoId={yoId}
+            max={10}
+            min={2}
+            anfitrionId={sala.anfitrionId}
+            renderExtra={(j) => <span className="ubp-punto" style={{ background: j.color }} />}
+          >
+            <p className="hint" style={{ marginTop: '0.8rem' }}>🗺️ {sala.totalRondas} rondas</p>
+          </ListaSala>
           {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
-
           {esAdmin ? (
             <button
               type="button"
               className="big full qq-btn-principal"
               style={{ marginTop: '1rem' }}
               disabled={sala.jugadores.length < 2}
-              onClick={handleIniciarPartida}
+              onClick={() => accion('iniciar')}
             >
-              <Icon name="play" size={22} />{' '}
-              {sala.jugadores.length < 2 ? 'Esperando jugadores (mínimo 2)...' : 'Iniciar juego'}
+              <Icon name="play" size={22} /> {sala.jugadores.length < 2 ? 'Esperando jugadores…' : '¡Empezar el viaje!'}
             </button>
           ) : (
-            <div className="panel center" style={{ padding: '1.8rem 1.4rem', marginTop: '1rem' }}>
-              <span className="lb-luna chica"><Icon name="hourglass" size={36} /></span>
-              <h3 style={{ margin: '0.4rem 0' }}>Esperando al anfitrión...</h3>
-              <p className="hint">
-                El anfitrión iniciará la partida cuando estéis todos listos.
-              </p>
-            </div>
+            <EsperandoAnfitrion />
           )}
         </section>
-      )}
+        {modalSalirLobby && (
+          <ModalSalir
+            titulo="¿Salir de la sala?"
+            texto="Abandonarás la sala de espera y volverás al menú online."
+            onSeguir={() => setModalSalirLobby(false)}
+            onSalir={() => { setModalSalirLobby(false); abandonarSala(); setVista('online_menu'); }}
+          />
+        )}
+      </div>
+    );
+  }
 
-      {/* 5. JUGANDO: FASE FOTO */}
-      {vista === 'sala' && sala && sala.estado === 'jugando' && ronda && ronda.faseRonda === 'foto' && (
-        <section className="game">
-          <div className="panel qq-menu-panel">
-            <div className="qq-card-top">
-              <button
-                type="button"
-                className="qq-link-volver"
-                onClick={() => setModalSalirPortada(true)}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M19 12H5M12 19l-7-7 7-7" />
-                </svg>
-                <span>Volver a la portada</span>
-              </button>
-              <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
-                Ronda {sala.rondaNum} de {sala.totalRondas}
-              </span>
-            </div>
+  const jugadores = sala.jugadores;
+  const salirDePartida = () => { setModalSalirPartida(false); abandonarSala(); onSalir?.(); };
+  const modalSalir = modalSalirPartida && (
+    <ModalSalir
+      titulo="¿Salir de la partida?"
+      texto={esAdmin ? 'Saldrás de la sala y otro jugador pasará a ser el anfitrión.' : 'Abandonarás la partida en curso.'}
+      onSeguir={() => setModalSalirPartida(false)}
+      onSalir={salirDePartida}
+    />
+  );
+  const hero = (extra = {}) => (
+    <Hero onSalir={() => setModalSalirPartida(true)} ronda={sala.rondaNum} total={sala.totalRondas} jugadores={jugadores} yoId={yoId} {...extra} />
+  );
 
-            <h3 className="panel-title" style={{ justifyContent: 'center', marginTop: '0.4rem' }}>
-              <Icon name="eye" size={22} /> ¡Memoriza este lugar!
-            </h3>
-            <img
-              className="ub-foto"
-              src={ronda.lugar.imagenUrl}
-              alt="Monumento a situar en el mapa"
-            />
-            <div className="timer">
-              <div
-                className={`timer-bar${ronda.segundosRestantesFoto <= 3 ? ' low' : ''}`}
-                style={{ width: `${(ronda.segundosRestantesFoto / 10) * 100}%` }}
-              />
-            </div>
-            <p className="timer-text">
-              <Icon name="clock" size={18} /> Pasando al mapa en: {ronda.segundosRestantesFoto} s
-            </p>
-          </div>
-        </section>
-      )}
-
-      {/* 6. JUGANDO: FASE MAPA */}
-      {vista === 'sala' && sala && sala.estado === 'jugando' && ronda && ronda.faseRonda === 'mapa' && (
-        <section className="game">
-          {verImagen && (
-            <div className="ub-modal-fondo" onClick={() => setVerImagen(false)}>
-              <div className="ub-modal ub-modal-foto" onClick={(e) => e.stopPropagation()}>
-                <img className="ub-foto" src={ronda.lugar.imagenUrl} alt="Lugar" />
-                <button className="big full" onClick={() => setVerImagen(false)}>Cerrar</button>
-              </div>
-            </div>
-          )}
-
-          <div className="panel qq-menu-panel">
-            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
-              <button
-                type="button"
-                className="qq-link-volver"
-                onClick={() => setModalSalirPortada(true)}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M19 12H5M12 19l-7-7 7-7" />
-                </svg>
-                <span>Volver a la portada</span>
-              </button>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
-                  Ronda {sala.rondaNum}/{sala.totalRondas}
-                </span>
-                <button type="button" className="secondary ub-mini" onClick={() => setVerImagen(true)}>
-                  <Icon name="eye" size={16} /> Ver foto
-                </button>
-              </div>
-            </div>
-
-            <div className="timer" style={{ marginTop: '0', marginBottom: '0.8rem' }}>
-              <div
-                className={`timer-bar${ronda.segundosRestantesMapa <= 15 ? ' low' : ''}`}
-                style={{ width: `${(ronda.segundosRestantesMapa / SEGUNDOS_TURNO) * 100}%` }}
-              />
-            </div>
-            <p className="timer-text" style={{ marginTop: '-0.3rem', marginBottom: '0.9rem' }}>
-              <Icon name="clock" size={16} /> {ronda.segundosRestantesMapa} s
-            </p>
-
-            <div className="scoreboard-container" style={{ justifyContent: 'center', marginBottom: '0.8rem' }}>
-              {sala.jugadores.map((j) => {
-                const listo = ronda.jugadoresConfirmados.includes(j.id);
-                return (
-                  <div key={j.id} className="score-pill" style={{ borderColor: listo ? '#10b981' : undefined }}>
-                    <span className="ub-punto" style={{ background: j.color }} />
-                    <span>{j.nombre}: {listo ? '✅ Listo' : 'Colocando…'}</span>
-                  </div>
-                );
-              })}
-            </div>
-
-            {ronda.destellosVisibles.length > 0 && (
-              <div className="status-alert acierto" style={{ textAlign: 'center', marginBottom: '0.8rem' }}>
-                📡 ¡RADAR ACTIVO (1s)! Vislumbrando marcadores provisionales de rivales no confirmados...
-              </div>
-            )}
-
-            <div className="ub-turno" style={{ '--c': miColor }}>
-              <p className="ub-turno-titulo">
-                <span className="ub-punto" style={{ background: miColor }} />
-                {yaConfirmado ? (
-                  <span>¡Marcador confirmado! Tu posición está blindada.</span>
-                ) : (
-                  <span>Toca el mapa para situar tu marcador <strong>★ Real</strong>.</span>
-                )}
-              </p>
-              <p className="ub-turno-texto">
-                {yaConfirmado
-                  ? 'Esperando a que el resto de jugadores confirmen o se agote el tiempo.'
-                  : 'Mientras no confirmes, tu marcador parpadeará durante 1 segundo para los demás cada 15 segundos.'}
-              </p>
-            </div>
-
-            <MapaMundi
-              key={`mapa-online-${sala.rondaNum}`}
-              marcadores={marcadoresMapa}
-              onClickMapa={handleColocarMarcador}
-              onMoverMarcador={(id, lat, lng) => handleColocarMarcador(lat, lng)}
-            />
-
-            {!yaConfirmado ? (
-              <button
-                className="big full qq-btn-principal"
-                disabled={!miPos}
-                onClick={handleConfirmarMarcador}
-                style={{ marginTop: '0.6rem' }}
-              >
-                <Icon name="check" size={22} /> Confirmar mi marcador definitivo
-              </button>
-            ) : (
-              <div className="status-alert info" style={{ textAlign: 'center', marginTop: '0.6rem' }}>
-                Has confirmado tu marcador. Esperando al resto...
-              </div>
-            )}
-          </div>
-        </section>
-      )}
-
-      {/* 7. RESULTADOS DE LA RONDA */}
-      {vista === 'sala' && sala && sala.estado === 'jugando' && ronda && ronda.faseRonda === 'resultados' && ronda.resultado && (
-        <section className="game">
-          <div className="panel qq-menu-panel">
-            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
-              <button
-                type="button"
-                className="qq-link-volver"
-                onClick={() => setModalSalirPortada(true)}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M19 12H5M12 19l-7-7 7-7" />
-                </svg>
-                <span>Volver a la portada</span>
-              </button>
-              <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
-                Ronda {sala.rondaNum} de {sala.totalRondas}
-              </span>
-            </div>
-
-            <MapaMundi
-              key={`res-online-${sala.rondaNum}`}
-              marcadores={marcadoresResultado}
-              lineas={lineasResultado}
-              ajustar
-              enfoque={enfoque}
-            />
-
-            <div className="ub-ranking" style={{ marginTop: '1rem' }}>
-              <h3 className="panel-title"><Icon name="trophy" size={22} /> Resultados de la ronda</h3>
-              <p className="ub-lugar-revelado">
-                <Icon name="pin" size={22} />
-                <span><strong>{ronda.resultado.lugar.nombre}</strong> · {ronda.resultado.lugar.pais}</span>
-              </p>
-
-              <div className="scoreboard">
-                {ronda.resultado.filas.map((f, i) => (
-                  <button
-                    key={f.jugadorId}
-                    className="ub-rank-fila"
-                    onClick={() => f.real && setEnfoque(f.real)}
-                    title="Ver su marcador en el mapa"
-                    disabled={!f.real}
-                  >
-                    <span className="score-name">
-                      <span className="pos">{i + 1}</span>
-                      <span className="ub-punto" style={{ background: f.color }} />
-                      {f.nombre}
-                    </span>
-                    <span className="ub-rank-datos">
-                      <span className="ub-rank-km">{f.real ? formatearKm(f.km) : 'No colocado'}</span>
-                      <span className={`ub-rank-pts${f.puntos > 0 ? ' suma' : ''}`}>+{f.puntos}</span>
-                    </span>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {esAdmin ? (
-              <div style={{ marginTop: '1.2rem' }}>
-                {sala.rondaNum < sala.totalRondas ? (
-                  <button className="big full qq-btn-principal" onClick={handleSiguienteRonda}>
-                    <Icon name="play" size={20} /> Siguiente ronda ({sala.rondaNum + 1} de {sala.totalRondas})
-                  </button>
-                ) : (
-                  <button className="big full qq-btn-principal" onClick={handleFinalizar}>
-                    <Icon name="trophy" size={20} /> Ver podio final
-                  </button>
-                )}
-
-                <div className="qq-tablero-footer">
-                  <button type="button" className="qq-link-otra-ronda" onClick={handleFinalizar}>
-                    Finalizar partida ahora
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <p className="hint center" style={{ marginTop: '1rem', marginBottom: 0 }}>
-                Esperando a que el anfitrión avance a la siguiente ronda...
-              </p>
-            )}
-          </div>
-        </section>
-      )}
-
-      {/* 8. PODIO FINAL ONLINE */}
-      {vista === 'sala' && sala && sala.estado === 'final' && (
-        <section className="game">
-          <div className="end-card">
-            <span className="end-icon"><Icon name="crown" size={48} /></span>
-            <h1 className="title">Clasificación Final</h1>
-            <p className="final-score">
-              {ganadores.length === 0
-                ? 'Nadie ha sumado puntos'
-                : ganadores.length === 1
-                  ? <>¡Victoria para {ganadores[0].nombre} con {maximo} puntos!</>
-                  : <>Empate entre {ganadores.map((g) => g.nombre).join(', ')} con {maximo} puntos</>}
-            </p>
-
-            <div className="scoreboard">
-              {ranking.map((j, i) => {
-                const lider = maximo > 0 && j.puntos === maximo;
-                return (
-                  <div key={j.id} className={`score-row ${lider ? 'first' : ''}`}>
-                    <span className="score-name">
-                      {lider ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
-                      <span className="ub-punto" style={{ background: j.color }} />
-                      {j.nombre}
-                    </span>
-                    <span className="score-pts">{j.puntos} pts</span>
-                  </div>
-                );
-              })}
-            </div>
-
-            <button
-              type="button"
-              className="big full qq-btn-principal"
-              style={{ marginTop: '1.4rem' }}
-              onClick={handleCerrarSalaYSalirAPortada}
-            >
-              Volver a la portada
+  // ---------- Final ----------
+  if (sala.estado === 'final') {
+    return (
+      <div className="ub-contenedor qq-en-partida">
+        <section className="game ubp-escena">
+          <Podio jugadores={jugadores} yoId={yoId} />
+          <Clasificacion jugadores={jugadores} yoId={yoId} titulo="Clasificación final" />
+          <div className="ubp-barra estatica">
+            <button type="button" className="ubp-boton grande" onClick={salirDePartida}>
+              <Icon name="home" size={22} /> Volver a la portada
             </button>
           </div>
         </section>
-      )}
+      </div>
+    );
+  }
 
-      {/* MODAL: SALIR DEL LOBBY AL SUBMENÚ ONLINE */}
-      {modalSalirLobby && (
-        <div className="rg-modal-fondo" onClick={() => setModalSalirLobby(false)}>
-          <div
-            className="rg-modal"
-            onClick={(e) => e.stopPropagation()}
-            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
-          >
-            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
-            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
-              ¿Salir de la sala?
-            </h3>
-            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
-              Si sales ahora abandonarás la sala de espera y volverás al menú anterior. ¿Estás seguro?
+  if (!ronda) return null;
+
+  // ---------- Foto ----------
+  if (ronda.faseRonda === 'foto') {
+    return (
+      <div className="ub-contenedor qq-en-partida">
+        <section className="game ubp-escena">
+          {hero()}
+          <TarjetaFoto src={ronda.lugar.imagenUrl} segundos={ronda.segundosRestantesFoto} total={SEGUNDOS_FOTO} />
+        </section>
+        {modalSalir}
+      </div>
+    );
+  }
+
+  // ---------- Mapa ----------
+  if (ronda.faseRonda === 'mapa') {
+    const marcadores = [];
+    if (miPos) {
+      marcadores.push({
+        id: 'mi-marcador', ...miPos, color: miColor, glifo: '★', grande: true, arrastrable: !yaConfirmado,
+        etiqueta: yaConfirmado ? 'Confirmado' : 'Tú'
+      });
+    }
+    (ronda.destellosVisibles || []).forEach((d) => marcadores.push({
+      id: d.id, lat: d.lat, lng: d.lng, color: d.color, glifo: inicial(d.nombre), fantasma: true, interactivo: false, etiqueta: `📡 ${d.nombre}`
+    }));
+    const radar = ronda.destellosVisibles?.length > 0;
+
+    return (
+      <div className="ub-contenedor qq-en-partida">
+        {verImagen && <ModalFoto src={ronda.lugar.imagenUrl} onCerrar={() => setVerImagen(false)} />}
+        <section className="game ubp-escena">
+          {hero({ confirmados: ronda.jugadoresConfirmados })}
+          <BarraTiempo segundos={ronda.segundosRestantesMapa} total={SEGUNDOS_TURNO} />
+          {radar && <div className="ubp-radar" role="status">📡 ¡Radar! Se ven los marcadores sin confirmar</div>}
+          <div className="ubp-instruccion" style={{ '--c': miColor }}>
+            <span className="ubp-avatar">{yaConfirmado ? '✓' : inicial(miJugador?.nombre)}</span>
+            <p>
+              {yaConfirmado
+                ? <>Marcador confirmado. Esperando al resto…</>
+                : miPos
+                  ? <>Arrastra tu marcador para afinar y <strong>confirma</strong>. Sin confirmar, el radar lo enseña cada 15 s.</>
+                  : <>Toca el mapa para situar tu marcador <strong>★</strong></>}
             </p>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
-              <button
-                type="button"
-                className="secondary full"
-                onClick={() => setModalSalirLobby(false)}
-              >
-                No, quedarme
-              </button>
-              <button
-                type="button"
-                className="secondary danger full"
-                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
-                onClick={handleVolverMenuOnline}
-              >
-                Sí, salir
-              </button>
-            </div>
+            <BotonFoto src={ronda.lugar.imagenUrl} onClick={() => setVerImagen(true)} />
           </div>
-        </div>
-      )}
-
-      {/* MODAL: CERRAR SALA Y VOLVER A PORTADA DESDE LA PARTIDA */}
-      {modalSalirPortada && (
-        <div className="rg-modal-fondo" onClick={() => setModalSalirPortada(false)}>
-          <div
-            className="rg-modal"
-            onClick={(e) => e.stopPropagation()}
-            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
-          >
-            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
-            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
-              ¿Salir de la sala?
-            </h3>
-            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
-              {esAdmin
-                ? 'Se cerrará la sala y volverás a la portada principal. ¿Estás seguro?'
-                : 'Abandonarás la partida en curso y volverás a la portada principal. ¿Estás seguro?'}
-            </p>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
-              <button
-                type="button"
-                className="secondary full"
-                onClick={() => setModalSalirPortada(false)}
-              >
-                No, quedarme
+          <MapaMundi
+            key={`mapa-online-${sala.rondaNum}`}
+            marcadores={marcadores}
+            onClickMapa={colocarMarcador}
+            onMoverMarcador={(id, lat, lng) => colocarMarcador(lat, lng)}
+          />
+          {errorMsg && <p className="error" style={{ margin: 0 }}>{errorMsg}</p>}
+          <div className="ubp-barra estatica">
+            {yaConfirmado ? (
+              <p className="ubp-espera">⏳ {ronda.jugadoresConfirmados.length}/{jugadores.length} jugadores han confirmado</p>
+            ) : (
+              <button type="button" className="ubp-boton grande" disabled={!miPos} onClick={() => accion('confirmar')}>
+                <Icon name="check" size={22} /> Confirmar mi marcador
               </button>
-              <button
-                type="button"
-                className="secondary danger full"
-                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
-                onClick={handleCerrarSalaYSalirAPortada}
-              >
-                Sí, salir de la sala
-              </button>
-            </div>
+            )}
           </div>
-        </div>
-      )}
-    </div>
-  );
+        </section>
+        {modalSalir}
+      </div>
+    );
+  }
+
+  // ---------- Resultados de la ronda ----------
+  if (ronda.faseRonda === 'resultados' && ronda.resultado) {
+    const res = ronda.resultado;
+    const filas = res.filas.map((f) => ({ ...f, id: f.jugadorId }));
+    const ultima = sala.rondaNum >= sala.totalRondas;
+    return (
+      <div className="ub-contenedor qq-en-partida">
+        <section className="game ubp-escena">
+          {hero()}
+          <MapaMundi
+            key={`res-online-${sala.rondaNum}`}
+            marcadores={[
+              { id: 'correcto', lat: res.lugar.lat, lng: res.lugar.lng, color: '#111827', glifo: '✓', grande: true, z: 1000, etiqueta: res.lugar.nombre },
+              ...filas.filter((f) => f.real).map((f) => ({
+                id: `jugador-${f.id}`, lat: f.real.lat, lng: f.real.lng, color: f.color, glifo: inicial(f.nombre), etiqueta: f.nombre
+              }))
+            ]}
+            lineas={filas.filter((f) => f.real).map((f) => ({ desde: f.real, hasta: res.lugar, color: f.color }))}
+            ajustar
+            enfoque={enfoque}
+          />
+          <TablaRonda lugar={res.lugar} filas={filas} onEnfocar={setEnfoque} yoId={yoId} />
+          <Clasificacion
+            jugadores={jugadores}
+            yoId={yoId}
+            sumadas={Object.fromEntries(filas.map((f) => [f.id, f.puntos]))}
+            subtitulo={`Tras la ronda ${sala.rondaNum} de ${sala.totalRondas} · gana quien menos sume`}
+          />
+          <div className="ubp-barra estatica">
+            {esAdmin ? (
+              <>
+                <button type="button" className="ubp-boton grande" onClick={() => accion(ultima ? 'finalizar' : 'siguiente-ronda')}>
+                  {ultima ? <><Icon name="crown" size={22} /> Ver el podio</> : <><Icon name="play" size={22} /> Siguiente ronda</>}
+                </button>
+                {!ultima && (
+                  <button type="button" className="ubp-enlace" onClick={() => accion('finalizar')}>
+                    <Icon name="flagFinish" size={16} /> Terminar la partida aquí
+                  </button>
+                )}
+              </>
+            ) : (
+              <p className="ubp-espera">⏳ Esperando a que el anfitrión continúe…</p>
+            )}
+          </div>
+        </section>
+        {modalSalir}
+      </div>
+    );
+  }
+
+  return null;
 }

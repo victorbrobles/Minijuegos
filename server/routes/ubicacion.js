@@ -19,28 +19,19 @@ function distanciaKm(a, b) {
   return 2 * RADIO_TIERRA_KM * Math.asin(Math.min(1, Math.sqrt(h)));
 }
 
-const RANGOS_PUNTOS = [
-  { hasta: 10, puntos: 10 },
-  { hasta: 50, puntos: 9 },
-  { hasta: 100, puntos: 8 },
-  { hasta: 200, puntos: 7 },
-  { hasta: 300, puntos: 6 },
-  { hasta: 500, puntos: 5 },
-  { hasta: 1000, puntos: 4 },
-  { hasta: 2000, puntos: 3 },
-  { hasta: 3000, puntos: 2 },
-  { hasta: 5000, puntos: 1 }
-];
+// Puntuación: cada jugador suma tantos puntos como kilómetros le separan del lugar.
+// Gana quien MENOS puntos tiene al final. Quien no coloca su marcador suma la penalización.
+export const PENALIZACION_SIN_MARCA = 20000;
+const RONDAS_PERMITIDAS = [5, 10, 15];
 
 function puntosPorDistancia(km) {
-  const rango = RANGOS_PUNTOS.find((r) => km <= r.hasta);
-  return rango ? rango.puntos : 0;
+  return Math.round(km);
 }
 
 // GET /api/ubicacion/lote
 router.get('/lote', (req, res) => {
   const pedidos = parseInt(req.query.n, 10) || 16;
-  const n = Math.min(Math.max(pedidos, 1), LUGARES.length);
+  const n = Math.min(Math.max(pedidos, 1), 40, LUGARES.length);
   res.json(barajar(LUGARES).slice(0, n));
 });
 
@@ -92,18 +83,19 @@ function cerrarRondaOnline(sala) {
         puntos: pts
       });
     } else {
+      j.puntos += PENALIZACION_SIN_MARCA;
       filas.push({
         jugadorId: j.id,
         nombre: j.nombre,
         color: j.color,
         real: null,
-        km: 99999,
-        puntos: 0
+        km: null,
+        puntos: PENALIZACION_SIN_MARCA
       });
     }
   });
 
-  filas.sort((a, b) => a.km - b.km);
+  filas.sort((a, b) => a.puntos - b.puntos);
 
   sala.ronda.resultado = {
     lugar,
@@ -114,7 +106,7 @@ function cerrarRondaOnline(sala) {
 
 // POST /api/ubicacion/online/crear
 router.post('/online/crear', (req, res) => {
-  const { nombre, lugares = [] } = req.body || {};
+  const { nombre, lugares = [], rondas } = req.body || {};
   if (!nombre?.trim()) return res.status(400).json({ error: 'Nombre requerido.' });
   if (!lugares.length) return res.status(400).json({ error: 'No se recibieron lugares para la partida.' });
 
@@ -127,6 +119,7 @@ router.post('/online/crear', (req, res) => {
     estado: 'lobby', // 'lobby' | 'jugando' | 'final'
     adminToken: tokenAdmin,
     rondaNum: 1,
+    totalRondas: Math.min(RONDAS_PERMITIDAS.includes(Number(rondas)) ? Number(rondas) : RONDAS, lugares.length),
     lugares,
     jugadores: [{ id: 1, nombre: nombre.trim(), token: tokenAdmin, color: COLORES[0], puntos: 0 }],
     ronda: null
@@ -146,7 +139,8 @@ router.post('/online/unirse', (req, res) => {
   if (sala.jugadores.length >= 10) return res.status(400).json({ error: 'Sala llena (máx 10).' });
 
   const token = 'tok_' + Math.random().toString(36).substring(2);
-  const nuevoId = sala.jugadores.length + 1;
+  // El id no puede repetirse aunque alguien haya salido de la sala
+  const nuevoId = Math.max(0, ...sala.jugadores.map((j) => j.id)) + 1;
 
   sala.jugadores.push({
     id: nuevoId,
@@ -236,7 +230,9 @@ router.get('/online/sala/:code', (req, res) => {
     esAdmin: sala.adminToken === token,
     yoId: jugador.id,
     rondaNum: sala.rondaNum,
-    totalRondas: RONDAS,
+    totalRondas: sala.totalRondas,
+    anfitrionId: sala.jugadores.find((j) => j.token === sala.adminToken)?.id ?? null,
+    penalizacion: PENALIZACION_SIN_MARCA,
     jugadores: sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre, color: j.color, puntos: j.puntos })),
     ronda: infoRonda
   });
@@ -250,6 +246,7 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
 
   sala.estado = 'jugando';
   sala.rondaNum = 1;
+  sala.jugadores.forEach((j) => { j.puntos = 0; });
   inicializarRondaOnline(sala);
 
   res.json({ success: true });
@@ -301,7 +298,7 @@ router.post('/online/sala/:code/siguiente-ronda', (req, res) => {
   const sala = salasOnline.get(req.params.code?.toUpperCase());
   if (!sala || sala.adminToken !== req.body?.token) return res.status(403).json({ error: 'No autorizado.' });
 
-  if (sala.rondaNum >= RONDAS || sala.rondaNum >= sala.lugares.length) {
+  if (sala.rondaNum >= sala.totalRondas) {
     sala.estado = 'final';
   } else {
     sala.rondaNum += 1;

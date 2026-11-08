@@ -227,7 +227,7 @@ export const META = {
     icono: 'pin',
     colores: ['#10b981', '#064e3b'],
     etiquetas: 'mapa lugares monumentos geografia mundo foto',
-    descripcion: 'Coloca un lugar o monumento icónico en un mapa satélite del mundo. Coloca una marca real y varios señuelos para engañar a tus rivales. Cuanto más cerca de las coordenadas reales dejes tu marca, más puntos obtendrás.',
+    descripcion: 'Sitúa en el mapa del mundo un lugar o monumento icónico que solo verás unos segundos. Cada kilómetro de error suma un punto y gana quien menos acumule. En un solo dispositivo, además, deja señuelos para engañar al siguiente jugador.',
     categorias: ['chill', 'favoritos']
   },
   'masmenos': {

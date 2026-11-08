@@ -94,3 +94,9 @@ npm run dev
 - **Excusas a Domicilio** (`Excusas/`): fichas, hechos y preguntas en `datos.js`; `motor.js` detecta contradicciones con lo que sabe el jefe, repeticiones y excusas absurdas.
 - **Semáforo Invertido** (`Semaforo/`): efecto Stroop con una regla que cambia cada 10 s.
 - **Un Solo Trazo** (`UnTrazo/`): `motor.js` genera figuras en una cuadrícula sin líneas cruzadas; una figura es posible si es conexa y tiene 0 o 2 puntos de grado impar.
+
+## Minijuego: Test del viajero (`Ubicacion/`)
+- Puntuación «como en el golf»: cada ronda sumas tantos puntos como kilómetros te separan del lugar real; sin marcador sumas 20.000. Gana quien **menos** puntos tenga (constante `PENALIZACION_SIN_MARCA` en `client/src/games/Ubicacion/geo.js` y en `server/routes/ubicacion.js`).
+- Partidas de 5, 10 o 15 rondas, en local (de 2 a 10 jugadores, con señuelos) u online.
+- Pantallas de partida en `Pantallas.jsx` (cabecera, foto, resultados, clasificación y podio); menús con los componentes comunes de `MenuJuego.jsx`.
+- Lugares en `server/data/seeds/ubicacion/ubicacion.seed.js` y `ampliacion.seed.js` (`l(id, nombre, país, lat, lng, artículo_de_Wikipedia_en_inglés)`). La foto se toma del artículo de Wikipedia; si no tiene foto de Commons, el lugar se descarta en esa partida.
