@@ -41,6 +41,20 @@ import Jugadas from './Jugadas/Jugadas.jsx';
 import CuatroClubes from './CuatroClubes/CuatroClubes.jsx';
 import GeoQuiz from './GeoQuiz/GeoQuiz.jsx';
 
+import VerdaderoFalso from './VerdaderoFalso/VerdaderoFalso.jsx';
+import Pecera from './Pecera/Pecera.jsx';
+import CriptoHacker from './CriptoHacker/CriptoHacker.jsx';
+import Anomalias from './Anomalias/Anomalias.jsx';
+import Trinchera from './Trinchera/Trinchera.jsx';
+import Ovejas from './Ovejas/Ovejas.jsx';
+import Segundero from './Segundero/Segundero.jsx';
+import Encadenada from './Encadenada/Encadenada.jsx';
+import MapaMentiroso from './MapaMentiroso/MapaMentiroso.jsx';
+import Ordenalos from './Ordenalos/Ordenalos.jsx';
+import Excusas from './Excusas/Excusas.jsx';
+import Semaforo from './Semaforo/Semaforo.jsx';
+import UnTrazo from './UnTrazo/UnTrazo.jsx';
+
 // id del juego (el mismo que en server/data/games.json) -> componente React
 const registry = {
   'siglas': Siglas,
@@ -84,7 +98,20 @@ const registry = {
   'footballsplit': FootballSplit,
   'jugadas': Jugadas,
   'cuatroclubes': CuatroClubes,
-  'geoquiz': GeoQuiz
+  'geoquiz': GeoQuiz,
+  'verdaderofalso': VerdaderoFalso,
+  'pecera': Pecera,
+  'criptohacker': CriptoHacker,
+  'anomalias': Anomalias,
+  'trinchera': Trinchera,
+  'ovejas': Ovejas,
+  'segundero': Segundero,
+  'encadenada': Encadenada,
+  'mapamentiroso': MapaMentiroso,
+  'ordenalos': Ordenalos,
+  'excusas': Excusas,
+  'semaforo': Semaforo,
+  'untrazo': UnTrazo
 };
 
 export default registry;

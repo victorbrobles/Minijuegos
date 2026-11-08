@@ -1,0 +1,136 @@
+/* client/src/games/Encadenada/Encadenada.css */
+.ec-contenedor { width: 100%; }
+
+.ec-objetivo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.7rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #0f172a;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-weight: 800;
+  font-size: 1.15rem;
+  letter-spacing: 2px;
+}
+
+.ec-objetivo strong { color: var(--g2); font-size: 1.35rem; }
+.ec-objetivo em {
+  margin-left: auto;
+  color: #64748b;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-style: normal;
+  letter-spacing: 0;
+}
+
+.ec-cadena {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 34px;
+}
+
+.ec-eslabon {
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.ec-eslabon::after { content: ' →'; opacity: 0.6; }
+
+.ec-pasos {
+  margin-left: auto;
+  color: #e2e8f0;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.ec-actual {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.55rem;
+}
+
+.ec-actual.error { animation: ecTemblor 0.35s ease; }
+.ec-actual.resuelto .ec-ficha { background: #dcfce7 !important; border-color: #22c55e !important; }
+
+@keyframes ecTemblor {
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+.ec-ficha {
+  width: 100% !important;
+  aspect-ratio: 1;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 3px solid transparent !important;
+  border-radius: 20px !important;
+  background: #ffffff !important;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.25) !important;
+  color: #0f172a !important;
+  font-family: 'Bricolage Grotesque', sans-serif !important;
+  font-size: clamp(2rem, 11vw, 3rem) !important;
+  font-weight: 800 !important;
+  cursor: pointer;
+}
+
+.ec-ficha.bien { color: #15803d !important; }
+
+.ec-ficha.activa {
+  border-color: var(--g1) !important;
+  background: color-mix(in srgb, var(--g1) 15%, #ffffff) !important;
+  transform: translateY(-4px);
+}
+
+.ec-teclado {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  gap: 0.3rem;
+}
+
+.ec-tecla {
+  width: 100% !important;
+  min-height: 46px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 10px !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.3) !important;
+  color: #0f172a !important;
+  font-weight: 800 !important;
+  font-size: 1.05rem !important;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.ec-tecla:disabled { opacity: 0.45; cursor: default; }
+.ec-tecla:active:not(:disabled) { transform: translateY(2px); }
+
+/* Fila central y última algo más estrechas, como un teclado */
+.ec-tecla:nth-child(11) { grid-column-start: 1; }
+
+.ec-controles {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 0.45rem;
+  align-items: center;
+  padding-bottom: calc(0.6rem + env(safe-area-inset-bottom));
+}
+
+.ec-controles .uj-boton { min-height: 46px; font-size: 0.95rem !important; }
+
+.ec-resultado { text-align: center; }
+.ec-medalla { margin: 0; font-size: 3rem; line-height: 1; }
+.ec-resultado h3 { margin: 0.3rem 0; }
+.ec-ganados { margin: 0.2rem 0 0.8rem; color: var(--g2); font-weight: 900; font-size: 1.1rem; }

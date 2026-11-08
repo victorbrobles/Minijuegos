@@ -1,0 +1,203 @@
+/* client/src/games/Ordenalos/Ordenalos.css */
+.or-contenedor { width: 100%; }
+
+.or-contador {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+  font-weight: 800;
+  font-size: 0.9rem;
+}
+
+.or-contador span {
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.95);
+  color: #0f172a;
+}
+
+.or-contador .pasado { background: #fee2e2; color: #b91c1c; }
+
+.or-balanza {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.8rem 0 0.4rem;
+}
+
+.or-brazo {
+  display: flex;
+  justify-content: space-between;
+  width: 82%;
+  height: 10px;
+  border-radius: 5px;
+  background: #ffffff;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.25);
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.or-balanza.izq .or-brazo { transform: rotate(-9deg); }
+.or-balanza.der .or-brazo { transform: rotate(9deg); }
+
+.or-plato {
+  position: relative;
+  top: 10px;
+  display: grid;
+  place-items: center;
+  width: 78px;
+  height: 58px;
+  margin: 0 -20px;
+  border-radius: 0 0 40px 40px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2);
+}
+
+.or-plato b {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  color: #ffffff;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.4rem;
+}
+
+.or-plato em { color: #94a3b8; font-style: normal; font-weight: 900; font-size: 1.4rem; }
+
+.or-pie {
+  width: 10px;
+  height: 46px;
+  margin-top: -4px;
+  border-radius: 0 0 4px 4px;
+  background: #ffffff;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.25);
+}
+
+.or-veredicto {
+  margin: 0.5rem 0 0;
+  padding: 0.3rem 0.9rem;
+  border-radius: 999px;
+  background: #0f172a;
+  color: #ffffff;
+  font-weight: 800;
+  animation: orAparecer 0.3s ease-out;
+}
+
+@keyframes orAparecer { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.or-cajas {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+}
+
+.or-caja {
+  position: relative;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100% !important;
+  min-height: 84px;
+  margin: 0 !important;
+  padding: 0.4rem !important;
+  border: 3px solid transparent !important;
+  border-radius: 18px !important;
+  background: #ffffff !important;
+  box-shadow: 0 5px 0 var(--c) !important;
+  color: #0f172a !important;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.or-caja:disabled { cursor: default; opacity: 1; }
+.or-caja.elegida { border-color: var(--c) !important; transform: translateY(-4px); }
+.or-caja.colocada { opacity: 0.55 !important; }
+
+.or-letra {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--c);
+}
+
+.or-peso { font-size: 0.85rem; font-weight: 800; }
+
+.or-num {
+  position: absolute;
+  top: -8px;
+  right: -6px;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #0f172a;
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 0.85rem;
+}
+
+.or-fila-orden {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  color: #e2e8f0;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.or-hueco {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 2px dashed rgba(255, 255, 255, 0.5);
+  border-radius: 10px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.85rem;
+}
+
+.or-hueco.lleno {
+  border: 0;
+  background: var(--c);
+  color: #ffffff;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.1rem;
+}
+
+.or-hueco.bien { box-shadow: 0 0 0 3px #22c55e; }
+.or-hueco.mal { box-shadow: 0 0 0 3px #ef4444; }
+
+.or-resultado { text-align: center; }
+.or-resultado p { margin: 0.2rem 0; }
+.or-estrellas { font-size: 2.2rem; color: #f59e0b; }
+
+.or-registro {
+  padding: 0.7rem 0.8rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.or-registro .uj-etiqueta { color: #e2e8f0; }
+
+.or-registro div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.or-registro span {
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #0f172a;
+  font-weight: 800;
+  font-size: 0.9rem;
+}

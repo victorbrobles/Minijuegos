@@ -8,10 +8,11 @@ export const CATEGORIAS_PORTADA = [
   { id: 'chill', titulo: '🌴 Para jugar de chill', desc: 'Risas, amigos, preguntas y pura diversión sin estrés' },
   { id: 'futbol', titulo: '⚽ Para amantes del fútbol', desc: 'Demuestra todo lo que sabes sobre el deporte rey' },
   { id: 'famosos', titulo: '🌟 De famosos y cultura pop', desc: 'Celebridades, cine, música, frases y televisión' },
-  { id: 'dos_jugadores', titulo: '👥 Para dos jugadores', desc: 'Ideales para competir o cooperar frente a frente' }
+  { id: 'dos_jugadores', titulo: '👥 Para dos jugadores', desc: 'Ideales para competir o cooperar frente a frente' },
+  { id: 'un_jugador', titulo: '🎯 Para un jugador', desc: 'Retos en solitario: lógica, memoria, estrategia y reflejos' }
 ];
 
-// Cada uno de los 36 minijuegos tiene un icono único y una combinación de colores (degradado) única
+// Cada uno de los minijuegos tiene un icono único y una combinación de colores (degradado) única
 export const META = {
   'bingoball': {
     titulo: 'Bingoball',
@@ -390,6 +391,123 @@ export const META = {
     etiquetas: 'geografia paises capitales fronteras idiomas banderas monumentos rios montañas mapas quiz trivial',
     descripcion: 'El quiz definitivo de geografía: capitales, fronteras, idiomas, banderas, ríos, monumentos y récords. Responde, enumera, ordena o deduce con pistas en cuatro modos de juego, ¡y demuestra quién conoce mejor el mundo!',
     categorias: ['prueba']
+  },
+  'verdaderofalso': {
+    titulo: '¿Verdadero o falso? Exprés',
+    imagen: '/covers/verdaderofalso.webp',
+    icono: 'verdaderofalso',
+    colores: ['#22c55e', '#be123c'],
+    etiquetas: 'verdadero falso rapido mitos cultura general reflejos un jugador solitario racha',
+    descripcion: 'Tres segundos por afirmación y el reloj nunca se detiene. ¿Verdadero o falso? Un solo fallo y se acabó: ¿hasta dónde llega tu racha?',
+    categorias: ['un_jugador']
+  },
+  'pecera': {
+    titulo: '¿Qué sobra en la pecera?',
+    imagen: '/covers/pecera.webp',
+    icono: 'pecera',
+    colores: ['#67e8f9', '#1d4ed8'],
+    etiquetas: 'intruso sobra criterio oculto trampa observacion cultura un jugador solitario',
+    descripcion: 'Seis cosas en la pecera, cinco comparten un criterio secreto. Encuentra al intruso sin caer en la trampa: el que parece sobrar casi nunca es.',
+    categorias: ['un_jugador']
+  },
+  'criptohacker': {
+    titulo: 'Cripto-Hacker',
+    imagen: '/covers/criptohacker.webp',
+    icono: 'criptohacker',
+    colores: ['#4ade80', '#020617'],
+    etiquetas: 'codigo hacker deduccion mastermind rastreo logica servidores un jugador solitario',
+    descripcion: 'Descifra el código de cada servidor con pura deducción antes de que el rastreo de seguridad llegue al 100 %. Cada intento te delata un poco más.',
+    categorias: ['un_jugador']
+  },
+  'anomalias': {
+    titulo: 'Inspector de Anomalías',
+    imagen: '/covers/anomalias.webp',
+    icono: 'anomalias',
+    colores: ['#f59e0b', '#27272a'],
+    etiquetas: 'camara vigilancia diferencias memoria observacion anomalia habitacion un jugador solitario',
+    descripcion: 'Vigilas una habitación con una cámara fija. Memoriza la escena: cuando vuelva la señal, algo habrá cambiado. Tócalo antes de que acabe el tiempo.',
+    categorias: ['un_jugador']
+  },
+  'trinchera': {
+    titulo: 'Trinchera 1914',
+    imagen: '/covers/trinchera.webp',
+    icono: 'trinchera',
+    colores: ['#a3a380', '#3f2d1c'],
+    etiquetas: 'gestion recursos cartas decisiones moral guerra historia supervivencia un jugador solitario',
+    descripcion: 'Invierno de 1914. Gestiona la moral, la comida, la munición y la salud de tu compañía decisión a decisión. ¿Llegaréis vivos a Navidad?',
+    categorias: ['un_jugador']
+  },
+  'ovejas': {
+    titulo: 'Cuenta Ovejas',
+    imagen: '/covers/ovejas.webp',
+    icono: 'ovejas',
+    colores: ['#86efac', '#15803d'],
+    etiquetas: 'contar animales rapidez percepcion granja ovejas memoria un jugador solitario',
+    descripcion: 'Una manada cruza el prado a toda velocidad, con cerdos, cabras y arbustos que tapan. Al final te preguntamos cuántos de un tipo han pasado. ¡Cuenta rápido!',
+    categorias: ['un_jugador']
+  },
+  'segundero': {
+    titulo: 'El Segundero Interior',
+    imagen: '/covers/segundero.webp',
+    icono: 'segundero',
+    colores: ['#38bdf8', '#312e81'],
+    etiquetas: 'tiempo reloj cronometro segundos percepcion calculo un jugador solitario',
+    descripcion: 'Para el reloj en el tiempo exacto… sin verlo. El contador se esconde enseguida y cada ronda trae una distracción nueva para engañar a tu reloj interno.',
+    categorias: ['un_jugador']
+  },
+  'encadenada': {
+    titulo: 'Palabra Encadenada',
+    imagen: '/covers/encadenada.webp',
+    icono: 'encadenada',
+    colores: ['#fb7185', '#7e22ce'],
+    etiquetas: 'palabras letras escalera vocabulario cambiar una letra puzle un jugador solitario',
+    descripcion: 'De CASA a COLA cambiando una sola letra en cada paso, y cada paso tiene que ser una palabra de verdad. ¿Igualarás el camino más corto?',
+    categorias: ['un_jugador']
+  },
+  'mapamentiroso': {
+    titulo: 'El Mapa Mentiroso',
+    imagen: '/covers/mapamentiroso.webp',
+    icono: 'mapamentiroso',
+    colores: ['#fbbf24', '#9a3412'],
+    etiquetas: 'mapa orientacion brujula direcciones norte sur memoria espacial un jugador solitario',
+    descripcion: 'Memoriza las indicaciones y señala dónde acabas. Pero ojo: a veces la brújula está girada y alguna indicación miente.',
+    categorias: ['un_jugador']
+  },
+  'ordenalos': {
+    titulo: 'Ordénalos sin mirar',
+    imagen: '/covers/ordenalos.webp',
+    icono: 'ordenalos',
+    colores: ['#2dd4bf', '#1e3a8a'],
+    etiquetas: 'ordenar pesos balanza logica comparar cajas deduccion un jugador solitario',
+    descripcion: 'Cajas con pesos secretos y una balanza que solo compara de dos en dos. Ordénalas de la más ligera a la más pesada con el menor número de pesadas.',
+    categorias: ['un_jugador']
+  },
+  'excusas': {
+    titulo: 'Excusas a Domicilio',
+    imagen: '/covers/excusas.webp',
+    icono: 'excusas',
+    colores: ['#25d366', '#075e54'],
+    etiquetas: 'excusas humor jefe chat trabajo coherencia historias un jugador solitario',
+    descripcion: 'Tu jefe te pide explicaciones por el chat y tú montas excusas con fichas. Todo vale… salvo contradecir lo que ya sabe de ti. ¿Aguantarás dos semanas sin que te despidan?',
+    categorias: ['un_jugador']
+  },
+  'semaforo': {
+    titulo: 'Semáforo Invertido',
+    imagen: '/covers/semaforo.webp',
+    icono: 'semaforo',
+    colores: ['#ef4444', '#1e293b'],
+    etiquetas: 'colores palabras reflejos atencion reglas stroop rapidez un jugador solitario',
+    descripcion: 'La palabra VERDE pintada de rojo… ¿tocas o no? La regla cambia cada diez segundos y cada vez va más rápido. Reflejos y cabeza fría.',
+    categorias: ['un_jugador']
+  },
+  'untrazo': {
+    titulo: 'Un Solo Trazo',
+    imagen: '/covers/untrazo.webp',
+    icono: 'untrazo',
+    colores: ['#f472b6', '#0f766e'],
+    etiquetas: 'dibujar trazo figuras lineas puntos logica euler puzle un jugador solitario',
+    descripcion: 'Repasa todas las líneas de la figura sin levantar el dedo ni pasar dos veces por la misma. Y si es imposible… ¡demuéstralo!',
+    categorias: ['un_jugador']
   }
 };
 

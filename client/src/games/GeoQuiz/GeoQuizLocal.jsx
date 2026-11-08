@@ -9,13 +9,13 @@ import GeoQuizPartida from './GeoQuizPartida.jsx';
 import GeoQuizConfig, { configPorDefecto } from './GeoQuizConfig.jsx';
 import './GeoQuiz.css';
 
-const MIN_JUGADORES = 1;
+const MIN_JUGADORES = 2;
 const MAX_JUGADORES = 10;
 
 export default function GeoQuizLocal({ onVolver, onExit, onAbrirAyuda }) {
   const navigate = useNavigate();
   const [fase, setFase] = useState('setup'); // 'setup' | 'juego'
-  const [nombres, setNombres] = useState(['Jugador 1', 'Jugador 2']);
+  const [nombres, setNombres] = useState(['Jugador 1', 'Jugador 2', 'Jugador 3']);
   const [config, setConfig] = useState(configPorDefecto);
   const [categorias, setCategorias] = useState([]);
   const [error, setError] = useState('');
@@ -117,7 +117,6 @@ export default function GeoQuizLocal({ onVolver, onExit, onAbrirAyuda }) {
           onEmpezar={empezar}
           puedeEmpezar={!cargando && categorias.length > 0}
           textoBoton={cargando ? 'Preparando preguntas…' : '¡Empezar GeoQuiz!'}
-          subtitulo={`De ${MIN_JUGADORES} a ${MAX_JUGADORES} jugadores. Con uno solo puedes practicar.`}
           error={error}
         >
           <BloqueConfig>

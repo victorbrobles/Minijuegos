@@ -140,7 +140,7 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
   const r = obtenerSala(req, res, { admin: true });
   if (!r) return;
   const { sala } = r;
-  if (sala.jugadores.length < 1) return res.status(400).json({ error: 'No hay jugadores.' });
+  if (sala.jugadores.length < 2) return res.status(400).json({ error: 'Hacen falta al menos 2 jugadores.' });
   const cfg = sala.config;
   sala.partida = E.crearPartida(
     sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre })),

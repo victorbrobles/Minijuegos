@@ -1,0 +1,416 @@
+/* client/src/components/UnJugador.css
+   Estilos comunes de los juegos para un jugador. Mismo lenguaje visual que la web:
+   cabecera con el degradado del juego (--g1 / --g2), tarjetas blancas y botones en relieve.
+   Mobile first. */
+
+/* ---------- Portada ---------- */
+.game-shell .uj-solo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: -0.4rem auto 0.9rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--g1) 12%, #ffffff);
+  color: color-mix(in srgb, var(--g1) 75%, #0f172a);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.game-shell .uj-record {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  margin: 0 auto 1rem;
+  padding: 0.55rem 0.9rem;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #78350f;
+  font-weight: 700;
+  max-width: 360px;
+}
+
+.game-shell .uj-opciones {
+  margin: 0.4rem 0 0.2rem;
+  text-align: left;
+}
+
+/* ---------- Escena de juego ---------- */
+.uj-escena {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding-top: 0.3rem;
+}
+
+.uj-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 0.8rem 0.9rem 0.85rem;
+  border-radius: 26px;
+  color: #ffffff;
+  background: linear-gradient(140deg, var(--g1) 0%, var(--g2) 100%);
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.3), 0 18px 34px -14px color-mix(in srgb, var(--g2) 80%, transparent);
+}
+
+.uj-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(70% 90% at 0% 0%, rgba(255, 255, 255, 0.22) 0%, transparent 60%),
+    radial-gradient(rgba(255, 255, 255, 0.12) 1.2px, transparent 1.4px) 0 0 / 18px 18px;
+}
+
+.uj-hero > * {
+  position: relative;
+}
+
+.uj-hero-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.uj-hero-titulo {
+  margin: 0.6rem 0 0;
+  font-size: clamp(1.3rem, 6vw, 1.7rem) !important;
+  line-height: 1.15;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff;
+  background: none !important;
+}
+
+.uj-salir {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 0.35rem;
+  flex: none;
+  width: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0.42rem 0.8rem 0.42rem 0.65rem !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.35) !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.16) !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+  font-size: 0.86rem !important;
+  font-weight: 800 !important;
+  cursor: pointer;
+}
+
+.uj-hero-chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.35rem;
+}
+
+.uj-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.32rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.22);
+  font-size: 0.8rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+/* ---------- Tarjetas y textos ---------- */
+.uj-tarjeta {
+  padding: 1.15rem 1.05rem;
+  border-radius: 24px;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  color: #0f172a;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.25), 0 18px 34px -16px rgba(0, 0, 0, 0.5);
+}
+
+.uj-etiqueta {
+  margin: 0 0 0.3rem;
+  color: #64748b;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+
+.uj-mini {
+  margin: 0.4rem 0;
+  color: #64748b;
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.uj-texto-claro {
+  color: #e2e8f0;
+  font-size: 0.9rem;
+  text-align: center;
+  margin: 0;
+}
+
+/* ---------- Botones ---------- */
+.uj-acciones {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.45rem;
+  padding-bottom: calc(0.6rem + env(safe-area-inset-bottom));
+}
+
+.uj-fila {
+  display: flex;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+.uj-boton {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: 100% !important;
+  min-height: 54px;
+  margin: 0 !important;
+  padding: 0.8rem 1rem !important;
+  border: none !important;
+  border-radius: 18px !important;
+  background: linear-gradient(135deg, var(--g1) 0%, var(--g2) 100%) !important;
+  color: #ffffff !important;
+  font-family: 'Bricolage Grotesque', sans-serif !important;
+  font-size: 1.05rem !important;
+  font-weight: 800 !important;
+  box-shadow: 0 5px 0 color-mix(in srgb, var(--g2) 55%, #000000), 0 12px 24px -10px color-mix(in srgb, var(--g1) 70%, transparent) !important;
+  cursor: pointer;
+  transition: transform 0.08s ease, box-shadow 0.08s ease, opacity 0.15s ease;
+}
+
+.uj-boton.grande {
+  min-height: 60px;
+  font-size: 1.15rem !important;
+}
+
+.uj-boton:active:not(:disabled) {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--g2) 55%, #000000) !important;
+}
+
+.uj-boton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.uj-boton.secundario {
+  background: #ffffff !important;
+  color: #334155 !important;
+  border: 2px solid #e2e8f0 !important;
+  box-shadow: 0 4px 0 #e2e8f0 !important;
+}
+
+.uj-boton.peligro {
+  background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  box-shadow: 0 5px 0 #991b1b !important;
+}
+
+.uj-boton.exito {
+  background: linear-gradient(135deg, #22c55e, #15803d) !important;
+  box-shadow: 0 5px 0 #14532d !important;
+}
+
+.uj-enlace {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 0.35rem;
+  width: auto !important;
+  min-height: 40px;
+  margin: 0 !important;
+  padding: 0.45rem 0.85rem !important;
+  border: none !important;
+  border-radius: 999px !important;
+  background: rgba(15, 12, 40, 0.65) !important;
+  box-shadow: none !important;
+  color: #e2e8f0 !important;
+  font-size: 0.86rem !important;
+  font-weight: 700 !important;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* ---------- Barra de progreso ---------- */
+.uj-barra-progreso {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.uj-barra-pista {
+  flex: 1;
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.uj-barra-pista span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #4ade80, #22c55e);
+  transition: width 0.2s linear;
+}
+
+.uj-barra-progreso.aviso .uj-barra-pista span { background: linear-gradient(90deg, #fbbf24, #f59e0b); }
+.uj-barra-progreso.critico .uj-barra-pista span { background: linear-gradient(90deg, #f87171, #ef4444); }
+
+.uj-barra-texto {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.25rem;
+  min-width: 56px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Fin ---------- */
+.uj-fin {
+  text-align: center;
+  border-top: 8px solid #22c55e;
+}
+
+.uj-fin.derrota {
+  border-top-color: #ef4444;
+}
+
+.uj-fin-icono {
+  display: inline-grid;
+  place-items: center;
+  width: 72px;
+  height: 72px;
+  margin-bottom: 0.5rem;
+  border-radius: 24px;
+  background: linear-gradient(135deg, var(--g1), var(--g2));
+  color: #ffffff;
+  box-shadow: 0 5px 0 color-mix(in srgb, var(--g2) 55%, #000000);
+}
+
+.uj-fin-titulo {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.5rem, 6.5vw, 2rem);
+  line-height: 1.15;
+}
+
+.uj-fin-puntos {
+  margin: 0.3rem 0;
+  color: #475569;
+  font-size: 1.05rem;
+}
+
+.uj-fin-puntos strong {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 2.4rem;
+  color: var(--g1);
+}
+
+.uj-nuevo-record {
+  display: inline-block;
+  margin: 0.4rem 0;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #78350f;
+  font-weight: 800;
+  animation: ujPop 0.4s ease-out;
+}
+
+@keyframes ujPop {
+  from { transform: scale(0.7); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+/* ---------- Avisos y modales ---------- */
+.uj-aviso {
+  position: fixed;
+  top: calc(0.8rem + env(safe-area-inset-top));
+  left: 50%;
+  z-index: 60;
+  width: max-content;
+  max-width: min(92vw, 520px);
+  padding: 0.75rem 1rem;
+  border-radius: 18px;
+  background: #1e293b;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-align: center;
+  box-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.6);
+  transform: translateX(-50%);
+  animation: ujBajar 0.25s ease-out both;
+}
+
+.uj-aviso.bueno { background: #15803d; }
+.uj-aviso.malo { background: #b91c1c; }
+
+@keyframes ujBajar {
+  from { opacity: 0; transform: translate(-50%, -12px); }
+  to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.uj-modal {
+  max-width: 400px !important;
+  padding: 1.6rem 1.3rem !important;
+  border-radius: 24px !important;
+  text-align: center;
+}
+
+.uj-modal h3 { margin: 0 0 0.4rem; }
+.uj-modal .hint { margin: 0 0 1.2rem; }
+.uj-modal-icono { font-size: 2.2rem; margin-bottom: 0.3rem; }
+
+/* Opciones tipo píldora (dificultad, etc.) */
+.uj-pildoras {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.uj-pildora {
+  width: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0.55rem 0.95rem !important;
+  border: 1.5px solid #cbd5e1 !important;
+  border-radius: 999px !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+  color: #334155 !important;
+  font-weight: 800 !important;
+  font-size: 0.9rem !important;
+  cursor: pointer;
+}
+
+.uj-pildora.activo {
+  border-color: transparent !important;
+  background: linear-gradient(135deg, var(--g1), var(--g2)) !important;
+  color: #ffffff !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .uj-aviso,
+  .uj-nuevo-record {
+    animation: none;
+  }
+}

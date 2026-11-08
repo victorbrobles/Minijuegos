@@ -1,0 +1,113 @@
+/* client/src/games/Semaforo/Semaforo.css */
+.sm-contenedor { width: 100%; }
+
+.sm-regla {
+  position: relative;
+  overflow: hidden;
+  margin-top: 0.7rem;
+  padding: 0.75rem 0.9rem 0.95rem;
+  border-radius: 18px;
+  background: #ffffff;
+  color: #0f172a;
+  text-align: center;
+  animation: smRegla 0.5s ease-out;
+}
+
+@keyframes smRegla {
+  0% { transform: scale(0.85); background: #fde68a; }
+  60% { transform: scale(1.04); }
+  100% { transform: none; background: #ffffff; }
+}
+
+.sm-regla-texto {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(1.1rem, 5.2vw, 1.4rem);
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.sm-regla-texto u { text-decoration-thickness: 3px; text-underline-offset: 3px; }
+.sm-regla-texto b { font-weight: 900; }
+
+.sm-regla-reloj {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 6px;
+  background: linear-gradient(90deg, var(--g1), var(--g2));
+  transition: width 0.1s linear;
+}
+
+.sm-zona {
+  position: relative;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100% !important;
+  min-height: 52vh;
+  margin: 0 !important;
+  padding: 1rem !important;
+  border: 4px solid rgba(255, 255, 255, 0.85) !important;
+  border-radius: 30px !important;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Sin !important para que las animaciones de acierto/fallo puedan cambiar el fondo */
+.sm-contenedor .sm-zona {
+  background: #1e293b;
+  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.35);
+}
+
+.sm-zona.bien { animation: smBien 0.35s ease-out; }
+.sm-zona.mal, .sm-zona.perdido { animation: smMal 0.45s ease-out; }
+
+@keyframes smBien { from { background: #166534; } to { background: #1e293b; } }
+@keyframes smMal {
+  0% { background: #7f1d1d; transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  50% { transform: translateX(8px); }
+  100% { background: #1e293b; transform: none; }
+}
+
+.sm-palabra {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(2.8rem, 15vw, 4.4rem);
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-shadow: 0 4px 0 rgba(0, 0, 0, 0.35);
+  animation: smEntrar 0.12s ease-out;
+}
+
+.sm-palabra.tocada { opacity: 0.35; transform: scale(0.92); }
+
+@keyframes smEntrar { from { transform: scale(0.7); opacity: 0; } to { transform: none; opacity: 1; } }
+
+.sm-cuenta {
+  color: #ffffff;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 5rem;
+  font-weight: 800;
+  animation: smEntrar 0.3s ease-out;
+}
+
+.sm-nueva {
+  color: #fde68a;
+  font-size: 1.4rem;
+  font-weight: 900;
+}
+
+.sm-pista {
+  position: absolute;
+  bottom: 0.8rem;
+  color: rgba(255, 255, 255, 0.35);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sm-regla, .sm-zona.bien, .sm-zona.mal, .sm-zona.perdido, .sm-palabra, .sm-cuenta { animation: none; }
+}

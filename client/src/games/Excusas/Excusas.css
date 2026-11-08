@@ -1,0 +1,192 @@
+/* client/src/games/Excusas/Excusas.css */
+.ex-contenedor { width: 100%; }
+
+.ex-credibilidad {
+  margin-top: 0.6rem;
+}
+
+.ex-credibilidad > span {
+  display: block;
+  margin-bottom: 0.2rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.ex-credibilidad .uj-barra-progreso { background: rgba(0, 0, 0, 0.2); }
+
+.ex-ficha-boton {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100% !important;
+  min-height: 42px !important;
+  margin: 0 !important;
+  padding: 0.4rem 0.8rem !important;
+  border: 2px dashed rgba(255, 255, 255, 0.5) !important;
+  border-radius: 14px !important;
+  background: rgba(255, 255, 255, 0.12) !important;
+  box-shadow: none !important;
+  color: #ffffff !important;
+  font-weight: 800 !important;
+  font-size: 0.9rem !important;
+  cursor: pointer;
+}
+
+.ex-ficha {
+  margin: 0;
+  padding: 0.8rem 1rem 0.8rem 2rem;
+  background: #fffbeb;
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.ex-ficha li { margin: 0.2rem 0; }
+
+.ex-movil {
+  overflow: hidden;
+  border: 6px solid #0f172a;
+  border-radius: 28px;
+  background: #e7ddd3;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.3);
+}
+
+.ex-movil-cabecera {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.8rem;
+  background: #075e54;
+  color: #ffffff;
+}
+
+.ex-movil-cabecera span:last-child { display: flex; flex-direction: column; line-height: 1.15; }
+.ex-movil-cabecera small { opacity: 0.8; font-size: 0.75rem; }
+
+.ex-avatar {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #ffffff;
+  font-size: 1.3rem;
+}
+
+.ex-chat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  height: 32vh;
+  min-height: 190px;
+  overflow-y: auto;
+  padding: 0.7rem;
+  background:
+    radial-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1.5px) 0 0 / 14px 14px,
+    #e7ddd3;
+}
+
+.ex-msg {
+  max-width: 82%;
+  padding: 0.5rem 0.75rem;
+  border-radius: 14px;
+  color: #0f172a;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.12);
+  animation: exEntrar 0.2s ease-out;
+}
+
+@keyframes exEntrar { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.ex-msg.jefe { align-self: flex-start; border-top-left-radius: 4px; background: #ffffff; }
+.ex-msg.yo { align-self: flex-end; border-top-right-radius: 4px; background: #d9fdd3; font-weight: 600; }
+.ex-msg.pillado { background: #fee2e2; font-weight: 700; }
+.ex-msg.repetida, .ex-msg.absurda { background: #fef3c7; }
+.ex-msg.dato { background: #e0e7ff; font-weight: 600; }
+
+.ex-msg.sistema {
+  align-self: center;
+  padding: 0.2rem 0.7rem;
+  background: #fdf6d8;
+  color: #64748b;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.ex-msg.escribiendo { display: flex; gap: 4px; padding: 0.7rem 0.9rem; }
+
+.ex-msg.escribiendo i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #94a3b8;
+  animation: exPunto 1s infinite;
+}
+
+.ex-msg.escribiendo i:nth-child(2) { animation-delay: 0.15s; }
+.ex-msg.escribiendo i:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes exPunto { 50% { transform: translateY(-4px); opacity: 0.5; } }
+
+.ex-constructor {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.9rem;
+  padding-bottom: calc(0.9rem + env(safe-area-inset-bottom));
+}
+
+.ex-fila .uj-etiqueta { margin-bottom: 0.25rem; }
+
+.ex-fichas {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.35rem;
+}
+
+.ex-pieza {
+  width: 100% !important;
+  min-height: 52px !important;
+  margin: 0 !important;
+  padding: 0.35rem 0.4rem !important;
+  border: 2px solid #e2e8f0 !important;
+  border-radius: 12px !important;
+  background: #ffffff !important;
+  box-shadow: 0 3px 0 #e2e8f0 !important;
+  color: #1e293b !important;
+  font-size: 0.82rem !important;
+  font-weight: 700 !important;
+  line-height: 1.15;
+  cursor: pointer;
+}
+
+.ex-pieza.sujeto.activa { border-color: #f97316 !important; background: #ffedd5 !important; box-shadow: 0 3px 0 #f97316 !important; }
+.ex-pieza.accion.activa { border-color: #8b5cf6 !important; background: #ede9fe !important; box-shadow: 0 3px 0 #8b5cf6 !important; }
+.ex-pieza.objeto.activa { border-color: #0ea5e9 !important; background: #e0f2fe !important; box-shadow: 0 3px 0 #0ea5e9 !important; }
+
+.ex-envio {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 0.2rem;
+}
+
+.ex-envio .uj-boton { width: auto !important; min-height: 48px; padding: 0.5rem 1rem !important; }
+
+.ex-previa {
+  margin: 0;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 0.9rem;
+  line-height: 1.3;
+}
+
+.ex-previa.vacia { color: #94a3b8; font-style: normal; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ex-msg, .ex-msg.escribiendo i { animation: none; }
+}

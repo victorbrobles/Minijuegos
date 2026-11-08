@@ -68,7 +68,7 @@ npm run dev
 - Las composiciones (`composiciones.js`) priorizan los roles nuevos; la «Clásica» es la única que solo usa roles clásicos.
 
 ## Minijuego: GeoQuiz
-- Quiz de geografía por turnos (local en un dispositivo u online, de 1 a 12 jugadores). Se sortea quién empieza y luego se sigue el orden;
+- Quiz de geografía por turnos (local en un dispositivo u online, de 2 a 12 jugadores). Se sortea quién empieza y luego se sigue el orden;
   cada turno empieza con la pantalla «Turno de…» y el botón «Listo».
 - Modos: **GeoMix** (todo mezclado), **Especialista** (una categoría), **Contrarreloj** (60 s por turno con preguntas rápidas) y
   **Supervivencia** (3 vidas, gana el último en pie).
@@ -76,3 +76,21 @@ npm run dev
 - Reglas en `server/geoquiz/engine.js`, con una **copia idéntica** en `client/src/games/GeoQuiz/engine.js` para el modo local (cambia las dos a la vez).
 - Preguntas en `server/data/seeds/geoquiz/` (un fichero por categoría; formato explicado en `_tipos.js`). Las respuestas admiten alias
   separados por `|` (`'Países Bajos|Holanda'`); al comprobarlas se ignoran tildes, mayúsculas y artículos y se perdonan pequeñas erratas.
+
+## Juegos para un jugador (categoría «🎯 Para un jugador»)
+- Son solo frontend y guardan el récord en el navegador (`localStorage`, clave `minijuegos_record_<id>`).
+- Piezas comunes en `client/src/components/UnJugador.jsx` (+ `UnJugador.css`): portada con récord (`PortadaUnJugador`), cabecera de partida,
+  pantalla final, ayuda, confirmar salida, avisos, barra de tiempo y `useRecord`. Usan los colores de cada juego de `meta.js`.
+- **¿Verdadero o falso? Exprés** (`VerdaderoFalso/`): 3 s por afirmación sin pausa; un fallo termina la partida. Afirmaciones en `afirmaciones.js` (`[texto, esVerdadera, explicación]`).
+- **¿Qué sobra en la pecera?** (`Pecera/`): retos escritos a mano en `retos.js` (6 elementos, intruso, trampa y explicaciones).
+- **Cripto-Hacker** (`CriptoHacker/`): deducción tipo Mastermind; cada intento y el tiempo suben el rastreo hasta el 100 %.
+- **Inspector de Anomalías** (`Anomalias/`): salas y objetos en `salas.js`; los cambios son más sutiles cuanto más alto es el nivel.
+- **Trinchera 1914** (`Trinchera/`): cartas en `cartas.js` (efectos `m`/`c`/`u`/`s`, con historias encadenadas mediante `activa`/`requiere`) y reglas en `motor.js`.
+- **Cuenta Ovejas** (`Ovejas/`): `motor.js` genera la manada (tipos, carriles, velocidades, arbustos) según el nivel.
+- **El Segundero Interior** (`Segundero/`): 6 rondas con distracciones definidas en `RONDAS` (contador oculto, pulsos de otro ritmo, destellos, contador falso).
+- **Palabra Encadenada** (`Encadenada/`): palabras de 4 letras en `diccionario.js` (sin tildes ni Ñ); `motor.js` calcula los caminos más cortos con BFS. Para aceptar más palabras, añádelas al diccionario.
+- **El Mapa Mentiroso** (`MapaMentiroso/`): `motor.js` genera ruta y pueblos; desde el nivel 3 la brújula se gira y desde el 5 una indicación va al revés.
+- **Ordénalos sin mirar** (`Ordenalos/`): pesos ocultos; el objetivo de pesadas es el mínimo teórico para ordenar n elementos.
+- **Excusas a Domicilio** (`Excusas/`): fichas, hechos y preguntas en `datos.js`; `motor.js` detecta contradicciones con lo que sabe el jefe, repeticiones y excusas absurdas.
+- **Semáforo Invertido** (`Semaforo/`): efecto Stroop con una regla que cambia cada 10 s.
+- **Un Solo Trazo** (`UnTrazo/`): `motor.js` genera figuras en una cuadrícula sin líneas cruzadas; una figura es posible si es conexa y tiene 0 o 2 puntos de grado impar.

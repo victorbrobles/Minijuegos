@@ -1,0 +1,152 @@
+/* client/src/games/Segundero/Segundero.css */
+.sg-contenedor { width: 100%; }
+
+.sg-truco {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.6rem 0 0;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.sg-esfera {
+  position: relative;
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  width: min(86vw, 340px) !important;
+  aspect-ratio: 1;
+  min-height: 0 !important;
+  margin: 0.4rem auto 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+  border: 10px solid #ffffff !important;
+  border-radius: 50% !important;
+  background: radial-gradient(circle at 35% 30%, #ffffff 0%, #f1f5f9 55%, #e2e8f0 100%) !important;
+  box-shadow: 0 10px 0 rgba(0, 0, 0, 0.3), inset 0 0 0 6px color-mix(in srgb, var(--g1) 35%, transparent) !important;
+  color: #0f172a !important;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.sg-esfera:disabled { cursor: default; opacity: 1; }
+.sg-esfera.corriendo { border-color: var(--g1) !important; }
+.sg-esfera.corriendo:active { transform: scale(0.98); }
+
+.sg-esfera.pulso-rapido { animation: sgPulso 0.72s ease-in-out infinite; }
+.sg-esfera.pulso-lento { animation: sgPulso 1.38s ease-in-out infinite; }
+
+@keyframes sgPulso {
+  0%, 100% { box-shadow: 0 10px 0 rgba(0, 0, 0, 0.3), inset 0 0 0 6px color-mix(in srgb, var(--g1) 35%, transparent); }
+  12% { box-shadow: 0 10px 0 rgba(0, 0, 0, 0.3), inset 0 0 0 26px color-mix(in srgb, var(--g1) 55%, transparent); }
+}
+
+.sg-destello {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: #ffffff;
+  opacity: 0;
+}
+
+.sg-destello.on { animation: sgFlash 0.25s ease-out; }
+
+@keyframes sgFlash {
+  from { opacity: 0.95; background: #facc15; }
+  to { opacity: 0; }
+}
+
+.sg-meta {
+  color: #64748b;
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.sg-objetivo {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(2.6rem, 14vw, 3.6rem);
+  font-weight: 800;
+  line-height: 1;
+  color: var(--g2);
+}
+
+.sg-crono {
+  margin-top: 0.4rem;
+  padding: 0.25rem 0.9rem;
+  border-radius: 12px;
+  background: #0f172a;
+  color: #4ade80;
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  font-size: 1.8rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.sg-accion {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  max-width: 80%;
+  margin-top: 0.5rem;
+  font-weight: 800;
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+.sg-resultado { text-align: center; }
+.sg-resultado p { margin: 0.4rem 0; }
+
+.sg-regla {
+  position: relative;
+  height: 28px;
+  margin: 0.3rem 0 0.6rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #fecaca, #dcfce7 40%, #dcfce7 60%, #fecaca);
+}
+
+.sg-marca {
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  width: 6px;
+  border-radius: 3px;
+  transform: translateX(-50%);
+}
+
+.sg-marca.objetivo { background: #0f172a; }
+.sg-marca.medido { background: var(--g1); width: 14px; border: 3px solid #ffffff; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); }
+
+.sg-puntos {
+  color: var(--g2);
+  font-size: 1.3rem;
+  font-weight: 900;
+}
+
+.sg-tabla {
+  display: grid;
+  gap: 0.3rem;
+  margin-top: 0.8rem;
+  text-align: left;
+}
+
+.sg-tabla > div {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.6rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: 12px;
+  background: #f1f5f9;
+  font-size: 0.88rem;
+}
+
+.sg-tabla span:first-child { font-weight: 800; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sg-esfera.pulso-rapido, .sg-esfera.pulso-lento, .sg-destello.on { animation: none; }
+}

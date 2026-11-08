@@ -250,5 +250,83 @@
     "name": "GeoQuiz",
     "description": "El quiz definitivo de geografía: capitales, fronteras, idiomas, banderas, ríos, monumentos y récords. Responde, enumera, ordena o deduce con pistas en cuatro modos de juego, ¡y demuestra quién conoce mejor el mundo!",
     "isNew": true
+  },
+  {
+    "id": "verdaderofalso",
+    "name": "¿Verdadero o falso? Exprés",
+    "description": "Tres segundos por afirmación y el reloj nunca se detiene. ¿Verdadero o falso? Un solo fallo y se acabó: ¿hasta dónde llega tu racha?",
+    "isNew": true
+  },
+  {
+    "id": "pecera",
+    "name": "¿Qué sobra en la pecera?",
+    "description": "Seis cosas en la pecera, cinco comparten un criterio secreto. Encuentra al intruso sin caer en la trampa: el que parece sobrar casi nunca es.",
+    "isNew": true
+  },
+  {
+    "id": "criptohacker",
+    "name": "Cripto-Hacker",
+    "description": "Descifra el código de cada servidor con pura deducción antes de que el rastreo de seguridad llegue al 100 %. Cada intento te delata un poco más.",
+    "isNew": true
+  },
+  {
+    "id": "anomalias",
+    "name": "Inspector de Anomalías",
+    "description": "Vigilas una habitación con una cámara fija. Memoriza la escena: cuando vuelva la señal, algo habrá cambiado. Tócalo antes de que acabe el tiempo.",
+    "isNew": true
+  },
+  {
+    "id": "trinchera",
+    "name": "Trinchera 1914",
+    "description": "Invierno de 1914. Gestiona la moral, la comida, la munición y la salud de tu compañía decisión a decisión. ¿Llegaréis vivos a Navidad?",
+    "isNew": true
+  },
+  {
+    "id": "ovejas",
+    "name": "Cuenta Ovejas",
+    "description": "Una manada cruza el prado a toda velocidad, con cerdos, cabras y arbustos que tapan. Al final te preguntamos cuántos de un tipo han pasado. ¡Cuenta rápido!",
+    "isNew": true
+  },
+  {
+    "id": "segundero",
+    "name": "El Segundero Interior",
+    "description": "Para el reloj en el tiempo exacto… sin verlo. El contador se esconde enseguida y cada ronda trae una distracción nueva para engañar a tu reloj interno.",
+    "isNew": true
+  },
+  {
+    "id": "encadenada",
+    "name": "Palabra Encadenada",
+    "description": "De CASA a COLA cambiando una sola letra en cada paso, y cada paso tiene que ser una palabra de verdad. ¿Igualarás el camino más corto?",
+    "isNew": true
+  },
+  {
+    "id": "mapamentiroso",
+    "name": "El Mapa Mentiroso",
+    "description": "Memoriza las indicaciones y señala dónde acabas. Pero ojo: a veces la brújula está girada y alguna indicación miente.",
+    "isNew": true
+  },
+  {
+    "id": "ordenalos",
+    "name": "Ordénalos sin mirar",
+    "description": "Cajas con pesos secretos y una balanza que solo compara de dos en dos. Ordénalas de la más ligera a la más pesada con el menor número de pesadas.",
+    "isNew": true
+  },
+  {
+    "id": "excusas",
+    "name": "Excusas a Domicilio",
+    "description": "Tu jefe te pide explicaciones por el chat y tú montas excusas con fichas. Todo vale… salvo contradecir lo que ya sabe de ti. ¿Aguantarás dos semanas sin que te despidan?",
+    "isNew": true
+  },
+  {
+    "id": "semaforo",
+    "name": "Semáforo Invertido",
+    "description": "La palabra VERDE pintada de rojo… ¿tocas o no? La regla cambia cada diez segundos y cada vez va más rápido. Reflejos y cabeza fría.",
+    "isNew": true
+  },
+  {
+    "id": "untrazo",
+    "name": "Un Solo Trazo",
+    "description": "Repasa todas las líneas de la figura sin levantar el dedo ni pasar dos veces por la misma. Y si es imposible… ¡demuéstralo!",
+    "isNew": true
   }
 ]
