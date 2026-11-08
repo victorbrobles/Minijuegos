@@ -8,6 +8,10 @@ import { EVENTOS, OBJETOS, MODIFICADORES, TEXTO_CAUSA, CAUSAS_PUBLICAS } from '.
 import TarjetaRol from './TarjetaRol.jsx';
 import TurnoNoche, { ElegirUno, BotonAbstenerse } from './TurnoNoche.jsx';
 import SelectorRoles, { ChipsRoles, ListaRolesExplicados, selInicial } from './SelectorRoles.jsx';
+import {
+  MenuModoOnline, FormCrearSala, FormUnirseSala, CabeceraSala, ListaSala, EsperandoAnfitrion
+} from '../../components/MenuJuego.jsx';
+import { CabeceraLobos, Aldea, ModalSalirLobos, FINAL } from './Escena.jsx';
 
 const API = '/api/lobos';
 const CLAVE_SESION = 'lobos-sesion';
@@ -33,13 +37,15 @@ async function llamar(ruta, metodo = 'GET', cuerpo, signal) {
   return datos;
 }
 
-const leerSesion = () => {
+export const haySesionLobos = () => Boolean(leerSesion());
+
+function leerSesion() {
   try {
     return JSON.parse(sessionStorage.getItem(CLAVE_SESION));
   } catch {
     return null;
   }
-};
+}
 const guardarSesion = (s) => {
   try {
     if (s) sessionStorage.setItem(CLAVE_SESION, JSON.stringify(s));
@@ -212,42 +218,7 @@ function Espera({ texto, faltan, v, offset, children }) {
   );
 }
 
-function ListaJugadores({ v }) {
-  return (
-    <div className="panel" style={{ marginTop: '1rem' }}>
-      <h3 className="panel-title">
-        <Icon name="users" size={20} /> Jugadores
-      </h3>
-      <div className="lb-lista">
-        {v.jugadores.map((p) => (
-          <div key={p.id} className={`lb-jug ${p.vivo === false ? 'muerto' : ''} ${p.id === v.yo ? 'yo' : ''}`}>
-            <span className="lb-jug-nombre">
-              {p.nombre}
-              {p.id === v.yo ? ' (tú)' : ''}
-              {p.id === 0 ? ' 👑' : ''}
-              {p.bot ? ' 🤖' : ''}
-            </span>
-            {p.vivo === false && p.rolRevelado && (
-              <span className="lb-jug-rol">✝ {ROLES[p.rolRevelado].nombre}</span>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function Entrada({
-  tituloJuego,
-  descripcionJuego,
-  vistaMenu,
-  setVistaMenu,
-  onEntrar,
-  onLocal,
-  onAbrirAyuda,
-  mensajeExterno,
-  limpiarMensajeExterno
-}) {
+function Entrada({ vistaMenu, setVistaMenu, onEntrar, onVolver, onAbrirAyuda, mensajeExterno, limpiarMensajeExterno }) {
   const [nombre, setNombre] = useState('');
   const [codigo, setCodigo] = useState('');
   const [error, setError] = useState('');
@@ -270,284 +241,54 @@ function Entrada({
     }
   };
 
-  /* 1. MENÚ PRINCIPAL (2 BOTONES) */
-  if (vistaMenu === 'menu') {
-    return (
-      <section className="game">
-        <div className="panel center qq-menu-panel">
-          <div className="qq-card-top solo-derecha">
-            <button
-              type="button"
-              className="qq-btn-ayuda"
-              onClick={onAbrirAyuda}
-              title="Cómo jugar"
-              aria-label="Cómo jugar"
-            >
-              ?
-            </button>
-          </div>
+  const ir = (vistaNueva) => {
+    setError('');
+    if (limpiarMensajeExterno) limpiarMensajeExterno();
+    setVistaMenu(vistaNueva);
+  };
 
-          <div className="qq-hero-icono">
-            <Icon name="moon" size={44} strokeWidth={1.7} />
-          </div>
-          <h1 className="title qq-main-title">{tituloJuego}</h1>
-          <p className="hint qq-main-desc">{descripcionJuego}</p>
-
-          {(error || mensajeExterno) && (
-            <p className="error" style={{ margin: '0.8rem 0' }}>
-              {error || mensajeExterno}
-            </p>
-          )}
-
-          <div className="qq-menu-opciones">
-            <button
-              type="button"
-              className="qq-opcion-card principal"
-              onClick={() => {
-                setVistaMenu('online_menu');
-                setError('');
-                if (limpiarMensajeExterno) limpiarMensajeExterno();
-              }}
-            >
-              <span className="qq-opcion-icono">
-                <Icon name="globe" size={26} />
-              </span>
-              <div className="qq-opcion-textos">
-                <strong>Jugar online</strong>
-                <span>Cada jugador desde su propio móvil con código de sala</span>
-              </div>
-            </button>
-
-            <button
-              type="button"
-              className="qq-opcion-card secundaria"
-              onClick={onLocal}
-            >
-              <span className="qq-opcion-icono">
-                <Icon name="users" size={26} />
-              </span>
-              <div className="qq-opcion-textos">
-                <strong>Jugar en un único dispositivo</strong>
-                <span>Pasando el móvil por turnos entre los jugadores</span>
-              </div>
-            </button>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  /* 1B. SUBMENÚ ONLINE (CREAR PARTIDA / UNIRSE CON CÓDIGO) */
-  if (vistaMenu === 'online_menu') {
-    return (
-      <section className="game">
-        <div className="panel center qq-menu-panel">
-          <div className="qq-card-top">
-            <BotonVolver
-              onClick={() => {
-                setVistaMenu('menu');
-                setError('');
-              }}
-            />
-            <button
-              type="button"
-              className="qq-btn-ayuda"
-              onClick={onAbrirAyuda}
-              title="Cómo jugar"
-              aria-label="Cómo jugar"
-            >
-              ?
-            </button>
-          </div>
-
-          <div className="qq-hero-icono">
-            <Icon name="globe" size={40} strokeWidth={1.6} />
-          </div>
-          <h2 className="title qq-main-title">Modo Online</h2>
-          <p className="hint qq-main-desc">
-            Crea una sala nueva para compartir el código con tus amigos o únete a una ya creada.
-          </p>
-
-          {(error || mensajeExterno) && (
-            <p className="error" style={{ margin: '0.8rem 0' }}>
-              {error || mensajeExterno}
-            </p>
-          )}
-
-          <div className="qq-menu-opciones">
-            <button
-              type="button"
-              className="qq-opcion-card principal"
-              onClick={() => {
-                setVistaMenu('crear');
-                setError('');
-              }}
-            >
-              <span className="qq-opcion-icono">
-                <Icon name="crown" size={26} />
-              </span>
-              <div className="qq-opcion-textos">
-                <strong>Crear partida</strong>
-                <span>Sé el anfitrión, genera un código y configura los roles</span>
-              </div>
-            </button>
-
-            <button
-              type="button"
-              className="qq-opcion-card secundaria"
-              onClick={() => {
-                setVistaMenu('unirse');
-                setError('');
-              }}
-            >
-              <span className="qq-opcion-icono">
-                <Icon name="users" size={26} />
-              </span>
-              <div className="qq-opcion-textos">
-                <strong>Unirse con código</strong>
-                <span>Introduce el código de 5 letras de tu anfitrión</span>
-              </div>
-            </button>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  /* 2. CREAR PARTIDA */
   if (vistaMenu === 'crear') {
     return (
-      <section className="game">
-        <div className="panel center qq-menu-panel">
-          <div className="qq-card-top">
-            <BotonVolver
-              onClick={() => {
-                setVistaMenu('online_menu');
-                setError('');
-              }}
-            />
-            <button
-              type="button"
-              className="qq-btn-ayuda"
-              onClick={onAbrirAyuda}
-              title="Cómo jugar"
-              aria-label="Cómo jugar"
-            >
-              ?
-            </button>
-          </div>
-
-          <div className="qq-hero-icono">
-            <Icon name="crown" size={40} strokeWidth={1.6} />
-          </div>
-          <h2 className="title qq-main-title">Crear partida</h2>
-          <p className="hint qq-main-desc">
-            Introduce tu nombre para abrir la sala y ser el anfitrión.
-          </p>
-
-          <div className="lb-form qq-form-estilizado">
-            <label className="field-label" htmlFor="lb-host-nombre">
-              Tu nombre
-            </label>
-            <input
-              id="lb-host-nombre"
-              className="qq-input-moderno"
-              type="text"
-              placeholder="Ej. Alex"
-              value={nombre}
-              onChange={(ev) => setNombre(ev.target.value)}
-              maxLength={20}
-              autoFocus
-            />
-            {error && <p className="error">{error}</p>}
-
-            <button
-              type="button"
-              className="big full qq-btn-principal"
-              disabled={cargando || !nombre.trim()}
-              onClick={() => enviar('crear')}
-            >
-              <Icon name="check" size={22} strokeWidth={2.5} /> Crear sala
-            </button>
-          </div>
-        </div>
-      </section>
+      <FormCrearSala
+        onVolver={() => ir('online_menu')}
+        onAyuda={onAbrirAyuda}
+        nombre={nombre}
+        setNombre={setNombre}
+        onCrear={() => enviar('crear')}
+        cargando={cargando}
+        error={error}
+        descripcion="Introduce tu nombre para abrir la sala. Como anfitrión configurarás los roles y dirigirás la partida."
+      />
     );
   }
 
-  /* 3. UNIRSE CON CÓDIGO */
+  if (vistaMenu === 'unirse') {
+    return (
+      <FormUnirseSala
+        onVolver={() => ir('online_menu')}
+        onAyuda={onAbrirAyuda}
+        codigo={codigo}
+        setCodigo={setCodigo}
+        nombre={nombre}
+        setNombre={setNombre}
+        onUnirse={() => enviar('unirse')}
+        cargando={cargando}
+        error={error}
+        longitudCodigo={5}
+        descripcion="Introduce el código de 5 letras que te ha compartido el anfitrión y tu nombre."
+      />
+    );
+  }
+
   return (
-    <section className="game">
-      <div className="panel center qq-menu-panel">
-        <div className="qq-card-top">
-          <BotonVolver
-            onClick={() => {
-              setVistaMenu('online_menu');
-              setError('');
-            }}
-          />
-          <button
-            type="button"
-            className="qq-btn-ayuda"
-            onClick={onAbrirAyuda}
-            title="Cómo jugar"
-            aria-label="Cómo jugar"
-          >
-            ?
-          </button>
-        </div>
-
-        <div className="qq-hero-icono">
-          <Icon name="users" size={40} strokeWidth={1.6} />
-        </div>
-        <h2 className="title qq-main-title">Unirse a partida</h2>
-        <p className="hint qq-main-desc">
-          Introduce el código que te ha compartido el anfitrión y tu nombre.
-        </p>
-
-        <div className="lb-form qq-form-estilizado">
-          <label className="field-label" htmlFor="lb-codigo">
-            Código de la partida
-          </label>
-          <input
-            id="lb-codigo"
-            className="lb-input-codigo qq-input-moderno"
-            type="text"
-            value={codigo}
-            maxLength={5}
-            autoCapitalize="characters"
-            autoComplete="off"
-            onChange={(ev) => setCodigo(ev.target.value.toUpperCase())}
-            placeholder="ABCDE"
-            autoFocus
-          />
-
-          <label className="field-label" htmlFor="lb-nombre" style={{ marginTop: '1rem' }}>
-            Tu nombre
-          </label>
-          <input
-            id="lb-nombre"
-            className="qq-input-moderno"
-            type="text"
-            value={nombre}
-            maxLength={20}
-            autoComplete="off"
-            onChange={(ev) => setNombre(ev.target.value)}
-            placeholder="Tu nombre"
-          />
-          {error && <p className="error">{error}</p>}
-
-          <button
-            type="button"
-            className="big full qq-btn-principal"
-            disabled={cargando || !nombre.trim() || codigo.trim().length < 5}
-            onClick={() => enviar('unirse')}
-          >
-            <Icon name="check" size={22} strokeWidth={2.5} /> Entrar en la partida
-          </button>
-        </div>
-      </div>
-    </section>
+    <MenuModoOnline
+      onVolver={onVolver}
+      onAyuda={onAbrirAyuda}
+      onCrear={() => ir('crear')}
+      onUnirse={() => ir('unirse')}
+      error={error || mensajeExterno}
+      longitudCodigo={5}
+    />
   );
 }
 
@@ -556,7 +297,6 @@ export function Lobby({ v, enviar, onAbrirModalSalir, onAbrirAyuda }) {
   const nEf = Math.min(v.limites.max, Math.max(v.limites.min, n));
   const [sel, setSel] = useState(() => selInicial(nEf));
   const [mec, setMec] = useState(() => ({ ...v.config.mec }));
-  const [copiado, setCopiado] = useState(false);
   const [eligiendoRoles, setEligiendoRoles] = useState(false);
   const primera = useRef(true);
 
@@ -582,15 +322,6 @@ export function Lobby({ v, enviar, onAbrirModalSalir, onAbrirAyuda }) {
     return () => clearTimeout(h);
   }, [sel.tab, sel.tipoSel, sel.custom, mec]);
 
-  const copiar = async () => {
-    try {
-      await navigator.clipboard.writeText(v.code);
-      setCopiado(true);
-      setTimeout(() => setCopiado(false), 1800);
-    } catch {
-      /* sin portapapeles */
-    }
-  };
   const cfg = (c) => enviar({ tipo: 'config', config: c });
   const faltan = v.limites.min - n;
 
@@ -706,77 +437,32 @@ export function Lobby({ v, enviar, onAbrirModalSalir, onAbrirAyuda }) {
 
   /* PASO 1 DEL LOBBY: CÓDIGO + JUGADORES + BOTÓN INICIAR JUEGO */
   return (
-    <section className="game">
-      <div className="panel center qq-menu-panel">
-        <div className="qq-card-top">
-          <BotonVolver onClick={onAbrirModalSalir} />
-          <button
-            type="button"
-            className="qq-btn-ayuda"
-            onClick={onAbrirAyuda}
-            title="Cómo jugar"
-            aria-label="Cómo jugar"
-          >
-            ?
-          </button>
-        </div>
-
-        <span className="qq-badge-sala"><Icon name="lock" size={15} /> Sala de espera</span>
-        <p className="hint">Código de la partida</p>
-        <button type="button" className="qq-codigo-btn" onClick={copiar} title="Copiar código">
-          {v.code}
-        </button>
-        <p className="hint small">
-          {copiado ? '¡Copiado al portapapeles!' : 'Pulsa el código para copiarlo y compártelo con los demás.'}
-        </p>
-      </div>
-
-      <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
-        <h3 className="qq-sala-titulo">
-          <Icon name="users" size={20} /> Jugadores ({n}/{v.limites.max})
-        </h3>
-        <div className="lb-lista qq-sala-lista">
-          {v.jugadores.map((p) => (
-            <div key={p.id} className={`lb-jug ${p.id === v.yo ? 'yo' : ''}`}>
-              <span className="lb-jug-nombre">
-                {p.nombre}
-                {p.id === v.yo ? ' (tú)' : ''}
-                {p.id === 0 ? ' 👑' : ''}
-                {p.bot ? ' 🤖' : ''}
-              </span>
-              {v.esAdmin && p.id !== 0 && (
-                <button
-                  type="button"
-                  className="secondary lb-quitar"
-                  onClick={() => enviar({ tipo: 'expulsar', id: p.id })}
-                >
-                  Quitar
-                </button>
-              )}
-            </div>
-          ))}
-        </div>
-        {faltan > 0 ? (
-          <p className="hint" style={{ marginTop: '0.8rem', marginBottom: '0.4rem' }}>
-            Faltan {faltan} jugador{faltan === 1 ? '' : 'es'} para poder empezar (mínimo {v.limites.min}).
-          </p>
-        ) : (
-          <p className="hint ok" style={{ marginTop: '0.8rem', marginBottom: '0.4rem' }}>
-            ¡Ya sois suficientes! El anfitrión puede iniciar el juego cuando quiera.
-          </p>
+    <section className="game qq-pantalla">
+      <CabeceraSala codigo={v.code} onVolver={onAbrirModalSalir} onAyuda={onAbrirAyuda} />
+      <ListaSala
+        jugadores={v.jugadores.map((p) => ({ ...p, nombre: `${p.nombre}${p.bot ? ' 🤖' : ''}` }))}
+        yoId={v.yo}
+        max={v.limites.max}
+        min={v.limites.min}
+        anfitrionId={v.anfitrionId ?? 0}
+        renderExtra={(p) => (
+          <span className="lbp-sala-extra">
+            {!p.bot && <i className={`lbp-conexion${p.conectado === false ? ' off' : ''}`} title={p.conectado === false ? 'Sin conexión' : 'Conectado'} />}
+            {v.esAdmin && p.id !== (v.anfitrionId ?? 0) && (
+              <button type="button" className="lbp-quitar" onClick={() => enviar({ tipo: 'expulsar', id: p.id })} aria-label={`Quitar a ${p.nombre}`}>
+                Quitar
+              </button>
+            )}
+          </span>
         )}
+      >
+        {faltan <= 0 && <p className="hint ok" style={{ marginTop: '0.8rem' }}>¡Ya sois suficientes! Lo ideal es jugar entre 8 y 12.</p>}
         {v.esAdmin && n < v.limites.max && (
-          <button
-            type="button"
-            className="secondary full"
-            style={{ marginTop: '0.6rem' }}
-            onClick={() => enviar({ tipo: 'addBot' })}
-          >
+          <button type="button" className="secondary full" style={{ marginTop: '0.6rem' }} onClick={() => enviar({ tipo: 'addBot' })}>
             <Icon name="chip" size={18} /> Añadir un jugador de prueba (bot)
           </button>
         )}
-      </div>
-
+      </ListaSala>
       {v.esAdmin ? (
         <button
           type="button"
@@ -788,23 +474,18 @@ export function Lobby({ v, enviar, onAbrirModalSalir, onAbrirAyuda }) {
             setEligiendoRoles(true);
           }}
         >
-          <Icon name="play" size={22} />{' '}
-          {faltan > 0 ? `Esperando jugadores (mínimo ${v.limites.min})...` : 'Iniciar juego'}
+          <Icon name="settings" size={22} />{' '}
+          {faltan > 0 ? `Esperando jugadores (mínimo ${v.limites.min})…` : 'Elegir roles y empezar'}
         </button>
       ) : (
-        <div className="panel center" style={{ padding: '1.8rem 1.4rem', marginTop: '1rem' }}>
-          <span className="lb-luna chica">
-            <Icon name="hourglass" size={36} />
-          </span>
-          <h3 style={{ margin: '0.4rem 0' }}>Esperando al anfitrión...</h3>
-          <p className="hint">
-            El anfitrión está configurando la partida y eligiendo los roles.
-          </p>
-          <div style={{ textAlign: 'left', marginTop: '1rem' }}>
-            <ChipsRoles roles={v.roles} />
-            <ListaRolesExplicados roles={v.roles} conDetalle />
-          </div>
-        </div>
+        <EsperandoAnfitrion texto="El anfitrión está configurando la partida y eligiendo los roles.">
+          {v.roles?.length > 0 && (
+            <div style={{ textAlign: 'left', marginTop: '1rem' }}>
+              <ChipsRoles roles={v.roles} />
+              <ListaRolesExplicados roles={v.roles} conDetalle />
+            </div>
+          )}
+        </EsperandoAnfitrion>
       )}
     </section>
   );
@@ -833,7 +514,6 @@ function VotoRemoto({ v, e, enviar, offset }) {
       )}
       {paso === 'propio' ? (
         <>
-          <h2 className="title">{v.votacion.segunda ? 'Votación repetida' : 'Votación'}</h2>
           <p className="hint">
             Elige a quién linchar. Tu voto es secreto hasta el recuento. <Cuenta finTs={v.finTs} offset={offset} />
           </p>
@@ -957,22 +637,31 @@ export function VistaJuego({ v, enviar, offset, onAbrirModalSalir }) {
   const rolActual = m?.rol ? ROLES[m.rol] : null;
   const iconoRol = vivo ? rolActual?.icono || 'users' : 'skull';
 
+  const momento = v.fase === 'noche' ? 'noche' : v.fase === 'fin' ? 'fin' : v.fase === 'reparto' ? 'noche' : 'dia';
+  const vivosN = v.jugadores.filter((p) => p.vivo !== false).length;
+  const tituloFase = {
+    reparto: 'Tu identidad secreta',
+    noche: `Noche ${v.ronda}`,
+    anuncio: v.origen === 'noche' ? 'Amanece en la aldea' : 'Veredicto del pueblo',
+    objeto: 'Objeto misterioso',
+    debate: 'Debate en la plaza',
+    votacion: v.votacion?.segunda ? 'Votación repetida' : 'Votación',
+    resultado: 'Recuento de votos',
+    fin: FINAL[v.fin?.ganador?.bando]?.titulo || 'Fin de la partida'
+  }[v.fase];
+  const etiquetaFase = v.fase === 'reparto' ? 'Reparto de roles' : v.fase === 'noche' ? 'Cae la noche' : v.fase === 'fin' ? `Fin de la partida · ronda ${v.ronda}` : `Día ${v.ronda}`;
   const barraSuperior = (
-    <div className="panel" style={{ padding: '0.75rem 1.1rem', marginBottom: '1rem' }}>
-      <div className="qq-card-top" style={{ marginBottom: 0 }}>
-        <BotonVolver texto="Volver a la portada" onClick={onAbrirModalSalir} />
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
-            <Icon name={iconoRol} size={15} /> {vivo ? 'Ronda' : 'Eliminado · ronda'} {v.ronda}
-          </span>
-          <button type="button" className="secondary lb-mirol" style={{ margin: 0 }} onClick={() => setVerRol(true)}>
-            <Icon name="eye" size={16} /> Mi rol
-          </button>
-        </div>
-      </div>
-    </div>
+    <CabeceraLobos
+      momento={momento}
+      etiqueta={etiquetaFase}
+      titulo={tituloFase}
+      vivos={vivosN}
+      total={v.jugadores.length}
+      onSalir={onAbrirModalSalir}
+      onMiRol={() => setVerRol(true)}
+      chips={[!vivo && v.fase !== 'fin' ? <><Icon name="skull" size={14} /> Eliminado</> : null, v.finTs && ['noche', 'votacion', 'anuncio', 'resultado', 'reparto'].includes(v.fase) ? <Cuenta finTs={v.finTs} offset={offset} /> : null]}
+    />
   );
-
   const ecoForm = v.puedoEco && (
     <div className="panel" style={{ marginTop: '1rem' }}>
       <h3 className="panel-title">
@@ -1060,14 +749,6 @@ export function VistaJuego({ v, enviar, offset, onAbrirModalSalir }) {
       cuerpo = (
         <>
           <div className="end-card">
-            <span className="end-icon">
-              <Icon name={v.origen === 'noche' ? 'sun' : 'landmark'} size={44} />
-            </span>
-            <p className="categoria">
-              <Icon name="flagFinish" size={16} />
-              Ronda {v.ronda}
-            </p>
-            <h1 className="title">{v.origen === 'noche' ? 'Amanece en la aldea' : 'Veredicto del pueblo'}</h1>
             {a?.rebobinada && <p className="reveal">⏳ Ha ocurrido algo raro… el tiempo ha retrocedido. Nadie ha muerto esta noche.</p>}
             {a && a.muertes.length === 0 && !a.rebobinada && (
               <p className="reveal">{v.origen === 'noche' ? 'Esta noche no ha muerto nadie.' : 'Nadie ha sido linchado.'}</p>
@@ -1193,7 +874,7 @@ export function VistaJuego({ v, enviar, offset, onAbrirModalSalir }) {
       cuerpo = (
         <>
           <div className="panel center">
-            <h1 className="title">Debate en la plaza</h1>
+            <span className="lbp-icono-escena"><Icon name="speech" size={30} /></span>
             {v.modDia && (
               <p className="lb-evento">
                 <Icon name="landmark" size={18} /> <strong>{MODIFICADORES[v.modDia].nombre}.</strong> {MODIFICADORES[v.modDia].texto}
@@ -1253,15 +934,7 @@ export function VistaJuego({ v, enviar, offset, onAbrirModalSalir }) {
       cuerpo = (
         <>
           <div className="end-card">
-            <span className="end-icon">
-              <Icon name={r.victima == null ? 'hourglass' : 'landmark'} size={44} />
-            </span>
-            <p className="categoria">
-              <Icon name="flagFinish" size={16} />
-              Ronda {v.ronda}
-              {r.repeticion ? ' · votación repetida' : ''}
-            </p>
-            <h1 className="title">Recuento de votos</h1>
+            {r.repeticion && <p className="lbp-etiqueta">Votación repetida</p>}
             <p className="final-score">
               {r.fichaDe != null
                 ? 'La ficha de favor ha anulado la sentencia'
@@ -1332,33 +1005,11 @@ export function VistaJuego({ v, enviar, offset, onAbrirModalSalir }) {
 
     case 'fin': {
       const g = v.fin.ganador;
-      const titulo = {
-        lobos: 'Ganan los Lobos',
-        pueblo: 'Gana el Pueblo',
-        solitario: 'Gana el Solitario',
-        amantes: 'Ganan los Enamorados',
-        epidemia: 'Gana la Epidemia',
-        nadie: 'Nadie gana'
-      }[g.bando];
-      const icono = {
-        lobos: 'paw',
-        pueblo: 'home',
-        solitario: 'flame',
-        amantes: 'heart',
-        epidemia: 'flask',
-        nadie: 'skull'
-      }[g.bando];
+      const final = FINAL[g.bando] || FINAL.nadie;
       cuerpo = (
         <>
           <div className="end-card">
-            <span className="end-icon">
-              <Icon name={icono} size={44} />
-            </span>
-            <p className="categoria">
-              <Icon name="flagFinish" size={16} />
-              Fin de la partida · ronda {v.ronda}
-            </p>
-            <h1 className="title">{titulo}</h1>
+            <span className="lbp-final-emoji" aria-hidden="true">{final.emoji}</span>
             <p className="reveal">{g.texto}</p>
             {v.victoriasPersonales.map((vp) => (
               <p key={vp.id} className="reveal">
@@ -1406,10 +1057,15 @@ export function VistaJuego({ v, enviar, offset, onAbrirModalSalir }) {
   }
 
   return (
-    <section className="game">
+    <section className={`game lbp-escena lb-partida ${momento}`}>
       {barraSuperior}
       {cuerpo}
-      {v.fase !== 'fin' && <ListaJugadores v={v} />}
+      {v.fase !== 'fin' && (
+        <Aldea
+          compacta={v.fase === 'noche'}
+          jugadores={v.jugadores.map((p) => ({ ...p, yo: p.id === v.yo, anfitrion: p.id === (v.anfitrionId ?? 0) }))}
+        />
+      )}
 
       {verRol && (
         <div className="rg-modal-fondo" onClick={() => setVerRol(false)}>
@@ -1443,16 +1099,10 @@ export function VistaJuego({ v, enviar, offset, onAbrirModalSalir }) {
   );
 }
 
-export default function LobosOnline({
-  tituloJuego = 'Luna de sangre',
-  descripcionJuego,
-  onLocal,
-  onSalir,
-  onAbrirAyuda
-}) {
+export default function LobosOnline({ onVolver, onSalir, onAbrirAyuda }) {
   const navigate = useNavigate();
   const [sesion, setSesion] = useState(() => leerSesion());
-  const [vistaMenu, setVistaMenu] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse'
+  const [vistaMenu, setVistaMenu] = useState('online_menu'); // 'online_menu' | 'crear' | 'unirse'
   const [mensaje, setMensaje] = useState('');
 
   const [modalSalirLobby, setModalSalirLobby] = useState(false);
@@ -1526,12 +1176,10 @@ export default function LobosOnline({
     return (
       <div className="lb-contenedor">
         <Entrada
-          tituloJuego={tituloJuego}
-          descripcionJuego={descripcionJuego}
           vistaMenu={vistaMenu}
           setVistaMenu={setVistaMenu}
           onEntrar={entrar}
-          onLocal={onLocal}
+          onVolver={onVolver}
           onAbrirAyuda={onAbrirAyuda}
           mensajeExterno={mensaje}
           limpiarMensajeExterno={() => setMensaje('')}
@@ -1543,11 +1191,10 @@ export default function LobosOnline({
   if (!vista) {
     return (
       <div className="lb-contenedor">
-        <section className="game center">
-          <div className="panel center qq-menu-panel">
-            <p className="hint" style={{ margin: '1rem 0' }}>
-              Conectando con la sala {sesion.code}…
-            </p>
+        <section className="game lbp-escena">
+          <div className="lbp-tarjeta lbp-cargando">
+            <span className="lbp-luna-carga" aria-hidden="true">🌕</span>
+            <p>Conectando con la sala {sesion.code}…</p>
           </div>
         </section>
       </div>
@@ -1577,70 +1224,21 @@ export default function LobosOnline({
         />
       )}
 
-      {/* MODAL: SALIR DEL LOBBY AL SUBMENÚ ONLINE */}
       {modalSalirLobby && (
-        <div className="rg-modal-fondo" onClick={() => setModalSalirLobby(false)}>
-          <div
-            className="rg-modal"
-            onClick={(e) => e.stopPropagation()}
-            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
-          >
-            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
-            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
-              ¿Salir de la sala?
-            </h3>
-            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
-              Si sales ahora abandonarás la sala de espera y volverás al menú anterior. ¿Estás seguro?
-            </p>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
-              <button type="button" className="secondary full" onClick={() => setModalSalirLobby(false)}>
-                No, quedarme
-              </button>
-              <button
-                type="button"
-                className="secondary danger full"
-                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
-                onClick={handleVolverMenuOnline}
-              >
-                Sí, salir
-              </button>
-            </div>
-          </div>
-        </div>
+        <ModalSalirLobos
+          titulo="¿Salir de la sala?"
+          texto={vista.esAdmin ? 'Eres el anfitrión: si sales, otro jugador pasará a ser el anfitrión (si no queda nadie, la sala se cerrará).' : 'Abandonarás la sala de espera y volverás al menú online.'}
+          onSeguir={() => setModalSalirLobby(false)}
+          onSalir={handleVolverMenuOnline}
+        />
       )}
-
-      {/* MODAL: SALIR DE LA PARTIDA A LA PORTADA */}
       {modalSalirPortada && (
-        <div className="rg-modal-fondo" onClick={() => setModalSalirPortada(false)}>
-          <div
-            className="rg-modal"
-            onClick={(e) => e.stopPropagation()}
-            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
-          >
-            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
-            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
-              ¿Salir de la sala?
-            </h3>
-            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
-              Abandonarás la partida en curso y volverás a la portada principal. ¿Estás seguro?
-            </p>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
-              <button type="button" className="secondary full" onClick={() => setModalSalirPortada(false)}>
-                No, quedarme
-              </button>
-              <button
-                type="button"
-                className="secondary danger full"
-                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
-                onClick={handleCerrarSalaYSalirAPortada}
-              >
-                Sí, salir de la sala
-              </button>
-            </div>
-          </div>
-        </div>
+        <ModalSalirLobos
+          titulo="¿Salir de la partida?"
+          texto={vista.esAdmin ? 'Eres el anfitrión: si sales, otro jugador pasará a dirigir la partida.' : 'Abandonarás la partida en curso y volverás a la portada.'}
+          onSeguir={() => setModalSalirPortada(false)}
+          onSalir={handleCerrarSalaYSalirAPortada}
+        />
       )}
     </div>
   );

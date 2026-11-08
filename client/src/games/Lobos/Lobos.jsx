@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import LobosLocal from './LobosLocal.jsx';
-import LobosOnline from './LobosOnline.jsx';
+import LobosOnline, { haySesionLobos } from './LobosOnline.jsx';
+import { MenuInicioJuego } from '../../components/MenuJuego.jsx';
 import './Lobos.css';
 import { metaDe } from '../meta.js';
 
@@ -10,7 +11,8 @@ import { metaDe } from '../meta.js';
 const { titulo: TITULO_JUEGO, descripcion: DESCRIPCION_JUEGO } = metaDe('lobos');
 
 export default function Lobos({ onExit }) {
-  const [modo, setModo] = useState('online');
+  // 'menu' | 'local' | 'online' (si hay una sala guardada se vuelve directamente a ella)
+  const [modo, setModo] = useState(() => (haySesionLobos() ? 'online' : 'menu'));
   const [mostrarAyuda, setMostrarAyuda] = useState(false);
   const navigate = useNavigate();
 
@@ -28,17 +30,24 @@ export default function Lobos({ onExit }) {
 
   return (
     <>
-      {modo === 'local' ? (
+      {modo === 'menu' && (
+        <MenuInicioJuego
+          juegoId="lobos"
+          onOnline={() => setModo('online')}
+          onLocal={() => setModo('local')}
+          onAyuda={() => setMostrarAyuda(true)}
+        />
+      )}
+      {modo === 'local' && (
         <LobosLocal
-          onVolver={() => setModo('online')}
+          onVolver={() => setModo('menu')}
           onExit={irAPortada}
           onAbrirAyuda={() => setMostrarAyuda(true)}
         />
-      ) : (
+      )}
+      {modo === 'online' && (
         <LobosOnline
-          tituloJuego={TITULO_JUEGO}
-          descripcionJuego={DESCRIPCION_JUEGO}
-          onLocal={() => setModo('local')}
+          onVolver={() => setModo('menu')}
           onSalir={irAPortada}
           onAbrirAyuda={() => setMostrarAyuda(true)}
         />

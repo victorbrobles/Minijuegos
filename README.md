@@ -66,6 +66,8 @@ npm run dev
 - Añadir un rol: definirlo en `roles.js`, implementar su acción en `TurnoNoche.jsx` y su efecto en `engine.js` (`resolverNoche`/`matar`).
 - Mecánicas globales opcionales (`engine.js`: `EVENTOS`, `OBJETOS`, `MODIFICADORES`, rumores): se activan en la pantalla de roles; todas desactivadas por defecto.
 - Las composiciones (`composiciones.js`) priorizan los roles nuevos; la «Clásica» es la única que solo usa roles clásicos.
+- Interfaz de partida en `Escena.jsx` (cabecera de noche/día, la aldea con todos los vecinos y la pantalla «pasa el móvil»); los menús usan los componentes comunes de `MenuJuego.jsx`.
+- Online: si el anfitrión abandona la sala, el papel pasa a otro jugador humano (`adminId` en `server/lobos/sala.js`); si no queda nadie en la sala de espera, se cierra.
 
 ## Minijuego: GeoQuiz
 - Quiz de geografía por turnos (local en un dispositivo u online, de 2 a 12 jugadores). Se sortea quién empieza y luego se sigue el orden;

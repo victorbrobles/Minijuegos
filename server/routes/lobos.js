@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { ErrorSala, crearSala, unirse, obtener, idDe, latido, accion, vista, esperarCambio } from '../lobos/sala.js';
+import { ErrorSala, crearSala, unirse, obtener, idDe, latido, accion, vista, esperarCambio, salaExiste } from '../lobos/sala.js';
 
 // API de «Luna de Sangre» (partida en red). El estado vive en memoria: si se reinicia el servidor, las salas se pierden.
 const router = Router();
@@ -41,7 +41,7 @@ router.post('/:code/accion', seguro((req, res) => {
   const id = idDe(sala, String(req.body?.token ?? ''));
   latido(sala, id);
   accion(sala, id, req.body);
-  if (['abandonar', 'expulsar'].includes(req.body?.tipo)) return res.json({ ok: true });
+  if (['abandonar', 'expulsar'].includes(req.body?.tipo) || !salaExiste(sala.code)) return res.json({ ok: true });
   return res.json({ ok: true, vista: vista(sala, id) });
 }));
 

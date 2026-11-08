@@ -41,6 +41,7 @@ export function crearSala(nombre) {
     jugadores: [{ nombre, token: crypto.randomBytes(12).toString('hex'), bot: false, visto: Date.now() }],
     fase: 'lobby',
     faseId: 0,
+    adminId: 0, // índice del anfitrión; pasa a otro jugador si el anfitrión se va
     ver: 1,
     config: {
       seleccion: { modo: 'recomendada', tipo: 'equilibrada', custom: {} },
@@ -87,6 +88,8 @@ export function unirse(code, nombre) {
   cambiar(sala);
   return { code: sala.code, token };
 }
+
+export const salaExiste = (code) => salas.has(String(code ?? '').toUpperCase().trim());
 
 export function obtener(code) {
   const sala = salas.get(String(code ?? '').toUpperCase().trim());
@@ -194,7 +197,7 @@ function saneaConfig(sala, c) {
 
 export function accion(sala, id, msg) {
   sala.ultima = Date.now();
-  const esAdmin = id === 0;
+  const esAdmin = id === sala.adminId;
   const tipo = msg?.tipo;
   const f = FASES[sala.fase] || {};
 
@@ -204,7 +207,13 @@ export function accion(sala, id, msg) {
     return cambiar(sala);
   }
   if (sala.fase === 'lobby') return accionLobby(sala, id, esAdmin, msg);
-  if (tipo === 'abandonar' && esAdmin) falla('El anfitrión no puede abandonar.');
+  // Abandonar en mitad de la partida: el jugador sigue en la partida (sus turnos caducan solos),
+  // pero si era el anfitrión, el mando pasa a otro jugador humano para que nadie se quede atascado.
+  if (tipo === 'abandonar') {
+    sala.jugadores[id].abandono = true;
+    if (esAdmin) cederAnfitrion(sala, id);
+    return cambiar(sala);
+  }
 
   if (tipo === 'reiniciar' && esAdmin && sala.fase === 'fin') return volverALobby(sala);
   const fn = f[tipo];
@@ -232,13 +241,24 @@ function accionLobby(sala, id, esAdmin, msg) {
     case 'expulsar': {
       if (!esAdmin) falla('Solo el anfitrión puede expulsar.', 403);
       const i = Number(msg.id);
-      if (!Number.isInteger(i) || i <= 0 || i >= sala.jugadores.length) falla('Jugador no válido.');
-      sala.jugadores.splice(i, 1);
+      if (!Number.isInteger(i) || i < 0 || i >= sala.jugadores.length || i === sala.adminId) falla('Jugador no válido.');
+      quitarDeLobby(sala, i);
       break;
     }
     case 'abandonar':
-      if (esAdmin) falla('El anfitrión no puede abandonar: cierra la sala.');
-      sala.jugadores.splice(id, 1);
+      if (esAdmin) {
+        // El anfitrión se va: si queda algún humano, pasa a ser el anfitrión; si no, se cierra la sala
+        const otros = sala.jugadores.filter((p, k) => k !== id && !p.bot);
+        if (!otros.length) {
+          limpiarTimers(sala);
+          salas.delete(sala.code);
+          return;
+        }
+        quitarDeLobby(sala, id);
+        sala.adminId = sala.jugadores.findIndex((p) => !p.bot);
+      } else {
+        quitarDeLobby(sala, id);
+      }
       break;
     case 'empezar':
       if (!esAdmin) falla('Solo el anfitrión puede empezar.', 403);
@@ -248,6 +268,22 @@ function accionLobby(sala, id, esAdmin, msg) {
       falla('Acción no permitida en la sala de espera.');
   }
   cambiar(sala);
+}
+
+// Quita a un jugador de la sala de espera manteniendo bien el índice del anfitrión
+function quitarDeLobby(sala, i) {
+  sala.jugadores.splice(i, 1);
+  if (i < sala.adminId) sala.adminId -= 1;
+}
+
+// Pasa el papel de anfitrión al siguiente humano conectado (o al siguiente humano, si no hay ninguno conectado)
+function cederAnfitrion(sala, saliente) {
+  const ahora = Date.now();
+  const candidatos = sala.jugadores
+    .map((p, k) => ({ p, k }))
+    .filter(({ p, k }) => k !== saliente && !p.bot && !p.abandono);
+  const conectado = candidatos.find(({ p }) => ahora - p.visto < 40000) || candidatos[0];
+  if (conectado) sala.adminId = conectado.k;
 }
 
 function empezar(sala) {
@@ -620,7 +656,7 @@ function textoRol(r) { return ROLES[r]?.id || r; }
 export function vista(sala, id) {
   const ahora = Date.now();
   const base = {
-    code: sala.code, ver: sala.ver, ahora, fase: sala.fase, yo: id, esAdmin: id === 0,
+    code: sala.code, ver: sala.ver, ahora, fase: sala.fase, yo: id, esAdmin: id === sala.adminId, anfitrionId: sala.adminId,
     limites: { min: MIN_JUGADORES, max: MAX_JUGADORES },
     config: sala.config,
     finTs: sala.timerFin,

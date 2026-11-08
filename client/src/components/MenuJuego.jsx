@@ -114,7 +114,7 @@ export function MenuInicioJuego({ juegoId, onOnline, onLocal, onCrear, onUnirse,
 }
 
 // Submenú del modo online: crear o unirse.
-export function MenuModoOnline({ onVolver, onCrear, onUnirse, onAyuda, error }) {
+export function MenuModoOnline({ onVolver, onCrear, onUnirse, onAyuda, error, longitudCodigo = 4 }) {
   return (
     <section className="game qq-pantalla">
       <PanelMenu onVolver={onVolver} onAyuda={onAyuda}>
@@ -126,7 +126,7 @@ export function MenuModoOnline({ onVolver, onCrear, onUnirse, onAyuda, error }) 
         <Error texto={error} />
         <div className="qq-menu-opciones">
           <OpcionMenu principal icono="crown" titulo="Crear partida" texto="Sé el anfitrión, genera un código y administra el juego" onClick={onCrear} />
-          <OpcionMenu icono="users" titulo="Unirse con código" texto="Introduce el código de 4 letras de tu anfitrión" onClick={onUnirse} />
+          <OpcionMenu icono="users" titulo="Unirse con código" texto={`Introduce el código de ${longitudCodigo} letras de tu anfitrión`} onClick={onUnirse} />
         </div>
       </PanelMenu>
     </section>

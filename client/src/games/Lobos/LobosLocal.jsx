@@ -39,6 +39,8 @@ import { MIN_JUGADORES, MAX_JUGADORES, validar } from './composiciones.js';
 import TarjetaRol, { ConsultarRol } from './TarjetaRol.jsx';
 import TurnoNoche, { ElegirUno, BotonAbstenerse } from './TurnoNoche.jsx';
 import SelectorRoles, { selInicial, rolesDeSel } from './SelectorRoles.jsx';
+import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx';
+import { CabeceraLobos, Aldea, PasaDispositivo, ModalSalirLobos, FINAL } from './Escena.jsx';
 
 const nombresPorDefecto = (n) => Array.from({ length: n }, (_, i) => `Jugador ${i + 1}`);
 
@@ -74,7 +76,7 @@ function BotonVolver({ onClick, texto = 'Volver' }) {
 }
 
 /* ───────── Voto de un jugador (con voto robado si procede) ───────── */
-function VotoTurno({ e, id, robadoDe, segunda, onVotar, onSalirPortada }) {
+function VotoTurno({ e, id, robadoDe, segunda, onVotar }) {
   const [paso, setPaso] = useState('propio');
   const [propio, setPropio] = useState(undefined);
   const [verRol, setVerRol] = useState(false);
@@ -84,25 +86,18 @@ function VotoTurno({ e, id, robadoDe, segunda, onVotar, onSalirPortada }) {
     .filter((x) => x !== id);
   const abstener = (cb) => <BotonAbstenerse onClick={() => cb(null)} />;
   return (
-    <section className="game">
+    <>
       {verRol && <ConsultarRol e={e} idFijo={id} onCerrar={() => setVerRol(false)} />}
-      <div className="panel qq-menu-panel">
-        <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
-          <BotonVolver texto="Volver a la portada" onClick={onSalirPortada} />
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-            <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
-              <Icon name="users" size={15} /> {j.nombre}
-            </span>
-            <button type="button" className="secondary lb-mirol" style={{ margin: 0 }} onClick={() => setVerRol(true)}>
-              <Icon name="eye" size={16} /> Mi rol
-            </button>
-          </div>
+      <div className="panel lbp-voto">
+        <div className="lbp-voto-cab">
+          <span className="lbp-etiqueta">{paso === 'propio' ? `Vota ${j.nombre}` : 'Voto robado'}</span>
+          <button type="button" className="lbp-mirol claro" onClick={() => setVerRol(true)}>
+            <Icon name="eye" size={14} /> Mi rol
+          </button>
         </div>
-
         {paso === 'propio' ? (
           <>
-            <h2 className="title">{segunda ? 'Votación repetida' : 'Votación'}</h2>
-            <p className="hint">Elige a quién linchar. Tu voto es secreto hasta el recuento.</p>
+            <p className="hint">{segunda ? 'Se repite la votación. ' : ''}Elige a quién linchar. Tu voto es secreto hasta el recuento.</p>
             <ElegirUno
               e={e}
               opciones={opciones}
@@ -123,10 +118,9 @@ function VotoTurno({ e, id, robadoDe, segunda, onVotar, onSalirPortada }) {
           </>
         ) : (
           <>
-            <h2 className="title">Voto robado</h2>
             <div className="lb-haz">
               <p>
-                Como <strong>Ladrón de Voces</strong>, emites también el voto de <strong>{e.jugadores[robadoDe].nombre}</strong>. Él no lo sabrá hasta el recuento.
+                Como <strong>Ladrón de Voces</strong>, emites también el voto de <strong>{e.jugadores[robadoDe].nombre}</strong>. No lo sabrá hasta el recuento.
               </p>
             </div>
             <ElegirUno
@@ -141,7 +135,7 @@ function VotoTurno({ e, id, robadoDe, segunda, onVotar, onSalirPortada }) {
           </>
         )}
       </div>
-    </section>
+    </>
   );
 }
 
@@ -200,10 +194,6 @@ export default function LobosLocal({ onVolver, onSalir, onExit, onAbrirAyuda }) 
       k > prev.length ? [...prev, ...nombresPorDefecto(k).slice(prev.length)] : prev.slice(0, k)
     );
     setSel(selInicial(k));
-  };
-
-  const cambiarNumJugadores = (ev) => {
-    actualizarCantidadJugadores(Number(ev.target.value));
   };
 
   const irAComposicion = () => {
@@ -375,163 +365,68 @@ export default function LobosLocal({ onVolver, onSalir, onExit, onAbrirAyuda }) 
     setFase('setup');
   };
 
-  const enPartidaActiva = fase !== 'setup' && fase !== 'composicion';
 
   const modalConfirmarSalida = modalSalirPortada && (
-    <div className="rg-modal-fondo" onClick={() => setModalSalirPortada(false)}>
-      <div
-        className="rg-modal"
-        onClick={(ev) => ev.stopPropagation()}
-        style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
-      >
-        <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
-        <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
-          ¿Salir a la portada?
-        </h3>
-        <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
-          Se cancelará la partida actual y volverás a la portada principal de juegos. ¿Estás seguro?
-        </p>
+    <ModalSalirLobos
+      texto="Se cancelará la partida actual y volverás a la portada."
+      onSeguir={() => setModalSalirPortada(false)}
+      onSalir={handleSalirAPortada}
+    />
+  );
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
-          <button type="button" className="secondary full" onClick={() => setModalSalirPortada(false)}>
-            No, continuar
-          </button>
-          <button
-            type="button"
-            className="secondary danger full"
-            style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
-            onClick={handleSalirAPortada}
-          >
-            Sí, salir a portada
-          </button>
-        </div>
-      </div>
-    </div>
+  const salir = () => setModalSalirPortada(true);
+  const vivosN = e ? vivos(e).length : null;
+  const cabecera = (momento, etiqueta, titulo, extra = {}) => (
+    <CabeceraLobos
+      momento={momento}
+      etiqueta={etiqueta}
+      titulo={titulo}
+      vivos={vivosN}
+      total={e?.jugadores.length}
+      onSalir={salir}
+      {...extra}
+    />
+  );
+  const aldea = (compacta = false) => e && (
+    <Aldea
+      compacta={compacta}
+      jugadores={e.jugadores.map((j) => ({ id: j.id, nombre: j.nombre, vivo: j.vivo, rolRevelado: j.vivo ? null : rolRevelado(e, j.id) }))}
+    />
   );
 
   /* 1. SETUP DE JUGADORES */
   if (fase === 'setup') {
     return (
       <div className="lb-contenedor">
-        <section className="game">
-          <div className="panel qq-menu-panel">
-            <div className="qq-card-top">
-              <BotonVolver onClick={onVolver || onSalir} />
-              <button
-                type="button"
-                className="qq-btn-ayuda"
-                onClick={onAbrirAyuda}
-                title="Cómo jugar"
-                aria-label="Cómo jugar"
-              >
-                ?
-              </button>
-            </div>
-
-            <div className="qq-config-header">
-              <div className="qq-hero-icono chico">
-                <Icon name="users" size={32} />
-              </div>
-              <div>
-                <h2 className="qq-config-titulo">Jugadores</h2>
-                <p className="qq-config-sub">
-                  Configura quiénes van a participar ({MIN_JUGADORES} a {MAX_JUGADORES} jugadores; ideal de 8 a 12)
-                </p>
-              </div>
-            </div>
-
-            <div className="qq-selector-cantidad-box">
-              <label className="qq-label-destacado" htmlFor="num-jugadores-lb">
-                Número de participantes
-              </label>
-              <div className="qq-stepper-row">
-                <button
-                  type="button"
-                  className="qq-stepper-btn"
-                  disabled={numJugadores <= MIN_JUGADORES}
-                  onClick={() => actualizarCantidadJugadores(numJugadores - 1)}
-                >
-                  &minus;
+        <SelectorJugadores
+          onVolver={onVolver || onSalir}
+          onAyuda={onAbrirAyuda}
+          min={MIN_JUGADORES}
+          max={MAX_JUGADORES}
+          numJugadores={numJugadores}
+          onCambiarNum={actualizarCantidadJugadores}
+          nombres={nombres}
+          onNombre={(i, valor) => setNombres((p) => p.map((x, k) => (k === i ? valor : x)))}
+          onEmpezar={irAComposicion}
+          textoBoton="Elegir los roles"
+          iconoBoton="moon"
+          subtitulo={`De ${MIN_JUGADORES} a ${MAX_JUGADORES} jugadores (lo ideal, de 8 a 12). Escribid los nombres en el orden en que estáis sentados en círculo.`}
+          maxLength={30}
+        >
+          <BloqueConfig titulo="Tiempo de debate diurno" style={{ marginTop: '1.2rem' }}>
+            <div className="lbp-pildoras">
+              {[[0, 'Sin límite'], [1, '1 min'], [2, '2 min'], [3, '3 min'], [5, '5 min']].map(([m, t]) => (
+                <button key={m} type="button" className={`lbp-pildora${minutos === m ? ' activo' : ''}`} onClick={() => setMinutos(m)}>
+                  {t}
                 </button>
-                <select
-                  id="num-jugadores-lb"
-                  className="qq-select-jugadores"
-                  value={numJugadores}
-                  onChange={cambiarNumJugadores}
-                >
-                  {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => i + MIN_JUGADORES).map((k) => (
-                    <option key={k} value={k}>
-                      {k} jugadores
-                    </option>
-                  ))}
-                </select>
-                <button
-                  type="button"
-                  className="qq-stepper-btn"
-                  disabled={numJugadores >= MAX_JUGADORES}
-                  onClick={() => actualizarCantidadJugadores(numJugadores + 1)}
-                >
-                  +
-                </button>
-              </div>
-            </div>
-
-            <span className="qq-label-destacado" style={{ marginTop: '1.2rem', display: 'block' }}>
-              Nombres (según el orden de asientos en círculo)
-            </span>
-            <div className="qq-nombres-grid">
-              {nombres.map((nombre, i) => (
-                <div key={i} className="qq-jugador-input-card">
-                  <span className="qq-jugador-badge">{i + 1}</span>
-                  <input
-                    type="text"
-                    value={nombre}
-                    maxLength={30}
-                    placeholder={`Jugador ${i + 1}`}
-                    onChange={(ev) => setNombres((p) => p.map((x, k) => (k === i ? ev.target.value : x)))}
-                  />
-                </div>
               ))}
             </div>
-
-            <div className="qq-selector-cantidad-box" style={{ marginTop: '1.2rem' }}>
-              <label className="qq-label-destacado" htmlFor="min-debate">
-                Tiempo de debate diurno
-              </label>
-              <select
-                id="min-debate"
-                className="qq-select-jugadores"
-                style={{ width: '100%' }}
-                value={minutos}
-                onChange={(ev) => setMinutos(Number(ev.target.value))}
-              >
-                <option value={0}>Sin límite de tiempo</option>
-                <option value={1}>1 minuto</option>
-                <option value={2}>2 minutos</option>
-                <option value={3}>3 minutos</option>
-                <option value={5}>5 minutos</option>
-              </select>
-
-              <label className="lb-check" style={{ marginTop: '0.8rem' }}>
-                <input
-                  type="checkbox"
-                  checked={votosPublicos}
-                  onChange={(ev) => setVotosPublicos(ev.target.checked)}
-                />
-                <span>Mostrar quién votó a quién tras el recuento</span>
-              </label>
-            </div>
-
-            <button
-              type="button"
-              className="big full qq-btn-principal"
-              style={{ marginTop: '1.5rem' }}
-              onClick={irAComposicion}
-            >
-              <Icon name="play" size={22} /> Iniciar juego
-            </button>
-          </div>
-        </section>
+            <label className="lb-check" style={{ marginTop: '0.9rem' }}>
+              <input type="checkbox" checked={votosPublicos} onChange={(ev) => setVotosPublicos(ev.target.checked)} />
+              <span>Mostrar quién votó a quién tras el recuento</span>
+            </label>
+          </BloqueConfig>
+        </SelectorJugadores>
       </div>
     );
   }
@@ -541,37 +436,18 @@ export default function LobosLocal({ onVolver, onSalir, onExit, onAbrirAyuda }) 
     const bloqueado = validacion.errores.length > 0;
     return (
       <div className="lb-contenedor">
-        <section className="game">
+        <section className="game qq-pantalla">
           <div className="panel qq-menu-panel">
             <div className="qq-card-top">
               <BotonVolver onClick={() => setFase('setup')} />
-              <button
-                type="button"
-                className="qq-btn-ayuda"
-                onClick={onAbrirAyuda}
-                title="Cómo jugar"
-                aria-label="Cómo jugar"
-              >
-                ?
-              </button>
+              <button type="button" className="qq-btn-ayuda" onClick={onAbrirAyuda} title="Cómo jugar" aria-label="Cómo jugar">?</button>
             </div>
-
             <div className="qq-section-header">
               <h2 className="qq-section-title">Elige los roles</h2>
-              <p className="hint">
-                {n} jugadores. Elige una combinación recomendada para tu mesa o diseña la tuya.
-              </p>
+              <p className="hint">{n} jugadores. Elige una combinación recomendada para tu mesa o diseña la tuya.</p>
             </div>
-
             <SelectorRoles n={n} sel={sel} setSel={setSel} mec={mec} setMec={setMec} />
-
-            <button
-              type="button"
-              className="big full qq-btn-principal"
-              style={{ marginTop: '1.2rem' }}
-              disabled={bloqueado}
-              onClick={empezarPartida}
-            >
+            <button type="button" className="big full qq-btn-principal" style={{ marginTop: '1.2rem' }} disabled={bloqueado} onClick={empezarPartida}>
               <Icon name="moon" size={22} /> ¡Empezar partida!
             </button>
           </div>
@@ -584,121 +460,89 @@ export default function LobosLocal({ onVolver, onSalir, onExit, onAbrirAyuda }) 
   if (fase === 'reparto' && e) {
     const j = e.jugadores[idx];
     return (
-      <div className={`lb-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+      <div className="lb-contenedor qq-en-partida">
         {modalConfirmarSalida}
-        {paso === 'pasar' ? (
-          <section className="game center">
-            <div className="panel qq-menu-panel">
-              <div className="qq-card-top">
-                <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
-                <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
-                  Reparto · {idx + 1}/{e.jugadores.length}
-                </span>
-              </div>
-              <div style={{ fontSize: '3.2rem', margin: '0.4rem 0' }}>📱</div>
-              <h1 className="title">
-                Pasa el dispositivo a <span className="hl">{j.nombre}</span>
-              </h1>
-              <p className="hint">Que nadie más mire la pantalla: vas a descubrir tu rol secreto.</p>
-              <button className="big full qq-btn-principal" onClick={() => setPaso('ver')}>
-                <Icon name="check" size={22} strokeWidth={2.5} /> Soy {j.nombre}, mostrar mi rol
+        <section className="game lbp-escena lb-partida noche">
+          {cabecera('noche', 'Reparto de roles', `Jugador ${idx + 1} de ${e.jugadores.length}`, { vivos: null })}
+          {paso === 'pasar' ? (
+            <PasaDispositivo
+              id={j.id}
+              nombre={j.nombre}
+              texto="Que nadie más mire la pantalla: vas a descubrir tu rol secreto."
+            >
+              <button className="lbp-boton grande" onClick={() => setPaso('ver')}>
+                <Icon name="eye" size={22} /> Soy {j.nombre}, mostrar mi rol
               </button>
-            </div>
-          </section>
-        ) : (
-          <section className="game">
-            <div className="panel qq-menu-panel">
-              <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
-                <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
-                <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
-                  Jugador {idx + 1} de {e.jugadores.length}
-                </span>
-              </div>
+            </PasaDispositivo>
+          ) : (
+            <>
               <TarjetaRol e={e} id={idx} />
-              <button className="big full qq-btn-principal" onClick={siguienteReparto}>
-                <Icon name="check" size={22} strokeWidth={2.5} />{' '}
-                {idx + 1 >= e.jugadores.length ? 'He memorizado mi rol: ¡que caiga la noche!' : 'He memorizado mi rol'}
-              </button>
-            </div>
-          </section>
-        )}
+              <div className="lbp-barra">
+                <button className="lbp-boton grande" onClick={siguienteReparto}>
+                  <Icon name="check" size={22} strokeWidth={2.5} />{' '}
+                  {idx + 1 >= e.jugadores.length ? 'Memorizado: ¡que caiga la noche!' : 'He memorizado mi rol'}
+                </button>
+              </div>
+            </>
+          )}
+        </section>
       </div>
     );
   }
 
   /* 4. NOCHE */
   if (fase === 'noche' && e && e.noche) {
+    const turnoJ = turnoActual != null ? e.jugadores[turnoActual] : null;
     return (
-      <div className={`lb-contenedor lb-escena-noche ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+      <div className="lb-contenedor qq-en-partida">
         {modalConfirmarSalida}
-        <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: '0.5rem' }}>
-          <button
-            type="button"
-            className="qq-link-volver"
-            style={{ color: '#e0e7ff' }}
-            onClick={() => setModalSalirPortada(true)}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-            <span style={{ color: '#e0e7ff' }}>Volver a la portada</span>
-          </button>
-        </div>
+        <section className="game lbp-escena lb-partida noche">
+          {paso !== 'turno' && cabecera('noche', 'Cae la noche', `Noche ${e.ronda}`, {
+            chips: [paso === 'pasar' ? <><Icon name="lock" size={14} /> Turno {e.noche.idx + 1}/{e.noche.orden.length}</> : null]
+          })}
 
-        {paso === 'intro' && (
-          <section className="game center">
-            <span className="lb-luna">
-              <Icon name="moon" size={64} strokeWidth={1.5} />
-            </span>
-            <p className="categoria">
-              <Icon name="moon" size={16} />
-              Noche {e.ronda}
-            </p>
-            <h1 className="title">Cae la noche sobre la aldea</h1>
-            {e.noche.evento && (
-              <p className="lb-evento grande">
-                <Icon name={EVENTOS[e.noche.evento].icono} size={20} />{' '}
-                <strong>{EVENTOS[e.noche.evento].nombre}.</strong> {EVENTOS[e.noche.evento].texto}
+          {paso === 'intro' && (
+            <div className="lbp-tarjeta lbp-noche-intro">
+              <span className="lbp-luna-grande" aria-hidden="true" />
+              <h2 className="lbp-titulo">Cae la noche sobre la aldea</h2>
+              {e.noche.evento && (
+                <p className="lb-evento grande">
+                  <Icon name={EVENTOS[e.noche.evento].icono} size={20} />{' '}
+                  <span><strong>{EVENTOS[e.noche.evento].nombre}.</strong> {EVENTOS[e.noche.evento].texto}</span>
+                </p>
+              )}
+              <p className="lbp-texto">
+                El móvil pasará por todos los jugadores vivos, uno a uno. Todos tardan lo mismo para no delatar quién tiene poderes. Cuando no sea tu turno, cierra los ojos.
               </p>
-            )}
-            <p className="hint">
-              El dispositivo pasará por todos los jugadores vivos, uno a uno. Cuando no sea tu turno, no mires la pantalla.
-            </p>
-            <button className="big full qq-btn-principal" onClick={() => setPaso('pasar')}>
-              Empezar la noche
-            </button>
-          </section>
-        )}
-        {paso === 'pasar' && turnoActual != null && (
-          <section className="game center">
-            <p className="categoria">
-              <Icon name="lock" size={16} />
-              Noche {e.ronda} · Turno {e.noche.idx + 1}/{e.noche.orden.length}
-            </p>
-            <h1 className="title">
-              Pasa el dispositivo a <span className="hl">{e.jugadores[turnoActual].nombre}</span>
-            </h1>
-            <p className="hint">No mires la pantalla si no es tu turno.</p>
-            <button className="big full qq-btn-principal" onClick={empezarTurno}>
-              <Icon name="check" size={22} strokeWidth={2.5} /> Soy {e.jugadores[turnoActual].nombre}, ¡estoy listo!
-            </button>
-          </section>
-        )}
-        {paso === 'turno' && turnoActual != null && (
-          <TurnoNoche key={`${e.ronda}-${e.noche.idx}`} e={e} id={turnoActual} onTerminar={terminarTurno} />
-        )}
-        {paso === 'amanece' && (
-          <section className="game center">
-            <span className="lb-luna">
-              <Icon name="sun" size={64} strokeWidth={1.5} />
-            </span>
-            <h1 className="title">La noche ha terminado</h1>
-            <p className="hint">Todos abren los ojos. Entrega el dispositivo a la mesa para ver qué ha ocurrido.</p>
-            <button className="big full qq-btn-principal" onClick={amanecer}>
-              <Icon name="sun" size={22} /> Amanecer
-            </button>
-          </section>
-        )}
+              <button className="lbp-boton grande" onClick={() => setPaso('pasar')}>
+                <Icon name="moon" size={22} /> Empezar la noche
+              </button>
+            </div>
+          )}
+          {paso === 'pasar' && turnoJ && (
+            <PasaDispositivo id={turnoJ.id} nombre={turnoJ.nombre} texto="No mires la pantalla si no es tu turno.">
+              <button className="lbp-boton grande" onClick={empezarTurno}>
+                <Icon name="check" size={22} strokeWidth={2.5} /> Soy {turnoJ.nombre}, ¡estoy listo!
+              </button>
+            </PasaDispositivo>
+          )}
+          {paso === 'turno' && turnoActual != null && (
+            <>
+              {cabecera('noche', `Noche ${e.ronda} · turno ${e.noche.idx + 1}/${e.noche.orden.length}`, null)}
+              <TurnoNoche key={`${e.ronda}-${e.noche.idx}`} e={e} id={turnoActual} onTerminar={terminarTurno} />
+            </>
+          )}
+          {paso === 'amanece' && (
+            <div className="lbp-tarjeta lbp-noche-intro">
+              <span className="lbp-sol-grande" aria-hidden="true" />
+              <h2 className="lbp-titulo">La noche ha terminado</h2>
+              <p className="lbp-texto">Todos abren los ojos. Dejad el móvil en el centro de la mesa para ver qué ha ocurrido.</p>
+              <button className="lbp-boton grande" onClick={amanecer}>
+                <Icon name="sun" size={22} /> Amanecer
+              </button>
+            </div>
+          )}
+        </section>
       </div>
     );
   }
@@ -709,22 +553,19 @@ export default function LobosLocal({ onVolver, onSalir, onExit, onAbrirAyuda }) 
     const cazador = e.pendientes.length ? e.jugadores[e.pendientes[0]] : null;
     const candidatos = cazador ? vivos(e).filter((x) => x.id !== cazador.id).map((x) => x.id) : [];
     const martirLinchado = a.muertes.some((m) => m.rol === 'martir' && m.causa === 'linchamiento');
-    const tipoTitulo = origen === 'noche' ? 'Amanece en la aldea' : 'Veredicto del pueblo';
+    const hayEco = origen === 'noche' && !ecoListo && a.muertes.length > 0 && e.jugadores.some((x) => x.vivo && x.rol === 'eco');
     return (
-      <div className={`lb-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+      <div className="lb-contenedor qq-en-partida">
         {modalConfirmarSalida}
-        <section className="game">
+        <section className="game lbp-escena lb-partida dia">
+          {cabecera('dia', `Día ${e.ronda}`, origen === 'noche' ? 'Amanece en la aldea' : 'Veredicto del pueblo')}
           <div className="end-card">
-            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
-              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
-              <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
-                Ronda {e.ronda}
-              </span>
-            </div>
-            <h1 className="title">{tipoTitulo}</h1>
             {a.rebobinada && <p className="reveal">⏳ Ha ocurrido algo raro… el tiempo ha retrocedido. Nadie ha muerto esta noche.</p>}
             {a.muertes.length === 0 && !a.rebobinada && (
-              <p className="reveal">{origen === 'noche' ? 'Esta noche no ha muerto nadie.' : 'Nadie ha sido linchado.'}</p>
+              <p className="lbp-nadie">
+                <span aria-hidden="true">{origen === 'noche' ? '🌤️' : '🕊️'}</span>
+                {origen === 'noche' ? 'Esta noche no ha muerto nadie.' : 'Nadie ha sido linchado.'}
+              </p>
             )}
             <div className="lb-muertes">
               {a.muertes.map((m) => (
@@ -746,37 +587,21 @@ export default function LobosLocal({ onVolver, onSalir, onExit, onAbrirAyuda }) 
               <div className="lb-cartas">
                 <p className="lb-res-titulo">📜 Las cartas selladas del Notario se abren</p>
                 {a.cartas.map((c, i) => (
-                  <p key={i}>
-                    «{c.sobreNombre} {c.veredicto === 'pueblo' ? 'es del Pueblo' : 'NO es del Pueblo'}»
-                  </p>
+                  <p key={i}>«{c.sobreNombre} {c.veredicto === 'pueblo' ? 'es del Pueblo' : 'NO es del Pueblo'}»</p>
                 ))}
                 <p className="hint small">El Notario decidía qué escribir: puede ser verdad… o mentira.</p>
               </div>
             )}
-            {a.rumor && (
-              <p className="reveal">
-                🗣 Rumor del pueblo: {a.rumor.texto} <small>(puede ser cierto o falso)</small>
-              </p>
-            )}
+            {a.rumor && <p className="reveal">🗣 Rumor del pueblo: {a.rumor.texto} <small>(puede ser cierto o falso)</small></p>}
             {a.evento === 'eclipse' && <p className="reveal">🌑 Eclipse: hoy no hay debate, se vota directamente.</p>}
-            {martirLinchado && (
-              <p className="reveal">🔔 El sacrificio del Mártir protege a la aldea: esta noche los lobos no podrán atacar.</p>
-            )}
-            {e.victoriasPersonales.map((v) => (
-              <p key={v.id} className="reveal">
-                💀 {v.texto}
-              </p>
-            ))}
+            {martirLinchado && <p className="reveal">🔔 El sacrificio del Mártir protege a la aldea: esta noche los lobos no podrán atacar.</p>}
+            {e.victoriasPersonales.map((v) => <p key={v.id} className="reveal">💀 {v.texto}</p>)}
           </div>
 
-          {origen === 'noche' && !ecoListo && !cazador && a.muertes.length > 0 && e.jugadores.some((x) => x.vivo && x.rol === 'eco') && (
-            <div className="panel" style={{ marginTop: '1rem' }}>
-              <h3 className="panel-title">
-                <Icon name="speech" size={22} /> Un último susurro
-              </h3>
-              <p className="hint">
-                Quien ha muerto esta noche puede dejar un mensaje anónimo para el Eco, sea verdad o mentira.
-              </p>
+          {hayEco && !cazador && (
+            <div className="panel">
+              <h3 className="panel-title"><Icon name="speech" size={22} /> Un último susurro</h3>
+              <p className="hint">Quien ha muerto esta noche puede dejar un mensaje anónimo para el Eco, sea verdad o mentira.</p>
               <textarea
                 className="lb-textarea"
                 maxLength={200}
@@ -787,7 +612,7 @@ export default function LobosLocal({ onVolver, onSalir, onExit, onAbrirAyuda }) 
               />
               <button
                 type="button"
-                className="big full qq-btn-principal"
+                className="lbp-boton"
                 onClick={() => {
                   setE(dejarMensajeEco(e, textoEco));
                   setEcoListo(true);
@@ -800,26 +625,25 @@ export default function LobosLocal({ onVolver, onSalir, onExit, onAbrirAyuda }) 
           )}
 
           {cazador ? (
-            <div className="panel" style={{ marginTop: '1rem' }}>
-              <h3 className="panel-title">
-                <Icon name="target" size={22} /> {cazador.nombre} era el Cazador: ¡dispara!
-              </h3>
+            <div className="panel">
+              <h3 className="panel-title"><Icon name="target" size={22} /> {cazador.nombre} era el Cazador: ¡dispara!</h3>
               <p className="hint">Con su último aliento elige a quién se lleva por delante.</p>
               {candidatos.length ? (
                 <ElegirUno e={e} opciones={candidatos} texto="Disparar" onConfirmar={(t) => dispararCazador(cazador.id, t)} />
               ) : (
-                <button className="big full" onClick={() => dispararCazador(cazador.id, null)}>
-                  No queda nadie a quien disparar
-                </button>
+                <button className="lbp-boton" onClick={() => dispararCazador(cazador.id, null)}>No queda nadie a quien disparar</button>
               )}
             </div>
           ) : (
-            !(origen === 'noche' && !ecoListo && a.muertes.length > 0 && e.jugadores.some((x) => x.vivo && x.rol === 'eco')) && (
-              <button className="big full qq-btn-principal" onClick={continuarTrasAnuncio}>
-                <Icon name="forward" size={22} /> Continuar
-              </button>
+            !hayEco && (
+              <div className="lbp-barra estatica">
+                <button className="lbp-boton grande" onClick={continuarTrasAnuncio}>
+                  <Icon name="forward" size={22} /> Continuar
+                </button>
+              </div>
             )
           )}
+          {aldea()}
         </section>
       </div>
     );
@@ -830,29 +654,20 @@ export default function LobosLocal({ onVolver, onSalir, onExit, onAbrirAyuda }) 
     const o = OBJETOS[objetoDia.tipo];
     const candidatos = vivos(e).filter((j) => !j.estado.objeto || j.id === objetoDia.dueno);
     return (
-      <div className={`lb-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+      <div className="lb-contenedor qq-en-partida">
         {modalConfirmarSalida}
-        <section className="game center">
-          <div className="panel qq-menu-panel">
-            <div className="qq-card-top">
-              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
-              <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
-                Objeto misterioso
-              </span>
-            </div>
-            <div className="qq-hero-icono">
-              <Icon name={o.icono} size={42} strokeWidth={1.6} />
-            </div>
-            <h1 className="title">¡Ha aparecido: {o.nombre}!</h1>
-            <p className="hint">{o.texto}</p>
+        <section className="game lbp-escena lb-partida dia">
+          {cabecera('dia', `Día ${e.ronda}`, 'Objeto misterioso')}
+          <div className="lbp-tarjeta lbp-objeto">
+            <span className="lbp-objeto-icono"><Icon name={o.icono} size={44} strokeWidth={1.6} /></span>
+            <h2 className="lbp-titulo">¡Ha aparecido: {o.nombre}!</h2>
+            <p className="lbp-texto">{o.texto}</p>
             {objetoDia.dueno == null ? (
               <>
-                <p className="hint">
-                  El primero que lo reclame se lo queda: <strong>¡pulsad vuestro nombre!</strong>
-                </p>
-                <div className="names-grid">
+                <p className="lbp-texto"><strong>El primero que lo reclame se lo queda: ¡pulsad vuestro nombre!</strong></p>
+                <div className="names-grid lb-eleccion">
                   {candidatos.map((j) => (
-                    <button key={j.id} type="button" className="secondary" onClick={() => reclamar(j.id)}>
+                    <button key={j.id} type="button" className="secondary lb-op" onClick={() => reclamar(j.id)}>
                       {j.nombre}
                     </button>
                   ))}
@@ -860,10 +675,8 @@ export default function LobosLocal({ onVolver, onSalir, onExit, onAbrirAyuda }) 
               </>
             ) : (
               <>
-                <p className="reveal">
-                  🎒 {e.jugadores[objetoDia.dueno].nombre} se ha quedado con el objeto. Lo verá en su ficha de rol y en su turno de noche.
-                </p>
-                <button className="big full qq-btn-principal" onClick={() => irADebate(e)}>
+                <p className="reveal">🎒 {e.jugadores[objetoDia.dueno].nombre} se ha quedado con el objeto. Lo verá en su ficha de rol y en su turno de noche.</p>
+                <button className="lbp-boton grande" onClick={() => irADebate(e)}>
                   <Icon name="forward" size={22} /> Continuar
                 </button>
               </>
@@ -876,80 +689,41 @@ export default function LobosLocal({ onVolver, onSalir, onExit, onAbrirAyuda }) 
 
   /* 6. DEBATE */
   if (fase === 'debate' && e) {
-    const vivosLista = vivos(e);
-    const muertos = e.jugadores.filter((j) => !j.vivo);
     const mm = String(Math.floor(segundos / 60)).padStart(2, '0');
     const ss = String(segundos % 60).padStart(2, '0');
+    const eclipse = e.noche?.evento === 'eclipse';
     return (
-      <div className={`lb-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+      <div className="lb-contenedor qq-en-partida">
         {modalConfirmarSalida}
-        <section className="game">
-          <div className="panel center qq-menu-panel">
-            <div className="qq-card-top">
-              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
-              <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
-                Día {e.ronda} · {vivosLista.length} vivos
-              </span>
-            </div>
-
-            <h1 className="title">Debate en la plaza</h1>
+        <section className="game lbp-escena lb-partida dia">
+          {cabecera('dia', `Día ${e.ronda}`, 'Debate en la plaza')}
+          <div className="lbp-tarjeta lbp-debate">
             {e.modDia && (
               <p className="lb-evento">
-                <Icon name="landmark" size={18} /> <strong>{MODIFICADORES[e.modDia].nombre}.</strong> {MODIFICADORES[e.modDia].texto}
+                <Icon name="landmark" size={18} /> <span><strong>{MODIFICADORES[e.modDia].nombre}.</strong> {MODIFICADORES[e.modDia].texto}</span>
               </p>
             )}
-            {e.noche?.evento === 'eclipse' ? (
+            {eclipse ? (
               <p className="lb-evento grande">
-                <Icon name="sun" size={20} /> <strong>Eclipse.</strong> {EVENTOS.eclipse.texto}
+                <Icon name="sun" size={20} /> <span><strong>Eclipse.</strong> {EVENTOS.eclipse.texto}</span>
               </p>
             ) : minutos > 0 ? (
-              <>
-                <div className="timer">
-                  <div className={`timer-bar ${segundos <= 20 ? 'low' : ''}`} style={{ width: `${(segundos / (minutos * 60)) * 100}%` }} />
-                </div>
-                <p className="timer-text">
-                  <Icon name="clock" size={18} />
-                  {mm}:{ss}
-                  {segundos === 0 ? ' · ¡Tiempo!' : ''}
-                </p>
-              </>
+              <div className={`lbp-reloj${segundos <= 20 ? ' critico' : ''}${segundos === 0 ? ' fin' : ''}`}>
+                <span className="lbp-reloj-num">{segundos === 0 ? '¡Tiempo!' : `${mm}:${ss}`}</span>
+                <div className="lbp-reloj-barra"><span style={{ width: `${(segundos / (minutos * 60)) * 100}%` }} /></div>
+              </div>
             ) : (
-              <p className="hint">Debatid todo lo que queráis. Cuando estéis listos, pasad a la votación.</p>
+              <p className="lbp-texto">Debatid todo lo que queráis. Cuando estéis listos, pasad a la votación.</p>
             )}
-            <p className="hint">¿Quién es el lobo? Acusad, defendeos y buscad contradicciones.</p>
+            <p className="lbp-texto">🐺 ¿Quién es el lobo? Acusad, defendeos y buscad contradicciones.</p>
           </div>
-
-          <div className="panel" style={{ marginTop: '1rem' }}>
-            <h3 className="panel-title">
-              <Icon name="users" size={20} /> En la aldea
-            </h3>
-            <div className="lb-vivos">
-              {vivosLista.map((j) => (
-                <span key={j.id} className="lb-vivo">
-                  {j.nombre}
-                </span>
-              ))}
-            </div>
-            {muertos.length > 0 && (
-              <>
-                <p className="field-label">Eliminados</p>
-                <div className="lb-vivos">
-                  {muertos.map((j) => (
-                    <span key={j.id} className="lb-vivo muerto">
-                      {j.nombre} · {ROLES[rolRevelado(e, j.id)].nombre}
-                    </span>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-
-          <div className="actions">
-            <button className="secondary" onClick={() => setModalConsulta(true)}>
-              <Icon name="eye" size={20} /> Consultar mi rol
-            </button>
-            <button className="big full qq-btn-principal" onClick={() => iniciarVotacion(false)}>
+          {aldea()}
+          <div className="lbp-barra">
+            <button className="lbp-boton grande" onClick={() => iniciarVotacion(false)}>
               <Icon name="landmark" size={22} /> Pasar a la votación
+            </button>
+            <button className="lbp-enlace" onClick={() => setModalConsulta(true)}>
+              <Icon name="eye" size={16} /> Consultar mi rol
             </button>
           </div>
         </section>
@@ -962,35 +736,23 @@ export default function LobosLocal({ onVolver, onSalir, onExit, onAbrirAyuda }) 
   if (fase === 'votacion' && e && vot) {
     if (paso === 'repite') {
       return (
-        <div className={`lb-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+        <div className="lb-contenedor qq-en-partida">
           {modalConfirmarSalida}
-          <section className="game center">
-            <div className="panel qq-menu-panel">
-              <div className="qq-card-top">
-                <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
-              </div>
-              <div className="qq-hero-icono">
-                <Icon name="landmark" size={42} strokeWidth={1.6} />
-              </div>
-              <h1 className="title">¡Veredicto invocado!</h1>
-              <p className="hint">
+          <section className="game lbp-escena lb-partida dia">
+            {cabecera('dia', `Día ${e.ronda}`, '¡Veredicto invocado!')}
+            <div className="lbp-tarjeta lbp-objeto">
+              <span className="lbp-objeto-icono"><Icon name="landmark" size={44} strokeWidth={1.6} /></span>
+              <p className="lbp-texto">
                 Alguien ha invocado el veredicto del Juez Corrupto: <strong>se anula la votación y se repite</strong>. Si la segunda señala al mismo jugador, el Juez también pagará con su vida.
               </p>
               <button
-                className="big full qq-btn-principal"
+                className="lbp-boton grande"
                 onClick={() => {
-                  setVot({
-                    ...vot,
-                    orden: barajar(vivos(e).map((j) => j.id)),
-                    i: 0,
-                    votos: {},
-                    segunda: true,
-                    robado: null
-                  });
+                  setVot({ ...vot, orden: barajar(vivos(e).map((j) => j.id)), i: 0, votos: {}, segunda: true, robado: null });
                   setPaso('pasar');
                 }}
               >
-                Repetir la votación
+                <Icon name="refresh" size={22} /> Repetir la votación
               </button>
             </div>
           </section>
@@ -1003,47 +765,32 @@ export default function LobosLocal({ onVolver, onSalir, onExit, onAbrirAyuda }) 
         ? e.flags.ladron.objetivo
         : null;
     return (
-      <div className={`lb-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+      <div className="lb-contenedor qq-en-partida">
         {modalConfirmarSalida}
-        {paso === 'pasar' ? (
-          <section className="game center">
-            <div className="panel qq-menu-panel">
-              <div className="qq-card-top">
-                <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
-                <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
-                  {vot.segunda ? 'Votación repetida' : 'Votación'} · {vot.i + 1}/{vot.orden.length}
-                </span>
-              </div>
-              <div style={{ fontSize: '3.2rem', margin: '0.4rem 0' }}>🗳️</div>
-              <h1 className="title">
-                Pasa el dispositivo a <span className="hl">{e.jugadores[votante].nombre}</span>
-              </h1>
+        <section className="game lbp-escena lb-partida dia">
+          {cabecera('dia', `Día ${e.ronda} · voto ${vot.i + 1}/${vot.orden.length}`, vot.segunda ? 'Votación repetida' : 'Votación')}
+          {paso === 'pasar' ? (
+            <PasaDispositivo id={votante} nombre={e.jugadores[votante].nombre} emoji="🗳️" texto="Vota en secreto: nadie más debe ver tu elección.">
               {e.modDia && !vot.segunda && (
                 <p className="lb-evento">
-                  <Icon name="landmark" size={18} /> <strong>{MODIFICADORES[e.modDia].nombre}:</strong> {MODIFICADORES[e.modDia].texto}
+                  <Icon name="landmark" size={18} /> <span><strong>{MODIFICADORES[e.modDia].nombre}:</strong> {MODIFICADORES[e.modDia].texto}</span>
                 </p>
               )}
-              <p className="hint">Vota en secreto: nadie más debe ver tu elección.</p>
-              <button className="big full qq-btn-principal" onClick={() => setPaso('votar')}>
+              <button className="lbp-boton grande" onClick={() => setPaso('votar')}>
                 <Icon name="check" size={22} strokeWidth={2.5} /> Soy {e.jugadores[votante].nombre}, ¡estoy listo!
               </button>
-              <button className="secondary full" style={{ marginTop: '.8rem' }} onClick={() => setModalConsulta(true)}>
-                <Icon name="eye" size={18} /> Consultar mi rol
-              </button>
-              {modalConsulta && <ConsultarRol e={e} onCerrar={() => setModalConsulta(false)} />}
-            </div>
-          </section>
-        ) : (
-          <VotoTurno
-            key={`${vot.segunda}-${vot.i}`}
-            e={e}
-            id={votante}
-            robadoDe={robadoDe}
-            segunda={vot.segunda}
-            onVotar={registrarVoto}
-            onSalirPortada={() => setModalSalirPortada(true)}
-          />
-        )}
+            </PasaDispositivo>
+          ) : (
+            <VotoTurno
+              key={`${vot.segunda}-${vot.i}`}
+              e={e}
+              id={votante}
+              robadoDe={robadoDe}
+              segunda={vot.segunda}
+              onVotar={registrarVoto}
+            />
+          )}
+        </section>
       </div>
     );
   }
@@ -1052,17 +799,11 @@ export default function LobosLocal({ onVolver, onSalir, onExit, onAbrirAyuda }) 
   if (fase === 'resultado' && e && res) {
     const todos = vivos(e);
     return (
-      <div className={`lb-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+      <div className="lb-contenedor qq-en-partida">
         {modalConfirmarSalida}
-        <section className="game">
+        <section className="game lbp-escena lb-partida dia">
+          {cabecera('dia', `Día ${e.ronda}`, 'Recuento de votos')}
           <div className="end-card">
-            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
-              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
-              <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
-                Ronda {e.ronda}
-              </span>
-            </div>
-            <h1 className="title">Recuento de votos</h1>
             <p className="final-score">
               {res.fichaDe != null
                 ? 'La ficha de favor ha anulado la sentencia'
@@ -1074,9 +815,7 @@ export default function LobosLocal({ onVolver, onSalir, onExit, onAbrirAyuda }) 
                       : `Empate entre ${res.empatados.map((i) => e.jugadores[i].nombre).join(' y ')}: no hay linchamiento`
                     : `El pueblo señala a ${e.jugadores[res.victima].nombre} (${res.max} ${res.max === 1 ? 'voto' : 'votos'})`}
             </p>
-            {res.fichaDe != null && (
-              <p className="reveal">🪙 Una ficha de favor se ha gastado: {e.jugadores[res.fichaDe].nombre} se libra del linchamiento.</p>
-            )}
+            {res.fichaDe != null && <p className="reveal">🪙 Una ficha de favor se ha gastado: {e.jugadores[res.fichaDe].nombre} se libra del linchamiento.</p>}
             {res.modif && <p className="hint small">Modificador de hoy: {MODIFICADORES[res.modif].nombre}.</p>}
             {res.identico && <p className="reveal">⚖ El resultado coincide con el primero: el Juez Corrupto paga con su vida.</p>}
             <div className="scoreboard">
@@ -1085,9 +824,7 @@ export default function LobosLocal({ onVolver, onSalir, onExit, onAbrirAyuda }) 
                 .map((j) => (
                   <div key={j.id} className={`score-row ${j.id === res.victima ? 'first' : ''}`}>
                     <span className="score-name">{j.nombre}</span>
-                    <span className="score-pts">
-                      {res.conteo[j.id]} {res.conteo[j.id] === 1 ? 'voto' : 'votos'}
-                    </span>
+                    <span className="score-pts">{res.conteo[j.id]} {res.conteo[j.id] === 1 ? 'voto' : 'votos'}</span>
                   </div>
                 ))}
               {res.abstenciones > 0 && (
@@ -1100,25 +837,23 @@ export default function LobosLocal({ onVolver, onSalir, onExit, onAbrirAyuda }) 
           </div>
           {e.config.votosPublicos && (
             <div className="panel reveal-panel">
-              <h3 className="reveal-title">
-                <Icon name="eye" size={20} /> Desglose de votos
-              </h3>
+              <h3 className="reveal-title"><Icon name="eye" size={20} /> Desglose de votos</h3>
               <div className="reveal-list">
                 {todos.map((j) => (
                   <div key={j.id} className="reveal-row">
                     <span className="reveal-name">{j.nombre}</span>
-                    <span className="reveal-card">
-                      {res.votos[j.id] != null ? `→ ${e.jugadores[res.votos[j.id]].nombre}` : 'se abstuvo'}
-                    </span>
+                    <span className="reveal-card">{res.votos[j.id] != null ? `→ ${e.jugadores[res.votos[j.id]].nombre}` : 'se abstuvo'}</span>
                   </div>
                 ))}
               </div>
               <p className="hint small center">Si tu voto no coincide con el que emitiste… alguien te lo ha robado.</p>
             </div>
           )}
-          <button className="big full qq-btn-principal" onClick={aplicarResultado}>
-            <Icon name="forward" size={22} /> {res.victima == null ? 'Continuar' : 'Ejecutar la sentencia'}
-          </button>
+          <div className="lbp-barra estatica">
+            <button className="lbp-boton grande" onClick={aplicarResultado}>
+              <Icon name="forward" size={22} /> {res.victima == null ? 'Continuar' : 'Ejecutar la sentencia'}
+            </button>
+          </div>
         </section>
       </div>
     );
@@ -1127,74 +862,41 @@ export default function LobosLocal({ onVolver, onSalir, onExit, onAbrirAyuda }) 
   /* 9. FIN */
   if (fase === 'fin' && e && e.ganador) {
     const g = e.ganador;
-    const titulo = {
-      lobos: 'Ganan los Lobos',
-      pueblo: 'Gana el Pueblo',
-      solitario: 'Gana el Solitario',
-      amantes: 'Ganan los Enamorados',
-      epidemia: 'Gana la Epidemia',
-      nadie: 'Nadie gana'
-    }[g.bando];
-    const icono = {
-      lobos: 'paw',
-      pueblo: 'home',
-      solitario: 'flame',
-      amantes: 'heart',
-      epidemia: 'flask',
-      nadie: 'skull'
-    }[g.bando];
+    const final = FINAL[g.bando] || FINAL.nadie;
     return (
-      <div className={`lb-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+      <div className="lb-contenedor qq-en-partida">
         {modalConfirmarSalida}
-        <section className="game">
+        <section className="game lbp-escena lb-partida fin">
+          {cabecera('fin', `Fin de la partida · ronda ${e.ronda}`, final.titulo)}
           <div className="end-card">
-            <span className="end-icon">
-              <Icon name={icono} size={44} />
-            </span>
-            <p className="categoria">
-              <Icon name="flagFinish" size={16} />
-              Fin de la partida · ronda {e.ronda}
-            </p>
-            <h1 className="title">{titulo}</h1>
+            <span className="lbp-final-emoji" aria-hidden="true">{final.emoji}</span>
             <p className="reveal">{g.texto}</p>
-            {e.victoriasPersonales.map((v) => (
-              <p key={v.id} className="reveal">
-                💀 {v.texto}
-              </p>
-            ))}
+            {e.victoriasPersonales.map((v) => <p key={v.id} className="reveal">💀 {v.texto}</p>)}
           </div>
           <div className="panel reveal-panel">
-            <h3 className="reveal-title">
-              <Icon name="eye" size={20} /> Todos los roles
-            </h3>
+            <h3 className="reveal-title"><Icon name="eye" size={20} /> Todos los roles</h3>
             <div className="reveal-list">
               {e.jugadores.map((j) => {
                 const cambio = j.rolInicial !== j.rol;
                 const gano = g.ids.includes(j.id) || e.victoriasPersonales.some((v) => v.id === j.id);
                 return (
                   <div key={j.id} className="reveal-row lb-final-fila" style={{ '--rol': BANDOS[ROLES[j.rol].bando].color }}>
-                    <span className="reveal-name">
-                      {gano ? '🏆 ' : ''}
-                      {j.nombre}
-                      {!j.vivo ? ' ✝' : ''}
-                    </span>
-                    <span className="reveal-card">
-                      {cambio ? `${ROLES[j.rolInicial].nombre} → ${ROLES[j.rol].nombre}` : ROLES[j.rol].nombre}
-                    </span>
+                    <span className="reveal-name">{gano ? '🏆 ' : ''}{j.nombre}{!j.vivo ? ' ✝' : ''}</span>
+                    <span className="reveal-card">{cambio ? `${ROLES[j.rolInicial].nombre} → ${ROLES[j.rol].nombre}` : ROLES[j.rol].nombre}</span>
                   </div>
                 );
               })}
             </div>
           </div>
-          <div className="actions">
-            <button className="big full qq-btn-principal" onClick={jugarOtraVez}>
+          <div className="lbp-barra estatica">
+            <button className="lbp-boton grande" onClick={jugarOtraVez}>
               <Icon name="refresh" size={22} /> Otra partida (mismos jugadores)
             </button>
-            <button className="secondary" onClick={nuevaConfiguracion}>
-              Cambiar jugadores
+            <button className="lbp-enlace" onClick={nuevaConfiguracion}>
+              <Icon name="users" size={16} /> Cambiar jugadores
             </button>
-            <button className="secondary danger" onClick={handleSalirAPortada}>
-              Volver a la portada
+            <button className="lbp-enlace" onClick={handleSalirAPortada}>
+              <Icon name="home" size={16} /> Volver a la portada
             </button>
           </div>
         </section>
