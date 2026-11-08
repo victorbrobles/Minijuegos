@@ -1,0 +1,100 @@
+// server/data/seeds/colores/parte6.js
+// Ampliación: apps y marcas digitales, juegos, personajes, comida, animales, banderas y objetos.
+// Colores disponibles: rojo, azul, amarillo, verde, naranja, morado, marron, blanco, negro, gris, rosa.
+export default [
+  // --- Apps, tecnología y marcas ---
+  { id: 501, item: "Logotipo de YouTube (botón de play)", colores: ["rojo", "blanco"] },
+  { id: 502, item: "Logotipo de Netflix (la N)", colores: ["rojo", "negro"] },
+  { id: 503, item: "Logotipo de Facebook (la «f»)", colores: ["azul", "blanco"] },
+  { id: 504, item: "Icono de Instagram (el degradado de la cámara)", colores: ["morado", "rosa", "naranja", "amarillo"] },
+  { id: 505, item: "Logotipo de Amazon (letras y sonrisa)", colores: ["negro", "naranja"] },
+  { id: 506, item: "Logotipo de Microsoft (los cuatro cuadrados)", colores: ["rojo", "verde", "azul", "amarillo"] },
+  { id: 507, item: "Icono de Google Chrome", colores: ["rojo", "amarillo", "verde", "azul"] },
+  { id: 508, item: "Icono de Gmail (la M del sobre, versión actual)", colores: ["rojo", "azul", "verde", "amarillo"] },
+  { id: 509, item: "Logotipo de Snapchat (el fantasma)", colores: ["amarillo", "blanco", "negro"] },
+  { id: 510, item: "Logotipo de LinkedIn", colores: ["azul", "blanco"] },
+  { id: 511, item: "Logotipo de Vodafone", colores: ["rojo", "blanco"] },
+  { id: 512, item: "Logotipo de la marca Orange", colores: ["naranja", "blanco"] },
+  { id: 513, item: "Logotipo de El Corte Inglés", colores: ["verde", "blanco"] },
+  { id: 514, item: "Logotipo de Visa", colores: ["azul", "blanco"] },
+
+  // --- Juegos y deporte ---
+  { id: 515, item: "Alfombra del Twister (los círculos)", colores: ["rojo", "azul", "amarillo", "verde"] },
+  { id: 516, item: "Bloque de hierba de Minecraft", colores: ["verde", "marron"] },
+  { id: 517, item: "Creeper de Minecraft", colores: ["verde", "negro"] },
+  { id: 518, item: "Dados clásicos de casino", colores: ["rojo", "blanco"] },
+  { id: 519, item: "Fichas clásicas de dominó", colores: ["blanco", "negro"] },
+  { id: 520, item: "Balón Telstar del Mundial de 1970", colores: ["blanco", "negro"] },
+  { id: 521, item: "Bolo clásico de bolera americana", colores: ["blanco", "rojo"] },
+  { id: 522, item: "Mesa de ping-pong clásica (con la red)", colores: ["azul", "blanco"] },
+  { id: 524, item: "Tablero del juego de las damas", colores: ["rojo", "negro"] },
+
+  // --- Personajes ---
+  { id: 525, item: "Pitufo (Los Pitufos)", colores: ["azul", "blanco"] },
+  { id: 526, item: "El Grinch vestido de Papá Noel", colores: ["verde", "rojo", "blanco"] },
+  { id: 527, item: "Hello Kitty (cara, lazo y nariz)", colores: ["blanco", "rojo", "amarillo", "negro"] },
+  { id: 528, item: "Minion (cuerpo, peto, gafas y guantes)", colores: ["amarillo", "azul", "gris", "negro"] },
+  { id: 529, item: "Shin-chan (camiseta y pantalón)", colores: ["rojo", "amarillo"] },
+  { id: 530, item: "Doraemon (cuerpo, cara, collar y cascabel)", colores: ["azul", "blanco", "rojo", "amarillo"] },
+  { id: 531, item: "Totoro (Mi vecino Totoro)", colores: ["gris", "blanco", "negro"] },
+  { id: 532, item: "Pac-Man y los fantasmas Blinky y Pinky", colores: ["amarillo", "rojo", "rosa"] },
+  { id: 533, item: "Ronald McDonald (traje y pelo)", colores: ["amarillo", "rojo", "blanco"] },
+  { id: 534, item: "Chewbacca (pelaje y bandolera)", colores: ["marron", "gris"] },
+
+  // --- Comida ---
+  { id: 541, item: "Rodaja de sandía", colores: ["rojo", "verde", "negro"] },
+  { id: 542, item: "Aguacate abierto (con su hueso)", colores: ["verde", "marron"] },
+  { id: 543, item: "Berenjena", colores: ["morado", "verde"] },
+  { id: 544, item: "Kiwi partido por la mitad", colores: ["verde", "negro", "marron"] },
+  { id: 545, item: "Nigiri de salmón", colores: ["naranja", "blanco"] },
+  { id: 546, item: "Mazorca de maíz con sus hojas", colores: ["amarillo", "verde"] },
+  { id: 547, item: "Zanahoria con sus hojas", colores: ["naranja", "verde"] },
+  { id: 548, item: "Tarta Selva Negra", colores: ["marron", "blanco", "rojo"] },
+  { id: 549, item: "Bastón de caramelo navideño", colores: ["rojo", "blanco"] },
+  { id: 550, item: "Pizza margarita", colores: ["rojo", "blanco", "verde"] },
+  { id: 551, item: "Huevo Kinder Sorpresa (envoltorio)", colores: ["blanco", "rojo", "naranja"] },
+  { id: 552, item: "Macarons franceses de pistacho y frambuesa", colores: ["verde", "rosa"] },
+
+  // --- Animales ---
+  { id: 553, item: "Pingüino emperador", colores: ["negro", "blanco", "amarillo"] },
+  { id: 554, item: "Guacamayo escarlata", colores: ["rojo", "amarillo", "azul"] },
+  { id: 555, item: "Abeja melífera", colores: ["amarillo", "negro"] },
+  { id: 556, item: "Mofeta", colores: ["negro", "blanco"] },
+  { id: 557, item: "Koala", colores: ["gris", "blanco", "negro"] },
+  { id: 558, item: "Jirafa", colores: ["amarillo", "marron"] },
+  { id: 559, item: "Pavo real macho (cola desplegada)", colores: ["azul", "verde"] },
+  { id: 560, item: "Frailecillo atlántico", colores: ["negro", "blanco", "naranja"] },
+  { id: 561, item: "Rana de ojos rojos", colores: ["verde", "rojo", "azul", "naranja"] },
+  { id: 562, item: "Orca", colores: ["negro", "blanco"] },
+
+  // --- Banderas del mundo ---
+  { id: 563, item: "Bandera de Suiza", colores: ["rojo", "blanco"] },
+  { id: 564, item: "Bandera de Noruega", colores: ["rojo", "azul", "blanco"] },
+  { id: 565, item: "Bandera de Finlandia", colores: ["blanco", "azul"] },
+  { id: 566, item: "Bandera de Estados Unidos", colores: ["rojo", "blanco", "azul"] },
+  { id: 567, item: "Bandera de China", colores: ["rojo", "amarillo"] },
+  { id: 568, item: "Bandera de Turquía", colores: ["rojo", "blanco"] },
+  { id: 569, item: "Bandera de Chile", colores: ["rojo", "blanco", "azul"] },
+  { id: 570, item: "Bandera de Perú", colores: ["rojo", "blanco"] },
+  { id: 571, item: "Bandera de Nigeria", colores: ["verde", "blanco"] },
+  { id: 572, item: "Bandera de Kenia", colores: ["negro", "rojo", "verde", "blanco"] },
+  { id: 573, item: "Bandera de Australia", colores: ["azul", "rojo", "blanco"] },
+  { id: 574, item: "Bandera de Marruecos", colores: ["rojo", "verde"] },
+  { id: 575, item: "Bandera de Bélgica", colores: ["negro", "amarillo", "rojo"] },
+  { id: 576, item: "Bandera de Polonia", colores: ["blanco", "rojo"] },
+  { id: 577, item: "Bandera de Cuba", colores: ["azul", "blanco", "rojo"] },
+  { id: 578, item: "Bandera de Venezuela", colores: ["amarillo", "azul", "rojo", "blanco"] },
+  { id: 579, item: "Bandera de Uruguay", colores: ["blanco", "azul", "amarillo"] },
+  { id: 580, item: "Bandera de Islandia", colores: ["azul", "blanco", "rojo"] },
+
+  // --- Objetos y lugares ---
+  { id: 581, item: "Autobús escolar estadounidense", colores: ["amarillo", "negro"] },
+  { id: 582, item: "Poste giratorio de barbería", colores: ["rojo", "blanco", "azul"] },
+  { id: 583, item: "Bandera pirata (Jolly Roger)", colores: ["negro", "blanco"] },
+  { id: 584, item: "Cabina de policía TARDIS (Doctor Who)", colores: ["azul", "blanco"] },
+  { id: 585, item: "Paraguas de cóctel clásico (sombrillita)", colores: ["rosa", "amarillo", "verde"] },
+  { id: 586, item: "Faro clásico de rayas", colores: ["rojo", "blanco"] },
+  { id: 587, item: "Uniforme de la Guardia Suiza del Vaticano", colores: ["azul", "amarillo", "rojo"] },
+  { id: 588, item: "Tren Shinkansen serie 0 (bala japonés)", colores: ["blanco", "azul"] },
+  { id: 589, item: "Coche DeLorean de Regreso al futuro", colores: ["gris", "negro"] }
+];
