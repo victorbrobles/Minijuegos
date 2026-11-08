@@ -42,7 +42,7 @@ function Chispas({ onExito }) {
     return () => clearTimeout(id);
   }, [e]); // eslint-disable-line react-hooks/exhaustive-deps
   return (
-    <Marco titulo="Avivar el fuego" instruccion="Toca las chispas antes de que se apaguen. Puedes fallar 2." progreso={`${e.hits} / 8`} mensaje={e.msg}>
+    <Marco titulo="Avivar el fuego" instruccion="Saltarán 8 chispas: tócalas antes de que se apaguen. Si se te escapan 3, vuelta a empezar." progreso={`Chispa ${Math.min(e.n, 8)}/8 · ${e.hits} ✔`} mensaje={e.msg}>
       <div className="tr-mj-area chispas">
         {e.t && <button type="button" key={e.t.k} className="tr-chispa" style={{ left: `${e.t.x}%`, top: `${e.t.y}%` }}
           onPointerDown={(ev) => { ev.preventDefault(); setE((x) => ({ ...x, hits: x.hits + 1, t: null })); }}><Icon name="flame" size={26} /></button>}
@@ -82,7 +82,7 @@ function Cubo({ onExito }) {
   return (
     <Marco titulo="Subir el cubo" instruccion="Pulsa el botón cuando el marcador esté en la zona verde. Aciertos seguidos: 3." progreso={`${ok} / 3`} mensaje={msg}>
       <div className="tr-barra-t"><div className="tr-zona" style={{ left: `${(zona - 0.11) * 100}%`, width: '22%' }} /><div className="tr-marca" style={{ left: `${pos * 100}%` }} /></div>
-      <button type="button" className="big full" onPointerDown={(e) => { e.preventDefault(); tirar(); }}><Icon name="well" size={22} /> ¡Ahora!</button>
+      <button type="button" className="trp-boton grande" onPointerDown={(e) => { e.preventDefault(); tirar(); }}><Icon name="well" size={22} /> ¡Ahora!</button>
     </Marco>
   );
 }
@@ -224,7 +224,7 @@ function Pares({ onExito }) {
   }, [vol]); // eslint-disable-line react-hooks/exhaustive-deps
   const girar = (i) => { if (vol.length >= 2 || vol.includes(i) || fijas.includes(i)) return; setMsg(''); setVol([...vol, i]); };
   return (
-    <Marco titulo="Ordenar los archivos" instruccion="Encuentra las 4 parejas. Puedes fallar 5 veces." progreso={`Fallos ${fallos} / 6`} mensaje={msg}>
+    <Marco titulo="Ordenar los archivos" instruccion="Encuentra las 4 parejas. Al sexto fallo se barajan de nuevo." progreso={`Fallos ${fallos} / 6`} mensaje={msg}>
       <div className="tr-pares">{cartas.map((ic, i) => {
         const abierta = vol.includes(i) || fijas.includes(i);
         return <button key={i} data-ic={ic} type="button" className={`${abierta ? 'abierta' : ''} ${fijas.includes(i) ? 'fija' : ''}`} onPointerDown={(e) => { e.preventDefault(); girar(i); }}>{abierta ? <Icon name={ic} size={30} /> : <Icon name="moon" size={24} />}</button>;
@@ -259,7 +259,7 @@ function Bascula({ onExito }) {
   return (
     <Marco titulo="Pesar el grano" instruccion="Mantén pulsado para llenar el saco y suelta justo en la línea. Pesadas seguidas: 2." progreso={`${ok} / 2`} mensaje={msg}>
       <div className="tr-bascula"><div className="tr-bascula-nivel" style={{ height: `${nivel}%` }} /><div className="tr-bascula-meta" style={{ bottom: `${meta}%` }} /></div>
-      <button type="button" className="big full tr-mantener" onPointerDown={(e) => { e.preventDefault(); e.currentTarget.setPointerCapture?.(e.pointerId); st.current.pulsando = true; setMsg(''); }}
+      <button type="button" className="trp-boton grande tr-mantener" onPointerDown={(e) => { e.preventDefault(); e.currentTarget.setPointerCapture?.(e.pointerId); st.current.pulsando = true; setMsg(''); }}
         onPointerUp={soltar} onPointerCancel={soltar} onContextMenu={(e) => e.preventDefault()}><Icon name="sack" size={22} /> Mantén pulsado</button>
     </Marco>
   );
@@ -274,7 +274,7 @@ export default function Minijuego({ id, clave, onExito, onCancelar }) {
   return (
     <div>
       <J key={clave} onExito={onExito} />
-      <button type="button" className="secondary full" style={{ marginTop: '.6rem' }} onClick={onCancelar}>Dejar la tarea por ahora</button>
+      <button type="button" className="trp-boton secundario" style={{ marginTop: '.7rem' }} onClick={onCancelar}>Dejar la tarea por ahora</button>
     </div>
   );
 }

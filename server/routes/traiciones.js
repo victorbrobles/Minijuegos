@@ -108,6 +108,8 @@ router.get('/online/sala/:code', (req, res) => {
   const base = {
     success: true, code: sala.code, estado: sala.estado, esAdmin, yoId: jugador.id,
     config: sala.config, numPartida: sala.numPartida, ahora: reloj(),
+    anfitrionId: sala.jugadores.find((j) => j.token === sala.adminToken)?.id ?? null,
+    minJugadores: MIN_JUGADORES, maxJugadores: MAX_JUGADORES,
     jugadores: sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre, puntos: j.puntos, conectado: Date.now() - j.visto < 15000 })),
     ultimaPartida: sala.ultimaPartida
   };
@@ -206,6 +208,9 @@ router.post('/online/sala/:code/finalizar', (req, res) => {
   const c = sala_y_jugador(req, res);
   if (!c) return;
   if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión.' });
+  // No se puede cerrar el marcador en mitad de una partida (los puntos de esa partida se perderían)
+  if (c.sala.estado === 'jugando' && c.sala.partida?.fase !== 'fin') return res.status(400).json({ error: 'La partida aún no ha terminado.' });
+  if (c.sala.estado === 'lobby') return res.status(400).json({ error: 'Todavía no se ha jugado ninguna partida.' });
   c.sala.estado = 'final';
   res.json({ success: true });
 });
@@ -219,6 +224,20 @@ router.post('/online/sala/:code/reiniciar', (req, res) => {
   c.sala.numPartida = 0;
   c.sala.ultimaPartida = null;
   c.sala.jugadores.forEach((j) => { j.puntos = 0; });
+  res.json({ success: true });
+});
+
+// El anfitrión quita de la sala de espera a alguien que se ha ido sin salir (móvil apagado, pestaña cerrada…)
+router.post('/online/sala/:code/expulsar', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión.' });
+  if (c.sala.estado !== 'lobby') return res.status(400).json({ error: 'Solo se puede quitar a alguien en la sala de espera.' });
+  const id = Number(req.body?.id);
+  if (id === c.jugador.id) return res.status(400).json({ error: 'No puedes quitarte a ti mismo.' });
+  const idx = c.sala.jugadores.findIndex((j) => j.id === id);
+  if (idx === -1) return res.status(404).json({ error: 'Ese jugador ya no está en la sala.' });
+  c.sala.jugadores.splice(idx, 1);
   res.json({ success: true });
 });
 

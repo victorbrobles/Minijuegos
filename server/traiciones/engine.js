@@ -196,7 +196,11 @@ export function tareaHecha(est, id, ahora) {
   const p = jug(est, id);
   if (est.fase !== 'juego') return err('Ahora no toca.');
   if (!p || !p.trabajo || p.trabajo.tipo !== 'tarea') return err('No estás haciendo ninguna tarea.');
-  if (ahora - p.trabajo.inicio < p.trabajo.minMs) return err('Demasiado rápido: esa prueba lleva más tiempo.');
+  if (p.trabajo.exito) return ok();
+  // Si la prueba se ha superado antes del tiempo mínimo, la tarea queda «rematándose» y se completa sola al llegar a él
+  // (antes se rechazaba y el jugador se quedaba atascado con la prueba ya superada).
+  const minimo = p.trabajo.inicio + p.trabajo.minMs;
+  if (ahora < minimo) { p.trabajo.exito = true; p.trabajo.finEn = minimo; return ok(); }
   completarTrabajo(est, p, ahora);
   return ok();
 }
@@ -223,7 +227,7 @@ export function apagar(est, id, ahora) {
 function completarTrabajo(est, p, t, caducada = false) {
   const w = p.trabajo; p.trabajo = null;
   if (w.tipo === 'tarea') {
-    if (caducada) return;
+    if (caducada && !w.exito) return;
     p.tareas[w.ref].hecha = true;
     aviso(p, t, 'ok', `Has completado: ${SALA[w.sala].tarea}.`);
     const fin = comprobarFin(est);
@@ -273,9 +277,9 @@ export function matar(est, id, objetivoId, ahora) {
   }
   v.vivo = false; v.causa = 'asesinado'; cancelarTrabajo(v);
   p.asesinatos += 1; p.atajos += 1;
-  aviso(p, ahora, 'secreto', 'Ahora puedes usar un atajo: salta a una sala lejana (solo hasta la próxima asamblea).');
   est.cuerpos.push({ id: v.id, sala: v.sala });
   aviso(p, ahora, 'secreto', `Has eliminado a ${v.nombre}.`);
+  aviso(p, ahora, 'secreto', 'Ahora puedes usar un atajo: salta a una sala lejana (solo hasta la próxima asamblea).');
   aviso(v, ahora, 'alerta', 'Te han eliminado. Eres un espíritu: puedes seguir con tus tareas, pero no puedes hablar con los vivos.');
   const fin = comprobarFin(est);
   if (fin) terminar(est, fin);
@@ -294,7 +298,7 @@ export function sabotear(est, id, tipo, ahora) {
   } else if (tipo === 'incendio') {
     const salas = barajar(SALAS.map((s) => s.id), est.rng).slice(0, 2);
     est.incendio = { hasta: ahora + AJUSTES.incendioMs, salas: Object.fromEntries(salas.map((s) => [s, false])) };
-    est.jugadores.forEach((q) => { if (q.trabajo?.tipo === 'tarea') cancelarTrabajo(q); });
+    est.jugadores.forEach((q) => { if (q.trabajo?.tipo === 'tarea' && !q.trabajo.exito) cancelarTrabajo(q); });
   } else return err('Sabotaje desconocido.');
   est.sabotajeListo = ahora + AJUSTES.sabotajeEnfriaMs;
   return ok();
@@ -565,7 +569,7 @@ export function vistaDe(est, id, ahora) {
     const tormenta = tormentaActiva(est, ahora);
     v.yo.sala = yo.sala;
     v.yo.mov = yo.mov ? { destino: yo.mov.destino, llegaEn: yo.mov.llegaEn, ms: yo.mov.ms, salto: !!yo.mov.salto } : null;
-    v.yo.trabajo = yo.trabajo ? { tipo: yo.trabajo.tipo, finEn: yo.trabajo.finEn, ref: yo.trabajo.ref, inicio: yo.trabajo.inicio, sala: yo.trabajo.sala, minijuego: yo.trabajo.minijuego, minMs: yo.trabajo.minMs } : null;
+    v.yo.trabajo = yo.trabajo ? { tipo: yo.trabajo.tipo, finEn: yo.trabajo.finEn, ref: yo.trabajo.ref, inicio: yo.trabajo.inicio, sala: yo.trabajo.sala, minijuego: yo.trabajo.minijuego, minMs: yo.trabajo.minMs, exito: !!yo.trabajo.exito } : null;
     v.yo.atajos = yo.atajos;
     v.yo.tareas = yo.tareas.map((t) => ({ sala: t.sala, texto: SALA[t.sala].tarea, hecha: t.hecha }));
     v.yo.tareasFalsas = !rolInfo.tarea;

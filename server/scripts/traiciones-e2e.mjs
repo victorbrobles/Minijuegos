@@ -38,7 +38,7 @@ while (pasos++ < 4000) {
     if (v.fase === 'veredicto' && v.yo.vivo && !v.listo) { await act(j, { tipo: 'continuar' }); continue; }
     if (v.fase === 'juego' && v.yo.trabajo?.tipo === 'tarea') {
       // la prueba la juega el cliente; el bot espera lo razonable y avisa de que la ha superado
-      if (v.ahora - v.yo.trabajo.inicio >= v.yo.trabajo.minMs + 3000) { const r = await act(j, { tipo: 'tarea-hecha' }); assert(r.status === 200, 'tarea-hecha: ' + JSON.stringify(r.data)); }
+      if (v.ahora - v.yo.trabajo.inicio >= v.yo.trabajo.minMs + 3000) { const r = await act(j, { tipo: 'tarea-hecha' }); assert(r.status === 200 || r.data.error === 'Ahora no toca.', 'tarea-hecha: ' + JSON.stringify(r.data)); } // «Ahora no toca»: otro bot acaba de convocar una asamblea (estado leído antes)
       continue;
     }
     if (v.fase !== 'juego' || v.yo.mov || v.yo.trabajo) continue;

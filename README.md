@@ -108,6 +108,12 @@ npm run dev
 - Partidas de 10, 15 o 25 rondas y 45 s por respuesta. Online, el servidor cierra la ronda al acabar el tiempo y acepta selecciones incompletas.
 - Elementos en `server/data/seeds/colores/parteN.js` (`{ id, item, colores: [...] }`, con los colores de la paleta: rojo, azul, amarillo, verde, naranja, morado, marron, blanco, negro, gris, rosa). `parte6.js` es la ampliación.
 
+## Minijuego: Traiciones (`Traiciones/`)
+- Solo online (un móvil por jugador, de 4 a 12). Menús y sala de espera con los componentes comunes; el anfitrión puede quitar a quien se haya quedado colgado en la sala.
+- Pantallas de partida en `Vistas.jsx` (cabecera con la sala o la fase, mapa, tareas, armas del traidor, debate, votación, veredicto y final) y pruebas de cada sala en `Minijuegos.jsx`.
+- La lógica vive en `server/traiciones/engine.js`; el cliente usa una copia idéntica (`node server/scripts/sync-traiciones.mjs` tras cambiarlo). Si una prueba se supera antes del tiempo mínimo de la sala, la tarea se remata sola al llegar a ese tiempo.
+- Pruebas: `node server/scripts/traiciones-sim.mjs` (equilibrio) y `node server/scripts/traiciones-e2e.mjs [jugadores]` (salas online con bots y reloj acelerado).
+
 ## Minijuego: Afina ese oído (`Cancion/`)
 - El fragmento de 30 s se busca en Deezer (intentando que coincida el artista) y se sirve desde `/api/cancion/audio/:clave`, para que el volumen progresivo funcione también en móviles. Si una canción no tiene fragmento, se elige otra.
 - Online, el servidor lleva el reloj de la canción (`posicionMs`) y cada móvil se sincroniza; la canción se pausa al pulsar, se reanuda tras un fallo y la ronda termina sola al acabar el fragmento o el tiempo de respuesta (20 s).
