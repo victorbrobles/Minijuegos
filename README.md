@@ -107,3 +107,9 @@ npm run dev
 - Pantallas de partida en `Pantallas.jsx` (paleta, huecos de colores, solución, clasificación y podio); menús con los componentes comunes.
 - Partidas de 10, 15 o 25 rondas y 45 s por respuesta. Online, el servidor cierra la ronda al acabar el tiempo y acepta selecciones incompletas.
 - Elementos en `server/data/seeds/colores/parteN.js` (`{ id, item, colores: [...] }`, con los colores de la paleta: rojo, azul, amarillo, verde, naranja, morado, marron, blanco, negro, gris, rosa). `parte6.js` es la ampliación.
+
+## Minijuego: Afina ese oído (`Cancion/`)
+- El fragmento de 30 s se busca en Deezer (intentando que coincida el artista) y se sirve desde `/api/cancion/audio/:clave`, para que el volumen progresivo funcione también en móviles. Si una canción no tiene fragmento, se elige otra.
+- Online, el servidor lleva el reloj de la canción (`posicionMs`) y cada móvil se sincroniza; la canción se pausa al pulsar, se reanuda tras un fallo y la ronda termina sola al acabar el fragmento o el tiempo de respuesta (20 s).
+- Puntos: de 10 a 3 según el segundo en que se pulsa; fallar resta 3. Partidas de 5, 10, 15 o 20 canciones.
+- Canciones en `server/data/seeds/cancion/parteN.js` (`{ id, titulo, artista, alias }`). Al cargar se quitan duplicados y alias que solo sean el nombre del artista. `parte6.js` es la ampliación.
