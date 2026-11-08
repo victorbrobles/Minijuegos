@@ -22,8 +22,33 @@ const COLORES_CATEGORIA = [
 ];
 
 /* ==========================================================================
-   COMPONENTES DE TABLERO COMPARTIDOS (ESTILO TABLEROPARTIDA DE QUIÉN ES QUIÉN)
+   COMPONENTES DE TABLERO COMPARTIDOS
    ========================================================================== */
+
+// Aviso flotante idéntico al de ConectaPartida.jsx
+export function Aviso({ evento }) {
+  const [visible, setVisible] = useState(null);
+  const ultimo = useRef(evento?.n ?? 0);
+
+  useEffect(() => {
+    if (!evento || evento.n === ultimo.current) return undefined;
+    ultimo.current = evento.n;
+    setVisible(evento);
+    const id = setTimeout(() => setVisible(null), 3800);
+    return () => clearTimeout(id);
+  }, [evento]);
+
+  if (!visible) return null;
+  const bueno = ['acierto', 'tema_ok', 'ultima_ok'].includes(visible.tipo);
+  const malo = ['fallo', 'tiempo', 'ultima_ko', 'tema_ko'].includes(visible.tipo);
+
+  return (
+    <div className={`cnp-aviso${bueno ? ' bueno' : ''}${malo ? ' malo' : ''}`} role="status" aria-live="polite">
+      <span aria-hidden="true">{bueno ? '🎉' : malo ? (visible.eliminado ? '💀' : '💔') : 'ℹ️'}</span>
+      {visible.texto}
+    </div>
+  );
+}
 
 export function BotonPortada({ onClick, texto = 'Portada' }) {
   return (
@@ -226,9 +251,14 @@ export default function BuscaminasLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [eliminadosRonda, setEliminadosRonda] = useState([]);
   const [ordenTurnoRonda, setOrdenTurnoRonda] = useState([]);
   const [indiceTurno, setIndiceTurno] = useState(0);
+  const [turnoTick, setTurnoTick] = useState(0);
 
   const [explosionModal, setExplosionModal] = useState(null);
   const [motivoFinRonda, setMotivoFinRonda] = useState('');
+
+  // Estado para el aviso flotante de éxito (estilo Conecta)
+  const [eventoAviso, setEventoAviso] = useState(null);
+  const avisoSeqRef = useRef(0);
 
   const [tiempoRestante, setTiempoRestante] = useState(TIEMPO_TURNO);
   const timerRef = useRef(null);
@@ -312,6 +342,7 @@ export default function BuscaminasLocal({ onVolver, onExit, onAbrirAyuda }) {
         }
         setOrdenTurnoRonda(orden);
         setIndiceTurno(0);
+        setTurnoTick(0);
         setExplosionModal(null);
         setMotivoFinRonda('');
         setFase('pasar_turno');
@@ -333,6 +364,14 @@ export default function BuscaminasLocal({ onVolver, onExit, onAbrirAyuda }) {
     while (nuevosEliminados.includes(ordenTurnoRonda[proxIndice])) {
       proxIndice = (proxIndice + 1) % ordenTurnoRonda.length;
     }
+
+    // Si solo queda 1 jugador vivo y ya tiene el turno en pantalla,
+    // no mostramos la pantalla intermedia de "Pasad el móvil": solo reiniciamos su tiempo.
+    if (proxIndice === indiceTurno && fase === 'jugando') {
+      setTurnoTick((t) => t + 1);
+      return;
+    }
+
     setIndiceTurno(proxIndice);
     setFase('pasar_turno');
   };
@@ -365,7 +404,7 @@ export default function BuscaminasLocal({ onVolver, onExit, onAbrirAyuda }) {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [fase, indiceTurno]);
+  }, [fase, indiceTurno, turnoTick]);
 
   const seleccionarCasilla = (casilla) => {
     if (casilla.descubierta || !jugadorActivo) return;
@@ -385,6 +424,14 @@ export default function BuscaminasLocal({ onVolver, onExit, onAbrirAyuda }) {
         ...prev,
         [jugadorActivo.id]: (prev[jugadorActivo.id] || 0) + casilla.puntos
       }));
+
+      // Mostrar mensaje de éxito en pantalla (imitando a Conecta)
+      avisoSeqRef.current += 1;
+      setEventoAviso({
+        n: avisoSeqRef.current,
+        tipo: 'acierto',
+        texto: `¡${jugadorActivo.nombre} acierta «${casilla.texto}» (+${casilla.puntos} ${casilla.puntos === 1 ? 'pt' : 'pts'})!`
+      });
 
       if (correctasDescubiertas >= TOTAL_CORRECTOS) {
         setMotivoFinRonda('¡Se han descubierto los 10 aciertos del tablero!');
@@ -437,6 +484,9 @@ export default function BuscaminasLocal({ onVolver, onExit, onAbrirAyuda }) {
 
   return (
     <div className={`bm-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+      {/* Aviso flotante de acierto (estilo Conecta) */}
+      <Aviso evento={eventoAviso} />
+
       {/* 1. CONFIGURACIÓN DE JUGADORES */}
       {fase === 'setup' && (
         <section className="game">
@@ -542,7 +592,7 @@ export default function BuscaminasLocal({ onVolver, onExit, onAbrirAyuda }) {
         </section>
       )}
 
-      {/* 2. SELECTOR DE CATEGORÍA (MISMO COMPONENTE VISUAL QUE QUIÉN ES QUIÉN) */}
+      {/* 2. SELECTOR DE CATEGORÍA */}
       {fase === 'categoria' && (
         <SelectorCategorias
           categorias={categorias}
@@ -555,7 +605,7 @@ export default function BuscaminasLocal({ onVolver, onExit, onAbrirAyuda }) {
         />
       )}
 
-      {/* 3. PANTALLA PASAR EL MÓVIL (MISMO DISEÑO QUE QUIÉN ES QUIÉN) */}
+      {/* 3. PANTALLA PASAR EL MÓVIL */}
       {fase === 'pasar_turno' && jugadorActivo && (
         <section className="game qqp-escena">
           <Cabecera

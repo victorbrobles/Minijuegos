@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import './Buscaminas.css';
 import {
+  Aviso,
   Cabecera,
   Avatar,
   OrdenTurnos,
@@ -61,6 +62,15 @@ export default function BuscaminasOnline({
   const [codigoCopiado, setCodigoCopiado] = useState(false);
   const [tiempoRestante, setTiempoRestante] = useState(TIEMPO_TURNO);
 
+  // Estado y referencias para el aviso flotante de éxito (estilo Conecta)
+  const [eventoAviso, setEventoAviso] = useState(null);
+  const avisoSeqRef = useRef(0);
+  const seguimientoRondaRef = useRef({
+    rondaNum: null,
+    acertadasIds: new Set(),
+    ultimoTurnoNombre: ''
+  });
+
   const intervalRef = useRef(null);
   const timerRef = useRef(null);
 
@@ -108,6 +118,39 @@ export default function BuscaminasOnline({
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [sesion]);
+
+  // Detecta cuando alguien descubre una casilla correcta para lanzar el aviso flotante
+  useEffect(() => {
+    const r = sala?.ronda;
+    if (!r || ! Array.isArray(r.casillas)) return;
+
+    const seg = seguimientoRondaRef.current;
+    const acertadasActuales = r.casillas.filter((c) => c.descubierta && c.correcto);
+
+    // Si acaba de empezar una ronda nueva o acabamos de entrar, sincronizamos sin disparar aviso
+    if (seg.rondaNum !== sala.rondaNum) {
+      seg.rondaNum = sala.rondaNum;
+      seg.acertadasIds = new Set(acertadasActuales.map((c) => c.id));
+      seg.ultimoTurnoNombre = r.jugadorActivoNombre || '';
+      return;
+    }
+
+    const nuevaCasilla = acertadasActuales.find((c) => !seg.acertadasIds.has(c.id));
+    if (nuevaCasilla) {
+      const autor = seg.ultimoTurnoNombre || r.jugadorActivoNombre || 'Jugador';
+      avisoSeqRef.current += 1;
+      setEventoAviso({
+        n: avisoSeqRef.current,
+        tipo: 'acierto',
+        texto: `¡${autor} acierta «${nuevaCasilla.texto}» (+${nuevaCasilla.puntos} ${nuevaCasilla.puntos === 1 ? 'pt' : 'pts'})!`
+      });
+    }
+
+    seg.acertadasIds = new Set(acertadasActuales.map((c) => c.id));
+    if (r.jugadorActivoNombre) {
+      seg.ultimoTurnoNombre = r.jugadorActivoNombre;
+    }
+  }, [sala]);
 
   const redirigirAPortada = () => {
     if (typeof onSalir === 'function') {
@@ -281,6 +324,10 @@ export default function BuscaminasOnline({
   const esMiTurno = ronda?.jugadorActivoId === yoId;
   const yoEliminado = ronda?.eliminadosRonda?.includes(yoId);
 
+  const correctasDescubiertas = ronda?.casillas ? ronda.casillas.filter((c) => c.descubierta && c.correcto).length : 0;
+  const minasExplotadas = ronda?.casillas ? ronda.casillas.filter((c) => c.descubierta && !c.correcto).length : 0;
+
+  // Se incluye correctasDescubiertas para que el tiempo se reinicie cuando el último jugador vivo encadena aciertos
   useEffect(() => {
     const isJugando = sala?.estado === 'jugando' && ronda?.faseRonda === 'jugando';
     if (!isJugando) {
@@ -307,7 +354,7 @@ export default function BuscaminasOnline({
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
-  }, [sala?.estado, ronda?.faseRonda, ronda?.jugadorActivoId, esMiTurno, yoEliminado]);
+  }, [sala?.estado, ronda?.faseRonda, ronda?.jugadorActivoId, correctasDescubiertas, esMiTurno, yoEliminado]);
 
   const handleCerrarExplosion = async () => {
     try {
@@ -356,13 +403,13 @@ export default function BuscaminasOnline({
   const maximoPuntos = ranking.length ? ranking[0].puntos : 0;
   const ganadores = maximoPuntos > 0 ? ranking.filter((j) => j.puntos === maximoPuntos) : [];
 
-  const correctasDescubiertas = ronda?.casillas ? ronda.casillas.filter((c) => c.descubierta && c.correcto).length : 0;
-  const minasExplotadas = ronda?.casillas ? ronda.casillas.filter((c) => c.descubierta && !c.correcto).length : 0;
-
   const enPartidaActiva = vista === 'sala' && sala && sala.estado !== 'lobby';
 
   return (
     <div className={`bm-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+      {/* Aviso flotante de acierto (estilo Conecta) */}
+      <Aviso evento={eventoAviso} />
+
       {/* 1. MENÚ PRINCIPAL */}
       {vista === 'menu' && (
         <section className="game">

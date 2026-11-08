@@ -1471,3 +1471,48 @@ body:has(.qq-en-partida) .back:not(.qq-btn-volver-sala) {
   margin: 0 0 1.4rem 0;
   line-height: 1.45;
 }
+
+/* ==========================================================================
+   AVISO FLOTANTE DE ÉXITO (IDÉNTICO A CONECTA)
+   ========================================================================== */
+
+.cnp-aviso {
+  position: fixed;
+  top: calc(0.8rem + env(safe-area-inset-top));
+  left: 50%;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: max-content;
+  max-width: min(92vw, 520px);
+  padding: 0.75rem 1rem;
+  border-radius: 18px;
+  background: #1e293b;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.92rem;
+  line-height: 1.3;
+  box-shadow: 0 12px 30px -8px rgba(0, 0, 0, 0.6);
+  transform: translateX(-50%);
+  animation: cnpBajar 0.25s ease-out both;
+}
+
+.cnp-aviso.bueno {
+  background: #15803d;
+}
+
+.cnp-aviso.malo {
+  background: #b91c1c;
+}
+
+@keyframes cnpBajar {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -12px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
