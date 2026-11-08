@@ -47,7 +47,7 @@ export const META = {
     icono: 'landmark',
     colores: ['#ea580c', '#7c2d12'],
     etiquetas: 'pueblo construir oficios roles ocultos estrategia cartas edificios eleccion secreta online',
-    descripcion: 'Hay que levantar un pueblo. Cada día se escoge un rol oculto a los demás. Escoge bien el rol para cada momento, engaña y sabotea a los demás, y sé el que construya el mejor pueblo de todos.',
+    descripcion: 'Cada fundador levanta su propio pueblo con monedas y planos. Cada ronda eliges en secreto uno de los oficios que quedan: cobrar, sabotear, construir más o llevarte la prioridad. Quien levante el mejor pueblo gana.',
     categorias: ['estrategia']
   },
   'coleccion': {

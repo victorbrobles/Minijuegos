@@ -48,7 +48,7 @@ const revisar = (sala) => { if (sala.partida?.fase === 'fin') cerrarPartida(sala
 
 function iniciarPartida(sala) {
   sala.numPartida += 1; sala.puntosAplicados = false;
-  sala.partida = E.crearPartida(sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre })));
+  sala.partida = E.crearPartida(sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre })), sala.config);
   sala.estado = 'jugando';
 }
 
@@ -61,7 +61,7 @@ router.post('/online/crear', (req, res) => {
   const token = nuevoToken();
   salas[code] = {
     code, adminToken: token, estado: 'lobby', contadorIds: 1, numPartida: 0, puntosAplicados: false,
-    partida: null, ultimaPartida: null, ultimaActividad: Date.now(),
+    partida: null, ultimaPartida: null, ultimaActividad: Date.now(), config: { duracion: 'normal' },
     jugadores: [{ id: 1, token, nombre, puntos: 0, visto: Date.now() }]
   };
   res.json({ success: true, code, token, jugadorId: 1 });
@@ -89,7 +89,8 @@ router.get('/online/sala/:code', (req, res) => {
   if (!c) return;
   const { sala, jugador, esAdmin } = c;
   const base = {
-    success: true, code: sala.code, estado: sala.estado, esAdmin, yoId: jugador.id, numPartida: sala.numPartida,
+    success: true, code: sala.code, estado: sala.estado, esAdmin, yoId: jugador.id, numPartida: sala.numPartida, config: sala.config,
+    anfitrionId: sala.jugadores.find((j) => j.token === sala.adminToken)?.id ?? null, min: MIN, max: MAX,
     jugadores: sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre, puntos: j.puntos, conectado: Date.now() - j.visto < 15000 })),
     ultimaPartida: sala.ultimaPartida
   };
@@ -98,6 +99,29 @@ router.get('/online/sala/:code', (req, res) => {
     base.vista = E.vistaDe(sala.partida, jugador.id);
   }
   res.json(base);
+});
+
+// ---------------------------------------------------------------- Configuración y expulsar (sala de espera)
+router.post('/online/sala/:code/config', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión.' });
+  if (c.sala.estado !== 'lobby') return res.status(400).json({ error: 'La partida ya ha empezado.' });
+  if (E.DURACIONES[req.body?.duracion]) c.sala.config.duracion = req.body.duracion;
+  res.json({ success: true, config: c.sala.config });
+});
+
+router.post('/online/sala/:code/expulsar', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión.' });
+  if (c.sala.estado !== 'lobby') return res.status(400).json({ error: 'Solo se puede quitar a alguien en la sala de espera.' });
+  const id = Number(req.body?.id);
+  if (id === c.jugador.id) return res.status(400).json({ error: 'No puedes quitarte a ti mismo.' });
+  const idx = c.sala.jugadores.findIndex((j) => j.id === id);
+  if (idx === -1) return res.status(404).json({ error: 'Ese jugador ya no está en la sala.' });
+  c.sala.jugadores.splice(idx, 1);
+  res.json({ success: true });
 });
 
 // ---------------------------------------------------------------- Iniciar
@@ -114,7 +138,7 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
 });
 
 // ---------------------------------------------------------------- Acciones
-// tipo: elegir-rol | basica | pendiente | habilidad | construir | terminar
+// tipo: elegir-rol | recurso | plano | habilidad | omitir | construir | edificio | terminar
 router.post('/online/sala/:code/accion', (req, res) => {
   const c = sala_y_jugador(req, res);
   if (!c) return;
@@ -124,10 +148,12 @@ router.post('/online/sala/:code/accion', (req, res) => {
   let r;
   switch (d.tipo) {
     case 'elegir-rol': r = E.elegirRol(p, id, Number(d.rol)); break;
-    case 'basica': r = E.basica(p, id, d.basica); break;
-    case 'pendiente': r = E.elegirPendiente(p, id, Number(d.uid)); break;
+    case 'recurso': r = E.recurso(p, id, d.recurso); break;
+    case 'plano': r = E.quedarPlano(p, id, Number(d.uid)); break;
     case 'habilidad': r = E.habilidad(p, id, d.params || {}); break;
+    case 'omitir': r = E.omitirHabilidad(p, id); break;
     case 'construir': r = E.construir(p, id, Number(d.uid)); break;
+    case 'edificio': r = E.usarEdificio(p, id, String(d.efecto), d.params || {}); break;
     case 'terminar': r = E.terminarTurno(p, id); break;
     default: return res.status(400).json({ error: 'Acción desconocida.' });
   }
@@ -161,6 +187,7 @@ router.post('/online/sala/:code/finalizar', (req, res) => {
   const c = sala_y_jugador(req, res);
   if (!c) return;
   if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión.' });
+  if (c.sala.estado !== 'jugando' || c.sala.partida?.fase !== 'fin') return res.status(400).json({ error: 'La partida aún no ha terminado.' });
   c.sala.estado = 'final';
   res.json({ success: true });
 });

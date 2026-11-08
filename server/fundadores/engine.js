@@ -4,79 +4,91 @@
 //   - client/src/games/Fundadores/engine.js (modo un solo dispositivo)  <-- COPIA IDÉNTICA de este archivo
 // Si cambias algo aquí:  npm run sync:fundadores  (en /server)
 //
-// IDEA: varios fundadores levantan juntos un mismo pueblo. Cada ronda todos eligen EN SECRETO un oficio;
-// si dos eligen el mismo, gana quien tenga prioridad y el otro se queda de Peón. Los oficios actúan por
-// orden (1 → 8) y cada uno altera la partida de una forma distinta. El pueblo se «inaugura» cuando entre
-// todos se alcanza una meta común de obra; gana quien tenga más prestigio.
+// IDEA: cada fundador levanta su propio pueblo. Todos empiezan con monedas y planos.
+// Cada ronda se retiran al azar algunos de los 10 oficios, de modo que quedan tantos como jugadores,
+// y por orden de prioridad cada uno elige uno EN SECRETO. Después los oficios se llaman en orden (1 → 10):
+// quien tenga el oficio llamado juega su turno: 1) cobra monedas o toma planos, 2) usa la habilidad del
+// oficio y 3) construye. Cuando alguien completa su pueblo se termina la ronda y gana el mejor pueblo
+// (edificios + variedad + quien lo completó + monedas sobrantes + medallas + ventajas de los edificios).
 
 // ---------------------------------------------------------------- Datos
 export const TIPOS = {
-  hogar: { nombre: 'Hogar', icono: 'home', color: '#ea580c', pasivo: 'Cada 3 Hogares: +1 prestigio al final.' },
-  comercio: { nombre: 'Comercio', icono: 'tag', color: '#0891b2', pasivo: 'Al cobrar jornal: +1 moneda por Comercio (máx. 2).' },
-  taller: { nombre: 'Taller', icono: 'flame', color: '#64748b', pasivo: 'Cada 2 Talleres: tus edificios cuestan 1 menos (mín. 1).' },
-  saber: { nombre: 'Saber', icono: 'book', color: '#db2777', pasivo: 'Cada 2 de Saber: ves 1 plano más al proyectar.' },
-  hito: { nombre: 'Hito', icono: 'landmark', color: '#ca8a04', pasivo: 'Edificios únicos con efectos especiales.' }
+  noble: { nombre: 'Noble', icono: 'crown', color: '#ca8a04' },
+  templo: { nombre: 'Templo', icono: 'landmark', color: '#2563eb' },
+  comercio: { nombre: 'Comercio', icono: 'tag', color: '#16a34a' },
+  guardia: { nombre: 'Guardia', icono: 'shield', color: '#dc2626' },
+  singular: { nombre: 'Singular', icono: 'star', color: '#9333ea' }
 };
-export const TIPOS_BASE = ['hogar', 'comercio', 'taller', 'saber'];
+export const ORDEN_TIPOS = ['noble', 'templo', 'comercio', 'guardia', 'singular'];
 
-// param: qué hay que indicar al usar la habilidad
+// param: qué hay que indicar al usar la habilidad ('rol' = nombrar un oficio)
 export const ROLES = [
-  { id: 1, nombre: 'Inspector', icono: 'search', param: 'rol', min: 2, max: 8,
-    desc: 'Nombra un oficio (2–8). Quien lo tenga queda clausurado: no podrá usar su habilidad. Si alguien lo tenía, cobras 1 moneda.' },
-  { id: 2, nombre: 'Contrabandista', icono: 'mask', param: 'rol', min: 3, max: 8,
-    desc: 'Nombra un oficio (3–8). Cuando le toque actuar, su dueño te entrega 2 monedas (o las que tenga).' },
-  { id: 3, nombre: 'Carpintero', icono: 'hardhat', param: null,
-    desc: 'Este turno puedes construir hasta 2 edificios y cada uno cuesta 1 menos (mín. 1).' },
-  { id: 4, nombre: 'Notario', icono: 'edit', param: 'jugador',
-    desc: 'Mira la mano de otro jugador y quédate con una copia de uno de sus planos (él conserva el suyo).' },
-  { id: 5, nombre: 'Gremial', icono: 'users', param: 'tipo',
-    desc: 'Elige un tipo: cobras 1 moneda por cada edificio de ese tipo que tengas y el primero de ese tipo que construyas hoy cuesta 1 menos.' },
-  { id: 6, nombre: 'Recaudador', icono: 'briefcase', param: null,
-    desc: 'Cobras 1 moneda de cada jugador que tenga más monedas que tú.' },
-  { id: 7, nombre: 'Reformista', icono: 'key', param: 'edificio',
-    desc: 'Compra un edificio de otro jugador pagándole su coste +1. Pasa a tu pueblo (y el dueño se lleva las monedas).' },
-  { id: 8, nombre: 'Aprendiz', icono: 'bulb', param: 'copiar',
-    desc: 'Usa la habilidad de un oficio (3–7) que NADIE haya elegido esta ronda. Actúas el último.' }
+  { id: 1, nombre: 'Saboteadora', icono: 'bomb', param: 'rol', breve: 'Anula un oficio',
+    desc: 'Nombra un oficio: quien lo tenga pierde su turno entero esta ronda.' },
+  { id: 2, nombre: 'Cobrador', icono: 'briefcase', param: 'rol', breve: 'Cobra a un oficio',
+    desc: 'Nombra un oficio (no el saboteado): al empezar su turno, su dueño te entrega la mitad de sus monedas.' },
+  { id: 3, nombre: 'Cartógrafa', icono: 'compass', param: null, breve: 'Más planos',
+    desc: 'Roba 3 planos y quédate con 2.' },
+  { id: 4, nombre: 'Heraldo', icono: 'crown', param: null, tipo: 'noble', breve: 'Prioridad',
+    desc: 'Te llevas el sello (aunque te saboteen): la próxima ronda eliges oficio el primero. Cobras 1 moneda por cada edificio Noble.' },
+  { id: 5, nombre: 'Guardiana', icono: 'shield', param: null, tipo: 'templo', breve: 'Protección',
+    desc: 'El Capitán no puede derribar tus edificios esta ronda. Cobras 1 moneda por cada Templo.' },
+  { id: 6, nombre: 'Mercader', icono: 'tag', param: null, tipo: 'comercio', breve: 'Monedas',
+    desc: 'Cobras 1 moneda extra y 1 más por cada edificio de Comercio.' },
+  { id: 7, nombre: 'Maestra de obras', icono: 'hardhat', param: null, breve: 'Construir más',
+    desc: 'Robas 2 planos y este turno puedes construir hasta 3 edificios.' },
+  { id: 8, nombre: 'Capitán', icono: 'flag', param: 'derribo', tipo: 'guardia', breve: 'Derribar',
+    desc: 'Cobras 1 moneda por cada Guardia. Además puedes derribar un edificio de otro pueblo pagando su coste menos 1 (no a pueblos completos ni protegidos).' },
+  { id: 9, nombre: 'Prestamista', icono: 'coin', param: null, breve: 'Ayuda al rezagado',
+    desc: 'Cobras 1 moneda por cada jugador que tenga más edificios que tú (como mínimo 2).' },
+  { id: 10, nombre: 'Alcaldesa', icono: 'landmark', param: null, breve: 'Medallas',
+    desc: 'Ganas una medalla (+2 puntos al final) y este turno los edificios Singulares te cuestan 2 menos.' }
 ];
 export const ROL = Object.fromEntries(ROLES.map((r) => [r.id, r]));
-export const PEON = { id: 0, nombre: 'Peón', icono: 'flag', desc: 'Sin habilidad: solo cobras/proyectas y construyes 1 edificio. Es lo que le toca a quien perdió un empate de oficio.' };
-export const nombreRol = (id) => (id === 0 ? PEON.nombre : ROL[id].nombre);
+export const nombreRol = (id) => ROL[id]?.nombre ?? '—';
 
-export const HITOS = [
-  { efecto: 'pozo', nombre: 'Pozo Dorado', coste: 5, prestigio: 5, texto: 'Al cobrar jornal, +1 moneda.' },
-  { efecto: 'biblioteca', nombre: 'Biblioteca Mayor', coste: 5, prestigio: 5, texto: 'Al proyectar ves 1 plano más.' },
-  { efecto: 'faro', nombre: 'El Faro', coste: 6, prestigio: 6, texto: 'Cuenta como el tipo que te falte para el bonus de Variedad.' },
-  { efecto: 'mercado', nombre: 'Mercado Central', coste: 6, prestigio: 6, texto: 'El primer edificio que construyas cada turno cuesta 1 menos.' },
-  { efecto: 'puerta', nombre: 'Puerta Fortificada', coste: 5, prestigio: 5, texto: 'Ni el Reformista ni el Notario pueden elegirte.' },
-  { efecto: 'monumento', nombre: 'El Monumento', coste: 7, prestigio: 8, texto: 'Tus edificios aportan +1 de obra a la meta común (acercan el final).' }
+export const SINGULARES = [
+  { efecto: 'archivo', nombre: 'Archivo Real', coste: 5, puntos: 5, texto: 'Al tomar planos te quedas con uno más.' },
+  { efecto: 'atalaya', nombre: 'Atalaya', coste: 4, puntos: 4, texto: 'Al tomar planos robas uno más para elegir.' },
+  { efecto: 'canteros', nombre: 'Gremio de canteros', coste: 5, puntos: 5, texto: 'Puedes construir edificios repetidos.' },
+  { efecto: 'cajafuerte', nombre: 'Caja fuerte', coste: 4, puntos: 4, texto: 'Al final, 1 punto por cada 2 monedas (en vez de cada 3).' },
+  { efecto: 'empalizada', nombre: 'Empalizada', coste: 4, puntos: 4, texto: 'El Capitán no puede derribar tus edificios.' },
+  { efecto: 'plaza', nombre: 'Plaza mayor', coste: 3, puntos: 3, texto: 'Cuenta como el tipo que te falte para el bonus de variedad.' },
+  { efecto: 'imprenta', nombre: 'Imprenta', coste: 4, puntos: 4, texto: 'Una vez por turno: paga 1 moneda y roba 1 plano.' },
+  { efecto: 'abastos', nombre: 'Mercado de abastos', coste: 3, puntos: 3, texto: 'Una vez por turno: descarta 1 plano y cobra 2 monedas.' },
+  { efecto: 'puerto', nombre: 'Puerto', coste: 5, puntos: 5, texto: 'Al final, +1 punto por cada edificio de Comercio.' },
+  { efecto: 'catedral', nombre: 'Catedral', coste: 6, puntos: 8, texto: 'Vale 8 puntos.' },
+  { efecto: 'fuente', nombre: 'Fuente de la plaza', coste: 5, puntos: 5, texto: 'Al final, +1 punto por cada otro edificio Singular.' },
+  { efecto: 'posada', nombre: 'Posada', coste: 3, puntos: 3, texto: 'Si eres el último en elegir oficio, cobras 2 monedas.' }
 ];
 
-const NOMBRES = {
-  hogar: { 1: 'Choza', 2: 'Cabaña', 3: 'Casa de adobe', 4: 'Casona', 5: 'Mansión' },
-  comercio: { 1: 'Puesto', 2: 'Tienda', 3: 'Taberna', 4: 'Bazar', 5: 'Gran Lonja' },
-  taller: { 1: 'Alfarería', 2: 'Carpintería', 3: 'Telar', 4: 'Herrería', 5: 'Fundición' },
-  saber: { 1: 'Escuela', 2: 'Botica', 3: 'Archivo', 4: 'Observatorio', 5: 'Academia' }
+const BASE = {
+  noble: [['Casa solariega', 3, 5], ['Palacete', 4, 4], ['Palacio', 5, 3]],
+  templo: [['Ermita', 1, 3], ['Capilla', 2, 3], ['Monasterio', 3, 3], ['Basílica', 5, 2]],
+  comercio: [['Taberna', 1, 5], ['Mercado', 2, 4], ['Lonja', 3, 3], ['Casa de cambio', 4, 3], ['Ayuntamiento', 5, 2]],
+  guardia: [['Garita', 1, 3], ['Cuartel', 2, 3], ['Torre vigía', 3, 3], ['Fortaleza', 5, 2]]
 };
-const COSTES = [1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 5, 5];
 
-export function crearMazo() {
+// Con 6 o más jugadores se duplican los edificios básicos para que no se acabe el mazo.
+export function crearMazo(numJugadores = 4) {
   const cartas = [];
+  const factor = numJugadores >= 6 ? 2 : 1;
   let n = 0;
-  TIPOS_BASE.forEach((tipo) => {
-    const costes = tipo === 'hogar' ? [...COSTES, 1, 2] : COSTES;
-    costes.forEach((c) => cartas.push({ uid: ++n, nombre: NOMBRES[tipo][c], tipo, coste: c, prestigio: c }));
+  Object.entries(BASE).forEach(([tipo, lista]) => {
+    lista.forEach(([nombre, coste, copias]) => {
+      for (let i = 0; i < copias * factor; i++) cartas.push({ uid: ++n, nombre, tipo, coste, puntos: coste });
+    });
   });
-  HITOS.forEach((h) => cartas.push({ uid: ++n, nombre: h.nombre, tipo: 'hito', coste: h.coste, prestigio: h.prestigio, efecto: h.efecto, texto: h.texto }));
+  SINGULARES.forEach((s) => cartas.push({ uid: ++n, nombre: s.nombre, tipo: 'singular', coste: s.coste, puntos: s.puntos, efecto: s.efecto, texto: s.texto }));
   return cartas;
 }
 
+export const DURACIONES = { corto: 6, normal: 7, largo: 8 }; // edificios para completar el pueblo
 export const AJUSTES = {
-  monedasIni: 3, planosIni: 3, jornal: 2, proyectar: 3,
-  metaPorJugador: 17,
-  rondasMax: 20,
-  consuelo: 1, // moneda extra que recibe el Peón
-  bonusVariedad: 3, bonusInauguracion: 3, hogaresPorBonus: 3,
-  min: 3, max: 7
+  monedasIni: 2, planosIni: 4, cobro: 2, planosRobo: 2,
+  bonusPrimero: 3, bonusCompleto: 2, bonusVariedad: 3, monedasPorPunto: 3, puntosMedalla: 2,
+  rondasMax: 30,
+  min: 2, max: 9
 };
 
 // ---------------------------------------------------------------- Utilidades
@@ -87,7 +99,8 @@ const ok = () => ({ ok: true });
 const err = (error) => ({ ok: false, error });
 const cuenta = (j, tipo) => j.pueblo.filter((c) => c.tipo === tipo).length;
 const tiene = (j, efecto) => j.pueblo.some((c) => c.efecto === efecto);
-const log = (est, texto) => { est.log.push({ ronda: est.ronda, texto }); if (est.log.length > 80) est.log.shift(); };
+const log = (est, texto) => { est.log.push({ ronda: est.ronda, texto }); if (est.log.length > 120) est.log.shift(); };
+const s = (n, uno, varios) => `${n} ${n === 1 ? uno : varios}`;
 
 function robar(est, n) {
   const sacadas = [];
@@ -101,360 +114,447 @@ function robar(est, n) {
 
 // ---------------------------------------------------------------- Crear partida
 export function crearPartida(jugadores, cfg = {}, { rng = Math.random } = {}) {
+  const meta = DURACIONES[cfg.duracion] || DURACIONES.normal;
   const est = {
-    rng, cfg, jugadores: [], mazo: barajar(crearMazo(), rng), descarte: [],
-    ronda: 0, sello: Math.floor(rng() * jugadores.length), fase: 'elegir',
-    elecciones: {}, asignados: {}, orden: [], paso: -1, turno: null,
-    clausurado: null, contrabando: {}, reveladas: {}, ultimaRonda: null,
-    progreso: 0, meta: AJUSTES.metaPorJugador * jugadores.length, inaugurador: null,
-    log: [], fin: null
+    rng, cfg: { duracion: DURACIONES[cfg.duracion] ? cfg.duracion : 'normal' }, meta,
+    jugadores: [], mazo: barajar(crearMazo(jugadores.length), rng), descarte: [],
+    ronda: 0, sello: Math.floor(rng() * jugadores.length), fase: 'eleccion',
+    enJuego: [], retirados: [], pool: [], ordenEleccion: [], eligiendo: 0, elecciones: {},
+    turnoRol: 0, turno: null, saboteado: null, cobrado: null, protegidoId: null, reveladas: {},
+    ordenCompleto: [], log: [], fin: null
   };
-  est.jugadores = jugadores.map((j) => ({ id: j.id, nombre: j.nombre, monedas: AJUSTES.monedasIni, mano: [], pueblo: [], fuera: false }));
+  est.jugadores = jugadores.map((j) => ({ id: j.id, nombre: j.nombre, monedas: AJUSTES.monedasIni, mano: [], pueblo: [], medallas: 0, fuera: false }));
   est.jugadores.forEach((j) => { j.mano = robar(est, AJUSTES.planosIni); });
   iniciarRonda(est);
   return est;
 }
 
 function iniciarRonda(est) {
-  est.ronda += 1; est.fase = 'elegir'; est.elecciones = {}; est.asignados = {}; est.orden = []; est.paso = -1;
-  est.turno = null; est.clausurado = null; est.contrabando = {}; est.reveladas = {};
-  log(est, `— Ronda ${est.ronda}: ${est.jugadores[est.sello].nombre} tiene la prioridad —`);
+  est.ronda += 1;
+  est.fase = 'eleccion';
+  const n = activos(est).length;
+  const ids = barajar(ROLES.map((r) => r.id), est.rng);
+  est.retirados = ids.slice(0, Math.max(0, ROLES.length - n)).sort((a, b) => a - b);
+  est.enJuego = ids.slice(Math.max(0, ROLES.length - n)).sort((a, b) => a - b);
+  est.pool = [...est.enJuego];
+  est.ordenEleccion = [];
+  for (let k = 0; k < est.jugadores.length; k++) {
+    const j = est.jugadores[(est.sello + k) % est.jugadores.length];
+    if (!j.fuera) est.ordenEleccion.push(j.id);
+  }
+  est.eligiendo = 0;
+  est.elecciones = {};
+  est.turnoRol = 0; est.turno = null;
+  est.saboteado = null; est.cobrado = null; est.protegidoId = null; est.reveladas = {};
+  log(est, `— Ronda ${est.ronda} · empieza a elegir ${est.jugadores[est.sello].nombre}. Hoy no se presentan: ${est.retirados.map(nombreRol).join(', ') || 'nadie'} —`);
 }
 
-// ---------------------------------------------------------------- Elegir oficio (secreto y simultáneo)
+// ---------------------------------------------------------------- Elegir oficio (en secreto, por turnos)
+export const eligeAhora = (est) => (est.fase === 'eleccion' ? est.ordenEleccion[est.eligiendo] ?? null : null);
+
 export function elegirRol(est, id, rol) {
+  if (est.fase !== 'eleccion') return err('Ahora no se eligen oficios.');
+  if (eligeAhora(est) !== id) return err('Todavía no te toca elegir.');
+  if (!est.pool.includes(rol)) return err('Ese oficio no está disponible.');
   const p = jug(est, id);
-  if (est.fase !== 'elegir') return err('Ahora no se eligen oficios.');
-  if (!p || p.fuera) return err('No puedes actuar.');
-  if (!ROL[rol]) return err('Oficio desconocido.');
+  const ultimo = est.eligiendo === est.ordenEleccion.length - 1;
+  est.pool = est.pool.filter((r) => r !== rol);
   est.elecciones[id] = rol;
-  if (activos(est).every((j) => est.elecciones[j.id])) resolverElecciones(est);
+  if (ultimo && tiene(p, 'posada')) { p.monedas += 2; log(est, `${p.nombre} elige el último y su Posada le da 2 monedas.`); }
+  avanzarEleccion(est);
   return ok();
 }
 
-function resolverElecciones(est) {
-  const n = est.jugadores.length;
-  const prioridad = [];
-  for (let k = 0; k < n; k++) { const j = est.jugadores[(est.sello + k) % n]; if (!j.fuera) prioridad.push(j); }
-  const dueno = {}; const peones = [];
-  prioridad.forEach((j) => {
-    const r = est.elecciones[j.id];
-    if (dueno[r] === undefined) { dueno[r] = j.id; est.asignados[j.id] = r; } else { peones.push(j.id); est.asignados[j.id] = 0; }
-  });
-  est.orden = ROLES.map((r) => ({ rol: r.id, jugadorId: dueno[r.id] ?? null }));
-  peones.forEach((id) => est.orden.push({ rol: 0, jugadorId: id }));
-  est.fase = 'turnos'; est.paso = -1;
-  if (peones.length) log(est, `${peones.length} ${peones.length === 1 ? 'jugador perdió' : 'jugadores perdieron'} un empate de oficio y actuarán de Peón.`);
-  log(est, 'Los oficios están repartidos. Se va llamando por orden…');
-  siguienteTurno(est);
+function avanzarEleccion(est) {
+  est.eligiendo += 1;
+  while (est.eligiendo < est.ordenEleccion.length && jug(est, est.ordenEleccion[est.eligiendo]).fuera) est.eligiendo += 1;
+  if (est.eligiendo >= est.ordenEleccion.length) empezarTurnos(est);
 }
 
-// ---------------------------------------------------------------- Turnos
-function siguienteTurno(est) {
-  for (;;) {
-    est.paso += 1;
-    if (est.paso >= est.orden.length) return finRonda(est);
-    const e = est.orden[est.paso];
-    const p = e.jugadorId ? jug(est, e.jugadorId) : null;
-    if (!p || p.fuera) continue;
-    empezarTurno(est, p, e.rol);
+function empezarTurnos(est) {
+  est.fase = 'turnos';
+  est.turnoRol = 0;
+  llamarSiguiente(est);
+}
+
+const duenoDe = (est, rol) => est.jugadores.find((j) => !j.fuera && est.elecciones[j.id] === rol) || null;
+
+function llamarSiguiente(est) {
+  est.turno = null;
+  for (let rol = est.turnoRol + 1; rol <= ROLES.length; rol++) {
+    est.turnoRol = rol;
+    if (!est.enJuego.includes(rol)) continue;
+    const p = duenoDe(est, rol);
+    if (!p) { log(est, `${nombreRol(rol)}: nadie lo eligió.`); continue; }
+    est.reveladas[rol] = p.id;
+    if (est.saboteado === rol) { log(est, `${nombreRol(rol)} era ${p.nombre}: está saboteado y pierde el turno.`); continue; }
+    if (est.cobrado && est.cobrado.rol === rol) {
+      const c = jug(est, est.cobrado.por);
+      const paga = Math.floor(p.monedas / 2);
+      if (c && !c.fuera && paga > 0) { p.monedas -= paga; c.monedas += paga; }
+      log(est, `${p.nombre} (${nombreRol(rol)}) paga ${s(paga, 'moneda', 'monedas')} al Cobrador.`);
+    }
+    est.turno = { jugadorId: p.id, rol, paso: 'recurso', pendiente: [], quedar: 0, despues: null, construidos: 0, limite: 1, descuentoSingular: 0, usados: {} };
+    log(est, `${nombreRol(rol)} es ${p.nombre}.`);
     return;
   }
-}
-
-function empezarTurno(est, p, rol) {
-  est.reveladas[p.id] = rol;
-  est.turno = {
-    jugadorId: p.id, rol, basica: false, habilidadUsada: false, construidos: 0, maxConstruir: 1,
-    bloqueada: est.clausurado === rol && rol !== 0, pendiente: null, descuentoRol: 0, gremial: null
-  };
-  log(est, `Turno del ${nombreRol(rol)}: ${p.nombre}.`);
-  if (rol === 0) { p.monedas += AJUSTES.consuelo; log(est, `${p.nombre} recibe ${AJUSTES.consuelo} moneda de consuelo.`); }
-  if (est.turno.bloqueada) log(est, `El ${nombreRol(rol)} está clausurado: no podrá usar su habilidad.`);
-  const ladron = est.contrabando[rol];
-  if (ladron) {
-    const l = jug(est, ladron);
-    const pago = Math.min(2, p.monedas);
-    p.monedas -= pago;
-    if (l && !l.fuera) { l.monedas += pago; log(est, `${p.nombre} paga ${pago} ${pago === 1 ? 'moneda' : 'monedas'} al Contrabandista (${l.nombre}).`); }
-  }
+  finRonda(est);
 }
 
 function finRonda(est) {
-  est.ultimaRonda = est.orden.filter((e) => e.jugadorId).map((e) => ({ rol: e.rol, jugadorId: e.jugadorId }));
   est.turno = null;
-  if (est.inaugurador !== null) return terminar(est, 'inauguracion');
-  if (activos(est).length < 2) return terminar(est, 'abandono');
-  if (est.mazo.length + est.descarte.length === 0) { log(est, 'Ya no quedan planos en el pueblo: se acabó la obra.'); return terminar(est, 'sin_planos'); }
-  if (est.ronda >= AJUSTES.rondasMax) { log(est, 'Se acabó el tiempo de obra.'); return terminar(est, 'tiempo'); }
-  const n = est.jugadores.length;
-  do { est.sello = (est.sello + 1) % n; } while (est.jugadores[est.sello].fuera);
+  const heraldo = est.enJuego.includes(4) ? duenoDe(est, 4) : null;
+  if (heraldo) {
+    est.sello = est.jugadores.indexOf(heraldo);
+    est.reveladas[4] = heraldo.id;
+  }
+  if (est.ordenCompleto.length || est.ronda >= AJUSTES.rondasMax || activos(est).length < 2) return terminar(est);
   iniciarRonda(est);
 }
 
-// ---------------------------------------------------------------- Acción básica
-function bonusJornal(p) {
-  return AJUSTES.jornal + Math.min(2, cuenta(p, 'comercio')) + (tiene(p, 'pozo') ? 1 : 0);
-}
-const proyectarN = (p) => AJUSTES.proyectar + Math.floor(cuenta(p, 'saber') / 2) + (tiene(p, 'biblioteca') ? 1 : 0);
-
-function esActivo(est, id) { return est.fase === 'turnos' && est.turno && est.turno.jugadorId === id; }
-
-export function basica(est, id, tipo) {
-  if (!esActivo(est, id)) return err('No es tu turno.');
-  const t = est.turno; const p = jug(est, id);
-  if (t.basica || t.pendiente) return err('Ya has hecho tu acción básica.');
-  if (tipo === 'jornal') {
-    const g = bonusJornal(p);
-    p.monedas += g; t.basica = true;
-    log(est, `${p.nombre} cobra jornal (+${g}).`);
-  } else if (tipo === 'proyectar') {
-    const cartas = robar(est, proyectarN(p));
-    if (!cartas.length) { p.monedas += AJUSTES.jornal; t.basica = true; log(est, `${p.nombre} no encuentra planos y cobra jornal.`); return ok(); }
-    t.pendiente = { tipo: 'proyectar', cartas };
-    log(est, `${p.nombre} proyecta nuevos planos.`);
-  } else return err('Acción desconocida.');
-  return ok();
+// ---------------------------------------------------------------- Turno
+function delTurno(est, id) {
+  if (est.fase !== 'turnos' || !est.turno) return err('Ahora no es momento de jugar turnos.');
+  if (est.turno.jugadorId !== id) return err('No es tu turno.');
+  return null;
 }
 
-export function elegirPendiente(est, id, uid) {
-  if (!esActivo(est, id)) return err('No es tu turno.');
+/** Paso 1: cobrar monedas o tomar planos. */
+export function recurso(est, id, tipo) {
+  const e = delTurno(est, id); if (e) return e;
   const t = est.turno; const p = jug(est, id);
-  if (!t.pendiente) return err('No hay nada que elegir.');
-  const c = t.pendiente.cartas.find((x) => x.uid === uid);
-  if (!c) return err('Plano no válido.');
-  if (t.pendiente.tipo === 'proyectar') {
-    p.mano.push(c);
-    est.descarte.push(...t.pendiente.cartas.filter((x) => x.uid !== uid));
-    t.basica = true;
-    log(est, `${p.nombre} se queda con un plano.`);
-  } else { // notario
-    const copia = { ...c, uid: 1000 + Math.floor(est.rng() * 1e9) };
-    p.mano.push(copia);
-    log(est, `${p.nombre} copia un plano de la mano de ${jug(est, t.pendiente.objetivo).nombre}.`);
+  if (t.paso !== 'recurso') return err('Ya has cobrado este turno.');
+  if (tipo === 'monedas') {
+    p.monedas += AJUSTES.cobro;
+    t.paso = 'habilidad';
+    log(est, `${p.nombre} cobra ${AJUSTES.cobro} monedas.`);
+    return ok();
   }
-  t.pendiente = null;
+  if (tipo !== 'planos') return err('Elige monedas o planos.');
+  const robados = robar(est, AJUSTES.planosRobo + (tiene(p, 'atalaya') ? 1 : 0));
+  if (!robados.length) return err('No quedan planos en el mazo: cobra monedas.');
+  const quedar = 1 + (tiene(p, 'archivo') ? 1 : 0);
+  log(est, `${p.nombre} toma planos.`);
+  ofrecerPlanos(est, p, robados, quedar, 'habilidad');
   return ok();
 }
 
-// ---------------------------------------------------------------- Habilidades
-export function libresParaAprendiz(est) {
-  const tomados = new Set(Object.values(est.asignados).filter((r) => r > 0));
-  return ROLES.filter((r) => r.id >= 3 && r.id <= 7 && !tomados.has(r.id)).map((r) => r.id);
-}
-
-export function habilidad(est, id, params = {}) {
-  if (!esActivo(est, id)) return err('No es tu turno.');
-  const t = est.turno; const p = jug(est, id);
-  if (t.rol === 0) return err('El Peón no tiene habilidad.');
-  if (t.bloqueada) return err('Tu oficio está clausurado.');
-  if (t.habilidadUsada) return err('Ya has usado tu habilidad.');
-  if (t.pendiente) return err('Termina primero de elegir.');
-  let rolEf = t.rol;
-  if (t.rol === 8) {
-    rolEf = Number(params.copiar);
-    if (!libresParaAprendiz(est).includes(rolEf)) return err('Ese oficio no está libre.');
-  }
-  const r = aplicar(est, p, rolEf, params, t.rol === 8);
-  if (!r.ok) return r;
-  t.habilidadUsada = true;
-  return ok();
-}
-
-function aplicar(est, p, rol, prm, copiado) {
+function ofrecerPlanos(est, p, robados, quedar, despues) {
   const t = est.turno;
-  const quien = copiado ? `${p.nombre} (Aprendiz, como ${nombreRol(rol)})` : `${p.nombre} (${nombreRol(rol)})`;
-  switch (rol) {
+  if (robados.length <= quedar) { p.mano.push(...robados); t.paso = despues; return; }
+  t.pendiente = robados; t.quedar = quedar; t.despues = despues; t.paso = 'planos';
+}
+
+/** Elige uno de los planos robados (se repite hasta quedarse con los que tocan). */
+export function quedarPlano(est, id, uid) {
+  const e = delTurno(est, id); if (e) return e;
+  const t = est.turno; const p = jug(est, id);
+  if (t.paso !== 'planos') return err('No estás eligiendo planos.');
+  const c = t.pendiente.find((x) => x.uid === uid);
+  if (!c) return err('Ese plano no está entre los robados.');
+  p.mano.push(c);
+  t.pendiente = t.pendiente.filter((x) => x.uid !== uid);
+  t.quedar -= 1;
+  if (t.quedar <= 0 || !t.pendiente.length) {
+    est.descarte.push(...t.pendiente);
+    t.pendiente = []; t.quedar = 0; t.paso = t.despues; t.despues = null;
+  }
+  return ok();
+}
+
+/** Paso 2: habilidad del oficio. params: { rol } | { derribo: { jugadorId, uid } } */
+export function habilidad(est, id, params = {}) {
+  const e = delTurno(est, id); if (e) return e;
+  const t = est.turno; const p = jug(est, id);
+  if (t.paso !== 'habilidad') return err(t.paso === 'recurso' ? 'Primero cobra monedas o toma planos.' : 'Ya has usado tu habilidad.');
+  switch (t.rol) {
     case 1: {
-      const x = Number(prm.rolObjetivo);
-      if (!(x >= 2 && x <= 8)) return err('Elige un oficio del 2 al 8.');
-      est.clausurado = x;
-      const objetivo = est.orden.find((e) => e.rol === x)?.jugadorId;
-      if (objetivo) { p.monedas += 1; }
-      log(est, `${quien} clausura al ${nombreRol(x)}.`);
-      return ok();
+      const r = Number(params.rol);
+      if (!ROL[r] || r === 1) return err('Nombra un oficio distinto del tuyo.');
+      if (!est.enJuego.includes(r)) return err('Ese oficio no se presenta esta ronda.');
+      est.saboteado = r;
+      log(est, `La Saboteadora anula al ${nombreRol(r)}.`);
+      break;
     }
     case 2: {
-      const x = Number(prm.rolObjetivo);
-      if (!(x >= 3 && x <= 8)) return err('Elige un oficio del 3 al 8.');
-      est.contrabando[x] = p.id;
-      log(est, `${quien} apunta al ${nombreRol(x)}: cuando le toque, tendrá que pagar.`);
+      const r = Number(params.rol);
+      if (!ROL[r] || r <= 2) return err('Nombra un oficio del 3 al 10.');
+      if (!est.enJuego.includes(r)) return err('Ese oficio no se presenta esta ronda.');
+      if (r === est.saboteado) return err('Ese oficio está saboteado: no jugará su turno.');
+      est.cobrado = { rol: r, por: p.id };
+      log(est, `El Cobrador irá a por el ${nombreRol(r)}.`);
+      break;
+    }
+    case 3: {
+      const robados = robar(est, 3);
+      log(est, `${p.nombre} (Cartógrafa) estudia ${s(robados.length, 'plano', 'planos')}.`);
+      ofrecerPlanos(est, p, robados, 2, 'construir');
       return ok();
     }
-    case 3:
-      t.maxConstruir = 2; t.descuentoRol = 1;
-      log(est, `${quien} podrá construir hasta 2 edificios con descuento.`);
-      return ok();
-    case 4: {
-      const o = jug(est, Number(prm.objetivo));
-      if (!o || o.fuera || o.id === p.id) return err('Elige a otro jugador.');
-      if (tiene(o, 'puerta')) return err(`${o.nombre} tiene la Puerta Fortificada: no se puede.`);
-      if (!o.mano.length) return err(`${o.nombre} no tiene planos.`);
-      t.pendiente = { tipo: 'notario', objetivo: o.id, cartas: o.mano.map((c) => ({ ...c })) };
-      log(est, `${quien} revisa la mano de ${o.nombre}.`);
-      return ok();
-    }
-    case 5: {
-      const tipo = prm.tipo;
-      if (!TIPOS_BASE.includes(tipo) && tipo !== 'hito') return err('Elige un tipo.');
-      const g = cuenta(p, tipo);
-      p.monedas += g; t.gremial = tipo;
-      log(est, `${quien} elige ${TIPOS[tipo].nombre} y cobra ${g}.`);
-      return ok();
-    }
-    case 6: {
-      let total = 0;
-      activos(est).forEach((o) => { if (o.id !== p.id && o.monedas > p.monedas) { o.monedas -= 1; total += 1; } });
-      p.monedas += total;
-      log(est, `${quien} recauda ${total} ${total === 1 ? 'moneda' : 'monedas'}.`);
-      return ok();
+    case 4: case 5: case 6: {
+      const tipo = ROL[t.rol].tipo;
+      let gana = cuenta(p, tipo) + (t.rol === 6 ? 1 : 0);
+      p.monedas += gana;
+      if (t.rol === 5) est.protegidoId = p.id;
+      log(est, `${p.nombre} (${nombreRol(t.rol)}) cobra ${s(gana, 'moneda', 'monedas')}${t.rol === 5 ? ' y protege su pueblo' : ''}.`);
+      break;
     }
     case 7: {
-      const o = jug(est, Number(prm.objetivo));
-      if (!o || o.fuera || o.id === p.id) return err('Elige a otro jugador.');
-      if (tiene(o, 'puerta')) return err(`${o.nombre} tiene la Puerta Fortificada: no se puede.`);
-      const c = o.pueblo.find((x) => x.uid === Number(prm.cartaUid));
-      if (!c) return err('Edificio no válido.');
-      if (p.pueblo.some((x) => x.nombre === c.nombre)) return err('Ya tienes un edificio igual.');
-      const precio = c.coste + 1;
-      if (p.monedas < precio) return err(`Necesitas ${precio} monedas.`);
-      p.monedas -= precio; o.monedas += precio;
-      o.pueblo = o.pueblo.filter((x) => x.uid !== c.uid); p.pueblo.push(c);
-      log(est, `${quien} compra ${c.nombre} a ${o.nombre} por ${precio}.`);
-      return ok();
+      const robados = robar(est, 2);
+      p.mano.push(...robados);
+      t.limite = 3;
+      log(est, `${p.nombre} (Maestra de obras) roba ${s(robados.length, 'plano', 'planos')} y podrá construir hasta 3 edificios.`);
+      break;
     }
-    default: return err('Este oficio no tiene habilidad que usar.');
+    case 8: {
+      const gana = cuenta(p, 'guardia');
+      if (params.derribo) {
+        const r = derribar(est, p, params.derribo);
+        if (!r.ok) return r;
+      }
+      p.monedas += gana;
+      log(est, `${p.nombre} (Capitán) cobra ${s(gana, 'moneda', 'monedas')}.`);
+      break;
+    }
+    case 9: {
+      const mios = p.pueblo.length;
+      const gana = Math.max(2, activos(est).filter((q) => q.id !== p.id && q.pueblo.length > mios).length);
+      p.monedas += gana;
+      log(est, `${p.nombre} (Prestamista) cobra ${s(gana, 'moneda', 'monedas')}.`);
+      break;
+    }
+    case 10: {
+      p.medallas += 1;
+      t.descuentoSingular = 2;
+      log(est, `${p.nombre} (Alcaldesa) recibe una medalla.`);
+      break;
+    }
+    default: return err('Oficio desconocido.');
   }
+  t.paso = 'construir';
+  return ok();
 }
 
-// ---------------------------------------------------------------- Construir
-export function costeReal(est, p, carta) {
+export function puedeDerribar(est, atacante, objetivo) {
+  if (!objetivo || objetivo.fuera || objetivo.id === atacante.id) return 'Elige el pueblo de otro jugador.';
+  if (objetivo.pueblo.length >= est.meta) return 'No se puede derribar en un pueblo completo.';
+  if (est.protegidoId === objetivo.id) return 'Ese pueblo está protegido por la Guardiana.';
+  if (tiene(objetivo, 'empalizada')) return 'Ese pueblo tiene una Empalizada.';
+  return null;
+}
+
+function derribar(est, p, { jugadorId, uid }) {
+  const v = jug(est, Number(jugadorId));
+  const motivo = puedeDerribar(est, p, v);
+  if (motivo) return err(motivo);
+  const c = v.pueblo.find((x) => x.uid === Number(uid));
+  if (!c) return err('Ese edificio no existe.');
+  const precio = Math.max(0, c.coste - 1);
+  if (p.monedas < precio) return err(`Necesitas ${s(precio, 'moneda', 'monedas')} para derribarlo.`);
+  p.monedas -= precio;
+  v.pueblo = v.pueblo.filter((x) => x.uid !== c.uid);
+  est.descarte.push(c);
+  log(est, `${p.nombre} (Capitán) derriba ${c.nombre} del pueblo de ${v.nombre} pagando ${s(precio, 'moneda', 'monedas')}.`);
+  return ok();
+}
+
+export function omitirHabilidad(est, id) {
+  const e = delTurno(est, id); if (e) return e;
+  if (est.turno.paso !== 'habilidad') return err('Ahora no puedes hacer eso.');
+  if (est.turno.rol === 4) log(est, `${jug(est, id).nombre} no usa la habilidad del Heraldo (pero se lleva el sello).`);
+  est.turno.paso = 'construir';
+  return ok();
+}
+
+export function costeDe(est, p, carta) {
   const t = est.turno;
-  let d = Math.floor(cuenta(p, 'taller') / 2);
-  if (t) {
-    d += t.descuentoRol;
-    if (t.gremial && t.gremial === carta.tipo && !p.pueblo.some((x) => x.tipo === t.gremial && x._hoy === est.ronda)) d += 1;
-    if (tiene(p, 'mercado') && t.construidos === 0) d += 1;
-  }
-  return Math.max(1, carta.coste - d);
+  const desc = t && t.jugadorId === p.id && carta.tipo === 'singular' ? t.descuentoSingular : 0;
+  return Math.max(0, carta.coste - desc);
 }
 
+export function motivoNoConstruir(est, p, carta) {
+  const t = est.turno;
+  if (!t || t.jugadorId !== p.id) return 'No es tu turno.';
+  if (t.paso === 'recurso') return 'Primero cobra monedas o toma planos.';
+  if (t.paso === 'planos') return 'Termina de elegir los planos.';
+  if (t.construidos >= t.limite) return t.limite === 1 ? 'Solo puedes construir 1 edificio por turno.' : `Ya has construido ${t.limite} edificios.`;
+  if (!tiene(p, 'canteros') && p.pueblo.some((c) => c.nombre === carta.nombre)) return 'Ya tienes ese edificio en tu pueblo.';
+  if (p.pueblo.length >= est.meta) return 'Tu pueblo ya está completo.';
+  const coste = costeDe(est, p, carta);
+  if (p.monedas < coste) return `Te faltan ${s(coste - p.monedas, 'moneda', 'monedas')}.`;
+  return null;
+}
+
+/** Paso 3: construir (se puede hacer tras la habilidad o saltándosela). */
 export function construir(est, id, uid) {
-  if (!esActivo(est, id)) return err('No es tu turno.');
+  const e = delTurno(est, id); if (e) return e;
   const t = est.turno; const p = jug(est, id);
-  if (!t.basica || t.pendiente) return err('Primero haz tu acción básica.');
-  if (t.construidos >= t.maxConstruir) return err('Ya has construido todo lo que podías este turno.');
-  const c = p.mano.find((x) => x.uid === uid);
-  if (!c) return err('Ese plano no está en tu mano.');
-  if (p.pueblo.some((x) => x.nombre === c.nombre)) return err('Ya tienes un edificio igual en tu pueblo.');
-  const coste = costeReal(est, p, c);
-  if (p.monedas < coste) return err(`Necesitas ${coste} monedas.`);
+  const carta = p.mano.find((c) => c.uid === Number(uid));
+  if (!carta) return err('Ese plano no está en tu mano.');
+  const motivo = motivoNoConstruir(est, p, carta);
+  if (motivo) return err(motivo);
+  if (t.paso === 'habilidad') t.paso = 'construir'; // construir antes de la habilidad = renunciar a ella
+  const coste = costeDe(est, p, carta);
   p.monedas -= coste;
-  p.mano = p.mano.filter((x) => x.uid !== uid);
-  p.pueblo.push({ ...c, _hoy: est.ronda });
+  p.mano = p.mano.filter((c) => c.uid !== carta.uid);
+  p.pueblo.push(carta);
   t.construidos += 1;
-  est.progreso += c.coste + (tiene(p, 'monumento') ? 1 : 0);
-  log(est, `${p.nombre} construye ${c.nombre} (${TIPOS[c.tipo].nombre}).`);
-  if (est.progreso >= est.meta && est.inaugurador === null) {
-    est.inaugurador = p.id;
-    log(est, `¡${p.nombre} pone la última piedra! El pueblo se inaugura al acabar la ronda.`);
+  log(est, `${p.nombre} construye ${carta.nombre} (${coste}).`);
+  if (p.pueblo.length >= est.meta && !est.ordenCompleto.includes(p.id)) {
+    est.ordenCompleto.push(p.id);
+    log(est, est.ordenCompleto.length === 1
+      ? `¡${p.nombre} completa su pueblo! Esta es la última ronda.`
+      : `${p.nombre} también completa su pueblo.`);
   }
+  return ok();
+}
+
+/** Ventajas activas de algunos edificios (una vez por turno). */
+export function usarEdificio(est, id, efecto, params = {}) {
+  const e = delTurno(est, id); if (e) return e;
+  const t = est.turno; const p = jug(est, id);
+  if (t.paso === 'recurso' || t.paso === 'planos') return err('Primero termina de cobrar.');
+  if (!tiene(p, efecto)) return err('No tienes ese edificio.');
+  if (t.usados[efecto]) return err('Ya lo has usado este turno.');
+  if (efecto === 'imprenta') {
+    if (p.monedas < 1) return err('Necesitas 1 moneda.');
+    const r = robar(est, 1);
+    if (!r.length) return err('No quedan planos.');
+    p.monedas -= 1; p.mano.push(...r);
+  } else if (efecto === 'abastos') {
+    const c = p.mano.find((x) => x.uid === Number(params.uid));
+    if (!c) return err('Elige un plano de tu mano para descartar.');
+    p.mano = p.mano.filter((x) => x.uid !== c.uid);
+    est.descarte.push(c);
+    p.monedas += 2;
+  } else return err('Ese edificio no tiene una acción que usar.');
+  t.usados[efecto] = true;
+  log(est, `${p.nombre} usa su ${SINGULARES.find((x) => x.efecto === efecto).nombre}.`);
   return ok();
 }
 
 export function terminarTurno(est, id) {
-  if (!esActivo(est, id)) return err('No es tu turno.');
+  const e = delTurno(est, id); if (e) return e;
   const t = est.turno;
-  if (!t.basica || t.pendiente) return err('Primero haz tu acción básica.');
-  siguienteTurno(est);
+  if (t.paso === 'recurso') return err('Primero cobra monedas o toma planos.');
+  if (t.paso === 'planos') return err('Termina de elegir los planos.');
+  llamarSiguiente(est);
   return ok();
 }
 
-// ---------------------------------------------------------------- Puntuación y final
-export function puntuar(est) {
-  return est.jugadores.map((p) => {
-    const base = p.pueblo.reduce((s, c) => s + c.prestigio, 0);
-    const presentes = TIPOS_BASE.filter((t) => cuenta(p, t) > 0).length;
-    const comodin = tiene(p, 'faro') ? 1 : 0;
-    const variedad = presentes === 4 || (presentes === 3 && comodin) ? AJUSTES.bonusVariedad : 0;
-    const hogares = Math.floor(cuenta(p, 'hogar') / AJUSTES.hogaresPorBonus);
-    const inaug = est.inaugurador === p.id ? AJUSTES.bonusInauguracion : 0;
-    const total = p.fuera ? 0 : base + variedad + hogares + inaug;
-    return { id: p.id, nombre: p.nombre, edificios: p.pueblo.length, base, variedad, hogares, inauguracion: inaug, total, monedas: p.monedas, fuera: p.fuera };
-  });
-}
-
-function terminar(est, motivo = 'inauguracion') {
-  est.fase = 'fin'; est.turno = null;
-  const tabla = puntuar(est).sort((a, b) => b.total - a.total || b.monedas - a.monedas || b.edificios - a.edificios);
-  const mejor = tabla[0];
-  const ganadores = tabla.filter((x) => x.total === mejor.total && x.monedas === mejor.monedas).map((x) => x.id);
-  est.fin = { tabla, ganadores, motivo };
-}
-
-// ---------------------------------------------------------------- Avance forzado y abandono
+// ---------------------------------------------------------------- Ausencias
+/** El anfitrión desbloquea la partida si alguien no responde: elige o juega por él lo mínimo. */
 export function forzar(est) {
-  if (est.fase === 'fin') return false;
-  if (est.fase === 'elegir') {
-    activos(est).forEach((j) => { if (!est.elecciones[j.id]) est.elecciones[j.id] = 1 + Math.floor(est.rng() * 8); });
-    resolverElecciones(est);
+  if (est.fase === 'eleccion') {
+    const id = eligeAhora(est);
+    if (id == null) return false;
+    const rol = est.pool[Math.floor(est.rng() * est.pool.length)];
+    log(est, `${jug(est, id).nombre} no respondía: se le asigna un oficio al azar.`);
+    return elegirRol(est, id, rol).ok;
+  }
+  if (est.fase === 'turnos' && est.turno) {
+    const t = est.turno; const p = jug(est, t.jugadorId);
+    if (t.paso === 'recurso') { p.monedas += AJUSTES.cobro; }
+    if (t.paso === 'planos') {
+      while (t.quedar > 0 && t.pendiente.length) { p.mano.push(t.pendiente.shift()); t.quedar -= 1; }
+      est.descarte.push(...t.pendiente); t.pendiente = [];
+    }
+    log(est, `${p.nombre} no respondía: termina su turno.`);
+    llamarSiguiente(est);
     return true;
   }
-  const t = est.turno; if (!t) return false;
-  if (!t.basica && !t.pendiente) basica(est, t.jugadorId, 'jornal');
-  if (t.pendiente) elegirPendiente(est, t.jugadorId, t.pendiente.cartas[0].uid);
-  terminarTurno(est, t.jugadorId);
-  return true;
+  return false;
 }
 
 export function abandonar(est, id) {
   const p = jug(est, id);
   if (!p || p.fuera || est.fase === 'fin') return;
-  p.fuera = true; est.descarte.push(...p.mano); p.mano = [];
-  delete est.elecciones[id];
-  log(est, `${p.nombre} abandona el pueblo.`);
-  if (activos(est).length < 2) return terminar(est, 'abandono');
-  if (est.fase === 'elegir') { if (activos(est).every((j) => est.elecciones[j.id])) resolverElecciones(est); }
-  else if (est.turno && est.turno.jugadorId === id) siguienteTurno(est);
+  p.fuera = true;
+  log(est, `${p.nombre} abandona la partida.`);
+  if (activos(est).length < 2) return terminar(est);
+  if (est.fase === 'eleccion' && eligeAhora(est) === id) avanzarEleccion(est);
+  else if (est.fase === 'turnos' && est.turno?.jugadorId === id) {
+    est.descarte.push(...est.turno.pendiente);
+    llamarSiguiente(est);
+  }
+}
+
+// ---------------------------------------------------------------- Puntuación
+export function puntuar(est, p) {
+  const edificios = p.pueblo.reduce((a, c) => a + c.puntos, 0);
+  const tipos = new Set(p.pueblo.map((c) => c.tipo));
+  const variedad = tipos.size >= 5 || (tiene(p, 'plaza') && tipos.size === 4) ? AJUSTES.bonusVariedad : 0;
+  const pos = est.ordenCompleto.indexOf(p.id);
+  const completar = pos === 0 ? AJUSTES.bonusPrimero : pos > 0 ? AJUSTES.bonusCompleto : 0;
+  const monedas = Math.floor(p.monedas / (tiene(p, 'cajafuerte') ? 2 : AJUSTES.monedasPorPunto));
+  const medallas = p.medallas * AJUSTES.puntosMedalla;
+  let ventajas = 0;
+  if (tiene(p, 'puerto')) ventajas += cuenta(p, 'comercio');
+  if (tiene(p, 'fuente')) ventajas += cuenta(p, 'singular') - 1;
+  return { edificios, variedad, completar, monedas, medallas, ventajas, total: edificios + variedad + completar + monedas + medallas + ventajas };
+}
+
+function terminar(est) {
+  if (est.fase === 'fin') return;
+  est.fase = 'fin'; est.turno = null;
+  const tabla = est.jugadores
+    .map((p) => ({ id: p.id, nombre: p.nombre, fuera: p.fuera, monedasFinal: p.monedas, ...puntuar(est, p) }))
+    .sort((a, b) => (a.fuera - b.fuera) || (b.total - a.total) || (b.monedasFinal - a.monedasFinal));
+  const mejores = tabla.filter((f) => !f.fuera);
+  const top = mejores[0];
+  const ganadores = top ? mejores.filter((f) => f.total === top.total && f.monedasFinal === top.monedasFinal).map((f) => f.id) : [];
+  est.fin = { tabla, ganadores };
+  log(est, `— Fin de la partida: gana ${ganadores.map((g) => jug(est, g).nombre).join(' y ')} —`);
 }
 
 // ---------------------------------------------------------------- Vista de un jugador
+const cartaVista = (c, est, p) => ({ uid: c.uid, nombre: c.nombre, tipo: c.tipo, coste: c.coste, puntos: c.puntos, efecto: c.efecto || null, texto: c.texto || null });
+
 export function vistaDe(est, id) {
   const yo = jug(est, id);
+  const fin = est.fase === 'fin';
+  const elige = eligeAhora(est);
   const t = est.turno;
-  const miTurno = esActivo(est, id);
-  const marcador = puntuar(est);
-  const v = {
-    fase: est.fase, ronda: est.ronda, meta: est.meta, progreso: est.progreso,
-    sello: { id: est.jugadores[est.sello].id, nombre: est.jugadores[est.sello].nombre },
-    inaugurador: est.inaugurador,
-    yo: { id: yo.id, nombre: yo.nombre, monedas: yo.monedas, mano: yo.mano, rol: est.asignados[id] ?? null, eleccion: est.elecciones[id] ?? null, fuera: yo.fuera },
-    jugadores: est.jugadores.map((p) => ({
-      id: p.id, nombre: p.nombre, monedas: p.monedas, nMano: p.mano.length, pueblo: p.pueblo, fuera: p.fuera,
-      esSello: est.jugadores[est.sello].id === p.id,
-      eligio: est.fase === 'elegir' ? !!est.elecciones[p.id] : null,
-      rolRevelado: est.reveladas[p.id] ?? null,
-      puntos: marcador.find((m) => m.id === p.id).total,
-      protegido: tiene(p, 'puerta')
-    })),
-    log: est.log.slice(-30),
-    ultimaRonda: est.ultimaRonda
+  const miTurno = t && t.jugadorId === id;
+  const rolDe = (j) => {
+    if (j.id === id) return est.elecciones[j.id] ?? null;
+    const r = est.elecciones[j.id];
+    return r && (fin || est.reveladas[r] === j.id) ? r : null;
   };
-  if (est.fase === 'elegir') v.faltan = activos(est).filter((j) => !est.elecciones[j.id]).map((j) => j.nombre);
-  if (t) {
-    const p = jug(est, t.jugadorId);
-    v.turno = {
-      jugadorId: p.id, nombre: p.nombre, rol: t.rol, rolNombre: nombreRol(t.rol), basica: t.basica,
-      habilidadUsada: t.habilidadUsada, construidos: t.construidos, maxConstruir: t.maxConstruir, bloqueada: t.bloqueada
-    };
-    if (miTurno) {
-      v.turno.pendiente = t.pendiente;
-      v.turno.costes = Object.fromEntries(yo.mano.map((c) => [c.uid, costeReal(est, yo, c)]));
-      v.turno.bonusJornal = bonusJornal(yo);
-      v.turno.proyectarN = proyectarN(yo);
-      if (t.rol === 8) v.turno.libres = libresParaAprendiz(est);
-    }
-  }
-  if (est.fase === 'fin') v.fin = est.fin;
+  const v = {
+    fase: est.fase, ronda: est.ronda, meta: est.meta, duracion: est.cfg.duracion,
+    sello: est.jugadores[est.sello]?.id ?? null,
+    enJuego: est.enJuego, retirados: est.retirados,
+    turnoRol: est.fase === 'turnos' ? est.turnoRol : null,
+    saboteado: est.saboteado, cobrado: est.cobrado ? est.cobrado.rol : null,
+    protegidoId: est.protegidoId,
+    mazo: est.mazo.length + est.descarte.length,
+    eleccion: est.fase === 'eleccion' ? {
+      turnoDe: elige,
+      orden: est.ordenEleccion,
+      yaEligieron: Object.keys(est.elecciones).map(Number),
+      pool: elige === id ? est.pool : null,
+      quedan: est.pool.length
+    } : null,
+    turno: t ? {
+      jugadorId: t.jugadorId, rol: t.rol, paso: t.paso, construidos: t.construidos, limite: t.limite,
+      descuentoSingular: t.descuentoSingular, usados: t.usados,
+      pendiente: miTurno ? t.pendiente.map((c) => cartaVista(c)) : [], quedar: miTurno ? t.quedar : 0,
+      nPendiente: t.pendiente.length
+    } : null,
+    jugadores: est.jugadores.map((j) => ({
+      id: j.id, nombre: j.nombre, monedas: j.monedas, planos: j.mano.length, medallas: j.medallas, fuera: j.fuera,
+      pueblo: j.pueblo.map((c) => cartaVista(c)), rol: rolDe(j),
+      eligiendo: elige === j.id, completo: est.ordenCompleto.indexOf(j.id) + 1 || null,
+      puntos: puntuar(est, j).total - Math.floor(j.monedas / (tiene(j, 'cajafuerte') ? 2 : AJUSTES.monedasPorPunto))
+    })),
+    yo: yo ? {
+      id: yo.id, monedas: yo.monedas, medallas: yo.medallas, rol: est.elecciones[yo.id] ?? null,
+      mano: yo.mano.map((c) => ({ ...cartaVista(c), costeReal: costeDe(est, yo, c), motivo: miTurno ? motivoNoConstruir(est, yo, c) : 'No es tu turno.' })),
+      ventajas: yo.pueblo.filter((c) => c.efecto).map((c) => c.efecto)
+    } : null,
+    log: est.log.slice(-40),
+    fin: fin ? est.fin : null
+  };
   return v;
 }

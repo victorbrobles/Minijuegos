@@ -108,6 +108,13 @@ npm run dev
 - Partidas de 10, 15 o 25 rondas y 45 s por respuesta. Online, el servidor cierra la ronda al acabar el tiempo y acepta selecciones incompletas.
 - Elementos en `server/data/seeds/colores/parteN.js` (`{ id, item, colores: [...] }`, con los colores de la paleta: rojo, azul, amarillo, verde, naranja, morado, marron, blanco, negro, gris, rosa). `parte6.js` es la ampliación.
 
+## Minijuego: Fundadores (`Fundadores/`)
+- Cada jugador (2 a 9) levanta su propio pueblo. Empieza con 2 monedas y 4 planos.
+- Cada ronda se retiran al azar oficios hasta que quedan tantos como jugadores (los retirados son públicos); por orden, empezando por quien tiene el sello, cada uno elige uno en secreto. Los 10 oficios se llaman por número y quien tenga el llamado juega su turno: cobrar 2 monedas o robar 2 planos y quedarse 1 → habilidad del oficio → construir.
+- Oficios: Saboteadora, Cobrador, Cartógrafa, Heraldo (sello/prioridad), Guardiana, Mercader, Maestra de obras, Capitán (derribar), Prestamista y Alcaldesa. Edificios de 5 tipos; los Singulares dan ventajas.
+- Termina la ronda en la que alguien completa el pueblo (6, 7 u 8 edificios). Puntos: edificios + variedad + completar + monedas sobrantes + medallas + ventajas.
+- Motor en `server/fundadores/engine.js` con copia idéntica en el cliente (`npm run sync:fundadores`). Pruebas: `node server/scripts/fundadores-sim.mjs` y `node server/scripts/fundadores-e2e.mjs [jugadores]`.
+
 ## Minijuego: Furbo! (`Furbo/`)
 - Menús, sala de espera y selector de jugadores con los componentes comunes; partida en `FurboPartida.jsx` (cabecera con fase, ronda, reloj y marcador, que muestra lo sumado en cada ronda) para los dos modos.
 - Lógica en `server/lib/furboEngine.js`. En un solo dispositivo no hay cuenta atrás (el móvil cambia de manos), salvo en la Prórroga. Si alguien abandona online, la ronda que le esperaba se resuelve al momento.
