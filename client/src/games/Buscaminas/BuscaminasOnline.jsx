@@ -62,7 +62,6 @@ export default function BuscaminasOnline({
   const [codigoCopiado, setCodigoCopiado] = useState(false);
   const [tiempoRestante, setTiempoRestante] = useState(TIEMPO_TURNO);
 
-  // Estado y referencias para el aviso flotante de éxito (estilo Conecta)
   const [eventoAviso, setEventoAviso] = useState(null);
   const avisoSeqRef = useRef(0);
   const seguimientoRondaRef = useRef({
@@ -119,15 +118,13 @@ export default function BuscaminasOnline({
     };
   }, [sesion]);
 
-  // Detecta cuando alguien descubre una casilla correcta para lanzar el aviso flotante
   useEffect(() => {
     const r = sala?.ronda;
-    if (!r || ! Array.isArray(r.casillas)) return;
+    if (!r || !Array.isArray(r.casillas)) return;
 
     const seg = seguimientoRondaRef.current;
     const acertadasActuales = r.casillas.filter((c) => c.descubierta && c.correcto);
 
-    // Si acaba de empezar una ronda nueva o acabamos de entrar, sincronizamos sin disparar aviso
     if (seg.rondaNum !== sala.rondaNum) {
       seg.rondaNum = sala.rondaNum;
       seg.acertadasIds = new Set(acertadasActuales.map((c) => c.id));
@@ -327,7 +324,6 @@ export default function BuscaminasOnline({
   const correctasDescubiertas = ronda?.casillas ? ronda.casillas.filter((c) => c.descubierta && c.correcto).length : 0;
   const minasExplotadas = ronda?.casillas ? ronda.casillas.filter((c) => c.descubierta && !c.correcto).length : 0;
 
-  // Se incluye correctasDescubiertas para que el tiempo se reinicie cuando el último jugador vivo encadena aciertos
   useEffect(() => {
     const isJugando = sala?.estado === 'jugando' && ronda?.faseRonda === 'jugando';
     if (!isJugando) {
@@ -407,7 +403,6 @@ export default function BuscaminasOnline({
 
   return (
     <div className={`bm-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
-      {/* Aviso flotante de acierto (estilo Conecta) */}
       <Aviso evento={eventoAviso} />
 
       {/* 1. MENÚ PRINCIPAL */}
@@ -745,7 +740,7 @@ export default function BuscaminasOnline({
         </section>
       )}
 
-      {/* 5. SELECTOR DE CATEGORÍA ONLINE */}
+      {/* 5. SELECTOR DE CATEGORÍA ONLINE (Última pantalla con botón de ayuda) */}
       {vista === 'sala' && sala && sala.estado === 'categoria' && (
         esAdmin ? (
           <SelectorCategorias
@@ -778,12 +773,11 @@ export default function BuscaminasOnline({
         )
       )}
 
-      {/* 6. TABLERO ONLINE EN JUEGO */}
+      {/* 6. TABLERO ONLINE EN JUEGO (Sin botón de ayuda) */}
       {vista === 'sala' && sala && sala.estado === 'jugando' && ronda && ronda.faseRonda === 'jugando' && (
         <section className="game qqp-escena">
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
-            onAyuda={onAbrirAyuda}
             categoria={{ nombre: ronda.categoriaNombre, icono: 'star' }}
             etiqueta={
               esMiTurno
@@ -884,7 +878,7 @@ export default function BuscaminasOnline({
         </section>
       )}
 
-      {/* 7. FIN DE RONDA ONLINE */}
+      {/* 7. FIN DE RONDA ONLINE (Sin botón de ayuda) */}
       {vista === 'sala' && sala && sala.estado === 'jugando' && ronda && ronda.faseRonda === 'ronda_fin' && (
         <section className="game qqp-escena">
           <Cabecera
@@ -965,7 +959,7 @@ export default function BuscaminasOnline({
         </section>
       )}
 
-      {/* 8. PODIO FINAL ONLINE */}
+      {/* 8. PODIO FINAL ONLINE (Sin botón de ayuda) */}
       {vista === 'sala' && sala && sala.estado === 'final' && (
         <section className="game qqp-escena">
           <Cabecera
