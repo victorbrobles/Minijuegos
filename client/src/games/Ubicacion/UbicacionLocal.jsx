@@ -1,17 +1,19 @@
 // client/src/games/Ubicacion/UbicacionLocal.jsx
+// Modo «un único dispositivo»: turnos con marcador real y dos señuelos.
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
+import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx';
 import MapaMundi from './MapaMundi.jsx';
-import { barajar, distanciaKm, formatearKm, puntosPorDistancia, resolverImagenes } from './geo.js';
+import { barajar, distanciaKm, puntosPorDistancia, resolverImagenes, OPCIONES_RONDAS } from './geo.js';
+import {
+  Hero, BarraTiempo, TarjetaFoto, BotonFoto, ModalFoto, TablaRonda, Clasificacion, Podio, ModalSalir, inicial
+} from './Pantallas.jsx';
 import './Ubicacion.css';
 
-const MIN_JUGADORES = 3;
+const MIN_JUGADORES = 2;
 const MAX_JUGADORES = 10;
-const RONDAS = 10;
 const SEGUNDOS_IMAGEN = 10;
 const SEGUNDOS_TURNO = 90;
-const CANDIDATOS = 16;
 
 const COLORES = ['#ef4444', '#2563eb', '#16a34a', '#f59e0b', '#9333ea', '#ec4899', '#0d9488', '#ea580c', '#475569', '#65a30d'];
 
@@ -22,92 +24,15 @@ const SLOTS = [
 ];
 const VACIOS = { real: null, s1: null, s2: null };
 
-const inicial = (nombre) => (nombre.trim()[0] ?? '?').toUpperCase();
-const urlWiki = (l) => (l.wiki ? `https://en.wikipedia.org/wiki/${encodeURIComponent(l.wiki)}` : null);
-
-function FaseImagen({ lugar, ronda, total, onFin, onError, onSalirPortada }) {
-  const [cargada, setCargada] = useState(false);
-  const [restante, setRestante] = useState(SEGUNDOS_IMAGEN);
-  const alAcabar = useRef(onFin);
-  alAcabar.current = onFin;
-
-  useEffect(() => {
-    if (!cargada) return undefined;
-    const fin = Date.now() + SEGUNDOS_IMAGEN * 1000;
-    const id = setInterval(() => {
-      const r = (fin - Date.now()) / 1000;
-      if (r <= 0) {
-        clearInterval(id);
-        setRestante(0);
-        alAcabar.current();
-      } else {
-        setRestante(r);
-      }
-    }, 100);
-    return () => clearInterval(id);
-  }, [cargada]);
-
-  return (
-    <section className="game">
-      <div className="panel qq-menu-panel">
-        <div className="qq-card-top">
-          <button type="button" className="qq-link-volver" onClick={onSalirPortada}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-            <span>Volver a la portada</span>
-          </button>
-          <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
-            Ronda {ronda} de {total}
-          </span>
-        </div>
-
-        <h3 className="panel-title" style={{ justifyContent: 'center', marginTop: '0.4rem' }}>
-          <Icon name="eye" size={22} /> ¡Memoriza este lugar!
-        </h3>
-        <img
-          className="ub-foto"
-          src={lugar.imagenUrl}
-          alt="Fotografía de un lugar emblemático"
-          onLoad={() => setCargada(true)}
-          onError={onError}
-        />
-        <div className="timer">
-          <div className={`timer-bar${restante <= 3 ? ' low' : ''}`} style={{ width: `${(restante / SEGUNDOS_IMAGEN) * 100}%` }} />
-        </div>
-        <p className="timer-text">
-          <Icon name="clock" size={18} /> {cargada ? `${Math.ceil(restante)} s` : 'Cargando foto…'}
-        </p>
-        <Credito lugar={lugar} mostrarEnlace={false} />
-      </div>
-    </section>
-  );
-}
-
-function Credito({ lugar, mostrarEnlace = false }) {
-  const url = urlWiki(lugar);
-  return (
-    <p className="ub-credito">
-      Foto de Wikimedia Commons (licencia libre)
-      {mostrarEnlace && url && (
-        <> · <a href={url} target="_blank" rel="noreferrer">ver origen y detalles</a></>
-      )}
-    </p>
-  );
-}
-
 export default function UbicacionLocal({ onVolver, onExit, onAbrirAyuda }) {
-  const navigate = useNavigate();
-
-  const [fase, setFase] = useState('setup');
+  const [fase, setFase] = useState('setup'); // setup | cargando | imagen | aviso | turno | resultados | puntuaciones | final
   const [verImagen, setVerImagen] = useState(false);
   const [errorCarga, setErrorCarga] = useState('');
-  const [modalSalirPortada, setModalSalirPortada] = useState(false);
+  const [modalSalir, setModalSalir] = useState(false);
 
-  const [numJugadores, setNumJugadores] = useState(4);
-  const [nombres, setNombres] = useState(() =>
-    Array.from({ length: MAX_JUGADORES }, (_, i) => `Jugador ${i + 1}`)
-  );
+  const [numJugadores, setNumJugadores] = useState(3);
+  const [nombres, setNombres] = useState(() => Array.from({ length: MAX_JUGADORES }, (_, i) => `Jugador ${i + 1}`));
+  const [rondasElegidas, setRondasElegidas] = useState(10);
 
   const [jugadores, setJugadores] = useState([]);
   const [puntos, setPuntos] = useState({});
@@ -123,44 +48,36 @@ export default function UbicacionLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [resultado, setResultado] = useState(null);
   const [enfoque, setEnfoque] = useState(null);
 
+  const [fotoCargada, setFotoCargada] = useState(false);
+  const [restanteFoto, setRestanteFoto] = useState(SEGUNDOS_IMAGEN);
   const [tiempoTurno, setTiempoTurno] = useState(SEGUNDOS_TURNO);
   const colocadosRef = useRef(colocados);
+  colocadosRef.current = colocados;
 
-  useEffect(() => {
-    colocadosRef.current = colocados;
-  }, [colocados]);
-
-  const handleSalirAPortada = () => {
-    setModalSalirPortada(false);
-    if (typeof onExit === 'function') {
-      onExit();
-    } else {
-      try {
-        navigate('/');
-      } catch {
-        window.location.href = '/';
-      }
-    }
-  };
-
-  const actualizarCantidadJugadores = (nuevoNum) => {
-    const num = Math.max(MIN_JUGADORES, Math.min(MAX_JUGADORES, nuevoNum));
-    setNumJugadores(num);
-  };
-
-  const totalRondas = Math.min(RONDAS, lugares.length);
+  const totalRondas = Math.min(rondasElegidas, lugares.length);
   const lugarActual = lugares[ronda - 1];
   const jugadorActual = jugadores[orden[turnoIdx]];
   const anterior = marcasRonda.length ? marcasRonda[marcasRonda.length - 1] : null;
   const jugadorAnterior = anterior ? jugadores.find((j) => j.id === anterior.jugadorId) : null;
-
   const esUltimoTurno = turnoIdx === orden.length - 1;
   const slotsActivos = esUltimoTurno ? SLOTS.filter((s) => s.id === 'real') : SLOTS;
 
+  // Cuenta atrás de la foto (empieza cuando la foto ha cargado)
   useEffect(() => {
-    if (fase !== 'turno') return;
-    setTiempoTurno(SEGUNDOS_TURNO);
+    if (fase !== 'imagen' || !fotoCargada) return undefined;
+    const fin = Date.now() + SEGUNDOS_IMAGEN * 1000;
+    setRestanteFoto(SEGUNDOS_IMAGEN);
+    const id = setInterval(() => {
+      const r = (fin - Date.now()) / 1000;
+      if (r <= 0) { clearInterval(id); setFase('aviso'); } else setRestanteFoto(r);
+    }, 100);
+    return () => clearInterval(id);
+  }, [fase, fotoCargada]);
 
+  // Reloj del turno
+  useEffect(() => {
+    if (fase !== 'turno') return undefined;
+    setTiempoTurno(SEGUNDOS_TURNO);
     const fin = Date.now() + SEGUNDOS_TURNO * 1000;
     const id = setInterval(() => {
       const rest = (fin - Date.now()) / 1000;
@@ -168,23 +85,22 @@ export default function UbicacionLocal({ onVolver, onExit, onAbrirAyuda }) {
         clearInterval(id);
         setTiempoTurno(0);
         confirmar(colocadosRef.current);
-      } else {
-        setTiempoTurno(rest);
-      }
-    }, 100);
-
+      } else setTiempoTurno(rest);
+    }, 200);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fase, turnoIdx]);
 
+  // Precarga la foto de la siguiente ronda
   useEffect(() => {
     const siguiente = lugares[ronda];
     if (siguiente) new Image().src = siguiente.imagenUrl;
   }, [lugares, ronda]);
 
+  // Si se acaban los lugares (fotos que no cargan), se termina la partida
   useEffect(() => {
-    if (['imagen', 'aviso', 'turno'].includes(fase) && !lugarActual) setFase('final');
-  }, [fase, lugarActual]);
+    if (['imagen', 'aviso', 'turno'].includes(fase) && !lugarActual && lugares.length) setFase('final');
+  }, [fase, lugarActual, lugares.length]);
 
   const iniciarPartida = async () => {
     const js = nombres.slice(0, numJugadores).map((n, i) => ({
@@ -197,10 +113,9 @@ export default function UbicacionLocal({ onVolver, onExit, onAbrirAyuda }) {
     setErrorCarga('');
     setFase('cargando');
     try {
-      const r = await fetch(`/api/ubicacion/lote?n=${CANDIDATOS}`);
+      const r = await fetch(`/api/ubicacion/lote?n=${rondasElegidas + 8}`);
       if (!r.ok) throw new Error('servidor');
-      const candidatos = await r.json();
-      const conFoto = await resolverImagenes(candidatos);
+      const conFoto = await resolverImagenes(await r.json());
       if (conFoto.length === 0) throw new Error('fotos');
       setLugares(conFoto);
       setRonda(1);
@@ -215,6 +130,7 @@ export default function UbicacionLocal({ onVolver, onExit, onAbrirAyuda }) {
     }
   };
 
+  // Abre la ronda alguien que aún no la haya abierto (sorteo) y se sigue en orden
   const empezarRonda = (js, pendientes) => {
     const pool = pendientes.length ? pendientes : js.map((_, i) => i);
     const k = Math.floor(Math.random() * pool.length);
@@ -227,10 +143,14 @@ export default function UbicacionLocal({ onVolver, onExit, onAbrirAyuda }) {
     setSlotActivo('real');
     setResultado(null);
     setEnfoque(null);
+    setFotoCargada(false);
     setFase('imagen');
   };
 
-  const descartarLugar = () => setLugares((ls) => ls.filter((l) => l.id !== lugarActual?.id));
+  const descartarLugar = () => {
+    setFotoCargada(false);
+    setLugares((ls) => ls.filter((l) => l.id !== lugarActual?.id));
+  };
 
   const colocar = (lat, lng) => {
     if (!slotActivo) return;
@@ -244,14 +164,13 @@ export default function UbicacionLocal({ onVolver, onExit, onAbrirAyuda }) {
     if (id in colocados) setColocados((c) => ({ ...c, [id]: { lat, lng } }));
   };
 
-  const confirmar = (datosColocados = colocados) => {
+  const confirmar = (datos = colocados) => {
     const entrada = {
       jugadorId: jugadorActual.id,
-      real: datosColocados.real || null,
-      senuelos: esUltimoTurno ? [] : [datosColocados.s1, datosColocados.s2].filter(Boolean),
+      real: datos.real || null,
       visibles: esUltimoTurno
-        ? [datosColocados.real].filter(Boolean)
-        : barajar([datosColocados.real, datosColocados.s1, datosColocados.s2].filter(Boolean))
+        ? [datos.real].filter(Boolean)
+        : barajar([datos.real, datos.s1, datos.s2].filter(Boolean))
     };
     const marcas = [...marcasRonda, entrada];
     setMarcasRonda(marcas);
@@ -269,18 +188,14 @@ export default function UbicacionLocal({ onVolver, onExit, onAbrirAyuda }) {
     const lugar = lugarActual;
     const filas = marcas
       .map((m) => {
-        let km = Infinity;
-        let puntos = 0;
-        if (m.real) {
-          km = distanciaKm(m.real, lugar);
-          puntos = puntosPorDistancia(km);
-        }
-        return { jugador: jugadores.find((j) => j.id === m.jugadorId), real: m.real, km, puntos };
+        const j = jugadores.find((x) => x.id === m.jugadorId);
+        const km = m.real ? distanciaKm(m.real, lugar) : null;
+        return { id: j.id, nombre: j.nombre, color: j.color, real: m.real, km, puntos: puntosPorDistancia(km) };
       })
-      .sort((a, b) => a.km - b.km);
+      .sort((a, b) => a.puntos - b.puntos);
     setPuntos((p) => {
       const n = { ...p };
-      filas.forEach((f) => { n[f.jugador.id] = (n[f.jugador.id] ?? 0) + f.puntos; });
+      filas.forEach((f) => { n[f.id] = (n[f.id] ?? 0) + f.puntos; });
       return n;
     });
     setResultado({ lugar, filas });
@@ -292,408 +207,215 @@ export default function UbicacionLocal({ onVolver, onExit, onAbrirAyuda }) {
     empezarRonda(jugadores, abridores);
   };
 
-  const colocadosN = slotsActivos.filter((s) => colocados[s.id]).length;
-  const slotInfo = slotsActivos.find((s) => s.id === slotActivo);
-
-  const marcadoresTurno = jugadorActual
-    ? [
-        ...(anterior?.visibles ?? []).map((p, i) => ({
-          id: `previo-${i}`, lat: p.lat, lng: p.lng, color: jugadorAnterior.color, glifo: '?', fantasma: true, interactivo: false
-        })),
-        ...slotsActivos.filter((s) => colocados[s.id]).map((s) => ({
-          id: s.id, ...colocados[s.id], color: jugadorActual.color, glifo: s.glifo, grande: s.id === 'real', arrastrable: true
-        }))
-      ]
-    : [];
-
-  const marcadoresResultado = resultado
-    ? [
-        { id: 'correcto', lat: resultado.lugar.lat, lng: resultado.lugar.lng, color: '#111827', glifo: '✓', grande: true, z: 1000, etiqueta: resultado.lugar.nombre },
-        ...resultado.filas.filter((f) => f.real).map((f) => ({
-          id: `jugador-${f.jugador.id}`, lat: f.real.lat, lng: f.real.lng, color: f.jugador.color, glifo: inicial(f.jugador.nombre), etiqueta: f.jugador.nombre
-        }))
-      ]
-    : [];
-  const lineasResultado = resultado
-    ? resultado.filas.filter((f) => f.real).map((f) => ({ desde: f.real, hasta: resultado.lugar, color: f.jugador.color }))
-    : [];
-
-  const clasificacion = [...jugadores].sort((a, b) => (puntos[b.id] ?? 0) - (puntos[a.id] ?? 0));
-  const maximo = clasificacion.length ? (puntos[clasificacion[0].id] ?? 0) : 0;
-  const ganadores = maximo > 0 ? clasificacion.filter((j) => (puntos[j.id] ?? 0) === maximo) : [];
-  const ganadoEnRonda = (id) => resultado?.filas.find((f) => f.jugador.id === id)?.puntos ?? 0;
+  const conPuntos = jugadores.map((j) => ({ ...j, puntos: puntos[j.id] ?? 0 }));
+  const sumadas = resultado ? Object.fromEntries(resultado.filas.map((f) => [f.id, f.puntos])) : {};
   const esUltimaRonda = ronda >= totalRondas;
+  const salir = () => setModalSalir(true);
 
-  const enPartidaActiva = fase !== 'setup';
+  const hero = (extra = {}) => (
+    <Hero onSalir={salir} ronda={ronda} total={totalRondas} jugadores={conPuntos} {...extra} />
+  );
 
-  return (
-    <div className={`ub-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
-      {verImagen && lugarActual && (
-        <div className="ub-modal-fondo" onClick={() => setVerImagen(false)}>
-          <div className="ub-modal ub-modal-foto" onClick={(e) => e.stopPropagation()}>
-            <img className="ub-foto" src={lugarActual.imagenUrl} alt="Fotografía del lugar de esta ronda" />
-            <Credito lugar={lugarActual} mostrarEnlace={false} />
-            <button className="big full" onClick={() => setVerImagen(false)}>Cerrar</button>
-          </div>
-        </div>
-      )}
+  const modalSalirPartida = modalSalir && (
+    <ModalSalir
+      texto="Se perderá la partida en curso y volverás a la portada."
+      onSeguir={() => setModalSalir(false)}
+      onSalir={() => { setModalSalir(false); onExit?.(); }}
+    />
+  );
 
-      {/* 1. SETUP DE JUGADORES (ESTILO UNIFICADO) */}
-      {fase === 'setup' && (
-        <section className="game">
-          <div className="panel qq-menu-panel">
-            <div className="qq-card-top">
-              <button
-                type="button"
-                className="qq-link-volver"
-                onClick={onVolver}
-              >
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M19 12H5M12 19l-7-7 7-7" />
-                </svg>
-                <span>Volver</span>
-              </button>
-              <button
-                type="button"
-                className="qq-btn-ayuda"
-                onClick={onAbrirAyuda}
-                title="Cómo jugar"
-                aria-label="Cómo jugar"
-              >
-                ?
-              </button>
-            </div>
-
-            <div className="qq-config-header">
-              <div className="qq-hero-icono chico">
-                <Icon name="users" size={32} />
-              </div>
-              <div>
-                <h2 className="qq-config-titulo">Jugadores</h2>
-                <p className="qq-config-sub">
-                  Configura quiénes van a participar en la partida ({MIN_JUGADORES} a {MAX_JUGADORES} jugadores)
-                </p>
-              </div>
-            </div>
-
-            {errorCarga && <p className="error" style={{ marginBottom: '1rem' }}>{errorCarga}</p>}
-
-            <div className="qq-selector-cantidad-box">
-              <label className="qq-label-destacado" htmlFor="num-jugadores-ub">
-                Número de participantes
-              </label>
-              <div className="qq-stepper-row">
-                <button
-                  type="button"
-                  className="qq-stepper-btn"
-                  disabled={numJugadores <= MIN_JUGADORES}
-                  onClick={() => actualizarCantidadJugadores(numJugadores - 1)}
-                >
-                  &minus;
+  // ---------- Configuración ----------
+  if (fase === 'setup') {
+    return (
+      <div className="ub-contenedor">
+        <SelectorJugadores
+          onVolver={onVolver}
+          onAyuda={onAbrirAyuda}
+          min={MIN_JUGADORES}
+          max={MAX_JUGADORES}
+          numJugadores={numJugadores}
+          onCambiarNum={(n) => setNumJugadores(Math.max(MIN_JUGADORES, Math.min(MAX_JUGADORES, n)))}
+          nombres={nombres.slice(0, numJugadores)}
+          onNombre={(i, v) => setNombres((ns) => ns.map((x, k) => (k === i ? v : x)))}
+          onEmpezar={iniciarPartida}
+          error={errorCarga}
+          maxLength={30}
+        >
+          <BloqueConfig titulo="Número de rondas" style={{ marginTop: '1.2rem' }}>
+            <div className="ubp-pildoras">
+              {OPCIONES_RONDAS.map((n) => (
+                <button key={n} type="button" className={`ubp-pildora${rondasElegidas === n ? ' activo' : ''}`} onClick={() => setRondasElegidas(n)}>
+                  {n} rondas
                 </button>
-                <select
-                  id="num-jugadores-ub"
-                  className="qq-select-jugadores"
-                  value={numJugadores}
-                  onChange={(e) => actualizarCantidadJugadores(parseInt(e.target.value, 10))}
-                >
-                  {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => (
-                    <option key={i + MIN_JUGADORES} value={i + MIN_JUGADORES}>
-                      {i + MIN_JUGADORES} jugadores
-                    </option>
-                  ))}
-                </select>
-                <button
-                  type="button"
-                  className="qq-stepper-btn"
-                  disabled={numJugadores >= MAX_JUGADORES}
-                  onClick={() => actualizarCantidadJugadores(numJugadores + 1)}
-                >
-                  +
-                </button>
-              </div>
-            </div>
-
-            <span className="qq-label-destacado" style={{ marginTop: '1.2rem', display: 'block' }}>
-              Nombres de los jugadores
-            </span>
-            <div className="qq-nombres-grid">
-              {nombres.slice(0, numJugadores).map((n, i) => (
-                <div key={i} className="qq-jugador-input-card">
-                  <span
-                    className="qq-jugador-badge"
-                    style={{ background: COLORES[i % COLORES.length] }}
-                  >
-                    {i + 1}
-                  </span>
-                  <input
-                    type="text"
-                    value={n}
-                    onChange={(e) =>
-                      setNombres((ns) => ns.map((x, k) => (k === i ? e.target.value : x)))
-                    }
-                    placeholder={`Jugador ${i + 1}`}
-                    maxLength={30}
-                  />
-                </div>
               ))}
             </div>
+          </BloqueConfig>
+        </SelectorJugadores>
+      </div>
+    );
+  }
 
-            <button
-              type="button"
-              className="big full qq-btn-principal"
-              style={{ marginTop: '1.5rem' }}
-              onClick={iniciarPartida}
-            >
-              <Icon name="play" size={22} /> Iniciar juego
-            </button>
+  // ---------- Cargando ----------
+  if (fase === 'cargando') {
+    return (
+      <div className="ub-contenedor qq-en-partida">
+        <section className="game ubp-escena">
+          <div className="ubp-tarjeta ubp-cargando">
+            <span className="ubp-globo" aria-hidden="true">🌍</span>
+            <p>Preparando el viaje…</p>
           </div>
         </section>
-      )}
+      </div>
+    );
+  }
 
-      {/* CARGANDO */}
-      {fase === 'cargando' && (
-        <section className="game">
-          <div className="panel center qq-menu-panel">
-            <p className="loading" style={{ margin: '1.5rem 0' }}>Buscando lugares emblemáticos…</p>
-          </div>
-        </section>
-      )}
+  return (
+    <div className="ub-contenedor qq-en-partida">
+      {verImagen && lugarActual && <ModalFoto src={lugarActual.imagenUrl} onCerrar={() => setVerImagen(false)} />}
 
-      {/* FOTO */}
+      {/* ---------- Foto ---------- */}
       {fase === 'imagen' && lugarActual && (
-        <FaseImagen
-          key={lugarActual.id}
-          lugar={lugarActual}
-          ronda={ronda}
-          total={totalRondas}
-          onFin={() => setFase('aviso')}
-          onError={descartarLugar}
-          onSalirPortada={() => setModalSalirPortada(true)}
-        />
+        <section className="game ubp-escena">
+          {hero()}
+          <TarjetaFoto
+            key={lugarActual.id}
+            src={lugarActual.imagenUrl}
+            segundos={restanteFoto}
+            total={SEGUNDOS_IMAGEN}
+            cargando={!fotoCargada}
+            onLoad={() => setFotoCargada(true)}
+            onError={descartarLugar}
+          />
+        </section>
       )}
 
-      {/* AVISO DE TURNO */}
+      {/* ---------- Pasa el móvil ---------- */}
       {fase === 'aviso' && jugadorActual && (
-        <section className="game">
-          <div className="panel qq-menu-panel ub-aviso" style={{ '--c': jugadorActual.color }}>
-            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
-              <button
-                type="button"
-                className="qq-link-volver"
-                onClick={() => setModalSalirPortada(true)}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M19 12H5M12 19l-7-7 7-7" />
-                </svg>
-                <span>Volver a la portada</span>
-              </button>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
-                  Ronda {ronda} de {totalRondas}
-                </span>
-                <button type="button" className="secondary ub-mini" onClick={() => setVerImagen(true)}>
-                  <Icon name="eye" size={16} /> Ver foto
-                </button>
-              </div>
-            </div>
-
-            <span className="ub-aviso-punto" />
-            <p className="ub-aviso-sub">Turno {turnoIdx + 1} de {orden.length}</p>
-            <h2 className="ub-aviso-nombre">{jugadorActual.nombre}</h2>
-            {turnoIdx === 0 ? (
-              <p className="hint"><Icon name="dice" size={18} /> El sorteo ha elegido a {jugadorActual.nombre} para abrir esta ronda.</p>
-            ) : esUltimoTurno ? (
-              <p className="hint"><Icon name="flagFinish" size={18} /> ¡Eres el último jugador! Solo tendrás que colocar tu marcador real.</p>
-            ) : (
-              <p className="hint">Verás los 3 marcadores de <strong>{jugadorAnterior.nombre}</strong> con «?».</p>
-            )}
-            <p className="hint small">Pasa el dispositivo a {jugadorActual.nombre} y pulsa cuando esté listo.</p>
-            <button className="big full qq-btn-principal" onClick={() => setFase('turno')}>
+        <section className="game ubp-escena">
+          {hero({ turnoId: jugadorActual.id })}
+          <div className="ubp-tarjeta ubp-listo">
+            <span className="ubp-listo-avatar" style={{ '--c': jugadorActual.color }}>{inicial(jugadorActual.nombre)}</span>
+            <p className="ubp-etiqueta">Pasa el móvil a</p>
+            <h2 className="ubp-listo-nombre">{jugadorActual.nombre}</h2>
+            <p className="ubp-texto">
+              {turnoIdx === 0
+                ? <>🎲 Abres la ronda. Coloca tu marcador real <strong>★</strong> y <strong>2 señuelos</strong> para despistar al siguiente.</>
+                : esUltimoTurno
+                  ? <>🏁 Eres el último: verás las marcas de <strong>{jugadorAnterior.nombre}</strong> con «?» y solo tendrás que colocar tu marcador real.</>
+                  : <>Verás las 3 marcas de <strong>{jugadorAnterior.nombre}</strong> con «?». Solo una es la buena… Coloca tu marcador real y 2 señuelos.</>}
+            </p>
+            <p className="ubp-turno-num">Turno {turnoIdx + 1} de {orden.length} · {SEGUNDOS_TURNO} segundos</p>
+          </div>
+          <div className="ubp-barra">
+            <button type="button" className="ubp-boton grande" onClick={() => setFase('turno')}>
               <Icon name="pin" size={22} /> Empezar mi turno
             </button>
           </div>
         </section>
       )}
 
-      {/* TURNO ACTIVO */}
+      {/* ---------- Turno ---------- */}
       {fase === 'turno' && jugadorActual && (
-        <section className="game">
-          <div className="panel qq-menu-panel">
-            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
-              <button
-                type="button"
-                className="qq-link-volver"
-                onClick={() => setModalSalirPortada(true)}
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M19 12H5M12 19l-7-7 7-7" />
-                </svg>
-                <span>Volver a la portada</span>
-              </button>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
-                  Ronda {ronda} de {totalRondas}
-                </span>
-                <button type="button" className="secondary ub-mini" onClick={() => setVerImagen(true)}>
-                  <Icon name="eye" size={16} /> Ver foto
-                </button>
-              </div>
-            </div>
-
-            <div className="timer" style={{ marginTop: '0', marginBottom: '0.8rem' }}>
-              <div className={`timer-bar${tiempoTurno <= 15 ? ' low' : ''}`} style={{ width: `${(tiempoTurno / SEGUNDOS_TURNO) * 100}%` }} />
-            </div>
-            <p className="timer-text" style={{ marginTop: '-0.4rem', marginBottom: '0.9rem' }}>
-              <Icon name="clock" size={16} /> {Math.ceil(tiempoTurno)} s
+        <section className="game ubp-escena">
+          {hero({ turnoId: jugadorActual.id })}
+          <BarraTiempo segundos={tiempoTurno} total={SEGUNDOS_TURNO} />
+          <div className="ubp-instruccion" style={{ '--c': jugadorActual.color }}>
+            <span className="ubp-avatar">{inicial(jugadorActual.nombre)}</span>
+            <p>
+              {slotActivo
+                ? <>Toca el mapa para colocar <strong>{SLOTS.find((s) => s.id === slotActivo).glifo} {SLOTS.find((s) => s.id === slotActivo).nombre}</strong></>
+                : <>Arrastra tus marcadores para afinar o confirma</>}
             </p>
-
-            <div className="ub-turno" style={{ '--c': jugadorActual.color }}>
-              <p className="ub-turno-titulo">
-                <span className="ub-punto" style={{ background: jugadorActual.color }} />
-                Turno de <strong>{jugadorActual.nombre}</strong>
-              </p>
-              <p className="ub-turno-texto">
-                {slotInfo ? <>Toca el mapa para colocar <strong>{slotInfo.glifo} {slotInfo.nombre}</strong>.</> : <>Arrastra el marcador para ajustarlo o confirma abajo.</>}
-              </p>
-            </div>
-
-            <MapaMundi
-              key={`turno-${ronda}-${jugadorActual.id}`}
-              marcadores={marcadoresTurno}
-              onClickMapa={colocar}
-              onMoverMarcador={moverMarcador}
-            />
-
-            <div className="ub-slots" style={{ gridTemplateColumns: esUltimoTurno ? '1fr' : 'repeat(3, 1fr)' }}>
-              {slotsActivos.map((s) => (
-                <button
-                  key={s.id}
-                  className={`ub-slot${slotActivo === s.id ? ' activo' : ''}${colocados[s.id] ? ' listo' : ''}`}
-                  style={{ '--c': jugadorActual.color }}
-                  onClick={() => setSlotActivo(s.id)}
-                  aria-pressed={slotActivo === s.id}
-                >
-                  <span className="ub-slot-glifo">{s.glifo}</span>
-                  <span>{s.nombre}</span>
-                  <small>{colocados[s.id] ? 'Colocado' : 'Sin colocar'}</small>
-                </button>
-              ))}
-            </div>
-
-            <button className="big full qq-btn-principal" disabled={colocadosN < slotsActivos.length} onClick={() => confirmar()}>
-              <Icon name="check" size={22} /> Confirmar {esUltimoTurno ? 'marcador real' : `marcadores (${colocadosN}/${slotsActivos.length})`}
-            </button>
+            {lugarActual && <BotonFoto src={lugarActual.imagenUrl} onClick={() => setVerImagen(true)} />}
           </div>
-        </section>
-      )}
 
-      {/* RESULTADOS */}
-      {fase === 'resultados' && resultado && (
-        <section className="game">
-          <div className="panel qq-menu-panel">
-            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
+          <MapaMundi
+            key={`turno-${ronda}-${jugadorActual.id}`}
+            marcadores={[
+              ...(anterior?.visibles ?? []).map((p, i) => ({
+                id: `previo-${i}`, lat: p.lat, lng: p.lng, color: jugadorAnterior.color, glifo: '?', fantasma: true, interactivo: false
+              })),
+              ...slotsActivos.filter((s) => colocados[s.id]).map((s) => ({
+                id: s.id, ...colocados[s.id], color: jugadorActual.color, glifo: s.glifo, grande: s.id === 'real', arrastrable: true
+              }))
+            ]}
+            onClickMapa={colocar}
+            onMoverMarcador={moverMarcador}
+          />
+
+          <div className={`ubp-slots${esUltimoTurno ? ' uno' : ''}`}>
+            {slotsActivos.map((s) => (
               <button
+                key={s.id}
                 type="button"
-                className="qq-link-volver"
-                onClick={() => setModalSalirPortada(true)}
+                className={`ubp-slot${slotActivo === s.id ? ' activo' : ''}${colocados[s.id] ? ' listo' : ''}`}
+                style={{ '--c': jugadorActual.color }}
+                onClick={() => setSlotActivo(s.id)}
+                aria-pressed={slotActivo === s.id}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M19 12H5M12 19l-7-7 7-7" />
-                </svg>
-                <span>Volver a la portada</span>
+                <span className="ubp-slot-glifo">{s.glifo}</span>
+                <span className="ubp-slot-nombre">{s.nombre}</span>
+                <small>{colocados[s.id] ? '✓ Colocado' : slotActivo === s.id ? 'Toca el mapa' : 'Pendiente'}</small>
               </button>
-              <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
-                Ronda {ronda} de {totalRondas}
-              </span>
-            </div>
+            ))}
+          </div>
 
-            <MapaMundi
-              key={`resultado-${ronda}`}
-              marcadores={marcadoresResultado}
-              lineas={lineasResultado}
-              ajustar
-              enfoque={enfoque}
-            />
-
-            <div className="ub-ranking" style={{ marginTop: '1rem' }}>
-              <h3 className="panel-title"><Icon name="trophy" size={22} /> Ranking de la ronda</h3>
-              <p className="ub-lugar-revelado">
-                <Icon name="pin" size={22} />
-                <span><strong>{resultado.lugar.nombre}</strong> · {resultado.lugar.pais}</span>
-              </p>
-
-              <div className="scoreboard">
-                {resultado.filas.map((f, i) => (
-                  <button
-                    key={f.jugador.id}
-                    className="ub-rank-fila"
-                    onClick={() => f.real && setEnfoque({ lat: f.real.lat, lng: f.real.lng })}
-                    title="Ver su marcador en el mapa"
-                    disabled={!f.real}
-                  >
-                    <span className="score-name">
-                      <span className="pos">{i + 1}</span>
-                      <span className="ub-punto" style={{ background: f.jugador.color }} />
-                      {f.jugador.nombre}
-                    </span>
-                    <span className="ub-rank-datos">
-                      <span className="ub-rank-km">{f.real ? formatearKm(f.km) : 'No colocado'}</span>
-                      <span className={`ub-rank-pts${f.puntos > 0 ? ' suma' : ''}`}>+{f.puntos}</span>
-                    </span>
-                  </button>
-                ))}
-              </div>
-
-              <Credito lugar={resultado.lugar} mostrarEnlace={true} />
-            </div>
-
-            <button className="big full qq-btn-principal" onClick={() => setFase('puntuaciones')}>
-              <Icon name="chart" size={22} /> Ver puntuaciones
+          <div className="ubp-barra estatica">
+            <button
+              type="button"
+              className="ubp-boton grande"
+              disabled={slotsActivos.some((s) => !colocados[s.id])}
+              onClick={() => confirmar()}
+            >
+              <Icon name="check" size={22} />
+              {esUltimoTurno ? 'Confirmar mi marcador' : `Confirmar marcadores (${slotsActivos.filter((s) => colocados[s.id]).length}/${slotsActivos.length})`}
             </button>
           </div>
         </section>
       )}
 
-      {/* PUNTUACIONES */}
-      {fase === 'puntuaciones' && (
-        <section className="game">
-          <div className="end-card ub-puntuaciones">
-            <span className="end-icon"><Icon name="trophy" size={44} /></span>
-            <h1 className="title">Puntuaciones</h1>
-            <p className="hint">Tras la ronda {ronda} de {totalRondas}</p>
-            <div className="scoreboard">
-              {clasificacion.map((j, i) => {
-                const pts = puntos[j.id] ?? 0;
-                const lider = maximo > 0 && pts === maximo;
-                return (
-                  <div key={j.id} className={`score-row${lider ? ' first' : ''}`}>
-                    <span className="score-name">
-                      {lider ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
-                      <span className="ub-punto" style={{ background: j.color }} />
-                      {j.nombre}
-                    </span>
-                    <span className="score-pts">
-                      <small className="ub-delta">+{ganadoEnRonda(j.id)}</small> {pts} pts
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
+      {/* ---------- Resultado de la ronda ---------- */}
+      {fase === 'resultados' && resultado && (
+        <section className="game ubp-escena">
+          {hero()}
+          <MapaMundi
+            key={`resultado-${ronda}`}
+            marcadores={[
+              { id: 'correcto', lat: resultado.lugar.lat, lng: resultado.lugar.lng, color: '#111827', glifo: '✓', grande: true, z: 1000, etiqueta: resultado.lugar.nombre },
+              ...resultado.filas.filter((f) => f.real).map((f) => ({
+                id: `jugador-${f.id}`, lat: f.real.lat, lng: f.real.lng, color: f.color, glifo: inicial(f.nombre), etiqueta: f.nombre
+              }))
+            ]}
+            lineas={resultado.filas.filter((f) => f.real).map((f) => ({ desde: f.real, hasta: resultado.lugar, color: f.color }))}
+            ajustar
+            enfoque={enfoque}
+          />
+          <TablaRonda lugar={resultado.lugar} filas={resultado.filas} onEnfocar={setEnfoque} />
+          <div className="ubp-barra estatica">
+            <button type="button" className="ubp-boton grande" onClick={() => setFase('puntuaciones')}>
+              <Icon name="chart" size={22} /> Ver clasificación
+            </button>
           </div>
+        </section>
+      )}
 
-          <div className="actions">
+      {/* ---------- Clasificación ---------- */}
+      {fase === 'puntuaciones' && (
+        <section className="game ubp-escena">
+          {hero()}
+          <Clasificacion jugadores={conPuntos} sumadas={sumadas} subtitulo={`Tras la ronda ${ronda} de ${totalRondas} · gana quien menos sume`} />
+          <div className="ubp-barra estatica">
             {esUltimaRonda ? (
-              <button onClick={() => setFase('final')}>
-                <Icon name="crown" size={20} /> Ver resultado final
+              <button type="button" className="ubp-boton grande" onClick={() => setFase('final')}>
+                <Icon name="crown" size={22} /> Ver resultado final
               </button>
             ) : (
               <>
-                <button onClick={siguienteRonda}>
-                  <Icon name="play" size={20} /> Siguiente ronda
+                <button type="button" className="ubp-boton grande" onClick={siguienteRonda}>
+                  <Icon name="play" size={22} /> Siguiente ronda
                 </button>
-                <button className="secondary danger" onClick={() => setFase('final')}>
-                  <Icon name="flagFinish" size={20} /> Finalizar el juego
+                <button type="button" className="ubp-enlace" onClick={() => setFase('final')}>
+                  <Icon name="flagFinish" size={16} /> Terminar la partida aquí
                 </button>
               </>
             )}
@@ -701,84 +423,23 @@ export default function UbicacionLocal({ onVolver, onExit, onAbrirAyuda }) {
         </section>
       )}
 
-      {/* FINAL */}
+      {/* ---------- Final ---------- */}
       {fase === 'final' && (
-        <section className="game">
-          <div className="end-card">
-            <span className="end-icon"><Icon name="crown" size={44} /></span>
-            <h1 className="title">Puntuaciones Finales</h1>
-            <p className="final-score">
-              {ganadores.length === 0
-                ? 'Nadie ha sumado puntos'
-                : ganadores.length === 1
-                  ? <>¡Gana {ganadores[0].nombre}!</>
-                  : <>Empate entre {ganadores.map((g) => g.nombre).join(', ')}</>}
-            </p>
-            <div className="scoreboard">
-              {clasificacion.map((j, i) => {
-                const pts = puntos[j.id] ?? 0;
-                const primero = maximo > 0 && pts === maximo;
-                return (
-                  <div key={j.id} className={`score-row${primero ? ' first' : ''}`}>
-                    <span className="score-name">
-                      {primero ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
-                      <span className="ub-punto" style={{ background: j.color }} />
-                      {j.nombre}
-                    </span>
-                    <span className="score-pts">{pts} pts</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="actions">
-            <button onClick={() => setFase('setup')}>
-              <Icon name="refresh" size={20} /> Nueva partida
+        <section className="game ubp-escena">
+          <Podio jugadores={conPuntos} />
+          <Clasificacion jugadores={conPuntos} titulo="Clasificación final" />
+          <div className="ubp-barra estatica">
+            <button type="button" className="ubp-boton grande" onClick={() => setFase('setup')}>
+              <Icon name="refresh" size={22} /> Nueva partida
             </button>
-            <button className="secondary danger" onClick={handleSalirAPortada}>
-              <Icon name="door" size={20} /> Volver a la portada
+            <button type="button" className="ubp-enlace" onClick={() => onExit?.()}>
+              <Icon name="home" size={16} /> Volver a la portada
             </button>
           </div>
         </section>
       )}
 
-      {/* MODAL: SALIR A LA PORTADA (MODO OFFLINE) */}
-      {modalSalirPortada && (
-        <div className="rg-modal-fondo" onClick={() => setModalSalirPortada(false)}>
-          <div
-            className="rg-modal"
-            onClick={(e) => e.stopPropagation()}
-            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
-          >
-            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
-            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
-              ¿Salir a la portada?
-            </h3>
-            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
-              Se cancelará la partida actual y volverás a la portada principal de juegos. ¿Estás seguro?
-            </p>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
-              <button
-                type="button"
-                className="secondary full"
-                onClick={() => setModalSalirPortada(false)}
-              >
-                No, continuar
-              </button>
-              <button
-                type="button"
-                className="secondary danger full"
-                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
-                onClick={handleSalirAPortada}
-              >
-                Sí, salir a portada
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {modalSalirPartida}
     </div>
   );
 }

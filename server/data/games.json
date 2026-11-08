@@ -44,7 +44,7 @@
   {
     "id": "ubicacion",
     "name": "Test del viajero",
-    "description": "Coloca un lugar o monumento icónico en un mapa satélite del mundo. Coloca una marca real y varios señuelos para engañar a tus rivales. Cuanto más cerca de las coordenadas reales dejes tu marca, más puntos obtendrás.",
+    "description": "Sitúa en el mapa del mundo un lugar o monumento icónico que solo verás unos segundos. Cada kilómetro de error suma un punto y gana quien menos acumule. En un solo dispositivo, además, deja señuelos para engañar al siguiente jugador.",
     "isNew": true
   },
   {

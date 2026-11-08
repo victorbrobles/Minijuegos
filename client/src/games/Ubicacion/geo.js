@@ -1,18 +1,9 @@
-// Utilidades de «Ubica el lugar»: distancias, puntuación por rangos y carga de fotos.
+// Utilidades de «Test del viajero»: distancias, puntuación y carga de fotos.
 
-// Nuevo sistema escalonado de puntuación según la distancia del marcador real
-export const RANGOS_PUNTOS = [
-  { hasta: 10, puntos: 10 },
-  { hasta: 50, puntos: 9 },
-  { hasta: 100, puntos: 8 },
-  { hasta: 200, puntos: 7 },
-  { hasta: 300, puntos: 6 },
-  { hasta: 500, puntos: 5 },
-  { hasta: 1000, puntos: 4 },
-  { hasta: 2000, puntos: 3 },
-  { hasta: 3000, puntos: 2 },
-  { hasta: 5000, puntos: 1 }
-];
+// Puntuación: cada jugador suma tantos puntos como kilómetros le separan del lugar.
+// Gana quien MENOS puntos tenga. Si no colocas tu marcador, sumas la penalización.
+export const PENALIZACION_SIN_MARCA = 20000;
+export const OPCIONES_RONDAS = [5, 10, 15];
 
 const RADIO_TIERRA_KM = 6371;
 const aRad = (grados) => (grados * Math.PI) / 180;
@@ -28,9 +19,10 @@ export function distanciaKm(a, b) {
 }
 
 export function puntosPorDistancia(km) {
-  const rango = RANGOS_PUNTOS.find((r) => km <= r.hasta);
-  return rango ? rango.puntos : 0;
+  return km == null || !Number.isFinite(km) ? PENALIZACION_SIN_MARCA : Math.round(km);
 }
+
+export const formatearPuntos = (n) => Math.round(n).toLocaleString('es-ES');
 
 export function formatearKm(km) {
   if (km < 1) return 'menos de 1 km';
