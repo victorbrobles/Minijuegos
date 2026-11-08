@@ -102,3 +102,8 @@ npm run dev
 - Partidas de 5, 10 o 15 rondas, en local (de 2 a 10 jugadores, con señuelos) u online.
 - Pantallas de partida en `Pantallas.jsx` (cabecera, foto, resultados, clasificación y podio); menús con los componentes comunes de `MenuJuego.jsx`.
 - Lugares en `server/data/seeds/ubicacion/ubicacion.seed.js` y `ampliacion.seed.js` (`l(id, nombre, país, lat, lng, artículo_de_Wikipedia_en_inglés)`). La foto se toma del artículo de Wikipedia; si no tiene foto de Commons, el lugar se descarta en esa partida.
+
+## Minijuego: La vida en colores (`Colores/`)
+- Pantallas de partida en `Pantallas.jsx` (paleta, huecos de colores, solución, clasificación y podio); menús con los componentes comunes.
+- Partidas de 10, 15 o 25 rondas y 45 s por respuesta. Online, el servidor cierra la ronda al acabar el tiempo y acepta selecciones incompletas.
+- Elementos en `server/data/seeds/colores/parteN.js` (`{ id, item, colores: [...] }`, con los colores de la paleta: rojo, azul, amarillo, verde, naranja, morado, marron, blanco, negro, gris, rosa). `parte6.js` es la ampliación.
