@@ -150,7 +150,10 @@ function elegir(p, clave) {
   return banco[idx];
 }
 
-function fijarTiempo(r, ahora, ms) {
+function fijarTiempo(r, ahora, ms, p = null) {
+  // En el modo local (un solo móvil que se pasa de mano en mano) no hay cuenta atrás:
+  // el reloj correría mientras el móvil cambia de manos. Solo la Prórroga se cronometra.
+  if (p?.local && r.tipo !== 'prorroga') return quitarTiempo(r);
   r.cierraEn = ahora + ms;
   r.totalMs = ms;
 }
@@ -179,7 +182,7 @@ function empezarFase(p) {
  * @param {{id:number,nombre:string}[]} jugadores
  * @param {{fases?:string[], duracion?:string}} config
  */
-export function crearPartida(jugadores, config = {}) {
+export function crearPartida(jugadores, config = {}, { local = false } = {}) {
   let fases = FASES.filter((f) => (config.fases || FASES).includes(f));
   if (fases.length === 0) fases = [...FASES];
   const duracion = DURACIONES[config.duracion] ? config.duracion : 'normal';
@@ -193,7 +196,8 @@ export function crearPartida(jugadores, config = {}) {
     rondaNum: 0,
     totalRondas: 0,
     usados: {},
-    ronda: null
+    ronda: null,
+    local: Boolean(local)
   };
   empezarFase(p);
   return p;
@@ -201,8 +205,42 @@ export function crearPartida(jugadores, config = {}) {
 
 export function marcarAusente(p, id) {
   const j = jugador(p, id);
-  if (j) j.ausente = true;
-  if (presentes(p).length < 2) p.estado = 'fin';
+  if (!j || j.ausente) return;
+  j.ausente = true;
+  if (presentes(p).length < 2) {
+    p.estado = 'fin';
+    p.ronda = null;
+    return;
+  }
+  // Si la ronda en curso esperaba a quien se ha ido, se resuelve ya (antes se quedaba esperando al reloj
+  // o, en la Prórroga, bloqueada para siempre porque solo el que describe podía empezar).
+  if (p.estado !== 'ronda' || !p.ronda) return;
+  const r = p.ronda;
+  const pres = presentes(p);
+  switch (r.tipo) {
+    case 'vestuario':
+      if (r.etapa === 'respondiendo' && pres.every((x) => r.respuestas[x.id] !== undefined)) revelarVestuario(p);
+      break;
+    case 'quiniela':
+      if (r.etapa === 'respondiendo' && pres.every((x) => r.respuestas[x.id] !== undefined)) revelarQuiniela(p);
+      break;
+    case 'rebote':
+      if (r.etapa === 'j1' && r.activoId === id) revelarRebote(p, { ausente: true });
+      else if (r.etapa === 'rebote' && r.reboteId === id) revelarRebote(p, { intento: r.intento, ausente: true });
+      break;
+    case 'prorroga':
+      if (r.describidorId === id) terminarProrroga(p);
+      break;
+    case 'penaltis':
+      if (r.tiradorId === id) {
+        r.gol = false;
+        r.etapa = 'revelado';
+        terminarRonda(p);
+      }
+      break;
+    default:
+      break;
+  }
 }
 
 // ------------------------------------------------------------------- rondas
@@ -214,7 +252,7 @@ function iniciarRonda(p, ahora) {
     case 'vestuario': {
       const pregunta = elegir(p, 'vestuario');
       p.ronda = { tipo: 'vestuario', pregunta, respuestas: {}, etapa: 'respondiendo', resultado: null };
-      fijarTiempo(p.ronda, ahora, TIEMPO.vestuario);
+      fijarTiempo(p.ronda, ahora, TIEMPO.vestuario, p);
       break;
     }
     case 'rebote': {
@@ -231,7 +269,7 @@ function iniciarRonda(p, ahora) {
         intento: null,
         resultado: null
       };
-      fijarTiempo(p.ronda, ahora, TIEMPO.rebote);
+      fijarTiempo(p.ronda, ahora, TIEMPO.rebote, p);
       break;
     }
     case 'quiniela': {
@@ -246,7 +284,7 @@ function iniciarRonda(p, ahora) {
         etapa: 'respondiendo',
         resultado: null
       };
-      fijarTiempo(p.ronda, ahora, TIEMPO.quiniela);
+      fijarTiempo(p.ronda, ahora, TIEMPO.quiniela, p);
       break;
     }
     case 'prorroga': {
@@ -278,7 +316,7 @@ function iniciarRonda(p, ahora) {
         puntos: 0,
         resultado: null
       };
-      fijarTiempo(p.ronda, ahora, TIEMPO.penaltis);
+      fijarTiempo(p.ronda, ahora, TIEMPO.penaltis, p);
       break;
     }
     default:
@@ -528,7 +566,7 @@ function responder(p, a, ahora) {
           return ok();
         }
         r.etapa = 'rebote';
-        fijarTiempo(r, ahora, TIEMPO.rebote);
+        fijarTiempo(r, ahora, TIEMPO.rebote, p);
         return ok();
       }
       if (r.etapa === 'rebote') {
@@ -577,7 +615,7 @@ function tirar(p, a, ahora) {
   r.opciones = opciones;
   r.correcta = opciones.indexOf(buena);
   r.etapa = 'pregunta';
-  fijarTiempo(r, ahora, TIEMPO.penaltis);
+  fijarTiempo(r, ahora, TIEMPO.penaltis, p);
   return ok();
 }
 

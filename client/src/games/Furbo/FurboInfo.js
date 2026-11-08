@@ -1,4 +1,4 @@
-// client/src/games/Furbo/furboInfo.js
+// client/src/games/Furbo/FurboInfo.js
 // Textos de las fases: se usan en la ayuda de los menús y en la pantalla de presentación de cada fase.
 
 export const FASES_INFO = {
@@ -42,7 +42,7 @@ export const FASES_INFO = {
     lema: 'Palabras prohibidas',
     resumen: 'Un jugador describe un concepto de fútbol sin decir las palabras prohibidas.',
     reglas: [
-      'Por turnos, un jugador ve en su pantalla una palabra y <strong>4 palabras prohibidas</strong>. Tiene <strong>60 segundos</strong>.',
+      'Por turnos, un jugador ve en su pantalla una palabra y sus <strong>palabras prohibidas</strong>. Tiene <strong>60 segundos</strong>.',
       'Debe describirla en voz alta para que los demás la adivinen, sin decir ni la palabra ni las prohibidas.',
       '<strong>✅ Acertada:</strong> +1 para quien describe y +1 para quien la adivinó. <strong>⏭️ Pasar:</strong> 0 puntos. <strong>🚫 Prohibida:</strong> si dice una palabra prohibida, resta −1.',
       'Se avanza a la siguiente palabra hasta que se acabe el tiempo.'
@@ -69,3 +69,11 @@ export const DURACIONES_INFO = {
 };
 
 export const ORDEN_FASES = ['vestuario', 'rebote', 'quiniela', 'prorroga', 'penaltis'];
+
+export const PUNTOS_INFO = [
+  ['🧤 Vestuario: coincidir con otro jugador', '+2'],
+  ['🎯 Rebote: clavar el dato / acertar el rebote', '+3 / +1'],
+  ['📋 Quiniela: acertar la opción', '+2'],
+  ['🗣️ Prórroga: palabra acertada (quien describe y quien adivina) / palabra prohibida', '+1 / −1'],
+  ['⚽ Penaltis: gol al centro / gol a la escuadra', '+1 / +3']
+];

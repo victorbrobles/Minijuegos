@@ -1,90 +1,45 @@
 // client/src/games/Furbo/FurboComun.jsx
 // Piezas compartidas por el modo local y el online: ayuda y configuración del partido.
-import React, { useState } from 'react';
-import { FASES_INFO, DURACIONES_INFO, ORDEN_FASES } from './FurboInfo.js';
+import React from 'react';
+import { FASES_INFO, DURACIONES_INFO, ORDEN_FASES, PUNTOS_INFO } from './FurboInfo.js';
 import './Furbo.css';
-import '../Adivina/Adivina.css';
 
-/** Botón «?» + modal con las reglas de todas las fases (mismo estilo que Buscaminas) */
-export function AyudaFurbo({ online = false }) {
-  const [abierto, setAbierto] = useState(false);
-
+/** Modal «Cómo jugar» (mismo formato que el resto de juegos). */
+export function AyudaFurbo({ titulo, descripcion, onCerrar }) {
   return (
-    <>
-      <button
-        type="button"
-        className={online ? 'btn-ayuda-flotante' : 'aprox-btn-ayuda'}
-        onClick={() => setAbierto(true)}
-        title="Reglas del juego"
-      >
-        <span className={online ? 'btn-ayuda-flotante-signo' : 'aprox-btn-ayuda-signo'}>?</span>
-      </button>
-
-      {abierto && (
-        <div className="rg-modal-fondo" onClick={() => setAbierto(false)}>
-          <div className="rg-modal aprox-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-            <div className="aprox-modal-header">
-              {online && <span className="aprox-modal-signo-title">?</span>}
-              <h3>¿Cómo se juega a Furbo?</h3>
-            </div>
-
-            <div className="aprox-modal-cuerpo">
-              <p>
-                <strong>Furbo</strong> es un partido de preguntas y juegos de fútbol dividido en 5 fases.
-                {online
-                  ? ' Cada jugador usa su propio dispositivo y el anfitrión controla el ritmo de la partida.'
-                  : ' Se juega con un solo dispositivo pasando el turno: cuando toque responder en secreto, la pantalla avisará de a quién pasárselo.'}
-              </p>
-
-              {ORDEN_FASES.map((id, index) => {
-                const f = FASES_INFO[id];
-                return (
-                  <React.Fragment key={id}>
-                    <p><strong>{index + 1}. {f.emoji} {f.nombre} ({f.lema}):</strong></p>
-                    <ul>
-                      {f.reglas.map((r, i) => (
-                        // eslint-disable-next-line react/no-danger
-                        <li key={i} dangerouslySetInnerHTML={{ __html: r }} />
-                      ))}
-                    </ul>
-                  </React.Fragment>
-                );
-              })}
-
-              <p><strong>Resumen de puntuación por fase:</strong></p>
-              <div className="aprox-tabla-puntos">
-                <div className="aprox-puntos-fila acierto">
-                  <span>🧤 Vestuario (coincidir respuesta)</span>
-                  <strong>+2 puntos</strong>
-                </div>
-                <div className="aprox-puntos-fila intermedia" style={{ background: '#fef3c7', color: '#92400e' }}>
-                  <span>🎯 Rebote (clavar dato / acertar rebote)</span>
-                  <strong>+3 / +1 pt</strong>
-                </div>
-                <div className="aprox-puntos-fila acierto">
-                  <span>📋 Quiniela 1X2 (acertar opción)</span>
-                  <strong>+2 puntos</strong>
-                </div>
-                <div className="aprox-puntos-fila intermedia" style={{ background: '#e0e7ff', color: '#3730a3' }}>
-                  <span>🗣️ Prórroga (palabra acertada / prohibida)</span>
-                  <strong>+1 / −1 pt</strong>
-                </div>
-                <div className="aprox-puntos-fila acierto" style={{ background: '#ede9fe', color: '#5b21b6' }}>
-                  <span>⚽ Penaltis (al centro / a la escuadra)</span>
-                  <strong>+1 / +3 pts</strong>
-                </div>
-              </div>
-            </div>
-
-            <div className="rg-modal-acciones">
-              <button className="big full" onClick={() => setAbierto(false)}>
-                Entendido
-              </button>
-            </div>
+    <div className="rg-modal-fondo" onClick={onCerrar}>
+      <div className="rg-modal qq-modal-ayuda" onClick={(e) => e.stopPropagation()}>
+        <div className="qq-modal-ayuda-header">
+          <span className="qq-ayuda-badge">❓ Cómo jugar</span>
+          <h3>{titulo}</h3>
+        </div>
+        <div className="qq-modal-ayuda-body">
+          <p>{descripcion}</p>
+          <p>Online, cada jugador usa su móvil y el anfitrión marca el ritmo. En un solo dispositivo, la pantalla avisa de a quién pasar el móvil cuando toca responder en secreto (y no hay cuenta atrás salvo en la Prórroga).</p>
+          {ORDEN_FASES.map((id, i) => {
+            const f = FASES_INFO[id];
+            return (
+              <React.Fragment key={id}>
+                <p className="fbp-ayuda-sub">{i + 1}. {f.emoji} {f.nombre} · {f.lema}</p>
+                <ul>
+                  {f.reglas.map((r, k) => (
+                    // eslint-disable-next-line react/no-danger
+                    <li key={k} dangerouslySetInnerHTML={{ __html: r }} />
+                  ))}
+                </ul>
+              </React.Fragment>
+            );
+          })}
+          <p className="fbp-ayuda-sub">🏆 Puntuación</p>
+          <div className="fbp-tabla-puntos">
+            {PUNTOS_INFO.map(([txt, pts]) => (
+              <div key={txt}><span>{txt}</span><strong>{pts}</strong></div>
+            ))}
           </div>
         </div>
-      )}
-    </>
+        <button type="button" className="big full qq-btn-principal" onClick={onCerrar}>¡Entendido!</button>
+      </div>
+    </div>
   );
 }
 
@@ -92,7 +47,7 @@ export function AyudaFurbo({ online = false }) {
  * Selección de fases y duración del partido.
  * onChange === null  ->  solo lectura (jugadores que no son anfitrión)
  */
-export function ConfigPartida({ config, onChange }) {
+export function ConfigPartida({ config, onChange, numJugadores = null }) {
   const editable = typeof onChange === 'function';
 
   const alternarFase = (id) => {
@@ -103,48 +58,54 @@ export function ConfigPartida({ config, onChange }) {
     onChange({ ...config, fases });
   };
 
+  const porJugador = { corto: 1, normal: 2, largo: 3 }[config.duracion] || 2;
+  const rondas = numJugadores ? numJugadores * porJugador * config.fases.length : null;
+
   return (
-    <>
-      <span className="field-label">Fases del partido</span>
-      <div className="furbo-fases-config">
+    <div className="fbp-config">
+      <span className="qq-label-destacado">Fases del partido</span>
+      <div className="fbp-fases">
         {ORDEN_FASES.map((id) => {
           const f = FASES_INFO[id];
           const activa = config.fases.includes(id);
           return (
-            <label
+            <button
               key={id}
-              className={`furbo-fase-check ${activa ? 'activa' : ''} ${editable ? '' : 'solo-lectura'}`}
+              type="button"
+              className={`fbp-fase ${activa ? 'activa' : ''}`}
+              disabled={!editable}
+              aria-pressed={activa}
+              onClick={() => alternarFase(id)}
             >
-              <input
-                type="checkbox"
-                checked={activa}
-                disabled={!editable}
-                onChange={() => alternarFase(id)}
-              />
-              <div className="furbo-fase-texto">
-                <strong>{f.emoji} {f.nombre}</strong>
+              <span className="fbp-fase-emoji">{f.emoji}</span>
+              <span className="fbp-fase-texto">
+                <strong>{f.nombre}</strong>
                 <small>{f.resumen}</small>
-              </div>
-            </label>
+              </span>
+              <span className="fbp-fase-check">{activa ? '✓' : ''}</span>
+            </button>
           );
         })}
       </div>
 
-      <span className="field-label">Duración</span>
-      <div className="furbo-duracion">
+      <span className="qq-label-destacado" style={{ marginTop: '1rem' }}>Duración</span>
+      <div className="fbp-pildoras">
         {Object.entries(DURACIONES_INFO).map(([id, d]) => (
           <button
             key={id}
             type="button"
-            className={`secondary ${config.duracion === id ? 'activa' : ''}`}
+            className={`fbp-pildora ${config.duracion === id ? 'activo' : ''}`}
             disabled={!editable}
             onClick={() => editable && onChange({ ...config, duracion: id })}
-            title={d.detalle}
           >
             {d.nombre}
           </button>
         ))}
       </div>
-    </>
+      <p className="hint small" style={{ margin: '0.5rem 0 0' }}>
+        {DURACIONES_INFO[config.duracion]?.detalle}
+        {rondas ? ` · unas ${rondas} rondas en total con ${numJugadores} jugadores.` : '.'}
+      </p>
+    </div>
   );
 }

@@ -33,7 +33,7 @@ router.post('/local/nueva', (req, res) => {
     return res.status(400).json({ ok: false, error: `Debe haber entre ${MIN_JUGADORES} y ${MAX_JUGADORES} jugadores.` });
   }
   const jugadores = nombres.map((n, i) => ({ id: i + 1, nombre: limpiarNombre(n) || `Jugador ${i + 1}` }));
-  const partida = crearPartida(jugadores, limpiarConfig(req.body?.config));
+  const partida = crearPartida(jugadores, limpiarConfig(req.body?.config), { local: true });
   res.json({ ok: true, partida, vista: vista(partida, null, { todo: true }) });
 });
 
@@ -102,7 +102,7 @@ router.post('/online/crear', (req, res) => {
     adminToken: token,
     estado: 'lobby', // 'lobby' | 'jugando'
     config: limpiarConfig({}),
-    jugadores: [{ id: 1, nombre, token }],
+    jugadores: [{ id: 1, nombre, token, visto: Date.now() }],
     siguienteId: 2,
     partida: null,
     ultimaActividad: Date.now()
@@ -126,7 +126,7 @@ router.post('/online/unirse', (req, res) => {
 
   const token = nuevoToken();
   const id = sala.siguienteId++;
-  sala.jugadores.push({ id, nombre, token });
+  sala.jugadores.push({ id, nombre, token, visto: Date.now() });
   sala.ultimaActividad = Date.now();
   res.json({ success: true, code: sala.code, token, jugadorId: id });
 });
@@ -137,6 +137,7 @@ router.get('/online/sala/:code', (req, res) => {
 
   const yo = jugadorPorToken(sala, req.query.token);
   if (!yo) return res.status(403).json({ error: 'No perteneces a esta sala.' });
+  yo.visto = Date.now();
 
   let v = null;
   if (sala.partida) {
@@ -151,7 +152,8 @@ router.get('/online/sala/:code', (req, res) => {
     config: sala.config,
     esAdmin: sala.adminToken === req.query.token,
     yoId: yo.id,
-    jugadores: sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre })),
+    anfitrionId: sala.jugadores.find((j) => j.token === sala.adminToken)?.id ?? null,
+    jugadores: sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre, conectado: Date.now() - (j.visto || 0) < 15000 })),
     vista: v
   });
 });
@@ -169,6 +171,10 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
   if (!sala) return res.status(404).json({ error: 'La sala no existe.' });
   if (sala.adminToken !== req.body?.token) return res.status(403).json({ error: 'Solo el anfitrión puede iniciar.' });
   if (sala.jugadores.length < MIN_JUGADORES) return res.status(400).json({ error: 'Se necesitan al menos 2 jugadores.' });
+  // Un doble toque en «Pitido inicial» reiniciaba la partida que acababa de empezar
+  if (sala.estado === 'jugando' && sala.partida && sala.partida.estado !== 'fin') {
+    return res.status(400).json({ error: 'La partida ya está en marcha.' });
+  }
 
   sala.partida = crearPartida(
     sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre })),
@@ -202,6 +208,19 @@ router.post('/online/sala/:code/reiniciar', (req, res) => {
   if (!sala || sala.adminToken !== req.body?.token) return res.status(403).json({ error: 'No autorizado.' });
   sala.estado = 'lobby';
   sala.partida = null;
+  res.json({ success: true });
+});
+
+// El anfitrión quita de la sala de espera a alguien que se ha quedado colgado
+router.post('/online/sala/:code/expulsar', (req, res) => {
+  const sala = obtenerSala(req);
+  if (!sala || sala.adminToken !== req.body?.token) return res.status(403).json({ error: 'No autorizado.' });
+  if (sala.estado !== 'lobby') return res.status(400).json({ error: 'Solo se puede quitar a alguien en la sala de espera.' });
+  const id = Number(req.body?.id);
+  const idx = sala.jugadores.findIndex((j) => j.id === id);
+  if (idx === -1) return res.status(404).json({ error: 'Ese jugador ya no está en la sala.' });
+  if (sala.jugadores[idx].token === sala.adminToken) return res.status(400).json({ error: 'No puedes quitarte a ti mismo.' });
+  sala.jugadores.splice(idx, 1);
   res.json({ success: true });
 });
 

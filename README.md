@@ -108,6 +108,11 @@ npm run dev
 - Partidas de 10, 15 o 25 rondas y 45 s por respuesta. Online, el servidor cierra la ronda al acabar el tiempo y acepta selecciones incompletas.
 - Elementos en `server/data/seeds/colores/parteN.js` (`{ id, item, colores: [...] }`, con los colores de la paleta: rojo, azul, amarillo, verde, naranja, morado, marron, blanco, negro, gris, rosa). `parte6.js` es la ampliación.
 
+## Minijuego: Furbo! (`Furbo/`)
+- Menús, sala de espera y selector de jugadores con los componentes comunes; partida en `FurboPartida.jsx` (cabecera con fase, ronda, reloj y marcador, que muestra lo sumado en cada ronda) para los dos modos.
+- Lógica en `server/lib/furboEngine.js`. En un solo dispositivo no hay cuenta atrás (el móvil cambia de manos), salvo en la Prórroga. Si alguien abandona online, la ronda que le esperaba se resuelve al momento.
+- Preguntas en `server/data/seeds/furbo/bancos/` (`base.js`, `manual.js` y las generadas desde `hechos.js`), unidas en `preguntas.js`.
+
 ## Minijuego: Traiciones (`Traiciones/`)
 - Solo online (un móvil por jugador, de 4 a 12). Menús y sala de espera con los componentes comunes; el anfitrión puede quitar a quien se haya quedado colgado en la sala.
 - Pantallas de partida en `Vistas.jsx` (cabecera con la sala o la fase, mapa, tareas, armas del traidor, debate, votación, veredicto y final) y pruebas de cada sala en `Minijuegos.jsx`.

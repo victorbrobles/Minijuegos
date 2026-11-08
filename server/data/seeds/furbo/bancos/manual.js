@@ -438,7 +438,7 @@ export const PROHIBIDAS = [
   ["El ascenso", "Segunda", "Subir", "Primera", "Playoff"],
   ["El play-off", "Eliminatoria", "Ascenso", "Final", "Promoción"],
   ["La concentración", "Hotel", "Equipo", "Víspera", "Partido"],
-  ["El vestuario", "Cambiarse", "Equipo", "Camiseta", "Duchas"]
+  ["El vestuario", "Cambiarse", "Equipo", "Camiseta", "Duchas"],
   ["La maldición de Béla Guttmann", "Benfica", "Cien años", "Final", "Europa"],
   ["El milagro de Estambul", "Liverpool", "Milan", "Tres", "Remontada"],
   ["La jaula", "Mourinho", "Defensa", "Messi", "Marcaje"],
