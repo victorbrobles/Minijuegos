@@ -1,121 +1,445 @@
 /* client/src/games/Impostor/Impostor.css */
 
-.imp-restriccion-box {
-  background: #fef2f2;
-  border: 1.5px solid #fecaca;
-  border-radius: 14px;
-  padding: 1.1rem 1.4rem;
-  margin: 1rem auto 0;
-  max-width: 500px;
-  text-align: center;
+body:has(.qq-en-partida) .back:not(.qq-btn-volver-sala) {
+  display: none !important;
 }
 
-.imp-restriccion-tag {
-  display: inline-block;
-  font-size: 0.78rem;
-  font-weight: 800;
-  color: #dc2626;
-  letter-spacing: 0.5px;
-  margin-bottom: 0.35rem;
+.imp-contenedor {
+  width: 100%;
+  position: relative;
+  min-height: 100vh;
+  padding-bottom: 2rem;
 }
 
-.imp-restriccion-texto {
-  margin: 0;
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: #991b1b;
-  line-height: 1.4;
-}
-
-/* Botones de selección de ganador (Impostor / Pueblo) */
-.imp-btn-ganador {
-  flex: 1;
-  padding: 1.1rem 1rem !important;
-  background: #ffffff !important;
-  color: #1e293b !important; /* Texto oscuro visible */
-  border: 2px solid #cbd5e1 !important;
-  border-radius: 16px !important;
-  font-size: 1.05rem !important;
-  font-weight: 800 !important;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
-}
-
-.imp-btn-ganador:hover {
-  border-color: #6366f1 !important;
-  color: #4f46e5 !important;
-  background: #f8fafc !important;
-}
-
-/* Estado seleccionado */
-.imp-btn-ganador.activa {
-  background: #eef2ff !important;
-  color: #4338ca !important; /* Texto violeta oscuro con máximo contraste */
-  border-color: #4f46e5 !important;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25) !important;
-}
-
-/* client/src/games/Impostor/Impostor.css */
-
-.imp-restriccion-box {
-  background: #fef2f2;
-  border: 1.5px solid #fecaca;
-  border-radius: 14px;
-  padding: 1.1rem 1.4rem;
-  margin: 1rem auto 0;
-  max-width: 500px;
-  text-align: center;
-}
-
-.imp-restriccion-tag {
-  display: inline-block;
-  font-size: 0.78rem;
-  font-weight: 800;
-  color: #dc2626;
-  letter-spacing: 0.5px;
-  margin-bottom: 0.35rem;
-}
-
-.imp-restriccion-texto {
-  margin: 0;
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: #991b1b;
-  line-height: 1.4;
-}
-
-/* Botones de selección de ganador (Impostor / Pueblo) */
-.imp-btn-ganador {
-  flex: 1;
-  padding: 1.1rem 1rem !important;
-  background: #ffffff !important;
-  color: #1e293b !important;
-  border: 2px solid #cbd5e1 !important;
-  border-radius: 16px !important;
-  font-size: 1.05rem !important;
-  font-weight: 800 !important;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
-}
-
-.imp-btn-ganador:hover {
-  border-color: #6366f1 !important;
-  color: #4f46e5 !important;
-  background: #f8fafc !important;
-}
-
-.imp-btn-ganador.activa {
-  background: #eef2ff !important;
-  color: #4338ca !important;
-  border-color: #4f46e5 !important;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25) !important;
+.imp-contenedor > .game {
+  max-width: 960px;
+  margin: 0 auto;
+  padding-top: 1rem;
 }
 
 /* ========================================================
-   LOBBY ONLINE: TARJETAS CON EL COLOR TEMÁTICO DEL JUEGO
+   MENÚS PREVIOS Y BARRA INTERNA (IDÉNTICO A BUSCAMINAS / QUIÉN ES QUIÉN)
    ======================================================== */
+
+.qq-menu-panel {
+  position: relative;
+  padding: 1.6rem 1.6rem 2rem !important;
+  border-radius: 26px !important;
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%) !important;
+  border: 1.5px solid #e2e8f0 !important;
+  box-shadow: 0 18px 38px -12px rgba(15, 23, 42, 0.35) !important;
+}
+
+.qq-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 0.6rem;
+}
+
+.qq-card-top.solo-derecha {
+  justify-content: flex-end;
+}
+
+.qq-link-volver {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0.3rem 0.5rem !important;
+  margin-left: -0.4rem;
+  font-size: 0.92rem !important;
+  font-weight: 700 !important;
+  color: #64748b !important;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 8px !important;
+  transition: color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+}
+
+.qq-link-volver:hover {
+  color: var(--g1, #334155) !important;
+  background: #f1f5f9 !important;
+  transform: translateX(-2px);
+}
+
+.qq-btn-ayuda {
+  width: 34px !important;
+  height: 34px !important;
+  min-width: 34px !important;
+  padding: 0 !important;
+  border-radius: 50% !important;
+  background: #f8fafc !important;
+  border: 1.5px solid #cbd5e1 !important;
+  color: var(--g1, #334155) !important;
+  font-size: 1rem !important;
+  font-weight: 900 !important;
+  display: grid !important;
+  place-items: center !important;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  box-shadow: 0 2px 6px rgba(51, 65, 85, 0.12);
+}
+
+.qq-btn-ayuda:hover {
+  background: var(--g1, #334155) !important;
+  color: #ffffff !important;
+  border-color: var(--g1, #334155) !important;
+  transform: scale(1.07);
+}
+
+.qq-hero-icono {
+  width: 76px;
+  height: 76px;
+  border-radius: 24px;
+  margin: 0 auto 0.9rem;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  color: var(--g1, #1e293b);
+  box-shadow: 0 8px 20px -6px rgba(30, 41, 59, 0.3);
+}
+
+.qq-hero-icono.chico {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.qq-main-title {
+  font-size: 1.85rem !important;
+  font-weight: 900 !important;
+  color: #0f172a !important;
+  margin: 0 0 0.45rem !important;
+  letter-spacing: -0.5px;
+}
+
+.qq-main-desc {
+  max-width: 440px;
+  margin: 0 auto 1.4rem !important;
+  font-size: 0.96rem !important;
+  line-height: 1.5 !important;
+  color: #64748b !important;
+}
+
+.qq-menu-opciones {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  width: 100%;
+  margin-top: 0.6rem;
+}
+
+.qq-opcion-card {
+  display: flex !important;
+  align-items: center !important;
+  gap: 1rem !important;
+  width: 100% !important;
+  text-align: left !important;
+  padding: 1.15rem 1.25rem !important;
+  border-radius: 20px !important;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.qq-opcion-card.principal {
+  background: linear-gradient(135deg, var(--g1, #334155) 0%, var(--g2, #0f172a) 100%) !important;
+  border: 2px solid transparent !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 22px -6px rgba(15, 23, 42, 0.45) !important;
+}
+
+.qq-opcion-card.principal:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 26px -6px rgba(15, 23, 42, 0.6) !important;
+  filter: brightness(1.04);
+}
+
+.qq-opcion-card.secundaria {
+  background: #ffffff !important;
+  border: 2px solid #e2e8f0 !important;
+  color: #0f172a !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04) !important;
+}
+
+.qq-opcion-card.secundaria:hover {
+  border-color: var(--g1, #334155) !important;
+  background: #f8fafc !important;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px -6px rgba(51, 65, 85, 0.18) !important;
+}
+
+.qq-opcion-icono {
+  width: 50px;
+  height: 50px;
+  border-radius: 15px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.qq-opcion-card.principal .qq-opcion-icono {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+.qq-opcion-card.secundaria .qq-opcion-icono {
+  background: #f1f5f9;
+  color: var(--g1, #334155);
+}
+
+.qq-opcion-textos {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.qq-opcion-textos strong {
+  font-size: 1.12rem;
+  font-weight: 800;
+}
+
+.qq-opcion-card.principal .qq-opcion-textos span {
+  font-size: 0.86rem;
+  color: rgba(255, 255, 255, 0.88);
+  line-height: 1.35;
+}
+
+.qq-opcion-card.secundaria .qq-opcion-textos span {
+  font-size: 0.86rem;
+  color: #64748b;
+  line-height: 1.35;
+}
+
+/* Formularios (Crear / Unirse) */
+.lb-form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.qq-form-estilizado {
+  margin-top: 1rem;
+  text-align: left;
+  gap: 0.4rem;
+}
+
+.qq-input-moderno {
+  width: 100%;
+  padding: 0.85rem 1rem !important;
+  border-radius: 14px !important;
+  border: 2px solid #e2e8f0 !important;
+  background: #f8fafc !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  color: #0f172a !important;
+  transition: all 0.18s ease;
+}
+
+.qq-input-moderno:focus {
+  outline: none !important;
+  border-color: var(--g1, #334155) !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 4px rgba(51, 65, 85, 0.15) !important;
+}
+
+.lb-input-codigo {
+  font-size: 1.6rem !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 4px !important;
+  text-align: center !important;
+  padding: 0.7rem !important;
+}
+
+.qq-btn-principal {
+  margin-top: 1.1rem;
+  background: linear-gradient(135deg, var(--g1, #334155) 0%, var(--g2, #0f172a) 100%) !important;
+  border-radius: 18px !important;
+  font-weight: 800 !important;
+  box-shadow: 0 10px 22px -6px rgba(15, 23, 42, 0.45) !important;
+}
+
+/* ========================================================
+   CONFIGURACIÓN DE JUGADORES Y SALA DE ESPERA
+   ======================================================== */
+
+.qq-config-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 0.2rem 0 1.3rem;
+  text-align: left;
+}
+
+.qq-config-titulo {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: #0f172a;
+}
+
+.qq-config-sub {
+  margin: 0.15rem 0 0;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.qq-label-destacado {
+  font-size: 0.84rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #475569;
+  margin-bottom: 0.55rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.qq-selector-cantidad-box {
+  background: #f1f5f9;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 1rem 1.1rem;
+  text-align: left;
+}
+
+.qq-stepper-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.qq-stepper-btn {
+  width: 44px !important;
+  height: 44px !important;
+  min-width: 44px !important;
+  padding: 0 !important;
+  border-radius: 13px !important;
+  background: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  color: #1e293b !important;
+  font-size: 1.35rem !important;
+  font-weight: 800 !important;
+  display: grid !important;
+  place-items: center !important;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.qq-stepper-btn:hover:not(:disabled) {
+  border-color: var(--g1, #334155) !important;
+  color: var(--g1, #334155) !important;
+  background: #f8fafc !important;
+}
+
+.qq-stepper-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.qq-select-jugadores {
+  flex: 1;
+  height: 44px;
+  border-radius: 13px !important;
+  border: 1.5px solid #cbd5e1 !important;
+  background: #ffffff !important;
+  font-weight: 800 !important;
+  font-size: 1rem !important;
+  color: #0f172a !important;
+  text-align: center;
+  padding: 0 0.8rem !important;
+}
+
+.qq-nombres-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.qq-jugador-input-card {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  border-radius: 15px;
+  padding: 0.4rem 0.7rem;
+  transition: all 0.18s ease;
+}
+
+.qq-jugador-input-card:focus-within {
+  border-color: var(--g1, #334155);
+  box-shadow: 0 0 0 3px rgba(51, 65, 85, 0.14);
+}
+
+.qq-jugador-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, var(--g1, #334155) 0%, var(--g2, #0f172a) 100%);
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.qq-jugador-input-card input {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0.45rem 0.2rem !important;
+  font-size: 0.96rem !important;
+  font-weight: 700 !important;
+  color: #1e293b !important;
+  width: 100%;
+}
+
+.qq-jugador-input-card input:focus {
+  outline: none !important;
+}
+
+/* Lobby online */
+.qq-codigo-btn {
+  background: #f8fafc !important;
+  border: 2.5px dashed var(--g1, #334155) !important;
+  border-radius: 18px !important;
+  padding: 0.5rem 1.8rem !important;
+  font-size: 3.2rem !important;
+  letter-spacing: 6px;
+  color: var(--g1, #0f172a) !important;
+  font-weight: 900 !important;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin: 0.6rem auto;
+  display: inline-block;
+}
+
+.qq-codigo-btn:hover {
+  transform: scale(1.03);
+  background: #e2e8f0 !important;
+}
+
+.lb-luna {
+  display: grid;
+  place-items: center;
+  margin: 0 auto 0.8rem;
+}
+
+.lb-luna.chica {
+  width: 68px;
+  height: 68px;
+  color: var(--g1, #334155);
+  background: #f1f5f9;
+  border-radius: 50%;
+}
 
 .lb-lista {
   display: grid;
@@ -130,8 +454,7 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.85rem 1.1rem;
-  /* Utiliza el color o degradado principal del juego actual con fallback a azul/índigo */
-  background: var(--g1, var(--c, #4f46e5));
+  background: var(--g1, #334155);
   border: 2px solid rgba(255, 255, 255, 0.35);
   border-radius: 16px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
@@ -147,28 +470,11 @@
   filter: brightness(1.05);
 }
 
-/* Tarjeta destacada cuando eres tú: brillo blanco sutil y borde marcado */
 .lb-jug.yo {
   border-color: #ffffff;
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.45), 0 6px 18px rgba(0, 0, 0, 0.18);
 }
 
-/* Punto indicador de conexión adaptado a fondo oscuro */
-.lb-punto {
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-  flex-shrink: 0;
-  background: rgba(255, 255, 255, 0.6);
-}
-
-.lb-punto.on {
-  background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.35);
-  animation: pulsoOnlineBlanco 1.8s infinite;
-}
-
-/* Texto del jugador en blanco de alto contraste */
 .lb-jug-nombre {
   font-size: 1rem;
   font-weight: 800;
@@ -180,30 +486,396 @@
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
-/* Animaciones */
 @keyframes popInJugador {
-  0% {
-    opacity: 0;
-    transform: scale(0.9) translateY(8px);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
+  from { opacity: 0; transform: scale(0.9) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* ==========================================================================
+   ELEMENTOS ESPECÍFICOS DE IMPOSTOR (TARJETAS DE MODOS Y ROLES)
+   ========================================================================== */
+
+.imp-modos-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin: 0;
+  padding: 0 0 1rem;
+}
+
+@media (max-width: 640px) {
+  .imp-modos-grid {
+    grid-template-columns: 1fr;
   }
 }
 
-@keyframes pulsoOnlineBlanco {
-  0% {
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.6);
-  }
-  70% {
-    box-shadow: 0 0 0 7px rgba(255, 255, 255, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
+.imp-modo-card {
+  display: flex !important;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.8rem;
+  width: 100% !important;
+  min-height: 180px;
+  margin: 0 !important;
+  padding: 1.25rem 1.15rem !important;
+  border: 2px solid transparent !important;
+  border-radius: 26px !important;
+  background: linear-gradient(135deg, var(--c1) 0%, var(--c2) 100%) !important;
+  box-shadow: 0 6px 0 rgba(0, 0, 0, 0.28), 0 16px 32px -14px rgba(0, 0, 0, 0.5) !important;
+  color: #ffffff !important;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.12s ease, filter 0.15s ease, box-shadow 0.12s ease;
+}
+
+.imp-modo-card:hover {
+  filter: brightness(1.06);
+  transform: translateY(-3px);
+}
+
+.imp-modo-card:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.28) !important;
+}
+
+.imp-modo-card.seleccionado {
+  box-shadow: 0 0 0 4px #ffffff, 0 8px 0 rgba(0, 0, 0, 0.3) !important;
+}
+
+.imp-modo-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.imp-modo-icono {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.22);
+  display: grid;
+  place-items: center;
+  font-size: 1.5rem;
+}
+
+.imp-modo-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.25);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.imp-modo-titulo {
+  margin: 0 0 0.35rem 0;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #ffffff;
+}
+
+.imp-modo-desc {
+  margin: 0;
+  font-size: 0.88rem;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.4;
+}
+
+.imp-modo-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.6rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.22);
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+/* Tarjeta de rol secreto (Inocente vs Impostor) */
+.imp-rol-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 2.2rem 1.6rem !important;
+}
+
+.imp-rol-card.es-pueblo {
+  background: linear-gradient(180deg, #f0fdf4 0%, #dcfce7 100%) !important;
+  border: 3px solid #22c55e;
+}
+
+.imp-rol-card.es-impostor {
+  background: linear-gradient(180deg, #fef2f2 0%, #fee2e2 100%) !important;
+  border: 3px solid #ef4444;
+}
+
+.imp-rol-badge {
+  display: inline-block;
+  padding: 0.35rem 1rem;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 0.8rem;
+}
+
+.imp-rol-badge.pueblo { background: #dcfce7; color: #15803d; }
+.imp-rol-badge.impostor { background: #fee2e2; color: #991b1b; }
+
+.imp-palabra-secreta {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: clamp(2rem, 8vw, 2.8rem);
+  font-weight: 900;
+  margin: 0.2rem 0 1rem;
+  line-height: 1.15;
+}
+
+.imp-palabra-secreta.pueblo { color: #166534; }
+.imp-palabra-secreta.impostor { color: #dc2626; }
+
+.imp-rol-instruccion {
+  max-width: 380px;
+  margin: 0 0 1.4rem;
+  font-size: 0.98rem;
+  color: #475569;
+  line-height: 1.45;
+}
+
+.imp-pista-box {
+  width: 100%;
+  padding: 0.9rem 1.1rem;
+  border-radius: 16px;
+  margin-bottom: 1.2rem;
+  text-align: left;
+}
+
+.imp-pista-box.ambar { background: #fef3c7; border: 1.5px solid #f59e0b; color: #92400e; }
+.imp-pista-box.violeta { background: #ede9fe; border: 1.5px solid #8b5cf6; color: #5b21b6; }
+.imp-pista-box.azul { background: #e0f2fe; border: 1.5px solid #06b6d4; color: #0369a1; }
+
+.imp-pista-label {
+  display: block;
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+}
+
+.imp-pista-valor {
+  font-size: 1.25rem;
+  font-weight: 900;
+  display: block;
+}
+
+.imp-pista-nota {
+  display: block;
+  font-size: 0.8rem;
+  margin-top: 0.2rem;
+  opacity: 0.85;
+}
+
+.imp-btn-privacidad {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+  padding: 0.55rem 1rem;
+  border-radius: 14px;
+  background: #f1f5f9;
+  border: 1.5px solid #cbd5e1;
+  color: #334155;
+  font-size: 0.88rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.imp-btn-privacidad:hover {
+  background: #e2e8f0;
+}
+
+.imp-btn-privacidad.mostrar {
+  background: #3b82f6;
+  border-color: #2563eb;
+  color: #ffffff;
+}
+
+/* Panel de resolución y botones de ganador */
+.imp-resolucion-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.imp-ganador-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+}
+
+@media (max-width: 480px) {
+  .imp-ganador-grid {
+    grid-template-columns: 1fr;
   }
 }
 
-.lb-punto {
-  display: none !important;
+.imp-btn-ganador {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  padding: 1rem !important;
+  border-radius: 18px !important;
+  background: #f8fafc !important;
+  border: 2px solid #cbd5e1 !important;
+  color: #0f172a !important;
+  font-family: 'Bricolage Grotesque', sans-serif !important;
+  font-size: 1.1rem !important;
+  font-weight: 800 !important;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.imp-btn-ganador:hover {
+  border-color: #3b82f6 !important;
+  background: #eff6ff !important;
+}
+
+.imp-btn-ganador.activa {
+  background: #eff6ff !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+  color: #1d4ed8 !important;
+}
+
+.imp-btn-ganador small {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.imp-rondas-box {
+  background: #f1f5f9;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 1rem 1.1rem;
+  text-align: center;
+}
+
+.imp-sub-nota {
+  margin: 0.2rem 0 0.8rem;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.imp-big-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.2rem;
+}
+
+.imp-big-stepper-btn {
+  width: 46px !important;
+  height: 46px !important;
+  min-width: 46px !important;
+  padding: 0 !important;
+  border-radius: 14px !important;
+  background: #ffffff !important;
+  border: 1.5px solid #cbd5e1 !important;
+  color: #0f172a !important;
+  font-size: 1.3rem !important;
+  font-weight: 900 !important;
+  display: grid !important;
+  place-items: center !important;
+  cursor: pointer;
+}
+
+.imp-big-stepper-val {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: #0f172a;
+  min-width: 50px;
+}
+
+/* Desglose de resultados */
+.imp-desglose-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.imp-desglose-fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-radius: 16px;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+}
+
+.imp-desglose-fila.gano {
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+
+.imp-desglose-nombre {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.98rem;
+  color: #0f172a;
+}
+
+.imp-rol-mini {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  background: #e2e8f0;
+}
+
+.imp-badge-pts {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  background: #e2e8f0;
+  color: #475569;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.imp-badge-pts.pos {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.imp-debate-emoji {
+  font-size: 3.5rem;
+  line-height: 1;
+  margin-bottom: 0.4rem;
+  display: block;
+}
+
+.imp-ranking-pts {
+  padding: 0.35rem 0.75rem;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  color: #0f172a;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+  white-space: nowrap;
 }
