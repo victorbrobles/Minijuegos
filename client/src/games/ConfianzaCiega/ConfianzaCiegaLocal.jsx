@@ -1,26 +1,139 @@
 // client/src/games/ConfianzaCiega/ConfianzaCiegaLocal.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import './ConfianzaCiega.css';
-import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx';
 
 const MIN_JUGADORES = 3;
 const MAX_JUGADORES = 15;
-const TIEMPO_MAXIMO_S = 120;
-const PREPARACION_S = 10;
+const TIEMPO_MAXIMO_S = 60;
 
-export default function ConfianzaCiegaLocal({ onVolver, onExit }) {
+const COLORES = ['#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316'];
+export const colorJugador = (i) => COLORES[((i % COLORES.length) + COLORES.length) % COLORES.length];
+export const inicial = (nombre = '?') => nombre.trim().charAt(0).toUpperCase() || '?';
+export const indiceColor = (j, i) => (typeof j?.id === 'number' ? j.id - 1 : i);
+
+/* ==========================================================================
+   COMPONENTES DE TABLERO COMPARTIDOS
+   ========================================================================== */
+
+export function BotonPortada({ onClick, texto = 'Portada' }) {
+  return (
+    <button type="button" className="qqp-salir" onClick={onClick}>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7" />
+      </svg>
+      <span>{texto}</span>
+    </button>
+  );
+}
+
+export function Avatar({ nombre, color, grande = false }) {
+  return (
+    <span className={`qqp-avatar${grande ? ' grande' : ''}`} style={{ '--c': color }}>
+      {inicial(nombre)}
+    </span>
+  );
+}
+
+export function Cabecera({ onSalir, textoSalir = 'Portada', onAyuda, categoria, etiqueta, titulo, avatar, chips, children }) {
+  return (
+    <header className="qqp-hero">
+      <span className="qqp-hero-deco" aria-hidden="true">
+        <Icon name="target" size={150} strokeWidth={1.4} />
+      </span>
+      <div className="qqp-hero-top">
+        {onSalir ? <BotonPortada onClick={onSalir} texto={textoSalir} /> : <span />}
+        <div className="qqp-hero-chips">
+          {chips}
+          {categoria && (
+            <span className="qqp-chip" title="Fase de la ronda">
+              <Icon name={categoria.icono || 'target'} size={14} /> <span>{categoria.nombre}</span>
+            </span>
+          )}
+          {onAyuda && (
+            <button type="button" className="qqp-ayuda" onClick={onAyuda} title="Cómo jugar" aria-label="Cómo jugar">
+              ?
+            </button>
+          )}
+        </div>
+      </div>
+      <div className="qqp-hero-cuerpo">
+        {avatar}
+        <div className="qqp-hero-textos">
+          {etiqueta && <p className="qqp-hero-etiqueta">{etiqueta}</p>}
+          <h2 className="qqp-hero-titulo">{titulo}</h2>
+        </div>
+      </div>
+      {children}
+    </header>
+  );
+}
+
+export function OrdenTurnos({ jugadores, activoId, apostaronMap = {}, puntosMap = null }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    ref.current?.querySelector('.activo')?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+  }, [activoId]);
+
+  return (
+    <ol className="qqp-orden" ref={ref} aria-label="Estado de los jugadores">
+      {jugadores.map((j, i) => {
+        const esActivo = j.id === activoId;
+        const yaAposto = Boolean(apostaronMap[j.id] ?? j.haApostado);
+        const pts = puntosMap ? (puntosMap[j.id] ?? 0) : (j.puntos ?? 0);
+        return (
+          <li
+            key={j.id}
+            className={`qqp-orden-item${esActivo ? ' activo' : ''}`}
+            style={{ '--c': colorJugador(indiceColor(j, i)) }}
+            aria-current={esActivo ? 'step' : undefined}
+          >
+            <span className="qqp-orden-avatar">{yaAposto ? '✓' : inicial(j.nombre)}</span>
+            <span className="qqp-orden-nombre">{j.nombre}</span>
+            <span className="qqp-orden-pts">{pts}p</span>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+export function BotonPrincipal({ children, onClick, disabled, type = 'button' }) {
+  return (
+    <button type={type} className="qqp-boton" onClick={onClick} disabled={disabled}>
+      {children}
+    </button>
+  );
+}
+
+export function EnlaceSecundario({ children, onClick, disabled }) {
+  return (
+    <button type="button" className="qqp-enlace" onClick={onClick} disabled={disabled}>
+      {children}
+    </button>
+  );
+}
+
+/* ==========================================================================
+   MODO LOCAL: CONFIANZA CIEGA
+   ========================================================================== */
+
+export default function ConfianzaCiegaLocal({ onVolver, onExit, onAbrirAyuda }) {
+  const navigate = useNavigate();
+
   const [fase, setFase] = useState('setup');
-  const [modalAyuda, setModalAyuda] = useState(false);
+  const [modalSalirPortada, setModalSalirPortada] = useState(false);
 
   const [esAdmin, setEsAdmin] = useState(false);
   const [usarPicantes, setUsarPicantes] = useState(false);
 
   useEffect(() => {
     try {
-      const adminToken = localStorage.getItem('admin_token') || 
-                         localStorage.getItem('is_admin') || 
-                         localStorage.getItem('admin_secret');
+      const adminToken =
+        localStorage.getItem('admin_token') ||
+        localStorage.getItem('is_admin') ||
+        localStorage.getItem('admin_secret');
       setEsAdmin(Boolean(adminToken));
     } catch {
       setEsAdmin(false);
@@ -49,14 +162,26 @@ export default function ConfianzaCiegaLocal({ onVolver, onExit }) {
   const [apuestaNumero, setApuestaNumero] = useState(5);
   const [apuestaCondicion, setApuestaCondicion] = useState('mas');
 
-  const [prep, setPrep] = useState(PREPARACION_S);
   const [restante, setRestante] = useState(TIEMPO_MAXIMO_S);
   const [contadorAciertos, setContadorAciertos] = useState(0);
 
   const [resultadoRonda, setResultadoRonda] = useState(null);
 
-  const handleNumJugadoresChange = (e) => {
-    const num = parseInt(e.target.value, 10);
+  const handleSalirAPortada = () => {
+    setModalSalirPortada(false);
+    if (typeof onExit === 'function') {
+      onExit();
+    } else {
+      try {
+        navigate('/');
+      } catch {
+        window.location.href = '/';
+      }
+    }
+  };
+
+  const actualizarCantidadJugadores = (nuevoNum) => {
+    const num = Math.max(MIN_JUGADORES, Math.min(MAX_JUGADORES, nuevoNum));
     setNumJugadores(num);
     const nuevos = Array.from({ length: num }, (_, i) => ({
       id: i + 1,
@@ -91,10 +216,10 @@ export default function ConfianzaCiegaLocal({ onVolver, onExit }) {
     setIndiceTurno(0);
     setRondaActual(1);
 
-    pedirConsignas(orden[0], listaActualizada);
+    pedirConsignas();
   };
 
-  const pedirConsignas = async (idxActivo, lista = jugadores) => {
+  const pedirConsignas = async () => {
     setErrorCarga(null);
     try {
       const res = await fetch(`/api/confianzaciega/consignas?includePicantes=${esAdmin && usarPicantes}`);
@@ -105,7 +230,8 @@ export default function ConfianzaCiegaLocal({ onVolver, onExit }) {
         setConsignaElegida('');
         setApuestas({});
         setContadorAciertos(0);
-        setFase('eleccion_consigna');
+        // Primero sale la pantalla de "Turno de..." para el protagonista
+        setFase('confirmacion_eleccion');
       } else {
         throw new Error('Error al cargar consignas');
       }
@@ -116,7 +242,8 @@ export default function ConfianzaCiegaLocal({ onVolver, onExit }) {
   };
 
   const jugadorActivo = jugadores[ordenTurnos[indiceTurno]];
-  const apostadoresRestantes = jugadores.filter((j) => j.id !== jugadorActivo?.id);
+  const jugadoresEnOrden = ordenTurnos.map((idx) => jugadores[idx]).filter(Boolean);
+  const apostadoresRestantes = jugadoresEnOrden.filter((j) => j.id !== jugadorActivo?.id);
   const apostadorActual = apostadoresRestantes[indiceApostador];
 
   const seleccionarConsigna = (consigna) => {
@@ -144,26 +271,21 @@ export default function ConfianzaCiegaLocal({ onVolver, onExit }) {
       setFase('confirmacion_apuesta');
     } else {
       setContadorAciertos(0);
-      setFase('turno_accion');
+      // Cuando todos han apostado, sale la pantalla de turno del protagonista antes de arrancar los 60s
+      setFase('confirmacion_accion');
     }
   };
 
+  // Cronómetro directo de 60 segundos sin cuenta atrás de preparación
   useEffect(() => {
-    if (fase !== 'turno_accion') return;
+    if (fase !== 'turno_accion') return undefined;
 
-    const finPrep = Date.now() + PREPARACION_S * 1000;
-    const finTurno = finPrep + TIEMPO_MAXIMO_S * 1000;
-    setPrep(PREPARACION_S);
+    const finTurno = Date.now() + TIEMPO_MAXIMO_S * 1000;
     setRestante(TIEMPO_MAXIMO_S);
 
     let avisado = false;
     const id = setInterval(() => {
       const ahora = Date.now();
-      if (ahora < finPrep) {
-        setPrep(Math.ceil((finPrep - ahora) / 1000));
-        return;
-      }
-      setPrep(0);
       const r = (finTurno - ahora) / 1000;
       if (r <= 0) {
         setRestante(0);
@@ -179,8 +301,6 @@ export default function ConfianzaCiegaLocal({ onVolver, onExit }) {
 
     return () => clearInterval(id);
   }, [fase]);
-
-  const preparando = prep > 0;
 
   const pararManualmente = () => {
     setFase('validacion_final');
@@ -265,291 +385,425 @@ export default function ConfianzaCiegaLocal({ onVolver, onExit }) {
     const proxIndice = (indiceTurno + 1) % ordenTurnos.length;
     setIndiceTurno(proxIndice);
     setRondaActual(rondaActual + 1);
-    pedirConsignas(ordenTurnos[proxIndice]);
+    pedirConsignas();
   };
 
   const ranking = [...jugadores].sort((a, b) => (puntos[b.id] ?? 0) - (puntos[a.id] ?? 0));
   const maximo = ranking.length ? (puntos[ranking[0].id] ?? 0) : 0;
   const ganadores = maximo > 0 ? ranking.filter((j) => (puntos[j.id] ?? 0) === maximo) : [];
 
+  const enPartidaActiva = fase !== 'setup';
+
   return (
-    <div className="aprox-contenedor">
-      {/* AYUDA */}
+    <div className={`cc-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+      {/* 1. CONFIGURACIÓN DE JUGADORES */}
       {fase === 'setup' && (
-        <>
+        <section className="game">
+          <div className="panel qq-menu-panel">
+            <div className="qq-card-top">
+              <button type="button" className="qq-link-volver" onClick={onVolver}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                <span>Volver</span>
+              </button>
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
 
-          {modalAyuda && (
-            <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
-              <div className="rg-modal aprox-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-                <div className="aprox-modal-header">
-                  <h3>¿Cómo se juega a Confianza Ciega?</h3>
+            <div className="qq-config-header">
+              <div className="qq-hero-icono chico">
+                <Icon name="users" size={32} />
+              </div>
+              <div>
+                <h2 className="qq-config-titulo">Jugadores</h2>
+                <p className="qq-config-sub">
+                  Configura quiénes van a participar ({MIN_JUGADORES} a {MAX_JUGADORES} jugadores)
+                </p>
+              </div>
+            </div>
+
+            <div className="qq-selector-cantidad-box">
+              <label className="qq-label-destacado" htmlFor="num-jugadores-cc">
+                Número de participantes
+              </label>
+              <div className="qq-stepper-row">
+                <button
+                  type="button"
+                  className="qq-stepper-btn"
+                  disabled={numJugadores <= MIN_JUGADORES}
+                  onClick={() => actualizarCantidadJugadores(numJugadores - 1)}
+                >
+                  &minus;
+                </button>
+                <select
+                  id="num-jugadores-cc"
+                  className="qq-select-jugadores"
+                  value={numJugadores}
+                  onChange={(e) => actualizarCantidadJugadores(parseInt(e.target.value, 10))}
+                >
+                  {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => (
+                    <option key={i + MIN_JUGADORES} value={i + MIN_JUGADORES}>
+                      {i + MIN_JUGADORES} jugadores
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  className="qq-stepper-btn"
+                  disabled={numJugadores >= MAX_JUGADORES}
+                  onClick={() => actualizarCantidadJugadores(numJugadores + 1)}
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <span className="qq-label-destacado" style={{ marginTop: '1.2rem', display: 'block' }}>
+              Nombres de los jugadores
+            </span>
+            <div className="qq-nombres-grid">
+              {jugadores.map((j, idx) => (
+                <div key={j.id} className="qq-jugador-input-card">
+                  <span
+                    className="qq-jugador-badge"
+                    style={{ background: colorJugador(idx) }}
+                  >
+                    {idx + 1}
+                  </span>
+                  <input
+                    type="text"
+                    value={j.nombre}
+                    onChange={(e) => handleNombreChange(idx, e.target.value)}
+                    placeholder={`Jugador ${j.id}`}
+                    maxLength={20}
+                  />
                 </div>
+              ))}
+            </div>
 
-                <div className="aprox-modal-cuerpo">
-                  <p><strong>1. Dinámica de la ronda:</strong></p>
-                  <ul>
-                    <li>El jugador activo ve dos consignas y elige una en secreto.</li>
-                    <li>Los demás jugadores apuestan un número y si dirá <em>más de</em> o <em>menos de</em> esa cantidad.</li>
-                    <li>Hay <strong>10 segundos de preparación</strong> antes de que empiece a correr el tiempo (2 minutos).</li>
-                    <li>El jugador que responde no suma puntos en su turno (solo cuando apuesta en el de otros).</li>
-                  </ul>
-
-                  <p><strong>2. Sistema de puntuación:</strong></p>
-                  <div className="aprox-tabla-puntos">
-                    <div className="aprox-puntos-fila acierto" style={{ background: '#dbeafe', color: '#1d4ed8' }}>
-                      <span>🎯 Número exacto</span>
-                      <strong>+{jugadores.length + 5} pts</strong>
-                    </div>
-                    <div className="aprox-puntos-fila acierto">
-                      <span>✓ Apuesta acertada</span>
-                      <strong>+{jugadores.length - 1} pts decreciendo</strong>
-                    </div>
-                    <div className="aprox-puntos-fila lejana">
-                      <span>❌ Apuesta fallada</span>
-                      <strong>-{jugadores.length - 1} pts</strong>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="rg-modal-acciones">
-                  <button className="big full" onClick={() => setModalAyuda(false)}>
-                    Entendido
+            {esAdmin && (
+              <div className="qq-selector-cantidad-box" style={{ marginTop: '1.2rem' }}>
+                <span className="qq-label-destacado">
+                  <Icon name="lock" size={14} /> Categoría de consignas (Admin)
+                </span>
+                <div className="cc-admin-cats">
+                  <button
+                    type="button"
+                    className={`cc-admin-cat-btn ${!usarPicantes ? 'activo' : ''}`}
+                    onClick={() => setUsarPicantes(false)}
+                  >
+                    😊 Normal (Todos los públicos)
+                  </button>
+                  <button
+                    type="button"
+                    className={`cc-admin-cat-btn ${usarPicantes ? 'activo' : ''}`}
+                    onClick={() => setUsarPicantes(true)}
+                  >
+                    🌶️ Picante (Comprometidas)
                   </button>
                 </div>
               </div>
-            </div>
-          )}
-        </>
+            )}
+
+            {errorCarga && <p className="error" style={{ marginTop: '0.8rem' }}>{errorCarga}</p>}
+
+            <button
+              type="button"
+              className="big full qq-btn-principal"
+              style={{ marginTop: '1.5rem' }}
+              onClick={iniciarPartida}
+            >
+              <Icon name="play" size={22} /> Iniciar juego
+            </button>
+          </div>
+        </section>
       )}
 
-      {/* 1. SETUP */}
-      {fase === 'setup' && (
-        <SelectorJugadores
-          onVolver={onVolver}
-          onAyuda={() => setModalAyuda(true)}
-          min={MIN_JUGADORES}
-          max={MAX_JUGADORES}
-          numJugadores={numJugadores}
-          onCambiarNum={(n) => handleNumJugadoresChange({ target: { value: n } })}
-          nombres={jugadores}
-          onNombre={handleNombreChange}
-          onEmpezar={iniciarPartida}
-          textoBoton="¡Empezar Partida!"
-          iconoBoton="play"
-        >
-          <BloqueConfig>
-          {esAdmin && (
-            <div style={{ marginTop: '1rem', padding: '0.75rem', background: '#fdf2f8', borderRadius: '12px', border: '1.5px dashed #f472b6' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', color: '#db2777', fontWeight: '700', fontSize: '0.9rem', cursor: 'pointer' }}>
-                <input
-                  type="checkbox"
-                  checked={usarPicantes}
-                  onChange={(e) => setUsarPicantes(e.target.checked)}
-                />
-                <span>Habilitar Categorías Picantes / Ocultas (Modo Admin)</span>
-              </label>
-            </div>
-          )}
-          </BloqueConfig>
-        </SelectorJugadores>
+      {/* 2A. PANTALLA DE TURNO ANTES DE ELEGIR CONSIGNA */}
+      {fase === 'confirmacion_eleccion' && jugadorActivo && (
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            categoria={{ nombre: 'Protagonista', icono: 'eye' }}
+            etiqueta={`Ronda ${rondaActual} · Paso de turno`}
+            titulo="Pasad el móvil"
+          >
+            <OrdenTurnos
+              jugadores={jugadoresEnOrden}
+              activoId={jugadorActivo.id}
+              puntosMap={puntos}
+            />
+          </Cabecera>
+
+          <div className="qqp-tarjeta qqp-pasar">
+            <Avatar nombre={jugadorActivo.nombre} color={colorJugador(indiceColor(jugadorActivo, 0))} grande />
+            <p className="qqp-pasar-para">Turno de</p>
+            <h3 className="qqp-pasar-nombre">{jugadorActivo.nombre}</h3>
+            <p className="qqp-texto">
+              Vas a ver dos consignas y elegirás una en secreto. Los demás verán ambas opciones, pero no sabrán cuál has escogido.
+            </p>
+          </div>
+
+          <div className="qqp-barra">
+            <BotonPrincipal onClick={() => setFase('eleccion_consigna')}>
+              <Icon name="eye" size={22} /> Soy {jugadorActivo.nombre}, ver consignas
+            </BotonPrincipal>
+          </div>
+        </section>
       )}
 
-      {/* 2. ELECCIÓN SECRETA DE CONSIGNA */}
+      {/* 2B. ELECCIÓN SECRETA DE CONSIGNA */}
       {fase === 'eleccion_consigna' && jugadorActivo && (
-        <section className="game">
-          <div className="hud">
-            <span className="chip"><Icon name="flagFinish" size={18} />Ronda {rondaActual}</span>
-            <span className="chip alt"><Icon name="dice" size={18} />Elección secreta</span>
-          </div>
-
-          <div className="starter">
-            <Icon name="dice" size={28} />
-            <p>Turno de: <strong>{jugadorActivo.nombre}</strong></p>
-          </div>
-
-          <div className="panel">
-            <h3 className="panel-title"><Icon name="eye" size={20} /> Elige una consigna en secreto</h3>
-            <p className="field-label">Los demás jugadores verán ambas opciones, pero solo tú sabrás cuál has elegido:</p>
-
-            <div className="aprox-opciones-confianza" style={{ gridTemplateColumns: '1fr 1fr' }}>
-              {opcionesConsignas.map((consigna, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  className="aprox-btn-opcion-confianza"
-                  onClick={() => seleccionarConsigna(consigna)}
-                  style={{ textAlign: 'left', alignItems: 'flex-start', padding: '1.4rem' }}
-                >
-                  <span className="aprox-badge-pregunta" style={{ marginBottom: '0.5rem' }}>Opción {idx + 1}</span>
-                  <div className="aprox-pregunta-texto" style={{ fontSize: '1.2rem', textAlign: 'left' }}>{consigna}</div>
-                  <span className="aprox-tag-confiar" style={{ marginTop: '1rem' }}>Elegir esta consigna</span>
-                </button>
-              ))}
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            categoria={{ nombre: 'Elección secreta', icono: 'eye' }}
+            etiqueta={`Ronda ${rondaActual} · Protagonista`}
+            titulo={jugadorActivo.nombre}
+            avatar={<Avatar nombre={jugadorActivo.nombre} color={colorJugador(indiceColor(jugadorActivo, 0))} />}
+          >
+            <div className="qqp-identidad">
+              <span className="qqp-identidad-icono"><Icon name="lock" size={16} /></span>
+              <span>Elige una consigna en secreto. Los demás verán ambas opciones, pero no cuál has escogido.</span>
             </div>
+
+            <OrdenTurnos
+              jugadores={jugadoresEnOrden}
+              activoId={jugadorActivo.id}
+              puntosMap={puntos}
+            />
+          </Cabecera>
+
+          <div className="cc-consignas-grid">
+            {opcionesConsignas.map((consigna, idx) => (
+              <button
+                key={idx}
+                type="button"
+                className="cc-consigna-card"
+                onClick={() => seleccionarConsigna(consigna)}
+              >
+                <span className="cc-consigna-pill">Opción {idx + 1}</span>
+                <strong className="cc-consigna-titulo">«{consigna}»</strong>
+                <span className="cc-consigna-cta">
+                  Elegir esta consigna <Icon name="check" size={15} />
+                </span>
+              </button>
+            ))}
           </div>
         </section>
       )}
 
-      {/* 3. CONFIRMACIÓN PRIVADA DE APUESTA */}
+      {/* 3. PASAR DISPOSITIVO PARA APUESTA PRIVADA */}
       {fase === 'confirmacion_apuesta' && apostadorActual && (
-        <section className="game">
-          <div className="hud">
-            <span className="chip"><Icon name="flagFinish" size={18} />Ronda {rondaActual}</span>
-            <span className="chip alt">Paso de turno privado</span>
-          </div>
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            categoria={{ nombre: 'Apuesta secreta', icono: 'lock' }}
+            etiqueta={`Ronda ${rondaActual} · Apostador ${indiceApostador + 1} de ${apostadoresRestantes.length}`}
+            titulo="Pasad el móvil"
+          >
+            <OrdenTurnos
+              jugadores={jugadoresEnOrden}
+              activoId={apostadorActual.id}
+              apostaronMap={apuestas}
+              puntosMap={puntos}
+            />
+          </Cabecera>
 
-          <div className="starter">
-            <Icon name="users" size={28} />
-            <p>Pasa el dispositivo a: <strong>{apostadorActual.nombre}</strong></p>
-          </div>
-
-          <div className="panel aprox-pregunta-card">
-            <span className="aprox-badge-pregunta">Apuesta privada</span>
-            <h2 className="aprox-pregunta-texto">Turno de {apostadorActual.nombre}</h2>
-            <p className="field-label" style={{ marginTop: '0.8rem' }}>
-              Nadie más debe mirar la pantalla para realizar la apuesta en secreto.
+          <div className="qqp-tarjeta qqp-pasar">
+            <Avatar nombre={apostadorActual.nombre} color={colorJugador(indiceColor(apostadorActual, 0))} grande />
+            <p className="qqp-pasar-para">Turno de</p>
+            <h3 className="qqp-pasar-nombre">{apostadorActual.nombre}</h3>
+            <p className="qqp-texto">
+              Nadie más debe mirar la pantalla para mantener tu apuesta en secreto sobre cuántas respuestas dará <strong>{jugadorActivo.nombre}</strong>.
             </p>
           </div>
 
-          <button className="big full" onClick={() => setFase('apuestas')}>
-            <Icon name="check" size={22} /> Soy {apostadorActual.nombre}, continuar
-          </button>
+          <div className="qqp-barra">
+            <BotonPrincipal onClick={() => setFase('apuestas')}>
+              <Icon name="eye" size={22} /> Soy {apostadorActual.nombre}, hacer mi apuesta
+            </BotonPrincipal>
+          </div>
         </section>
       )}
 
-      {/* 4. FORMULACIÓN DE APUESTA */}
+      {/* 4. FORMULARIO DE APUESTA */}
       {fase === 'apuestas' && apostadorActual && (
-        <section className="game">
-          <div className="hud">
-            <span className="chip"><Icon name="flagFinish" size={18} />Ronda {rondaActual}</span>
-            <span className="chip alt"><Icon name="target" size={18} />Apuesta ({indiceApostador + 1} de {apostadoresRestantes.length})</span>
-          </div>
-
-          <div className="starter">
-            <Icon name="target" size={28} />
-            <p>Apuesta de: <strong>{apostadorActual.nombre}</strong></p>
-          </div>
-
-          <div className="panel aprox-pregunta-card">
-            <span className="aprox-badge-pregunta">Opciones de consigna</span>
-            <p className="field-label" style={{ margin: '0.4rem 0 0.8rem' }}>
-              <strong>{jugadorActivo.nombre}</strong> ha elegido en secreto una de estas dos:
-            </p>
-            <div style={{ display: 'flex', gap: '0.8rem', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
-              <span className="chip" style={{ fontSize: '1rem', padding: '0.6rem 1rem' }}>{opcionesConsignas[0]}</span>
-              <strong>ó</strong>
-              <span className="chip" style={{ fontSize: '1rem', padding: '0.6rem 1rem' }}>{opcionesConsignas[1]}</span>
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            categoria={{ nombre: `Apuesta ${indiceApostador + 1}/${apostadoresRestantes.length}`, icono: 'target' }}
+            etiqueta={`Ronda ${rondaActual} · Apostando sobre ${jugadorActivo.nombre}`}
+            titulo={apostadorActual.nombre}
+            avatar={<Avatar nombre={apostadorActual.nombre} color={colorJugador(indiceColor(apostadorActual, 0))} />}
+          >
+            <div className="qqp-identidad cc-consigna-box">
+              <span className="cc-hero-sub">
+                <strong>{jugadorActivo.nombre}</strong> ha elegido en secreto una de estas dos:
+              </span>
+              <div className="cc-dual-pills">
+                <span className="cc-dual-pill">1. «{opcionesConsignas[0]}»</span>
+                <span className="cc-dual-pill">2. «{opcionesConsignas[1]}»</span>
+              </div>
             </div>
-          </div>
 
-          <div className="panel" style={{ textAlign: 'center' }}>
-            <h3 className="panel-title" style={{ justifyContent: 'center' }}>
-              ¿Cuántas palabras crees que dirá?
-            </h3>
+            <OrdenTurnos
+              jugadores={jugadoresEnOrden}
+              activoId={apostadorActual.id}
+              apostaronMap={apuestas}
+              puntosMap={puntos}
+            />
+          </Cabecera>
 
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1.5rem', margin: '1.2rem 0' }}>
+          <div className="qqp-tarjeta cc-apuesta-card">
+            <p className="qqp-carta-cara-titulo" style={{ justifyContent: 'center', width: '100%' }}>
+              <Icon name="target" size={16} /> ¿Cuántas respuestas válidas crees que dirá?
+            </p>
+
+            <div className="cc-big-stepper">
               <button
                 type="button"
-                className="aprox-btn-ayuda"
-                style={{ position: 'static', width: '48px', height: '48px', fontSize: '1.5rem' }}
+                className="cc-big-stepper-btn"
                 onClick={() => setApuestaNumero(Math.max(0, apuestaNumero - 1))}
               >
-                -
+                &minus;
               </button>
-              <span style={{ fontSize: '3.2rem', fontWeight: '900', color: '#4338ca', minWidth: '70px' }}>
-                {apuestaNumero}
-              </span>
+              <span className="cc-big-stepper-val">{apuestaNumero}</span>
               <button
                 type="button"
-                className="aprox-btn-ayuda"
-                style={{ position: 'static', width: '48px', height: '48px', fontSize: '1.5rem' }}
+                className="cc-big-stepper-btn"
                 onClick={() => setApuestaNumero(apuestaNumero + 1)}
               >
                 +
               </button>
             </div>
 
-            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1.2rem' }}>
+            <div className="cc-condicion-grid">
               <button
                 type="button"
                 className={`cc-btn-condicion ${apuestaCondicion === 'mas' ? 'activa' : ''}`}
                 onClick={() => setApuestaCondicion('mas')}
               >
-                Más de {apuestaNumero}
+                📈 Más de {apuestaNumero}
               </button>
               <button
                 type="button"
                 className={`cc-btn-condicion ${apuestaCondicion === 'menos' ? 'activa' : ''}`}
                 onClick={() => setApuestaCondicion('menos')}
               >
-                Menos de {apuestaNumero}
+                📉 Menos de {apuestaNumero}
               </button>
             </div>
           </div>
 
-          <button className="big full" onClick={confirmarApuestaIndividual}>
-            <Icon name="check" size={22} /> Confirmar apuesta y pasar turno
-          </button>
+          <div className="qqp-barra">
+            <BotonPrincipal onClick={confirmarApuestaIndividual}>
+              <Icon name="check" size={20} strokeWidth={2.5} /> Confirmar apuesta y continuar
+            </BotonPrincipal>
+          </div>
         </section>
       )}
 
-      {/* 5. TURNO DE ACCIÓN */}
-      {fase === 'turno_accion' && (
-        <section className="game">
-          <div className="hud">
-            <span className="chip"><Icon name="flagFinish" size={18} />Ronda {rondaActual}</span>
-            <span className="chip alt">
-              <Icon name="clock" size={18} />
-              {preparando ? 'Preparación (10s)' : '¡Tiempo en marcha!'}
-            </span>
-          </div>
+      {/* 5A. PANTALLA DE TURNO ANTES DE EMPEZAR A ENUMERAR ELEMENTOS */}
+      {fase === 'confirmacion_accion' && jugadorActivo && (
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            categoria={{ nombre: '¡A responder!', icono: 'zap' }}
+            etiqueta={`Ronda ${rondaActual} · Todas las apuestas listas`}
+            titulo="Pasad el móvil"
+          >
+            <OrdenTurnos
+              jugadores={jugadoresEnOrden}
+              activoId={jugadorActivo.id}
+              apostaronMap={apuestas}
+              puntosMap={puntos}
+            />
+          </Cabecera>
 
-          <div className="starter">
-            <Icon name="zap" size={28} />
-            <p>¡Turno de <strong>{jugadorActivo.nombre}</strong>!</p>
-          </div>
-
-          <div className="panel aprox-pregunta-card">
-            <span className="aprox-badge-pregunta">Consigna elegida</span>
-            <h2 className="aprox-pregunta-texto" style={{ color: '#4338ca', fontSize: '1.8rem' }}>
-              {consignaElegida}
-            </h2>
-            <p className="field-label" style={{ marginTop: '0.6rem' }}>
-              Di tantas palabras válidas en voz alta como puedas en 2 minutos. Los demás validáis:
+          <div className="qqp-tarjeta qqp-pasar">
+            <Avatar nombre={jugadorActivo.nombre} color={colorJugador(indiceColor(jugadorActivo, 0))} grande />
+            <p className="qqp-pasar-para">Turno de</p>
+            <h3 className="qqp-pasar-nombre">{jugadorActivo.nombre}</h3>
+            <p className="qqp-texto">
+              En cuanto pulses el botón comenzará directamente el tiempo de <strong>{TIEMPO_MAXIMO_S} segundos</strong> para enumerar respuestas de <strong>«{consignaElegida}»</strong>.
             </p>
           </div>
 
-          <div className="timer" role="timer" aria-label="Tiempo restante">
-            <div
-              className={`timer-bar${!preparando && restante <= 10 ? ' low' : ''}`}
-              style={{ width: `${preparando ? 100 : (restante / TIEMPO_MAXIMO_S) * 100}%` }}
-            />
+          <div className="qqp-barra">
+            <BotonPrincipal onClick={() => setFase('turno_accion')}>
+              <Icon name="play" size={22} /> Soy {jugadorActivo.nombre}, ¡estoy listo!
+            </BotonPrincipal>
           </div>
-          <p className="timer-text">
-            <Icon name="clock" size={16} />
-            {preparando ? `Preparados… ${prep} s` : `${Math.ceil(restante)} s`}
-          </p>
+        </section>
+      )}
 
-          <div className="panel" style={{ textAlign: 'center', marginTop: '1rem' }}>
-            <span className="field-label">Aciertos aprobados por el grupo:</span>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1.5rem', margin: '0.8rem 0' }}>
+      {/* 5B. TURNO DE ACCIÓN (60 SEGUNDOS DIRECTOS) */}
+      {fase === 'turno_accion' && jugadorActivo && (
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            categoria={{
+              nombre: '¡En marcha!',
+              icono: 'clock'
+            }}
+            etiqueta={`Ronda ${rondaActual} · Turno de acción`}
+            titulo={jugadorActivo.nombre}
+            avatar={<Avatar nombre={jugadorActivo.nombre} color={colorJugador(indiceColor(jugadorActivo, 0))} />}
+          >
+            <div className="qqp-identidad cc-consigna-box">
+              <div className="cc-consigna-top">
+                <span className="qqp-identidad-icono">
+                  <Icon name="zap" size={16} strokeWidth={2.4} />
+                </span>
+                <span className="cc-consigna-texto">«{consignaElegida}»</span>
+              </div>
+
+              <div className="cc-hero-stats">
+                <span className="cc-hero-stat ok">✅ {contadorAciertos} válidas</span>
+                <span className={`cc-hero-stat timer${restante <= 15 ? ' low' : ''}`}>
+                  <Icon name="clock" size={14} />
+                  {Math.ceil(restante)}s
+                </span>
+              </div>
+
+              <div className="cc-timer-track" role="timer">
+                <div
+                  className={`cc-timer-fill${restante <= 15 ? ' low' : ''}`}
+                  style={{ width: `${(restante / TIEMPO_MAXIMO_S) * 100}%` }}
+                />
+              </div>
+            </div>
+          </Cabecera>
+
+          <div className="qqp-tarjeta cc-apuesta-card">
+            <p className="qqp-carta-cara-titulo" style={{ justifyContent: 'center', width: '100%' }}>
+              <Icon name="check" size={16} /> Respuestas válidas aprobadas por el grupo
+            </p>
+            <p className="cc-sub-instruccion">
+              Di tantas respuestas como puedas en voz alta en {TIEMPO_MAXIMO_S} segundos. El grupo suma cada acierto válido:
+            </p>
+
+            <div className="cc-big-stepper">
               <button
                 type="button"
-                className="aprox-btn-ayuda"
-                style={{ position: 'static', width: '52px', height: '52px', fontSize: '1.5rem' }}
-                disabled={preparando}
+                className="cc-big-stepper-btn"
                 onClick={() => setContadorAciertos(Math.max(0, contadorAciertos - 1))}
               >
                 -1
               </button>
-              <span style={{ fontSize: '3.5rem', fontWeight: '900', color: '#10b981', minWidth: '80px' }}>
-                {contadorAciertos}
-              </span>
+              <span className="cc-big-stepper-val aciertos">{contadorAciertos}</span>
               <button
                 type="button"
-                className="aprox-btn-ayuda"
-                style={{ position: 'static', width: '52px', height: '52px', fontSize: '1.5rem' }}
-                disabled={preparando}
+                className="cc-big-stepper-btn"
                 onClick={() => setContadorAciertos(contadorAciertos + 1)}
               >
                 +1
@@ -557,53 +811,50 @@ export default function ConfianzaCiegaLocal({ onVolver, onExit }) {
             </div>
           </div>
 
-          <div className="actions">
-            <button
-              className="secondary danger full"
-              disabled={preparando}
-              onClick={pararManualmente}
-            >
-              <Icon name="flagFinish" size={20} /> Parar tiempo
-            </button>
+          <div className="qqp-barra">
+            <BotonPrincipal onClick={pararManualmente}>
+              <Icon name="flagFinish" size={20} /> Parar tiempo y cerrar recuento
+            </BotonPrincipal>
           </div>
         </section>
       )}
 
-      {/* 6. CONFIRMACIÓN FINAL */}
-      {fase === 'validacion_final' && (
-        <section className="game">
-          <div className="hud">
-            <span className="chip"><Icon name="flagFinish" size={18} />Ronda {rondaActual}</span>
-            <span className="chip alt">Recuento final</span>
-          </div>
+      {/* 6. VALIDACIÓN FINAL DEL RECUENTO */}
+      {fase === 'validacion_final' && jugadorActivo && (
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            categoria={{ nombre: 'Recuento final', icono: 'check' }}
+            etiqueta={`Ronda ${rondaActual} · Tiempo finalizado`}
+            titulo={`Recuento de ${jugadorActivo.nombre}`}
+            avatar={<Avatar nombre={jugadorActivo.nombre} color={colorJugador(indiceColor(jugadorActivo, 0))} />}
+          >
+            <div className="qqp-identidad">
+              <span className="qqp-identidad-icono"><Icon name="zap" size={16} /></span>
+              <span>Consigna: <strong>«{consignaElegida}»</strong></span>
+            </div>
+          </Cabecera>
 
-          <div className="starter">
-            <Icon name="trophy" size={28} />
-            <p>¡Tiempo terminado!</p>
-          </div>
-
-          <div className="panel aprox-pregunta-card">
-            <span className="aprox-badge-pregunta">Consigna</span>
-            <h2 className="aprox-pregunta-texto">{consignaElegida}</h2>
-            <p className="field-label" style={{ marginTop: '0.8rem' }}>
-              Confirmad el número definitivo de aciertos antes de comprobar las apuestas:
+          <div className="qqp-tarjeta cc-apuesta-card">
+            <p className="qqp-carta-cara-titulo" style={{ justifyContent: 'center', width: '100%' }}>
+              <Icon name="trophy" size={16} /> Confirmad el número definitivo de aciertos
             </p>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1.5rem', margin: '1rem 0' }}>
+            <p className="cc-sub-instruccion">
+              Ajustad la cifra si quedó alguna respuesta pendiente antes de desvelar las apuestas:
+            </p>
+
+            <div className="cc-big-stepper">
               <button
                 type="button"
-                className="aprox-btn-ayuda"
-                style={{ position: 'static', width: '48px', height: '48px', fontSize: '1.5rem' }}
+                className="cc-big-stepper-btn"
                 onClick={() => setContadorAciertos(Math.max(0, contadorAciertos - 1))}
               >
-                -
+                &minus;
               </button>
-              <span style={{ fontSize: '3rem', fontWeight: '900', color: '#10b981', minWidth: '70px' }}>
-                {contadorAciertos}
-              </span>
+              <span className="cc-big-stepper-val aciertos">{contadorAciertos}</span>
               <button
                 type="button"
-                className="aprox-btn-ayuda"
-                style={{ position: 'static', width: '48px', height: '48px', fontSize: '1.5rem' }}
+                className="cc-big-stepper-btn"
                 onClick={() => setContadorAciertos(contadorAciertos + 1)}
               >
                 +
@@ -611,125 +862,190 @@ export default function ConfianzaCiegaLocal({ onVolver, onExit }) {
             </div>
           </div>
 
-          <button className="big full" onClick={() => calcularResultados(contadorAciertos)}>
-            <Icon name="check" size={22} /> Confirmar y ver resultados
-          </button>
+          <div className="qqp-barra">
+            <BotonPrincipal onClick={() => calcularResultados(contadorAciertos)}>
+              <Icon name="check" size={20} strokeWidth={2.5} /> Confirmar y ver resultados
+            </BotonPrincipal>
+          </div>
         </section>
       )}
 
       {/* 7. RESULTADOS DE LA RONDA */}
       {fase === 'resultados' && resultadoRonda && (
-        <section className="game">
-          <div className="end-card aprox-resolucion-card">
-            <span className="end-icon"><Icon name="trophy" size={44} /></span>
-            <p className="categoria">{consignaElegida}</p>
-            <h1 className="title">
-              Palabras conseguidas: <span className="aprox-num-correcto">{resultadoRonda.aciertosFinales}</span>
-            </h1>
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            etiqueta={`Ronda ${rondaActual} completada`}
+            titulo={`Aciertos: ${resultadoRonda.aciertosFinales}`}
+          >
+            <div className="qqp-identidad">
+              <span className="qqp-identidad-icono"><Icon name="check" size={16} strokeWidth={2.5} /></span>
+              <span>«{consignaElegida}»</span>
+            </div>
+          </Cabecera>
 
-            <div className="aprox-resolucion-lista">
+          <div className="qqp-tarjeta">
+            <p className="qqp-carta-cara-titulo" style={{ marginBottom: '0.8rem' }}>
+              <Icon name="target" size={16} /> Resultado de las apuestas
+            </p>
+            <div className="cc-resolucion-lista">
               {resultadoRonda.detalles.map((item) => (
                 <div
                   key={item.jugadorId}
-                  className={`aprox-fila-resultado cc-fila-${item.estadoColor}`}
+                  className={`cc-fila-resultado cc-fila-${item.estadoColor}`}
                 >
-                  <div className="aprox-res-col-val">
-                    <span className="aprox-res-num">
+                  <div className="cc-res-col-val">
+                    <span className="cc-res-num">
                       {item.condicion === 'mas' ? `> ${item.numero}` : `< ${item.numero}`}
                     </span>
-                    <span className="aprox-res-dist">(dif: {item.diff})</span>
+                    <span className="cc-res-dist">dif: {item.diff}</span>
                   </div>
 
-                  <div className="aprox-res-col-jugadores">
-                    <div>
-                      <strong>{item.nombre}</strong>{' '}
-                      <span className="aprox-badge-pts">
+                  <div className="cc-res-col-jugadores">
+                    <div className="cc-res-autor-linea">
+                      <strong>{item.nombre}</strong>
+                      <span
+                        className={`cc-badge-pts ${
+                          item.puntosGanados > 0 ? 'pos' : item.puntosGanados < 0 ? 'neg' : ''
+                        }`}
+                      >
                         {item.puntosGanados >= 0 ? `+${item.puntosGanados}` : item.puntosGanados} pts
                       </span>
                     </div>
                   </div>
 
-                  <div className="aprox-res-etiqueta">
-                    {item.estadoColor === 'azul' && '🎯 CLAVADO'}
-                    {item.estadoColor === 'verde' && '✓ ACERTADA'}
-                    {item.estadoColor === 'rojo' && '❌ FALLADA'}
+                  <div className="cc-res-etiqueta">
+                    {item.estadoColor === 'azul' && '🎯 Clavado'}
+                    {item.estadoColor === 'verde' && '✓ Acertada'}
+                    {item.estadoColor === 'rojo' && '❌ Fallada'}
                   </div>
                 </div>
               ))}
             </div>
-
-            <div className="scoreboard" style={{ marginTop: '1.5rem', width: '100%' }}>
-              <h3 className="section-title" style={{ margin: '0 0 0.8rem', textAlign: 'center' }}>
-                Marcador general
-              </h3>
-              {ranking.map((j, i) => {
-                const pts = puntos[j.id] ?? 0;
-                const primero = maximo > 0 && pts === maximo;
-                return (
-                  <div key={j.id} className={`score-row${primero ? ' first' : ''}`}>
-                    <span className="score-name">
-                      {primero ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
-                      {j.nombre}
-                    </span>
-                    <span className="score-pts">{pts} pts</span>
-                  </div>
-                );
-              })}
-            </div>
           </div>
 
-          <div className="actions">
-            <button onClick={avanzarSiguienteRonda}>
-              <Icon name="play" size={20} />
-              Siguiente ronda ({rondaActual + 1})
-            </button>
-            <button className="secondary danger" onClick={() => setFase('final')}>
-              <Icon name="flagFinish" size={20} /> Finalizar el juego
-            </button>
+          <div className="qqp-tarjeta">
+            <p className="qqp-carta-cara-titulo" style={{ marginBottom: '0.8rem' }}>
+              <Icon name="trophy" size={16} /> Clasificación general
+            </p>
+            <ul className="qqp-rivales">
+              {ranking.map((j, i) => {
+                const pts = puntos[j.id] ?? 0;
+                const lider = maximo > 0 && pts === maximo;
+                return (
+                  <li key={j.id} className="qqp-rival" style={{ '--c': colorJugador(indiceColor(j, i)) }}>
+                    <span className="qqp-rival-avatar">{lider ? '👑' : i + 1}</span>
+                    <span className="qqp-rival-datos">
+                      <span className="qqp-rival-nombre">{lider ? 'Líder actual' : `Puesto ${i + 1}`}</span>
+                      <strong className="qqp-rival-tarjeta">{j.nombre}</strong>
+                    </span>
+                    <span className="cc-ranking-pts">{pts} pts</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
+          <div className="qqp-barra">
+            <BotonPrincipal onClick={avanzarSiguienteRonda}>
+              <Icon name="play" size={20} /> Siguiente ronda (Ronda {rondaActual + 1})
+            </BotonPrincipal>
+            <EnlaceSecundario onClick={() => setFase('final')}>
+              Finalizar partida y ver podio
+            </EnlaceSecundario>
           </div>
         </section>
       )}
 
-      {/* 8. PANTALLA FINAL */}
+      {/* 8. PODIO FINAL */}
       {fase === 'final' && (
-        <section className="game">
-          <div className="end-card">
-            <span className="end-icon"><Icon name="crown" size={44} /></span>
-            <h1 className="title">Puntuaciones Finales</h1>
-            <p className="final-score">
-              {ganadores.length === 0
-                ? 'Nadie ha sumado puntos'
-                : ganadores.length === 1
-                ? <>¡Gana {ganadores[0].nombre}!</>
-                : <>Empate entre {ganadores.map((g) => g.nombre).join(', ')}</>}
-            </p>
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            etiqueta="Partida terminada"
+            titulo="Clasificación Final"
+            avatar={<span className="qqp-avatar" style={{ '--c': '#f59e0b' }}>🏆</span>}
+          >
+            <div className="qqp-identidad">
+              <span className="qqp-identidad-icono"><Icon name="crown" size={16} /></span>
+              <span>
+                {ganadores.length === 0
+                  ? 'Nadie ha sumado puntos en esta partida.'
+                  : ganadores.length === 1
+                  ? <>¡Victoria para <strong>{ganadores[0].nombre}</strong> con <strong>{maximo} pts</strong>!</>
+                  : <>Empate entre <strong>{ganadores.map((g) => g.nombre).join(', ')}</strong> con <strong>{maximo} pts</strong></>}
+              </span>
+            </div>
+          </Cabecera>
 
-            <div className="scoreboard">
+          <div className="qqp-tarjeta">
+            <p className="qqp-carta-cara-titulo" style={{ marginBottom: '0.8rem' }}>
+              <Icon name="users" size={16} /> Podio de jugadores
+            </p>
+            <ul className="qqp-rivales">
               {ranking.map((j, i) => {
                 const pts = puntos[j.id] ?? 0;
-                const primero = maximo > 0 && pts === maximo;
+                const lider = maximo > 0 && pts === maximo;
                 return (
-                  <div key={j.id} className={`score-row${primero ? ' first' : ''}`}>
-                    <span className="score-name">
-                      {primero ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
-                      {j.nombre}
+                  <li key={j.id} className="qqp-rival" style={{ '--c': colorJugador(indiceColor(j, i)) }}>
+                    <span className="qqp-rival-avatar">{lider ? '👑' : i + 1}</span>
+                    <span className="qqp-rival-datos">
+                      <span className="qqp-rival-nombre">{lider ? '¡Ganador!' : `Puesto ${i + 1}`}</span>
+                      <strong className="qqp-rival-tarjeta">{j.nombre}</strong>
                     </span>
-                    <span className="score-pts">{pts} pts</span>
-                  </div>
+                    <span className="cc-ranking-pts">{pts} pts</span>
+                  </li>
                 );
               })}
-            </div>
+            </ul>
           </div>
 
-          <div className="actions">
-            <button onClick={() => setFase('setup')}>
+          <div className="qqp-barra">
+            <BotonPrincipal onClick={() => setFase('setup')}>
               <Icon name="refresh" size={20} /> Nueva partida
-            </button>
-            <button className="secondary danger" onClick={onVolver}>
-              <Icon name="door" size={20} /> Volver al menú
-            </button>
+            </BotonPrincipal>
+            <EnlaceSecundario onClick={() => setModalSalirPortada(true)}>
+              Salir a la portada principal
+            </EnlaceSecundario>
           </div>
         </section>
+      )}
+
+      {/* MODAL: SALIR A LA PORTADA */}
+      {modalSalirPortada && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalirPortada(false)}>
+          <div
+            className="rg-modal"
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
+          >
+            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
+            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
+              ¿Salir a la portada?
+            </h3>
+            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
+              Se cancelará la partida actual y volverás a la portada principal de juegos. ¿Estás seguro?
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+              <button
+                type="button"
+                className="secondary full"
+                onClick={() => setModalSalirPortada(false)}
+              >
+                No, continuar
+              </button>
+              <button
+                type="button"
+                className="secondary danger full"
+                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
+                onClick={handleSalirAPortada}
+              >
+                Sí, salir a portada
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
