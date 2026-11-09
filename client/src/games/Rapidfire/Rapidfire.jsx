@@ -14,6 +14,7 @@ export default function Rapidfire({ onExit }) {
   const [mostrarAyuda, setMostrarAyuda] = useState(false);
   const navigate = useNavigate();
 
+  // Redirección infalible a la portada
   const irAPortada = () => {
     if (typeof onExit === 'function') {
       onExit();
@@ -44,53 +45,55 @@ export default function Rapidfire({ onExit }) {
         />
       )}
 
-      {/* MODAL DE AYUDA GLOBAL */}
+      {/* MODAL DE AYUDA UNIFICADO */}
       {mostrarAyuda && (
         <div className="rg-modal-fondo" onClick={() => setMostrarAyuda(false)}>
           <div
-            className="rg-modal aprox-modal-ayuda"
+            className="rg-modal qq-modal-ayuda"
             onClick={(e) => e.stopPropagation()}
-            style={{ maxWidth: '520px', textAlign: 'left', padding: '1.5rem' }}
           >
-            <div className="aprox-modal-header" style={{ marginBottom: '1rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.6rem' }}>
-              <span className="aprox-modal-signo-title">?</span>
-              <h3 style={{ margin: 0, fontSize: '1.25rem', color: '#1e1b4b' }}>¿Cómo se juega a Rápido y certero?</h3>
+            <div className="qq-modal-ayuda-header">
+              <span className="qq-ayuda-badge">❓ Cómo jugar</span>
+              <h3>{TITULO_JUEGO}</h3>
             </div>
 
-            <div className="aprox-modal-cuerpo" style={{ fontSize: '0.92rem', lineHeight: '1.5', color: '#334155' }}>
-              <p style={{ marginTop: 0, marginBottom: '1rem' }}>{DESCRIPCION_JUEGO}</p>
-              
-              <p><strong>1. Dinámica del juego:</strong></p>
+            <div className="qq-modal-ayuda-body">
+              <p>{DESCRIPCION_JUEGO}</p>
               <ul>
-                <li>El jugador que tiene el turno elige 1 de las 3 categorías temáticas que se sortean al inicio de la ronda.</li>
-                <li>Aparece un reto con el número de elementos requeridos (ej. <em>Di 5 películas de terror</em>).</li>
-                <li>Cuentas con <strong>3 segundos de preparación</strong> antes de que comiencen los <strong>60 segundos</strong> para responder.</li>
-                <li>Debes decir los elementos en voz alta. Si fallas o se agota el tiempo, el turno pasa por <strong>rebote</strong> al siguiente jugador para que complete los que faltan.</li>
-                <li>La siguiente ronda la abrirá siempre de forma secuencial el jugador siguiente al que inició la ronda anterior.</li>
+                <li>
+                  <strong>Elige entre 3 temáticas:</strong> Al inicio de cada ronda se sortean 3 categorías y el jugador en turno escoge una.
+                </li>
+                <li>
+                  <strong>Preparación y 60 segundos:</strong> Tienes <strong>3 segundos</strong> para prepararte antes de que empiece la cuenta atrás de <strong>60 segundos</strong> para decir los elementos en voz alta.
+                </li>
+                <li>
+                  <strong>Rebote:</strong> Si fallas o se agota el tiempo, el turno pasa por rebote al siguiente jugador para que complete las respuestas que falten.
+                </li>
               </ul>
 
-              <p style={{ marginTop: '0.9rem', marginBottom: '0.4rem', fontWeight: 800, color: '#0f172a' }}>Sistema de puntuación:</p>
-              <div className="aprox-tabla-puntos">
-                <div className="aprox-puntos-fila acierto">
-                  <span>🎯 Reto completado con éxito</span>
-                  <strong>+2 puntos por elemento pedido</strong>
+              <div className="rf-ayuda-puntos">
+                <div className="rf-ayuda-fila ok">
+                  <span>🎯 Reto completado</span>
+                  <strong>+2 pts por elemento</strong>
                 </div>
-                <div className="aprox-puntos-fila intermedia" style={{ background: '#dbeafe', color: '#1e40af' }}>
+                <div className="rf-ayuda-fila rebote">
                   <span>🔄 Completado en rebote</span>
-                  <strong>Se lleva los puntos totales del reto</strong>
+                  <strong>Se lleva todos los puntos</strong>
                 </div>
-                <div className="aprox-puntos-fila cercana" style={{ background: '#fee2e2', color: '#991b1b' }}>
-                  <span>🏳️ Rendirse / Nadie lo logra</span>
-                  <strong>0 puntos para todos en la ronda</strong>
+                <div className="rf-ayuda-fila danger">
+                  <span>🏳️ Rendirse / Nadie acierta</span>
+                  <strong>0 puntos en la ronda</strong>
                 </div>
               </div>
             </div>
 
-            <div className="rg-modal-acciones" style={{ marginTop: '1.2rem' }}>
-              <button type="button" className="big full qq-btn-principal" onClick={() => setMostrarAyuda(false)}>
-                Entendido
-              </button>
-            </div>
+            <button
+              type="button"
+              className="big full qq-btn-principal"
+              onClick={() => setMostrarAyuda(false)}
+            >
+              ¡Entendido!
+            </button>
           </div>
         </div>
       )}

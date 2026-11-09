@@ -1,8 +1,7 @@
 // client/src/games/Rapidfire/RapidfireLocal.jsx
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import CategoryCard from '../../components/CategoryCard.jsx';
 import './Rapidfire.css';
 
 const TIEMPO_S = 60;
@@ -12,7 +11,17 @@ const NUM_OPCIONES = 3;
 const MIN_JUGADORES = 2;
 const MAX_JUGADORES = 10;
 
-const COLORES = ['#ef4444', '#2563eb', '#16a34a', '#f59e0b', '#9333ea', '#ec4899', '#0d9488', '#ea580c', '#475569', '#65a30d'];
+const COLORES = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316'];
+export const colorJugador = (i) => COLORES[((i % COLORES.length) + COLORES.length) % COLORES.length];
+export const inicial = (nombre = '?') => nombre.trim().charAt(0).toUpperCase() || '?';
+export const indiceColor = (j, i) => (typeof j?.id === 'number' ? j.id - 1 : i);
+
+const COLORES_CATEGORIA = [
+  ['#f97316', '#ef4444'],
+  ['#8b5cf6', '#6366f1'],
+  ['#06b6d4', '#3b82f6'],
+  ['#22c55e', '#16a34a']
+];
 
 const aleatorio = (n) => Math.floor(Math.random() * n);
 
@@ -23,6 +32,167 @@ function barajar(lista) {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+
+/* ==========================================================================
+   COMPONENTES DE TABLERO COMPARTIDOS (USADOS EN LOCAL Y ONLINE)
+   ========================================================================== */
+
+export function Aviso({ evento }) {
+  const [visible, setVisible] = useState(null);
+  const ultimo = useRef(evento?.n ?? 0);
+
+  useEffect(() => {
+    if (!evento || evento.n === ultimo.current) return undefined;
+    ultimo.current = evento.n;
+    setVisible(evento);
+    const id = setTimeout(() => setVisible(null), 3500);
+    return () => clearTimeout(id);
+  }, [evento]);
+
+  if (!visible) return null;
+  const bueno = visible.tipo === 'acierto' || visible.tipo === 'rebote_ok';
+  const malo = visible.tipo === 'tiempo' || visible.tipo === 'rendido';
+
+  return (
+    <div className={`cnp-aviso${bueno ? ' bueno' : ''}${malo ? ' malo' : ''}`} role="status" aria-live="polite">
+      <span aria-hidden="true">
+        {bueno ? '🎉' : visible.tipo === 'rebote' ? '🔄' : visible.tipo === 'tiempo' ? '⏰' : '🏳️'}
+      </span>
+      {visible.texto}
+    </div>
+  );
+}
+
+export function BotonPortada({ onClick, texto = 'Portada' }) {
+  return (
+    <button type="button" className="qqp-salir" onClick={onClick}>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7" />
+      </svg>
+      <span>{texto}</span>
+    </button>
+  );
+}
+
+export function Avatar({ nombre, color, grande = false }) {
+  return (
+    <span className={`qqp-avatar${grande ? ' grande' : ''}`} style={{ '--c': color || '#ef4444' }}>
+      {inicial(nombre)}
+    </span>
+  );
+}
+
+export function Cabecera({ onSalir, textoSalir = 'Portada', onAyuda, categoria, etiqueta, titulo, avatar, chips, children }) {
+  return (
+    <header className="qqp-hero">
+      <span className="qqp-hero-deco" aria-hidden="true">
+        <Icon name="zap" size={150} strokeWidth={1.4} />
+      </span>
+      <div className="qqp-hero-top">
+        {onSalir ? <BotonPortada onClick={onSalir} texto={textoSalir} /> : <span />}
+        <div className="qqp-hero-chips">
+          {chips}
+          {categoria && (
+            <span className="qqp-chip" title="Categoría de la ronda">
+              <Icon name={categoria.icono || 'star'} size={14} /> <span>{categoria.nombre}</span>
+            </span>
+          )}
+          {onAyuda && (
+            <button type="button" className="qqp-ayuda" onClick={onAyuda} title="Cómo jugar" aria-label="Cómo jugar">
+              ?
+            </button>
+          )}
+        </div>
+      </div>
+      <div className="qqp-hero-cuerpo">
+        {avatar}
+        <div className="qqp-hero-textos">
+          {etiqueta && <p className="qqp-hero-etiqueta">{etiqueta}</p>}
+          <h2 className="qqp-hero-titulo">{titulo}</h2>
+        </div>
+      </div>
+      {children}
+    </header>
+  );
+}
+
+export function OrdenTurnos({ jugadores, activoId, intentadosIds = [], puntosMap = null, yoId = null }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    ref.current?.querySelector('.activo')?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+  }, [activoId]);
+
+  return (
+    <ol className="qqp-orden" ref={ref} aria-label="Orden de jugadores">
+      {jugadores.map((j, i) => {
+        const esActivo = j.id === activoId;
+        const yaIntento = !esActivo && intentadosIds.includes(j.id);
+        const pts = puntosMap ? (puntosMap[j.id] ?? 0) : (j.puntos ?? 0);
+        return (
+          <li
+            key={j.id}
+            className={`qqp-orden-item${esActivo ? ' activo' : ''}${yaIntento ? ' hecho' : ''}`}
+            style={{ '--c': colorJugador(indiceColor(j, i)) }}
+            aria-current={esActivo ? 'step' : undefined}
+          >
+            <span className="qqp-orden-avatar">{inicial(j.nombre)}</span>
+            <span className="qqp-orden-nombre">
+              {j.nombre}{yoId && j.id === yoId ? ' (tú)' : ''}
+            </span>
+            <span className="qqp-orden-pts">{pts}p</span>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+export function OpcionesCategoria({ opciones = [], onElegir, deshabilitado = false }) {
+  return (
+    <ul className={`rf-categorias-grid${deshabilitado ? ' bloqueado' : ''}`}>
+      {opciones.map((cat, i) => {
+        const [c1, c2] = COLORES_CATEGORIA[i % COLORES_CATEGORIA.length];
+        return (
+          <li key={cat.id}>
+            <button
+              type="button"
+              className="qqp-categoria rf-categoria-card"
+              style={{ '--c1': c1, '--c2': c2 }}
+              disabled={deshabilitado}
+              onClick={() => !deshabilitado && onElegir && onElegir(cat)}
+            >
+              <span className="qqp-categoria-icono">
+                <Icon name={cat.icono || 'star'} size={26} />
+              </span>
+              <span className="qqp-categoria-textos">
+                <span className="qqp-categoria-nombre">{cat.nombre}</span>
+                <span className="qqp-categoria-info">
+                  {deshabilitado ? 'Opción sorteada' : 'Toca para jugar este reto'}
+                </span>
+              </span>
+            </button>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+export function BotonPrincipal({ children, onClick, disabled, type = 'button' }) {
+  return (
+    <button type={type} className="qqp-boton" onClick={onClick} disabled={disabled}>
+      {children}
+    </button>
+  );
+}
+
+export function EnlaceSecundario({ children, onClick }) {
+  return (
+    <button type="button" className="qqp-enlace" onClick={onClick}>
+      {children}
+    </button>
+  );
 }
 
 function BotonVolver({ onClick, texto = 'Volver' }) {
@@ -36,7 +206,26 @@ function BotonVolver({ onClick, texto = 'Volver' }) {
   );
 }
 
-function Turno({ jugador, ronda, esRebote, motivo, categoria, reto, onAcierto, onRebote, onTiempo, onRendirse, onSalirPortada }) {
+/* ==========================================================================
+   PANTALLA DE TURNO ACTIVO (LOCAL)
+   ========================================================================== */
+
+function Turno({
+  jugador,
+  jugadores,
+  puntos,
+  intentadosIds,
+  ronda,
+  esRebote,
+  motivo,
+  categoria,
+  reto,
+  onAcierto,
+  onRebote,
+  onTiempo,
+  onRendirse,
+  onSalirPortada
+}) {
   const [prep, setPrep] = useState(PREPARACION_S);
   const [restante, setRestante] = useState(TIEMPO_S);
   const alAcabarse = useRef(onTiempo);
@@ -69,67 +258,98 @@ function Turno({ jugador, ronda, esRebote, motivo, categoria, reto, onAcierto, o
   }, []);
 
   const preparando = prep > 0;
+  const segundosMostrar = preparando ? prep : Math.ceil(restante);
+  const porcentajeBarra = preparando
+    ? (prep / PREPARACION_S) * 100
+    : (restante / TIEMPO_S) * 100;
+  const puntosEnJuego = reto.n * PUNTOS_POR_ACIERTO;
 
   return (
-    <section className="game">
-      <div className="panel qq-menu-panel">
-        <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
-          <BotonVolver texto="Volver a la portada" onClick={onSalirPortada} />
-          <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
-            {esRebote ? 'Rebote' : `Ronda ${ronda}`}
+    <section className="game qqp-escena">
+      <Cabecera
+        onSalir={onSalirPortada}
+        categoria={categoria}
+        etiqueta={esRebote ? `Ronda ${ronda} · Turno de rebote` : `Ronda ${ronda} · Turno en juego`}
+        titulo={jugador.nombre}
+        avatar={<Avatar nombre={jugador.nombre} color={colorJugador(indiceColor(jugador, 0))} />}
+        chips={
+          <span className="qqp-chip">
+            <Icon name="trophy" size={14} /> <span>+{puntosEnJuego} pts</span>
           </span>
-        </div>
-
-        {motivo && (
-          <p className="rf-aviso" role="status" style={{ marginBottom: '1rem' }}>
-            <Icon name={motivo === 'tiempo' ? 'hourglass' : 'refresh'} size={22} />
-            {motivo === 'tiempo' ? '¡Se acabó el tiempo!' : '¡Rebote!'} Le toca a <strong>{jugador.nombre}</strong>
-          </p>
+        }
+      >
+        {/* Temporizador en la cabecera: solo se muestra cuando termina la cuenta atrás de preparación */}
+        {!preparando && (
+          <div className="qqp-identidad bm-consigna-box">
+            <div className="bm-hero-stats">
+              <span className="bm-hero-stat">
+                {esRebote
+                  ? '🔄 Rebote: di las respuestas que faltan'
+                  : '🎙️ Di las respuestas en voz alta'}
+              </span>
+              <span className={`bm-hero-stat timer${restante <= 10 ? ' low' : ''}`}>
+                <Icon name="clock" size={14} /> {`${segundosMostrar}s`}
+              </span>
+            </div>
+            <div className="bm-timer-track" role="timer" aria-label="Tiempo restante">
+              <div
+                className={`bm-timer-fill${restante <= 10 ? ' low' : ''}`}
+                style={{ width: `${porcentajeBarra}%` }}
+              />
+            </div>
+          </div>
         )}
 
-        <div className="starter" style={{ textAlign: 'center', marginBottom: '1rem' }}>
-          <span>Turno de: <strong>{jugador.nombre}</strong></span>
+        <OrdenTurnos
+          jugadores={jugadores}
+          activoId={jugador.id}
+          intentadosIds={intentadosIds}
+          puntosMap={puntos}
+        />
+      </Cabecera>
+
+      {motivo && (
+        <div className="rf-aviso-banner" role="status">
+          <Icon name={motivo === 'tiempo' ? 'hourglass' : 'refresh'} size={20} />
+          <span>
+            {motivo === 'tiempo' ? '¡Se acabó el tiempo anterior!' : '¡Rebote!'} Turno para <strong>{jugador.nombre}</strong>
+          </span>
         </div>
+      )}
 
-        <p className="categoria" style={{ display: 'inline-flex', margin: '0 auto 1rem', width: 'fit-content' }}>
-          <Icon name={categoria.icono} size={16} /> {categoria.nombre}
-        </p>
+      {/* Tarjeta blanca limpia (con la única cuenta atrás inicial abajo) */}
+      <div className="qqp-tarjeta rf-tarjeta-reto">
+        <div className="rf-reto-numero">{reto.n}</div>
+        <p className="rf-reto-texto">{reto.texto}</p>
 
-        <div className="sigla-card rf-reto">
-          <p className="rf-n" style={{ color: '#dc2626', fontSize: '3.5rem', fontWeight: '900', lineHeight: 1 }}>{reto.n}</p>
-          <p className="rf-texto" style={{ color: '#1e293b', fontSize: '1.25rem', fontWeight: '600', marginTop: '0.5rem' }}>{reto.texto}</p>
-        </div>
+        {preparando && (
+          <div className="rf-prep-box" role="status" aria-live="polite">
+            <span className="rf-prep-circulo">{prep}</span>
+            <span className="rf-prep-label">Comenzando cuenta atrás…</span>
+          </div>
+        )}
+      </div>
 
-        <div className="timer" role="timer" aria-label="Tiempo restante" style={{ marginTop: '0.5rem' }}>
-          <div
-            className={`timer-bar${!preparando && restante <= 10 ? ' low' : ''}`}
-            style={{ width: `${(restante / TIEMPO_S) * 100}%` }}
-          />
-        </div>
-        <p className="timer-text">
-          <Icon name="clock" size={16} />
-          {preparando ? `Preparados… ${prep}` : `${Math.ceil(restante)} s`}
-        </p>
-
+      <div className="qqp-barra">
         <div className="rf-botones">
-          <button className="ok" disabled={preparando} onClick={onAcierto}>
-            <Icon name="check" size={22} strokeWidth={2.5} /> Correcto
+          <button type="button" className="ok" disabled={preparando} onClick={onAcierto}>
+            <Icon name="check" size={22} strokeWidth={2.5} /> ¡Correcto!
           </button>
-          <button className="rebote" disabled={preparando} onClick={onRebote}>
+          <button type="button" className="rebote" disabled={preparando} onClick={onRebote}>
             <Icon name="refresh" size={22} strokeWidth={2.5} /> Rebote
           </button>
         </div>
-
-        <div className="qq-tablero-footer">
-          <button type="button" className="qq-link-otra-ronda" onClick={onRendirse}>
-            Rendirse (nadie puntúa)
-          </button>
-        </div>
-        {esRebote && <p className="previa">Rebote: el jugador debe decir las que faltan.</p>}
+        <EnlaceSecundario onClick={onRendirse}>
+          <Icon name="flag" size={15} /> Rendirse (nadie puntúa)
+        </EnlaceSecundario>
       </div>
     </section>
   );
 }
+
+/* ==========================================================================
+   MODO LOCAL PRINCIPAL
+   ========================================================================== */
 
 export default function RapidfireLocal({ onVolver, onExit, onAbrirAyuda }) {
   const navigate = useNavigate();
@@ -137,7 +357,7 @@ export default function RapidfireLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [paso, setPaso] = useState('config');
   const [modalSalirPortada, setModalSalirPortada] = useState(false);
   const [categoriasTodas, setCategoriasTodas] = useState([]);
-  
+
   const [numJugadores, setNumJugadores] = useState(2);
   const [jugadores, setJugadores] = useState([
     { id: 1, nombre: 'Jugador 1' },
@@ -154,6 +374,10 @@ export default function RapidfireLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [categoria, setCategoria] = useState(null);
   const [reto, setReto] = useState(null);
   const [ultimo, setUltimo] = useState(null);
+
+  const [eventoAviso, setEventoAviso] = useState(null);
+  const avisoSeqRef = useRef(0);
+
   const usados = useRef([]);
   const intentados = useRef(new Set());
 
@@ -165,6 +389,11 @@ export default function RapidfireLocal({ onVolver, onExit, onAbrirAyuda }) {
       })
       .catch((err) => console.error('Error al cargar categorías de rapidfire:', err));
   }, []);
+
+  const lanzarAviso = (tipo, texto) => {
+    avisoSeqRef.current += 1;
+    setEventoAviso({ n: avisoSeqRef.current, tipo, texto });
+  };
 
   const handleSalirAPortada = () => {
     setModalSalirPortada(false);
@@ -182,10 +411,12 @@ export default function RapidfireLocal({ onVolver, onExit, onAbrirAyuda }) {
   const actualizarCantidadJugadores = (nuevoNum) => {
     const num = Math.max(MIN_JUGADORES, Math.min(MAX_JUGADORES, nuevoNum));
     setNumJugadores(num);
-    setJugadores(Array.from({ length: num }, (_, i) => ({
-      id: i + 1,
-      nombre: jugadores[i]?.nombre ?? `Jugador ${i + 1}`
-    })));
+    setJugadores(
+      Array.from({ length: num }, (_, i) => ({
+        id: i + 1,
+        nombre: jugadores[i]?.nombre ?? `Jugador ${i + 1}`
+      }))
+    );
   };
 
   const handleNombre = (index, valor) => {
@@ -208,10 +439,17 @@ export default function RapidfireLocal({ onVolver, onExit, onAbrirAyuda }) {
     setJugadorInicialRonda(primer);
     setProximoInicialRonda((primer + 1) % lista.length);
     setTurno(primer);
-    
+
     setUltimo(null);
     sortearOpciones(categoriasTodas);
     setPaso('categorias');
+  };
+
+  const nuevaPartida = () => {
+    setUltimo(null);
+    setCategoria(null);
+    setReto(null);
+    setPaso('config');
   };
 
   const elegirCategoria = async (cat) => {
@@ -237,6 +475,11 @@ export default function RapidfireLocal({ onVolver, onExit, onAbrirAyuda }) {
     }
   };
 
+  const cerrarRonda = (resultado) => {
+    setUltimo(resultado);
+    setPaso('puntuaciones');
+  };
+
   const pasarTurno = (porque) => {
     let sig = (turno + 1) % jugadores.length;
     let intentosLoop = 0;
@@ -247,18 +490,21 @@ export default function RapidfireLocal({ onVolver, onExit, onAbrirAyuda }) {
 
     if (!intentados.current.has(sig)) {
       intentados.current.add(sig);
+      const sigJugador = jugadores[sig];
       setTurno(sig);
       setIntento((k) => k + 1);
       setMotivo(porque);
+      lanzarAviso(
+        porque === 'tiempo' ? 'tiempo' : 'rebote',
+        porque === 'tiempo'
+          ? `¡Tiempo agotado! Rebote para ${sigJugador.nombre}`
+          : `¡Rebote para ${sigJugador.nombre}!`
+      );
     } else {
       setProximoInicialRonda((jugadorInicialRonda + 1) % jugadores.length);
+      lanzarAviso('rendido', 'Nadie ha completado el reto en esta ronda.');
       cerrarRonda({ tipo: 'rendido' });
     }
-  };
-
-  const cerrarRonda = (resultado) => {
-    setUltimo(resultado);
-    setPaso('puntuaciones');
   };
 
   const acierto = () => {
@@ -267,11 +513,14 @@ export default function RapidfireLocal({ onVolver, onExit, onAbrirAyuda }) {
     setPuntos((p) => ({ ...p, [jugador.id]: (p[jugador.id] ?? 0) + ganados }));
 
     setProximoInicialRonda((jugadorInicialRonda + 1) % jugadores.length);
-    cerrarRonda({ tipo: intento > 0 ? 'rebote' : 'acierto', jugador: jugador.nombre, puntos: ganados });
+    const tipo = intento > 0 ? 'rebote' : 'acierto';
+    lanzarAviso('acierto', `¡${jugador.nombre} completa el reto y suma +${ganados} puntos!`);
+    cerrarRonda({ tipo, jugador: jugador.nombre, puntos: ganados });
   };
 
   const rendirse = () => {
     setProximoInicialRonda((jugadorInicialRonda + 1) % jugadores.length);
+    lanzarAviso('rendido', 'Ronda finalizada sin puntos.');
     cerrarRonda({ tipo: 'rendido' });
   };
 
@@ -290,29 +539,15 @@ export default function RapidfireLocal({ onVolver, onExit, onAbrirAyuda }) {
   const maximo = ranking.length ? (puntos[ranking[0].id] ?? 0) : 0;
   const ganadores = maximo > 0 ? ranking.filter((j) => (puntos[j.id] ?? 0) === maximo) : [];
 
-  const tabla = (
-    <div className="scoreboard">
-      {ranking.map((j, i) => {
-        const pts = puntos[j.id] ?? 0;
-        const primero = maximo > 0 && pts === maximo;
-        return (
-          <div key={j.id} className={`score-row${primero ? ' first' : ''}`}>
-            <span className="score-name">
-              {primero ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
-              {j.nombre}
-            </span>
-            <span className="score-pts">{pts} pts</span>
-          </div>
-        );
-      })}
-    </div>
-  );
-
+  const jugadorActual = jugadores[turno] || jugadores[0];
+  const intentadosIds = Array.from(intentados.current).map((idx) => jugadores[idx]?.id).filter(Boolean);
   const enPartidaActiva = paso !== 'config';
 
   return (
     <div className={`rf-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
-      {/* 1. CONFIGURACIÓN */}
+      <Aviso evento={eventoAviso} />
+
+      {/* 1. CONFIGURACIÓN DE JUGADORES */}
       {paso === 'config' && (
         <section className="game">
           <div className="panel qq-menu-panel">
@@ -385,7 +620,7 @@ export default function RapidfireLocal({ onVolver, onExit, onAbrirAyuda }) {
                 <div key={j.id} className="qq-jugador-input-card">
                   <span
                     className="qq-jugador-badge"
-                    style={{ background: COLORES[idx % COLORES.length] }}
+                    style={{ background: colorJugador(idx) }}
                   >
                     {idx + 1}
                   </span>
@@ -395,7 +630,6 @@ export default function RapidfireLocal({ onVolver, onExit, onAbrirAyuda }) {
                     onChange={(e) => handleNombre(idx, e.target.value)}
                     placeholder={`Jugador ${j.id}`}
                     maxLength={20}
-                    required
                   />
                 </div>
               ))}
@@ -407,54 +641,45 @@ export default function RapidfireLocal({ onVolver, onExit, onAbrirAyuda }) {
               style={{ marginTop: '1.5rem' }}
               onClick={empezar}
             >
-              <Icon name="dice" size={24} /> ¡Iniciar juego!
+              <Icon name="play" size={22} /> Iniciar juego
             </button>
           </div>
         </section>
       )}
 
-      {/* 2. CATEGORÍAS */}
-      {paso === 'categorias' && (
-        <section className="game">
-          <div className="panel qq-menu-panel">
-            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
-              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
-              <span className="qq-tablero-badge" style={{ marginBottom: 0 }}>
-                Ronda {ronda}
-              </span>
-            </div>
+      {/* 2. SELECCIÓN ENTRE LAS 3 CATEGORÍAS SORTEADAS (Con botón de ayuda) */}
+      {paso === 'categorias' && jugadorActual && (
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => (ronda === 1 ? setPaso('config') : setModalSalirPortada(true))}
+            textoSalir={ronda === 1 ? 'Volver' : 'Portada'}
+            onAyuda={onAbrirAyuda}
+            etiqueta={`Ronda ${ronda} · ${ronda === 1 ? 'Empieza al azar' : 'Abre la ronda'}`}
+            titulo={`${jugadorActual.nombre}, elige temática`}
+            avatar={<Avatar nombre={jugadorActual.nombre} color={colorJugador(indiceColor(jugadorActual, turno))} />}
+          >
+            <OrdenTurnos
+              jugadores={jugadores}
+              activoId={jugadorActual.id}
+              puntosMap={puntos}
+            />
+          </Cabecera>
 
-            <div className="starter" style={{ textAlign: 'center', marginBottom: '1.2rem' }}>
-              <Icon name="dice" size={28} />
-              <p style={{ margin: 0 }}>
-                {ronda === 1 ? 'Empieza al azar' : 'Abre la ronda'}: <strong>{jugadores[turno].nombre}</strong>
-              </p>
-            </div>
-
-            <div className="qq-section-header">
-              <h3 className="qq-section-title">{jugadores[turno].nombre}, elige una categoría:</h3>
-            </div>
-
-            <div className="rf-opciones">
-              {opciones.map((c, idx) => (
-                <CategoryCard
-                  key={c.id}
-                  nombre={c.nombre}
-                  icono={c.icono}
-                  indice={idx}
-                  onClick={() => elegirCategoria(c)}
-                />
-              ))}
-            </div>
-          </div>
+          <OpcionesCategoria
+            opciones={opciones}
+            onElegir={elegirCategoria}
+          />
         </section>
       )}
 
-      {/* 3. TURNO */}
-      {paso === 'turno' && categoria && reto && (
+      {/* 3. TURNO ACTIVO (Sin botón de ayuda) */}
+      {paso === 'turno' && categoria && reto && jugadorActual && (
         <Turno
           key={intento}
-          jugador={jugadores[turno]}
+          jugador={jugadorActual}
+          jugadores={jugadores}
+          puntos={puntos}
+          intentadosIds={intentadosIds}
           ronda={ronda}
           esRebote={intento > 0}
           motivo={motivo}
@@ -470,63 +695,112 @@ export default function RapidfireLocal({ onVolver, onExit, onAbrirAyuda }) {
 
       {/* 4. PUNTUACIONES DE LA RONDA */}
       {paso === 'puntuaciones' && (
-        <section className="game">
-          <div className="panel qq-menu-panel">
-            <div className="qq-card-top" style={{ marginBottom: '0.8rem' }}>
-              <BotonVolver texto="Volver a la portada" onClick={() => setModalSalirPortada(true)} />
-            </div>
-
-            <div className="end-card" style={{ border: 'none', boxShadow: 'none', padding: '0 0 1rem' }}>
-              <span className="end-icon"><Icon name="trophy" size={44} /></span>
-              <h1 className="title">Puntuaciones</h1>
-              {ultimo && (
-                <p className="reveal">
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            categoria={categoria}
+            etiqueta={`Ronda ${ronda} completada`}
+            titulo="Puntuaciones"
+          >
+            {ultimo && (
+              <div className="qqp-identidad">
+                <span className="qqp-identidad-icono">
+                  <Icon name={ultimo.tipo === 'rendido' ? 'flag' : 'trophy'} size={16} />
+                </span>
+                <span>
                   {ultimo.tipo === 'rendido'
-                    ? 'Os habéis rendido o nadie lo logró: nadie suma puntos esta ronda.'
+                    ? 'Nadie ha sumado puntos en esta ronda.'
                     : ultimo.tipo === 'rebote'
-                      ? <><strong>{ultimo.jugador}</strong> ha cogido el rebote y se lleva <strong>{ultimo.puntos} puntos</strong>.</>
-                      : <><strong>{ultimo.jugador}</strong> lo ha dicho todo y suma <strong>{ultimo.puntos} puntos</strong>.</>}
-                </p>
-              )}
-              {tabla}
-            </div>
-
-            <div style={{ marginTop: '1.2rem', display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-              <button type="button" className="big full qq-btn-principal" onClick={continuar}>
-                <Icon name="play" size={20} /> Continuar: ronda {ronda + 1}
-              </button>
-              <div className="qq-tablero-footer" style={{ marginTop: 0, paddingTop: '0.6rem', borderTop: 'none' }}>
-                <button type="button" className="qq-link-otra-ronda" onClick={() => setPaso('final')}>
-                  Finalizar juego
-                </button>
+                      ? <><strong>{ultimo.jugador}</strong> completó el rebote (<strong>+{ultimo.puntos} pts</strong>).</>
+                      : <><strong>{ultimo.jugador}</strong> completó el reto (<strong>+{ultimo.puntos} pts</strong>).</>}
+                </span>
               </div>
-            </div>
+            )}
+          </Cabecera>
+
+          <div className="qqp-tarjeta">
+            <p className="qqp-carta-cara-titulo" style={{ marginBottom: '0.8rem' }}>
+              <Icon name="trophy" size={16} /> Clasificación general
+            </p>
+            <ul className="qqp-rivales">
+              {ranking.map((j, i) => {
+                const pts = puntos[j.id] ?? 0;
+                const lider = maximo > 0 && pts === maximo;
+                return (
+                  <li key={j.id} className="qqp-rival" style={{ '--c': colorJugador(indiceColor(j, i)) }}>
+                    <span className="qqp-rival-avatar">{lider ? '👑' : i + 1}</span>
+                    <span className="qqp-rival-datos">
+                      <span className="qqp-rival-nombre">{lider ? 'Líder actual' : `Puesto ${i + 1}`}</span>
+                      <strong className="qqp-rival-tarjeta">{j.nombre}</strong>
+                    </span>
+                    <span className="rf-ranking-pts">{pts} pts</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
+          <div className="qqp-barra">
+            <BotonPrincipal onClick={continuar}>
+              <Icon name="play" size={20} /> Continuar: Ronda {ronda + 1}
+            </BotonPrincipal>
+            <EnlaceSecundario onClick={() => setPaso('final')}>
+              Finalizar partida y ver podio
+            </EnlaceSecundario>
           </div>
         </section>
       )}
 
       {/* 5. PODIO FINAL */}
       {paso === 'final' && (
-        <section className="game">
-          <div className="end-card">
-            <span className="end-icon"><Icon name="crown" size={44} /></span>
-            <h1 className="title">Puntuaciones finales</h1>
-            <p className="final-score">
-              {ganadores.length === 0
-                ? 'Nadie ha sumado puntos'
-                : ganadores.length === 1
-                  ? <>¡Gana {ganadores[0].nombre}!</>
-                  : <>Empate entre {ganadores.map((g) => g.nombre).join(', ')}</>}
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            etiqueta="Partida terminada"
+            titulo="Clasificación Final"
+            avatar={<span className="qqp-avatar" style={{ '--c': '#f59e0b' }}>🏆</span>}
+          >
+            <div className="qqp-identidad">
+              <span className="qqp-identidad-icono"><Icon name="crown" size={16} /></span>
+              <span>
+                {ganadores.length === 0
+                  ? 'Nadie ha conseguido puntos en esta partida.'
+                  : ganadores.length === 1
+                    ? <>¡Victoria para <strong>{ganadores[0].nombre}</strong> con <strong>{maximo} pts</strong>!</>
+                    : <>Empate entre <strong>{ganadores.map((g) => g.nombre).join(', ')}</strong> con <strong>{maximo} pts</strong></>}
+              </span>
+            </div>
+          </Cabecera>
+
+          <div className="qqp-tarjeta">
+            <p className="qqp-carta-cara-titulo" style={{ marginBottom: '0.8rem' }}>
+              <Icon name="users" size={16} /> Podio de jugadores
             </p>
-            {tabla}
+            <ul className="qqp-rivales">
+              {ranking.map((j, i) => {
+                const pts = puntos[j.id] ?? 0;
+                const lider = maximo > 0 && pts === maximo;
+                return (
+                  <li key={j.id} className="qqp-rival" style={{ '--c': colorJugador(indiceColor(j, i)) }}>
+                    <span className="qqp-rival-avatar">{lider ? '👑' : i + 1}</span>
+                    <span className="qqp-rival-datos">
+                      <span className="qqp-rival-nombre">{lider ? '¡Ganador!' : `Puesto ${i + 1}`}</span>
+                      <strong className="qqp-rival-tarjeta">{j.nombre}</strong>
+                    </span>
+                    <span className="rf-ranking-pts">{pts} pts</span>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
-          <div className="actions" style={{ marginTop: '1.5rem' }}>
-            <button type="button" className="big full qq-btn-principal" onClick={nuevaPartida}>
+
+          <div className="qqp-barra">
+            <BotonPrincipal onClick={nuevaPartida}>
               <Icon name="refresh" size={20} /> Nueva partida
-            </button>
-            <button type="button" className="secondary danger full" onClick={handleSalirAPortada}>
-              <Icon name="door" size={20} /> Volver a la portada
-            </button>
+            </BotonPrincipal>
+            <EnlaceSecundario onClick={handleSalirAPortada}>
+              Salir a la portada principal
+            </EnlaceSecundario>
           </div>
         </section>
       )}
