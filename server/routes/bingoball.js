@@ -1,503 +1,212 @@
 // server/routes/bingoball.js
+// Salas online de «Bingoball». Mismo esquema que el resto de juegos: salas en memoria + sondeo HTTP.
+// La lógica vive en ../bingoball/engine.js; cada jugador recibe solo su cartón. El reloj avanza al consultar.
 import express from 'express';
-import crypto from 'crypto';
-import { GRUPOS_BINGOS, getBingoPorId, getTodosJugadoresBingo } from '../data/seeds/bingoball/bingoballData.js';
+import * as E from '../bingoball/engine.js';
+import { GRUPOS_BINGOS } from '../data/seeds/bingoball/bingoballData.js';
+
+const bingoDeGrupo = (grupoId) => {
+  const grupo = GRUPOS_BINGOS.find((g) => g.id === grupoId) || GRUPOS_BINGOS[0];
+  return grupo.bingos[Math.floor(Math.random() * grupo.bingos.length)];
+};
 
 const router = express.Router();
-const salasOnline = {};
+const salas = {};
+const MIN = E.AJUSTES.min;
+const MAX = E.AJUSTES.max;
+const CADUCIDAD_MS = 4 * 60 * 60 * 1000;
 
-const TIEMPO_FUTBOLISTA = 15; // 15 segundos por futbolista
-
-const barajar = (arr) => {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
-};
-
-const generarCodigoSala = () => {
+const codigoSala = () => {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let c = '';
-  for (let i = 0; i < 4; i++) {
-    c += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
+  for (let i = 0; i < 4; i++) c += chars.charAt(Math.floor(Math.random() * chars.length));
   return c;
 };
+const nuevoToken = () => Math.random().toString(36).slice(2) + Date.now().toString(36) + Math.random().toString(36).slice(2);
 
-// Selecciona un sub-bingo aleatorio dentro del grupo principal seleccionado
-function elegirBingoAleatorioDeGrupo(grupoId) {
-  const grupo = GRUPOS_BINGOS.find(g => g.id === grupoId) || GRUPOS_BINGOS[0];
-  const bingos = grupo.bingos;
-  const elegido = bingos[Math.floor(Math.random() * bingos.length)];
-  return elegido.id;
+setInterval(() => {
+  const ahora = Date.now();
+  Object.keys(salas).forEach((c) => { if (ahora - salas[c].ultimaActividad > CADUCIDAD_MS) delete salas[c]; });
+}, 10 * 60 * 1000).unref();
+
+function sala_y_jugador(req, res) {
+  const code = String(req.params.code || '').toUpperCase();
+  const token = req.body?.token ?? req.query?.token;
+  const sala = salas[code];
+  if (!sala) { res.status(404).json({ error: 'La sala no existe o ha caducado.' }); return null; }
+  const jugador = sala.jugadores.find((j) => j.token === token);
+  if (!jugador) { res.status(403).json({ error: 'No perteneces a esta sala.' }); return null; }
+  sala.ultimaActividad = Date.now();
+  jugador.visto = Date.now();
+  return { sala, jugador, esAdmin: sala.adminToken === token };
 }
 
-// Genera un cartón de 4 filas x 3 columnas (12 casillas en total)
-function generarCartonParaJugador(bingoId) {
-  const bingo = getBingoPorId(bingoId);
-  const pool = barajar([...bingo.categorias]);
-  const seleccionadas = pool.slice(0, 12);
-  const carton = [];
-
-  for (let i = 0; i < seleccionadas.length; i++) {
-    const cat = seleccionadas[i];
-    const fila = Math.floor(i / 3); // 0, 1, 2, 3
-    carton.push({
-      id: `c_${i}_${Math.random().toString(36).substring(2, 7)}`,
-      categoriaId: cat.id,
-      nombre: cat.nombre,
-      fila,
-      marcada: false,
-      jugadorAsignado: null
-    });
-  }
-  return carton;
+function cerrarPartida(sala) {
+  if (sala.puntosAplicados) return;
+  sala.puntosAplicados = true;
+  const g = sala.partida.fin.ganadores;
+  const pts = Object.fromEntries(sala.jugadores.map((j) => [j.id, g.includes(j.id) ? 3 : 0]));
+  sala.jugadores.forEach((j) => { j.puntos += pts[j.id] || 0; });
+  sala.ultimaPartida = { partida: sala.numPartida, puntos: pts };
 }
+const revisar = (sala) => {
+  if (sala.estado === 'jugando' && sala.partida) E.tick(sala.partida, Date.now());
+  if (sala.partida?.fase === 'fin') cerrarPartida(sala);
+};
 
-// Obtiene un futbolista aleatorio que tenga UTILIDAD REAL para al menos un jugador
-function obtenerSiguienteFutbolista(sala) {
-  const bingo = getBingoPorId(sala.bingoId);
-  if (!bingo || !bingo.categorias) return 'Futbolista Misterioso';
-
-  // 1. Recopilar qué categorías siguen ABIERTAS (no marcadas) en los cartones de todos los jugadores
-  const categoriasAbiertasIds = new Set();
-  sala.jugadores.forEach(j => {
-    (j.carton || []).forEach(casilla => {
-      if (!casilla.marcada) {
-        categoriasAbiertasIds.add(casilla.categoriaId);
-      }
-    });
-  });
-
-  // Si ya no quedan casillas abiertas en ningún cartón (o todos terminaron)
-  if (categoriasAbiertasIds.size === 0) {
-    return 'Fin del Cartón';
-  }
-
-  // 2. Buscar únicamente los futbolistas que pertenezcan a alguna de esas categorías abiertas
-  const futbolistasUtilesSet = new Set();
-  bingo.categorias.forEach(cat => {
-    if (categoriasAbiertasIds.has(cat.id)) {
-      cat.jugadores.forEach(f => futbolistasUtilesSet.add(f));
-    }
-  });
-
-  const futbolistasUtiles = Array.from(futbolistasUtilesSet);
-  if (futbolistasUtiles.length === 0) {
-    return 'Futbolista Misterioso';
-  }
-
-  // 3. Filtrar para evitar que se repitan los recién salidos (últimos 15) entre los que siguen siendo útiles
-  const disponibles = futbolistasUtiles.filter(f => !sala.historialJugadores.slice(-15).includes(f));
-  const pool = disponibles.length > 0 ? disponibles : futbolistasUtiles;
-  
-  const elegido = pool[Math.floor(Math.random() * pool.length)];
-  sala.historialJugadores.push(elegido);
-  return elegido;
-}
-
-// -------------------------------------------------------------
-// Fases del Juego y Temporizadores
-// -------------------------------------------------------------
-function iniciarFasePreparacion(sala) {
-  if (sala.timer) clearInterval(sala.timer);
-  sala.estado = 'preparacion';
-  sala.segundosRestantes = 10;
-
-  sala.timer = setInterval(() => {
-    sala.segundosRestantes -= 1;
-    if (sala.segundosRestantes <= 0) {
-      clearInterval(sala.timer);
-      iniciarCuentaAtras(sala);
-    }
-  }, 1000);
-}
-
-function iniciarCuentaAtras(sala) {
-  if (sala.timer) clearInterval(sala.timer);
-  sala.estado = 'cuenta_atras';
-  sala.cuentaAtras321 = 3;
-
-  sala.timer = setInterval(() => {
-    sala.cuentaAtras321 -= 1;
-    if (sala.cuentaAtras321 <= 0) {
-      clearInterval(sala.timer);
-      iniciarPartidaJugando(sala);
-    }
-  }, 1000);
-}
-
-function iniciarPartidaJugando(sala) {
+function iniciarPartida(sala) {
+  sala.numPartida += 1; sala.puntosAplicados = false;
+  sala.partida = E.crearPartida(sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre })), bingoDeGrupo(sala.config.grupo), Date.now());
   sala.estado = 'jugando';
-  sala.historialJugadores = [];
-  sala.jugadores.forEach(j => {
-    j.bloqueado = false;
-    j.haMarcadoEsteTurno = false;
-  });
-  siguienteTurnoFutbolista(sala);
 }
 
-function siguienteTurnoFutbolista(sala) {
-  if (sala.estado !== 'jugando') return;
-  if (sala.timer) clearInterval(sala.timer);
-
-  // Al salir un nuevo futbolista, el bloqueo temporal por fallo se resetea
-  sala.jugadores.forEach(j => {
-    j.bloqueado = false;
-    j.haMarcadoEsteTurno = false;
-  });
-
-  sala.jugadorActual = obtenerSiguienteFutbolista(sala);
-  sala.segundosRestantes = TIEMPO_FUTBOLISTA;
-
-  sala.timer = setInterval(() => {
-    if (sala.estado !== 'jugando') {
-      clearInterval(sala.timer);
-      return;
-    }
-
-    sala.segundosRestantes -= 1;
-    if (sala.segundosRestantes <= 0) {
-      clearInterval(sala.timer);
-      siguienteTurnoFutbolista(sala);
-    }
-  }, 1000);
-}
-
-// -------------------------------------------------------------
-// Endpoints de la API
-// -------------------------------------------------------------
-
-// 1. Crear sala
-router.post('/crear', (req, res) => {
-  const { nombre } = req.body || {};
-  if (!nombre || !nombre.trim()) {
-    return res.status(400).json({ error: 'Debes indicar un nombre' });
-  }
-
-  let code = generarCodigoSala();
-  while (salasOnline[code]) code = generarCodigoSala();
-
-  const token = crypto.randomUUID();
-
-  salasOnline[code] = {
-    code,
-    estado: 'lobby',
-    grupoId: 'internacional',
-    bingoId: 'internacional_unico',
-    segundosRestantes: 10,
-    cuentaAtras321: 3,
-    jugadorActual: null,
-    ganadorBingo: null,
-    historialJugadores: [],
-    timer: null,
-    jugadores: [
-      {
-        id: 1,
-        nombre: nombre.trim(),
-        token,
-        puntos: 0,
-        esAdmin: true,
-        carton: [],
-        bloqueado: false,
-        haMarcadoEsteTurno: false
-      }
-    ]
+// ---------------------------------------------------------------- Crear / unirse
+router.post('/online/crear', (req, res) => {
+  const nombre = String(req.body?.nombre || '').trim().slice(0, 20);
+  if (!nombre) return res.status(400).json({ error: 'Debes indicar un nombre.' });
+  let code = codigoSala();
+  while (salas[code]) code = codigoSala();
+  const token = nuevoToken();
+  salas[code] = {
+    code, adminToken: token, estado: 'lobby', contadorIds: 1, numPartida: 0, puntosAplicados: false,
+    partida: null, ultimaPartida: null, ultimaActividad: Date.now(), config: { grupo: GRUPOS_BINGOS[0].id },
+    jugadores: [{ id: 1, token, nombre, puntos: 0, visto: Date.now() }]
   };
-
-  res.json({ success: true, code, token });
+  res.json({ success: true, code, token, jugadorId: 1 });
 });
 
-// 2. Unirse a sala
-router.post('/unirse', (req, res) => {
-  const { nombre, joinCode } = req.body || {};
-  const code = (joinCode || '').trim().toUpperCase();
-  const sala = salasOnline[code];
+router.post('/online/unirse', (req, res) => {
+  const code = String(req.body?.code || '').trim().toUpperCase();
+  const nombre = String(req.body?.nombre || '').trim().slice(0, 20);
+  const sala = salas[code];
+  if (!nombre) return res.status(400).json({ error: 'Debes indicar un nombre.' });
+  if (!sala) return res.status(404).json({ error: 'La sala no existe o el código es incorrecto.' });
+  if (sala.estado !== 'lobby') return res.status(400).json({ error: 'La partida ya ha comenzado.' });
+  if (sala.jugadores.length >= MAX) return res.status(400).json({ error: 'La sala está completa.' });
+  if (sala.jugadores.some((j) => j.nombre.toLowerCase() === nombre.toLowerCase())) return res.status(400).json({ error: 'Ya hay un jugador con ese nombre en la sala.' });
+  const token = nuevoToken();
+  sala.contadorIds += 1;
+  sala.jugadores.push({ id: sala.contadorIds, token, nombre, puntos: 0, visto: Date.now() });
+  sala.ultimaActividad = Date.now();
+  res.json({ success: true, code, token, jugadorId: sala.contadorIds });
+});
 
-  if (!sala) return res.status(404).json({ error: 'Sala no encontrada' });
-  if (sala.estado !== 'lobby') return res.status(400).json({ error: 'La partida ya ha comenzado' });
-  if (sala.jugadores.length >= 15) return res.status(400).json({ error: 'La sala está llena (máx. 15 jugadores)' });
-
-  if (sala.jugadores.some(j => j.nombre.toLowerCase() === nombre.trim().toLowerCase())) {
-    return res.status(400).json({ error: 'Ya hay un jugador con ese nombre en la sala' });
+// ---------------------------------------------------------------- Estado
+router.get('/online/sala/:code', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  const { sala, jugador, esAdmin } = c;
+  revisar(sala);
+  const base = {
+    success: true, ahora: Date.now(), grupos: GRUPOS_BINGOS.map((g) => ({ id: g.id, nombre: g.nombre })), code: sala.code, estado: sala.estado, esAdmin, yoId: jugador.id, numPartida: sala.numPartida, config: sala.config,
+    anfitrionId: sala.jugadores.find((j) => j.token === sala.adminToken)?.id ?? null, min: MIN, max: MAX,
+    jugadores: sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre, puntos: j.puntos, conectado: Date.now() - j.visto < 15000 })),
+    ultimaPartida: sala.ultimaPartida
+  };
+  if (sala.estado === 'jugando' && sala.partida) {
+    if (!sala.partida.jugadores.some((j) => j.id === jugador.id)) return res.status(403).json({ error: 'Ya no estás en la partida.' });
+    base.vista = E.vistaDe(sala.partida, jugador.id);
   }
-
-  const token = crypto.randomUUID();
-  const nuevoId = sala.jugadores.length > 0 ? Math.max(...sala.jugadores.map(j => j.id)) + 1 : 1;
-
-  sala.jugadores.push({
-    id: nuevoId,
-    nombre: nombre.trim(),
-    token,
-    puntos: 0,
-    esAdmin: false,
-    carton: [],
-    bloqueado: false,
-    haMarcadoEsteTurno: false
-  });
-
-  res.json({ success: true, code, token });
+  res.json(base);
 });
 
-// 3. Consultar estado de sala
-router.get('/sala/:code', (req, res) => {
-  const code = req.params.code.toUpperCase();
-  const { token } = req.query;
-  const sala = salasOnline[code];
-
-  if (!sala) return res.status(404).json({ error: 'Sala no encontrada o cerrada' });
-
-  const yo = sala.jugadores.find(j => j.token === token);
-  if (!yo) return res.status(403).json({ error: 'No autorizado' });
-
-  res.json({
-    success: true,
-    code: sala.code,
-    estado: sala.estado,
-    grupoId: sala.grupoId,
-    bingoId: sala.bingoId,
-    segundosRestantes: sala.segundosRestantes,
-    cuentaAtras321: sala.cuentaAtras321,
-    jugadorActual: sala.jugadorActual,
-    ganadorBingo: sala.ganadorBingo,
-    miCarton: yo.carton || [],
-    bloqueado: Boolean(yo.bloqueado),
-    puntos: yo.puntos,
-    esAdmin: yo.esAdmin,
-    jugadores: sala.jugadores.map(j => ({
-      id: j.id,
-      nombre: j.nombre,
-      puntos: j.puntos,
-      esTu: j.id === yo.id,
-      esAdmin: j.esAdmin
-    }))
-  });
+// ---------------------------------------------------------------- Configuración y expulsar (sala de espera)
+router.post('/online/sala/:code/config', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión.' });
+  if (c.sala.estado !== 'lobby') return res.status(400).json({ error: 'La partida ya ha empezado.' });
+  if (GRUPOS_BINGOS.some((g) => g.id === req.body?.grupo)) c.sala.config.grupo = req.body.grupo;
+  res.json({ success: true, config: c.sala.config });
 });
 
-// 4. Configurar categoría principal del Bingo
-router.post('/sala/:code/configurar', (req, res) => {
-  const code = req.params.code.toUpperCase();
-  const { token, grupoId } = req.body || {};
-  const sala = salasOnline[code];
-
-  if (!sala) return res.status(404).json({ error: 'Sala no encontrada' });
-  const yo = sala.jugadores.find(j => j.token === token);
-  if (!yo || !yo.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión puede cambiar la temática' });
-
-  sala.grupoId = grupoId || 'internacional';
-  res.json({ success: true, grupoId: sala.grupoId });
-});
-
-// 5. Iniciar partida desde el lobby
-router.post('/sala/:code/iniciar', (req, res) => {
-  const code = req.params.code.toUpperCase();
-  const { token } = req.body || {};
-  const sala = salasOnline[code];
-
-  if (!sala) return res.status(404).json({ error: 'Sala no encontrada' });
-  const yo = sala.jugadores.find(j => j.token === token);
-  if (!yo || !yo.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión puede iniciar la partida' });
-  if (sala.jugadores.length < 3) return res.status(400).json({ error: 'Se necesitan mínimo 3 jugadores' });
-
-  sala.bingoId = elegirBingoAleatorioDeGrupo(sala.grupoId);
-
-  sala.jugadores.forEach(j => {
-    j.puntos = 0;
-    j.carton = generarCartonParaJugador(sala.bingoId);
-    j.bloqueado = false;
-    j.haMarcadoEsteTurno = false;
-  });
-
-  sala.ganadorBingo = null;
-  iniciarFasePreparacion(sala);
-
+router.post('/online/sala/:code/expulsar', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión.' });
+  if (c.sala.estado !== 'lobby') return res.status(400).json({ error: 'Solo se puede quitar a alguien en la sala de espera.' });
+  const id = Number(req.body?.id);
+  if (id === c.jugador.id) return res.status(400).json({ error: 'No puedes quitarte a ti mismo.' });
+  const idx = c.sala.jugadores.findIndex((j) => j.id === id);
+  if (idx === -1) return res.status(404).json({ error: 'Ese jugador ya no está en la sala.' });
+  c.sala.jugadores.splice(idx, 1);
   res.json({ success: true });
 });
 
-// 6. Marcar casilla en el cartón
-router.post('/sala/:code/marcar', (req, res) => {
-  const code = req.params.code.toUpperCase();
-  const { token, casillaId } = req.body || {};
-  const sala = salasOnline[code];
-
-  if (!sala || sala.estado !== 'jugando') return res.status(400).json({ error: 'Partida no activa' });
-
-  const yo = sala.jugadores.find(j => j.token === token);
-  if (!yo) return res.status(403).json({ error: 'Jugador no encontrado' });
-
-  if (yo.bloqueado) {
-    return res.status(400).json({ error: 'Estás bloqueado durante este turno por haber fallado.' });
-  }
-
-  if (yo.haMarcadoEsteTurno) {
-    return res.status(400).json({ error: 'Ya has actuado con este futbolista.' });
-  }
-
-  const casilla = (yo.carton || []).find(c => c.id === casillaId);
-  if (!casilla || casilla.marcada) {
-    return res.status(400).json({ error: 'Casilla no válida o ya marcada.' });
-  }
-
-  const bingo = getBingoPorId(sala.bingoId);
-  const categoria = bingo.categorias.find(c => c.id === casilla.categoriaId);
-  const futbolistaActual = sala.jugadorActual;
-
-  const esCorrecto = categoria && categoria.jugadores.some(
-    nombreJugador => nombreJugador.toLowerCase() === (futbolistaActual || '').toLowerCase()
-  );
-
-  yo.haMarcadoEsteTurno = true;
-
-  if (esCorrecto) {
-    casilla.marcada = true;
-    casilla.jugadorAsignado = futbolistaActual;
-    yo.puntos += 2;
-
-    const cartonCompleto = yo.carton.every(c => c.marcada);
-    if (cartonCompleto) {
-      yo.puntos += 25;
-      sala.ganadorBingo = yo.nombre;
-      sala.estado = 'bingo_cantado';
-      if (sala.timer) clearInterval(sala.timer);
-
-      return res.json({
-        success: true,
-        acierto: true,
-        mensaje: `¡CORRECTO (+2 pts)! ¡${yo.nombre} ha cantado BINGO (+25 pts)!`
-      });
-    }
-
-    return res.json({
-      success: true,
-      acierto: true,
-      mensaje: `¡Correcto (+2 pts)! ${futbolistaActual} encaja en "${casilla.nombre}".`
-    });
-  } else {
-    yo.puntos = Math.max(0, yo.puntos - 1);
-    yo.bloqueado = true;
-
-    return res.json({
-      success: true,
-      acierto: false,
-      mensaje: `¡Fallo (-1 pt)! ${futbolistaActual} NO encaja en "${casilla.nombre}". Bloqueado hasta el siguiente futbolista.`
-    });
-  }
-});
-
-// 7. Cantar línea (Fila de 3 casillas)
-router.post('/sala/:code/linea', (req, res) => {
-  const code = req.params.code.toUpperCase();
-  const { token, filaIndex } = req.body || {};
-  const sala = salasOnline[code];
-
-  if (!sala || sala.estado !== 'jugando') return res.status(400).json({ error: 'Partida no activa' });
-
-  const yo = sala.jugadores.find(j => j.token === token);
-  if (!yo) return res.status(403).json({ error: 'No autorizado' });
-
-  const casillasFila = (yo.carton || []).filter(c => c.fila === filaIndex);
-  if (casillasFila.length === 3 && casillasFila.every(c => c.marcada)) {
-    yo.puntos += 15;
-
-    const bingo = getBingoPorId(sala.bingoId);
-    
-    // Categorías presentes en las otras 3 filas del cartón
-    const categoriasEnOtrasFilas = new Set(
-      yo.carton.filter(c => c.fila !== filaIndex).map(c => c.categoriaId)
-    );
-
-    // Categorías del bingo que NO están en las otras 3 filas
-    const candidatas = bingo.categorias.filter(c => !categoriasEnOtrasFilas.has(c.id));
-
-    // Priorizar las que no acaban de completarse en esta fila
-    const categoriasCompletadas = new Set(casillasFila.map(c => c.categoriaId));
-    const frescas = candidatas.filter(c => !categoriasCompletadas.has(c.id));
-
-    const seleccionadasParaFila = barajar(frescas.length >= 3 ? frescas : candidatas).slice(0, 3);
-
-    casillasFila.forEach((casilla, idx) => {
-      const nuevaCat = seleccionadasParaFila[idx];
-      casilla.id = `c_${filaIndex}_${idx}_${Math.random().toString(36).substring(2, 7)}`;
-      casilla.categoriaId = nuevaCat.id;
-      casilla.nombre = nuevaCat.nombre;
-      casilla.marcada = false;
-      casilla.jugadorAsignado = null;
-    });
-
-    return res.json({ success: true, mensaje: '¡Línea cantada! +15 puntos.' });
-  }
-
-  res.status(400).json({ error: 'Fila incompleta' });
-});
-
-// 8. Siguiente Bingo (conservando puntos)
-router.post('/sala/:code/siguiente-bingo', (req, res) => {
-  const code = req.params.code.toUpperCase();
-  const { token, grupoId } = req.body || {};
-  const sala = salasOnline[code];
-
-  if (!sala) return res.status(404).json({ error: 'Sala no encontrada' });
-  const yo = sala.jugadores.find(j => j.token === token);
-  if (!yo || !yo.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión puede iniciar el siguiente bingo' });
-
-  if (grupoId) {
-    sala.grupoId = grupoId;
-  }
-
-  sala.bingoId = elegirBingoAleatorioDeGrupo(sala.grupoId);
-
-  sala.jugadores.forEach(j => {
-    j.carton = generarCartonParaJugador(sala.bingoId);
-    j.bloqueado = false;
-    j.haMarcadoEsteTurno = false;
-  });
-
-  sala.ganadorBingo = null;
-  sala.historialJugadores = [];
-  iniciarFasePreparacion(sala);
-
+// ---------------------------------------------------------------- Iniciar
+router.post('/online/sala/:code/iniciar', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión puede iniciar.' });
+  if (c.sala.estado === 'jugando') return res.status(400).json({ error: 'La partida ya está en marcha.' });
+  if (c.sala.jugadores.length < MIN) return res.status(400).json({ error: `Se necesitan al menos ${MIN} jugadores.` });
+  c.sala.jugadores.forEach((j) => { j.puntos = 0; });
+  c.sala.ultimaPartida = null; c.sala.numPartida = 0;
+  iniciarPartida(c.sala);
   res.json({ success: true });
 });
 
-// 9. Finalizar partida
-router.post('/sala/:code/finalizar', (req, res) => {
-  const code = req.params.code.toUpperCase();
-  const { token } = req.body || {};
-  const sala = salasOnline[code];
+// ---------------------------------------------------------------- Acciones
+// tipo: marcar | saltar (anfitrión) | terminar (anfitrión)
+router.post('/online/sala/:code/accion', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  const { sala, jugador, esAdmin } = c;
+  if (sala.estado !== 'jugando' || !sala.partida) return res.status(400).json({ error: 'No hay partida en marcha.' });
+  revisar(sala);
+  const p = sala.partida; const d = req.body || {}; const ahora = Date.now();
+  const soloAdmin = { ok: false, error: 'Solo el anfitrión puede hacerlo.' };
+  let r;
+  switch (d.tipo) {
+    case 'marcar': r = E.marcar(p, jugador.id, String(d.casillaId || ''), ahora); break;
+    case 'saltar': r = esAdmin ? E.saltar(p, ahora) : soloAdmin; break;
+    case 'terminar': r = esAdmin ? E.terminar(p) : soloAdmin; break;
+    default: return res.status(400).json({ error: 'Acción desconocida.' });
+  }
+  revisar(sala);
+  if (!r.ok) return res.status(400).json({ error: r.error });
+  res.json({ success: true, resultado: r });
+});
 
-  if (!sala) return res.status(404).json({ error: 'Sala no encontrada' });
-  const yo = sala.jugadores.find(j => j.token === token);
-  if (!yo || !yo.esAdmin) return res.status(403).json({ error: 'No autorizado' });
-
-  if (sala.timer) clearInterval(sala.timer);
-  sala.estado = 'final';
-
+// ---------------------------------------------------------------- Después de la partida
+router.post('/online/sala/:code/siguiente-partida', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión.' });
+  if (!c.sala.partida || c.sala.partida.fase !== 'fin') return res.status(400).json({ error: 'La partida aún no ha terminado.' });
+  if (c.sala.jugadores.length < MIN) return res.status(400).json({ error: `Se necesitan al menos ${MIN} jugadores.` });
+  iniciarPartida(c.sala);
   res.json({ success: true });
 });
 
-// 10. Salir de la sala
-router.post('/sala/:code/salir', (req, res) => {
-  const code = req.params.code.toUpperCase();
-  const { token } = req.body || {};
-  const sala = salasOnline[code];
+router.post('/online/sala/:code/finalizar', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión.' });
+  if (c.sala.estado !== 'jugando' || c.sala.partida?.fase !== 'fin') return res.status(400).json({ error: 'La partida aún no ha terminado.' });
+  c.sala.estado = 'final';
+  res.json({ success: true });
+});
 
-  if (sala) {
-    const idx = sala.jugadores.findIndex(j => j.token === token);
-    if (idx !== -1) {
-      const eraAdmin = sala.jugadores[idx].esAdmin;
-      sala.jugadores.splice(idx, 1);
+router.post('/online/sala/:code/reiniciar', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión.' });
+  Object.assign(c.sala, { estado: 'lobby', partida: null, numPartida: 0, ultimaPartida: null });
+  c.sala.jugadores.forEach((j) => { j.puntos = 0; });
+  res.json({ success: true });
+});
 
-      if (sala.jugadores.length === 0) {
-        if (sala.timer) clearInterval(sala.timer);
-        delete salasOnline[code];
-      } else if (eraAdmin) {
-        sala.jugadores[0].esAdmin = true;
-      }
-    }
-  }
-
+router.post('/online/sala/:code/salir', (req, res) => {
+  const code = String(req.params.code || '').toUpperCase();
+  const sala = salas[code];
+  if (!sala) return res.json({ success: true });
+  const idx = sala.jugadores.findIndex((j) => j.token === req.body?.token);
+  if (idx === -1) return res.json({ success: true });
+  const [fuera] = sala.jugadores.splice(idx, 1);
+  if (sala.estado === 'jugando' && sala.partida) { E.abandonar(sala.partida, fuera.id); revisar(sala); }
+  if (sala.jugadores.length === 0) delete salas[code];
+  else if (sala.adminToken === fuera.token) sala.adminToken = sala.jugadores[0].token;
   res.json({ success: true });
 });
 
