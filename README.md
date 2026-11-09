@@ -108,6 +108,16 @@ npm run dev
 - Partidas de 10, 15 o 25 rondas y 45 s por respuesta. Online, el servidor cierra la ronda al acabar el tiempo y acepta selecciones incompletas.
 - Elementos en `server/data/seeds/colores/parteN.js` (`{ id, item, colores: [...] }`, con los colores de la paleta: rojo, azul, amarillo, verde, naranja, morado, marron, blanco, negro, gris, rosa). `parte6.js` es la ampliación.
 
+## Minijuego: ¿Con quién he jugado? (`Jugadores/`)
+- Online o en un dispositivo, 2–15 jugadores, 5/10/15 parejas. Hay que decir un futbolista que coincidiera en algún **club** (no selección) con los dos, aunque fuera en clubes distintos.
+- Respuestas (`server/data/seeds/jugadores/index.js`): las escritas a mano más las calculadas con la base de futbolistas de «Fútbol en raya» (clubes con años). Se descartan las que la base desmiente (con un año de margen por los fichajes de invierno).
+- Pulsador y respuesta escrita: si está en la lista, acierto (+3); si no, decide el anfitrión (o el grupo). Fallo −1. Motor `server/jugadores/engine.js` (`npm run sync:jugadores`). Prueba: `node server/scripts/jugadores-sim.mjs`.
+
+## Minijuego: El club de los cuatro (`CuatroClubes/`)
+- Online o en un dispositivo, 2–10 jugadores, 3/5/8 rondas. Por turnos (pantalla «Turno de…» con «¡Listo!», 90 s) cada uno dice un futbolista y suma un punto por cada uno de los cuatro clubes en los que jugó (pleno = 4). No se repiten futbolistas en la ronda.
+- Puntuación automática con la base de futbolistas (`server/data/seeds/cuatroclubes/index.js`); si no lo conocemos o pudo jugar en un club sin datos (Parma, Getafe…), el anfitrión marca los clubes. Al acabar la ronda se ven las mejores respuestas posibles.
+- Motor `server/cuatroclubes/engine.js` (`npm run sync:cuatroclubes`). Prueba: `node server/scripts/cuatroclubes-sim.mjs`.
+
 ## Minijuego: Fútbol en raya (`FutbolGrid/`)
 - Online (2–12, dos equipos: cada uno elige el suyo en la sala de espera) o en un dispositivo (jugadores alternos en Azul ✕ y Rojo ◯).
 - El equipo en turno elige casilla y tiene 90 s para un futbolista que cumpla fila y columna; acierte o falle, turno del rival. No se repiten futbolistas. Tres en raya gana; si no queda ninguna casilla posible, empate.
