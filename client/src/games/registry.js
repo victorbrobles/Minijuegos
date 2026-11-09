@@ -23,6 +23,7 @@ import Cancion from './Cancion/Cancion.jsx';
 import Ciegas from './Ciegas/Ciegas.jsx';
 import Traiciones from './Traiciones/Traiciones.jsx';
 import Coleccion from './Coleccion/Coleccion.jsx';
+import SumaCero from './SumaCero/SumaCero.jsx';
 import UnoADiez from './UnoADiez/UnoADiez.jsx';
 import Fundadores from './Fundadores/Fundadores.jsx';
 import Telepatia from './Telepatia/Telepatia.jsx';
@@ -88,6 +89,7 @@ const registry = {
   'descarte': Descarte,
   'bingoball': Bingoball,
   'cuentas': Cuentas,
+  'sumacero': SumaCero,
   'conoce': Conoce,
   'logos': Logos,
   'hipotesis': Hipotesis,

@@ -59,6 +59,15 @@ export const META = {
     descripcion: 'Cada uno tiene un encargo secreto: la colección que debe reunir antes que nadie. Puede que otro vaya a por la misma sin que lo sepas. Roba, bombardea, espía, cambia encargos y arriésgate con las cartas de acción.',
     categorias: ['estrategia']
   },
+  'sumacero': {
+    titulo: 'Suma Cero',
+    imagen: '/covers/sumacero.webp',
+    icono: 'scale',
+    colores: ['#a78bfa', '#312e81'],
+    etiquetas: 'cartas numeros suma cero sabotaje plantarse online',
+    descripcion: 'Empiezas con 5 cartas positivas y negativas: consigue que tu mano sume exactamente 0. Roba, descarta, usa cartas especiales para fastidiar al resto y plántate a tiempo… porque te pueden destrozar la mano justo antes del final.',
+    categorias: ['estrategia']
+  },
   'cuentas': {
     titulo: 'Lleva la cuenta',
     imagen: '/covers/cuentas.webp',

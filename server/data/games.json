@@ -146,7 +146,13 @@
   {
     "id": "coleccion",
     "name": "Colecciona con cabeza",
-    "description": "Una colección de cartas con 8 palos diferentes y muchas cartas de acción. Consigue cinco cartas del mismo palo y ganarás, pero ojo, si acumulas cinco diferentes perderás. ¡Usa bien las cartas de acción!",
+    "description": "Cada uno tiene un encargo secreto: la colección que debe reunir antes que nadie. Puede que otro vaya a por la misma sin que lo sepas. Roba, bombardea, espía, cambia encargos y arriésgate con las cartas de acción.",
+    "isNew": true
+  },
+  {
+    "id": "sumacero",
+    "name": "Suma Cero",
+    "description": "Empiezas con 5 cartas positivas y negativas: consigue que tu mano sume exactamente 0. Roba, descarta, usa cartas especiales para fastidiar al resto y plántate a tiempo… porque te pueden destrozar la mano justo antes del final.",
     "isNew": true
   },
   {
@@ -158,7 +164,7 @@
   {
     "id": "fundadores",
     "name": "Fundadores",
-    "description": "Hay que levantar un pueblo. Cada día se escoge un rol oculto a los demás. Escoge bien el rol para cada momento, engaña y sabotea a los demás, y sé el que construya el mejor pueblo de todos.",
+    "description": "Cada fundador levanta su propio pueblo con monedas y planos. Cada ronda eliges en secreto uno de los oficios que quedan: cobrar, sabotear, construir más o llevarte la prioridad. Quien levante el mejor pueblo gana.",
     "isNew": true
   },
   {
@@ -200,7 +206,7 @@
   {
     "id": "hipotesis",
     "name": "La Hipótesis Ganadora",
-    "description": "Cada ronda el laboratorio esconde una verdad y tú solo conoces un trocito. Formula una hipótesis (cierta o de farol), apuesta por las de los demás y descubre quién miente.",
+    "description": "Cada ronda hay una verdad oculta y tú solo conoces un trocito. Formula una hipótesis, cierta o de farol, y después decide en qué hipótesis de los demás confías. Escenarios distintos y sorpresas en cada ronda.",
     "isNew": true
   },
   {

@@ -108,6 +108,13 @@ npm run dev
 - Partidas de 10, 15 o 25 rondas y 45 s por respuesta. Online, el servidor cierra la ronda al acabar el tiempo y acepta selecciones incompletas.
 - Elementos en `server/data/seeds/colores/parteN.js` (`{ id, item, colores: [...] }`, con los colores de la paleta: rojo, azul, amarillo, verde, naranja, morado, marron, blanco, negro, gris, rosa). `parte6.js` es la ampliación.
 
+## Minijuego: Suma Cero (`SumaCero/`)
+- De 2 a 6 jugadores. Cada uno empieza con 5 cartas de −10 a +10: hay que conseguir que la mano sume 0 (o lo más cerca posible).
+- Turno: robar (del mazo o la de arriba del descarte) y después descartar una carta o usar una especial. En lugar de robar puedes plantarte: cada rival juega un último turno… y puede fastidiarte.
+- Especiales: Mano rápida (robar al azar), Purga (descarta su carta más alta), Cambio de manos, Doble, Espejo (cambia signos), Congelar y Avalancha (todos los demás roban 2).
+- Puntos por ronda (menos es mejor): |suma| + 2 por especial sin usar, −3 si la suma es 0 exacto y +5 si te plantas y no tienes la mejor mano. Partidas de 3, 5 o 7 rondas.
+- Motor en `server/sumacero/engine.js` con copia idéntica en el cliente (`npm run sync:sumacero`). Pruebas: `node server/scripts/sumacero-sim.mjs` y `node server/scripts/sumacero-e2e.mjs [jugadores]`. La portada (`client/public/covers/sumacero.webp`) es provisional.
+
 ## Minijuego: Colecciona con cabeza (`Coleccion/`)
 - Cada jugador (2 a 6) recibe un encargo secreto: la colección que debe reunir en su vitrina (pleno, doble pareja, trío y uno, familia o arcoíris de 5 palos). Varios pueden ir a por lo mismo sin saberlo. Gana quien cumpla su encargo (en cualquier momento, aunque sea por culpa de otro).
 - Turno: robar 2 y hacer 2 jugadas (poner carta en la vitrina, devolverla a la mano o jugar acción). Mano máx. 7, vitrina máx. 6. 🌟 Comodines valen por cualquier palo.

@@ -7,6 +7,7 @@
     "start": "node index.js",
     "sync:fundadores": "node scripts/sync-fundadores.mjs",
     "sync:coleccion": "node scripts/sync-coleccion.mjs",
+    "sync:sumacero": "node scripts/sync-sumacero.mjs",
     "sim:fundadores": "node scripts/fundadores-sim.mjs",
     "sync:logos": "node scripts/sync-logos.mjs"
   },
