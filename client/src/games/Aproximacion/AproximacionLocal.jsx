@@ -3,18 +3,151 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import './Aproximacion.css';
-import { SelectorJugadores } from '../../components/MenuJuego.jsx';
 
 const MAX_RONDAS = 15;
 const MIN_JUGADORES = 4;
 const MAX_JUGADORES = 20;
-const TIEMPO_TURNO = 30; // 30 segundos por turno
+const TIEMPO_TURNO = 30;
 
-export default function AproximacionLocal({ onVolver, onExit }) {
+const COLORES = ['#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316'];
+export const colorJugador = (i) => COLORES[((i % COLORES.length) + COLORES.length) % COLORES.length];
+export const inicial = (nombre = '?') => nombre.trim().charAt(0).toUpperCase() || '?';
+export const indiceColor = (j, i) => (typeof j?.id === 'number' ? j.id - 1 : i);
+
+/* ==========================================================================
+   COMPONENTES DE TABLERO COMPARTIDOS (UNIFICADOS CON BUSCAMINAS / QUIÉN ES QUIÉN)
+   ========================================================================== */
+
+export function Aviso({ evento }) {
+  const [visible, setVisible] = useState(null);
+  const ultimo = useRef(evento?.n ?? 0);
+
+  useEffect(() => {
+    if (!evento || evento.n === ultimo.current) return undefined;
+    ultimo.current = evento.n;
+    setVisible(evento);
+    const id = setTimeout(() => setVisible(null), 3500);
+    return () => clearTimeout(id);
+  }, [evento]);
+
+  if (!visible) return null;
+  const bueno = ['acierto', 'confia', 'ok'].includes(visible.tipo);
+  const malo = ['fallo', 'tiempo', 'error'].includes(visible.tipo);
+
+  return (
+    <div className={`cnp-aviso${bueno ? ' bueno' : ''}${malo ? ' malo' : ''}`} role="status" aria-live="polite">
+      <span aria-hidden="true">{bueno ? '🎯' : malo ? '⏰' : 'ℹ️'}</span>
+      {visible.texto}
+    </div>
+  );
+}
+
+export function BotonPortada({ onClick, texto = 'Portada' }) {
+  return (
+    <button type="button" className="qqp-salir" onClick={onClick}>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7" />
+      </svg>
+      <span>{texto}</span>
+    </button>
+  );
+}
+
+export function Avatar({ nombre, color, grande = false }) {
+  return (
+    <span className={`qqp-avatar${grande ? ' grande' : ''}`} style={{ '--c': color }}>
+      {inicial(nombre)}
+    </span>
+  );
+}
+
+export function Cabecera({ onSalir, textoSalir = 'Portada', onAyuda, categoria, etiqueta, titulo, avatar, chips, children }) {
+  return (
+    <header className="qqp-hero">
+      <span className="qqp-hero-deco" aria-hidden="true">
+        <Icon name="target" size={150} strokeWidth={1.4} />
+      </span>
+      <div className="qqp-hero-top">
+        {onSalir ? <BotonPortada onClick={onSalir} texto={textoSalir} /> : <span />}
+        <div className="qqp-hero-chips">
+          {chips}
+          {categoria && (
+            <span className="qqp-chip" title="Tipo de pregunta">
+              <Icon name={categoria.icono || 'target'} size={14} /> <span>{categoria.nombre}</span>
+            </span>
+          )}
+          {onAyuda && (
+            <button type="button" className="qqp-ayuda" onClick={onAyuda} title="Cómo jugar" aria-label="Cómo jugar">
+              ?
+            </button>
+          )}
+        </div>
+      </div>
+      <div className="qqp-hero-cuerpo">
+        {avatar}
+        <div className="qqp-hero-textos">
+          {etiqueta && <p className="qqp-hero-etiqueta">{etiqueta}</p>}
+          <h2 className="qqp-hero-titulo">{titulo}</h2>
+        </div>
+      </div>
+      {children}
+    </header>
+  );
+}
+
+export function OrdenTurnos({ jugadores, activoId, puntosMap = null }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    ref.current?.querySelector('.activo')?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+  }, [activoId]);
+
+  return (
+    <ol className="qqp-orden" ref={ref} aria-label="Orden de jugadores">
+      {jugadores.map((j, i) => {
+        const esActivo = j.id === activoId;
+        const pts = puntosMap ? (puntosMap[j.id] ?? 0) : (j.puntos ?? 0);
+        return (
+          <li
+            key={j.id}
+            className={`qqp-orden-item${esActivo ? ' activo' : ''}`}
+            style={{ '--c': colorJugador(indiceColor(j, i)) }}
+            aria-current={esActivo ? 'step' : undefined}
+          >
+            <span className="qqp-orden-avatar">{inicial(j.nombre)}</span>
+            <span className="qqp-orden-nombre">{j.nombre}</span>
+            <span className="qqp-orden-pts">{pts}p</span>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+export function BotonPrincipal({ children, onClick, disabled, type = 'button' }) {
+  return (
+    <button type={type} className="qqp-boton" onClick={onClick} disabled={disabled}>
+      {children}
+    </button>
+  );
+}
+
+export function EnlaceSecundario({ children, onClick, disabled }) {
+  return (
+    <button type="button" className="qqp-enlace" onClick={onClick} disabled={disabled}>
+      {children}
+    </button>
+  );
+}
+
+/* ==========================================================================
+   MODO LOCAL: APROXIMACIÓN
+   ========================================================================== */
+
+export default function AproximacionLocal({ onVolver, onExit, onAbrirAyuda }) {
   const navigate = useNavigate();
 
   const [fase, setFase] = useState('setup');
-  const [modalAyuda, setModalAyuda] = useState(false);
+  const [modalSalirPortada, setModalSalirPortada] = useState(false);
 
   const [numJugadores, setNumJugadores] = useState(4);
   const [jugadores, setJugadores] = useState([
@@ -29,9 +162,7 @@ export default function AproximacionLocal({ onVolver, onExit }) {
   const [rondaActual, setRondaActual] = useState(1);
   const [preguntaActual, setPreguntaActual] = useState(null);
 
-  // Índice sorteado en la ronda 1 para rotar correlativamente en las siguientes
   const [primerIndexInicial, setPrimerIndexInicial] = useState(null);
-
   const [ordenTurnos, setOrdenTurnos] = useState([]);
   const [subTurnoIndex, setSubTurnoIndex] = useState(0);
   const [decisiones, setDecisiones] = useState({});
@@ -42,14 +173,15 @@ export default function AproximacionLocal({ onVolver, onExit }) {
   const [errorInput, setErrorInput] = useState('');
 
   const [resultadoRonda, setResultadoRonda] = useState(null);
-  
   const [tiempoRestante, setTiempoRestante] = useState(TIEMPO_TURNO);
-  
-  // Referencias para acceder al estado actual dentro del timer
+
+  const [eventoAviso, setEventoAviso] = useState(null);
+  const avisoSeqRef = useRef(0);
+
   const inputNumeroRef = useRef(inputNumero);
   const confianzaElegidaRef = useRef(confianzaElegida);
   const faseRef = useRef(fase);
-  
+
   useEffect(() => {
     inputNumeroRef.current = inputNumero;
     confianzaElegidaRef.current = confianzaElegida;
@@ -63,8 +195,21 @@ export default function AproximacionLocal({ onVolver, onExit }) {
       .catch((err) => console.error('Error cargando preguntas:', err));
   }, []);
 
-  const handleNumJugadoresChange = (e) => {
-    const num = parseInt(e.target.value, 10);
+  const handleSalirAPortada = () => {
+    setModalSalirPortada(false);
+    if (typeof onExit === 'function') {
+      onExit();
+    } else {
+      try {
+        navigate('/');
+      } catch {
+        window.location.href = '/';
+      }
+    }
+  };
+
+  const actualizarCantidadJugadores = (nuevoNum) => {
+    const num = Math.max(MIN_JUGADORES, Math.min(MAX_JUGADORES, nuevoNum));
     setNumJugadores(num);
     const nuevos = Array.from({ length: num }, (_, i) => ({
       id: i + 1,
@@ -92,7 +237,6 @@ export default function AproximacionLocal({ onVolver, onExit }) {
     });
     setPuntos(puntuaciones);
 
-    // Sorteo aleatorio inicial una única vez
     const primerIndexSorteado = Math.floor(Math.random() * listaActualizada.length);
     setPrimerIndexInicial(primerIndexSorteado);
 
@@ -101,15 +245,14 @@ export default function AproximacionLocal({ onVolver, onExit }) {
   };
 
   const prepararRonda = (numRonda, listaJugadores = jugadores, baseIndex = primerIndexInicial) => {
-    const preg = preguntas[(numRonda - 1) % preguntas.length] || {
+    const preg = preguntas[(numRonda - 1) % Math.max(1, preguntas.length)] || {
       id: 999,
-      pregunta: '¿Cuántos países hay en el mundo?',
+      pregunta: '¿Cuántos países reconocidos hay en el mundo?',
       respuesta: 195,
       manual: false
     };
     setPreguntaActual(preg);
 
-    // Turno inicial desplazado de forma correlativa por cada ronda
     const primerIndex = (baseIndex + (numRonda - 1)) % listaJugadores.length;
     const orden = [];
     for (let i = 0; i < listaJugadores.length; i++) {
@@ -129,6 +272,8 @@ export default function AproximacionLocal({ onVolver, onExit }) {
   };
 
   const jugadorActual = jugadores[ordenTurnos[subTurnoIndex]];
+  const primerJugadorRonda = jugadores[ordenTurnos[0]];
+  const jugadoresEnOrden = ordenTurnos.map((idx) => jugadores[idx]).filter(Boolean);
   const esPrimerJugador = subTurnoIndex === 0;
 
   const respuestasDadas = Object.entries(decisiones)
@@ -138,13 +283,12 @@ export default function AproximacionLocal({ onVolver, onExit }) {
       jugadorNombre: jugadores.find((j) => j.id === Number(jId))?.nombre,
       valor: d.valor
     }));
-    
-  // Temporizador para turnos y segunda vuelta
+
   useEffect(() => {
     if (fase !== 'turno' && fase !== 'segunda_vuelta_inicial') return;
-    
+
     setTiempoRestante(TIEMPO_TURNO);
-    
+
     const id = setInterval(() => {
       setTiempoRestante((prev) => {
         if (prev <= 1) {
@@ -155,11 +299,11 @@ export default function AproximacionLocal({ onVolver, onExit }) {
         return prev - 1;
       });
     }, 1000);
-    
+
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subTurnoIndex, fase]);
-  
+
   const forzarEnvioTurno = () => {
     if (faseRef.current === 'turno') {
       let nuevaDecision = null;
@@ -172,28 +316,34 @@ export default function AproximacionLocal({ onVolver, onExit }) {
             confiaEnId: jugadorReferencia.jugadorId
           };
         }
-      } 
-      
+      }
+
       if (!nuevaDecision) {
         let numVal = 0;
         if (inputNumeroRef.current !== '' && !isNaN(Number(inputNumeroRef.current))) {
-            numVal = Math.round(Number(inputNumeroRef.current));
+          numVal = Math.round(Number(inputNumeroRef.current));
         }
-        
-        // Evitar duplicados si se acaba el tiempo
+
         let valorFinal = numVal;
         while (respuestasDadas.some((r) => r.valor === valorFinal)) {
-            valorFinal++;
+          valorFinal++;
         }
-        
+
         nuevaDecision = {
           tipo: 'propia',
           valor: valorFinal,
           confiaEnId: null
         };
       }
-      
-      setDecisiones(prev => {
+
+      avisoSeqRef.current += 1;
+      setEventoAviso({
+        n: avisoSeqRef.current,
+        tipo: 'tiempo',
+        texto: `¡Tiempo agotado! Se asigna respuesta a ${jugadorActual?.nombre}.`
+      });
+
+      setDecisiones((prev) => {
         const nuevasDecisiones = {
           ...prev,
           [jugadorActual.id]: nuevaDecision
@@ -201,14 +351,13 @@ export default function AproximacionLocal({ onVolver, onExit }) {
         setTimeout(() => avanzarSiguienteTurno(nuevasDecisiones), 0);
         return nuevasDecisiones;
       });
-      
     } else if (faseRef.current === 'segunda_vuelta_inicial') {
-        confirmarSegundaVuelta(null);
+      confirmarSegundaVuelta(null);
     }
   };
 
   const confirmarTurno = (e) => {
-    if(e) e.preventDefault();
+    if (e) e.preventDefault();
     setErrorInput('');
 
     let nuevaDecision = null;
@@ -224,6 +373,13 @@ export default function AproximacionLocal({ onVolver, onExit }) {
         valor: jugadorReferencia.valor,
         confiaEnId: jugadorReferencia.jugadorId
       };
+
+      avisoSeqRef.current += 1;
+      setEventoAviso({
+        n: avisoSeqRef.current,
+        tipo: 'confia',
+        texto: `${jugadorActual.nombre} confía en el ${jugadorReferencia.valor} de ${jugadorReferencia.jugadorNombre}.`
+      });
     } else {
       if (inputNumero === '' || isNaN(Number(inputNumero))) {
         setErrorInput('Introduce un número válido.');
@@ -233,7 +389,7 @@ export default function AproximacionLocal({ onVolver, onExit }) {
       const numVal = Math.round(Number(inputNumero));
       const yaExiste = respuestasDadas.some((r) => r.valor === numVal);
       if (yaExiste) {
-        setErrorInput(`El número ${numVal} ya ha sido dicho. Debes decir otro número o confiar en él.`);
+        setErrorInput(`El número ${numVal} ya ha sido dicho. Escribe otro o pulsa en su tarjeta para confiar en él.`);
         return;
       }
 
@@ -242,6 +398,13 @@ export default function AproximacionLocal({ onVolver, onExit }) {
         valor: numVal,
         confiaEnId: null
       };
+
+      avisoSeqRef.current += 1;
+      setEventoAviso({
+        n: avisoSeqRef.current,
+        tipo: 'ok',
+        texto: `${jugadorActual.nombre} apuesta por el número ${numVal}.`
+      });
     }
 
     const nuevasDecisiones = {
@@ -414,104 +577,170 @@ export default function AproximacionLocal({ onVolver, onExit }) {
   const maximo = ranking.length ? (puntos[ranking[0].id] ?? 0) : 0;
   const ganadores = maximo > 0 ? ranking.filter((j) => (puntos[j.id] ?? 0) === maximo) : [];
 
+  const enPartidaActiva = fase !== 'setup';
+
   return (
-    <div className="aprox-contenedor">
+    <div className={`aprox-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+      <Aviso evento={eventoAviso} />
+
+      {/* 1. CONFIGURACIÓN DE JUGADORES */}
       {fase === 'setup' && (
-        <>
+        <section className="game">
+          <div className="panel qq-menu-panel">
+            <div className="qq-card-top">
+              <button type="button" className="qq-link-volver" onClick={onVolver}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                <span>Volver</span>
+              </button>
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
 
-          {modalAyuda && (
-            <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
-              <div className="rg-modal aprox-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-                <div className="aprox-modal-header">
-                  <span className="aprox-modal-signo-title">?</span>
-                  <h3>¿Cómo se juega a Aproximación?</h3>
-                </div>
-
-                <div className="aprox-modal-cuerpo">
-                  <p><strong>1. Dinámica de la ronda:</strong></p>
-                  <ul>
-                    <li>Sale una pregunta numérica (geografía, récords, deportes o sobre vosotros mismos).</li>
-                    <li>Un jugador al azar empieza respondiendo con una cifra. Dispone de <strong>30 segundos</strong>.</li>
-                    <li>Los siguientes jugadores ven las respuestas anteriores y pueden <strong>poner su propio número</strong> o <strong>confiar en el de otro</strong>.</li>
-                    <li>Al final de la ronda, el primer jugador tiene una <strong>segunda oportunidad</strong> (otros 30s) para mantener su cifra o cambiar y confiar en la de otro.</li>
-                  </ul>
-
-                  <p><strong>2. Sistema de puntuación:</strong></p>
-                  <div className="aprox-tabla-puntos">
-                    <div className="aprox-puntos-fila acierto">
-                      <span>🎯 Respuesta exacta</span>
-                      <strong>+15 pts (autor) / +8 pts (confianza)</strong>
-                    </div>
-                    <div className="aprox-puntos-fila cercana">
-                      <span>🥇 Más cercana</span>
-                      <strong>+6 pts (autor) / +3 pts (confianza)</strong>
-                    </div>
-                    <div className="aprox-puntos-fila lejana">
-                      <span>❌ Más lejana</span>
-                      <strong>-5 pts (autor) / 0 pts (confianza)</strong>
-                    </div>
-                    <div className="aprox-puntos-fila intermedio">
-                      <span>⚖️ Mitad superior de intermedias</span>
-                      <strong>+1 pt (autor) / 0 pts (confianza)</strong>
-                    </div>
-                    <div className="aprox-puntos-fila intermedio-mala">
-                      <span>⚠️ Mitad inferior de intermedias</span>
-                      <strong>-1 pt (autor) / 0 pts (confianza)</strong>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="rg-modal-acciones">
-                  <button className="big full" onClick={() => setModalAyuda(false)}>
-                    Entendido
-                  </button>
-                </div>
+            <div className="qq-config-header">
+              <div className="qq-hero-icono chico">
+                <Icon name="users" size={32} />
+              </div>
+              <div>
+                <h2 className="qq-config-titulo">Jugadores</h2>
+                <p className="qq-config-sub">
+                  Configura quiénes van a participar ({MIN_JUGADORES} a {MAX_JUGADORES} jugadores)
+                </p>
               </div>
             </div>
-          )}
-        </>
-      )}
 
-      {/* 1. SETUP */}
-      {fase === 'setup' && (
-        <SelectorJugadores
-          onVolver={onVolver}
-          onAyuda={() => setModalAyuda(true)}
-          min={MIN_JUGADORES}
-          max={MAX_JUGADORES}
-          numJugadores={numJugadores}
-          onCambiarNum={(n) => handleNumJugadoresChange({ target: { value: n } })}
-          nombres={jugadores}
-          onNombre={handleNombreChange}
-          onEmpezar={iniciarPartida}
-          textoBoton="¡Empezar Partida (15 Rondas)!"
-        />
-      )}
+            <div className="qq-selector-cantidad-box">
+              <label className="qq-label-destacado" htmlFor="num-jugadores-aprox">
+                Número de participantes
+              </label>
+              <div className="qq-stepper-row">
+                <button
+                  type="button"
+                  className="qq-stepper-btn"
+                  disabled={numJugadores <= MIN_JUGADORES}
+                  onClick={() => actualizarCantidadJugadores(numJugadores - 1)}
+                >
+                  &minus;
+                </button>
+                <select
+                  id="num-jugadores-aprox"
+                  className="qq-select-jugadores"
+                  value={numJugadores}
+                  onChange={(e) => actualizarCantidadJugadores(parseInt(e.target.value, 10))}
+                >
+                  {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => (
+                    <option key={i + MIN_JUGADORES} value={i + MIN_JUGADORES}>
+                      {i + MIN_JUGADORES} jugadores
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  className="qq-stepper-btn"
+                  disabled={numJugadores >= MAX_JUGADORES}
+                  onClick={() => actualizarCantidadJugadores(numJugadores + 1)}
+                >
+                  +
+                </button>
+              </div>
+            </div>
 
-      {/* 2. TURNO */}
-      {fase === 'turno' && preguntaActual && jugadorActual && (
-        <section className="game">
-          <div className="hud">
-            <span className="chip"><Icon name="flagFinish" size={18} />Ronda {rondaActual} de {MAX_RONDAS}</span>
-            <span className="chip alt"><Icon name="users" size={18} />Jugador {subTurnoIndex + 1} de {jugadores.length}</span>
-          </div>
-
-          <div className="starter">
-            <Icon name="dice" size={28} />
-            <p>Turno de: <strong>{jugadorActual.nombre}</strong></p>
-          </div>
-
-          <div className="panel aprox-pregunta-card">
-            <span className={`aprox-badge-pregunta ${preguntaActual.manual ? 'personal' : ''}`}>
-              {preguntaActual.manual ? 'Pregunta sobre los Jugadores' : 'Pregunta Numérica'}
+            <span className="qq-label-destacado" style={{ marginTop: '1.2rem', display: 'block' }}>
+              Nombres de los jugadores
             </span>
-            <h2 className="aprox-pregunta-texto">{preguntaActual.pregunta}</h2>
+            <div className="qq-nombres-grid">
+              {jugadores.map((j, idx) => (
+                <div key={j.id} className="qq-jugador-input-card">
+                  <span
+                    className="qq-jugador-badge"
+                    style={{ background: colorJugador(idx) }}
+                  >
+                    {idx + 1}
+                  </span>
+                  <input
+                    type="text"
+                    value={j.nombre}
+                    onChange={(e) => handleNombreChange(idx, e.target.value)}
+                    placeholder={`Jugador ${j.id}`}
+                    maxLength={20}
+                  />
+                </div>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              className="big full qq-btn-principal"
+              style={{ marginTop: '1.5rem' }}
+              onClick={iniciarPartida}
+            >
+              <Icon name="play" size={22} /> Iniciar juego ({MAX_RONDAS} rondas)
+            </button>
           </div>
+        </section>
+      )}
+
+      {/* 2. TURNO ACTIVO */}
+      {fase === 'turno' && preguntaActual && jugadorActual && (
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            categoria={{
+              nombre: preguntaActual.manual ? 'Sobre el grupo' : 'Pregunta numérica',
+              icono: preguntaActual.manual ? 'users' : 'target'
+            }}
+            etiqueta={`Ronda ${rondaActual} de ${MAX_RONDAS} · Jugador ${subTurnoIndex + 1} de ${jugadores.length}`}
+            titulo={jugadorActual.nombre}
+            avatar={<Avatar nombre={jugadorActual.nombre} color={colorJugador(indiceColor(jugadorActual, 0))} />}
+          >
+            <div className="qqp-identidad aprox-consigna-box">
+              <div className="aprox-consigna-top">
+                <span className="qqp-identidad-icono">
+                  <Icon name="target" size={16} strokeWidth={2.4} />
+                </span>
+                <span className="aprox-consigna-texto">«{preguntaActual.pregunta}»</span>
+              </div>
+
+              <div className="aprox-hero-stats">
+                <span className="aprox-hero-stat">
+                  🔢 {respuestasDadas.length} {respuestasDadas.length === 1 ? 'cifra dicha' : 'cifras dichas'}
+                </span>
+                <span className={`aprox-hero-stat timer${tiempoRestante <= 10 ? ' low' : ''}`}>
+                  <Icon name="clock" size={14} /> {tiempoRestante}s
+                </span>
+              </div>
+
+              <div className="aprox-timer-track" role="timer">
+                <div
+                  className={`aprox-timer-fill${tiempoRestante <= 10 ? ' low' : ''}`}
+                  style={{ width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%` }}
+                />
+              </div>
+            </div>
+
+            <OrdenTurnos
+              jugadores={jugadoresEnOrden}
+              activoId={jugadorActual.id}
+              puntosMap={puntos}
+            />
+          </Cabecera>
 
           {!esPrimerJugador && respuestasDadas.length > 0 && (
-            <div className="panel aprox-respuestas-previas">
-              <h3 className="panel-title"><Icon name="eye" size={20} /> Respuestas dadas hasta ahora</h3>
-              <p className="field-label">Puedes confiar en una de estas cifras o introducir tu propio número:</p>
+            <div className="qqp-tarjeta">
+              <p className="qqp-carta-cara-titulo" style={{ marginBottom: '0.35rem' }}>
+                <Icon name="eye" size={16} /> Cifras propuestas hasta ahora
+              </p>
+              <p className="aprox-sub-instruccion">
+                Toca una cifra para confiar en ella o escribe tu propio número debajo:
+              </p>
 
               <div className="aprox-opciones-confianza">
                 {respuestasDadas.map((r) => {
@@ -533,14 +762,14 @@ export default function AproximacionLocal({ onVolver, onExit }) {
                       }}
                     >
                       <div className="aprox-opcion-valor">{r.valor}</div>
-                      <div className="aprox-opcion-autor">Dicha por <strong>{r.jugadorNombre}</strong></div>
+                      <div className="aprox-opcion-autor">De <strong>{r.jugadorNombre}</strong></div>
                       {quienesConfian.length > 0 && (
                         <div className="aprox-opcion-apoyos">
                           Confían: {quienesConfian.join(', ')}
                         </div>
                       )}
                       <span className="aprox-tag-confiar">
-                        {seleccionada ? '✓ Has elegido confiar' : 'Pulsar para confiar'}
+                        {seleccionada ? '✓ Confiando' : 'Confiar'}
                       </span>
                     </button>
                   );
@@ -549,21 +778,23 @@ export default function AproximacionLocal({ onVolver, onExit }) {
             </div>
           )}
 
-          <form onSubmit={confirmarTurno} className="panel aprox-formulario">
-            <h3 className="panel-title">
+          <form onSubmit={confirmarTurno} className="qqp-tarjeta aprox-form-card">
+            <label className="qq-label-destacado" htmlFor="aprox-input-num">
               {esPrimerJugador
                 ? `¿Cuál es tu respuesta, ${jugadorActual.nombre}?`
                 : confianzaElegida !== null
                 ? `Has elegido confiar en ${jugadores.find((j) => j.id === confianzaElegida)?.nombre}`
-                : `O escribe tu propio número (sin repetir):`}
-            </h3>
+                : 'O introduce tu propia cifra (sin repetir)'}
+            </label>
 
-            {confianzaElegida === null && (
+            {confianzaElegida === null ? (
               <input
+                id="aprox-input-num"
+                className="qq-input-moderno aprox-input-gigante"
                 type="number"
                 step="1"
                 autoFocus
-                placeholder="Escribe una cantidad numérica..."
+                placeholder="Ej. 150"
                 value={inputNumero}
                 onChange={(e) => {
                   setInputNumero(e.target.value);
@@ -572,49 +803,78 @@ export default function AproximacionLocal({ onVolver, onExit }) {
                 }}
                 required
               />
+            ) : (
+              <div className="aprox-confianza-resumen">
+                <span>Apostando por el número <strong>{respuestasDadas.find((r) => r.jugadorId === confianzaElegida)?.valor}</strong></span>
+                <button
+                  type="button"
+                  className="aprox-btn-cambiar-idea"
+                  onClick={() => setConfianzaElegida(null)}
+                >
+                  Escribir mi número
+                </button>
+              </div>
             )}
 
-            {errorInput && <p className="error" role="alert">{errorInput}</p>}
+            {errorInput && <p className="error" role="alert" style={{ marginTop: '0.6rem' }}>{errorInput}</p>}
 
-            <button type="submit" className="big full" style={{ marginTop: '1rem' }}>
-              <Icon name="check" size={22} strokeWidth={2.5} />
-              {confianzaElegida !== null ? 'Confirmar confianza' : 'Confirmar mi número'}
-            </button>
-            <div className="timer" style={{ marginTop: '1.2rem', marginBottom: '1rem' }}>
-               <div className={`timer-bar${tiempoRestante <= 10 ? ' low' : ''}`} style={{ width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%` }} />
+            <div style={{ marginTop: '1rem' }}>
+              <BotonPrincipal type="submit">
+                <Icon name="check" size={20} strokeWidth={2.5} />
+                {confianzaElegida !== null ? 'Confirmar confianza' : 'Confirmar mi número'}
+              </BotonPrincipal>
             </div>
-            <p className="timer-text" style={{ marginTop: '-0.5rem', marginBottom: '0.8rem' }}>
-                <Icon name="clock" size={16} /> {tiempoRestante} s
-            </p>
           </form>
         </section>
       )}
 
-      {/* 3. SEGUNDA VUELTA */}
-      {fase === 'segunda_vuelta_inicial' && (
-        <section className="game">
-          <div className="hud">
-            <span className="chip"><Icon name="flagFinish" size={18} />Ronda {rondaActual}</span>
-            <span className="chip alt">Segunda oportunidad</span>
-          </div>
+      {/* 3. SEGUNDA VUELTA DEL PRIMER JUGADOR */}
+      {fase === 'segunda_vuelta_inicial' && primerJugadorRonda && (
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            categoria={{ nombre: 'Segunda oportunidad', icono: 'refresh' }}
+            etiqueta={`Ronda ${rondaActual} de ${MAX_RONDAS} · Decisión final`}
+            titulo={primerJugadorRonda.nombre}
+            avatar={<Avatar nombre={primerJugadorRonda.nombre} color={colorJugador(indiceColor(primerJugadorRonda, 0))} />}
+          >
+            <div className="qqp-identidad aprox-consigna-box">
+              <div className="aprox-consigna-top">
+                <span className="qqp-identidad-icono">
+                  <Icon name="target" size={16} strokeWidth={2.4} />
+                </span>
+                <span className="aprox-consigna-texto">«{preguntaActual.pregunta}»</span>
+              </div>
 
-          <div className="starter">
-            <Icon name="refresh" size={28} />
-            <p><strong>{jugadores[ordenTurnos[0]].nombre}</strong>, ¿te quedas con tu número o cambias?</p>
-          </div>
+              <div className="aprox-hero-stats">
+                <span className="aprox-hero-stat ok">
+                  Tu cifra inicial: <strong>{decisiones[primerJugadorRonda.id]?.valor}</strong>
+                </span>
+                <span className={`aprox-hero-stat timer${tiempoRestante <= 10 ? ' low' : ''}`}>
+                  <Icon name="clock" size={14} /> {tiempoRestante}s
+                </span>
+              </div>
 
-          <div className="panel aprox-pregunta-card">
-            <h2 className="aprox-pregunta-texto">{preguntaActual.pregunta}</h2>
-            <div className="aprox-mi-respuesta-inicial">
-              Tu respuesta inicial fue: <strong>{decisiones[jugadores[ordenTurnos[0]].id]?.valor}</strong>
+              <div className="aprox-timer-track" role="timer">
+                <div
+                  className={`aprox-timer-fill${tiempoRestante <= 10 ? ' low' : ''}`}
+                  style={{ width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%` }}
+                />
+              </div>
             </div>
-          </div>
+          </Cabecera>
 
-          <div className="panel aprox-respuestas-previas">
-            <h3 className="panel-title">Respuestas del resto de jugadores:</h3>
+          <div className="qqp-tarjeta">
+            <p className="qqp-carta-cara-titulo" style={{ marginBottom: '0.35rem' }}>
+              <Icon name="refresh" size={16} /> ¿Cambias de opinión?
+            </p>
+            <p className="aprox-sub-instruccion">
+              Por haber abierto la ronda, puedes mantener tu cifra o tocar la de otro compañero para confiar en ella:
+            </p>
+
             <div className="aprox-opciones-confianza">
               {respuestasDadas
-                .filter((r) => r.jugadorId !== jugadores[ordenTurnos[0]].id)
+                .filter((r) => r.jugadorId !== primerJugadorRonda.id)
                 .map((r) => (
                   <button
                     key={r.jugadorId}
@@ -624,48 +884,42 @@ export default function AproximacionLocal({ onVolver, onExit }) {
                   >
                     <div className="aprox-opcion-valor">{r.valor}</div>
                     <div className="aprox-opcion-autor">De <strong>{r.jugadorNombre}</strong></div>
-                    <span className="aprox-tag-confiar">Cambiar y confiar en esta</span>
+                    <span className="aprox-tag-confiar">Cambiar y confiar</span>
                   </button>
                 ))}
             </div>
           </div>
 
-          <button className="big full" onClick={() => confirmarSegundaVuelta(null)}>
-            <Icon name="check" size={22} /> Mantener mi respuesta ({decisiones[jugadores[ordenTurnos[0]].id]?.valor})
-          </button>
-          <div className="timer" style={{ marginTop: '1.2rem', marginBottom: '1rem' }}>
-               <div className={`timer-bar${tiempoRestante <= 10 ? ' low' : ''}`} style={{ width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%` }} />
-            </div>
-            <p className="timer-text" style={{ marginTop: '-0.5rem', marginBottom: '0.8rem' }}>
-                <Icon name="clock" size={16} /> {tiempoRestante} s
-            </p>
+          <div className="qqp-barra">
+            <BotonPrincipal onClick={() => confirmarSegundaVuelta(null)}>
+              <Icon name="check" size={20} strokeWidth={2.5} /> Mantener mi cifra ({decisiones[primerJugadorRonda.id]?.valor})
+            </BotonPrincipal>
+          </div>
         </section>
       )}
 
-      {/* 4. INTRODUCIR REAL */}
-      {fase === 'introducir_real' && (
-        <section className="game">
-          <div className="hud">
-            <span className="chip"><Icon name="flagFinish" size={18} />Ronda {rondaActual}</span>
-            <span className="chip alt">Recuento común</span>
-          </div>
+      {/* 4. INTRODUCIR CIFRA REAL MANUAL */}
+      {fase === 'introducir_real' && preguntaActual && (
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            categoria={{ nombre: 'Sobre el grupo', icono: 'users' }}
+            etiqueta={`Ronda ${rondaActual} de ${MAX_RONDAS} · Recuento común`}
+            titulo="¡Momento del recuento!"
+          >
+            <div className="qqp-identidad">
+              <span className="qqp-identidad-icono"><Icon name="users" size={16} /></span>
+              <span>«{preguntaActual.pregunta}»</span>
+            </div>
+          </Cabecera>
 
-          <div className="starter">
-            <Icon name="users" size={28} />
-            <p>¡Momento del recuento conjunto!</p>
-          </div>
-
-          <div className="panel aprox-pregunta-card">
-            <span className="aprox-badge-pregunta personal">Pregunta sobre los Jugadores</span>
-            <h2 className="aprox-pregunta-texto">{preguntaActual.pregunta}</h2>
-            <p className="field-label" style={{ marginTop: '0.8rem' }}>
-              Contad y sumad en voz alta entre todos los presentes e introducid el total exacto obtenido:
-            </p>
-          </div>
-
-          <form onSubmit={confirmarCifraRealManual} className="panel aprox-formulario">
-            <h3 className="panel-title">Cifra real total:</h3>
+          <form onSubmit={confirmarCifraRealManual} className="qqp-tarjeta aprox-form-card">
+            <label className="qq-label-destacado" htmlFor="aprox-manual-real">
+              Contad y sumad entre todos los presentes e introducid el total real
+            </label>
             <input
+              id="aprox-manual-real"
+              className="qq-input-moderno aprox-input-gigante"
               type="number"
               step="1"
               autoFocus
@@ -677,34 +931,50 @@ export default function AproximacionLocal({ onVolver, onExit }) {
               }}
               required
             />
-            {errorInput && <p className="error" role="alert">{errorInput}</p>}
+            {errorInput && <p className="error" role="alert" style={{ marginTop: '0.6rem' }}>{errorInput}</p>}
 
-            <button type="submit" className="big full" style={{ marginTop: '1rem' }}>
-              <Icon name="trophy" size={22} /> Calcular resultados y puntuaciones
-            </button>
+            <div style={{ marginTop: '1rem' }}>
+              <BotonPrincipal type="submit">
+                <Icon name="trophy" size={20} /> Calcular resultados y puntos
+              </BotonPrincipal>
+            </div>
           </form>
         </section>
       )}
 
-      {/* 5. RESULTADOS */}
+      {/* 5. RESULTADOS DE LA RONDA */}
       {fase === 'resultados' && resultadoRonda && (
-        <section className="game">
-          <div className="end-card aprox-resolucion-card">
-            <span className="end-icon"><Icon name="trophy" size={44} /></span>
-            <p className="categoria">{preguntaActual.pregunta}</p>
-            <h1 className="title">Respuesta correcta: <span className="aprox-num-correcto">{resultadoRonda.objetivo}</span></h1>
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            etiqueta={`Ronda ${rondaActual} de ${MAX_RONDAS} completada`}
+            titulo={`Respuesta: ${resultadoRonda.objetivo}`}
+          >
+            <div className="qqp-identidad">
+              <span className="qqp-identidad-icono"><Icon name="check" size={16} strokeWidth={2.5} /></span>
+              <span>«{preguntaActual.pregunta}»</span>
+            </div>
+          </Cabecera>
 
+          <div className="qqp-tarjeta">
+            <p className="qqp-carta-cara-titulo" style={{ marginBottom: '0.8rem' }}>
+              <Icon name="target" size={16} /> Desglose de aproximaciones
+            </p>
             <div className="aprox-resolucion-lista">
               {resultadoRonda.listaUnicas.map((item) => {
                 const esExacta = item.distancia === 0;
                 const esMin = item.distancia === resultadoRonda.listaUnicas[0].distancia && !esExacta;
-                const esMax = item.distancia === resultadoRonda.listaUnicas[resultadoRonda.listaUnicas.length - 1].distancia && resultadoRonda.listaUnicas.length > 1 && !esExacta;
+                const esMax =
+                  item.distancia === resultadoRonda.listaUnicas[resultadoRonda.listaUnicas.length - 1].distancia &&
+                  resultadoRonda.listaUnicas.length > 1 &&
+                  !esExacta;
 
                 const confiadosNombres = Object.entries(resultadoRonda.decsFinales)
                   .filter(([id, d]) => Number(id) !== item.autorId && d.valor === item.valor)
                   .map(([id]) => jugadores.find((j) => j.id === Number(id))?.nombre);
 
                 const autorNombre = jugadores.find((j) => j.id === item.autorId)?.nombre;
+                const deltaAutor = resultadoRonda.scoresRonda[item.autorId] ?? 0;
 
                 return (
                   <div
@@ -715,110 +985,167 @@ export default function AproximacionLocal({ onVolver, onExit }) {
                   >
                     <div className="aprox-res-col-val">
                       <span className="aprox-res-num">{item.valor}</span>
-                      <span className="aprox-res-dist">(distancia: {item.distancia})</span>
+                      <span className="aprox-res-dist">a {item.distancia}</span>
                     </div>
 
                     <div className="aprox-res-col-jugadores">
-                      <div>
-                        <strong>{autorNombre}</strong>{' '}
-                        <span className="aprox-badge-pts">
-                          {resultadoRonda.scoresRonda[item.autorId] >= 0 ? `+${resultadoRonda.scoresRonda[item.autorId]}` : resultadoRonda.scoresRonda[item.autorId]} pts
+                      <div className="aprox-res-autor-linea">
+                        <strong>{autorNombre}</strong>
+                        <span className={`aprox-badge-pts ${deltaAutor > 0 ? 'pos' : deltaAutor < 0 ? 'neg' : ''}`}>
+                          {deltaAutor >= 0 ? `+${deltaAutor}` : deltaAutor} pts
                         </span>
                       </div>
                       {confiadosNombres.length > 0 && (
                         <div className="aprox-res-confian">
-                          Confiaron: {confiadosNombres.map((nom) => {
-                            const jId = jugadores.find((j) => j.nombre === nom)?.id;
-                            const ptsConf = resultadoRonda.scoresRonda[jId];
-                            return `${nom} (+${ptsConf} pts)`;
-                          }).join(', ')}
+                          Confiaron:{' '}
+                          {confiadosNombres
+                            .map((nom) => {
+                              const jId = jugadores.find((j) => j.nombre === nom)?.id;
+                              const ptsConf = resultadoRonda.scoresRonda[jId] ?? 0;
+                              return `${nom} (+${ptsConf}p)`;
+                            })
+                            .join(', ')}
                         </div>
                       )}
                     </div>
 
                     <div className="aprox-res-etiqueta">
-                      {esExacta && '🎯 EXACTA'}
-                      {esMin && '🥇 MÁS CERCANA'}
-                      {esMax && '❌ MÁS LEJANA'}
-                      {!esExacta && !esMin && !esMax && '⚖️ INTERMEDIA'}
+                      {esExacta && '🎯 Exacta'}
+                      {esMin && '🥇 Más cercana'}
+                      {esMax && '❌ Más lejana'}
+                      {!esExacta && !esMin && !esMax && '⚖️ Intermedia'}
                     </div>
                   </div>
                 );
               })}
             </div>
-
-            <div className="scoreboard" style={{ marginTop: '1.5rem', width: '100%' }}>
-              <h3 className="section-title" style={{ margin: '0 0 0.8rem', textAlign: 'center' }}>
-                Marcador general
-              </h3>
-              {ranking.map((j, i) => {
-                const pts = puntos[j.id] ?? 0;
-                const primero = maximo > 0 && pts === maximo;
-                return (
-                  <div key={j.id} className={`score-row${primero ? ' first' : ''}`}>
-                    <span className="score-name">
-                      {primero ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
-                      {j.nombre}
-                    </span>
-                    <span className="score-pts">{pts} pts</span>
-                  </div>
-                );
-              })}
-            </div>
           </div>
 
-          <div className="actions">
-            <button onClick={avanzarSiguienteRonda}>
+          <div className="qqp-tarjeta">
+            <p className="qqp-carta-cara-titulo" style={{ marginBottom: '0.8rem' }}>
+              <Icon name="trophy" size={16} /> Clasificación general
+            </p>
+            <ul className="qqp-rivales">
+              {ranking.map((j, i) => {
+                const pts = puntos[j.id] ?? 0;
+                const lider = maximo > 0 && pts === maximo;
+                return (
+                  <li key={j.id} className="qqp-rival" style={{ '--c': colorJugador(indiceColor(j, i)) }}>
+                    <span className="qqp-rival-avatar">{lider ? '👑' : i + 1}</span>
+                    <span className="qqp-rival-datos">
+                      <span className="qqp-rival-nombre">{lider ? 'Líder actual' : `Puesto ${i + 1}`}</span>
+                      <strong className="qqp-rival-tarjeta">{j.nombre}</strong>
+                    </span>
+                    <span className="aprox-ranking-pts">{pts} pts</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
+          <div className="qqp-barra">
+            <BotonPrincipal onClick={avanzarSiguienteRonda}>
               <Icon name="play" size={20} />
-              {rondaActual < MAX_RONDAS ? `Siguiente ronda (${rondaActual + 1} de ${MAX_RONDAS})` : 'Ver puntuaciones finales'}
-            </button>
-            <button className="secondary danger" onClick={() => setFase('final')}>
-              <Icon name="flagFinish" size={20} />Finalizar el juego
-            </button>
+              {rondaActual < MAX_RONDAS
+                ? `Jugar ronda ${rondaActual + 1} de ${MAX_RONDAS}`
+                : 'Ver podio final'}
+            </BotonPrincipal>
+            <EnlaceSecundario onClick={() => setFase('final')}>
+              Finalizar partida anticipadamente
+            </EnlaceSecundario>
           </div>
         </section>
       )}
 
-      {/* 6. FINAL */}
+      {/* 6. PODIO FINAL */}
       {fase === 'final' && (
-        <section className="game">
-          <div className="end-card">
-            <span className="end-icon"><Icon name="crown" size={44} /></span>
-            <h1 className="title">Puntuaciones Finales</h1>
-            <p className="final-score">
-              {ganadores.length === 0
-                ? 'Nadie ha sumado puntos'
-                : ganadores.length === 1
-                ? <>¡Gana {ganadores[0].nombre}!</>
-                : <>Empate entre {ganadores.map((g) => g.nombre).join(', ')}</>}
-            </p>
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            etiqueta="Partida terminada"
+            titulo="Clasificación Final"
+            avatar={<span className="qqp-avatar" style={{ '--c': '#f59e0b' }}>🏆</span>}
+          >
+            <div className="qqp-identidad">
+              <span className="qqp-identidad-icono"><Icon name="crown" size={16} /></span>
+              <span>
+                {ganadores.length === 0
+                  ? 'Nadie ha sumado puntos en esta partida.'
+                  : ganadores.length === 1
+                  ? <>¡Victoria para <strong>{ganadores[0].nombre}</strong> con <strong>{maximo} pts</strong>!</>
+                  : <>Empate entre <strong>{ganadores.map((g) => g.nombre).join(', ')}</strong> con <strong>{maximo} pts</strong></>}
+              </span>
+            </div>
+          </Cabecera>
 
-            <div className="scoreboard">
+          <div className="qqp-tarjeta">
+            <p className="qqp-carta-cara-titulo" style={{ marginBottom: '0.8rem' }}>
+              <Icon name="users" size={16} /> Podio de jugadores
+            </p>
+            <ul className="qqp-rivales">
               {ranking.map((j, i) => {
                 const pts = puntos[j.id] ?? 0;
-                const primero = maximo > 0 && pts === maximo;
+                const lider = maximo > 0 && pts === maximo;
                 return (
-                  <div key={j.id} className={`score-row${primero ? ' first' : ''}`}>
-                    <span className="score-name">
-                      {primero ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
-                      {j.nombre}
+                  <li key={j.id} className="qqp-rival" style={{ '--c': colorJugador(indiceColor(j, i)) }}>
+                    <span className="qqp-rival-avatar">{lider ? '👑' : i + 1}</span>
+                    <span className="qqp-rival-datos">
+                      <span className="qqp-rival-nombre">{lider ? '¡Ganador!' : `Puesto ${i + 1}`}</span>
+                      <strong className="qqp-rival-tarjeta">{j.nombre}</strong>
                     </span>
-                    <span className="score-pts">{pts} pts</span>
-                  </div>
+                    <span className="aprox-ranking-pts">{pts} pts</span>
+                  </li>
                 );
               })}
-            </div>
+            </ul>
           </div>
 
-          <div className="actions">
-            <button onClick={() => setFase('setup')}>
-              <Icon name="refresh" size={20} />Nueva partida
-            </button>
-            <button className="secondary danger" onClick={() => navigate('/')}>
-              <Icon name="door" size={20} />Salir al menú principal
-            </button>
+          <div className="qqp-barra">
+            <BotonPrincipal onClick={() => setFase('setup')}>
+              <Icon name="refresh" size={20} /> Nueva partida
+            </BotonPrincipal>
+            <EnlaceSecundario onClick={() => setModalSalirPortada(true)}>
+              Salir a la portada principal
+            </EnlaceSecundario>
           </div>
         </section>
+      )}
+
+      {/* MODAL: SALIR A LA PORTADA */}
+      {modalSalirPortada && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalirPortada(false)}>
+          <div
+            className="rg-modal"
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
+          >
+            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
+            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
+              ¿Salir a la portada?
+            </h3>
+            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
+              Se cancelará la partida actual y volverás a la portada principal de juegos. ¿Estás seguro?
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+              <button
+                type="button"
+                className="secondary full"
+                onClick={() => setModalSalirPortada(false)}
+              >
+                No, continuar
+              </button>
+              <button
+                type="button"
+                className="secondary danger full"
+                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
+                onClick={handleSalirAPortada}
+              >
+                Sí, salir a portada
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
