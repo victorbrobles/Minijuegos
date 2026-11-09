@@ -440,23 +440,73 @@
 .bbp-sello b { display: grid; place-items: center; width: 1.9rem; height: 1.9rem; border-radius: 50%; background: #16a34a; color: #ffffff; font-size: 1rem; transform: rotate(-12deg); box-shadow: 0 2px 0 #14532d; }
 .bbp-sello small { color: #14532d; font-size: 0.7rem; font-weight: 900; line-height: 1.1; overflow-wrap: anywhere; }
 
-.bbp-grupos { display: flex; flex-direction: column; gap: 0.4rem; }
-.bbp-grupo {
+/* Elección del tipo de bingo */
+.bbp-tipos { display: flex; flex-direction: column; gap: 0.65rem; }
+.bbp-tipo {
+  position: relative;
+  display: flex !important;
+  align-items: center;
+  gap: 0.85rem;
   width: 100% !important;
   min-height: 0 !important;
   margin: 0 !important;
-  padding: 0.65rem 0.8rem !important;
-  border: 2px solid #e2e8f0 !important;
-  border-radius: 14px !important;
-  background: #ffffff !important;
-  box-shadow: 0 3px 0 #cbd5e1 !important;
-  color: #0f172a !important;
-  font-weight: 800 !important;
+  padding: 0.9rem 1rem !important;
+  overflow: hidden;
+  border: none !important;
+  border-radius: 24px !important;
+  background: linear-gradient(135deg, var(--t1) 0%, var(--t2) 100%) !important;
+  box-shadow: 0 5px 0 color-mix(in srgb, var(--t2) 60%, #000000), 0 14px 26px -14px rgba(0, 0, 0, 0.6) !important;
+  color: #ffffff !important;
   text-align: left;
   cursor: pointer;
+  transition: transform 0.12s ease, opacity 0.12s ease;
 }
-.bbp-grupo:disabled { cursor: default; opacity: 0.7; }
-.bbp-grupo.activo { border-color: #2563eb !important; background: #eff6ff !important; box-shadow: 0 3px 0 #2563eb !important; opacity: 1; }
+.bbp-tipo::after {
+  content: '';
+  position: absolute;
+  right: -30px;
+  bottom: -40px;
+  width: 130px;
+  height: 130px;
+  border: 14px solid rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.bbp-tipo:disabled { cursor: default; opacity: 1; }
+.bbp-tipos:has(.sel) .bbp-tipo:not(.sel) { opacity: 0.6; }
+.bbp-tipo.sel { outline: 4px solid #ffffff; outline-offset: -4px; transform: scale(1.015); }
+.bbp-tipo-emoji {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 3.4rem;
+  height: 3.4rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.22);
+  font-size: 2rem;
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.12);
+}
+.bbp-tipo-cuerpo { position: relative; z-index: 1; display: flex; flex: 1; flex-direction: column; gap: 0.15rem; min-width: 0; }
+.bbp-tipo-cuerpo strong { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.3rem; line-height: 1.1; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25); }
+.bbp-tipo-cuerpo small { font-size: 0.85rem; font-weight: 700; line-height: 1.3; opacity: 0.95; }
+.bbp-tipo-ejemplos { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.45rem; }
+.bbp-tipo-ejemplos i { padding: 0.22rem 0.55rem; border-radius: 999px; background: rgba(255, 255, 255, 0.92); color: #0f172a; font-size: 0.72rem; font-style: normal; font-weight: 800; line-height: 1.25; }
+.bbp-tipo-ejemplos i.mas { background: rgba(0, 0, 0, 0.25); color: #ffffff; }
+.bbp-tipo-check {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  flex: none;
+  align-self: flex-start;
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 50%;
+  background: #ffffff;
+  color: var(--t2);
+  font-size: 1rem;
+  font-weight: 900;
+}
 .bbp-ranking-nombre small { display: block; color: #64748b; font-size: 0.72rem; font-weight: 700; }
 
 @media (max-width: 380px) {

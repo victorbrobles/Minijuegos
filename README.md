@@ -115,7 +115,7 @@ npm run dev
 - Motor en `server/trayectoria/engine.js` (copia con `npm run sync:trayectoria`). Prueba: `node server/scripts/trayectoria-sim.mjs`. En local los futbolistas se cargan en un trozo aparte.
 
 ## Minijuego: Bingoball (`Bingoball/`)
-- Solo online, de 2 a 15 jugadores. Cartón de 12 categorías (4 × 3); cada 15 s sale un futbolista (cromo con equipación propia) y se marca la casilla en la que encaja.
+- Solo online, de 2 a 15 jugadores. En la sala de espera solo se ven los jugadores; al pulsar «¡Jugar!» el anfitrión elige el tipo de bingo (Selecciones, Champions, LaLiga, Grandes Ligas o Leyendas). Cartón de 12 categorías (4 × 3); cada 15 s sale un futbolista (cromo con equipación propia) y se marca la casilla en la que encaja.
 - Acierto +2, fallo −1 (y sin marcar hasta el siguiente), línea +5, bingo +20 (termina la partida).
 - Motor en `server/bingoball/engine.js` (copia con `npm run sync:bingoball`). Prueba: `node server/scripts/bingoball-sim.mjs`.
 

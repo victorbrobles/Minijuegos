@@ -2,9 +2,9 @@
 // Menú, sala de espera, partida y clasificación (el servidor lleva el reloj; cada móvil ve solo su cartón).
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
-import { PantallaJuego, PantallaPreparacion, PantallaFin, Avatar, ModalSalir, SelectorGrupo } from './Vistas.jsx';
+import { PantallaJuego, PantallaPreparacion, PantallaFin, PantallaTipos, Avatar, ModalSalir } from './Vistas.jsx';
 import {
-  MenuInicioJuego, FormCrearSala, FormUnirseSala, CabeceraSala, ListaSala, EsperandoAnfitrion, BloqueConfig
+  MenuInicioJuego, FormCrearSala, FormUnirseSala, CabeceraSala, ListaSala, EsperandoAnfitrion
 } from '../../components/MenuJuego.jsx';
 import './Bingoball.css';
 
@@ -184,18 +184,22 @@ export default function BingoballOnline({ onSalir, onAbrirAyuda }) {
               </span>
             )}
           />
-          <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
-            <h3 className="qq-sala-titulo"><Icon name="dice" size={20} /> La partida</h3>
-            <BloqueConfig titulo="Temática del bingo">
-              <SelectorGrupo grupos={sala.grupos} valor={sala.config.grupo} onCambiar={sala.esAdmin ? (g) => llamar('config', { grupo: g }) : null} />
-            </BloqueConfig>
-            {sala.esAdmin && (
-              <button type="button" className="big full qq-btn-principal" disabled={n < sala.min} onClick={() => llamar('iniciar')}>
-                <Icon name="play" size={22} /> {n < sala.min ? `Esperando jugadores (mínimo ${sala.min})…` : '¡Repartir cartones!'}
+          {sala.esAdmin && (
+            <div style={{ marginTop: '1.2rem' }}>
+              <button type="button" className="big full qq-btn-principal" disabled={n < sala.min} onClick={() => llamar('elegir')}>
+                <Icon name="play" size={22} /> {n < sala.min ? `Esperando jugadores (mínimo ${sala.min})…` : '¡Jugar!'}
               </button>
-            )}
-          </div>
+            </div>
+          )}
           {!sala.esAdmin && <EsperandoAnfitrion texto="Cuando estéis todos, el anfitrión empezará la partida." />}
+        </section>
+      )}
+
+      {sala.estado === 'eligiendo' && (
+        <section className="game bbp-escena">
+          <PantallaTipos grupos={sala.grupos} inicial={sala.config.grupo} esAdmin={sala.esAdmin}
+            anfitrion={sala.jugadores.find((j) => j.id === sala.anfitrionId)?.nombre}
+            onElegir={(g) => llamar('iniciar', { grupo: g })} onVolver={() => llamar('volver')} onSalir={() => setModal('partida')} />
         </section>
       )}
 
@@ -210,7 +214,7 @@ export default function BingoballOnline({ onSalir, onAbrirAyuda }) {
               <div className="bbp-barra estatica">
                 {sala.esAdmin ? (
                   <>
-                    <button type="button" className="bbp-boton grande" disabled={n < sala.min} onClick={() => llamar('siguiente-partida')}>
+                    <button type="button" className="bbp-boton grande" disabled={n < sala.min} onClick={() => llamar('elegir')}>
                       <Icon name="refresh" size={20} /> Otro bingo (mismos jugadores)
                     </button>
                     <button type="button" className="bbp-boton secundario" onClick={() => llamar('finalizar')}>

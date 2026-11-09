@@ -98,7 +98,7 @@ router.get('/online/sala/:code', (req, res) => {
   const { sala, jugador, esAdmin } = c;
   revisar(sala);
   const base = {
-    success: true, ahora: Date.now(), grupos: GRUPOS_BINGOS.map((g) => ({ id: g.id, nombre: g.nombre })), code: sala.code, estado: sala.estado, esAdmin, yoId: jugador.id, numPartida: sala.numPartida, config: sala.config,
+    success: true, ahora: Date.now(), grupos: GRUPOS_BINGOS.map((g) => ({ id: g.id, nombre: g.nombre, categorias: g.bingos[0].categorias.length, ejemplos: g.bingos[0].categorias.slice(0, 3).map((x) => x.nombre) })), code: sala.code, estado: sala.estado, esAdmin, yoId: jugador.id, numPartida: sala.numPartida, config: sala.config,
     anfitrionId: sala.jugadores.find((j) => j.token === sala.adminToken)?.id ?? null, min: MIN, max: MAX,
     jugadores: sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre, puntos: j.puntos, conectado: Date.now() - j.visto < 15000 })),
     ultimaPartida: sala.ultimaPartida
@@ -134,15 +134,44 @@ router.post('/online/sala/:code/expulsar', (req, res) => {
 });
 
 // ---------------------------------------------------------------- Iniciar
+// El anfitrión pulsa «Jugar» (o «Otro bingo» al acabar): todos pasan a la pantalla de elegir tipo de bingo.
+router.post('/online/sala/:code/elegir', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  const { sala } = c;
+  if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión.' });
+  const trasPartida = sala.estado === 'jugando' && sala.partida?.fase === 'fin';
+  if (sala.estado !== 'lobby' && !trasPartida) return res.status(400).json({ error: 'Ahora no se puede elegir bingo.' });
+  if (sala.jugadores.length < MIN) return res.status(400).json({ error: `Se necesitan al menos ${MIN} jugadores.` });
+  sala.continuar = trasPartida;
+  sala.estado = 'eligiendo';
+  res.json({ success: true });
+});
+
+// Volver atrás desde la elección (a la sala de espera o a la clasificación del último bingo).
+router.post('/online/sala/:code/volver', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión.' });
+  if (c.sala.estado !== 'eligiendo') return res.json({ success: true });
+  c.sala.estado = c.sala.continuar && c.sala.partida ? 'jugando' : 'lobby';
+  res.json({ success: true });
+});
+
 router.post('/online/sala/:code/iniciar', (req, res) => {
   const c = sala_y_jugador(req, res);
   if (!c) return;
+  const { sala } = c;
   if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión puede iniciar.' });
-  if (c.sala.estado === 'jugando') return res.status(400).json({ error: 'La partida ya está en marcha.' });
-  if (c.sala.jugadores.length < MIN) return res.status(400).json({ error: `Se necesitan al menos ${MIN} jugadores.` });
-  c.sala.jugadores.forEach((j) => { j.puntos = 0; });
-  c.sala.ultimaPartida = null; c.sala.numPartida = 0;
-  iniciarPartida(c.sala);
+  if (sala.estado !== 'eligiendo' && sala.estado !== 'lobby') return res.status(400).json({ error: 'La partida ya está en marcha.' });
+  if (sala.jugadores.length < MIN) return res.status(400).json({ error: `Se necesitan al menos ${MIN} jugadores.` });
+  if (GRUPOS_BINGOS.some((g) => g.id === req.body?.grupo)) sala.config.grupo = req.body.grupo;
+  if (!(sala.estado === 'eligiendo' && sala.continuar)) {
+    sala.jugadores.forEach((j) => { j.puntos = 0; });
+    sala.ultimaPartida = null; sala.numPartida = 0;
+  }
+  sala.continuar = false;
+  iniciarPartida(sala);
   res.json({ success: true });
 });
 

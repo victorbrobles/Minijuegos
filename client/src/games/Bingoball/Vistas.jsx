@@ -222,13 +222,63 @@ export function ModalSalir({ titulo, texto, onSeguir, onSalir }) {
   );
 }
 
-export function SelectorGrupo({ grupos = [], valor, onCambiar }) {
+// Aspecto de cada tipo de bingo (los datos vienen del servidor)
+const TIPOS = {
+  internacional: { emoji: '🌍', color: ['#38bdf8', '#1d4ed8'], titulo: 'Selecciones', texto: 'Mundiales, Eurocopas, Copa América y grandes de cada país.' },
+  champions: { emoji: '🏆', color: ['#818cf8', '#312e81'], titulo: 'Champions League', texto: 'Finales, goleadores y campeones de la Orejona.' },
+  laliga: { emoji: '🇪🇸', color: ['#fb7185', '#b91c1c'], titulo: 'LaLiga', texto: 'Pichichis, Zamoras, clásicos y récords de Primera.' },
+  grandes_ligas: { emoji: '⚽', color: ['#4ade80', '#15803d'], titulo: 'Grandes Ligas', texto: 'Premier, Serie A, Bundesliga y Ligue 1.' },
+  leyendas: { emoji: '👑', color: ['#fcd34d', '#b45309'], titulo: 'Leyendas', texto: 'Mitos y récords de toda la historia del fútbol.' }
+};
+
+/** Elección del tipo de bingo (el anfitrión elige; el resto espera viendo las opciones). */
+export function PantallaTipos({ grupos = [], inicial: elegidoInicial, esAdmin, anfitrion, onElegir, onVolver, onSalir }) {
+  const [elegido, setElegido] = useState(elegidoInicial || grupos[0]?.id);
+  const actual = grupos.find((g) => g.id === elegido);
   return (
-    <div className="bbp-grupos">
-      {grupos.map((g) => (
-        <button key={g.id} type="button" className={`bbp-grupo${valor === g.id ? ' activo' : ''}`} disabled={!onCambiar} onClick={() => onCambiar?.(g.id)}>{g.nombre}</button>
-      ))}
-    </div>
+    <>
+      <header className="bbp-hero">
+        <span className="bbp-bolas-fondo" aria-hidden="true">7 23 41</span>
+        <div className="bbp-hero-top">
+          <button type="button" className="bbp-salir" onClick={onSalir}><Icon name="door" size={15} /> Salir</button>
+        </div>
+        <p className="bbp-hero-etiqueta">{esAdmin ? 'Paso 2 de 2' : 'Un momento…'}</p>
+        <h1 className="bbp-hero-titulo">{esAdmin ? '¿Qué bingo jugamos?' : `${anfitrion ?? 'El anfitrión'} está eligiendo el bingo`}</h1>
+      </header>
+      <div className="bbp-tipos">
+        {grupos.map((g) => {
+          const t = TIPOS[g.id] || { emoji: '⚽', color: ['#60a5fa', '#1d4ed8'], titulo: g.nombre, texto: '' };
+          const sel = esAdmin && elegido === g.id;
+          return (
+            <button key={g.id} type="button" className={`bbp-tipo${sel ? ' sel' : ''}`} disabled={!esAdmin}
+              style={{ '--t1': t.color[0], '--t2': t.color[1] }} onClick={() => setElegido(g.id)}>
+              <span className="bbp-tipo-emoji" aria-hidden="true">{t.emoji}</span>
+              <span className="bbp-tipo-cuerpo">
+                <strong>{t.titulo}</strong>
+                <small>{t.texto}</small>
+                {sel && g.ejemplos?.length > 0 && (
+                  <span className="bbp-tipo-ejemplos">
+                    {g.ejemplos.map((e) => <i key={e}>{e}</i>)}
+                    <i className="mas">y {Math.max(0, g.categorias - g.ejemplos.length)} categorías más</i>
+                  </span>
+                )}
+              </span>
+              {sel && <b className="bbp-tipo-check">✓</b>}
+            </button>
+          );
+        })}
+      </div>
+      {esAdmin ? (
+        <div className="bbp-barra estatica">
+          <button type="button" className="bbp-boton grande" disabled={!actual} onClick={() => onElegir(elegido)}>
+            <Icon name="play" size={20} /> Jugar a {TIPOS[elegido]?.titulo ?? 'este bingo'}
+          </button>
+          <button type="button" className="bbp-enlace" onClick={onVolver}><Icon name="arrowLeft" size={15} /> Volver</button>
+        </div>
+      ) : (
+        <p className="bbp-esperando">⏳ En cuanto lo elija se repartirán los cartones.</p>
+      )}
+    </>
   );
 }
 
