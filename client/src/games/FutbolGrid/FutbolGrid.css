@@ -490,3 +490,10 @@
   .fgp-celda-nombre { font-size: 0.6rem; }
 }
 @media (prefers-reduced-motion: reduce) { .fgp-celda.activa, .fgp-celda.ganadora { animation: none !important; } }
+.fgp-soluciones { display: flex; flex-direction: column; gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
+.fgp-soluciones li { padding: 0.55rem 0.7rem; border-radius: 14px; background: #f5f3ff; }
+.fgp-sol-cats { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; margin: 0 0 0.3rem !important; }
+.fgp-sol-cats span { padding: 0.15rem 0.5rem; border-radius: 8px; background: #ede9fe; color: #581c87 !important; font-size: 0.74rem; font-weight: 800; }
+.fgp-sol-cats b { color: #9333ea; }
+.fgp-sol-nombres { margin: 0 !important; color: #0f172a !important; font-size: 0.88rem; font-weight: 700; line-height: 1.4; }
+.fgp-sol-nombres small { color: #64748b; font-weight: 700; }

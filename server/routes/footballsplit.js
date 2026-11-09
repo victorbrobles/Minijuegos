@@ -161,6 +161,7 @@ router.post('/online/sala/:code/accion', (req, res) => {
   switch (d.tipo) {
     case 'responder': r = E.responder(p, id, String(d.parte || ''), String(d.respuesta || '').slice(0, 60), ahora); break;
     case 'pista': r = E.pista(p, id, String(d.parte || '')); break;
+    case 'listo': r = E.listo(p, id, ahora); break;
     case 'pasar': r = E.pasar(p, id, ahora); break;
     case 'siguiente': r = esAdmin ? E.siguiente(p, ahora) : soloAdmin; break;
     case 'terminar': r = esAdmin ? E.terminar(p) : soloAdmin; break;

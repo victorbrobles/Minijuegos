@@ -9,8 +9,8 @@ export const COLORES = ['#6366f1', '#dc2626', '#16a34a', '#f59e0b', '#9333ea', '
 export const colorDe = (id) => COLORES[((Number(id) || 1) - 1) % COLORES.length];
 const inicial = (n) => (n || '?').trim().charAt(0).toUpperCase();
 
-export function Avatar({ id, nombre }) {
-  return <span className="ffp-avatar" style={{ '--c': colorDe(id) }}>{inicial(nombre)}</span>;
+export function Avatar({ id, nombre, grande = false }) {
+  return <span className={`ffp-avatar${grande ? ' grande' : ''}`} style={{ '--c': colorDe(id) }}>{inicial(nombre)}</span>;
 }
 
 function useRestante(hasta, offset = 0) {
@@ -96,31 +96,24 @@ function Ultimo({ v }) {
   return <div className={`ffp-ultimo ${u.ok ? 'bien' : 'mal'}`}>{t}</div>;
 }
 
-function FormRespuesta({ v, parte, offset, enviar, onCambiarParte }) {
+function FormRespuesta({ v, parte, enviar, onCambiarParte }) {
   const [texto, setTexto] = useState('');
   const ref = useRef(null);
-  useEffect(() => { if (parte) ref.current?.focus(); }, [parte]);
-  const x = parte ? v.partes[parte] : null;
+  useEffect(() => { ref.current?.focus(); setTexto(''); }, [parte]);
+  const x = v.partes[parte];
   const nombre = PARTES.find((p) => p.id === parte)?.nombre;
   return (
-    <form className="ffp-tarjeta ffp-respuesta" onSubmit={(e) => { e.preventDefault(); if (parte && texto.trim()) { enviar('responder', { parte, respuesta: texto }); setTexto(''); } }}>
-      <p className="ffp-etiqueta">{parte ? `¿De quién es el ${nombre.toLowerCase()}?` : 'Toca un trozo de la cara'}</p>
-      {parte && (
-        <>
-          <input ref={ref} className="ffp-input" value={texto} onChange={(e) => setTexto(e.target.value)} placeholder="Nombre del futbolista"
-            autoComplete="off" autoCorrect="off" spellCheck={false} maxLength={60} />
-          <div className="ffp-dos">
-            <button type="button" className="ffp-boton secundario" disabled={Boolean(x?.pista)} onClick={() => enviar('pista', { parte })}>
-              💡 {x?.pista ? 'Pista vista' : `Pista (vale ${AJUSTES.puntosPista})`}
-            </button>
-            <button type="submit" className="ffp-boton" disabled={!texto.trim()}><Icon name="check" size={20} /> Responder</button>
-          </div>
-        </>
-      )}
-      <div className="ffp-fila-enlaces">
-        {parte && <button type="button" className="ffp-enlace oscuro" onClick={() => onCambiarParte(null)}>Otro trozo</button>}
-        <button type="button" className="ffp-enlace oscuro" onClick={() => enviar('pasar')}>⏭️ Pasar turno</button>
+    <form className="ffp-tarjeta ffp-respuesta" onSubmit={(e) => { e.preventDefault(); if (texto.trim()) { enviar('responder', { parte, respuesta: texto }); setTexto(''); } }}>
+      <p className="ffp-etiqueta">{nombre === 'Ojos' ? '¿De quién son los ojos?' : `¿De quién es el ${nombre.toLowerCase()}?`}</p>
+      <input ref={ref} className="ffp-input" value={texto} onChange={(e) => setTexto(e.target.value)} placeholder="Nombre del futbolista"
+        autoComplete="off" autoCorrect="off" spellCheck={false} maxLength={60} />
+      <div className="ffp-dos">
+        <button type="button" className="ffp-boton secundario" disabled={Boolean(x?.pista)} onClick={() => enviar('pista', { parte })}>
+          💡 {x?.pista ? 'Pista vista' : `Pista (vale ${AJUSTES.puntosPista})`}
+        </button>
+        <button type="submit" className="ffp-boton" disabled={!texto.trim()}><Icon name="check" size={20} /> Responder</button>
       </div>
+      <button type="button" className="ffp-enlace oscuro" onClick={() => onCambiarParte(null)}>Elegir otro trozo</button>
     </form>
   );
 }
@@ -136,24 +129,59 @@ function Reloj({ v, offset }) {
   );
 }
 
+/** Pantalla de «turno de…» antes de que empiece a correr el reloj del jugador. */
+function TurnoDe({ v, quien, local, puedo, onListo }) {
+  return (
+    <div className="ffp-tarjeta ffp-gate">
+      <Avatar id={quien?.id} nombre={quien?.nombre} grande />
+      <p className="ffp-etiqueta centrada">{local ? 'Pasad el móvil' : puedo ? 'Te toca' : 'Siguiente turno'}</p>
+      <h2>Turno de {quien?.nombre}</h2>
+      <p className="ffp-texto">{puedo ? `Tendrás ${AJUSTES.segTurno} segundos: toca un trozo de la cara y di de quién es.` : `Esperando a que ${quien?.nombre} esté listo…`}</p>
+      {puedo && <button type="button" className="ffp-boton grande" onClick={onListo}><Icon name="check" size={20} /> ¡Listo!</button>}
+    </div>
+  );
+}
+
 /** Ronda en juego. `miTurno` dice si quien mira puede responder (en un dispositivo, siempre). */
 export function PantallaJuego({ v, enviar, onSalir, offset = 0, miTurno, local = false, admin }) {
   const [parte, setParte] = useState(null);
-  useEffect(() => { setParte(null); }, [v.turno, v.ronda]);
+  useEffect(() => { setParte(null); }, [v.turno, v.ronda, v.listo]);
   useEffect(() => { if (parte && v.partes[parte]?.resuelta) setParte(null); }, [v.partes, parte]);
   const quien = v.jugadores.find((j) => j.id === v.turno);
   const resueltas = PARTES.filter((p) => v.partes[p.id].resuelta).length;
+  const titulo = `¿De quién es cada trozo? (${resueltas}/3)`;
+  const etiqueta = local || !miTurno ? `Turno de ${quien?.nombre}` : 'Tu turno';
+
+  if (!v.listo) {
+    return (
+      <>
+        <Hero v={v} onSalir={onSalir} etiqueta={etiqueta} titulo={titulo} clase={miTurno && !local ? 'mio' : ''} />
+        <Ultimo v={v} />
+        <TurnoDe v={v} quien={quien} local={local} puedo={miTurno} onListo={() => enviar('listo')} />
+        {admin?.esAdmin && admin.atascado && (
+          <div className="ffp-barra estatica">
+            <button type="button" className="ffp-enlace" onClick={admin.onForzar}><Icon name="forward" size={15} /> ¿No responde? Saltar su turno</button>
+          </div>
+        )}
+      </>
+    );
+  }
+
   return (
     <>
-      <Hero v={v} onSalir={onSalir} etiqueta={local ? `Turno de ${quien?.nombre}` : miTurno ? 'Tu turno' : `Turno de ${quien?.nombre}`}
-        titulo={`¿De quién es cada trozo? (${resueltas}/3)`} clase={miTurno && !local ? 'mio' : ''} />
+      <Hero v={v} onSalir={onSalir} etiqueta={etiqueta} titulo={titulo} clase={miTurno && !local ? 'mio' : ''} />
       <Ultimo v={v} />
       <Reloj v={v} offset={offset} />
+      {miTurno && !parte && <p className="ffp-indicacion">👆 Toca un trozo de la cara para responder</p>}
       <Cara v={v} seleccion={parte} onElegir={miTurno ? setParte : null} />
       <Pistas v={v} />
-      {miTurno
-        ? <FormRespuesta v={v} parte={parte} offset={offset} enviar={enviar} onCambiarParte={setParte} />
-        : <p className="ffp-esperando">⏳ {quien?.nombre} está intentando adivinar…</p>}
+      {miTurno && parte && <FormRespuesta v={v} parte={parte} enviar={enviar} onCambiarParte={setParte} />}
+      {!miTurno && <p className="ffp-esperando">⏳ {quien?.nombre} está intentando adivinar…</p>}
+      {miTurno && (
+        <div className="ffp-barra estatica">
+          <button type="button" className="ffp-boton secundario" onClick={() => enviar('pasar')}>⏭️ Pasar turno</button>
+        </div>
+      )}
       {admin?.esAdmin && (
         <div className="ffp-barra estatica">
           <div className="ffp-dos">
@@ -166,25 +194,57 @@ export function PantallaJuego({ v, enviar, onSalir, offset = 0, miTurno, local =
   );
 }
 
+/**
+ * Fin de una cara en dos pasos: primero las soluciones y, al pulsar «Ver puntuaciones», la clasificación con el
+ * botón de la siguiente ronda (que llega como `children`).
+ */
 export function PantallaResultado({ v, onSalir, children }) {
+  const [paso, setPaso] = useState('soluciones');
+  useEffect(() => { setPaso('soluciones'); }, [v.ronda]);
+  if (paso === 'soluciones') {
+    return (
+      <>
+        <Hero v={v} onSalir={onSalir} etiqueta={v.motivo === 'completa' ? '¡Cara completa!' : 'Nadie ha completado la cara'} titulo="Las soluciones" clase="fin" />
+        <Cara v={v} />
+        <div className="ffp-tarjeta">
+          <ul className="ffp-solucion">
+            {PARTES.map((pt) => {
+              const x = v.partes[pt.id];
+              const j = v.jugadores.find((q) => q.id === x.jugadorId);
+              return (
+                <li key={pt.id} className={x.resuelta ? 'bien' : ''}>
+                  <span className="ffp-sol-parte">{pt.nombre}</span>
+                  <strong>{x.futbolista}</strong>
+                  <small>{x.resuelta ? `Lo acertó ${j?.nombre ?? '—'} (+${x.puntos})` : 'Nadie lo acertó'}</small>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+        <div className="ffp-barra estatica">
+          <button type="button" className="ffp-boton grande" onClick={() => setPaso('puntos')}><Icon name="chart" size={20} /> Ver puntuaciones</button>
+        </div>
+      </>
+    );
+  }
+  const orden = [...v.jugadores].sort((a, b) => b.puntos - a.puntos);
+  const max = orden[0]?.puntos ?? 0;
+  const ganadas = Object.fromEntries(PARTES.map((pt) => v.partes[pt.id]).filter((x) => x.resuelta).map((x) => [x.jugadorId, 0]));
+  PARTES.forEach((pt) => { const x = v.partes[pt.id]; if (x.resuelta) ganadas[x.jugadorId] += x.puntos; });
   return (
     <>
-      <Hero v={v} onSalir={onSalir} etiqueta={v.motivo === 'completa' ? '¡Cara completa!' : 'Fin de la ronda'} titulo="Así estaba hecha la cara" clase="fin" />
-      <Cara v={v} />
+      <Hero v={v} onSalir={onSalir} etiqueta={`Después de la cara ${v.ronda} de ${v.rondas}`} titulo="Puntuaciones" clase="fin" />
       <div className="ffp-tarjeta">
-        <ul className="ffp-solucion">
-          {PARTES.map((pt) => {
-            const x = v.partes[pt.id];
-            const j = v.jugadores.find((q) => q.id === x.jugadorId);
-            return (
-              <li key={pt.id} className={x.resuelta ? 'bien' : ''}>
-                <span className="ffp-sol-parte">{pt.nombre}</span>
-                <strong>{x.futbolista}</strong>
-                <small>{x.resuelta ? `${j?.nombre ?? '—'} +${x.puntos}` : 'nadie'}</small>
-              </li>
-            );
-          })}
-        </ul>
+        <ol className="ffp-ranking">
+          {orden.map((j, i) => (
+            <li key={j.id} className={max > 0 && j.puntos === max ? 'lider' : ''}>
+              <span className="ffp-pos">{j.fuera ? '🚪' : i + 1}</span>
+              <Avatar id={j.id} nombre={j.nombre} />
+              <span className="ffp-ranking-nombre">{j.nombre}{j.id === v.yo?.id ? ' (tú)' : ''}<small>{ganadas[j.id] ? `+${ganadas[j.id]} en esta cara` : 'sin puntos en esta cara'}</small></span>
+              <strong>{j.puntos}</strong>
+            </li>
+          ))}
+        </ol>
       </div>
       {children}
     </>
@@ -253,7 +313,7 @@ export function Ayuda({ onCerrar, titulo, descripcion }) {
           {descripcion && <p>{descripcion}</p>}
           <ul>
             <li>Cada ronda sale una cara hecha con el <strong>pelo</strong>, los <strong>ojos</strong> y la <strong>barbilla</strong> de tres futbolistas distintos.</li>
-            <li>Por turnos ({AJUSTES.segTurno} s cada uno), toca un trozo y escribe de quién es. Si aciertas sumas {AJUSTES.puntos} puntos y sigues; si fallas o pasas, le toca al siguiente.</li>
+            <li>Por turnos: al pulsar «¡Listo!» tienes {AJUSTES.segTurno} s. Toca un trozo y escribe de quién es. Si aciertas sumas {AJUSTES.puntos} puntos y sigues; si fallas o pasas, le toca al siguiente.</li>
             <li>Puedes pedir una pista de un trozo: acertarlo pasa a valer {AJUSTES.puntosPista} puntos.</li>
             <li>La ronda acaba cuando se descubren los tres trozos o cuando todos habéis tenido vuestro turno.</li>
             <li>Vale el apellido (o el nombre por el que se le conoce), sin tildes y con pequeñas erratas.</li>

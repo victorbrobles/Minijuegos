@@ -87,7 +87,9 @@ export function Tablero({ v, puedeElegir, onElegir }) {
             }
             return (
               <div key={i} className={cls}>
-                {activa ? <span className="fgp-pensando">✍️</span> : ejemplos ? <span className="fgp-ejemplos">{ejemplos.join(', ')}</span> : null}
+                {activa ? <span className="fgp-pensando">✍️</span> : ejemplos ? (
+                  <span className="fgp-ejemplos">{ejemplos.nombres.slice(0, 2).join(', ')}{ejemplos.total > 2 ? ` +${ejemplos.total - 2}` : ''}</span>
+                ) : null}
               </div>
             );
           })}
@@ -172,7 +174,7 @@ export function PantallaJuego({ v, enviar, onSalir, offset = 0, miEquipo, nombre
         <div className="fgp-barra estatica">
           <div className="fgp-dos">
             {admin.atascado && <button type="button" className="fgp-enlace" onClick={admin.onForzar}><Icon name="forward" size={15} /> Saltar turno</button>}
-            <button type="button" className="fgp-enlace" onClick={() => enviar('terminar')}><Icon name="flagFinish" size={15} /> Terminar partida</button>
+            <button type="button" className="fgp-enlace" onClick={() => enviar('terminar')}>🏳️ Rendirse y ver soluciones</button>
           </div>
         </div>
       )}
@@ -195,9 +197,24 @@ export function PantallaFin({ v, onSalir, children }) {
   const g = v.fin.ganador;
   return (
     <>
-      <Hero v={v} onSalir={onSalir} etiqueta="Fin de la partida" titulo={g ? `¡Gana el equipo ${EQUIPOS[g].nombre}!` : '¡Empate!'} clase={`fin${g ? ` eq-${g}` : ''}`} />
+      <Hero v={v} onSalir={onSalir} etiqueta="Fin de la partida" titulo={g ? `¡Gana el equipo ${EQUIPOS[g].nombre}!` : v.fin.rendicion ? 'Os habéis rendido' : '¡Empate!'} clase={`fin${g ? ` eq-${g}` : ''}`} />
       <Tablero v={v} puedeElegir={false} onElegir={() => {}} />
-      {v.fin.ejemplos.some(Boolean) && <p className="fgp-nota">En las casillas libres tienes ejemplos de futbolistas que valían.</p>}
+      {v.fin.ejemplos.some(Boolean) && (
+        <div className="fgp-tarjeta">
+          <p className="fgp-etiqueta">{v.fin.rendicion ? '🏳️ Os habéis rendido · ' : ''}Respuestas posibles en las casillas libres</p>
+          <ul className="fgp-soluciones">
+            {v.fin.ejemplos.map((e, i) => e && (
+              <li key={i}>
+                <p className="fgp-sol-cats"><span>{v.filas[Math.floor(i / 3)]}</span><b>+</b><span>{v.columnas[i % 3]}</span></p>
+                <p className="fgp-sol-nombres">
+                  {e.nombres.length ? e.nombres.join(' · ') : 'Ya se habían usado todas las respuestas posibles.'}
+                  {e.total > e.nombres.length && <small> y {e.total - e.nombres.length} más</small>}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
       <Equipos jugadores={v.jugadores} turno={null} yoId={v.yo?.id} fase="fin" />
       {children}
     </>
@@ -235,6 +252,7 @@ export function Ayuda({ onCerrar, titulo, descripcion }) {
             <li>En su turno, el equipo elige una casilla libre y tiene {AJUSTES.segRespuesta} segundos para decir un futbolista que cumpla la categoría de su fila y la de su columna.</li>
             <li>Si acierta, la casilla es suya. Acierte o falle, el turno pasa al otro equipo. Un futbolista no puede repetirse en el tablero.</li>
             <li>Gana el primero que hace <strong>tres en raya</strong>. Si se llena el tablero sin raya, es empate.</li>
+            <li>Si nadie consigue la raya, podéis <strong>rendiros</strong>: se desvelan futbolistas válidos para cada casilla libre.</li>
             <li>Vale el apellido o el nombre por el que se conoce al jugador, y se perdonan tildes y pequeñas erratas.</li>
           </ul>
         </div>

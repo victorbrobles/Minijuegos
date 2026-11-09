@@ -6,7 +6,7 @@
 // una casilla libre y tiene unos segundos para decir un futbolista que cumpla las dos categorías. Si acierta, la
 // casilla es suya. Acierte o falle, el turno pasa al otro equipo. Un futbolista no se puede repetir en el tablero.
 
-export const AJUSTES = { min: 2, max: 12, segRespuesta: 45 };
+export const AJUSTES = { min: 2, max: 12, segRespuesta: 90, ejemplos: 8 };
 export const EQUIPOS = {
   X: { nombre: 'Azul', simbolo: '✕' },
   O: { nombre: 'Rojo', simbolo: '◯' }
@@ -43,11 +43,12 @@ const parecido = (a, b) => a === b || (b.length >= 6 && distancia(a, b) <= (b.le
  * Busca el futbolista válido al que se refiere el texto: nombre completo (con pequeñas erratas), el apellido o
  * el nombre por el que se le conoce (última palabra), o varias palabras de su nombre. Devuelve el nombre o null.
  */
-export function buscar(texto, validos) {
+export function buscar(texto, validos, alias = {}) {
   const a = normalizar(texto);
   const pa = palabras(texto);
   if (!a || !pa.length) return null;
   for (const n of validos) if (parecido(a, normalizar(n))) return n;
+  for (const n of validos) if ((alias[n] || []).some((x) => parecido(a, normalizar(x)))) return n;
   for (const n of validos) {
     const pn = palabras(n);
     if (!pn.length) continue;
@@ -73,7 +74,7 @@ function anotar(p, texto, tipo = '') {
 /** jugadores: [{ id, nombre, equipo? }] — sin equipo, se reparten alternos. */
 export function crearPartida(jugadores, grid, empieza = 'X') {
   const p = {
-    grid: { id: grid.id, dificultad: grid.dificultad, filas: grid.filas, columnas: grid.columnas, respuestas: grid.respuestas },
+    grid: { id: grid.id, dificultad: grid.dificultad, filas: grid.filas, columnas: grid.columnas, respuestas: grid.respuestas, alias: grid.alias || {} },
     jugadores: jugadores.map((j, i) => ({ id: j.id, nombre: j.nombre, equipo: j.equipo || (i % 2 === 0 ? 'X' : 'O'), aciertos: 0, fuera: false })),
     tablero: Array(9).fill(null),
     usados: [],
@@ -90,13 +91,20 @@ export function crearPartida(jugadores, grid, empieza = 'X') {
   return p;
 }
 
-function cerrar(p, ganador, linea = null) {
+function cerrar(p, ganador, linea = null, rendicion = false) {
   p.fase = 'fin';
   p.celda = null;
   p.hasta = null;
-  const ejemplos = p.tablero.map((c, i) => (c ? null : (p.grid.respuestas[Math.floor(i / 3)][i % 3] || []).slice(0, 3)));
-  p.fin = { ganador, linea, ejemplos };
-  anotar(p, ganador ? `🏆 ¡Gana el equipo ${EQUIPOS[ganador].nombre}!` : '🤝 Empate: tablero lleno sin tres en raya.', 'bueno');
+  const usados = new Set(p.usados.map(normalizar));
+  // Casillas sin ocupar: posibles respuestas (las no usadas en el tablero) y cuántas había en total
+  const ejemplos = p.tablero.map((c, i) => {
+    if (c) return null;
+    const todas = (p.grid.respuestas[Math.floor(i / 3)][i % 3] || []).filter((n) => !usados.has(normalizar(n)));
+    return { nombres: todas.slice(0, AJUSTES.ejemplos), total: todas.length };
+  });
+  p.fin = { ganador, linea, ejemplos, rendicion };
+  anotar(p, ganador ? `🏆 ¡Gana el equipo ${EQUIPOS[ganador].nombre}!`
+    : rendicion ? '🏳️ Os habéis rendido: estas eran las respuestas posibles.' : '🤝 Empate: tablero lleno sin tres en raya.', 'bueno');
 }
 
 function comprobar(p) {
@@ -150,7 +158,7 @@ export function responder(p, id, texto, ahora = Date.now()) {
   if (!String(texto || '').trim()) return { ok: false, error: 'Escribe un futbolista.' };
   const c = p.celda;
   const validos = p.grid.respuestas[Math.floor(c / 3)][c % 3] || [];
-  const nombre = buscar(texto, validos);
+  const nombre = buscar(texto, validos, p.grid.alias);
   const quien = id != null ? jug(p, id)?.nombre : null;
   if (nombre && p.usados.some((u) => normalizar(u) === normalizar(nombre))) {
     return { ok: false, error: `${nombre} ya está en el tablero: elige a otro.` };
@@ -188,9 +196,10 @@ export function tick(p, ahora = Date.now()) {
   return true;
 }
 
+/** Os rendís (o el anfitrión termina): sin ganador y se desvelan las respuestas posibles de las casillas libres. */
 export function terminar(p) {
   if (p.fase === 'fin') return { ok: false, error: 'La partida ya ha terminado.' };
-  cerrar(p, null);
+  cerrar(p, null, null, true);
   return { ok: true };
 }
 

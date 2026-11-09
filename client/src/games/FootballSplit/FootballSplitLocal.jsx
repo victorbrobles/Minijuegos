@@ -74,6 +74,7 @@ export default function FootballSplitLocal({ onVolver, onExit, onAbrirAyuda }) {
     let r;
     if (tipo === 'responder') r = E.responder(est, est.turno, d.parte, d.respuesta, ahora);
     else if (tipo === 'pista') r = E.pista(est, est.turno, d.parte);
+    else if (tipo === 'listo') r = E.listo(est, est.turno, ahora);
     else if (tipo === 'pasar') r = E.pasar(est, est.turno, ahora);
     else if (tipo === 'terminar') r = E.terminar(est);
     else if (tipo === 'siguiente') r = E.siguiente(est, ahora);
@@ -96,7 +97,7 @@ export default function FootballSplitLocal({ onVolver, onExit, onAbrirAyuda }) {
     contenido = (
       <PantallaResultado v={v} onSalir={onSalir}>
         <div className="ffp-barra estatica">
-          <button type="button" className="ffp-boton grande" onClick={() => enviar('siguiente')}><Icon name="play" size={20} /> {v.ronda >= v.rondas ? 'Ver resultado final' : 'Siguiente cara'}</button>
+          <button type="button" className="ffp-boton grande" onClick={() => enviar('siguiente')}><Icon name="play" size={20} /> {v.ronda >= v.rondas ? 'Ver resultado final' : 'Nueva ronda: siguiente cara'}</button>
           {v.ronda < v.rondas && <button type="button" className="ffp-enlace" onClick={() => enviar('terminar')}><Icon name="flagFinish" size={15} /> Terminar la partida ya</button>}
         </div>
       </PantallaResultado>

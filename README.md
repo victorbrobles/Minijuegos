@@ -110,13 +110,15 @@ npm run dev
 
 ## Minijuego: Fútbol en raya (`FutbolGrid/`)
 - Online (2–12, dos equipos: cada uno elige el suyo en la sala de espera) o en un dispositivo (jugadores alternos en Azul ✕ y Rojo ◯).
-- El equipo en turno elige casilla y tiene 45 s para un futbolista que cumpla fila y columna; acierte o falle, turno del rival. No se repiten futbolistas. Tres en raya gana; si no queda ninguna casilla posible, empate.
-- Respuestas tolerantes (apellido, nombre conocido, tildes, erratas) y nunca se envían al cliente online. Los `grid_21`–`grid_30` no tienen respuestas y se excluyen (`server/data/seeds/futbolgrid/index.js`).
+- El equipo en turno elige casilla y tiene 90 s para un futbolista que cumpla fila y columna; acierte o falle, turno del rival. No se repiten futbolistas. Tres en raya gana; si no queda ninguna casilla posible, empate.
+- Respuestas: base de ~800 futbolistas (`jugadores1-4.js`: clubes con años, selección, títulos) y entrenadores con sus etapas (`clubes.js`); `respuestas.js` calcula qué futbolistas cumplen cada casilla y se suman a las escritas a mano (las que la base desmiente por selección, club o entrenador se descartan). Los 40 tableros son jugables; algunas categorías imposibles se cambiaron en `index.js` (CAMBIOS).
+- Rendirse: termina sin ganador y desvela, por cada casilla libre, futbolistas válidos (sin usar) y cuántos había.
+- Respuestas tolerantes (apellido, nombre conocido, alias como «cr7» o «kun», tildes, erratas) y nunca se envían al cliente online.
 - Motor `server/futbolgrid/engine.js` (`npm run sync:futbolgrid`). Prueba: `node server/scripts/futbolgrid-sim.mjs`.
 
 ## Minijuego: FrankensFootball (`FootballSplit/`)
 - Online o en un dispositivo, 2–12 jugadores, 5/10/15 caras. Cada cara mezcla pelo, ojos y barbilla de tres futbolistas (sin repetir en la partida).
-- Por turnos de 60 s: tocas un trozo y escribes de quién es; acierto +5 (con pista +2) y sigues; fallo o pase, turno del siguiente. La ronda acaba con la cara completa o tras una vuelta.
+- Cada vez que cambia el turno sale «Turno de…» con «¡Listo!» (ahí empieza el reloj de 60 s). Tocas un trozo y escribes de quién es; acierto +5 (con pista +2) y sigues; fallo o pase, turno del siguiente. La ronda acaba con la cara completa o tras una vuelta: primero pantalla de soluciones y después la de puntuaciones con «Nueva ronda».
 - Los nombres ya no se envían al cliente hasta acertarlos. Motor `server/footballsplit/engine.js` (`npm run sync:footballsplit`). Prueba: `node server/scripts/footballsplit-sim.mjs`.
 
 ## Minijuego: ¡Qué jugadón! (`Jugadas/`)

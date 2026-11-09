@@ -437,3 +437,9 @@
 .ffp-ranking-nombre small { display: block; color: #64748b; font-size: 0.72rem; font-weight: 700; }
 .ffp-franja.sel { outline: none; }
 .ffp-franja.sel::after { content: ''; position: absolute; inset: 0; border: 4px solid #facc15; background: rgba(250, 204, 21, 0.12); pointer-events: none; }
+.ffp-indicacion { margin: 0 !important; padding: 0.45rem 0.9rem; border-radius: 999px; background: rgba(255, 255, 255, 0.15); color: #ffffff !important; font-size: 0.9rem; font-weight: 800; text-align: center; animation: ffpLatir 1.6s ease-in-out infinite; }
+@keyframes ffpLatir { 50% { opacity: 0.7; } }
+.ffp-gate { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; padding: 1.6rem 1.2rem 1.3rem; text-align: center; }
+.ffp-gate h2 { margin: 0; color: #0f172a; font-size: 1.5rem; }
+.ffp-gate .ffp-boton { margin-top: 0.6rem; }
+.ffp-avatar.grande { width: 84px; height: 84px; margin-bottom: 0.4rem; border-radius: 28px; font-size: 2.4rem; animation: ffpFlotar 2.6s ease-in-out infinite; }

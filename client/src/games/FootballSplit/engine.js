@@ -97,7 +97,8 @@ function empezarRonda(p, primeroId, ahora) {
   p.turnosRonda = 1;
   p.primero = siguienteActivo(p, primeroId, true);
   p.turno = p.primero;
-  p.hasta = ahora + AJUSTES.segTurno * 1000;
+  p.listo = false; // cada vez que el turno cambia de manos, el jugador pulsa «listo» y entonces corre su reloj
+  p.hasta = null;
   p.fase = 'jugando';
   p.ultimo = null;
   anotar(p, `Cara ${p.ronda}: empieza ${jug(p, p.turno)?.nombre}.`);
@@ -115,12 +116,24 @@ function pasarTurno(p, ahora) {
   if (sig == null || p.turnosRonda >= activos(p).length) { cerrarRonda(p, 'vuelta'); return; }
   p.turno = sig;
   p.turnosRonda += 1;
+  p.listo = false;
+  p.hasta = null;
+}
+
+/** El jugador con el turno pulsa «listo»: empieza su reloj. */
+export function listo(p, id, ahora = Date.now()) {
+  if (p.fase !== 'jugando') return { ok: false, error: 'La ronda ya ha terminado.' };
+  if (id != null && id !== p.turno) return { ok: false, error: 'No es tu turno.' };
+  if (p.listo) return { ok: true };
+  p.listo = true;
   p.hasta = ahora + AJUSTES.segTurno * 1000;
+  return { ok: true };
 }
 
 export function responder(p, id, parte, texto, ahora = Date.now()) {
   if (p.fase !== 'jugando') return { ok: false, error: 'La ronda ya ha terminado.' };
   if (id !== p.turno) return { ok: false, error: 'No es tu turno.' };
+  if (!p.listo) return { ok: false, error: 'Pulsa «listo» para empezar tu turno.' };
   if (!IDS.includes(parte) || p.resueltas[parte]) return { ok: false, error: 'Elige un trozo de la cara sin resolver.' };
   if (!String(texto || '').trim()) return { ok: false, error: 'Escribe un futbolista.' };
   const real = p.retos[p.ronda - 1].partes[parte].jugador;
@@ -145,6 +158,7 @@ export function responder(p, id, parte, texto, ahora = Date.now()) {
 export function pista(p, id, parte) {
   if (p.fase !== 'jugando') return { ok: false, error: 'La ronda ya ha terminado.' };
   if (id != null && id !== p.turno) return { ok: false, error: 'Solo quien tiene el turno puede pedir pista.' };
+  if (!p.listo) return { ok: false, error: 'Pulsa «listo» para empezar tu turno.' };
   if (!IDS.includes(parte) || p.resueltas[parte]) return { ok: false, error: 'Ese trozo ya está resuelto.' };
   if (!p.pistas[parte]) anotar(p, `💡 Pista para el ${nombreParte(parte).toLowerCase()}.`);
   p.pistas[parte] = true;
@@ -161,7 +175,7 @@ export function pasar(p, id, ahora = Date.now()) {
 }
 
 export function tick(p, ahora = Date.now()) {
-  if (p.fase !== 'jugando' || !p.hasta || ahora < p.hasta) return false;
+  if (p.fase !== 'jugando' || !p.listo || !p.hasta || ahora < p.hasta) return false;
   p.ultimo = { ok: false, jugadorId: p.turno, tiempo: true };
   anotar(p, `⏰ Se acabó el tiempo de ${jug(p, p.turno)?.nombre}.`, 'malo');
   pasarTurno(p, ahora);
@@ -214,6 +228,7 @@ export function vistaDe(p, yoId) {
     ronda: p.ronda,
     rondas: p.rondas,
     turno: p.turno,
+    listo: Boolean(p.listo),
     hasta: p.hasta,
     motivo: p.motivo,
     partes: Object.fromEntries(IDS.map((k) => {
