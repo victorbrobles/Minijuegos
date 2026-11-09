@@ -108,6 +108,15 @@ npm run dev
 - Partidas de 10, 15 o 25 rondas y 45 s por respuesta. Online, el servidor cierra la ronda al acabar el tiempo y acepta selecciones incompletas.
 - Elementos en `server/data/seeds/colores/parteN.js` (`{ id, item, colores: [...] }`, con los colores de la paleta: rojo, azul, amarillo, verde, naranja, morado, marron, blanco, negro, gris, rosa). `parte6.js` es la ampliación.
 
+## Minijuego: ¡Descarta y Elimina! (`Descarte/`)
+- De 3 a 12 jugadores, online o en un único dispositivo; partidas de 3, 5 o 7 tableros con las 27 letras (1, 2 o 3 puntos según lo difícil que sea la letra).
+- El retador elige rival (alguien que no haya jugado en esta vuelta) y una de tres categorías. El rival tiene 30 s para dar una palabra que empiece por una letra que siga en el tablero: si vale, la letra se elimina y suma sus puntos; después el rival pasa a retar. El tablero acaba sin letras o cuando todos fallan seguidos.
+- Online la palabra se escribe y los demás votan 12 s (mayoría para rechazar; si nadie protesta, vale; el anfitrión puede arbitrar). En un dispositivo se dice en voz alta y el grupo toca la letra.
+- Motor en `server/descarte/engine.js` con copia en el cliente (`npm run sync:descarte`). Prueba: `node server/scripts/descarte-sim.mjs`.
+
+## Minijuego: 6 Pistas (`Pistas/`)
+- Online: ids de jugador únicos aunque alguien salga, nombre obligatorio, solo el anfitrión revela la solución, sala de espera común (quitar jugadores, estado de conexión) y reconexión si falla la red.
+
 ## Minijuego: El Golpe (`Golpe/`)
 - Solo online, de 3 a 8 jugadores, 3 o 5 misiones (museo, banco, prisión y central eléctrica). Cada misión tiene 3 pasos con 4 opciones; en secreto cada opción es segura, peligrosa (funciona, pero arriesgada) o imposible (el plan fracasa).
 - Fases: encargo (pistas privadas y objetivo secreto) → plan (una opción por paso) → debate con chat → votación del mejor plan (no el tuyo) y acusación del traidor → resolución (se ejecuta el más votado y se revela todo).

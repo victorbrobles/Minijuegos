@@ -10,6 +10,7 @@
     "sync:sumacero": "node scripts/sync-sumacero.mjs",
     "sync:cuentas": "node scripts/sync-cuentas.mjs",
     "sync:golpe": "node scripts/sync-golpe.mjs",
+    "sync:descarte": "node scripts/sync-descarte.mjs",
     "sim:fundadores": "node scripts/fundadores-sim.mjs",
     "sync:logos": "node scripts/sync-logos.mjs"
   },

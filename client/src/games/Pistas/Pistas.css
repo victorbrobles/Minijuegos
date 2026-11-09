@@ -879,3 +879,36 @@ body:has(.qq-en-partida) .back {
   background: #ffffff !important;
   box-shadow: 0 0 0 4px rgba(124, 58, 237, 0.16) !important;
 }
+/* Lobby online y estado de conexión */
+.ptp-sala-extra { display: inline-flex; align-items: center; gap: 0.5rem; margin-left: auto; }
+.ptp-sin-conexion { font-size: 0.95rem; }
+.ptp-quitar {
+  width: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0.3rem 0.7rem !important;
+  border: none !important;
+  border-radius: 999px !important;
+  background: #fee2e2 !important;
+  box-shadow: none !important;
+  color: #b91c1c !important;
+  font-size: 0.8rem !important;
+  font-weight: 800 !important;
+  cursor: pointer;
+}
+.ptp-sin-red {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  z-index: 60;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100vw - 32px);
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  background: #1e293b;
+  color: #fff;
+  font-weight: 800;
+  font-size: 0.85rem;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.3);
+}

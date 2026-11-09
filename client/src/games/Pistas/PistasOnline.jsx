@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
 import './Pistas.css';
-import { MenuInicioJuego, MenuModoOnline, FormCrearSala, FormUnirseSala, CabeceraSala } from '../../components/MenuJuego.jsx';
+import { MenuInicioJuego, MenuModoOnline, FormCrearSala, FormUnirseSala, CabeceraSala, ListaSala, EsperandoAnfitrion } from '../../components/MenuJuego.jsx';
 
 const CLAVE_SESION_PISTAS = 'pistas_online_session';
 const COLORES_JUGADOR = ['#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316', '#84cc16', '#6366f1'];
@@ -27,6 +27,7 @@ export default function PistasOnline({ onLocal, onSalir }) {
   });
 
   const [sala, setSala] = useState(null);
+  const [sinRed, setSinRed] = useState(false);
   const [miTexto, setMiTexto] = useState('');
   const [enviandoRespuesta, setEnviandoRespuesta] = useState(false);
 
@@ -40,24 +41,41 @@ export default function PistasOnline({ onLocal, onSalir }) {
       return;
     }
 
+    let fallos = 0;
+    let pedidas = 0;
+    let aplicada = 0;
+    const cerrar = (msg) => {
+      sessionStorage.removeItem(CLAVE_SESION_PISTAS);
+      setSesion(null);
+      setSala(null);
+      setSinRed(false);
+      setVista('online_menu');
+      setErrorMsg(msg);
+    };
     const consultarEstado = () => {
+      const n = ++pedidas;
       fetch(`/api/pistas/online/sala/${sesion.code}?token=${sesion.token}`)
-        .then((r) => {
-          if (!r.ok) throw new Error('Sala no disponible');
-          return r.json();
-        })
-        .then((d) => {
+        .then(async (r) => {
+          if (r.status === 404 || r.status === 403) {
+            const d = await r.json().catch(() => ({}));
+            cerrar(d.error || 'La sala se ha cerrado.');
+            return;
+          }
+          if (!r.ok) throw new Error('red');
+          const d = await r.json();
+          if (n < aplicada) return;
+          aplicada = n;
+          fallos = 0;
+          setSinRed(false);
           if (d.success) {
             setSala(d);
             setVista('sala');
           }
         })
         .catch(() => {
-          sessionStorage.removeItem(CLAVE_SESION_PISTAS);
-          setSesion(null);
-          setSala(null);
-          setVista('online_menu');
-          setErrorMsg('La sala se ha cerrado o se ha perdido la conexión.');
+          fallos += 1;
+          if (fallos >= 3) setSinRed(true);
+          if (fallos >= 40) cerrar('Se ha perdido la conexión con la sala.');
         });
     };
 
@@ -140,6 +158,19 @@ export default function PistasOnline({ onLocal, onSalir }) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: sesion.token, modo: nuevoModo })
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleExpulsar = async (jugadorId) => {
+    if (!sesion) return;
+    try {
+      await fetch(`/api/pistas/online/sala/${sesion.code}/expulsar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: sesion.token, jugadorId })
       });
     } catch (err) {
       console.error(err);
@@ -244,6 +275,8 @@ export default function PistasOnline({ onLocal, onSalir }) {
 
   return (
     <div className={`pts-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+      {sinRed && <div className="ptp-sin-red">📶 Reconectando con la sala…</div>}
+
       {/* MODAL DE AYUDA */}
       {modalAyuda && (
         <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
@@ -349,23 +382,17 @@ export default function PistasOnline({ onLocal, onSalir }) {
             )}
           </div>
 
-          <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
-            <h3 className="qq-sala-titulo"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length})</h3>
-            <div className="lb-lista qq-sala-lista">
-              {sala.jugadores.map((j) => (
-                <div key={j.id} className={`lb-jug ${j.id === yoId ? 'yo' : ''}`}>
-                  <span className="lb-jug-nombre">
-                    {j.nombre}{j.id === yoId ? ' (tú)' : ''}{j.id === 1 ? ' 👑' : ''}
-                  </span>
-                </div>
-              ))}
-            </div>
-            {sala.jugadores.length < 2 && (
-              <p className="hint" style={{ marginTop: '0.8rem' }}>
-                Falta al menos 1 jugador más para poder empezar.
-              </p>
+          <ListaSala
+            jugadores={sala.jugadores} yoId={yoId} min={2} max={15} anfitrionId={sala.anfitrionId}
+            renderExtra={(j) => (
+              <span className="ptp-sala-extra">
+                {!j.conectado && <span className="ptp-sin-conexion" title="Sin conexión">📵</span>}
+                {esAdmin && j.id !== yoId && (
+                  <button type="button" className="ptp-quitar" onClick={() => handleExpulsar(j.id)}>Quitar</button>
+                )}
+              </span>
             )}
-          </div>
+          />
 
           {esAdmin ? (
             <div style={{ marginTop: '1.2rem' }}>
@@ -379,11 +406,7 @@ export default function PistasOnline({ onLocal, onSalir }) {
               </button>
             </div>
           ) : (
-            <div className="panel center qq-menu-panel" style={{ padding: '2rem 1.5rem', marginTop: '1rem' }}>
-              <span className="lb-luna chica"><Icon name="hourglass" size={40} /></span>
-              <h3 style={{ margin: '0.5rem 0' }}>Esperando al anfitrión...</h3>
-              <p className="hint">En cuanto comience la partida, verás aparecer las pistas.</p>
-            </div>
+            <EsperandoAnfitrion texto="En cuanto el anfitrión empiece, verás aparecer las pistas." />
           )}
         </section>
       )}
