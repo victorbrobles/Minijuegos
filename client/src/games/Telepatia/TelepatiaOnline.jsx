@@ -1,20 +1,47 @@
 // client/src/games/Telepatia/TelepatiaOnline.jsx
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import './Telepatia.css';
-import '../Adivina/Adivina.css';
-import { MenuInicioJuego, MenuModoOnline, FormCrearSala, FormUnirseSala, CabeceraSala, EsperandoAnfitrion } from '../../components/MenuJuego.jsx';
+import {
+  Cabecera,
+  Avatar,
+  OrdenTurnos,
+  BotonPrincipal,
+  EnlaceSecundario,
+  colorJugador,
+  indiceColor
+} from './TelepatiaLocal.jsx';
 
 const CLAVE_SESION_TEL = 'telepatia_online_session';
 
-export default function TelepatiaOnline({ onLocal, onSalir }) {
-  const [vista, setVista] = useState('menu');
+function BotonVolver({ onClick, texto = 'Volver' }) {
+  return (
+    <button type="button" className="qq-link-volver" onClick={onClick}>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7" />
+      </svg>
+      <span>{texto}</span>
+    </button>
+  );
+}
+
+export default function TelepatiaOnline({
+  tituloJuego = 'Telepatía',
+  descripcionJuego,
+  onLocal,
+  onSalir,
+  onAbrirAyuda
+}) {
+  const navigate = useNavigate();
+  const [vista, setVista] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
   const [nombre, setNombre] = useState('');
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
-  const [modalSalir, setModalSalir] = useState(false);
-  const [modalAyuda, setModalAyuda] = useState(false);
+
+  const [modalSalirLobby, setModalSalirLobby] = useState(false);
+  const [modalSalirPortada, setModalSalirPortada] = useState(false);
   const [codigoCopiado, setCodigoCopiado] = useState(false);
 
   // Input de palabra del jugador
@@ -23,7 +50,11 @@ export default function TelepatiaOnline({ onLocal, onSalir }) {
 
   const [sala, setSala] = useState(null);
   const [sesion, setSesion] = useState(() => {
-    try { return JSON.parse(sessionStorage.getItem(CLAVE_SESION_TEL)); } catch { return null; }
+    try {
+      return JSON.parse(sessionStorage.getItem(CLAVE_SESION_TEL));
+    } catch {
+      return null;
+    }
   });
 
   const intervalRef = useRef(null);
@@ -33,36 +64,43 @@ export default function TelepatiaOnline({ onLocal, onSalir }) {
     if (!sesion) {
       if (intervalRef.current) clearInterval(intervalRef.current);
       setSala(null);
-      return;
+      return undefined;
     }
 
     const consultarEstado = () => {
       fetch(`/api/telepatia/sala/${sesion.code}?token=${sesion.token}`)
-        .then(r => r.ok ? r.json() : Promise.reject('Sala no disponible'))
-        .then(d => {
+        .then((r) => (r.ok ? r.json() : Promise.reject(new Error('Sala no disponible'))))
+        .then((d) => {
           if (d.success) {
             setSala(d);
             setVista('sala');
           }
-        }).catch(() => {
+        })
+        .catch(() => {
           sessionStorage.removeItem(CLAVE_SESION_TEL);
           setSesion(null);
           setSala(null);
           setVista('online_menu');
+          setErrorMsg('La sala se ha cerrado o se ha perdido la conexión.');
         });
     };
 
     consultarEstado();
-    intervalRef.current = setInterval(consultarEstado, 1000);
+    intervalRef.current = setInterval(consultarEstado, 800);
     return () => clearInterval(intervalRef.current);
   }, [sesion]);
 
-  // Cierra automáticamente el modal al empezar la partida
-  useEffect(() => {
-    if (sala && sala.estado !== 'lobby') {
-      setModalAyuda(false);
+  const redirigirAPortada = () => {
+    if (typeof onSalir === 'function') {
+      onSalir();
+    } else {
+      try {
+        navigate('/');
+      } catch {
+        window.location.href = '/';
+      }
     }
-  }, [sala?.estado]);
+  };
 
   const peticionPost = async (endpoint, extraBody = {}) => {
     setCargando(true);
@@ -74,7 +112,7 @@ export default function TelepatiaOnline({ onLocal, onSalir }) {
         body: JSON.stringify({ token: sesion?.token, code: sesion?.code, ...extraBody })
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+      if (!res.ok) throw new Error(data.error || 'Error en la petición');
       if (data.token) {
         const nueva = { code: data.code, token: data.token };
         sessionStorage.setItem(CLAVE_SESION_TEL, JSON.stringify(nueva));
@@ -89,16 +127,55 @@ export default function TelepatiaOnline({ onLocal, onSalir }) {
     }
   };
 
-  const handleCrear = () => nombre.trim() && peticionPost('crear', { nombre });
-  const handleUnirse = () => nombre.trim() && codigoInput && peticionPost('unirse', { nombre, joinCode: codigoInput.toUpperCase() });
+  const handleCrear = () => nombre.trim() && peticionPost('crear', { nombre: nombre.trim() });
+  const handleUnirse = () =>
+    nombre.trim() &&
+    codigoInput.trim() &&
+    peticionPost('unirse', { nombre: nombre.trim(), joinCode: codigoInput.trim().toUpperCase() });
 
-  const handleSalir = () => {
-    if (sesion) peticionPost(`sala/${sesion.code}/salir`);
+  const handleVolverMenuOnline = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    const sesionActual = sesion;
     sessionStorage.removeItem(CLAVE_SESION_TEL);
     setSesion(null);
     setSala(null);
+    setModalSalirLobby(false);
     setVista('online_menu');
-    setModalSalir(false);
+
+    if (sesionActual?.code && sesionActual?.token) {
+      fetch(`/api/telepatia/sala/${sesionActual.code}/salir`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: sesionActual.token, code: sesionActual.code }),
+        keepalive: true
+      }).catch(() => {});
+    }
+  };
+
+  const handleCerrarSalaYSalirAPortada = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    const sesionActual = sesion;
+    sessionStorage.removeItem(CLAVE_SESION_TEL);
+    setSesion(null);
+    setSala(null);
+    setModalSalirPortada(false);
+
+    if (sesionActual?.code && sesionActual?.token) {
+      fetch(`/api/telepatia/sala/${sesionActual.code}/salir`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: sesionActual.token, code: sesionActual.code }),
+        keepalive: true
+      }).catch(() => {});
+    }
+
+    redirigirAPortada();
   };
 
   const copiarCodigo = () => {
@@ -108,7 +185,6 @@ export default function TelepatiaOnline({ onLocal, onSalir }) {
     setTimeout(() => setCodigoCopiado(false), 2000);
   };
 
-  // Al pasar a estado 'escribiendo', reiniciar el input y enfocar
   useEffect(() => {
     if (sala?.estado === 'escribiendo') {
       setMiPalabra('');
@@ -117,354 +193,641 @@ export default function TelepatiaOnline({ onLocal, onSalir }) {
     }
   }, [sala?.estado, sala?.rondaNum]);
 
-  const enviarPalabra = () => {
+  const enviarPalabra = (e) => {
+    if (e) e.preventDefault();
     if (!miPalabra.trim() || haEnviado) return;
     setHaEnviado(true);
     peticionPost(`sala/${sesion.code}/enviar-palabra`, { palabra: miPalabra.trim() });
   };
 
-  const mostrarAyuda = vista === 'menu' || vista === 'crear' || vista === 'unirse' || (vista === 'sala' && sala?.estado === 'lobby');
+  const yo = sala?.jugadores?.find((j) => j.esTu);
+  const esAdmin = Boolean(yo?.esAdmin);
+  const faltan = sala?.jugadores ? Math.max(0, 4 - sala.jugadores.length) : 4;
 
-  const BotonAyudaCard = () => (
-    <button
-      type="button"
-      onClick={() => setModalAyuda(true)}
-      title="Reglas del juego"
-      style={{
-        position: 'absolute',
-        top: '1rem',
-        right: '1rem',
-        width: '38px',
-        height: '38px',
-        borderRadius: '50%',
-        border: '1.5px solid #c7d2fe',
-        backgroundColor: '#ffffff',
-        color: '#4338ca',
-        fontSize: '1.2rem',
-        fontWeight: '700',
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        boxShadow: '0 2px 8px rgba(99, 102, 241, 0.12)',
-        padding: 0,
-        zIndex: 5
-      }}
-    >
-      ?
-    </button>
-  );
-
-  const ModalAyuda = () => modalAyuda ? (
-    <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
-      <div
-        className="rg-modal aprox-modal-ayuda"
-        onClick={(e) => e.stopPropagation()}
-        style={{ maxWidth: '540px', maxHeight: '88vh', overflowY: 'auto', textAlign: 'left' }}
-      >
-        <div className="aprox-modal-header">
-          <span className="aprox-modal-signo-title">?</span>
-          <h3>¿Cómo se juega a Telepatía?</h3>
-        </div>
-
-        <div className="aprox-modal-cuerpo">
-          <p><strong>1. Dinámica de la ronda:</strong></p>
-          <ul>
-            <li>En cada ronda aparece una <strong>Palabra de Origen</strong> común para todos los móviles.</li>
-            <li>Tienes <strong>5 segundos</strong> para escribir una palabra que relaciones mentalmente con ella y pulsar Enviar.</li>
-          </ul>
-
-          <p><strong>2. Coincidencias y Rachas:</strong></p>
-          <ul>
-            <li>El sistema compara todas las palabras enviadas. Si <strong>2 o más jugadores escriben exactamente la misma</strong>, ¡conectan mentes y suman puntos!</li>
-            <li><strong>🔥 Racha multiplicadora:</strong> La 1ª coincidencia suma <strong>+1 punto</strong>. Si vuelves a coincidir en la ronda siguiente consecutiva, tu racha sube (+2 pts, +3 pts...).</li>
-            <li>Si no coincides en una ronda, tu racha vuelve a empezar desde cero.</li>
-          </ul>
-
-          <p><strong>3. Fin de partida:</strong></p>
-          <ul>
-            <li>Se juegan <strong>15 rondas</strong> de máxima velocidad mental. ¡El jugador que lidere la clasificación al final gana la partida!</li>
-          </ul>
-        </div>
-
-        <div className="rg-modal-acciones" style={{ marginTop: '1.2rem' }}>
-          <button className="big full" onClick={() => setModalAyuda(false)}>
-            Entendido
-          </button>
-        </div>
-      </div>
-    </div>
-  ) : null;
-
-  if (vista === 'menu') {
-    return (
-      <div className="tel-contenedor" style={{ position: 'relative' }}>
-        <ModalAyuda />
-        <MenuInicioJuego
-            juegoId="telepatia"
-            onOnline={() => { setVista('online_menu'); setErrorMsg(''); }}
-            onLocal={onLocal}
-            onAyuda={() => setModalAyuda(true)}
-            error={errorMsg}
-          />
-      </div>
-    );
-  }
-
-  if (vista === 'online_menu') {
-    return (
-      <div className="tel-contenedor" style={{ position: 'relative' }}>
-        <ModalAyuda />
-        <MenuModoOnline
-          onVolver={() => { setVista('menu'); setErrorMsg(''); }}
-          onCrear={() => { setVista('crear'); setErrorMsg(''); }}
-          onUnirse={() => { setVista('unirse'); setErrorMsg(''); }}
-          onAyuda={() => setModalAyuda(true)}
-          error={errorMsg}
-        />
-      </div>
-    );
-  }
-
-  if (vista === 'crear' || vista === 'unirse') {
-    return (
-      <div className="tel-contenedor" style={{ position: 'relative' }}>
-        <ModalAyuda />
-        {vista === 'crear' ? (
-          <FormCrearSala
-            onVolver={() => { setVista('online_menu'); setErrorMsg(''); }}
-            onAyuda={() => setModalAyuda(true)}
-            nombre={nombre}
-            setNombre={setNombre}
-            onCrear={handleCrear}
-            cargando={cargando}
-            error={errorMsg}
-            maxLength={15}
-          />
-        ) : (
-          <FormUnirseSala
-            onVolver={() => { setVista('online_menu'); setErrorMsg(''); }}
-            onAyuda={() => setModalAyuda(true)}
-            codigo={codigoInput}
-            setCodigo={setCodigoInput}
-            nombre={nombre}
-            setNombre={setNombre}
-            onUnirse={handleUnirse}
-            cargando={cargando}
-            error={errorMsg}
-            maxLength={15}
-          />
-        )}
-      </div>
-    );
-  }
-
-  if (!sala) return <div className="panel center"><p>Cargando sala...</p></div>;
-
-  const yo = sala.jugadores.find(j => j.esTu);
-  const esAdmin = yo?.esAdmin;
-  const faltan = 4 - sala.jugadores.length;
-
-  const ranking = [...sala.jugadores].sort((a, b) => b.puntos - a.puntos);
+  const ranking = sala?.jugadores ? [...sala.jugadores].sort((a, b) => b.puntos - a.puntos) : [];
   const maxPuntos = ranking.length > 0 ? ranking[0].puntos : 0;
-  const ganadores = maxPuntos > 0 ? ranking.filter(j => j.puntos === maxPuntos) : [];
+  const ganadores = maxPuntos > 0 ? ranking.filter((j) => j.puntos === maxPuntos) : [];
+
+  const enPartidaActiva = vista === 'sala' && sala && sala.estado !== 'lobby';
 
   return (
-    <div className="tel-contenedor" style={{ position: 'relative' }}>
-      <ModalAyuda />
-
-      {/* 1. LOBBY ONLINE */}
-      {sala.estado === 'lobby' && (
-        <section className="game qq-pantalla">
-          <CabeceraSala codigo={sala.code} onVolver={() => setModalSalir(true)} onAyuda={() => setModalAyuda(true)} />
-
-          <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
-            <h3 className="qq-sala-titulo"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length}/20)</h3>
-            <div className="lb-lista qq-sala-lista">
-              {sala.jugadores.map((j) => (
-                <div key={j.id} className={`lb-jug ${j.esTu ? 'yo' : ''}`}>
-                  <span className="lb-jug-nombre">{j.nombre} {j.esTu && '(tú)'} {j.esAdmin && '👑'}</span>
-                </div>
-              ))}
-            </div>
-            {faltan > 0 ? (
-              <p className="hint" style={{ marginTop: '0.8rem' }}>Faltan {faltan} jugador{faltan === 1 ? '' : 'es'} para poder empezar (mínimo 4).</p>
-            ) : (
-              <p className="hint ok" style={{ marginTop: '0.8rem' }}>¡Ya sois suficientes! El anfitrión puede empezar.</p>
-            )}
-          </div>
-
-          <div className="actions" style={{ marginTop: '1rem' }}>
-            {esAdmin && (
+    <div className={`tel-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+      {/* 1. MENÚ PRINCIPAL */}
+      {vista === 'menu' && (
+        <section className="game">
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top solo-derecha">
               <button
-                className="big full qq-btn-principal"
-                disabled={faltan > 0}
-                onClick={() => peticionPost(`sala/${sesion.code}/iniciar`)}
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
               >
-                <Icon name="play" size={22} /> Empezar Partida (15 rondas)
+                ?
               </button>
-            )}
-          </div>
+            </div>
 
-          {!esAdmin && <EsperandoAnfitrion />}
+            <div className="qq-hero-icono">
+              <Icon name="zap" size={44} strokeWidth={1.7} />
+            </div>
+            <h1 className="title qq-main-title">{tituloJuego}</h1>
+            <p className="hint qq-main-desc">{descripcionJuego}</p>
+
+            {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
+
+            <div className="qq-menu-opciones">
+              <button
+                type="button"
+                className="qq-opcion-card principal"
+                onClick={() => {
+                  setVista('online_menu');
+                  setErrorMsg('');
+                }}
+              >
+                <span className="qq-opcion-icono">
+                  <Icon name="globe" size={26} />
+                </span>
+                <div className="qq-opcion-textos">
+                  <strong>Jugar online</strong>
+                  <span>Cada jugador escribe su palabra en 5 segundos desde su móvil</span>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                className="qq-opcion-card secundaria"
+                onClick={onLocal}
+              >
+                <span className="qq-opcion-icono">
+                  <Icon name="users" size={26} />
+                </span>
+                <div className="qq-opcion-textos">
+                  <strong>Jugar en un único dispositivo</strong>
+                  <span>Diciendo la palabra en voz alta a la vez y apuntando coincidencias</span>
+                </div>
+              </button>
+            </div>
+          </div>
         </section>
       )}
 
-      {/* 2. ESCRIBIENDO (5 SEGUNDOS) - Ayuda oculta */}
-      {sala.estado === 'escribiendo' && (
+      {/* 1B. SUBMENÚ ONLINE */}
+      {vista === 'online_menu' && (
         <section className="game">
-          <div className="hud">
-            <span className="chip"><Icon name="flagFinish" size={18} />Ronda {sala.rondaNum} / 15</span>
-            <span className="chip alt"><Icon name="clock" size={16} /> ¡Rápido!</span>
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver
+                onClick={() => {
+                  setVista('menu');
+                  setErrorMsg('');
+                }}
+              />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
+
+            <div className="qq-hero-icono">
+              <Icon name="globe" size={40} strokeWidth={1.7} />
+            </div>
+            <h2 className="title qq-main-title">Modo Online</h2>
+            <p className="hint qq-main-desc">
+              Crea una sala nueva para compartir el código con tus amigos o únete a una ya creada.
+            </p>
+
+            {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
+
+            <div className="qq-menu-opciones">
+              <button
+                type="button"
+                className="qq-opcion-card principal"
+                onClick={() => {
+                  setVista('crear');
+                  setErrorMsg('');
+                }}
+              >
+                <span className="qq-opcion-icono">
+                  <Icon name="crown" size={26} />
+                </span>
+                <div className="qq-opcion-textos">
+                  <strong>Crear partida</strong>
+                  <span>Sé el anfitrión y genera un código para tu grupo (mínimo 4)</span>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                className="qq-opcion-card secundaria"
+                onClick={() => {
+                  setVista('unirse');
+                  setErrorMsg('');
+                }}
+              >
+                <span className="qq-opcion-icono">
+                  <Icon name="users" size={26} />
+                </span>
+                <div className="qq-opcion-textos">
+                  <strong>Unirse con código</strong>
+                  <span>Introduce el código de 4 letras de tu anfitrión</span>
+                </div>
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 2. CREAR SALA */}
+      {vista === 'crear' && (
+        <section className="game">
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver
+                onClick={() => {
+                  setVista('online_menu');
+                  setErrorMsg('');
+                }}
+              />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
+
+            <div className="qq-hero-icono">
+              <Icon name="crown" size={40} strokeWidth={1.6} />
+            </div>
+            <h2 className="title qq-main-title">Crear partida</h2>
+            <p className="hint qq-main-desc">
+              Introduce tu nombre para abrir la sala y ser el anfitrión.
+            </p>
+
+            <div className="lb-form qq-form-estilizado">
+              <label className="field-label" htmlFor="tel-host-nombre">Tu nombre</label>
+              <input
+                id="tel-host-nombre"
+                className="qq-input-moderno"
+                type="text"
+                placeholder="Ej. Alex"
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value)}
+                maxLength={15}
+                autoFocus
+              />
+              {errorMsg && <p className="error">{errorMsg}</p>}
+
+              <button
+                type="button"
+                className="big full qq-btn-principal"
+                disabled={cargando || !nombre.trim()}
+                onClick={handleCrear}
+              >
+                <Icon name="check" size={22} strokeWidth={2.5} /> Crear sala
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 3. UNIRSE A SALA */}
+      {vista === 'unirse' && (
+        <section className="game">
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver
+                onClick={() => {
+                  setVista('online_menu');
+                  setErrorMsg('');
+                }}
+              />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
+
+            <div className="qq-hero-icono">
+              <Icon name="users" size={40} strokeWidth={1.6} />
+            </div>
+            <h2 className="title qq-main-title">Unirse a partida</h2>
+            <p className="hint qq-main-desc">
+              Introduce el código que te ha compartido el anfitrión y tu nombre.
+            </p>
+
+            <div className="lb-form qq-form-estilizado">
+              <label className="field-label" htmlFor="tel-code-input">Código de la partida</label>
+              <input
+                id="tel-code-input"
+                className="lb-input-codigo qq-input-moderno"
+                type="text"
+                placeholder="ABCD"
+                value={codigoInput}
+                onChange={(e) => setCodigoInput(e.target.value.toUpperCase())}
+                maxLength={4}
+                autoFocus
+              />
+
+              <label className="field-label" htmlFor="tel-guest-nombre" style={{ marginTop: '1rem' }}>
+                Tu nombre
+              </label>
+              <input
+                id="tel-guest-nombre"
+                className="qq-input-moderno"
+                type="text"
+                placeholder="Tu nombre"
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value)}
+                maxLength={15}
+              />
+              {errorMsg && <p className="error">{errorMsg}</p>}
+
+              <button
+                type="button"
+                className="big full qq-btn-principal"
+                disabled={cargando || !nombre.trim() || codigoInput.trim().length < 4}
+                onClick={handleUnirse}
+              >
+                <Icon name="check" size={22} strokeWidth={2.5} /> Entrar en la partida
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* 4. SALA DE ESPERA (LOBBY) */}
+      {vista === 'sala' && sala && sala.estado === 'lobby' && (
+        <section className="game">
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver onClick={() => setModalSalirLobby(true)} />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
+
+            <span className="qq-badge-sala"><Icon name="lock" size={15} /> Sala de espera</span>
+            <p className="hint">Código de la partida</p>
+            <button
+              type="button"
+              className="qq-codigo-btn"
+              onClick={copiarCodigo}
+              title="Copiar código"
+            >
+              {sala.code}
+            </button>
+            <p className="hint small">
+              {codigoCopiado
+                ? '¡Copiado al portapapeles!'
+                : 'Pulsa el código para copiarlo y compártelo con los demás.'}
+            </p>
           </div>
 
-          <div className="panel center">
+          <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
+            <h3 className="qq-sala-titulo">
+              <Icon name="users" size={20} /> Jugadores ({sala.jugadores.length}/20)
+            </h3>
+            <div className="lb-lista qq-sala-lista">
+              {sala.jugadores.map((j) => (
+                <div key={j.id} className={`lb-jug ${j.esTu ? 'yo' : ''}`}>
+                  <span className="lb-jug-nombre">
+                    {j.nombre}{j.esTu ? ' (tú)' : ''}{j.esAdmin ? ' 👑' : ''}
+                  </span>
+                </div>
+              ))}
+            </div>
+            {faltan > 0 && (
+              <p className="hint" style={{ marginTop: '0.8rem' }}>
+                Faltan al menos {faltan} jugador{faltan === 1 ? '' : 'es'} para poder empezar (mínimo 4).
+              </p>
+            )}
+          </div>
+
+          {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
+
+          {esAdmin ? (
+            <button
+              type="button"
+              className="big full qq-btn-principal"
+              style={{ marginTop: '1rem' }}
+              disabled={faltan > 0}
+              onClick={() => peticionPost(`sala/${sesion.code}/iniciar`)}
+            >
+              <Icon name="play" size={22} />
+              {faltan > 0 ? 'Esperando jugadores (mínimo 4)...' : '¡Iniciar juego! (15 rondas)'}
+            </button>
+          ) : (
+            <div className="panel center" style={{ padding: '1.8rem 1.4rem', marginTop: '1rem' }}>
+              <span className="lb-luna chica"><Icon name="hourglass" size={36} /></span>
+              <h3 style={{ margin: '0.4rem 0' }}>Esperando al anfitrión...</h3>
+              <p className="hint">
+                El anfitrión iniciará la partida cuando estéis todos listos (mínimo 4 jugadores).
+              </p>
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* 5. ESCRIBIENDO (5 SEGUNDOS) */}
+      {vista === 'sala' && sala && sala.estado === 'escribiendo' && (
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            categoria={{ nombre: '¡5 segundos!', icono: 'clock' }}
+            etiqueta={`Ronda ${sala.rondaNum} de 15 · Palabra de origen`}
+            titulo={sala.palabraActual}
+            avatar={
+              yo ? <Avatar nombre={yo.nombre} color={colorJugador(indiceColor(yo, 0))} /> : undefined
+            }
+          >
+            <div className="qqp-identidad tel-consigna-box">
+              <div className="tel-hero-stats">
+                <span className="tel-hero-stat">
+                  ⚡ ¡Piensa rápido y conecta mentes!
+                </span>
+                <span className={`tel-hero-stat timer${sala.segundosRestantes <= 2 ? ' low' : ''}`}>
+                  <Icon name="clock" size={14} /> {sala.segundosRestantes}s
+                </span>
+              </div>
+              <div className="tel-timer-track" role="timer">
+                <div
+                  className={`tel-timer-fill${sala.segundosRestantes <= 2 ? ' low' : ''}`}
+                  style={{ width: `${(Math.max(0, sala.segundosRestantes) / 5) * 100}%` }}
+                />
+              </div>
+            </div>
+
+            <OrdenTurnos jugadores={sala.jugadores} />
+          </Cabecera>
+
+          <form onSubmit={enviarPalabra} className="qqp-tarjeta tel-form-card">
             <div className={`tel-countdown ${sala.segundosRestantes <= 2 ? 'peligro' : ''}`}>
               {sala.segundosRestantes}
             </div>
 
-            <p className="field-label">Palabra de origen:</p>
-            <div className="tel-palabra-card">
-              <h1 className="tel-palabra-texto">{sala.palabraActual}</h1>
-            </div>
+            <label className="qq-label-destacado" htmlFor="tel-online-input">
+              {haEnviado
+                ? '¡Palabra enviada! Esperando el cierre de la ronda…'
+                : `Escribe una palabra asociada con «${sala.palabraActual}»`}
+            </label>
 
-            <p className="hint" style={{ marginBottom: '1rem' }}>
-              Escribe una palabra relacionada antes de que el contador llegue a 0:
-            </p>
+            <input
+              id="tel-online-input"
+              ref={inputRef}
+              type="text"
+              className="qq-input-moderno tel-input-palabra"
+              placeholder="TU PALABRA..."
+              value={miPalabra}
+              disabled={haEnviado || sala.segundosRestantes <= 0}
+              onChange={(e) => setMiPalabra(e.target.value.toUpperCase())}
+              maxLength={20}
+            />
 
-            <form onSubmit={(e) => { e.preventDefault(); enviarPalabra(); }}>
-              <input
-                ref={inputRef}
-                type="text"
-                className="tel-input-palabra"
-                placeholder="TU PALABRA..."
-                value={miPalabra}
-                disabled={haEnviado || sala.segundosRestantes <= 0}
-                onChange={(e) => setMiPalabra(e.target.value.toUpperCase())}
-                maxLength={20}
-              />
-
-              <button
+            <div style={{ marginTop: '1rem' }}>
+              <BotonPrincipal
                 type="submit"
-                className="big full"
-                style={{ marginTop: '1rem' }}
                 disabled={haEnviado || !miPalabra.trim() || sala.segundosRestantes <= 0}
               >
-                <Icon name="check" size={20} /> {haEnviado ? '¡Palabra enviada!' : 'Enviar palabra'}
-              </button>
-            </form>
-          </div>
+                <Icon name="check" size={20} strokeWidth={2.5} />
+                {haEnviado ? '¡Palabra enviada!' : 'Enviar palabra'}
+              </BotonPrincipal>
+            </div>
+          </form>
         </section>
       )}
 
-      {/* 3. RESULTADO DE RONDA */}
-      {sala.estado === 'resultado' && (
-        <section className="game">
-          <div className="end-card">
-            <span className="end-icon"><Icon name="zap" size={44} /></span>
-            <p className="categoria">Fin de la ronda {sala.rondaNum}</p>
-            <h1 className="title">Resultados de la ronda</h1>
-            <p className="reveal">{sala.logRonda}</p>
-          </div>
+      {/* 6. RESULTADO DE LA RONDA */}
+      {vista === 'sala' && sala && sala.estado === 'resultado' && (
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            etiqueta={`Ronda ${sala.rondaNum} de 15 completada`}
+            titulo="Resultados de la ronda"
+          >
+            <div className="qqp-identidad">
+              <span className="qqp-identidad-icono"><Icon name="zap" size={16} /></span>
+              <span>{sala.logRonda}</span>
+            </div>
+          </Cabecera>
 
-          <div className="panel" style={{ marginTop: '1rem' }}>
-            <h3 className="panel-title"><Icon name="speech" size={20} /> Palabras dichas</h3>
-            {sala.gruposCoincidentes?.map((g, i) => (
-              <div key={i} className={`tel-grupo-card ${g.coincide ? 'coincidencia' : ''}`}>
-                <div className="tel-grupo-cab">
-                  <span className="tel-grupo-palabra">«{g.palabra}»</span>
-                  {g.coincide && <span className="tel-grupo-pts">+{g.puntosSumados} {g.puntosSumados === 1 ? 'pto' : 'ptos'}</span>}
-                </div>
-                <div className="tel-chips-jugadores">
-                  {g.jugadores.map((n, idx) => (
-                    <span key={idx} className="tel-chip-jug">👤 {n}</span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="panel" style={{ marginTop: '1rem' }}>
-            <h3 className="panel-title"><Icon name="trophy" size={20} /> Clasificación actual</h3>
-            <div className="scoreboard">
-              {ranking.map((j, i) => (
-                <div key={j.id} className={`score-row ${i === 0 && j.puntos > 0 ? 'first' : ''}`}>
-                  <span className="score-name">
-                    {j.nombre} {j.esTu && '(Tú)'} {j.racha > 1 && <span className="badge" style={{background:'#dcfce7', color:'#166534'}}>🔥 x{j.racha}</span>}
-                  </span>
-                  <span className="score-pts">{j.puntos} {j.puntos === 1 ? 'pto' : 'ptos'}</span>
+          <div className="qqp-tarjeta">
+            <p className="qqp-carta-cara-titulo" style={{ marginBottom: '0.8rem' }}>
+              <Icon name="eye" size={16} /> Palabras enviadas
+            </p>
+            <div className="tel-grupos-lista">
+              {sala.gruposCoincidentes?.map((g, i) => (
+                <div key={i} className={`tel-grupo-card ${g.coincide ? 'coincidencia' : ''}`}>
+                  <div className="tel-grupo-cab">
+                    <span className="tel-grupo-palabra">«{g.palabra}»</span>
+                    {g.coincide && (
+                      <span className="tel-grupo-pts">
+                        +{g.puntosSumados} {g.puntosSumados === 1 ? 'pt' : 'pts'}
+                      </span>
+                    )}
+                  </div>
+                  <div className="tel-chips-jugadores">
+                    {g.jugadores.map((n, idx) => (
+                      <span key={idx} className="tel-chip-jug">👤 {n}</span>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="actions" style={{ marginTop: '1.2rem' }}>
+          <div className="qqp-tarjeta">
+            <p className="qqp-carta-cara-titulo" style={{ marginBottom: '0.8rem' }}>
+              <Icon name="trophy" size={16} /> Clasificación actual
+            </p>
+            <ul className="qqp-rivales">
+              {ranking.map((j, i) => {
+                const lider = maxPuntos > 0 && j.puntos === maxPuntos;
+                return (
+                  <li key={j.id} className="qqp-rival" style={{ '--c': colorJugador(indiceColor(j, i)) }}>
+                    <span className="qqp-rival-avatar">{lider ? '👑' : i + 1}</span>
+                    <span className="qqp-rival-datos">
+                      <span className="qqp-rival-nombre">
+                        {lider ? 'Líder actual' : `Puesto ${i + 1}`}
+                        {j.racha > 1 ? ` · 🔥 Racha x${j.racha}` : ''}
+                      </span>
+                      <strong className="qqp-rival-tarjeta">
+                        {j.nombre}{j.esTu ? ' (tú)' : ''}
+                      </strong>
+                    </span>
+                    <span className="tel-ranking-pts">{j.puntos} pts</span>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
+          <div className="qqp-barra">
             {esAdmin ? (
               <>
-                <button className="big full" onClick={() => peticionPost(`sala/${sesion.code}/siguiente`)}>
-                  <Icon name="play" size={20} /> {sala.rondaNum >= 15 ? 'Ver Podio Final' : `Ir a Ronda ${sala.rondaNum + 1}`}
-                </button>
-                <button className="secondary danger full" onClick={() => peticionPost(`sala/${sesion.code}/terminar-ya`)}>
-                  Finalizar partida ahora
-                </button>
+                <BotonPrincipal onClick={() => peticionPost(`sala/${sesion.code}/siguiente`)}>
+                  <Icon name="play" size={20} />
+                  {sala.rondaNum >= 15 ? 'Ver podio final' : `Ir a Ronda ${sala.rondaNum + 1} de 15`}
+                </BotonPrincipal>
+                <EnlaceSecundario onClick={() => peticionPost(`sala/${sesion.code}/terminar-ya`)}>
+                  Finalizar partida anticipadamente
+                </EnlaceSecundario>
               </>
             ) : (
-              <p className="hint center">Esperando a que el anfitrión avance la ronda...</p>
+              <p className="qqp-estado">
+                <span className="qqp-spinner" aria-hidden="true" /> Esperando a que el anfitrión lance la siguiente ronda…
+              </p>
             )}
           </div>
         </section>
       )}
 
-      {/* 4. FIN / PODIO */}
-      {sala.estado === 'fin' && (
-        <section className="game">
-          <div className="end-card">
-            <span className="end-icon"><Icon name="trophy" size={44} /></span>
-            <h1 className="title">¡Partida Terminada!</h1>
-            <p className="final-score" style={{ color: '#0891b2' }}>
-              {ganadores.length === 0
-                ? 'Nadie consiguió conectar mentes esta vez.'
-                : `🏆 Ganador: ${ganadores.map(g => g.nombre).join(', ')} con ${maxPuntos} pts`}
+      {/* 7. FIN / PODIO ONLINE */}
+      {vista === 'sala' && sala && sala.estado === 'fin' && (
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            etiqueta="Partida terminada"
+            titulo="Clasificación Final"
+            avatar={<span className="qqp-avatar" style={{ '--c': '#f59e0b' }}>🏆</span>}
+          >
+            <div className="qqp-identidad">
+              <span className="qqp-identidad-icono"><Icon name="crown" size={16} /></span>
+              <span>
+                {ganadores.length === 0
+                  ? 'Nadie consiguió conectar mentes en esta partida.'
+                  : ganadores.length === 1
+                  ? <>¡Victoria para <strong>{ganadores[0].nombre}</strong> con <strong>{maxPuntos} pts</strong>!</>
+                  : <>Empate entre <strong>{ganadores.map((g) => g.nombre).join(', ')}</strong> con <strong>{maxPuntos} pts</strong></>}
+              </span>
+            </div>
+          </Cabecera>
+
+          <div className="qqp-tarjeta">
+            <p className="qqp-carta-cara-titulo" style={{ marginBottom: '0.8rem' }}>
+              <Icon name="users" size={16} /> Podio de jugadores
             </p>
+            <ul className="qqp-rivales">
+              {ranking.map((j, i) => {
+                const lider = maxPuntos > 0 && j.puntos === maxPuntos;
+                return (
+                  <li key={j.id} className="qqp-rival" style={{ '--c': colorJugador(indiceColor(j, i)) }}>
+                    <span className="qqp-rival-avatar">{lider ? '👑' : i + 1}</span>
+                    <span className="qqp-rival-datos">
+                      <span className="qqp-rival-nombre">{lider ? '¡Ganador!' : `Puesto ${i + 1}`}</span>
+                      <strong className="qqp-rival-tarjeta">
+                        {j.nombre}{j.esTu ? ' (tú)' : ''}
+                      </strong>
+                    </span>
+                    <span className="tel-ranking-pts">{j.puntos} pts</span>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
 
-          <div className="panel reveal-panel" style={{ marginTop: '1rem' }}>
-            <h3 className="reveal-title"><Icon name="trophy" size={20} /> Clasificación Final</h3>
-            <div className="scoreboard">
-              {ranking.map((j, i) => (
-                <div key={j.id} className={`score-row ${j.puntos === maxPuntos && maxPuntos > 0 ? 'first' : ''}`}>
-                  <span className="score-name">{i + 1}. {j.nombre} {j.esTu && '(Tú)'}</span>
-                  <span className="score-pts">{j.puntos} ptos</span>
-                </div>
-              ))}
+          <div className="qqp-barra">
+            {esAdmin && (
+              <BotonPrincipal onClick={() => peticionPost(`sala/${sesion.code}/iniciar`)}>
+                <Icon name="refresh" size={20} /> Jugar otra vez (mismos jugadores)
+              </BotonPrincipal>
+            )}
+            <BotonPrincipal onClick={() => setModalSalirPortada(true)}>
+              <Icon name="door" size={20} /> Salir a la portada
+            </BotonPrincipal>
+          </div>
+        </section>
+      )}
+
+      {/* MODAL DE CONFIRMACIÓN PARA SALIR DEL LOBBY AL SUBMENÚ */}
+      {modalSalirLobby && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalirLobby(false)}>
+          <div
+            className="rg-modal"
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
+          >
+            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
+            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
+              ¿Salir de la sala?
+            </h3>
+            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
+              Si sales ahora abandonarás la sala de espera y volverás al menú anterior. ¿Estás seguro?
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+              <button
+                type="button"
+                className="secondary full"
+                onClick={() => setModalSalirLobby(false)}
+              >
+                No, quedarme
+              </button>
+              <button
+                type="button"
+                className="secondary danger full"
+                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
+                onClick={handleVolverMenuOnline}
+              >
+                Sí, salir
+              </button>
             </div>
           </div>
-
-          <div className="actions" style={{ marginTop: '1.2rem' }}>
-            {esAdmin && (
-              <button className="big full" onClick={() => peticionPost(`sala/${sesion.code}/iniciar`)}>
-                <Icon name="refresh" size={20} /> Jugar otra vez
-              </button>
-            )}
-            <button className="secondary danger full" onClick={handleSalir}>
-              <Icon name="door" size={20} /> Salir al menú
-            </button>
-          </div>
-        </section>
+        </div>
       )}
 
-      {/* MODAL SALIR */}
-      {modalSalir && (
-        <div className="rg-modal-fondo" onClick={() => setModalSalir(false)}>
-          <div className="rg-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}>
+      {/* MODAL DE CERRAR SALA Y SALIR A PORTADA */}
+      {modalSalirPortada && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalirPortada(false)}>
+          <div
+            className="rg-modal"
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
+          >
             <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
-            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>¿Abandonar la partida?</h3>
+            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
+              ¿Salir a la portada?
+            </h3>
             <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
-              Perderás tus puntos actuales. ¿Deseas salir?
+              Abandonarás la partida actual y volverás a la portada principal. ¿Estás seguro?
             </p>
+
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
-              <button type="button" className="secondary full" onClick={() => setModalSalir(false)}>Quedarme</button>
-              <button type="button" className="secondary danger full" onClick={handleSalir}>Salir</button>
+              <button
+                type="button"
+                className="secondary full"
+                onClick={() => setModalSalirPortada(false)}
+              >
+                No, quedarme
+              </button>
+              <button
+                type="button"
+                className="secondary danger full"
+                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
+                onClick={handleCerrarSalaYSalirAPortada}
+              >
+                Sí, salir de la sala
+              </button>
             </div>
           </div>
         </div>
