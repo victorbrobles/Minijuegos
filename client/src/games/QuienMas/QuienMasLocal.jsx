@@ -1,37 +1,155 @@
 // client/src/games/QuienMas/QuienMasLocal.jsx
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './QuienMas.css';
 import { useAdmin, adminHeaders } from '../../lib/admin.js';
 import Icon from '../../components/Icon.jsx';
-import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx';
 
 const MIN_JUGADORES = 3;
 const MAX_JUGADORES = 20;
 const TIEMPO_VOTO = 30;
 
-const nombresPorDefecto = (n) => Array.from({ length: n }, (_, i) => `Jugador ${i + 1}`);
+const COLORES = ['#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316'];
+export const colorJugador = (i) => COLORES[((i % COLORES.length) + COLORES.length) % COLORES.length];
+export const inicial = (nombre = '?') => nombre.trim().charAt(0).toUpperCase() || '?';
+export const indiceColor = (j, i) => (typeof j?.id === 'number' ? j.id - 1 : i);
 
-function limpiarNombres(nombres) {
+function limpiarNombres(lista) {
   const usados = new Set();
-  return nombres.map((n, i) => {
-    const base = n.trim() || `Jugador ${i + 1}`;
+  return lista.map((j, i) => {
+    const base = (j.nombre || '').trim() || `Jugador ${i + 1}`;
     let nombre = base;
-    for (let k = 2; usados.has(nombre.toLowerCase()); k++) nombre = `${base} (${k})`;
+    for (let k = 2; usados.has(nombre.toLowerCase()); k++) {
+      nombre = `${base} (${k})`;
+    }
     usados.add(nombre.toLowerCase());
-    return nombre;
+    return { ...j, nombre };
   });
 }
 
-export default function QuienMasLocal({ onVolver, onExit }) {
+/* ==========================================================================
+   COMPONENTES DE TABLERO COMPARTIDOS
+   ========================================================================== */
+
+export function BotonPortada({ onClick, texto = 'Portada' }) {
+  return (
+    <button type="button" className="qqp-salir" onClick={onClick}>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7" />
+      </svg>
+      <span>{texto}</span>
+    </button>
+  );
+}
+
+export function Avatar({ nombre, color, grande = false }) {
+  return (
+    <span className={`qqp-avatar${grande ? ' grande' : ''}`} style={{ '--c': color }}>
+      {inicial(nombre)}
+    </span>
+  );
+}
+
+export function Cabecera({ onSalir, textoSalir = 'Portada', onAyuda, categoria, etiqueta, titulo, avatar, chips, children }) {
+  return (
+    <header className="qqp-hero">
+      <span className="qqp-hero-deco" aria-hidden="true">
+        <Icon name="users" size={150} strokeWidth={1.4} />
+      </span>
+      <div className="qqp-hero-top">
+        {onSalir ? <BotonPortada onClick={onSalir} texto={textoSalir} /> : <span />}
+        <div className="qqp-hero-chips">
+          {chips}
+          {categoria && (
+            <span className="qqp-chip" title="Categoría">
+              <Icon name={categoria.icono || 'lock'} size={14} /> <span>{categoria.nombre}</span>
+            </span>
+          )}
+          {onAyuda && (
+            <button type="button" className="qqp-ayuda" onClick={onAyuda} title="Cómo jugar" aria-label="Cómo jugar">
+              ?
+            </button>
+          )}
+        </div>
+      </div>
+      <div className="qqp-hero-cuerpo">
+        {avatar}
+        <div className="qqp-hero-textos">
+          {etiqueta && <p className="qqp-hero-etiqueta">{etiqueta}</p>}
+          <h2 className="qqp-hero-titulo">{titulo}</h2>
+        </div>
+      </div>
+      {children}
+    </header>
+  );
+}
+
+export function OrdenTurnos({ jugadores, activoNombre, votaronMap = {}, puntosMap = null }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    ref.current?.querySelector('.activo')?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+  }, [activoNombre]);
+
+  return (
+    <ol className="qqp-orden" ref={ref} aria-label="Estado de los jugadores">
+      {jugadores.map((j, i) => {
+        const nombre = typeof j === 'string' ? j : j.nombre;
+        const esActivo = nombre === activoNombre;
+        const yaVoto = Boolean(votaronMap[nombre] ?? j.haVotado);
+        const pts = puntosMap ? (puntosMap[nombre] ?? 0) : (j.puntos ?? 0);
+        return (
+          <li
+            key={nombre}
+            className={`qqp-orden-item${esActivo ? ' activo' : ''}`}
+            style={{ '--c': colorJugador(i) }}
+            aria-current={esActivo ? 'step' : undefined}
+          >
+            <span className="qqp-orden-avatar">{yaVoto ? '✓' : inicial(nombre)}</span>
+            <span className="qqp-orden-nombre">{nombre}</span>
+            <span className="qqp-orden-pts">{pts}p</span>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+export function BotonPrincipal({ children, onClick, disabled, type = 'button' }) {
+  return (
+    <button type={type} className="qqp-boton" onClick={onClick} disabled={disabled}>
+      {children}
+    </button>
+  );
+}
+
+export function EnlaceSecundario({ children, onClick, disabled }) {
+  return (
+    <button type="button" className="qqp-enlace" onClick={onClick} disabled={disabled}>
+      {children}
+    </button>
+  );
+}
+
+/* ==========================================================================
+   MODO LOCAL: ¿DE VERDAD OS CONOCÉIS?
+   ========================================================================== */
+
+export default function QuienMasLocal({ onVolver, onExit, onAbrirAyuda }) {
+  const navigate = useNavigate();
   const esAdmin = useAdmin();
 
   // Fases: 'setup' | 'cargando' | 'pasar' | 'votando' | 'resultado' | 'ranking'
   const [fase, setFase] = useState('setup');
-  const [modalAyuda, setModalAyuda] = useState(false);
+  const [modalSalirPortada, setModalSalirPortada] = useState(false);
 
   // Configuración
   const [numJugadores, setNumJugadores] = useState(4);
-  const [nombres, setNombres] = useState(nombresPorDefecto(4));
+  const [listaConfig, setListaConfig] = useState([
+    { id: 1, nombre: 'Jugador 1' },
+    { id: 2, nombre: 'Jugador 2' },
+    { id: 3, nombre: 'Jugador 3' },
+    { id: 4, nombre: 'Jugador 4' }
+  ]);
   const [categoria, setCategoria] = useState('normal');
   const [error, setError] = useState('');
 
@@ -56,16 +174,33 @@ export default function QuienMasLocal({ onVolver, onExit }) {
 
   const categoriaActiva = esAdmin ? categoria : 'normal';
 
-  const cambiarNumJugadores = (e) => {
-    const n = Number(e.target.value);
-    setNumJugadores(n);
-    setNombres((prev) => (n > prev.length
-      ? [...prev, ...nombresPorDefecto(n).slice(prev.length)]
-      : prev.slice(0, n)));
+  const handleSalirAPortada = () => {
+    setModalSalirPortada(false);
+    if (typeof onExit === 'function') {
+      onExit();
+    } else {
+      try {
+        navigate('/');
+      } catch {
+        window.location.href = '/';
+      }
+    }
   };
 
-  const cambiarNombre = (idx, valor) => {
-    setNombres((prev) => prev.map((n, i) => (i === idx ? valor : n)));
+  const actualizarCantidadJugadores = (nuevoNum) => {
+    const n = Math.max(MIN_JUGADORES, Math.min(MAX_JUGADORES, nuevoNum));
+    setNumJugadores(n);
+    const nuevos = Array.from({ length: n }, (_, i) => ({
+      id: i + 1,
+      nombre: listaConfig[i]?.nombre || `Jugador ${i + 1}`
+    }));
+    setListaConfig(nuevos);
+  };
+
+  const handleNombreChange = (idx, valor) => {
+    const nuevos = [...listaConfig];
+    nuevos[idx] = { ...nuevos[idx], nombre: valor };
+    setListaConfig(nuevos);
   };
 
   const nuevaRonda = (lista, jugs) => {
@@ -82,10 +217,11 @@ export default function QuienMasLocal({ onVolver, onExit }) {
   };
 
   const empezarPartida = async () => {
-    const jugs = limpiarNombres(nombres);
-    setNombres(jugs);
-    setJugadores(jugs);
-    setPuntos(Object.fromEntries(jugs.map((n) => [n, 0])));
+    const limpios = limpiarNombres(listaConfig);
+    setListaConfig(limpios);
+    const nombresJugs = limpios.map((j) => j.nombre);
+    setJugadores(nombresJugs);
+    setPuntos(Object.fromEntries(nombresJugs.map((n) => [n, 0])));
     setError('');
     setFase('cargando');
 
@@ -96,7 +232,7 @@ export default function QuienMasLocal({ onVolver, onExit }) {
       const lista = [...(data.preguntas || [])].sort(() => Math.random() - 0.5);
       if (lista.length === 0) throw new Error('La lista de preguntas está vacía.');
       setRonda(1);
-      nuevaRonda(lista, jugs);
+      nuevaRonda(lista, nombresJugs);
     } catch (err) {
       setError(err.message || 'No se pudieron obtener las preguntas.');
       setFase('setup');
@@ -121,7 +257,6 @@ export default function QuienMasLocal({ onVolver, onExit }) {
     votarRef.current = votar;
   });
 
-  // Temporizador de 30 segundos durante la votación
   useEffect(() => {
     if (fase !== 'votando') {
       if (timerRef.current) clearInterval(timerRef.current);
@@ -153,7 +288,7 @@ export default function QuienMasLocal({ onVolver, onExit }) {
 
   const calcularRonda = (finales) => {
     const recuento = Object.fromEntries(jugadores.map((n) => [n, 0]));
-    Object.values(finales).forEach((c) => { recuento[c] += 1; });
+    Object.values(finales).forEach((c) => { recuento[c] = (recuento[c] || 0) + 1; });
 
     const maximo = Math.max(...Object.values(recuento));
     const masVotados = jugadores.filter((n) => recuento[n] === maximo);
@@ -176,151 +311,247 @@ export default function QuienMasLocal({ onVolver, onExit }) {
   const maximoPuntos = ranking.length ? puntos[ranking[0]] || 0 : 0;
   const ganadores = maximoPuntos > 0 ? ranking.filter((n) => puntos[n] === maximoPuntos) : [];
 
+  const totalVotaron = Object.keys(votos).length;
+  const enPartidaActiva = fase !== 'setup';
+
   return (
-    <div className="qm-contenedor">
-      {/* AYUDA */}
+    <div className={`qm-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+      {/* 1. CONFIGURACIÓN DE JUGADORES */}
       {fase === 'setup' && (
-        <>
+        <section className="game">
+          <div className="panel qq-menu-panel">
+            <div className="qq-card-top">
+              <button type="button" className="qq-link-volver" onClick={onVolver}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                <span>Volver</span>
+              </button>
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
 
-          {modalAyuda && (
-            <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
-              <div className="rg-modal modal-ayuda-juego" onClick={(e) => e.stopPropagation()}>
-                <div className="modal-ayuda-header">
-                  <span className="modal-ayuda-signo-title">?</span>
-                  <h3>Cómo se juega a «¿De verdad os conocéis?»</h3>
+            <div className="qq-config-header">
+              <div className="qq-hero-icono chico">
+                <Icon name="users" size={32} />
+              </div>
+              <div>
+                <h2 className="qq-config-titulo">Jugadores</h2>
+                <p className="qq-config-sub">
+                  Configura quiénes van a participar ({MIN_JUGADORES} a {MAX_JUGADORES} jugadores)
+                </p>
+              </div>
+            </div>
+
+            <div className="qq-selector-cantidad-box">
+              <label className="qq-label-destacado" htmlFor="num-jugadores-qm">
+                Número de participantes
+              </label>
+              <div className="qq-stepper-row">
+                <button
+                  type="button"
+                  className="qq-stepper-btn"
+                  disabled={numJugadores <= MIN_JUGADORES}
+                  onClick={() => actualizarCantidadJugadores(numJugadores - 1)}
+                >
+                  &minus;
+                </button>
+                <select
+                  id="num-jugadores-qm"
+                  className="qq-select-jugadores"
+                  value={numJugadores}
+                  onChange={(e) => actualizarCantidadJugadores(parseInt(e.target.value, 10))}
+                >
+                  {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => (
+                    <option key={i + MIN_JUGADORES} value={i + MIN_JUGADORES}>
+                      {i + MIN_JUGADORES} jugadores
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  className="qq-stepper-btn"
+                  disabled={numJugadores >= MAX_JUGADORES}
+                  onClick={() => actualizarCantidadJugadores(numJugadores + 1)}
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            <span className="qq-label-destacado" style={{ marginTop: '1.2rem', display: 'block' }}>
+              Nombres de los jugadores
+            </span>
+            <div className="qq-nombres-grid">
+              {listaConfig.map((j, idx) => (
+                <div key={j.id} className="qq-jugador-input-card">
+                  <span
+                    className="qq-jugador-badge"
+                    style={{ background: colorJugador(idx) }}
+                  >
+                    {idx + 1}
+                  </span>
+                  <input
+                    type="text"
+                    value={j.nombre}
+                    onChange={(e) => handleNombreChange(idx, e.target.value)}
+                    placeholder={`Jugador ${j.id}`}
+                    maxLength={20}
+                  />
                 </div>
+              ))}
+            </div>
 
-                <div className="modal-ayuda-cuerpo">
-                  <p><strong>1. Votación secreta:</strong></p>
-                  <ul>
-                    <li>Aparece una pregunta sobre la personalidad del grupo.</li>
-                    <li>Cada jugador, por turnos y pasándose el dispositivo, vota <strong>en secreto</strong> al jugador que mejor encaja.</li>
-                    <li>Dispones de <strong>30 segundos</strong> para emitir tu voto. Si se agota el tiempo, se seleccionará un jugador al azar.</li>
-                  </ul>
-                  <p><strong>2. Puntuación:</strong></p>
-                  <ul>
-                    <li>Si votas al jugador <strong>más votado</strong>, sumas <strong>+1 punto</strong>.</li>
-                    <li>Si hay <strong>empate</strong> en la primera posición, <strong>nadie suma puntos</strong>.</li>
-                  </ul>
-                </div>
-
-                <div className="rg-modal-acciones">
-                  <button className="big full" onClick={() => setModalAyuda(false)}>
-                    Entendido
+            {esAdmin && (
+              <div className="qq-selector-cantidad-box" style={{ marginTop: '1.2rem' }}>
+                <span className="qq-label-destacado">
+                  <Icon name="lock" size={14} /> Tipo de preguntas (Admin)
+                </span>
+                <div className="qm-admin-cats">
+                  <button
+                    type="button"
+                    className={`qm-admin-cat-btn ${categoria === 'normal' ? 'activo' : ''}`}
+                    onClick={() => setCategoria('normal')}
+                  >
+                    😊 Normal (Todos los públicos)
+                  </button>
+                  <button
+                    type="button"
+                    className={`qm-admin-cat-btn ${categoria === 'picante' ? 'activo' : ''}`}
+                    onClick={() => setCategoria('picante')}
+                  >
+                    🌶️ Picante (Comprometidas)
                   </button>
                 </div>
               </div>
-            </div>
-          )}
-        </>
-      )}
+            )}
 
-      {/* 1. SETUP */}
-      {fase === 'setup' && (
-        <SelectorJugadores
-          onVolver={onVolver}
-          onAyuda={() => setModalAyuda(true)}
-          min={MIN_JUGADORES}
-          max={MAX_JUGADORES}
-          numJugadores={numJugadores}
-          onCambiarNum={(n) => cambiarNumJugadores({ target: { value: n } })}
-          nombres={jugadores}
-          onNombre={cambiarNombre}
-          onEmpezar={empezarPartida}
-          textoBoton="¡Empezar Partida!"
-          iconoBoton="play"
-        >
-          <BloqueConfig>
-            <span className="qq-label-destacado qq-label-icono"><Icon name="lock" size={16} /> Preguntas (administrador)</span>
-            <label className="field-label" htmlFor="categoria-qm">Tipo de preguntas</label>
-            <select id="categoria-qm" value={categoria} onChange={(e) => setCategoria(e.target.value)}>
-              <option value="normal">Normal: para todos los públicos</option>
-              <option value="picante">Picante: incómodas y comprometidas</option>
-            </select>
-          </BloqueConfig>
-        </SelectorJugadores>
+            {error && <p className="error" style={{ marginTop: '0.8rem' }}>{error}</p>}
+
+            <button
+              type="button"
+              className="big full qq-btn-principal"
+              style={{ marginTop: '1.5rem' }}
+              onClick={empezarPartida}
+            >
+              <Icon name="play" size={22} /> Iniciar juego
+            </button>
+          </div>
+        </section>
       )}
 
       {/* 2. CARGANDO */}
       {fase === 'cargando' && (
-        <section className="game">
-          <p className="loading">Cargando preguntas…</p>
+        <section className="game qqp-escena">
+          <div className="qqp-tarjeta qqp-pasar">
+            <span className="qqp-spinner" aria-hidden="true" />
+            <p className="qqp-texto" style={{ marginTop: '0.8rem' }}>Cargando preguntas…</p>
+          </div>
         </section>
       )}
 
       {/* 3. PASAR EL DISPOSITIVO */}
       {fase === 'pasar' && jugadorTurno && (
-        <section className="game center">
-          <p className="categoria"><Icon name="lock" size={16} />Ronda {ronda} · Voto secreto</p>
-          <h1 className="title">
-            Pasa el dispositivo a <span className="hl">{jugadorTurno}</span>
-          </h1>
-          <p className="hint">No mires la pantalla si no es tu turno para que el voto siga siendo secreto.</p>
-          <button className="big full" onClick={() => setFase('votando')}>
-            <Icon name="check" size={22} strokeWidth={2.5} /> Soy {jugadorTurno}, ¡estoy listo!
-          </button>
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            categoria={{ nombre: 'Voto secreto', icono: 'lock' }}
+            etiqueta={`Ronda ${ronda} · ${totalVotaron} de ${jugadores.length} han votado`}
+            titulo="Pasad el móvil"
+          >
+            <OrdenTurnos
+              jugadores={jugadores}
+              activoNombre={jugadorTurno}
+              votaronMap={votos}
+              puntosMap={puntos}
+            />
+          </Cabecera>
+
+          <div className="qqp-tarjeta qqp-pasar">
+            <Avatar nombre={jugadorTurno} color={colorJugador(turno)} grande />
+            <p className="qqp-pasar-para">Le toca votar a</p>
+            <h3 className="qqp-pasar-nombre">{jugadorTurno}</h3>
+            <p className="qqp-texto">
+              No mires la pantalla si no es tu turno para que el voto siga siendo totalmente secreto.
+            </p>
+          </div>
+
+          <div className="qqp-barra">
+            <BotonPrincipal onClick={() => setFase('votando')}>
+              <Icon name="eye" size={22} /> Soy {jugadorTurno}, ¡a votar!
+            </BotonPrincipal>
+          </div>
         </section>
       )}
 
       {/* 4. VOTANDO */}
       {fase === 'votando' && jugadorTurno && (
-        <section className="game">
-          <div className="hud">
-            <span className="chip"><Icon name="users" size={18} />{jugadorTurno}</span>
-            <span className="chip alt">
-              <Icon name="flagFinish" size={18} />Ronda {ronda}
-            </span>
-          </div>
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            categoria={{ nombre: 'Voto secreto', icono: 'lock' }}
+            etiqueta={`Ronda ${ronda} · Turno de votación`}
+            titulo={jugadorTurno}
+            avatar={<Avatar nombre={jugadorTurno} color={colorJugador(turno)} />}
+          >
+            <div className="qqp-identidad qm-consigna-box">
+              <div className="qm-consigna-top">
+                <span className="qqp-identidad-icono">
+                  <Icon name="users" size={16} strokeWidth={2.4} />
+                </span>
+                <span className="qm-consigna-texto">«{pregunta}»</span>
+              </div>
 
-          <div className="panel qm-pregunta">
-            <h2 className="title">{pregunta}</h2>
-            <p className="hint">Elige al jugador que más encaja con la pregunta:</p>
+              <div className="qm-hero-stats">
+                <span className="qm-hero-stat">
+                  🗳️ Voto {totalVotaron + 1} de {jugadores.length}
+                </span>
+                <span className={`qm-hero-stat timer${tiempoRestante <= 10 ? ' low' : ''}`}>
+                  <Icon name="clock" size={14} /> {tiempoRestante}s
+                </span>
+              </div>
 
-            {/* Temporizador de 30 segundos */}
-            <div
-              className="timer"
-              role="timer"
-              style={{
-                margin: '0.8rem 0 0.3rem',
-                background: '#e2e8f0',
-                borderRadius: '9999px',
-                height: '8px',
-                overflow: 'hidden'
-              }}
-            >
-              <div
-                className={`timer-bar ${tiempoRestante <= 10 ? 'low' : ''}`}
-                style={{
-                  width: `${(tiempoRestante / TIEMPO_VOTO) * 100}%`,
-                  height: '100%',
-                  backgroundColor: tiempoRestante <= 10 ? '#ef4444' : '#16a34a',
-                  borderRadius: '9999px',
-                  transition: 'width 0.1s linear, background-color 0.3s ease'
-                }}
-              />
+              <div className="qm-timer-track" role="timer">
+                <div
+                  className={`qm-timer-fill${tiempoRestante <= 10 ? ' low' : ''}`}
+                  style={{ width: `${(tiempoRestante / TIEMPO_VOTO) * 100}%` }}
+                />
+              </div>
             </div>
-            <p
-              className="timer-text"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '0.35rem',
-                color: tiempoRestante <= 10 ? '#dc2626' : '#64748b',
-                fontSize: '0.9rem',
-                fontWeight: 700,
-                margin: '0 0 1rem'
-              }}
-            >
-              <Icon name="clock" size={16} />
-              {tiempoRestante} s
-            </p>
 
-            <div className="names-grid">
-              {jugadores.map((nombre) => (
-                <button key={nombre} type="button" className="secondary" onClick={() => votar(nombre)}>
-                  {nombre}
-                  {nombre === jugadorTurno && <span className="badge">Tú</span>}
+            <OrdenTurnos
+              jugadores={jugadores}
+              activoNombre={jugadorTurno}
+              votaronMap={votos}
+              puntosMap={puntos}
+            />
+          </Cabecera>
+
+          <div className="qqp-tarjeta">
+            <p className="qqp-carta-cara-titulo" style={{ marginBottom: '0.8rem' }}>
+              <Icon name="check" size={16} /> Elige al jugador que mejor encaja
+            </p>
+            <div className="qm-candidatos-grid">
+              {jugadores.map((nombre, idx) => (
+                <button
+                  key={nombre}
+                  type="button"
+                  className="qm-candidato-btn"
+                  style={{ '--c': colorJugador(idx) }}
+                  onClick={() => votar(nombre)}
+                >
+                  <span className="qm-candidato-avatar">{inicial(nombre)}</span>
+                  <span className="qm-candidato-nombre">
+                    {nombre}
+                    {nombre === jugadorTurno && <span className="qm-badge-tu">Tú</span>}
+                  </span>
                 </button>
               ))}
             </div>
@@ -330,98 +561,183 @@ export default function QuienMasLocal({ onVolver, onExit }) {
 
       {/* 5. RESULTADO DE LA RONDA */}
       {fase === 'resultado' && resultado && (
-        <section className="game">
-          <div className="end-card">
-            <span className="end-icon"><Icon name={resultado.empate ? 'hourglass' : 'trophy'} size={44} /></span>
-            <p className="categoria"><Icon name="flagFinish" size={16} />Ronda {ronda}</p>
-            <h1 className="title">Votación de la ronda</h1>
-            <p className="reveal">«{pregunta}»</p>
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            etiqueta={`Ronda ${ronda} completada`}
+            titulo={
+              resultado.empate
+                ? '¡Empate en la votación!'
+                : `Más votado: ${resultado.ganador}`
+            }
+            avatar={
+              <span className="qqp-avatar" style={{ '--c': resultado.empate ? '#64748b' : '#f59e0b' }}>
+                {resultado.empate ? '⚖️' : '🏆'}
+              </span>
+            }
+          >
+            <div className="qqp-identidad">
+              <span className="qqp-identidad-icono"><Icon name="users" size={16} /></span>
+              <span>«{pregunta}»</span>
+            </div>
+          </Cabecera>
 
-            <p className="final-score" style={{ marginTop: '1rem' }}>
-              {resultado.empate
-                ? <>¡Empate entre {resultado.masVotados.join(' y ')}! Nadie suma puntos</>
-                : <>Más votado: {resultado.ganador} ({resultado.maximo} {resultado.maximo === 1 ? 'voto' : 'votos'})</>}
+          <div className="qqp-tarjeta">
+            <p className="qqp-carta-cara-titulo" style={{ marginBottom: '0.8rem' }}>
+              <Icon name="trophy" size={16} /> Recuento de votos recibidos
             </p>
+            <ul className="qqp-rivales">
+              {[...jugadores]
+                .sort((a, b) => (resultado.recuento[b] || 0) - (resultado.recuento[a] || 0))
+                .map((nombre) => {
+                  const idx = jugadores.indexOf(nombre);
+                  const n = resultado.recuento[nombre] || 0;
+                  const esMasVotado = !resultado.empate && nombre === resultado.ganador;
+                  return (
+                    <li key={nombre} className="qqp-rival" style={{ '--c': colorJugador(idx) }}>
+                      <span className="qqp-rival-avatar">{esMasVotado ? '👑' : inicial(nombre)}</span>
+                      <span className="qqp-rival-datos">
+                        <span className="qqp-rival-nombre">
+                          {esMasVotado ? '¡El más votado!' : 'Candidato'}
+                        </span>
+                        <strong className="qqp-rival-tarjeta">{nombre}</strong>
+                      </span>
+                      <span className="qm-ranking-pts">
+                        {n} {n === 1 ? 'voto' : 'votos'}
+                      </span>
+                    </li>
+                  );
+                })}
+            </ul>
+          </div>
 
-            <div className="scoreboard">
+          <div className="qqp-tarjeta">
+            <p className="qqp-carta-cara-titulo" style={{ marginBottom: '0.8rem' }}>
+              <Icon name="eye" size={16} /> ¿A quién votó cada uno?
+            </p>
+            <div className="qm-desglose-lista">
               {jugadores.map((nombre) => {
-                const n = resultado.recuento[nombre];
+                const gano = resultado.ganados[nombre] > 0;
                 return (
-                  <div key={nombre} className={`score-row ${!resultado.empate && nombre === resultado.ganador ? 'first' : ''}`}>
-                    <span className="score-name">{nombre}</span>
-                    <span className="score-pts">{n} {n === 1 ? 'voto' : 'votos'}</span>
+                  <div key={nombre} className={`qm-desglose-fila ${gano ? 'acierto' : ''}`}>
+                    <span className="qm-desglose-texto">
+                      <strong>{nombre}</strong> votó a <strong>{resultado.votos[nombre]}</strong>
+                    </span>
+                    <span className={`qm-badge-pto ${gano ? 'pos' : ''}`}>
+                      {gano ? '+1 pt' : '0 pts'}
+                    </span>
                   </div>
                 );
               })}
             </div>
           </div>
 
-          <div className="panel reveal-panel">
-            <h3 className="reveal-title"><Icon name="eye" size={20} /> Desglose de votos</h3>
-            <div className="reveal-list">
-              {jugadores.map((nombre) => (
-                <div key={nombre} className="reveal-row">
-                  <span className="reveal-name">{nombre} votó a {resultado.votos[nombre]}</span>
-                  <span className="reveal-card">{resultado.ganados[nombre] > 0 ? '+1 pto' : '0 ptos'}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="actions">
-            <button className="big full" onClick={siguientePregunta}>
+          <div className="qqp-barra">
+            <BotonPrincipal onClick={siguientePregunta}>
               <Icon name="play" size={20} /> Siguiente pregunta
-            </button>
-            <button className="secondary" onClick={() => setFase('ranking')}>
-              <Icon name="trophy" size={20} /> Ver clasificación
-            </button>
+            </BotonPrincipal>
+            <EnlaceSecundario onClick={() => setFase('ranking')}>
+              <Icon name="trophy" size={16} /> Ver clasificación general
+            </EnlaceSecundario>
           </div>
         </section>
       )}
 
-      {/* 6. CLASIFICACIÓN */}
+      {/* 6. CLASIFICACIÓN GENERAL */}
       {fase === 'ranking' && (
-        <section className="game">
-          <div className="end-card">
-            <span className="end-icon"><Icon name="crown" size={44} /></span>
-            <p className="categoria"><Icon name="flagFinish" size={16} />Rondas jugadas: {ronda}</p>
-            <h1 className="title">Puntuación total</h1>
-            <p className="final-score">
-              {ganadores.length === 0
-                ? 'Nadie ha conseguido puntos todavía'
-                : ganadores.length === 1
-                ? <>¡{ganadores[0]} lidera con {maximoPuntos} {maximoPuntos === 1 ? 'punto' : 'puntos'}!</>
-                : <>Empate en cabeza: {ganadores.join(', ')} con {maximoPuntos} pts</>}
-            </p>
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            etiqueta={`Rondas jugadas: ${ronda}`}
+            titulo="Clasificación General"
+            avatar={<span className="qqp-avatar" style={{ '--c': '#f59e0b' }}>🏆</span>}
+          >
+            <div className="qqp-identidad">
+              <span className="qqp-identidad-icono"><Icon name="crown" size={16} /></span>
+              <span>
+                {ganadores.length === 0
+                  ? 'Nadie ha conseguido puntos todavía.'
+                  : ganadores.length === 1
+                  ? <>¡<strong>{ganadores[0]}</strong> lidera con <strong>{maximoPuntos} {maximoPuntos === 1 ? 'pt' : 'pts'}</strong>!</>
+                  : <>Empate en cabeza entre <strong>{ganadores.join(', ')}</strong> con <strong>{maximoPuntos} pts</strong></>}
+              </span>
+            </div>
+          </Cabecera>
 
-            <div className="scoreboard">
+          <div className="qqp-tarjeta">
+            <p className="qqp-carta-cara-titulo" style={{ marginBottom: '0.8rem' }}>
+              <Icon name="users" size={16} /> Podio de jugadores
+            </p>
+            <ul className="qqp-rivales">
               {ranking.map((nombre, i) => {
-                const lider = maximoPuntos > 0 && puntos[nombre] === maximoPuntos;
+                const idx = jugadores.indexOf(nombre);
+                const pts = puntos[nombre] || 0;
+                const lider = maximoPuntos > 0 && pts === maximoPuntos;
                 return (
-                  <div key={nombre} className={`score-row ${lider ? 'first' : ''}`}>
-                    <span className="score-name">
-                      {lider ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
-                      {nombre}
+                  <li key={nombre} className="qqp-rival" style={{ '--c': colorJugador(idx) }}>
+                    <span className="qqp-rival-avatar">{lider ? '👑' : i + 1}</span>
+                    <span className="qqp-rival-datos">
+                      <span className="qqp-rival-nombre">{lider ? 'Líder' : `Puesto ${i + 1}`}</span>
+                      <strong className="qqp-rival-tarjeta">{nombre}</strong>
                     </span>
-                    <span className="score-pts">{puntos[nombre] || 0} pts</span>
-                  </div>
+                    <span className="qm-ranking-pts">{pts} pts</span>
+                  </li>
                 );
               })}
-            </div>
+            </ul>
           </div>
 
-          <div className="actions">
-            <button className="big full" onClick={siguientePregunta}>
-              <Icon name="play" size={20} /> Continuar jugando
-            </button>
-            <button onClick={() => setFase('setup')}>
+          <div className="qqp-barra">
+            {reserva.length > 0 && (
+              <BotonPrincipal onClick={siguientePregunta}>
+                <Icon name="play" size={20} /> Continuar jugando (Ronda {ronda + 1})
+              </BotonPrincipal>
+            )}
+            <BotonPrincipal onClick={() => setFase('setup')}>
               <Icon name="refresh" size={20} /> Nueva partida
-            </button>
-            <button className="secondary danger" onClick={onVolver}>
-              <Icon name="door" size={20} /> Volver al menú
-            </button>
+            </BotonPrincipal>
+            <EnlaceSecundario onClick={() => setModalSalirPortada(true)}>
+              Salir a la portada principal
+            </EnlaceSecundario>
           </div>
         </section>
+      )}
+
+      {/* MODAL: SALIR A LA PORTADA */}
+      {modalSalirPortada && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalirPortada(false)}>
+          <div
+            className="rg-modal"
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
+          >
+            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
+            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
+              ¿Salir a la portada?
+            </h3>
+            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
+              Se cancelará la partida actual y volverás a la portada principal de juegos. ¿Estás seguro?
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+              <button
+                type="button"
+                className="secondary full"
+                onClick={() => setModalSalirPortada(false)}
+              >
+                No, continuar
+              </button>
+              <button
+                type="button"
+                className="secondary danger full"
+                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
+                onClick={handleSalirAPortada}
+              >
+                Sí, salir a portada
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

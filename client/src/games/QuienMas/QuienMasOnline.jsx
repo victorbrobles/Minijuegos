@@ -1,23 +1,52 @@
 // client/src/games/QuienMas/QuienMasOnline.jsx
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAdmin, adminHeaders } from '../../lib/admin.js';
 import Icon from '../../components/Icon.jsx';
 import './QuienMas.css';
-import { MenuInicioJuego, MenuModoOnline, FormCrearSala, FormUnirseSala, CabeceraSala } from '../../components/MenuJuego.jsx';
+import {
+  Cabecera,
+  Avatar,
+  OrdenTurnos,
+  BotonPrincipal,
+  EnlaceSecundario,
+  colorJugador,
+  inicial,
+  indiceColor
+} from './QuienMasLocal.jsx';
 
 const CLAVE_SESION_QM = 'quienmas_online_session';
 const TIEMPO_VOTO = 30;
 
-export default function QuienMasOnline({ onLocal, onSalir }) {
+function BotonVolver({ onClick, texto = 'Volver' }) {
+  return (
+    <button type="button" className="qq-link-volver" onClick={onClick}>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7" />
+      </svg>
+      <span>{texto}</span>
+    </button>
+  );
+}
+
+export default function QuienMasOnline({
+  tituloJuego = '¿De verdad os conocéis?',
+  descripcionJuego,
+  onLocal,
+  onSalir,
+  onAbrirAyuda
+}) {
+  const navigate = useNavigate();
   const esAdminGlobal = useAdmin();
 
-  const [vista, setVista] = useState('menu'); // 'menu' | 'crear' | 'unirse' | 'sala'
+  const [vista, setVista] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
   const [nombre, setNombre] = useState('');
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
-  const [modalSalir, setModalSalir] = useState(false);
-  const [modalAyuda, setModalAyuda] = useState(false);
+
+  const [modalSalirLobby, setModalSalirLobby] = useState(false);
+  const [modalSalirPortada, setModalSalirPortada] = useState(false);
 
   const [sesion, setSesion] = useState(() => {
     try {
@@ -74,6 +103,65 @@ export default function QuienMasOnline({ onLocal, onSalir }) {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [sesion]);
+
+  const redirigirAPortada = () => {
+    if (typeof onSalir === 'function') {
+      onSalir();
+    } else {
+      try {
+        navigate('/');
+      } catch {
+        window.location.href = '/';
+      }
+    }
+  };
+
+  const handleCerrarSalaYSalirAPortada = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    const sesionActual = sesion;
+    sessionStorage.removeItem(CLAVE_SESION_QM);
+    setSesion(null);
+    setSala(null);
+    setModalSalirPortada(false);
+
+    if (sesionActual?.code && sesionActual?.token) {
+      fetch(`/api/quienmas/online/sala/${sesionActual.code}/salir`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: sesionActual.token }),
+        keepalive: true
+      }).catch(() => {});
+    }
+
+    redirigirAPortada();
+  };
+
+  const handleVolverMenuOnline = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+
+    const sesionActual = sesion;
+    sessionStorage.removeItem(CLAVE_SESION_QM);
+    setSesion(null);
+    setSala(null);
+    setModalSalirLobby(false);
+    setVista('online_menu');
+
+    if (sesionActual?.code && sesionActual?.token) {
+      fetch(`/api/quienmas/online/sala/${sesionActual.code}/salir`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: sesionActual.token }),
+        keepalive: true
+      }).catch(() => {});
+    }
+  };
 
   const handleCrear = async () => {
     if (!nombre.trim()) return;
@@ -166,7 +254,6 @@ export default function QuienMasOnline({ onLocal, onSalir }) {
     handleVotarRef.current = handleVotar;
   });
 
-  // Temporizador de 30 segundos durante la votación online
   useEffect(() => {
     if (sala?.estado !== 'votando' || sala?.yaVoto) {
       if (timerVotoRef.current) clearInterval(timerVotoRef.current);
@@ -249,24 +336,6 @@ export default function QuienMasOnline({ onLocal, onSalir }) {
     }
   };
 
-  const handleSalir = async () => {
-    if (sesion) {
-      try {
-        await fetch(`/api/quienmas/online/sala/${sesion.code}/salir`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token: sesion.token })
-        });
-      } catch {
-        /* ignorar */
-      }
-    }
-    sessionStorage.removeItem(CLAVE_SESION_QM);
-    setSesion(null);
-    setSala(null);
-    setVista('online_menu');
-  };
-
   const copiarCodigo = () => {
     if (!sala?.code) return;
     navigator.clipboard?.writeText(sala.code);
@@ -275,136 +344,342 @@ export default function QuienMasOnline({ onLocal, onSalir }) {
   };
 
   const esAdmin = Boolean(sala?.esAdmin);
+  const yoId = sala?.yoId;
+  const miJugador = sala?.jugadores?.find((j) => j.id === yoId);
   const resultado = sala?.resultado;
   const ranking = [...(sala?.jugadores || [])].sort((a, b) => b.puntos - a.puntos);
   const maximoPuntos = ranking.length ? ranking[0].puntos : 0;
   const ganadores = maximoPuntos > 0 ? ranking.filter((j) => j.puntos === maximoPuntos) : [];
 
-  // Mostrar ayuda en menús y en el lobby, desaparece al empezar a jugar
+  const enPartidaActiva = vista === 'sala' && sala && sala.estado !== 'lobby';
 
   return (
-    <div className="qm-contenedor">
-      {/* ---------------- BOTÓN Y MODAL DE AYUDA ---------------- */}
-
-      {modalAyuda && (
-        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
-          <div className="rg-modal modal-ayuda-juego" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-ayuda-header">
-              <span className="modal-ayuda-signo-title">?</span>
-              <h3>Cómo se juega a «¿De verdad os conocéis?»</h3>
+    <div className={`qm-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+      {/* 1. MENÚ PRINCIPAL */}
+      {vista === 'menu' && (
+        <section className="game">
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top solo-derecha">
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
             </div>
 
-            <div className="modal-ayuda-cuerpo">
-              <p><strong>1. Votación secreta:</strong></p>
-              <ul>
-                <li>Aparece una pregunta sobre la personalidad del grupo.</li>
-                <li>Cada jugador vota <strong>en secreto</strong> al jugador que mejor encaja.</li>
-                <li>Dispones de <strong>30 segundos</strong> para emitir tu voto. Si se agota el tiempo, se seleccionará un jugador al azar.</li>
-              </ul>
-              <p><strong>2. Puntuación:</strong></p>
-              <ul>
-                <li>Si votas al jugador <strong>más votado</strong>, sumas <strong>+1 punto</strong>.</li>
-                <li>Si hay <strong>empate</strong> en la primera posición, <strong>nadie suma puntos</strong>.</li>
-              </ul>
+            <div className="qq-hero-icono">
+              <Icon name="users" size={44} strokeWidth={1.7} />
             </div>
+            <h1 className="title qq-main-title">{tituloJuego}</h1>
+            <p className="hint qq-main-desc">{descripcionJuego}</p>
 
-            <div className="rg-modal-acciones">
-              <button className="big full" onClick={() => setModalAyuda(false)}>
-                Entendido
+            {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
+
+            <div className="qq-menu-opciones">
+              <button
+                type="button"
+                className="qq-opcion-card principal"
+                onClick={() => {
+                  setVista('online_menu');
+                  setErrorMsg('');
+                }}
+              >
+                <span className="qq-opcion-icono">
+                  <Icon name="globe" size={26} />
+                </span>
+                <div className="qq-opcion-textos">
+                  <strong>Jugar online</strong>
+                  <span>Cada jugador vota en secreto desde su propio móvil</span>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                className="qq-opcion-card secundaria"
+                onClick={onLocal}
+              >
+                <span className="qq-opcion-icono">
+                  <Icon name="users" size={26} />
+                </span>
+                <div className="qq-opcion-textos">
+                  <strong>Jugar en un único dispositivo</strong>
+                  <span>Pasando el móvil por turnos para votar en secreto</span>
+                </div>
               </button>
             </div>
           </div>
-        </div>
-      )}
-      {/* ---------------- FIN AYUDA ---------------- */}
-
-      {/* 1. MENÚ PRINCIPAL */}
-      {vista === 'menu' && (
-        <MenuInicioJuego
-          juegoId="quienmas"
-          onOnline={() => { setVista('online_menu'); setErrorMsg(''); }}
-          onLocal={onLocal}
-          onAyuda={() => setModalAyuda(true)}
-          error={errorMsg}
-        />
+        </section>
       )}
 
+      {/* 1B. SUBMENÚ ONLINE */}
       {vista === 'online_menu' && (
-        <MenuModoOnline
-          onVolver={() => { setVista('menu'); setErrorMsg(''); }}
-          onCrear={() => { setVista('crear'); setErrorMsg(''); }}
-          onUnirse={() => { setVista('unirse'); setErrorMsg(''); }}
-          onAyuda={() => setModalAyuda(true)}
-          error={errorMsg}
-        />
+        <section className="game">
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver
+                onClick={() => {
+                  setVista('menu');
+                  setErrorMsg('');
+                }}
+              />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
+
+            <div className="qq-hero-icono">
+              <Icon name="globe" size={40} strokeWidth={1.7} />
+            </div>
+            <h2 className="title qq-main-title">Modo Online</h2>
+            <p className="hint qq-main-desc">
+              Crea una sala nueva para compartir el código con tus amigos o únete a una ya creada.
+            </p>
+
+            {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
+
+            <div className="qq-menu-opciones">
+              <button
+                type="button"
+                className="qq-opcion-card principal"
+                onClick={() => {
+                  setVista('crear');
+                  setErrorMsg('');
+                }}
+              >
+                <span className="qq-opcion-icono">
+                  <Icon name="crown" size={26} />
+                </span>
+                <div className="qq-opcion-textos">
+                  <strong>Crear partida</strong>
+                  <span>Sé el anfitrión y genera un código para tu grupo</span>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                className="qq-opcion-card secundaria"
+                onClick={() => {
+                  setVista('unirse');
+                  setErrorMsg('');
+                }}
+              >
+                <span className="qq-opcion-icono">
+                  <Icon name="users" size={26} />
+                </span>
+                <div className="qq-opcion-textos">
+                  <strong>Unirse con código</strong>
+                  <span>Introduce el código de 4 letras de tu anfitrión</span>
+                </div>
+              </button>
+            </div>
+          </div>
+        </section>
       )}
 
       {/* 2. CREAR SALA */}
       {vista === 'crear' && (
-        <FormCrearSala
-          onVolver={() => { setVista('online_menu'); setErrorMsg(''); }}
-          onAyuda={() => setModalAyuda(true)}
-          nombre={nombre}
-          setNombre={setNombre}
-          onCrear={handleCrear}
-          cargando={cargando}
-          error={errorMsg}
-        />
+        <section className="game">
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver
+                onClick={() => {
+                  setVista('online_menu');
+                  setErrorMsg('');
+                }}
+              />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
+
+            <div className="qq-hero-icono">
+              <Icon name="crown" size={40} strokeWidth={1.6} />
+            </div>
+            <h2 className="title qq-main-title">Crear partida</h2>
+            <p className="hint qq-main-desc">
+              Introduce tu nombre para abrir la sala y ser el anfitrión.
+            </p>
+
+            <div className="lb-form qq-form-estilizado">
+              <label className="field-label" htmlFor="qm-host-nombre">Tu nombre</label>
+              <input
+                id="qm-host-nombre"
+                className="qq-input-moderno"
+                type="text"
+                placeholder="Ej. Alex"
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value)}
+                maxLength={20}
+                autoFocus
+              />
+              {errorMsg && <p className="error">{errorMsg}</p>}
+
+              <button
+                type="button"
+                className="big full qq-btn-principal"
+                disabled={cargando || !nombre.trim()}
+                onClick={handleCrear}
+              >
+                <Icon name="check" size={22} strokeWidth={2.5} /> Crear sala
+              </button>
+            </div>
+          </div>
+        </section>
       )}
 
       {/* 3. UNIRSE A SALA */}
       {vista === 'unirse' && (
-        <FormUnirseSala
-          onVolver={() => { setVista('online_menu'); setErrorMsg(''); }}
-          onAyuda={() => setModalAyuda(true)}
-          codigo={codigoInput}
-          setCodigo={setCodigoInput}
-          nombre={nombre}
-          setNombre={setNombre}
-          onUnirse={handleUnirse}
-          cargando={cargando}
-          error={errorMsg}
-        />
+        <section className="game">
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver
+                onClick={() => {
+                  setVista('online_menu');
+                  setErrorMsg('');
+                }}
+              />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
+
+            <div className="qq-hero-icono">
+              <Icon name="users" size={40} strokeWidth={1.6} />
+            </div>
+            <h2 className="title qq-main-title">Unirse a partida</h2>
+            <p className="hint qq-main-desc">
+              Introduce el código que te ha compartido el anfitrión y tu nombre.
+            </p>
+
+            <div className="lb-form qq-form-estilizado">
+              <label className="field-label" htmlFor="qm-code-input">Código de la partida</label>
+              <input
+                id="qm-code-input"
+                className="lb-input-codigo qq-input-moderno"
+                type="text"
+                placeholder="ABCD"
+                value={codigoInput}
+                onChange={(e) => setCodigoInput(e.target.value.toUpperCase())}
+                maxLength={4}
+                autoFocus
+              />
+
+              <label className="field-label" htmlFor="qm-guest-nombre" style={{ marginTop: '1rem' }}>
+                Tu nombre
+              </label>
+              <input
+                id="qm-guest-nombre"
+                className="qq-input-moderno"
+                type="text"
+                placeholder="Tu nombre"
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value)}
+                maxLength={20}
+              />
+              {errorMsg && <p className="error">{errorMsg}</p>}
+
+              <button
+                type="button"
+                className="big full qq-btn-principal"
+                disabled={cargando || !nombre.trim() || codigoInput.trim().length < 4}
+                onClick={handleUnirse}
+              >
+                <Icon name="check" size={22} strokeWidth={2.5} /> Entrar en la partida
+              </button>
+            </div>
+          </div>
+        </section>
       )}
 
-      {/* 4. SALA: LOBBY */}
+      {/* 4. SALA DE ESPERA (LOBBY) */}
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
-        <section className="game qq-pantalla">
-          <CabeceraSala codigo={sala.code} onVolver={() => setModalSalir(true)} onAyuda={() => setModalAyuda(true)} />
+        <section className="game">
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver onClick={() => setModalSalirLobby(true)} />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
 
-          {/* Selector de categoría (solo disponible si el modo admin global está activado y el usuario es anfitrión) */}
+            <span className="qq-badge-sala"><Icon name="lock" size={15} /> Sala de espera</span>
+            <p className="hint">Código de la partida</p>
+            <button
+              type="button"
+              className="qq-codigo-btn"
+              onClick={copiarCodigo}
+              title="Copiar código"
+            >
+              {sala.code}
+            </button>
+            <p className="hint small">
+              {codigoCopiado
+                ? '¡Copiado al portapapeles!'
+                : 'Pulsa el código para copiarlo y compártelo con los demás.'}
+            </p>
+          </div>
+
           {esAdminGlobal && esAdmin && (
             <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
-              <h3 className="qq-sala-titulo"><Icon name="dice" size={20} /> Categoría de preguntas (Admin)</h3>
-              <div>
-                <label className="field-label">Elige la temática para el grupo:</label>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem', marginTop: '0.5rem' }}>
-                  <button
-                    type="button"
-                    className={`pts-btn-modo ${sala.categoria === 'normal' ? 'activo' : ''}`}
-                    onClick={() => handleCambiarCategoria('normal')}
-                  >
-                    😊 Normal (Todos los públicos)
-                  </button>
-                  <button
-                    type="button"
-                    className={`pts-btn-modo ${sala.categoria === 'picante' ? 'activo' : ''}`}
-                    onClick={() => handleCambiarCategoria('picante')}
-                  >
-                    🌶️ Picante (Comprometidas)
-                  </button>
-                </div>
+              <span className="qq-label-destacado">
+                <Icon name="lock" size={14} /> Categoría de preguntas (Admin)
+              </span>
+              <div className="qm-admin-cats">
+                <button
+                  type="button"
+                  className={`qm-admin-cat-btn ${sala.categoria === 'normal' ? 'activo' : ''}`}
+                  onClick={() => handleCambiarCategoria('normal')}
+                >
+                  😊 Normal (Todos los públicos)
+                </button>
+                <button
+                  type="button"
+                  className={`qm-admin-cat-btn ${sala.categoria === 'picante' ? 'activo' : ''}`}
+                  onClick={() => handleCambiarCategoria('picante')}
+                >
+                  🌶️ Picante (Comprometidas)
+                </button>
               </div>
             </div>
           )}
 
           <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
-            <h3 className="qq-sala-titulo"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length})</h3>
+            <h3 className="qq-sala-titulo">
+              <Icon name="users" size={20} /> Jugadores ({sala.jugadores.length})
+            </h3>
             <div className="lb-lista qq-sala-lista">
               {sala.jugadores.map((j) => (
-                <div key={j.id} className={`lb-jug ${j.id === sala.yoId ? 'yo' : ''}`}>
+                <div key={j.id} className={`lb-jug ${j.id === yoId ? 'yo' : ''}`}>
                   <span className="lb-jug-nombre">
-                    {j.nombre}{j.id === sala.yoId ? ' (tú)' : ''}{j.id === 1 ? ' 👑' : ''}
+                    {j.nombre}{j.id === yoId ? ' (tú)' : ''}{j.id === 1 ? ' 👑' : ''}
                   </span>
                 </div>
               ))}
@@ -417,290 +692,345 @@ export default function QuienMasOnline({ onLocal, onSalir }) {
           </div>
 
           {esAdmin ? (
-            <div style={{ marginTop: '1.2rem' }}>
-              <button
-                className="big full qq-btn-principal"
-                disabled={sala.jugadores.length < 3}
-                onClick={handleIniciarPartida}
-              >
-                <Icon name="play" size={22} />
-                {sala.jugadores.length < 3 ? 'Esperando jugadores...' : '¡Empezar Partida!'}
-              </button>
-            </div>
+            <button
+              type="button"
+              className="big full qq-btn-principal"
+              style={{ marginTop: '1rem' }}
+              disabled={sala.jugadores.length < 3}
+              onClick={handleIniciarPartida}
+            >
+              <Icon name="play" size={22} />
+              {sala.jugadores.length < 3 ? 'Esperando jugadores...' : 'Iniciar juego'}
+            </button>
           ) : (
-            <div className="panel center qq-menu-panel" style={{ padding: '2rem 1.5rem', marginTop: '1rem' }}>
-              <span className="lb-luna chica"><Icon name="hourglass" size={40} /></span>
-              <h3 style={{ margin: '0.5rem 0' }}>Esperando al anfitrión...</h3>
-              <p className="hint">En cuanto comience la partida, verás la primera pregunta para votar en secreto.</p>
+            <div className="panel center" style={{ padding: '1.8rem 1.4rem', marginTop: '1rem' }}>
+              <span className="lb-luna chica"><Icon name="hourglass" size={36} /></span>
+              <h3 style={{ margin: '0.4rem 0' }}>Esperando al anfitrión...</h3>
+              <p className="hint">
+                En cuanto comience la partida, verás la primera pregunta para votar en secreto.
+              </p>
             </div>
           )}
-
         </section>
       )}
 
       {/* 5. SALA: VOTANDO */}
       {vista === 'sala' && sala && sala.estado === 'votando' && (
-        <section className="game">
-          <div className="hud">
-            <span className="chip"><Icon name="flagFinish" size={18} />Ronda {sala.rondaNum}</span>
-            <span className="chip alt">
-              <Icon name="check" size={18} /> {sala.totalVotaron} / {sala.totalJugadores} han votado
-            </span>
-          </div>
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            categoria={{ nombre: 'Voto secreto', icono: 'lock' }}
+            etiqueta={`Ronda ${sala.rondaNum} · ${sala.totalVotaron} de ${sala.totalJugadores} han votado`}
+            titulo={sala.yaVoto ? '¡Voto enviado!' : '¡Te toca votar!'}
+            avatar={
+              miJugador ? (
+                <Avatar nombre={miJugador.nombre} color={colorJugador((miJugador.id ?? 1) - 1)} />
+              ) : undefined
+            }
+          >
+            <div className="qqp-identidad qm-consigna-box">
+              <div className="qm-consigna-top">
+                <span className="qqp-identidad-icono">
+                  <Icon name="users" size={16} strokeWidth={2.4} />
+                </span>
+                <span className="qm-consigna-texto">«{sala.preguntaActual}»</span>
+              </div>
 
-          <div className="panel qm-pregunta">
-            <h2 className="title">«{sala.preguntaActual}»</h2>
+              <div className="qm-hero-stats">
+                <span className="qm-hero-stat ok">
+                  ✅ {sala.totalVotaron}/{sala.totalJugadores} listos
+                </span>
+                {!sala.yaVoto && (
+                  <span className={`qm-hero-stat timer${tiempoRestante <= 10 ? ' low' : ''}`}>
+                    <Icon name="clock" size={14} /> {tiempoRestante}s
+                  </span>
+                )}
+              </div>
 
-            {!sala.yaVoto ? (
-              <>
-                <p className="hint" style={{ margin: '0.5rem 0 0.4rem' }}>
-                  Elige en secreto al jugador que más encaja con la pregunta:
-                </p>
-
-                {/* Temporizador de 30 segundos */}
-                <div
-                  className="timer"
-                  role="timer"
-                  style={{
-                    margin: '0.6rem 0 0.3rem',
-                    background: '#e2e8f0',
-                    borderRadius: '9999px',
-                    height: '8px',
-                    overflow: 'hidden'
-                  }}
-                >
+              {!sala.yaVoto && (
+                <div className="qm-timer-track" role="timer">
                   <div
-                    className={`timer-bar ${tiempoRestante <= 10 ? 'low' : ''}`}
-                    style={{
-                      width: `${(tiempoRestante / TIEMPO_VOTO) * 100}%`,
-                      height: '100%',
-                      backgroundColor: tiempoRestante <= 10 ? '#ef4444' : '#16a34a',
-                      borderRadius: '9999px',
-                      transition: 'width 0.1s linear, background-color 0.3s ease'
-                    }}
+                    className={`qm-timer-fill${tiempoRestante <= 10 ? ' low' : ''}`}
+                    style={{ width: `${(tiempoRestante / TIEMPO_VOTO) * 100}%` }}
                   />
                 </div>
-                <p
-                  className="timer-text"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '0.35rem',
-                    color: tiempoRestante <= 10 ? '#dc2626' : '#64748b',
-                    fontSize: '0.9rem',
-                    fontWeight: 700,
-                    margin: '0 0 1rem'
-                  }}
-                >
-                  <Icon name="clock" size={16} />
-                  {tiempoRestante} s
-                </p>
+              )}
+            </div>
 
-                <div className="names-grid">
-                  {sala.jugadores.map((j) => (
-                    <button
-                      key={j.id}
-                      type="button"
-                      className="secondary"
-                      onClick={() => handleVotar(j.nombre)}
-                    >
+            <OrdenTurnos
+              jugadores={sala.jugadores}
+              activoNombre={!sala.yaVoto ? miJugador?.nombre : null}
+            />
+          </Cabecera>
+
+          {!sala.yaVoto ? (
+            <div className="qqp-tarjeta">
+              <p className="qqp-carta-cara-titulo" style={{ marginBottom: '0.8rem' }}>
+                <Icon name="check" size={16} /> Elige en secreto al jugador que mejor encaja
+              </p>
+              <div className="qm-candidatos-grid">
+                {sala.jugadores.map((j, idx) => (
+                  <button
+                    key={j.id}
+                    type="button"
+                    className="qm-candidato-btn"
+                    style={{ '--c': colorJugador(indiceColor(j, idx)) }}
+                    onClick={() => handleVotar(j.nombre)}
+                  >
+                    <span className="qm-candidato-avatar">{inicial(j.nombre)}</span>
+                    <span className="qm-candidato-nombre">
                       {j.nombre}
-                      {j.id === sala.yoId && <span className="badge">Tú</span>}
-                    </button>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <div style={{ padding: '1.2rem 0' }}>
-                <span className="badge" style={{ background: '#dcfce7', color: '#166534', fontSize: '1rem', padding: '0.4rem 1rem' }}>
-                  ✅ Has votado a <strong>{sala.miVoto}</strong>
-                </span>
-                <p className="hint" style={{ marginTop: '1rem' }}>
-                  Esperando a que los demás jugadores terminen de votar ({sala.totalVotaron} de {sala.totalJugadores})...
-                </p>
-
-                <div className="scoreboard-container" style={{ justifyContent: 'center', marginTop: '0.8rem' }}>
-                  {sala.jugadores.map((j) => (
-                    <div key={j.id} className="score-pill">
-                      <span>{j.nombre}</span>
-                      <span style={{ marginLeft: '6px' }}>{j.haVotado ? '✅' : '⏳'}</span>
-                    </div>
-                  ))}
-                </div>
+                      {j.id === yoId && <span className="qm-badge-tu">Tú</span>}
+                    </span>
+                  </button>
+                ))}
               </div>
-            )}
-          </div>
-
-          {esAdmin && (
-            <div style={{ marginTop: '1rem' }}>
-              <button className="secondary full" onClick={handleCerrarVotacion}>
-                <Icon name="check" size={18} /> Cerrar votación y ver resultados ya
-              </button>
+            </div>
+          ) : (
+            <div className="qqp-tarjeta qqp-pasar">
+              <span className="lb-luna chica"><Icon name="check" size={34} /></span>
+              <p className="qqp-pasar-para">Tu voto secreto</p>
+              <h3 className="qqp-pasar-nombre" style={{ fontSize: '1.8rem' }}>{sala.miVoto}</h3>
+              <p className="qqp-texto">
+                Esperando a que terminen de votar los demás jugadores ({sala.totalVotaron} de {sala.totalJugadores})…
+              </p>
             </div>
           )}
 
-          <div className="actions" style={{ marginTop: '1.2rem' }}>
-            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
-              <Icon name="door" size={20} /> Salir de la sala
-            </button>
-          </div>
+          {esAdmin && (
+            <div className="qqp-barra">
+              <EnlaceSecundario onClick={handleCerrarVotacion}>
+                <Icon name="flagFinish" size={16} /> Cerrar votación y mostrar resultados ya
+              </EnlaceSecundario>
+            </div>
+          )}
         </section>
       )}
 
       {/* 6. SALA: RESULTADO DE LA RONDA */}
       {vista === 'sala' && sala && sala.estado === 'resultado' && resultado && (
-        <section className="game">
-          <div className="end-card">
-            <span className="end-icon">
-              <Icon name={resultado.empate ? 'hourglass' : 'trophy'} size={44} />
-            </span>
-            <p className="categoria"><Icon name="flagFinish" size={16} />Ronda {sala.rondaNum}</p>
-            <h1 className="title">Votación de la ronda</h1>
-            <p className="reveal">«{sala.preguntaActual}»</p>
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            etiqueta={`Ronda ${sala.rondaNum} completada`}
+            titulo={
+              resultado.empate
+                ? '¡Empate en la votación!'
+                : `Más votado: ${resultado.ganador}`
+            }
+            avatar={
+              <span className="qqp-avatar" style={{ '--c': resultado.empate ? '#64748b' : '#f59e0b' }}>
+                {resultado.empate ? '⚖️' : '🏆'}
+              </span>
+            }
+          >
+            <div className="qqp-identidad">
+              <span className="qqp-identidad-icono"><Icon name="users" size={16} /></span>
+              <span>«{sala.preguntaActual}»</span>
+            </div>
+          </Cabecera>
 
-            <p className="final-score" style={{ marginTop: '1rem' }}>
-              {resultado.empate
-                ? <>¡Empate entre {resultado.masVotados.join(' y ')}! Nadie suma puntos</>
-                : <>Más votado: {resultado.ganador} ({resultado.maximo} {resultado.maximo === 1 ? 'voto' : 'votos'})</>}
+          <div className="qqp-tarjeta">
+            <p className="qqp-carta-cara-titulo" style={{ marginBottom: '0.8rem' }}>
+              <Icon name="trophy" size={16} /> Recuento de votos recibidos
             </p>
+            <ul className="qqp-rivales">
+              {[...sala.jugadores]
+                .sort((a, b) => (resultado.recuento[b.nombre] || 0) - (resultado.recuento[a.nombre] || 0))
+                .map((j, i) => {
+                  const n = resultado.recuento[j.nombre] || 0;
+                  const esMasVotado = !resultado.empate && j.nombre === resultado.ganador;
+                  return (
+                    <li key={j.id} className="qqp-rival" style={{ '--c': colorJugador(indiceColor(j, i)) }}>
+                      <span className="qqp-rival-avatar">{esMasVotado ? '👑' : inicial(j.nombre)}</span>
+                      <span className="qqp-rival-datos">
+                        <span className="qqp-rival-nombre">
+                          {esMasVotado ? '¡El más votado!' : 'Candidato'}
+                        </span>
+                        <strong className="qqp-rival-tarjeta">
+                          {j.nombre}{j.id === yoId ? ' (tú)' : ''}
+                        </strong>
+                      </span>
+                      <span className="qm-ranking-pts">
+                        {n} {n === 1 ? 'voto' : 'votos'}
+                      </span>
+                    </li>
+                  );
+                })}
+            </ul>
+          </div>
 
-            <div className="scoreboard">
+          <div className="qqp-tarjeta">
+            <p className="qqp-carta-cara-titulo" style={{ marginBottom: '0.8rem' }}>
+              <Icon name="eye" size={16} /> ¿A quién votó cada uno?
+            </p>
+            <div className="qm-desglose-lista">
               {sala.jugadores.map((j) => {
-                const n = resultado.recuento[j.nombre] || 0;
+                const gano = resultado.ganados[j.nombre] > 0;
                 return (
-                  <div key={j.id} className={`score-row ${!resultado.empate && j.nombre === resultado.ganador ? 'first' : ''}`}>
-                    <span className="score-name">{j.nombre} {j.id === sala.yoId ? '(Tú)' : ''}</span>
-                    <span className="score-pts">{n} {n === 1 ? 'voto' : 'votos'}</span>
+                  <div key={j.id} className={`qm-desglose-fila ${gano ? 'acierto' : ''}`}>
+                    <span className="qm-desglose-texto">
+                      <strong>{j.nombre}</strong> votó a <strong>{resultado.votos[j.nombre] || 'Nadie'}</strong>
+                    </span>
+                    <span className={`qm-badge-pto ${gano ? 'pos' : ''}`}>
+                      {gano ? '+1 pt' : '0 pts'}
+                    </span>
                   </div>
                 );
               })}
             </div>
           </div>
 
-          <div className="panel reveal-panel" style={{ marginTop: '1rem' }}>
-            <h3 className="reveal-title"><Icon name="eye" size={20} /> Desglose de votos</h3>
-            <div className="reveal-list">
-              {sala.jugadores.map((j) => (
-                <div key={j.id} className="reveal-row">
-                  <span className="reveal-name">
-                    {j.nombre} votó a <strong>{resultado.votos[j.nombre] || 'Nadie'}</strong>
-                  </span>
-                  <span className="reveal-card">
-                    {resultado.ganados[j.nombre] > 0 ? '+1 pto' : '0 ptos'}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="actions" style={{ marginTop: '1.2rem' }}>
+          <div className="qqp-barra">
             {esAdmin ? (
               <>
-                <button className="big full" onClick={handleSiguientePregunta}>
+                <BotonPrincipal onClick={handleSiguientePregunta}>
                   <Icon name="play" size={20} /> Siguiente pregunta
-                </button>
-                <button className="secondary full" onClick={handleVerRanking}>
-                  <Icon name="trophy" size={20} /> Ver clasificación general
-                </button>
+                </BotonPrincipal>
+                <EnlaceSecundario onClick={handleVerRanking}>
+                  <Icon name="trophy" size={16} /> Ver clasificación general
+                </EnlaceSecundario>
               </>
             ) : (
-              <p className="hint center">Esperando a que el anfitrión pase a la siguiente pregunta...</p>
+              <p className="qqp-estado">
+                <span className="qqp-spinner" aria-hidden="true" /> Esperando a que el anfitrión lance la siguiente pregunta…
+              </p>
             )}
-
-            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
-              <Icon name="door" size={20} /> Salir de la sala
-            </button>
           </div>
         </section>
       )}
 
       {/* 7. SALA: RANKING GENERAL */}
       {vista === 'sala' && sala && sala.estado === 'ranking' && (
-        <section className="game">
-          <div className="end-card">
-            <span className="end-icon"><Icon name="crown" size={44} /></span>
-            <p className="categoria"><Icon name="flagFinish" size={16} />Rondas jugadas: {sala.rondaNum}</p>
-            <h1 className="title">Puntuación total</h1>
-            <p className="final-score">
-              {ganadores.length === 0
-                ? 'Nadie ha conseguido puntos todavía'
-                : ganadores.length === 1
-                ? <>¡{ganadores[0].nombre} lidera con {maximoPuntos} {maximoPuntos === 1 ? 'punto' : 'puntos'}!</>
-                : <>Empate en cabeza: {ganadores.map((g) => g.nombre).join(', ')} con {maximoPuntos} pts</>}
-            </p>
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            etiqueta={`Rondas jugadas: ${sala.rondaNum}`}
+            titulo="Clasificación General"
+            avatar={<span className="qqp-avatar" style={{ '--c': '#f59e0b' }}>🏆</span>}
+          >
+            <div className="qqp-identidad">
+              <span className="qqp-identidad-icono"><Icon name="crown" size={16} /></span>
+              <span>
+                {ganadores.length === 0
+                  ? 'Nadie ha conseguido puntos todavía.'
+                  : ganadores.length === 1
+                  ? <>¡<strong>{ganadores[0].nombre}</strong> lidera con <strong>{maximoPuntos} {maximoPuntos === 1 ? 'pt' : 'pts'}</strong>!</>
+                  : <>Empate en cabeza entre <strong>{ganadores.map((g) => g.nombre).join(', ')}</strong> con <strong>{maximoPuntos} pts</strong></>}
+              </span>
+            </div>
+          </Cabecera>
 
-            <div className="scoreboard">
+          <div className="qqp-tarjeta">
+            <p className="qqp-carta-cara-titulo" style={{ marginBottom: '0.8rem' }}>
+              <Icon name="users" size={16} /> Podio de jugadores
+            </p>
+            <ul className="qqp-rivales">
               {ranking.map((j, i) => {
                 const lider = maximoPuntos > 0 && j.puntos === maximoPuntos;
                 return (
-                  <div key={j.id} className={`score-row ${lider ? 'first' : ''}`}>
-                    <span className="score-name">
-                      {lider ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
-                      {j.nombre} {j.id === sala.yoId ? '(Tú)' : ''}
+                  <li key={j.id} className="qqp-rival" style={{ '--c': colorJugador(indiceColor(j, i)) }}>
+                    <span className="qqp-rival-avatar">{lider ? '👑' : i + 1}</span>
+                    <span className="qqp-rival-datos">
+                      <span className="qqp-rival-nombre">{lider ? 'Líder' : `Puesto ${i + 1}`}</span>
+                      <strong className="qqp-rival-tarjeta">
+                        {j.nombre}{j.id === yoId ? ' (tú)' : ''}
+                      </strong>
                     </span>
-                    <span className="score-pts">{j.puntos || 0} pts</span>
-                  </div>
+                    <span className="qm-ranking-pts">{j.puntos || 0} pts</span>
+                  </li>
                 );
               })}
-            </div>
+            </ul>
           </div>
 
-          <div className="actions" style={{ marginTop: '1.2rem' }}>
+          <div className="qqp-barra">
             {esAdmin ? (
               <>
-                <button className="big full" onClick={handleSiguientePregunta}>
+                <BotonPrincipal onClick={handleSiguientePregunta}>
                   <Icon name="play" size={20} /> Continuar jugando (Siguiente pregunta)
-                </button>
-                <button className="secondary full" onClick={handleReiniciarPartida}>
-                  <Icon name="refresh" size={20} /> Nueva partida (reiniciar puntos)
-                </button>
+                </BotonPrincipal>
+                <EnlaceSecundario onClick={handleReiniciarPartida}>
+                  <Icon name="refresh" size={16} /> Reiniciar puntos y empezar de cero
+                </EnlaceSecundario>
               </>
             ) : (
-              <p className="hint center">Esperando a que el anfitrión continúe...</p>
+              <p className="qqp-estado">
+                <span className="qqp-spinner" aria-hidden="true" /> Esperando a que el anfitrión continúe…
+              </p>
             )}
-
-            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
-              <Icon name="door" size={20} /> Salir al menú principal
-            </button>
           </div>
         </section>
       )}
 
-      {/* MODAL DE CONFIRMACIÓN PARA SALIR */}
-      {modalSalir && (
-        <div className="rg-modal-fondo" onClick={() => setModalSalir(false)}>
-          <div 
-            className="rg-modal" 
-            onClick={(e) => e.stopPropagation()} 
+      {/* MODAL DE CONFIRMACIÓN PARA SALIR DEL LOBBY AL SUBMENÚ */}
+      {modalSalirLobby && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalirLobby(false)}>
+          <div
+            className="rg-modal"
+            onClick={(e) => e.stopPropagation()}
             style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
           >
             <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
             <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
-              ¿Abandonar la partida?
+              ¿Salir de la sala?
             </h3>
             <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
-              Si sales de la sala perderás tu progreso actual en la partida. ¿Estás seguro de que deseas salir?
+              Si sales ahora abandonarás la sala de espera y volverás al menú anterior. ¿Estás seguro?
             </p>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
-              <button 
-                type="button" 
-                className="secondary full" 
-                onClick={() => setModalSalir(false)}
+              <button
+                type="button"
+                className="secondary full"
+                onClick={() => setModalSalirLobby(false)}
               >
                 No, quedarme
               </button>
-              <button 
-                type="button" 
-                className="secondary danger full" 
+              <button
+                type="button"
+                className="secondary danger full"
                 style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
-                onClick={() => {
-                  setModalSalir(false);
-                  handleSalir();
-                }}
+                onClick={handleVolverMenuOnline}
               >
                 Sí, salir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE CERRAR SALA Y SALIR A PORTADA */}
+      {modalSalirPortada && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalirPortada(false)}>
+          <div
+            className="rg-modal"
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
+          >
+            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
+            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
+              ¿Salir a la portada?
+            </h3>
+            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
+              Abandonarás la partida actual y volverás a la portada principal. ¿Estás seguro?
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+              <button
+                type="button"
+                className="secondary full"
+                onClick={() => setModalSalirPortada(false)}
+              >
+                No, quedarme
+              </button>
+              <button
+                type="button"
+                className="secondary danger full"
+                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
+                onClick={handleCerrarSalaYSalirAPortada}
+              >
+                Sí, salir de la sala
               </button>
             </div>
           </div>
