@@ -1,4 +1,6 @@
 // server/data/seeds/trayectoria/trayectorias.seed.js
+import { COLORES_CLUB, siglasDe } from './escudos.js';
+import { CLUBES_INFO } from '../cuatroclubes/cuatroclubes.js';
 
 const LOGOS = {
   barca: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
@@ -39,9 +41,13 @@ const LOGOS = {
   espanyol: "https://upload.wikimedia.org/wikipedia/en/d/d6/Rcd_espanyol_logo.svg"
 };
 
+// Escudo de cada club: imagen conocida (LOGOS o «Cuatro clubes») y, siempre, colores y siglas para dibujar
+// un escudo propio en el cliente si no hay imagen o no carga.
 const c = (nombre, logoUrl, periodo) => ({
   nombre,
-  logo: logoUrl || `https://images.fotmob.com/image_resources/logo/teamlogo/${encodeURIComponent(nombre.toLowerCase().replace(/ /g, '_'))}.png`,
+  logo: logoUrl || CLUBES_INFO[nombre]?.escudo || null,
+  colores: COLORES_CLUB[nombre] || CLUBES_INFO[nombre]?.colores || ['#475569', '#ffffff'],
+  siglas: siglasDe(nombre),
   periodo
 });
 
@@ -2737,14 +2743,14 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["villa", "el guaje", "david villa"],
     "nacionalidad": "España",
     "clubes": [
-      ("Sporting de Gijón", "null", "2000 - 2003"),
-      ("Real Zaragoza", "null", "2003 - 2005"),
-      ("Valencia CF", "LOGOS.valencia", "2005 - 2010"),
-      ("FC Barcelona", "LOGOS.barca", "2010 - 2013"),
-      ("Atlético de Madrid", "LOGOS.atletico", "2013 - 2014"),
-      ("New York City FC", "null", "2014 - 2018"),
-      ("Melbourne City", "null", "2014"),
-      ("Vissel Kobe", "null", "2019")
+      c("Sporting de Gijón", null, "2000 - 2003"),
+      c("Real Zaragoza", null, "2003 - 2005"),
+      c("Valencia CF", LOGOS.valencia, "2005 - 2010"),
+      c("FC Barcelona", LOGOS.barca, "2010 - 2013"),
+      c("Atlético de Madrid", LOGOS.atletico, "2013 - 2014"),
+      c("New York City FC", null, "2014 - 2018"),
+      c("Melbourne City", null, "2014"),
+      c("Vissel Kobe", null, "2019")
     ]
   },
   {
@@ -2755,12 +2761,12 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["beckham"],
     "nacionalidad": "Inglaterra",
     "clubes": [
-      ("Manchester United", "LOGOS.manutd", "1992 - 2003"),
-      ("Preston North End", "null", "1995"),
-      ("Real Madrid", "LOGOS.madrid", "2003 - 2007"),
-      ("LA Galaxy", "null", "2007 - 2012"),
-      ("AC Milan", "LOGOS.milan", "2009 - 2010"),
-      ("Paris Saint-Germain", "LOGOS.psg", "2013")
+      c("Manchester United", LOGOS.manutd, "1992 - 2003"),
+      c("Preston North End", null, "1995"),
+      c("Real Madrid", LOGOS.madrid, "2003 - 2007"),
+      c("LA Galaxy", null, "2007 - 2012"),
+      c("AC Milan", LOGOS.milan, "2009 - 2010"),
+      c("Paris Saint-Germain", LOGOS.psg, "2013")
     ]
   },
   {
@@ -2771,11 +2777,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["rooney"],
     "nacionalidad": "Inglaterra",
     "clubes": [
-      ("Everton FC", "null", "2002 - 2004"),
-      ("Manchester United", "LOGOS.manutd", "2004 - 2017"),
-      ("Everton FC", "null", "2017 - 2018"),
-      ("D.C. United", "null", "2018 - 2019"),
-      ("Derby County", "null", "2020 - 2021")
+      c("Everton FC", null, "2002 - 2004"),
+      c("Manchester United", LOGOS.manutd, "2004 - 2017"),
+      c("Everton FC", null, "2017 - 2018"),
+      c("D.C. United", null, "2018 - 2019"),
+      c("Derby County", null, "2020 - 2021")
     ]
   },
   {
@@ -2786,14 +2792,14 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["drogba"],
     "nacionalidad": "Costa de Marfil",
     "clubes": [
-      ("Le Mans", "null", "1998 - 2002"),
-      ("EA Guingamp", "null", "2002 - 2003"),
-      ("Olympique de Marsella", "LOGOS.marseille", "2003 - 2004"),
-      ("Chelsea FC", "LOGOS.chelsea", "2004 - 2012"),
-      ("Shanghai Shenhua", "null", "2012"),
-      ("Galatasaray", "null", "2013 - 2014"),
-      ("Chelsea FC", "LOGOS.chelsea", "2014 - 2015"),
-      ("Montreal Impact", "null", "2015 - 2016")
+      c("Le Mans", null, "1998 - 2002"),
+      c("EA Guingamp", null, "2002 - 2003"),
+      c("Olympique de Marsella", LOGOS.marseille, "2003 - 2004"),
+      c("Chelsea FC", LOGOS.chelsea, "2004 - 2012"),
+      c("Shanghai Shenhua", null, "2012"),
+      c("Galatasaray", null, "2013 - 2014"),
+      c("Chelsea FC", LOGOS.chelsea, "2014 - 2015"),
+      c("Montreal Impact", null, "2015 - 2016")
     ]
   },
   {
@@ -2804,15 +2810,15 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["etoo", "samuel etoo"],
     "nacionalidad": "Camerún",
     "clubes": [
-      ("CD Leganés", "null", "1997 - 1998"),
-      ("Real Madrid", "LOGOS.madrid", "1998 - 2000"),
-      ("RCD Mallorca", "null", "2000 - 2004"),
-      ("FC Barcelona", "LOGOS.barca", "2004 - 2009"),
-      ("Inter de Milán", "LOGOS.inter", "2009 - 2011"),
-      ("Anzhi Makhachkala", "null", "2011 - 2013"),
-      ("Chelsea FC", "LOGOS.chelsea", "2013 - 2014"),
-      ("Everton FC", "null", "2014 - 2015"),
-      ("Sampdoria", "null", "2015")
+      c("CD Leganés", null, "1997 - 1998"),
+      c("Real Madrid", LOGOS.madrid, "1998 - 2000"),
+      c("RCD Mallorca", null, "2000 - 2004"),
+      c("FC Barcelona", LOGOS.barca, "2004 - 2009"),
+      c("Inter de Milán", LOGOS.inter, "2009 - 2011"),
+      c("Anzhi Makhachkala", null, "2011 - 2013"),
+      c("Chelsea FC", LOGOS.chelsea, "2013 - 2014"),
+      c("Everton FC", null, "2014 - 2015"),
+      c("Sampdoria", null, "2015")
     ]
   },
   {
@@ -2823,12 +2829,12 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["robben"],
     "nacionalidad": "Países Bajos",
     "clubes": [
-      ("FC Groningen", "null", "2000 - 2002"),
-      ("PSV Eindhoven", "null", "2002 - 2004"),
-      ("Chelsea FC", "LOGOS.chelsea", "2004 - 2007"),
-      ("Real Madrid", "LOGOS.madrid", "2007 - 2009"),
-      ("Bayern Múnich", "LOGOS.bayern", "2009 - 2019"),
-      ("FC Groningen", "null", "2020 - 2021")
+      c("FC Groningen", null, "2000 - 2002"),
+      c("PSV Eindhoven", null, "2002 - 2004"),
+      c("Chelsea FC", LOGOS.chelsea, "2004 - 2007"),
+      c("Real Madrid", LOGOS.madrid, "2007 - 2009"),
+      c("Bayern Múnich", LOGOS.bayern, "2009 - 2019"),
+      c("FC Groningen", null, "2020 - 2021")
     ]
   },
   {
@@ -2839,12 +2845,12 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["ribery"],
     "nacionalidad": "Francia",
     "clubes": [
-      ("FC Metz", "null", "2004 - 2005"),
-      ("Galatasaray", "null", "2005"),
-      ("Olympique de Marsella", "LOGOS.marseille", "2005 - 2007"),
-      ("Bayern Múnich", "LOGOS.bayern", "2007 - 2019"),
-      ("Fiorentina", "null", "2019 - 2021"),
-      ("Salernitana", "null", "2021 - 2022")
+      c("FC Metz", null, "2004 - 2005"),
+      c("Galatasaray", null, "2005"),
+      c("Olympique de Marsella", LOGOS.marseille, "2005 - 2007"),
+      c("Bayern Múnich", LOGOS.bayern, "2007 - 2019"),
+      c("Fiorentina", null, "2019 - 2021"),
+      c("Salernitana", null, "2021 - 2022")
     ]
   },
   {
@@ -2855,8 +2861,8 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["gerrard"],
     "nacionalidad": "Inglaterra",
     "clubes": [
-      ("Liverpool FC", "LOGOS.liverpool", "1998 - 2015"),
-      ("LA Galaxy", "null", "2015 - 2016")
+      c("Liverpool FC", LOGOS.liverpool, "1998 - 2015"),
+      c("LA Galaxy", null, "2015 - 2016")
     ]
   },
   {
@@ -2867,11 +2873,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["lampard"],
     "nacionalidad": "Inglaterra",
     "clubes": [
-      ("West Ham United", "null", "1995 - 2001"),
-      ("Swansea City", "null", "1995 - 1996"),
-      ("Chelsea FC", "LOGOS.chelsea", "2001 - 2014"),
-      ("Manchester City", "LOGOS.mancity", "2014 - 2015"),
-      ("New York City FC", "null", "2015 - 2016")
+      c("West Ham United", null, "1995 - 2001"),
+      c("Swansea City", null, "1995 - 1996"),
+      c("Chelsea FC", LOGOS.chelsea, "2001 - 2014"),
+      c("Manchester City", LOGOS.mancity, "2014 - 2015"),
+      c("New York City FC", null, "2015 - 2016")
     ]
   },
   {
@@ -2882,7 +2888,7 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["maldini"],
     "nacionalidad": "Italia",
     "clubes": [
-      ("AC Milan", "LOGOS.milan", "1984 - 2009")
+      c("AC Milan", LOGOS.milan, "1984 - 2009")
     ]
   },
   {
@@ -2893,7 +2899,7 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["totti"],
     "nacionalidad": "Italia",
     "clubes": [
-      ("AS Roma", "LOGOS.roma", "1992 - 2017")
+      c("AS Roma", LOGOS.roma, "1992 - 2017")
     ]
   },
   {
@@ -2904,10 +2910,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["del piero"],
     "nacionalidad": "Italia",
     "clubes": [
-      ("Padova", "null", "1991 - 1993"),
-      ("Juventus", "LOGOS.juventus", "1993 - 2012"),
-      ("Sydney FC", "null", "2012 - 2014"),
-      ("Delhi Dynamos", "null", "2014")
+      c("Padova", null, "1991 - 1993"),
+      c("Juventus", LOGOS.juventus, "1993 - 2012"),
+      c("Sydney FC", null, "2012 - 2014"),
+      c("Delhi Dynamos", null, "2014")
     ]
   },
   {
@@ -2918,12 +2924,12 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["roberto carlos"],
     "nacionalidad": "Brasil",
     "clubes": [
-      ("Palmeiras", "null", "1993 - 1995"),
-      ("Inter de Milán", "LOGOS.inter", "1995 - 1996"),
-      ("Real Madrid", "LOGOS.madrid", "1996 - 2007"),
-      ("Fenerbahçe", "null", "2007 - 2009"),
-      ("Corinthians", "null", "2010 - 2011"),
-      ("Anzhi Makhachkala", "null", "2011 - 2012")
+      c("Palmeiras", null, "1993 - 1995"),
+      c("Inter de Milán", LOGOS.inter, "1995 - 1996"),
+      c("Real Madrid", LOGOS.madrid, "1996 - 2007"),
+      c("Fenerbahçe", null, "2007 - 2009"),
+      c("Corinthians", null, "2010 - 2011"),
+      c("Anzhi Makhachkala", null, "2011 - 2012")
     ]
   },
   {
@@ -2934,11 +2940,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["cafu"],
     "nacionalidad": "Brasil",
     "clubes": [
-      ("São Paulo FC", "null", "1989 - 1994"),
-      ("Real Zaragoza", "null", "1995"),
-      ("Palmeiras", "null", "1995 - 1997"),
-      ("AS Roma", "LOGOS.roma", "1997 - 2003"),
-      ("AC Milan", "LOGOS.milan", "2003 - 2008")
+      c("São Paulo FC", null, "1989 - 1994"),
+      c("Real Zaragoza", null, "1995"),
+      c("Palmeiras", null, "1995 - 1997"),
+      c("AS Roma", LOGOS.roma, "1997 - 2003"),
+      c("AC Milan", LOGOS.milan, "2003 - 2008")
     ]
   },
   {
@@ -2949,12 +2955,12 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["rivaldo"],
     "nacionalidad": "Brasil",
     "clubes": [
-      ("Palmeiras", "null", "1994 - 1996"),
-      ("Deportivo La Coruña", "LOGOS.depor", "1996 - 1997"),
-      ("FC Barcelona", "LOGOS.barca", "1997 - 2002"),
-      ("AC Milan", "LOGOS.milan", "2002 - 2004"),
-      ("Olympiacos", "null", "2004 - 2007"),
-      ("AEK Atenas", "null", "2007 - 2008")
+      c("Palmeiras", null, "1994 - 1996"),
+      c("Deportivo La Coruña", LOGOS.depor, "1996 - 1997"),
+      c("FC Barcelona", LOGOS.barca, "1997 - 2002"),
+      c("AC Milan", LOGOS.milan, "2002 - 2004"),
+      c("Olympiacos", null, "2004 - 2007"),
+      c("AEK Atenas", null, "2007 - 2008")
     ]
   },
   {
@@ -2965,13 +2971,13 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["maradona", "el pelusa"],
     "nacionalidad": "Argentina",
     "clubes": [
-      ("Argentinos Juniors", "null", "1976 - 1981"),
-      ("Boca Juniors", "LOGOS.boca", "1981 - 1982"),
-      ("FC Barcelona", "LOGOS.barca", "1982 - 1984"),
-      ("SSC Napoli", "LOGOS.napoli", "1984 - 1991"),
-      ("Sevilla FC", "LOGOS.sevilla", "1992 - 1993"),
-      ("Newell's Old Boys", "null", "1993 - 1994"),
-      ("Boca Juniors", "LOGOS.boca", "1995 - 1997")
+      c("Argentinos Juniors", null, "1976 - 1981"),
+      c("Boca Juniors", LOGOS.boca, "1981 - 1982"),
+      c("FC Barcelona", LOGOS.barca, "1982 - 1984"),
+      c("SSC Napoli", LOGOS.napoli, "1984 - 1991"),
+      c("Sevilla FC", LOGOS.sevilla, "1992 - 1993"),
+      c("Newell's Old Boys", null, "1993 - 1994"),
+      c("Boca Juniors", LOGOS.boca, "1995 - 1997")
     ]
   },
   {
@@ -2982,8 +2988,8 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["pele", "o rei"],
     "nacionalidad": "Brasil",
     "clubes": [
-      ("Santos FC", "null", "1956 - 1974"),
-      ("New York Cosmos", "null", "1975 - 1977")
+      c("Santos FC", null, "1956 - 1974"),
+      c("New York Cosmos", null, "1975 - 1977")
     ]
   },
   {
@@ -2994,12 +3000,12 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["cruyff"],
     "nacionalidad": "Países Bajos",
     "clubes": [
-      ("AFC Ajax", "LOGOS.ajax", "1964 - 1973"),
-      ("FC Barcelona", "LOGOS.barca", "1973 - 1978"),
-      ("Los Angeles Aztecs", "null", "1979"),
-      ("Levante UD", "null", "1981"),
-      ("AFC Ajax", "LOGOS.ajax", "1981 - 1983"),
-      ("Feyenoord", "null", "1983 - 1984")
+      c("AFC Ajax", LOGOS.ajax, "1964 - 1973"),
+      c("FC Barcelona", LOGOS.barca, "1973 - 1978"),
+      c("Los Angeles Aztecs", null, "1979"),
+      c("Levante UD", null, "1981"),
+      c("AFC Ajax", LOGOS.ajax, "1981 - 1983"),
+      c("Feyenoord", null, "1983 - 1984")
     ]
   },
   {
@@ -3010,7 +3016,7 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["foden"],
     "nacionalidad": "Inglaterra",
     "clubes": [
-      ("Manchester City", "LOGOS.mancity", "2017 - Presente")
+      c("Manchester City", LOGOS.mancity, "2017 - Presente")
     ]
   },
   {
@@ -3021,7 +3027,7 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["gavi", "pablo gavi"],
     "nacionalidad": "España",
     "clubes": [
-      ("FC Barcelona", "LOGOS.barca", "2021 - Presente")
+      c("FC Barcelona", LOGOS.barca, "2021 - Presente")
     ]
   },
   {
@@ -3032,7 +3038,7 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["nico williams"],
     "nacionalidad": "España",
     "clubes": [
-      ("Athletic Club", "LOGOS.athletic", "2021 - Presente")
+      c("Athletic Club", LOGOS.athletic, "2021 - Presente")
     ]
   },
   {
@@ -3043,9 +3049,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["olmo", "dani olmo"],
     "nacionalidad": "España",
     "clubes": [
-      ("Dinamo Zagreb", "null", "2015 - 2020"),
-      ("RB Leipzig", "null", "2020 - 2024"),
-      ("FC Barcelona", "LOGOS.barca", "2024 - Presente")
+      c("Dinamo Zagreb", null, "2015 - 2020"),
+      c("RB Leipzig", null, "2020 - 2024"),
+      c("FC Barcelona", LOGOS.barca, "2024 - Presente")
     ]
   },
   {
@@ -3056,8 +3062,8 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["palmer", "cole palmer"],
     "nacionalidad": "Inglaterra",
     "clubes": [
-      ("Manchester City", "LOGOS.mancity", "2020 - 2023"),
-      ("Chelsea FC", "LOGOS.chelsea", "2023 - Presente")
+      c("Manchester City", LOGOS.mancity, "2020 - 2023"),
+      c("Chelsea FC", LOGOS.chelsea, "2023 - Presente")
     ]
   },
   {
@@ -3068,7 +3074,7 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["musiala"],
     "nacionalidad": "Alemania",
     "clubes": [
-      ("Bayern Múnich", "LOGOS.bayern", "2020 - Presente")
+      c("Bayern Múnich", LOGOS.bayern, "2020 - Presente")
     ]
   },
   {
@@ -3079,7 +3085,7 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["wirtz"],
     "nacionalidad": "Alemania",
     "clubes": [
-      ("Bayer Leverkusen", "null", "2020 - Presente")
+      c("Bayer Leverkusen", null, "2020 - Presente")
     ]
   },
   {
@@ -3090,12 +3096,12 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["odegaard"],
     "nacionalidad": "Noruega",
     "clubes": [
-      ("Strømsgodset", "null", "2014 - 2015"),
-      ("Real Madrid", "LOGOS.madrid", "2015 - 2021"),
-      ("SC Heerenveen", "null", "2017 - 2018"),
-      ("Vitesse Arnhem", "null", "2018 - 2019"),
-      ("Real Sociedad", "LOGOS.sociedad", "2019 - 2020"),
-      ("Arsenal FC", "LOGOS.arsenal", "2021 - Presente")
+      c("Strømsgodset", null, "2014 - 2015"),
+      c("Real Madrid", LOGOS.madrid, "2015 - 2021"),
+      c("SC Heerenveen", null, "2017 - 2018"),
+      c("Vitesse Arnhem", null, "2018 - 2019"),
+      c("Real Sociedad", LOGOS.sociedad, "2019 - 2020"),
+      c("Arsenal FC", LOGOS.arsenal, "2021 - Presente")
     ]
   },
   {
@@ -3106,8 +3112,8 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["rice", "declan rice"],
     "nacionalidad": "Inglaterra",
     "clubes": [
-      ("West Ham United", "null", "2017 - 2023"),
-      ("Arsenal FC", "LOGOS.arsenal", "2023 - Presente")
+      c("West Ham United", null, "2017 - 2023"),
+      c("Arsenal FC", LOGOS.arsenal, "2023 - Presente")
     ]
   },
   {
@@ -3118,8 +3124,8 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["rashford"],
     "nacionalidad": "Inglaterra",
     "clubes": [
-      ("Manchester United", "LOGOS.manutd", "2015 - Presente"),
-      ("Aston Villa", "null", "2025")
+      c("Manchester United", LOGOS.manutd, "2015 - Presente"),
+      c("Aston Villa", null, "2025")
     ]
   },
   {
@@ -3130,8 +3136,8 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["alexander-arnold", "arnold", "taa"],
     "nacionalidad": "Inglaterra",
     "clubes": [
-      ("Liverpool FC", "LOGOS.liverpool", "2016 - 2025"),
-      ("Real Madrid", "LOGOS.madrid", "2025 - Presente")
+      c("Liverpool FC", LOGOS.liverpool, "2016 - 2025"),
+      c("Real Madrid", LOGOS.madrid, "2025 - Presente")
     ]
   },
   {
@@ -3142,9 +3148,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["grealish"],
     "nacionalidad": "Inglaterra",
     "clubes": [
-      ("Notts County", "null", "2013 - 2014"),
-      ("Aston Villa", "null", "2014 - 2021"),
-      ("Manchester City", "LOGOS.mancity", "2021 - Presente")
+      c("Notts County", null, "2013 - 2014"),
+      c("Aston Villa", null, "2014 - 2021"),
+      c("Manchester City", LOGOS.mancity, "2021 - Presente")
     ]
   },
   {
@@ -3155,11 +3161,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["walker", "kyle walker"],
     "nacionalidad": "Inglaterra",
     "clubes": [
-      ("Sheffield United", "null", "2008 - 2009"),
-      ("Tottenham Hotspur", "LOGOS.tottenham", "2009 - 2017"),
-      ("Aston Villa", "null", "2011"),
-      ("Manchester City", "LOGOS.mancity", "2017 - 2025"),
-      ("AC Milan", "LOGOS.milan", "2025 - Presente")
+      c("Sheffield United", null, "2008 - 2009"),
+      c("Tottenham Hotspur", LOGOS.tottenham, "2009 - 2017"),
+      c("Aston Villa", null, "2011"),
+      c("Manchester City", LOGOS.mancity, "2017 - 2025"),
+      c("AC Milan", LOGOS.milan, "2025 - Presente")
     ]
   },
   {
@@ -3170,9 +3176,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["stones"],
     "nacionalidad": "Inglaterra",
     "clubes": [
-      ("Barnsley FC", "null", "2011 - 2013"),
-      ("Everton FC", "null", "2013 - 2016"),
-      ("Manchester City", "LOGOS.mancity", "2016 - Presente")
+      c("Barnsley FC", null, "2011 - 2013"),
+      c("Everton FC", null, "2013 - 2016"),
+      c("Manchester City", LOGOS.mancity, "2016 - Presente")
     ]
   },
   {
@@ -3183,8 +3189,8 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["ruben dias"],
     "nacionalidad": "Portugal",
     "clubes": [
-      ("SL Benfica", "LOGOS.benfica", "2017 - 2020"),
-      ("Manchester City", "LOGOS.mancity", "2020 - Presente")
+      c("SL Benfica", LOGOS.benfica, "2017 - 2020"),
+      c("Manchester City", LOGOS.mancity, "2020 - Presente")
     ]
   },
   {
@@ -3195,9 +3201,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["ederson"],
     "nacionalidad": "Brasil",
     "clubes": [
-      ("Rio Ave", "null", "2012 - 2015"),
-      ("SL Benfica", "LOGOS.benfica", "2015 - 2017"),
-      ("Manchester City", "LOGOS.mancity", "2017 - Presente")
+      c("Rio Ave", null, "2012 - 2015"),
+      c("SL Benfica", LOGOS.benfica, "2015 - 2017"),
+      c("Manchester City", LOGOS.mancity, "2017 - Presente")
     ]
   },
   {
@@ -3208,8 +3214,8 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["donnarumma"],
     "nacionalidad": "Italia",
     "clubes": [
-      ("AC Milan", "LOGOS.milan", "2015 - 2021"),
-      ("Paris Saint-Germain", "LOGOS.psg", "2021 - Presente")
+      c("AC Milan", LOGOS.milan, "2015 - 2021"),
+      c("Paris Saint-Germain", LOGOS.psg, "2021 - Presente")
     ]
   },
   {
@@ -3220,10 +3226,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["dibu martinez", "dibu", "emiliano martinez"],
     "nacionalidad": "Argentina",
     "clubes": [
-      ("Arsenal FC", "LOGOS.arsenal", "2012 - 2020"),
-      ("Getafe CF", "null", "2017 - 2018"),
-      ("Reading FC", "null", "2019"),
-      ("Aston Villa", "null", "2020 - Presente")
+      c("Arsenal FC", LOGOS.arsenal, "2012 - 2020"),
+      c("Getafe CF", null, "2017 - 2018"),
+      c("Reading FC", null, "2019"),
+      c("Aston Villa", null, "2020 - Presente")
     ]
   },
   {
@@ -3234,10 +3240,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["rudiger"],
     "nacionalidad": "Alemania",
     "clubes": [
-      ("VfB Stuttgart", "null", "2012 - 2015"),
-      ("AS Roma", "LOGOS.roma", "2015 - 2017"),
-      ("Chelsea FC", "LOGOS.chelsea", "2017 - 2022"),
-      ("Real Madrid", "LOGOS.madrid", "2022 - Presente")
+      c("VfB Stuttgart", null, "2012 - 2015"),
+      c("AS Roma", LOGOS.roma, "2015 - 2017"),
+      c("Chelsea FC", LOGOS.chelsea, "2017 - 2022"),
+      c("Real Madrid", LOGOS.madrid, "2022 - Presente")
     ]
   },
   {
@@ -3248,9 +3254,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["militao"],
     "nacionalidad": "Brasil",
     "clubes": [
-      ("São Paulo FC", "null", "2017 - 2018"),
-      ("FC Porto", "LOGOS.porto", "2018 - 2019"),
-      ("Real Madrid", "LOGOS.madrid", "2019 - Presente")
+      c("São Paulo FC", null, "2017 - 2018"),
+      c("FC Porto", LOGOS.porto, "2018 - 2019"),
+      c("Real Madrid", LOGOS.madrid, "2019 - Presente")
     ]
   },
   {
@@ -3261,8 +3267,8 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["camavinga"],
     "nacionalidad": "Francia",
     "clubes": [
-      ("Stade Rennais", "null", "2019 - 2021"),
-      ("Real Madrid", "LOGOS.madrid", "2021 - Presente")
+      c("Stade Rennais", null, "2019 - 2021"),
+      c("Real Madrid", LOGOS.madrid, "2021 - Presente")
     ]
   },
   {
@@ -3273,9 +3279,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["tchouameni"],
     "nacionalidad": "Francia",
     "clubes": [
-      ("Girondins de Burdeos", "null", "2018 - 2020"),
-      ("AS Mónaco", "LOGOS.monaco", "2020 - 2022"),
-      ("Real Madrid", "LOGOS.madrid", "2022 - Presente")
+      c("Girondins de Burdeos", null, "2018 - 2020"),
+      c("AS Mónaco", LOGOS.monaco, "2020 - 2022"),
+      c("Real Madrid", LOGOS.madrid, "2022 - Presente")
     ]
   },
   {
@@ -3286,9 +3292,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["kounde"],
     "nacionalidad": "Francia",
     "clubes": [
-      ("Girondins de Burdeos", "null", "2017 - 2019"),
-      ("Sevilla FC", "LOGOS.sevilla", "2019 - 2022"),
-      ("FC Barcelona", "LOGOS.barca", "2022 - Presente")
+      c("Girondins de Burdeos", null, "2017 - 2019"),
+      c("Sevilla FC", LOGOS.sevilla, "2019 - 2022"),
+      c("FC Barcelona", LOGOS.barca, "2022 - Presente")
     ]
   },
   {
@@ -3299,9 +3305,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["araujo"],
     "nacionalidad": "Uruguay",
     "clubes": [
-      ("Rentistas", "null", "2016 - 2017"),
-      ("Boston River", "null", "2017 - 2018"),
-      ("FC Barcelona", "LOGOS.barca", "2019 - Presente")
+      c("Rentistas", null, "2016 - 2017"),
+      c("Boston River", null, "2017 - 2018"),
+      c("FC Barcelona", LOGOS.barca, "2019 - Presente")
     ]
   },
   {
@@ -3312,9 +3318,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["leao", "rafael leao"],
     "nacionalidad": "Portugal",
     "clubes": [
-      ("Sporting CP", "LOGOS.sporting", "2017 - 2018"),
-      ("Lille OSC", "null", "2018 - 2019"),
-      ("AC Milan", "LOGOS.milan", "2019 - Presente")
+      c("Sporting CP", LOGOS.sporting, "2017 - 2018"),
+      c("Lille OSC", null, "2018 - 2019"),
+      c("AC Milan", LOGOS.milan, "2019 - Presente")
     ]
   },
   {
@@ -3325,10 +3331,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["theo hernandez", "theo"],
     "nacionalidad": "Francia",
     "clubes": [
-      ("Deportivo Alavés", "null", "2016 - 2017"),
-      ("Real Madrid", "LOGOS.madrid", "2017 - 2019"),
-      ("Real Sociedad", "LOGOS.sociedad", "2018 - 2019"),
-      ("AC Milan", "LOGOS.milan", "2019 - Presente")
+      c("Deportivo Alavés", null, "2016 - 2017"),
+      c("Real Madrid", LOGOS.madrid, "2017 - 2019"),
+      c("Real Sociedad", LOGOS.sociedad, "2018 - 2019"),
+      c("AC Milan", LOGOS.milan, "2019 - Presente")
     ]
   },
   {
@@ -3339,10 +3345,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["kvaratskhelia", "kvara"],
     "nacionalidad": "Georgia",
     "clubes": [
-      ("Rubin Kazán", "null", "2019 - 2022"),
-      ("Dinamo Batumi", "null", "2022"),
-      ("SSC Napoli", "LOGOS.napoli", "2022 - 2025"),
-      ("Paris Saint-Germain", "LOGOS.psg", "2025 - Presente")
+      c("Rubin Kazán", null, "2019 - 2022"),
+      c("Dinamo Batumi", null, "2022"),
+      c("SSC Napoli", LOGOS.napoli, "2022 - 2025"),
+      c("Paris Saint-Germain", LOGOS.psg, "2025 - Presente")
     ]
   },
   {
@@ -3353,9 +3359,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["barella"],
     "nacionalidad": "Italia",
     "clubes": [
-      ("Cagliari", "null", "2014 - 2019"),
-      ("Como 1907", "null", "2016"),
-      ("Inter de Milán", "LOGOS.inter", "2019 - Presente")
+      c("Cagliari", null, "2014 - 2019"),
+      c("Como 1907", null, "2016"),
+      c("Inter de Milán", LOGOS.inter, "2019 - Presente")
     ]
   },
   {
@@ -3366,12 +3372,12 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["joao felix"],
     "nacionalidad": "Portugal",
     "clubes": [
-      ("SL Benfica", "LOGOS.benfica", "2018 - 2019"),
-      ("Atlético de Madrid", "LOGOS.atletico", "2019 - 2024"),
-      ("Chelsea FC", "LOGOS.chelsea", "2023"),
-      ("FC Barcelona", "LOGOS.barca", "2023 - 2024"),
-      ("Chelsea FC", "LOGOS.chelsea", "2024 - 2025"),
-      ("AC Milan", "LOGOS.milan", "2025 - Presente")
+      c("SL Benfica", LOGOS.benfica, "2018 - 2019"),
+      c("Atlético de Madrid", LOGOS.atletico, "2019 - 2024"),
+      c("Chelsea FC", LOGOS.chelsea, "2023"),
+      c("FC Barcelona", LOGOS.barca, "2023 - 2024"),
+      c("Chelsea FC", LOGOS.chelsea, "2024 - 2025"),
+      c("AC Milan", LOGOS.milan, "2025 - Presente")
     ]
   },
   {
@@ -3382,14 +3388,14 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["cancelo", "joao cancelo"],
     "nacionalidad": "Portugal",
     "clubes": [
-      ("SL Benfica", "LOGOS.benfica", "2014 - 2015"),
-      ("Valencia CF", "LOGOS.valencia", "2014 - 2018"),
-      ("Inter de Milán", "LOGOS.inter", "2017 - 2018"),
-      ("Juventus", "LOGOS.juventus", "2018 - 2019"),
-      ("Manchester City", "LOGOS.mancity", "2019 - 2024"),
-      ("Bayern Múnich", "LOGOS.bayern", "2023"),
-      ("FC Barcelona", "LOGOS.barca", "2023 - 2024"),
-      ("Al Hilal", "null", "2024 - Presente")
+      c("SL Benfica", LOGOS.benfica, "2014 - 2015"),
+      c("Valencia CF", LOGOS.valencia, "2014 - 2018"),
+      c("Inter de Milán", LOGOS.inter, "2017 - 2018"),
+      c("Juventus", LOGOS.juventus, "2018 - 2019"),
+      c("Manchester City", LOGOS.mancity, "2019 - 2024"),
+      c("Bayern Múnich", LOGOS.bayern, "2023"),
+      c("FC Barcelona", LOGOS.barca, "2023 - 2024"),
+      c("Al Hilal", null, "2024 - Presente")
     ]
   },
   {
@@ -3400,7 +3406,7 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["koke"],
     "nacionalidad": "España",
     "clubes": [
-      ("Atlético de Madrid", "LOGOS.atletico", "2009 - Presente")
+      c("Atlético de Madrid", LOGOS.atletico, "2009 - Presente")
     ]
   },
   {
@@ -3411,7 +3417,7 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["inaki williams"],
     "nacionalidad": "Ghana",
     "clubes": [
-      ("Athletic Club", "LOGOS.athletic", "2014 - Presente")
+      c("Athletic Club", LOGOS.athletic, "2014 - Presente")
     ]
   },
   {
@@ -3422,7 +3428,7 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["oyarzabal"],
     "nacionalidad": "España",
     "clubes": [
-      ("Real Sociedad", "LOGOS.sociedad", "2015 - Presente")
+      c("Real Sociedad", LOGOS.sociedad, "2015 - Presente")
     ]
   },
   {
@@ -3433,7 +3439,7 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["unai simon"],
     "nacionalidad": "España",
     "clubes": [
-      ("Athletic Club", "LOGOS.athletic", "2018 - Presente")
+      c("Athletic Club", LOGOS.athletic, "2018 - Presente")
     ]
   },
   {
@@ -3444,11 +3450,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["cucurella"],
     "nacionalidad": "España",
     "clubes": [
-      ("FC Barcelona", "LOGOS.barca", "2017 - 2020"),
-      ("SD Eibar", "null", "2018 - 2019"),
-      ("Getafe CF", "null", "2019 - 2021"),
-      ("Brighton & Hove Albion", "null", "2021 - 2022"),
-      ("Chelsea FC", "LOGOS.chelsea", "2022 - Presente")
+      c("FC Barcelona", LOGOS.barca, "2017 - 2020"),
+      c("SD Eibar", null, "2018 - 2019"),
+      c("Getafe CF", null, "2019 - 2021"),
+      c("Brighton & Hove Albion", null, "2021 - 2022"),
+      c("Chelsea FC", LOGOS.chelsea, "2022 - Presente")
     ]
   },
   {
@@ -3459,10 +3465,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["fabian", "fabian ruiz"],
     "nacionalidad": "España",
     "clubes": [
-      ("Real Betis", "LOGOS.betis", "2014 - 2018"),
-      ("Elche CF", "null", "2017"),
-      ("SSC Napoli", "LOGOS.napoli", "2018 - 2022"),
-      ("Paris Saint-Germain", "LOGOS.psg", "2022 - Presente")
+      c("Real Betis", LOGOS.betis, "2014 - 2018"),
+      c("Elche CF", null, "2017"),
+      c("SSC Napoli", LOGOS.napoli, "2018 - 2022"),
+      c("Paris Saint-Germain", LOGOS.psg, "2022 - Presente")
     ]
   },
   {
@@ -3473,10 +3479,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["pedro", "pedrito"],
     "nacionalidad": "España",
     "clubes": [
-      ("FC Barcelona", "LOGOS.barca", "2008 - 2015"),
-      ("Chelsea FC", "LOGOS.chelsea", "2015 - 2020"),
-      ("AS Roma", "LOGOS.roma", "2020 - 2021"),
-      ("Lazio", "null", "2021 - Presente")
+      c("FC Barcelona", LOGOS.barca, "2008 - 2015"),
+      c("Chelsea FC", LOGOS.chelsea, "2015 - 2020"),
+      c("AS Roma", LOGOS.roma, "2020 - 2021"),
+      c("Lazio", null, "2021 - Presente")
     ]
   },
   {
@@ -3487,12 +3493,12 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["mata", "juan mata"],
     "nacionalidad": "España",
     "clubes": [
-      ("Valencia CF", "LOGOS.valencia", "2007 - 2011"),
-      ("Chelsea FC", "LOGOS.chelsea", "2011 - 2014"),
-      ("Manchester United", "LOGOS.manutd", "2014 - 2022"),
-      ("Galatasaray", "null", "2022 - 2023"),
-      ("Vissel Kobe", "null", "2023"),
-      ("Western Sydney Wanderers", "null", "2024 - Presente")
+      c("Valencia CF", LOGOS.valencia, "2007 - 2011"),
+      c("Chelsea FC", LOGOS.chelsea, "2011 - 2014"),
+      c("Manchester United", LOGOS.manutd, "2014 - 2022"),
+      c("Galatasaray", null, "2022 - 2023"),
+      c("Vissel Kobe", null, "2023"),
+      c("Western Sydney Wanderers", null, "2024 - Presente")
     ]
   },
   {
@@ -3503,11 +3509,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["azpilicueta", "dave"],
     "nacionalidad": "España",
     "clubes": [
-      ("CA Osasuna", "null", "2007 - 2010"),
-      ("Olympique de Marsella", "LOGOS.marseille", "2010 - 2012"),
-      ("Chelsea FC", "LOGOS.chelsea", "2012 - 2023"),
-      ("Atlético de Madrid", "LOGOS.atletico", "2023 - 2025"),
-      ("Sevilla FC", "LOGOS.sevilla", "2025 - Presente")
+      c("CA Osasuna", null, "2007 - 2010"),
+      c("Olympique de Marsella", LOGOS.marseille, "2010 - 2012"),
+      c("Chelsea FC", LOGOS.chelsea, "2012 - 2023"),
+      c("Atlético de Madrid", LOGOS.atletico, "2023 - 2025"),
+      c("Sevilla FC", LOGOS.sevilla, "2025 - Presente")
     ]
   },
   {
@@ -3518,13 +3524,13 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["marcos alonso"],
     "nacionalidad": "España",
     "clubes": [
-      ("Real Madrid", "LOGOS.madrid", "2010"),
-      ("Bolton Wanderers", "null", "2010 - 2013"),
-      ("Fiorentina", "null", "2013 - 2016"),
-      ("Sunderland", "null", "2014"),
-      ("Chelsea FC", "LOGOS.chelsea", "2016 - 2022"),
-      ("FC Barcelona", "LOGOS.barca", "2022 - 2024"),
-      ("Celta de Vigo", "LOGOS.celta", "2024 - Presente")
+      c("Real Madrid", LOGOS.madrid, "2010"),
+      c("Bolton Wanderers", null, "2010 - 2013"),
+      c("Fiorentina", null, "2013 - 2016"),
+      c("Sunderland", null, "2014"),
+      c("Chelsea FC", LOGOS.chelsea, "2016 - 2022"),
+      c("FC Barcelona", LOGOS.barca, "2022 - 2024"),
+      c("Celta de Vigo", LOGOS.celta, "2024 - Presente")
     ]
   },
   {
@@ -3535,10 +3541,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["saul", "saul niguez"],
     "nacionalidad": "España",
     "clubes": [
-      ("Atlético de Madrid", "LOGOS.atletico", "2012 - Presente"),
-      ("Rayo Vallecano", "null", "2013 - 2014"),
-      ("Chelsea FC", "LOGOS.chelsea", "2021 - 2022"),
-      ("Sevilla FC", "LOGOS.sevilla", "2024 - 2025")
+      c("Atlético de Madrid", LOGOS.atletico, "2012 - Presente"),
+      c("Rayo Vallecano", null, "2013 - 2014"),
+      c("Chelsea FC", LOGOS.chelsea, "2021 - 2022"),
+      c("Sevilla FC", LOGOS.sevilla, "2024 - 2025")
     ]
   },
   {
@@ -3549,9 +3555,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["marcos llorente", "llorente"],
     "nacionalidad": "España",
     "clubes": [
-      ("Real Madrid", "LOGOS.madrid", "2015 - 2019"),
-      ("Deportivo Alavés", "null", "2016 - 2017"),
-      ("Atlético de Madrid", "LOGOS.atletico", "2019 - Presente")
+      c("Real Madrid", LOGOS.madrid, "2015 - 2019"),
+      c("Deportivo Alavés", null, "2016 - 2017"),
+      c("Atlético de Madrid", LOGOS.atletico, "2019 - Presente")
     ]
   },
   {
@@ -3562,8 +3568,8 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["lucas vazquez"],
     "nacionalidad": "España",
     "clubes": [
-      ("RCD Espanyol", "LOGOS.espanyol", "2014 - 2015"),
-      ("Real Madrid", "LOGOS.madrid", "2015 - 2025")
+      c("RCD Espanyol", LOGOS.espanyol, "2014 - 2015"),
+      c("Real Madrid", LOGOS.madrid, "2015 - 2025")
     ]
   },
   {
@@ -3574,8 +3580,8 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["nacho"],
     "nacionalidad": "España",
     "clubes": [
-      ("Real Madrid", "LOGOS.madrid", "2011 - 2024"),
-      ("Al Qadsiah", "null", "2024 - Presente")
+      c("Real Madrid", LOGOS.madrid, "2011 - 2024"),
+      c("Al Qadsiah", null, "2024 - Presente")
     ]
   },
   {
@@ -3586,15 +3592,15 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["joselu"],
     "nacionalidad": "España",
     "clubes": [
-      ("Celta de Vigo", "LOGOS.celta", "2009 - 2010"),
-      ("TSG Hoffenheim", "null", "2012 - 2014"),
-      ("Stoke City", "null", "2015 - 2017"),
-      ("Deportivo La Coruña", "LOGOS.depor", "2016 - 2017"),
-      ("Newcastle United", "null", "2017 - 2019"),
-      ("Deportivo Alavés", "null", "2019 - 2022"),
-      ("RCD Espanyol", "LOGOS.espanyol", "2022 - 2023"),
-      ("Real Madrid", "LOGOS.madrid", "2023 - 2024"),
-      ("Al Gharafa", "null", "2024 - Presente")
+      c("Celta de Vigo", LOGOS.celta, "2009 - 2010"),
+      c("TSG Hoffenheim", null, "2012 - 2014"),
+      c("Stoke City", null, "2015 - 2017"),
+      c("Deportivo La Coruña", LOGOS.depor, "2016 - 2017"),
+      c("Newcastle United", null, "2017 - 2019"),
+      c("Deportivo Alavés", null, "2019 - 2022"),
+      c("RCD Espanyol", LOGOS.espanyol, "2022 - 2023"),
+      c("Real Madrid", LOGOS.madrid, "2023 - 2024"),
+      c("Al Gharafa", null, "2024 - Presente")
     ]
   },
   {
@@ -3605,10 +3611,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["gerard moreno"],
     "nacionalidad": "España",
     "clubes": [
-      ("Villarreal CF", "LOGOS.villarreal", "2012 - 2015"),
-      ("RCD Mallorca", "null", "2013 - 2014"),
-      ("RCD Espanyol", "LOGOS.espanyol", "2015 - 2018"),
-      ("Villarreal CF", "LOGOS.villarreal", "2018 - Presente")
+      c("Villarreal CF", LOGOS.villarreal, "2012 - 2015"),
+      c("RCD Mallorca", null, "2013 - 2014"),
+      c("RCD Espanyol", LOGOS.espanyol, "2015 - 2018"),
+      c("Villarreal CF", LOGOS.villarreal, "2018 - Presente")
     ]
   },
   {
@@ -3619,11 +3625,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["parejo", "dani parejo"],
     "nacionalidad": "España",
     "clubes": [
-      ("Real Madrid", "LOGOS.madrid", "2008 - 2009"),
-      ("Queens Park Rangers", "null", "2008"),
-      ("Getafe CF", "null", "2009 - 2011"),
-      ("Valencia CF", "LOGOS.valencia", "2011 - 2020"),
-      ("Villarreal CF", "LOGOS.villarreal", "2020 - Presente")
+      c("Real Madrid", LOGOS.madrid, "2008 - 2009"),
+      c("Queens Park Rangers", null, "2008"),
+      c("Getafe CF", null, "2009 - 2011"),
+      c("Valencia CF", LOGOS.valencia, "2011 - 2020"),
+      c("Villarreal CF", LOGOS.villarreal, "2020 - Presente")
     ]
   },
   {
@@ -3634,11 +3640,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["albiol", "raul albiol"],
     "nacionalidad": "España",
     "clubes": [
-      ("Getafe CF", "null", "2004 - 2005"),
-      ("Valencia CF", "LOGOS.valencia", "2005 - 2009"),
-      ("Real Madrid", "LOGOS.madrid", "2009 - 2013"),
-      ("SSC Napoli", "LOGOS.napoli", "2013 - 2019"),
-      ("Villarreal CF", "LOGOS.villarreal", "2019 - 2025")
+      c("Getafe CF", null, "2004 - 2005"),
+      c("Valencia CF", LOGOS.valencia, "2005 - 2009"),
+      c("Real Madrid", LOGOS.madrid, "2009 - 2013"),
+      c("SSC Napoli", LOGOS.napoli, "2013 - 2019"),
+      c("Villarreal CF", LOGOS.villarreal, "2019 - 2025")
     ]
   },
   {
@@ -3649,12 +3655,12 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["callejon"],
     "nacionalidad": "España",
     "clubes": [
-      ("RCD Espanyol", "LOGOS.espanyol", "2008 - 2011"),
-      ("Real Madrid", "LOGOS.madrid", "2011 - 2013"),
-      ("SSC Napoli", "LOGOS.napoli", "2013 - 2020"),
-      ("Fiorentina", "null", "2020 - 2022"),
-      ("Granada CF", "null", "2022 - 2024"),
-      ("Marbella FC", "null", "2024 - 2025")
+      c("RCD Espanyol", LOGOS.espanyol, "2008 - 2011"),
+      c("Real Madrid", LOGOS.madrid, "2011 - 2013"),
+      c("SSC Napoli", LOGOS.napoli, "2013 - 2020"),
+      c("Fiorentina", null, "2020 - 2022"),
+      c("Granada CF", null, "2022 - 2024"),
+      c("Marbella FC", null, "2024 - 2025")
     ]
   },
   {
@@ -3665,16 +3671,16 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["reina", "pepe reina"],
     "nacionalidad": "España",
     "clubes": [
-      ("FC Barcelona", "LOGOS.barca", "2000 - 2002"),
-      ("Villarreal CF", "LOGOS.villarreal", "2002 - 2005"),
-      ("Liverpool FC", "LOGOS.liverpool", "2005 - 2014"),
-      ("SSC Napoli", "LOGOS.napoli", "2013 - 2014"),
-      ("Bayern Múnich", "LOGOS.bayern", "2014 - 2015"),
-      ("SSC Napoli", "LOGOS.napoli", "2015 - 2018"),
-      ("AC Milan", "LOGOS.milan", "2018 - 2020"),
-      ("Lazio", "null", "2020 - 2022"),
-      ("Villarreal CF", "LOGOS.villarreal", "2022 - 2024"),
-      ("Como 1907", "null", "2024 - 2025")
+      c("FC Barcelona", LOGOS.barca, "2000 - 2002"),
+      c("Villarreal CF", LOGOS.villarreal, "2002 - 2005"),
+      c("Liverpool FC", LOGOS.liverpool, "2005 - 2014"),
+      c("SSC Napoli", LOGOS.napoli, "2013 - 2014"),
+      c("Bayern Múnich", LOGOS.bayern, "2014 - 2015"),
+      c("SSC Napoli", LOGOS.napoli, "2015 - 2018"),
+      c("AC Milan", LOGOS.milan, "2018 - 2020"),
+      c("Lazio", null, "2020 - 2022"),
+      c("Villarreal CF", LOGOS.villarreal, "2022 - 2024"),
+      c("Como 1907", null, "2024 - 2025")
     ]
   },
   {
@@ -3685,10 +3691,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["valdes", "victor valdes"],
     "nacionalidad": "España",
     "clubes": [
-      ("FC Barcelona", "LOGOS.barca", "2002 - 2014"),
-      ("Manchester United", "LOGOS.manutd", "2015 - 2016"),
-      ("Standard de Lieja", "null", "2016"),
-      ("Middlesbrough FC", "null", "2016 - 2017")
+      c("FC Barcelona", LOGOS.barca, "2002 - 2014"),
+      c("Manchester United", LOGOS.manutd, "2015 - 2016"),
+      c("Standard de Lieja", null, "2016"),
+      c("Middlesbrough FC", null, "2016 - 2017")
     ]
   },
   {
@@ -3699,11 +3705,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["arbeloa"],
     "nacionalidad": "España",
     "clubes": [
-      ("Real Madrid", "LOGOS.madrid", "2004 - 2006"),
-      ("Deportivo La Coruña", "LOGOS.depor", "2006 - 2007"),
-      ("Liverpool FC", "LOGOS.liverpool", "2007 - 2009"),
-      ("Real Madrid", "LOGOS.madrid", "2009 - 2016"),
-      ("West Ham United", "null", "2016 - 2017")
+      c("Real Madrid", LOGOS.madrid, "2004 - 2006"),
+      c("Deportivo La Coruña", LOGOS.depor, "2006 - 2007"),
+      c("Liverpool FC", LOGOS.liverpool, "2007 - 2009"),
+      c("Real Madrid", LOGOS.madrid, "2009 - 2016"),
+      c("West Ham United", null, "2016 - 2017")
     ]
   },
   {
@@ -3714,14 +3720,14 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["fernando llorente"],
     "nacionalidad": "España",
     "clubes": [
-      ("Athletic Club", "LOGOS.athletic", "2005 - 2013"),
-      ("Juventus", "LOGOS.juventus", "2013 - 2015"),
-      ("Sevilla FC", "LOGOS.sevilla", "2015 - 2016"),
-      ("Swansea City", "null", "2016 - 2017"),
-      ("Tottenham Hotspur", "LOGOS.tottenham", "2017 - 2019"),
-      ("SSC Napoli", "LOGOS.napoli", "2019 - 2021"),
-      ("Udinese", "null", "2021"),
-      ("SD Eibar", "null", "2021 - 2022")
+      c("Athletic Club", LOGOS.athletic, "2005 - 2013"),
+      c("Juventus", LOGOS.juventus, "2013 - 2015"),
+      c("Sevilla FC", LOGOS.sevilla, "2015 - 2016"),
+      c("Swansea City", null, "2016 - 2017"),
+      c("Tottenham Hotspur", LOGOS.tottenham, "2017 - 2019"),
+      c("SSC Napoli", LOGOS.napoli, "2019 - 2021"),
+      c("Udinese", null, "2021"),
+      c("SD Eibar", null, "2021 - 2022")
     ]
   },
   {
@@ -3732,9 +3738,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["javi martinez"],
     "nacionalidad": "España",
     "clubes": [
-      ("Athletic Club", "LOGOS.athletic", "2006 - 2012"),
-      ("Bayern Múnich", "LOGOS.bayern", "2012 - 2021"),
-      ("Qatar SC", "null", "2021 - Presente")
+      c("Athletic Club", LOGOS.athletic, "2006 - 2012"),
+      c("Bayern Múnich", LOGOS.bayern, "2012 - 2021"),
+      c("Qatar SC", null, "2021 - Presente")
     ]
   },
   {
@@ -3745,12 +3751,12 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["ander herrera", "herrera"],
     "nacionalidad": "España",
     "clubes": [
-      ("Real Zaragoza", "null", "2009 - 2011"),
-      ("Athletic Club", "LOGOS.athletic", "2011 - 2014"),
-      ("Manchester United", "LOGOS.manutd", "2014 - 2019"),
-      ("Paris Saint-Germain", "LOGOS.psg", "2019 - 2022"),
-      ("Athletic Club", "LOGOS.athletic", "2022 - 2025"),
-      ("Boca Juniors", "LOGOS.boca", "2025 - Presente")
+      c("Real Zaragoza", null, "2009 - 2011"),
+      c("Athletic Club", LOGOS.athletic, "2011 - 2014"),
+      c("Manchester United", LOGOS.manutd, "2014 - 2019"),
+      c("Paris Saint-Germain", LOGOS.psg, "2019 - 2022"),
+      c("Athletic Club", LOGOS.athletic, "2022 - 2025"),
+      c("Boca Juniors", LOGOS.boca, "2025 - Presente")
     ]
   },
   {
@@ -3761,8 +3767,8 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["muniain"],
     "nacionalidad": "España",
     "clubes": [
-      ("Athletic Club", "LOGOS.athletic", "2009 - 2024"),
-      ("San Lorenzo", "null", "2024 - 2025")
+      c("Athletic Club", LOGOS.athletic, "2009 - 2024"),
+      c("San Lorenzo", null, "2024 - 2025")
     ]
   },
   {
@@ -3773,14 +3779,14 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["negredo"],
     "nacionalidad": "España",
     "clubes": [
-      ("UD Almería", "null", "2007 - 2009"),
-      ("Sevilla FC", "LOGOS.sevilla", "2009 - 2013"),
-      ("Manchester City", "LOGOS.mancity", "2013 - 2015"),
-      ("Valencia CF", "LOGOS.valencia", "2014 - 2017"),
-      ("Middlesbrough FC", "null", "2016 - 2017"),
-      ("Besiktas", "null", "2017 - 2018"),
-      ("Cádiz CF", "null", "2020 - 2024"),
-      ("Real Valladolid", "null", "2024")
+      c("UD Almería", null, "2007 - 2009"),
+      c("Sevilla FC", LOGOS.sevilla, "2009 - 2013"),
+      c("Manchester City", LOGOS.mancity, "2013 - 2015"),
+      c("Valencia CF", LOGOS.valencia, "2014 - 2017"),
+      c("Middlesbrough FC", null, "2016 - 2017"),
+      c("Besiktas", null, "2017 - 2018"),
+      c("Cádiz CF", null, "2020 - 2024"),
+      c("Real Valladolid", null, "2024")
     ]
   },
   {
@@ -3791,15 +3797,15 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["soldado"],
     "nacionalidad": "España",
     "clubes": [
-      ("Real Madrid", "LOGOS.madrid", "2005 - 2008"),
-      ("CA Osasuna", "null", "2006 - 2007"),
-      ("Getafe CF", "null", "2008 - 2010"),
-      ("Valencia CF", "LOGOS.valencia", "2010 - 2013"),
-      ("Tottenham Hotspur", "LOGOS.tottenham", "2013 - 2015"),
-      ("Villarreal CF", "LOGOS.villarreal", "2015 - 2017"),
-      ("Fenerbahçe", "null", "2017 - 2019"),
-      ("Granada CF", "null", "2019 - 2021"),
-      ("Levante UD", "null", "2021 - 2023")
+      c("Real Madrid", LOGOS.madrid, "2005 - 2008"),
+      c("CA Osasuna", null, "2006 - 2007"),
+      c("Getafe CF", null, "2008 - 2010"),
+      c("Valencia CF", LOGOS.valencia, "2010 - 2013"),
+      c("Tottenham Hotspur", LOGOS.tottenham, "2013 - 2015"),
+      c("Villarreal CF", LOGOS.villarreal, "2015 - 2017"),
+      c("Fenerbahçe", null, "2017 - 2019"),
+      c("Granada CF", null, "2019 - 2021"),
+      c("Levante UD", null, "2021 - 2023")
     ]
   },
   {
@@ -3810,12 +3816,12 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["canales"],
     "nacionalidad": "España",
     "clubes": [
-      ("Racing de Santander", "null", "2008 - 2010"),
-      ("Real Madrid", "LOGOS.madrid", "2010 - 2011"),
-      ("Valencia CF", "LOGOS.valencia", "2011 - 2014"),
-      ("Real Sociedad", "LOGOS.sociedad", "2014 - 2018"),
-      ("Real Betis", "LOGOS.betis", "2018 - 2023"),
-      ("CF Monterrey", "null", "2023 - Presente")
+      c("Racing de Santander", null, "2008 - 2010"),
+      c("Real Madrid", LOGOS.madrid, "2010 - 2011"),
+      c("Valencia CF", LOGOS.valencia, "2011 - 2014"),
+      c("Real Sociedad", LOGOS.sociedad, "2014 - 2018"),
+      c("Real Betis", LOGOS.betis, "2018 - 2023"),
+      c("CF Monterrey", null, "2023 - Presente")
     ]
   },
   {
@@ -3826,11 +3832,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["sarabia"],
     "nacionalidad": "España",
     "clubes": [
-      ("Getafe CF", "null", "2011 - 2016"),
-      ("Sevilla FC", "LOGOS.sevilla", "2016 - 2019"),
-      ("Paris Saint-Germain", "LOGOS.psg", "2019 - 2023"),
-      ("Sporting CP", "LOGOS.sporting", "2021 - 2022"),
-      ("Wolverhampton", "null", "2023 - Presente")
+      c("Getafe CF", null, "2011 - 2016"),
+      c("Sevilla FC", LOGOS.sevilla, "2016 - 2019"),
+      c("Paris Saint-Germain", LOGOS.psg, "2019 - 2023"),
+      c("Sporting CP", LOGOS.sporting, "2021 - 2022"),
+      c("Wolverhampton", null, "2023 - Presente")
     ]
   },
   {
@@ -3841,9 +3847,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["ferran torres", "ferran"],
     "nacionalidad": "España",
     "clubes": [
-      ("Valencia CF", "LOGOS.valencia", "2017 - 2020"),
-      ("Manchester City", "LOGOS.mancity", "2020 - 2021"),
-      ("FC Barcelona", "LOGOS.barca", "2022 - Presente")
+      c("Valencia CF", LOGOS.valencia, "2017 - 2020"),
+      c("Manchester City", LOGOS.mancity, "2020 - 2021"),
+      c("FC Barcelona", LOGOS.barca, "2022 - Presente")
     ]
   },
   {
@@ -3854,9 +3860,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["laporte"],
     "nacionalidad": "España",
     "clubes": [
-      ("Athletic Club", "LOGOS.athletic", "2012 - 2018"),
-      ("Manchester City", "LOGOS.mancity", "2018 - 2023"),
-      ("Al Nassr", "null", "2023 - Presente")
+      c("Athletic Club", LOGOS.athletic, "2012 - 2018"),
+      c("Manchester City", LOGOS.mancity, "2018 - 2023"),
+      c("Al Nassr", null, "2023 - Presente")
     ]
   },
   {
@@ -3867,9 +3873,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["le normand"],
     "nacionalidad": "España",
     "clubes": [
-      ("Stade Brestois", "null", "2016"),
-      ("Real Sociedad", "LOGOS.sociedad", "2018 - 2024"),
-      ("Atlético de Madrid", "LOGOS.atletico", "2024 - Presente")
+      c("Stade Brestois", null, "2016"),
+      c("Real Sociedad", LOGOS.sociedad, "2018 - 2024"),
+      c("Atlético de Madrid", LOGOS.atletico, "2024 - Presente")
     ]
   },
   {
@@ -3880,11 +3886,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["mikel merino", "merino"],
     "nacionalidad": "España",
     "clubes": [
-      ("CA Osasuna", "null", "2014 - 2016"),
-      ("Borussia Dortmund", "LOGOS.dortmund", "2016 - 2017"),
-      ("Newcastle United", "null", "2017 - 2018"),
-      ("Real Sociedad", "LOGOS.sociedad", "2018 - 2024"),
-      ("Arsenal FC", "LOGOS.arsenal", "2024 - Presente")
+      c("CA Osasuna", null, "2014 - 2016"),
+      c("Borussia Dortmund", LOGOS.dortmund, "2016 - 2017"),
+      c("Newcastle United", null, "2017 - 2018"),
+      c("Real Sociedad", LOGOS.sociedad, "2018 - 2024"),
+      c("Arsenal FC", LOGOS.arsenal, "2024 - Presente")
     ]
   },
   {
@@ -3895,7 +3901,7 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["zubimendi"],
     "nacionalidad": "España",
     "clubes": [
-      ("Real Sociedad", "LOGOS.sociedad", "2019 - Presente")
+      c("Real Sociedad", LOGOS.sociedad, "2019 - Presente")
     ]
   },
   {
@@ -3906,8 +3912,8 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["grimaldo"],
     "nacionalidad": "España",
     "clubes": [
-      ("SL Benfica", "LOGOS.benfica", "2016 - 2023"),
-      ("Bayer Leverkusen", "null", "2023 - Presente")
+      c("SL Benfica", LOGOS.benfica, "2016 - 2023"),
+      c("Bayer Leverkusen", null, "2023 - Presente")
     ]
   },
   {
@@ -3918,10 +3924,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["pedro porro"],
     "nacionalidad": "España",
     "clubes": [
-      ("Girona FC", "null", "2017 - 2019"),
-      ("Real Valladolid", "null", "2019 - 2020"),
-      ("Sporting CP", "LOGOS.sporting", "2020 - 2023"),
-      ("Tottenham Hotspur", "LOGOS.tottenham", "2023 - Presente")
+      c("Girona FC", null, "2017 - 2019"),
+      c("Real Valladolid", null, "2019 - 2020"),
+      c("Sporting CP", LOGOS.sporting, "2020 - 2023"),
+      c("Tottenham Hotspur", LOGOS.tottenham, "2023 - Presente")
     ]
   },
   {
@@ -3932,9 +3938,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["raya", "david raya"],
     "nacionalidad": "España",
     "clubes": [
-      ("Blackburn Rovers", "null", "2014 - 2019"),
-      ("Brentford FC", "null", "2019 - 2024"),
-      ("Arsenal FC", "LOGOS.arsenal", "2023 - Presente")
+      c("Blackburn Rovers", null, "2014 - 2019"),
+      c("Brentford FC", null, "2019 - 2024"),
+      c("Arsenal FC", LOGOS.arsenal, "2023 - Presente")
     ]
   },
   {
@@ -3945,11 +3951,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["kepa"],
     "nacionalidad": "España",
     "clubes": [
-      ("Real Valladolid", "null", "2015 - 2016"),
-      ("Athletic Club", "LOGOS.athletic", "2016 - 2018"),
-      ("Chelsea FC", "LOGOS.chelsea", "2018 - Presente"),
-      ("Real Madrid", "LOGOS.madrid", "2023 - 2024"),
-      ("AFC Bournemouth", "null", "2024 - Presente")
+      c("Real Valladolid", null, "2015 - 2016"),
+      c("Athletic Club", LOGOS.athletic, "2016 - 2018"),
+      c("Chelsea FC", LOGOS.chelsea, "2018 - Presente"),
+      c("Real Madrid", LOGOS.madrid, "2023 - 2024"),
+      c("AFC Bournemouth", null, "2024 - Presente")
     ]
   },
   {
@@ -3960,9 +3966,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["pau torres"],
     "nacionalidad": "España",
     "clubes": [
-      ("Villarreal CF", "LOGOS.villarreal", "2017 - 2023"),
-      ("Málaga CF", "null", "2018 - 2019"),
-      ("Aston Villa", "null", "2023 - Presente")
+      c("Villarreal CF", LOGOS.villarreal, "2017 - 2023"),
+      c("Málaga CF", null, "2018 - 2019"),
+      c("Aston Villa", null, "2023 - Presente")
     ]
   },
   {
@@ -3973,9 +3979,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["ceballos"],
     "nacionalidad": "España",
     "clubes": [
-      ("Real Betis", "LOGOS.betis", "2014 - 2017"),
-      ("Real Madrid", "LOGOS.madrid", "2017 - Presente"),
-      ("Arsenal FC", "LOGOS.arsenal", "2019 - 2021")
+      c("Real Betis", LOGOS.betis, "2014 - 2017"),
+      c("Real Madrid", LOGOS.madrid, "2017 - Presente"),
+      c("Arsenal FC", LOGOS.arsenal, "2019 - 2021")
     ]
   },
   {
@@ -3986,9 +3992,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["brahim", "brahim diaz"],
     "nacionalidad": "Marruecos",
     "clubes": [
-      ("Manchester City", "LOGOS.mancity", "2016 - 2019"),
-      ("Real Madrid", "LOGOS.madrid", "2019 - Presente"),
-      ("AC Milan", "LOGOS.milan", "2020 - 2023")
+      c("Manchester City", LOGOS.mancity, "2016 - 2019"),
+      c("Real Madrid", LOGOS.madrid, "2019 - Presente"),
+      c("AC Milan", LOGOS.milan, "2020 - 2023")
     ]
   },
   {
@@ -3999,8 +4005,8 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["ansu fati", "ansu"],
     "nacionalidad": "España",
     "clubes": [
-      ("FC Barcelona", "LOGOS.barca", "2019 - Presente"),
-      ("Brighton & Hove Albion", "null", "2023 - 2024")
+      c("FC Barcelona", LOGOS.barca, "2019 - Presente"),
+      c("Brighton & Hove Albion", null, "2023 - 2024")
     ]
   },
   {
@@ -4011,9 +4017,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["schweinsteiger"],
     "nacionalidad": "Alemania",
     "clubes": [
-      ("Bayern Múnich", "LOGOS.bayern", "2002 - 2015"),
-      ("Manchester United", "LOGOS.manutd", "2015 - 2017"),
-      ("Chicago Fire", "null", "2017 - 2019")
+      c("Bayern Múnich", LOGOS.bayern, "2002 - 2015"),
+      c("Manchester United", LOGOS.manutd, "2015 - 2017"),
+      c("Chicago Fire", null, "2017 - 2019")
     ]
   },
   {
@@ -4024,8 +4030,8 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["lahm"],
     "nacionalidad": "Alemania",
     "clubes": [
-      ("Bayern Múnich", "LOGOS.bayern", "2002 - 2017"),
-      ("VfB Stuttgart", "null", "2003 - 2005")
+      c("Bayern Múnich", LOGOS.bayern, "2002 - 2017"),
+      c("VfB Stuttgart", null, "2003 - 2005")
     ]
   },
   {
@@ -4036,10 +4042,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["klose"],
     "nacionalidad": "Alemania",
     "clubes": [
-      ("FC Kaiserslautern", "null", "1999 - 2004"),
-      ("Werder Bremen", "null", "2004 - 2007"),
-      ("Bayern Múnich", "LOGOS.bayern", "2007 - 2011"),
-      ("Lazio", "null", "2011 - 2016")
+      c("FC Kaiserslautern", null, "1999 - 2004"),
+      c("Werder Bremen", null, "2004 - 2007"),
+      c("Bayern Múnich", LOGOS.bayern, "2007 - 2011"),
+      c("Lazio", null, "2011 - 2016")
     ]
   },
   {
@@ -4050,11 +4056,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["ballack"],
     "nacionalidad": "Alemania",
     "clubes": [
-      ("FC Kaiserslautern", "null", "1997 - 1999"),
-      ("Bayer Leverkusen", "null", "1999 - 2002"),
-      ("Bayern Múnich", "LOGOS.bayern", "2002 - 2006"),
-      ("Chelsea FC", "LOGOS.chelsea", "2006 - 2010"),
-      ("Bayer Leverkusen", "null", "2010 - 2012")
+      c("FC Kaiserslautern", null, "1997 - 1999"),
+      c("Bayer Leverkusen", null, "1999 - 2002"),
+      c("Bayern Múnich", LOGOS.bayern, "2002 - 2006"),
+      c("Chelsea FC", LOGOS.chelsea, "2006 - 2010"),
+      c("Bayer Leverkusen", null, "2010 - 2012")
     ]
   },
   {
@@ -4065,8 +4071,8 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["kahn", "oliver kahn"],
     "nacionalidad": "Alemania",
     "clubes": [
-      ("Karlsruher SC", "null", "1987 - 1994"),
-      ("Bayern Múnich", "LOGOS.bayern", "1994 - 2008")
+      c("Karlsruher SC", null, "1987 - 1994"),
+      c("Bayern Múnich", LOGOS.bayern, "1994 - 2008")
     ]
   },
   {
@@ -4077,10 +4083,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["cech", "petr cech"],
     "nacionalidad": "República Checa",
     "clubes": [
-      ("Sparta Praga", "null", "2001 - 2002"),
-      ("Stade Rennais", "null", "2002 - 2004"),
-      ("Chelsea FC", "LOGOS.chelsea", "2004 - 2015"),
-      ("Arsenal FC", "LOGOS.arsenal", "2015 - 2019")
+      c("Sparta Praga", null, "2001 - 2002"),
+      c("Stade Rennais", null, "2002 - 2004"),
+      c("Chelsea FC", LOGOS.chelsea, "2004 - 2015"),
+      c("Arsenal FC", LOGOS.arsenal, "2015 - 2019")
     ]
   },
   {
@@ -4091,9 +4097,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["terry", "john terry"],
     "nacionalidad": "Inglaterra",
     "clubes": [
-      ("Chelsea FC", "LOGOS.chelsea", "1998 - 2017"),
-      ("Nottingham Forest", "null", "2000"),
-      ("Aston Villa", "null", "2017 - 2018")
+      c("Chelsea FC", LOGOS.chelsea, "1998 - 2017"),
+      c("Nottingham Forest", null, "2000"),
+      c("Aston Villa", null, "2017 - 2018")
     ]
   },
   {
@@ -4104,10 +4110,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["ferdinand"],
     "nacionalidad": "Inglaterra",
     "clubes": [
-      ("West Ham United", "null", "1995 - 2000"),
-      ("Leeds United", "null", "2000 - 2002"),
-      ("Manchester United", "LOGOS.manutd", "2002 - 2014"),
-      ("Queens Park Rangers", "null", "2014 - 2015")
+      c("West Ham United", null, "1995 - 2000"),
+      c("Leeds United", null, "2000 - 2002"),
+      c("Manchester United", LOGOS.manutd, "2002 - 2014"),
+      c("Queens Park Rangers", null, "2014 - 2015")
     ]
   },
   {
@@ -4118,7 +4124,7 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["scholes"],
     "nacionalidad": "Inglaterra",
     "clubes": [
-      ("Manchester United", "LOGOS.manutd", "1993 - 2013")
+      c("Manchester United", LOGOS.manutd, "1993 - 2013")
     ]
   },
   {
@@ -4129,7 +4135,7 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["giggs"],
     "nacionalidad": "Gales",
     "clubes": [
-      ("Manchester United", "LOGOS.manutd", "1990 - 2014")
+      c("Manchester United", LOGOS.manutd, "1990 - 2014")
     ]
   },
   {
@@ -4140,11 +4146,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["owen", "michael owen"],
     "nacionalidad": "Inglaterra",
     "clubes": [
-      ("Liverpool FC", "LOGOS.liverpool", "1996 - 2004"),
-      ("Real Madrid", "LOGOS.madrid", "2004 - 2005"),
-      ("Newcastle United", "null", "2005 - 2009"),
-      ("Manchester United", "LOGOS.manutd", "2009 - 2012"),
-      ("Stoke City", "null", "2012 - 2013")
+      c("Liverpool FC", LOGOS.liverpool, "1996 - 2004"),
+      c("Real Madrid", LOGOS.madrid, "2004 - 2005"),
+      c("Newcastle United", null, "2005 - 2009"),
+      c("Manchester United", LOGOS.manutd, "2009 - 2012"),
+      c("Stoke City", null, "2012 - 2013")
     ]
   },
   {
@@ -4155,9 +4161,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["shearer"],
     "nacionalidad": "Inglaterra",
     "clubes": [
-      ("Southampton FC", "null", "1988 - 1992"),
-      ("Blackburn Rovers", "null", "1992 - 1996"),
-      ("Newcastle United", "null", "1996 - 2006")
+      c("Southampton FC", null, "1988 - 1992"),
+      c("Blackburn Rovers", null, "1992 - 1996"),
+      c("Newcastle United", null, "1996 - 2006")
     ]
   },
   {
@@ -4168,12 +4174,12 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["vieira"],
     "nacionalidad": "Francia",
     "clubes": [
-      ("AS Cannes", "null", "1993 - 1995"),
-      ("AC Milan", "LOGOS.milan", "1995 - 1996"),
-      ("Arsenal FC", "LOGOS.arsenal", "1996 - 2005"),
-      ("Juventus", "LOGOS.juventus", "2005 - 2006"),
-      ("Inter de Milán", "LOGOS.inter", "2006 - 2010"),
-      ("Manchester City", "LOGOS.mancity", "2010 - 2011")
+      c("AS Cannes", null, "1993 - 1995"),
+      c("AC Milan", LOGOS.milan, "1995 - 1996"),
+      c("Arsenal FC", LOGOS.arsenal, "1996 - 2005"),
+      c("Juventus", LOGOS.juventus, "2005 - 2006"),
+      c("Inter de Milán", LOGOS.inter, "2006 - 2010"),
+      c("Manchester City", LOGOS.mancity, "2010 - 2011")
     ]
   },
   {
@@ -4184,9 +4190,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["bergkamp"],
     "nacionalidad": "Países Bajos",
     "clubes": [
-      ("AFC Ajax", "LOGOS.ajax", "1986 - 1993"),
-      ("Inter de Milán", "LOGOS.inter", "1993 - 1995"),
-      ("Arsenal FC", "LOGOS.arsenal", "1995 - 2006")
+      c("AFC Ajax", LOGOS.ajax, "1986 - 1993"),
+      c("Inter de Milán", LOGOS.inter, "1993 - 1995"),
+      c("Arsenal FC", LOGOS.arsenal, "1995 - 2006")
     ]
   },
   {
@@ -4197,12 +4203,12 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["van nistelrooy"],
     "nacionalidad": "Países Bajos",
     "clubes": [
-      ("SC Heerenveen", "null", "1997 - 1998"),
-      ("PSV Eindhoven", "null", "1998 - 2001"),
-      ("Manchester United", "LOGOS.manutd", "2001 - 2006"),
-      ("Real Madrid", "LOGOS.madrid", "2006 - 2010"),
-      ("Hamburgo SV", "null", "2010 - 2011"),
-      ("Málaga CF", "null", "2011 - 2012")
+      c("SC Heerenveen", null, "1997 - 1998"),
+      c("PSV Eindhoven", null, "1998 - 2001"),
+      c("Manchester United", LOGOS.manutd, "2001 - 2006"),
+      c("Real Madrid", LOGOS.madrid, "2006 - 2010"),
+      c("Hamburgo SV", null, "2010 - 2011"),
+      c("Málaga CF", null, "2011 - 2012")
     ]
   },
   {
@@ -4213,12 +4219,12 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["seedorf"],
     "nacionalidad": "Países Bajos",
     "clubes": [
-      ("AFC Ajax", "LOGOS.ajax", "1992 - 1995"),
-      ("Sampdoria", "null", "1995 - 1996"),
-      ("Real Madrid", "LOGOS.madrid", "1996 - 1999"),
-      ("Inter de Milán", "LOGOS.inter", "2000 - 2002"),
-      ("AC Milan", "LOGOS.milan", "2002 - 2012"),
-      ("Botafogo", "null", "2012 - 2014")
+      c("AFC Ajax", LOGOS.ajax, "1992 - 1995"),
+      c("Sampdoria", null, "1995 - 1996"),
+      c("Real Madrid", LOGOS.madrid, "1996 - 1999"),
+      c("Inter de Milán", LOGOS.inter, "2000 - 2002"),
+      c("AC Milan", LOGOS.milan, "2002 - 2012"),
+      c("Botafogo", null, "2012 - 2014")
     ]
   },
   {
@@ -4229,13 +4235,13 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["kluivert"],
     "nacionalidad": "Países Bajos",
     "clubes": [
-      ("AFC Ajax", "LOGOS.ajax", "1994 - 1997"),
-      ("AC Milan", "LOGOS.milan", "1997 - 1998"),
-      ("FC Barcelona", "LOGOS.barca", "1998 - 2004"),
-      ("Newcastle United", "null", "2004 - 2005"),
-      ("Valencia CF", "LOGOS.valencia", "2005 - 2006"),
-      ("PSV Eindhoven", "null", "2006 - 2007"),
-      ("Lille OSC", "null", "2007 - 2008")
+      c("AFC Ajax", LOGOS.ajax, "1994 - 1997"),
+      c("AC Milan", LOGOS.milan, "1997 - 1998"),
+      c("FC Barcelona", LOGOS.barca, "1998 - 2004"),
+      c("Newcastle United", null, "2004 - 2005"),
+      c("Valencia CF", LOGOS.valencia, "2005 - 2006"),
+      c("PSV Eindhoven", null, "2006 - 2007"),
+      c("Lille OSC", null, "2007 - 2008")
     ]
   },
   {
@@ -4246,10 +4252,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["van der sar"],
     "nacionalidad": "Países Bajos",
     "clubes": [
-      ("AFC Ajax", "LOGOS.ajax", "1990 - 1999"),
-      ("Juventus", "LOGOS.juventus", "1999 - 2001"),
-      ("Fulham FC", "null", "2001 - 2005"),
-      ("Manchester United", "LOGOS.manutd", "2005 - 2011")
+      c("AFC Ajax", LOGOS.ajax, "1990 - 1999"),
+      c("Juventus", LOGOS.juventus, "1999 - 2001"),
+      c("Fulham FC", null, "2001 - 2005"),
+      c("Manchester United", LOGOS.manutd, "2005 - 2011")
     ]
   },
   {
@@ -4260,11 +4266,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["shevchenko"],
     "nacionalidad": "Ucrania",
     "clubes": [
-      ("Dinamo de Kiev", "null", "1994 - 1999"),
-      ("AC Milan", "LOGOS.milan", "1999 - 2006"),
-      ("Chelsea FC", "LOGOS.chelsea", "2006 - 2009"),
-      ("AC Milan", "LOGOS.milan", "2008 - 2009"),
-      ("Dinamo de Kiev", "null", "2009 - 2012")
+      c("Dinamo de Kiev", null, "1994 - 1999"),
+      c("AC Milan", LOGOS.milan, "1999 - 2006"),
+      c("Chelsea FC", LOGOS.chelsea, "2006 - 2009"),
+      c("AC Milan", LOGOS.milan, "2008 - 2009"),
+      c("Dinamo de Kiev", null, "2009 - 2012")
     ]
   },
   {
@@ -4275,9 +4281,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["nedved"],
     "nacionalidad": "República Checa",
     "clubes": [
-      ("Sparta Praga", "null", "1992 - 1996"),
-      ("Lazio", "null", "1996 - 2001"),
-      ("Juventus", "LOGOS.juventus", "2001 - 2009")
+      c("Sparta Praga", null, "1992 - 1996"),
+      c("Lazio", null, "1996 - 2001"),
+      c("Juventus", LOGOS.juventus, "2001 - 2009")
     ]
   },
   {
@@ -4288,12 +4294,12 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["cannavaro"],
     "nacionalidad": "Italia",
     "clubes": [
-      ("SSC Napoli", "LOGOS.napoli", "1992 - 1995"),
-      ("Parma Calcio", "null", "1995 - 2002"),
-      ("Inter de Milán", "LOGOS.inter", "2002 - 2004"),
-      ("Juventus", "LOGOS.juventus", "2004 - 2006"),
-      ("Real Madrid", "LOGOS.madrid", "2006 - 2009"),
-      ("Juventus", "LOGOS.juventus", "2009 - 2010")
+      c("SSC Napoli", LOGOS.napoli, "1992 - 1995"),
+      c("Parma Calcio", null, "1995 - 2002"),
+      c("Inter de Milán", LOGOS.inter, "2002 - 2004"),
+      c("Juventus", LOGOS.juventus, "2004 - 2006"),
+      c("Real Madrid", LOGOS.madrid, "2006 - 2009"),
+      c("Juventus", LOGOS.juventus, "2009 - 2010")
     ]
   },
   {
@@ -4304,9 +4310,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["nesta"],
     "nacionalidad": "Italia",
     "clubes": [
-      ("Lazio", "null", "1993 - 2002"),
-      ("AC Milan", "LOGOS.milan", "2002 - 2012"),
-      ("Montreal Impact", "null", "2012 - 2013")
+      c("Lazio", null, "1993 - 2002"),
+      c("AC Milan", LOGOS.milan, "2002 - 2012"),
+      c("Montreal Impact", null, "2012 - 2013")
     ]
   },
   {
@@ -4317,10 +4323,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["inzaghi", "pippo inzaghi"],
     "nacionalidad": "Italia",
     "clubes": [
-      ("Parma Calcio", "null", "1995 - 1996"),
-      ("Atalanta", "null", "1996 - 1997"),
-      ("Juventus", "LOGOS.juventus", "1997 - 2001"),
-      ("AC Milan", "LOGOS.milan", "2001 - 2012")
+      c("Parma Calcio", null, "1995 - 1996"),
+      c("Atalanta", null, "1996 - 1997"),
+      c("Juventus", LOGOS.juventus, "1997 - 2001"),
+      c("AC Milan", LOGOS.milan, "2001 - 2012")
     ]
   },
   {
@@ -4331,11 +4337,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["gattuso"],
     "nacionalidad": "Italia",
     "clubes": [
-      ("Perugia", "null", "1995 - 1997"),
-      ("Rangers FC", "null", "1997 - 1998"),
-      ("Salernitana", "null", "1998 - 1999"),
-      ("AC Milan", "LOGOS.milan", "1999 - 2012"),
-      ("FC Sion", "null", "2012 - 2013")
+      c("Perugia", null, "1995 - 1997"),
+      c("Rangers FC", null, "1997 - 1998"),
+      c("Salernitana", null, "1998 - 1999"),
+      c("AC Milan", LOGOS.milan, "1999 - 2012"),
+      c("FC Sion", null, "2012 - 2013")
     ]
   },
   {
@@ -4346,9 +4352,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["zanetti", "pupi zanetti"],
     "nacionalidad": "Argentina",
     "clubes": [
-      ("Talleres RE", "null", "1992 - 1993"),
-      ("Banfield", "null", "1993 - 1995"),
-      ("Inter de Milán", "LOGOS.inter", "1995 - 2014")
+      c("Talleres RE", null, "1992 - 1993"),
+      c("Banfield", null, "1993 - 1995"),
+      c("Inter de Milán", LOGOS.inter, "1995 - 2014")
     ]
   },
   {
@@ -4359,13 +4365,13 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["batistuta", "batigol"],
     "nacionalidad": "Argentina",
     "clubes": [
-      ("Newell's Old Boys", "null", "1988 - 1989"),
-      ("River Plate", "LOGOS.river", "1989 - 1990"),
-      ("Boca Juniors", "LOGOS.boca", "1990 - 1991"),
-      ("Fiorentina", "null", "1991 - 2000"),
-      ("AS Roma", "LOGOS.roma", "2000 - 2003"),
-      ("Inter de Milán", "LOGOS.inter", "2003"),
-      ("Al Arabi", "null", "2003 - 2005")
+      c("Newell's Old Boys", null, "1988 - 1989"),
+      c("River Plate", LOGOS.river, "1989 - 1990"),
+      c("Boca Juniors", LOGOS.boca, "1990 - 1991"),
+      c("Fiorentina", null, "1991 - 2000"),
+      c("AS Roma", LOGOS.roma, "2000 - 2003"),
+      c("Inter de Milán", LOGOS.inter, "2003"),
+      c("Al Arabi", null, "2003 - 2005")
     ]
   },
   {
@@ -4376,13 +4382,13 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["forlan"],
     "nacionalidad": "Uruguay",
     "clubes": [
-      ("Independiente", "null", "1997 - 2002"),
-      ("Manchester United", "LOGOS.manutd", "2002 - 2004"),
-      ("Villarreal CF", "LOGOS.villarreal", "2004 - 2007"),
-      ("Atlético de Madrid", "LOGOS.atletico", "2007 - 2011"),
-      ("Inter de Milán", "LOGOS.inter", "2011 - 2012"),
-      ("Internacional", "null", "2012 - 2013"),
-      ("Peñarol", "null", "2015 - 2016")
+      c("Independiente", null, "1997 - 2002"),
+      c("Manchester United", LOGOS.manutd, "2002 - 2004"),
+      c("Villarreal CF", LOGOS.villarreal, "2004 - 2007"),
+      c("Atlético de Madrid", LOGOS.atletico, "2007 - 2011"),
+      c("Inter de Milán", LOGOS.inter, "2011 - 2012"),
+      c("Internacional", null, "2012 - 2013"),
+      c("Peñarol", null, "2015 - 2016")
     ]
   },
   {
@@ -4393,13 +4399,13 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["mascherano", "el jefecito"],
     "nacionalidad": "Argentina",
     "clubes": [
-      ("River Plate", "LOGOS.river", "2003 - 2005"),
-      ("Corinthians", "null", "2005 - 2006"),
-      ("West Ham United", "null", "2006 - 2007"),
-      ("Liverpool FC", "LOGOS.liverpool", "2007 - 2010"),
-      ("FC Barcelona", "LOGOS.barca", "2010 - 2018"),
-      ("Hebei China Fortune", "null", "2018 - 2019"),
-      ("Estudiantes de La Plata", "null", "2020")
+      c("River Plate", LOGOS.river, "2003 - 2005"),
+      c("Corinthians", null, "2005 - 2006"),
+      c("West Ham United", null, "2006 - 2007"),
+      c("Liverpool FC", LOGOS.liverpool, "2007 - 2010"),
+      c("FC Barcelona", LOGOS.barca, "2010 - 2018"),
+      c("Hebei China Fortune", null, "2018 - 2019"),
+      c("Estudiantes de La Plata", null, "2020")
     ]
   },
   {
@@ -4410,12 +4416,12 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["yaya toure", "toure"],
     "nacionalidad": "Costa de Marfil",
     "clubes": [
-      ("Beveren", "null", "2001 - 2003"),
-      ("Metalurh Donetsk", "null", "2003 - 2005"),
-      ("Olympiacos", "null", "2005 - 2006"),
-      ("AS Mónaco", "LOGOS.monaco", "2006 - 2007"),
-      ("FC Barcelona", "LOGOS.barca", "2007 - 2010"),
-      ("Manchester City", "LOGOS.mancity", "2010 - 2018")
+      c("Beveren", null, "2001 - 2003"),
+      c("Metalurh Donetsk", null, "2003 - 2005"),
+      c("Olympiacos", null, "2005 - 2006"),
+      c("AS Mónaco", LOGOS.monaco, "2006 - 2007"),
+      c("FC Barcelona", LOGOS.barca, "2007 - 2010"),
+      c("Manchester City", LOGOS.mancity, "2010 - 2018")
     ]
   },
   {
@@ -4426,10 +4432,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["kompany"],
     "nacionalidad": "Bélgica",
     "clubes": [
-      ("Anderlecht", "null", "2003 - 2006"),
-      ("Hamburgo SV", "null", "2006 - 2008"),
-      ("Manchester City", "LOGOS.mancity", "2008 - 2019"),
-      ("Anderlecht", "null", "2019 - 2020")
+      c("Anderlecht", null, "2003 - 2006"),
+      c("Hamburgo SV", null, "2006 - 2008"),
+      c("Manchester City", LOGOS.mancity, "2008 - 2019"),
+      c("Anderlecht", null, "2019 - 2020")
     ]
   },
   {
@@ -4440,11 +4446,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["eriksen"],
     "nacionalidad": "Dinamarca",
     "clubes": [
-      ("AFC Ajax", "LOGOS.ajax", "2010 - 2013"),
-      ("Tottenham Hotspur", "LOGOS.tottenham", "2013 - 2020"),
-      ("Inter de Milán", "LOGOS.inter", "2020 - 2021"),
-      ("Brentford FC", "null", "2022"),
-      ("Manchester United", "LOGOS.manutd", "2022 - 2025")
+      c("AFC Ajax", LOGOS.ajax, "2010 - 2013"),
+      c("Tottenham Hotspur", LOGOS.tottenham, "2013 - 2020"),
+      c("Inter de Milán", LOGOS.inter, "2020 - 2021"),
+      c("Brentford FC", null, "2022"),
+      c("Manchester United", LOGOS.manutd, "2022 - 2025")
     ]
   },
   {
@@ -4455,14 +4461,14 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["coutinho"],
     "nacionalidad": "Brasil",
     "clubes": [
-      ("Vasco da Gama", "null", "2009 - 2010"),
-      ("Inter de Milán", "LOGOS.inter", "2010 - 2013"),
-      ("RCD Espanyol", "LOGOS.espanyol", "2012"),
-      ("Liverpool FC", "LOGOS.liverpool", "2013 - 2018"),
-      ("FC Barcelona", "LOGOS.barca", "2018 - 2022"),
-      ("Bayern Múnich", "LOGOS.bayern", "2019 - 2020"),
-      ("Aston Villa", "null", "2022 - 2024"),
-      ("Vasco da Gama", "null", "2024 - Presente")
+      c("Vasco da Gama", null, "2009 - 2010"),
+      c("Inter de Milán", LOGOS.inter, "2010 - 2013"),
+      c("RCD Espanyol", LOGOS.espanyol, "2012"),
+      c("Liverpool FC", LOGOS.liverpool, "2013 - 2018"),
+      c("FC Barcelona", LOGOS.barca, "2018 - 2022"),
+      c("Bayern Múnich", LOGOS.bayern, "2019 - 2020"),
+      c("Aston Villa", null, "2022 - 2024"),
+      c("Vasco da Gama", null, "2024 - Presente")
     ]
   },
   {
@@ -4473,10 +4479,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["varane"],
     "nacionalidad": "Francia",
     "clubes": [
-      ("RC Lens", "null", "2010 - 2011"),
-      ("Real Madrid", "LOGOS.madrid", "2011 - 2021"),
-      ("Manchester United", "LOGOS.manutd", "2021 - 2024"),
-      ("Como 1907", "null", "2024")
+      c("RC Lens", null, "2010 - 2011"),
+      c("Real Madrid", LOGOS.madrid, "2011 - 2021"),
+      c("Manchester United", LOGOS.manutd, "2021 - 2024"),
+      c("Como 1907", null, "2024")
     ]
   },
   {
@@ -4487,9 +4493,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["coman"],
     "nacionalidad": "Francia",
     "clubes": [
-      ("Paris Saint-Germain", "LOGOS.psg", "2013 - 2014"),
-      ("Juventus", "LOGOS.juventus", "2014 - 2015"),
-      ("Bayern Múnich", "LOGOS.bayern", "2015 - Presente")
+      c("Paris Saint-Germain", LOGOS.psg, "2013 - 2014"),
+      c("Juventus", LOGOS.juventus, "2014 - 2015"),
+      c("Bayern Múnich", LOGOS.bayern, "2015 - Presente")
     ]
   },
   {
@@ -4500,10 +4506,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["sane", "leroy sane"],
     "nacionalidad": "Alemania",
     "clubes": [
-      ("Schalke 04", "null", "2014 - 2016"),
-      ("Manchester City", "LOGOS.mancity", "2016 - 2020"),
-      ("Bayern Múnich", "LOGOS.bayern", "2020 - 2025"),
-      ("Galatasaray", "null", "2025 - Presente")
+      c("Schalke 04", null, "2014 - 2016"),
+      c("Manchester City", LOGOS.mancity, "2016 - 2020"),
+      c("Bayern Múnich", LOGOS.bayern, "2020 - 2025"),
+      c("Galatasaray", null, "2025 - Presente")
     ]
   },
   {
@@ -4514,11 +4520,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["gnabry"],
     "nacionalidad": "Alemania",
     "clubes": [
-      ("Arsenal FC", "LOGOS.arsenal", "2012 - 2016"),
-      ("West Bromwich Albion", "null", "2015 - 2016"),
-      ("Werder Bremen", "null", "2016 - 2017"),
-      ("TSG Hoffenheim", "null", "2017 - 2018"),
-      ("Bayern Múnich", "LOGOS.bayern", "2018 - Presente")
+      c("Arsenal FC", LOGOS.arsenal, "2012 - 2016"),
+      c("West Bromwich Albion", null, "2015 - 2016"),
+      c("Werder Bremen", null, "2016 - 2017"),
+      c("TSG Hoffenheim", null, "2017 - 2018"),
+      c("Bayern Múnich", LOGOS.bayern, "2018 - Presente")
     ]
   },
   {
@@ -4529,9 +4535,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["havertz"],
     "nacionalidad": "Alemania",
     "clubes": [
-      ("Bayer Leverkusen", "null", "2016 - 2020"),
-      ("Chelsea FC", "LOGOS.chelsea", "2020 - 2023"),
-      ("Arsenal FC", "LOGOS.arsenal", "2023 - Presente")
+      c("Bayer Leverkusen", null, "2016 - 2020"),
+      c("Chelsea FC", LOGOS.chelsea, "2020 - 2023"),
+      c("Arsenal FC", LOGOS.arsenal, "2023 - Presente")
     ]
   },
   {
@@ -4542,10 +4548,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["de ligt"],
     "nacionalidad": "Países Bajos",
     "clubes": [
-      ("AFC Ajax", "LOGOS.ajax", "2016 - 2019"),
-      ("Juventus", "LOGOS.juventus", "2019 - 2022"),
-      ("Bayern Múnich", "LOGOS.bayern", "2022 - 2024"),
-      ("Manchester United", "LOGOS.manutd", "2024 - Presente")
+      c("AFC Ajax", LOGOS.ajax, "2016 - 2019"),
+      c("Juventus", LOGOS.juventus, "2019 - 2022"),
+      c("Bayern Múnich", LOGOS.bayern, "2022 - 2024"),
+      c("Manchester United", LOGOS.manutd, "2024 - Presente")
     ]
   },
   {
@@ -4556,9 +4562,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["marquinhos"],
     "nacionalidad": "Brasil",
     "clubes": [
-      ("Corinthians", "null", "2011 - 2012"),
-      ("AS Roma", "LOGOS.roma", "2012 - 2013"),
-      ("Paris Saint-Germain", "LOGOS.psg", "2013 - Presente")
+      c("Corinthians", null, "2011 - 2012"),
+      c("AS Roma", LOGOS.roma, "2012 - 2013"),
+      c("Paris Saint-Germain", LOGOS.psg, "2013 - Presente")
     ]
   },
   {
@@ -4569,9 +4575,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["verratti"],
     "nacionalidad": "Italia",
     "clubes": [
-      ("Pescara", "null", "2008 - 2012"),
-      ("Paris Saint-Germain", "LOGOS.psg", "2012 - 2023"),
-      ("Al Arabi", "null", "2023 - Presente")
+      c("Pescara", null, "2008 - 2012"),
+      c("Paris Saint-Germain", LOGOS.psg, "2012 - 2023"),
+      c("Al Arabi", null, "2023 - Presente")
     ]
   },
   {
@@ -4582,11 +4588,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["jorginho"],
     "nacionalidad": "Italia",
     "clubes": [
-      ("Hellas Verona", "null", "2010 - 2014"),
-      ("SSC Napoli", "LOGOS.napoli", "2014 - 2018"),
-      ("Chelsea FC", "LOGOS.chelsea", "2018 - 2023"),
-      ("Arsenal FC", "LOGOS.arsenal", "2023 - 2025"),
-      ("Flamengo", "null", "2025 - Presente")
+      c("Hellas Verona", null, "2010 - 2014"),
+      c("SSC Napoli", LOGOS.napoli, "2014 - 2018"),
+      c("Chelsea FC", LOGOS.chelsea, "2018 - 2023"),
+      c("Arsenal FC", LOGOS.arsenal, "2023 - 2025"),
+      c("Flamengo", null, "2025 - Presente")
     ]
   },
   {
@@ -4597,9 +4603,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["chiesa"],
     "nacionalidad": "Italia",
     "clubes": [
-      ("Fiorentina", "null", "2016 - 2020"),
-      ("Juventus", "LOGOS.juventus", "2020 - 2024"),
-      ("Liverpool FC", "LOGOS.liverpool", "2024 - Presente")
+      c("Fiorentina", null, "2016 - 2020"),
+      c("Juventus", LOGOS.juventus, "2020 - 2024"),
+      c("Liverpool FC", LOGOS.liverpool, "2024 - Presente")
     ]
   },
   {
@@ -4610,9 +4616,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["tonali"],
     "nacionalidad": "Italia",
     "clubes": [
-      ("Brescia", "null", "2017 - 2020"),
-      ("AC Milan", "LOGOS.milan", "2020 - 2023"),
-      ("Newcastle United", "null", "2023 - Presente")
+      c("Brescia", null, "2017 - 2020"),
+      c("AC Milan", LOGOS.milan, "2020 - 2023"),
+      c("Newcastle United", null, "2023 - Presente")
     ]
   },
   {
@@ -4623,9 +4629,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["bastoni"],
     "nacionalidad": "Italia",
     "clubes": [
-      ("Atalanta", "null", "2016 - 2017"),
-      ("Parma Calcio", "null", "2018 - 2019"),
-      ("Inter de Milán", "LOGOS.inter", "2019 - Presente")
+      c("Atalanta", null, "2016 - 2017"),
+      c("Parma Calcio", null, "2018 - 2019"),
+      c("Inter de Milán", LOGOS.inter, "2019 - Presente")
     ]
   },
   {
@@ -4636,11 +4642,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["calhanoglu"],
     "nacionalidad": "Turquía",
     "clubes": [
-      ("Karlsruher SC", "null", "2011 - 2013"),
-      ("Hamburgo SV", "null", "2013 - 2014"),
-      ("Bayer Leverkusen", "null", "2014 - 2017"),
-      ("AC Milan", "LOGOS.milan", "2017 - 2021"),
-      ("Inter de Milán", "LOGOS.inter", "2021 - Presente")
+      c("Karlsruher SC", null, "2011 - 2013"),
+      c("Hamburgo SV", null, "2013 - 2014"),
+      c("Bayer Leverkusen", null, "2014 - 2017"),
+      c("AC Milan", LOGOS.milan, "2017 - 2021"),
+      c("Inter de Milán", LOGOS.inter, "2021 - Presente")
     ]
   },
   {
@@ -4651,12 +4657,12 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["mkhitaryan"],
     "nacionalidad": "Armenia",
     "clubes": [
-      ("Shakhtar Donetsk", "null", "2010 - 2013"),
-      ("Borussia Dortmund", "LOGOS.dortmund", "2013 - 2016"),
-      ("Manchester United", "LOGOS.manutd", "2016 - 2018"),
-      ("Arsenal FC", "LOGOS.arsenal", "2018 - 2019"),
-      ("AS Roma", "LOGOS.roma", "2019 - 2022"),
-      ("Inter de Milán", "LOGOS.inter", "2022 - Presente")
+      c("Shakhtar Donetsk", null, "2010 - 2013"),
+      c("Borussia Dortmund", LOGOS.dortmund, "2013 - 2016"),
+      c("Manchester United", LOGOS.manutd, "2016 - 2018"),
+      c("Arsenal FC", LOGOS.arsenal, "2018 - 2019"),
+      c("AS Roma", LOGOS.roma, "2019 - 2022"),
+      c("Inter de Milán", LOGOS.inter, "2022 - Presente")
     ]
   },
   {
@@ -4667,9 +4673,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["vlahovic"],
     "nacionalidad": "Serbia",
     "clubes": [
-      ("Partizán de Belgrado", "null", "2016 - 2018"),
-      ("Fiorentina", "null", "2018 - 2022"),
-      ("Juventus", "LOGOS.juventus", "2022 - Presente")
+      c("Partizán de Belgrado", null, "2016 - 2018"),
+      c("Fiorentina", null, "2018 - 2022"),
+      c("Juventus", LOGOS.juventus, "2022 - Presente")
     ]
   },
   {
@@ -4680,9 +4686,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["pulisic"],
     "nacionalidad": "Estados Unidos",
     "clubes": [
-      ("Borussia Dortmund", "LOGOS.dortmund", "2016 - 2019"),
-      ("Chelsea FC", "LOGOS.chelsea", "2019 - 2023"),
-      ("AC Milan", "LOGOS.milan", "2023 - Presente")
+      c("Borussia Dortmund", LOGOS.dortmund, "2016 - 2019"),
+      c("Chelsea FC", LOGOS.chelsea, "2019 - 2023"),
+      c("AC Milan", LOGOS.milan, "2023 - Presente")
     ]
   },
   {
@@ -4693,9 +4699,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["maignan"],
     "nacionalidad": "Francia",
     "clubes": [
-      ("Paris Saint-Germain", "LOGOS.psg", "2013 - 2015"),
-      ("Lille OSC", "null", "2015 - 2021"),
-      ("AC Milan", "LOGOS.milan", "2021 - Presente")
+      c("Paris Saint-Germain", LOGOS.psg, "2013 - 2015"),
+      c("Lille OSC", null, "2015 - 2021"),
+      c("AC Milan", LOGOS.milan, "2021 - Presente")
     ]
   },
   {
@@ -4706,10 +4712,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["sommer"],
     "nacionalidad": "Suiza",
     "clubes": [
-      ("FC Basilea", "null", "2009 - 2014"),
-      ("Borussia Mönchengladbach", "null", "2014 - 2023"),
-      ("Bayern Múnich", "LOGOS.bayern", "2023"),
-      ("Inter de Milán", "LOGOS.inter", "2023 - Presente")
+      c("FC Basilea", null, "2009 - 2014"),
+      c("Borussia Mönchengladbach", null, "2014 - 2023"),
+      c("Bayern Múnich", LOGOS.bayern, "2023"),
+      c("Inter de Milán", LOGOS.inter, "2023 - Presente")
     ]
   },
   {
@@ -4720,10 +4726,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["xhaka"],
     "nacionalidad": "Suiza",
     "clubes": [
-      ("FC Basilea", "null", "2010 - 2012"),
-      ("Borussia Mönchengladbach", "null", "2012 - 2016"),
-      ("Arsenal FC", "LOGOS.arsenal", "2016 - 2023"),
-      ("Bayer Leverkusen", "null", "2023 - Presente")
+      c("FC Basilea", null, "2010 - 2012"),
+      c("Borussia Mönchengladbach", null, "2012 - 2016"),
+      c("Arsenal FC", LOGOS.arsenal, "2016 - 2023"),
+      c("Bayer Leverkusen", null, "2023 - Presente")
     ]
   },
   {
@@ -4734,14 +4740,14 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["shaqiri"],
     "nacionalidad": "Suiza",
     "clubes": [
-      ("FC Basilea", "null", "2009 - 2012"),
-      ("Bayern Múnich", "LOGOS.bayern", "2012 - 2015"),
-      ("Inter de Milán", "LOGOS.inter", "2015"),
-      ("Stoke City", "null", "2015 - 2018"),
-      ("Liverpool FC", "LOGOS.liverpool", "2018 - 2021"),
-      ("Olympique de Lyon", "LOGOS.lyon", "2021 - 2022"),
-      ("Chicago Fire", "null", "2022 - 2024"),
-      ("FC Basilea", "null", "2024 - Presente")
+      c("FC Basilea", null, "2009 - 2012"),
+      c("Bayern Múnich", LOGOS.bayern, "2012 - 2015"),
+      c("Inter de Milán", LOGOS.inter, "2015"),
+      c("Stoke City", null, "2015 - 2018"),
+      c("Liverpool FC", LOGOS.liverpool, "2018 - 2021"),
+      c("Olympique de Lyon", LOGOS.lyon, "2021 - 2022"),
+      c("Chicago Fire", null, "2022 - 2024"),
+      c("FC Basilea", null, "2024 - Presente")
     ]
   },
   {
@@ -4752,14 +4758,14 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["perisic"],
     "nacionalidad": "Croacia",
     "clubes": [
-      ("Club Brujas", "null", "2009 - 2011"),
-      ("Borussia Dortmund", "LOGOS.dortmund", "2011 - 2013"),
-      ("VfL Wolfsburg", "null", "2013 - 2015"),
-      ("Inter de Milán", "LOGOS.inter", "2015 - 2022"),
-      ("Bayern Múnich", "LOGOS.bayern", "2019 - 2020"),
-      ("Tottenham Hotspur", "LOGOS.tottenham", "2022 - 2024"),
-      ("Hajduk Split", "null", "2024"),
-      ("PSV Eindhoven", "null", "2024 - Presente")
+      c("Club Brujas", null, "2009 - 2011"),
+      c("Borussia Dortmund", LOGOS.dortmund, "2011 - 2013"),
+      c("VfL Wolfsburg", null, "2013 - 2015"),
+      c("Inter de Milán", LOGOS.inter, "2015 - 2022"),
+      c("Bayern Múnich", LOGOS.bayern, "2019 - 2020"),
+      c("Tottenham Hotspur", LOGOS.tottenham, "2022 - 2024"),
+      c("Hajduk Split", null, "2024"),
+      c("PSV Eindhoven", null, "2024 - Presente")
     ]
   },
   {
@@ -4770,9 +4776,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["brozovic"],
     "nacionalidad": "Croacia",
     "clubes": [
-      ("Dinamo Zagreb", "null", "2012 - 2015"),
-      ("Inter de Milán", "LOGOS.inter", "2015 - 2023"),
-      ("Al Nassr", "null", "2023 - Presente")
+      c("Dinamo Zagreb", null, "2012 - 2015"),
+      c("Inter de Milán", LOGOS.inter, "2015 - 2023"),
+      c("Al Nassr", null, "2023 - Presente")
     ]
   },
   {
@@ -4783,11 +4789,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["kovacic"],
     "nacionalidad": "Croacia",
     "clubes": [
-      ("Dinamo Zagreb", "null", "2010 - 2013"),
-      ("Inter de Milán", "LOGOS.inter", "2013 - 2015"),
-      ("Real Madrid", "LOGOS.madrid", "2015 - 2019"),
-      ("Chelsea FC", "LOGOS.chelsea", "2018 - 2023"),
-      ("Manchester City", "LOGOS.mancity", "2023 - Presente")
+      c("Dinamo Zagreb", null, "2010 - 2013"),
+      c("Inter de Milán", LOGOS.inter, "2013 - 2015"),
+      c("Real Madrid", LOGOS.madrid, "2015 - 2019"),
+      c("Chelsea FC", LOGOS.chelsea, "2018 - 2023"),
+      c("Manchester City", LOGOS.mancity, "2023 - Presente")
     ]
   },
   {
@@ -4798,9 +4804,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["gvardiol"],
     "nacionalidad": "Croacia",
     "clubes": [
-      ("Dinamo Zagreb", "null", "2019 - 2021"),
-      ("RB Leipzig", "null", "2021 - 2023"),
-      ("Manchester City", "LOGOS.mancity", "2023 - Presente")
+      c("Dinamo Zagreb", null, "2019 - 2021"),
+      c("RB Leipzig", null, "2021 - 2023"),
+      c("Manchester City", LOGOS.mancity, "2023 - Presente")
     ]
   },
   {
@@ -4811,13 +4817,13 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["mandzukic"],
     "nacionalidad": "Croacia",
     "clubes": [
-      ("Dinamo Zagreb", "null", "2007 - 2010"),
-      ("VfL Wolfsburg", "null", "2010 - 2012"),
-      ("Bayern Múnich", "LOGOS.bayern", "2012 - 2014"),
-      ("Atlético de Madrid", "LOGOS.atletico", "2014 - 2015"),
-      ("Juventus", "LOGOS.juventus", "2015 - 2019"),
-      ("Al Duhail", "null", "2020"),
-      ("AC Milan", "LOGOS.milan", "2021")
+      c("Dinamo Zagreb", null, "2007 - 2010"),
+      c("VfL Wolfsburg", null, "2010 - 2012"),
+      c("Bayern Múnich", LOGOS.bayern, "2012 - 2014"),
+      c("Atlético de Madrid", LOGOS.atletico, "2014 - 2015"),
+      c("Juventus", LOGOS.juventus, "2015 - 2019"),
+      c("Al Duhail", null, "2020"),
+      c("AC Milan", LOGOS.milan, "2021")
     ]
   },
   {
@@ -4828,12 +4834,12 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["suker", "davor suker"],
     "nacionalidad": "Croacia",
     "clubes": [
-      ("Dinamo Zagreb", "null", "1989 - 1991"),
-      ("Sevilla FC", "LOGOS.sevilla", "1991 - 1996"),
-      ("Real Madrid", "LOGOS.madrid", "1996 - 1999"),
-      ("Arsenal FC", "LOGOS.arsenal", "1999 - 2000"),
-      ("West Ham United", "null", "2000 - 2001"),
-      ("1860 Múnich", "null", "2001 - 2003")
+      c("Dinamo Zagreb", null, "1989 - 1991"),
+      c("Sevilla FC", LOGOS.sevilla, "1991 - 1996"),
+      c("Real Madrid", LOGOS.madrid, "1996 - 1999"),
+      c("Arsenal FC", LOGOS.arsenal, "1999 - 2000"),
+      c("West Ham United", null, "2000 - 2001"),
+      c("1860 Múnich", null, "2001 - 2003")
     ]
   },
   {
@@ -4844,11 +4850,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["mijatovic", "pedja mijatovic"],
     "nacionalidad": "Montenegro",
     "clubes": [
-      ("Partizán de Belgrado", "null", "1989 - 1993"),
-      ("Valencia CF", "LOGOS.valencia", "1993 - 1996"),
-      ("Real Madrid", "LOGOS.madrid", "1996 - 1999"),
-      ("Fiorentina", "null", "1999 - 2002"),
-      ("Levante UD", "null", "2002 - 2003")
+      c("Partizán de Belgrado", null, "1989 - 1993"),
+      c("Valencia CF", LOGOS.valencia, "1993 - 1996"),
+      c("Real Madrid", LOGOS.madrid, "1996 - 1999"),
+      c("Fiorentina", null, "1999 - 2002"),
+      c("Levante UD", null, "2002 - 2003")
     ]
   },
   {
@@ -4859,10 +4865,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["redondo", "fernando redondo"],
     "nacionalidad": "Argentina",
     "clubes": [
-      ("Argentinos Juniors", "null", "1985 - 1990"),
-      ("CD Tenerife", "null", "1990 - 1994"),
-      ("Real Madrid", "LOGOS.madrid", "1994 - 2000"),
-      ("AC Milan", "LOGOS.milan", "2000 - 2004")
+      c("Argentinos Juniors", null, "1985 - 1990"),
+      c("CD Tenerife", null, "1990 - 1994"),
+      c("Real Madrid", LOGOS.madrid, "1994 - 2000"),
+      c("AC Milan", LOGOS.milan, "2000 - 2004")
     ]
   },
   {
@@ -4873,10 +4879,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["hierro", "fernando hierro"],
     "nacionalidad": "España",
     "clubes": [
-      ("Real Valladolid", "null", "1987 - 1989"),
-      ("Real Madrid", "LOGOS.madrid", "1989 - 2003"),
-      ("Al Rayyan", "null", "2003 - 2004"),
-      ("Bolton Wanderers", "null", "2004 - 2005")
+      c("Real Valladolid", null, "1987 - 1989"),
+      c("Real Madrid", LOGOS.madrid, "1989 - 2003"),
+      c("Al Rayyan", null, "2003 - 2004"),
+      c("Bolton Wanderers", null, "2004 - 2005")
     ]
   },
   {
@@ -4887,8 +4893,8 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["michel"],
     "nacionalidad": "España",
     "clubes": [
-      ("Real Madrid", "LOGOS.madrid", "1982 - 1996"),
-      ("Atlético Celaya", "null", "1996 - 1997")
+      c("Real Madrid", LOGOS.madrid, "1982 - 1996"),
+      c("Atlético Celaya", null, "1996 - 1997")
     ]
   },
   {
@@ -4899,8 +4905,8 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["butragueno", "el buitre"],
     "nacionalidad": "España",
     "clubes": [
-      ("Real Madrid", "LOGOS.madrid", "1984 - 1995"),
-      ("Atlético Celaya", "null", "1995 - 1998")
+      c("Real Madrid", LOGOS.madrid, "1984 - 1995"),
+      c("Atlético Celaya", null, "1995 - 1998")
     ]
   },
   {
@@ -4911,11 +4917,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["hugo sanchez"],
     "nacionalidad": "México",
     "clubes": [
-      ("Pumas UNAM", "null", "1976 - 1981"),
-      ("Atlético de Madrid", "LOGOS.atletico", "1981 - 1985"),
-      ("Real Madrid", "LOGOS.madrid", "1985 - 1992"),
-      ("Club América", "null", "1992 - 1993"),
-      ("Rayo Vallecano", "null", "1993 - 1994")
+      c("Pumas UNAM", null, "1976 - 1981"),
+      c("Atlético de Madrid", LOGOS.atletico, "1981 - 1985"),
+      c("Real Madrid", LOGOS.madrid, "1985 - 1992"),
+      c("Club América", null, "1992 - 1993"),
+      c("Rayo Vallecano", null, "1993 - 1994")
     ]
   },
   {
@@ -4926,13 +4932,13 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["zamorano", "bam bam zamorano"],
     "nacionalidad": "Chile",
     "clubes": [
-      ("Cobresal", "null", "1985 - 1988"),
-      ("FC St. Gallen", "null", "1988 - 1990"),
-      ("Sevilla FC", "LOGOS.sevilla", "1990 - 1992"),
-      ("Real Madrid", "LOGOS.madrid", "1992 - 1996"),
-      ("Inter de Milán", "LOGOS.inter", "1996 - 2001"),
-      ("Club América", "null", "2001 - 2002"),
-      ("Colo-Colo", "null", "2003")
+      c("Cobresal", null, "1985 - 1988"),
+      c("FC St. Gallen", null, "1988 - 1990"),
+      c("Sevilla FC", LOGOS.sevilla, "1990 - 1992"),
+      c("Real Madrid", LOGOS.madrid, "1992 - 1996"),
+      c("Inter de Milán", LOGOS.inter, "1996 - 2001"),
+      c("Club América", null, "2001 - 2002"),
+      c("Colo-Colo", null, "2003")
     ]
   },
   {
@@ -4943,12 +4949,12 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["guardiola", "pep guardiola"],
     "nacionalidad": "España",
     "clubes": [
-      ("FC Barcelona", "LOGOS.barca", "1990 - 2001"),
-      ("Brescia", "null", "2001 - 2002"),
-      ("AS Roma", "LOGOS.roma", "2002 - 2003"),
-      ("Brescia", "null", "2003"),
-      ("Al Ahli", "null", "2003 - 2005"),
-      ("Dorados de Sinaloa", "null", "2005 - 2006")
+      c("FC Barcelona", LOGOS.barca, "1990 - 2001"),
+      c("Brescia", null, "2001 - 2002"),
+      c("AS Roma", LOGOS.roma, "2002 - 2003"),
+      c("Brescia", null, "2003"),
+      c("Al Ahli", null, "2003 - 2005"),
+      c("Dorados de Sinaloa", null, "2005 - 2006")
     ]
   },
   {
@@ -4959,9 +4965,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["luis enrique", "lucho"],
     "nacionalidad": "España",
     "clubes": [
-      ("Sporting de Gijón", "null", "1989 - 1991"),
-      ("Real Madrid", "LOGOS.madrid", "1991 - 1996"),
-      ("FC Barcelona", "LOGOS.barca", "1996 - 2004")
+      c("Sporting de Gijón", null, "1989 - 1991"),
+      c("Real Madrid", LOGOS.madrid, "1991 - 1996"),
+      c("FC Barcelona", LOGOS.barca, "1996 - 2004")
     ]
   },
   {
@@ -4972,11 +4978,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["koeman"],
     "nacionalidad": "Países Bajos",
     "clubes": [
-      ("FC Groningen", "null", "1980 - 1983"),
-      ("AFC Ajax", "LOGOS.ajax", "1983 - 1986"),
-      ("PSV Eindhoven", "null", "1986 - 1989"),
-      ("FC Barcelona", "LOGOS.barca", "1989 - 1995"),
-      ("Feyenoord", "null", "1995 - 1997")
+      c("FC Groningen", null, "1980 - 1983"),
+      c("AFC Ajax", LOGOS.ajax, "1983 - 1986"),
+      c("PSV Eindhoven", null, "1986 - 1989"),
+      c("FC Barcelona", LOGOS.barca, "1989 - 1995"),
+      c("Feyenoord", null, "1995 - 1997")
     ]
   },
   {
@@ -4987,12 +4993,12 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["romario"],
     "nacionalidad": "Brasil",
     "clubes": [
-      ("Vasco da Gama", "null", "1985 - 1988"),
-      ("PSV Eindhoven", "null", "1988 - 1993"),
-      ("FC Barcelona", "LOGOS.barca", "1993 - 1995"),
-      ("Flamengo", "null", "1995 - 1996"),
-      ("Valencia CF", "LOGOS.valencia", "1996 - 1997"),
-      ("Vasco da Gama", "null", "2000 - 2002")
+      c("Vasco da Gama", null, "1985 - 1988"),
+      c("PSV Eindhoven", null, "1988 - 1993"),
+      c("FC Barcelona", LOGOS.barca, "1993 - 1995"),
+      c("Flamengo", null, "1995 - 1996"),
+      c("Valencia CF", LOGOS.valencia, "1996 - 1997"),
+      c("Vasco da Gama", null, "2000 - 2002")
     ]
   },
   {
@@ -5003,11 +5009,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["bebeto"],
     "nacionalidad": "Brasil",
     "clubes": [
-      ("Flamengo", "null", "1983 - 1989"),
-      ("Vasco da Gama", "null", "1989 - 1992"),
-      ("Deportivo La Coruña", "LOGOS.depor", "1992 - 1996"),
-      ("Sevilla FC", "LOGOS.sevilla", "1996 - 1997"),
-      ("Botafogo", "null", "1998 - 1999")
+      c("Flamengo", null, "1983 - 1989"),
+      c("Vasco da Gama", null, "1989 - 1992"),
+      c("Deportivo La Coruña", LOGOS.depor, "1992 - 1996"),
+      c("Sevilla FC", LOGOS.sevilla, "1996 - 1997"),
+      c("Botafogo", null, "1998 - 1999")
     ]
   },
   {
@@ -5018,9 +5024,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["kiko", "kiko narvaez"],
     "nacionalidad": "España",
     "clubes": [
-      ("Cádiz CF", "null", "1991 - 1993"),
-      ("Atlético de Madrid", "LOGOS.atletico", "1993 - 2001"),
-      ("CF Extremadura", "null", "2002")
+      c("Cádiz CF", null, "1991 - 1993"),
+      c("Atlético de Madrid", LOGOS.atletico, "1993 - 2001"),
+      c("CF Extremadura", null, "2002")
     ]
   },
   {
@@ -5031,14 +5037,14 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["simeone", "cholo simeone"],
     "nacionalidad": "Argentina",
     "clubes": [
-      ("Vélez Sarsfield", "null", "1987 - 1990"),
-      ("Pisa", "null", "1990 - 1992"),
-      ("Sevilla FC", "LOGOS.sevilla", "1992 - 1994"),
-      ("Atlético de Madrid", "LOGOS.atletico", "1994 - 1997"),
-      ("Inter de Milán", "LOGOS.inter", "1997 - 1999"),
-      ("Lazio", "null", "1999 - 2003"),
-      ("Atlético de Madrid", "LOGOS.atletico", "2003 - 2005"),
-      ("Racing Club", "null", "2005 - 2006")
+      c("Vélez Sarsfield", null, "1987 - 1990"),
+      c("Pisa", null, "1990 - 1992"),
+      c("Sevilla FC", LOGOS.sevilla, "1992 - 1994"),
+      c("Atlético de Madrid", LOGOS.atletico, "1994 - 1997"),
+      c("Inter de Milán", LOGOS.inter, "1997 - 1999"),
+      c("Lazio", null, "1999 - 2003"),
+      c("Atlético de Madrid", LOGOS.atletico, "2003 - 2005"),
+      c("Racing Club", null, "2005 - 2006")
     ]
   },
   {
@@ -5049,7 +5055,7 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["julen guerrero", "guerrero"],
     "nacionalidad": "España",
     "clubes": [
-      ("Athletic Club", "LOGOS.athletic", "1992 - 2006")
+      c("Athletic Club", LOGOS.athletic, "1992 - 2006")
     ]
   },
   {
@@ -5060,8 +5066,8 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["etxeberria"],
     "nacionalidad": "España",
     "clubes": [
-      ("Real Sociedad", "LOGOS.sociedad", "1994 - 1995"),
-      ("Athletic Club", "LOGOS.athletic", "1995 - 2010")
+      c("Real Sociedad", LOGOS.sociedad, "1994 - 1995"),
+      c("Athletic Club", LOGOS.athletic, "1995 - 2010")
     ]
   },
   {
@@ -5072,11 +5078,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["alfonso", "alfonso perez"],
     "nacionalidad": "España",
     "clubes": [
-      ("Real Madrid", "LOGOS.madrid", "1991 - 1995"),
-      ("Real Betis", "LOGOS.betis", "1995 - 2000"),
-      ("FC Barcelona", "LOGOS.barca", "2000 - 2002"),
-      ("Olympique de Marsella", "LOGOS.marseille", "2002"),
-      ("Real Betis", "LOGOS.betis", "2002 - 2005")
+      c("Real Madrid", LOGOS.madrid, "1991 - 1995"),
+      c("Real Betis", LOGOS.betis, "1995 - 2000"),
+      c("FC Barcelona", LOGOS.barca, "2000 - 2002"),
+      c("Olympique de Marsella", LOGOS.marseille, "2002"),
+      c("Real Betis", LOGOS.betis, "2002 - 2005")
     ]
   },
   {
@@ -5087,11 +5093,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["finidi"],
     "nacionalidad": "Nigeria",
     "clubes": [
-      ("AFC Ajax", "LOGOS.ajax", "1993 - 1996"),
-      ("Real Betis", "LOGOS.betis", "1996 - 2000"),
-      ("RCD Mallorca", "null", "2000 - 2001"),
-      ("Ipswich Town", "null", "2001 - 2003"),
-      ("RCD Mallorca", "null", "2003 - 2004")
+      c("AFC Ajax", LOGOS.ajax, "1993 - 1996"),
+      c("Real Betis", LOGOS.betis, "1996 - 2000"),
+      c("RCD Mallorca", null, "2000 - 2001"),
+      c("Ipswich Town", null, "2001 - 2003"),
+      c("RCD Mallorca", null, "2003 - 2004")
     ]
   },
   {
@@ -5102,12 +5108,12 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["denilson"],
     "nacionalidad": "Brasil",
     "clubes": [
-      ("São Paulo FC", "null", "1994 - 1998"),
-      ("Real Betis", "LOGOS.betis", "1998 - 2005"),
-      ("Flamengo", "null", "2000"),
-      ("Girondins de Burdeos", "null", "2005 - 2006"),
-      ("Al Nassr", "null", "2006 - 2007"),
-      ("Palmeiras", "null", "2008")
+      c("São Paulo FC", null, "1994 - 1998"),
+      c("Real Betis", LOGOS.betis, "1998 - 2005"),
+      c("Flamengo", null, "2000"),
+      c("Girondins de Burdeos", null, "2005 - 2006"),
+      c("Al Nassr", null, "2006 - 2007"),
+      c("Palmeiras", null, "2008")
     ]
   },
   {
@@ -5118,11 +5124,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["assuncao"],
     "nacionalidad": "Brasil",
     "clubes": [
-      ("Santos FC", "null", "1996 - 1997"),
-      ("Flamengo", "null", "1998"),
-      ("AS Roma", "LOGOS.roma", "1999 - 2002"),
-      ("Real Betis", "LOGOS.betis", "2002 - 2007"),
-      ("Palmeiras", "null", "2010 - 2012")
+      c("Santos FC", null, "1996 - 1997"),
+      c("Flamengo", null, "1998"),
+      c("AS Roma", LOGOS.roma, "1999 - 2002"),
+      c("Real Betis", LOGOS.betis, "2002 - 2007"),
+      c("Palmeiras", null, "2010 - 2012")
     ]
   },
   {
@@ -5133,11 +5139,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["kanoute"],
     "nacionalidad": "Malí",
     "clubes": [
-      ("Olympique de Lyon", "LOGOS.lyon", "1997 - 2000"),
-      ("West Ham United", "null", "2000 - 2003"),
-      ("Tottenham Hotspur", "LOGOS.tottenham", "2003 - 2005"),
-      ("Sevilla FC", "LOGOS.sevilla", "2005 - 2012"),
-      ("Beijing Guoan", "null", "2012 - 2013")
+      c("Olympique de Lyon", LOGOS.lyon, "1997 - 2000"),
+      c("West Ham United", null, "2000 - 2003"),
+      c("Tottenham Hotspur", LOGOS.tottenham, "2003 - 2005"),
+      c("Sevilla FC", LOGOS.sevilla, "2005 - 2012"),
+      c("Beijing Guoan", null, "2012 - 2013")
     ]
   },
   {
@@ -5148,11 +5154,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["luis fabiano"],
     "nacionalidad": "Brasil",
     "clubes": [
-      ("São Paulo FC", "null", "2001 - 2004"),
-      ("FC Porto", "LOGOS.porto", "2004 - 2005"),
-      ("Sevilla FC", "LOGOS.sevilla", "2005 - 2011"),
-      ("São Paulo FC", "null", "2011 - 2015"),
-      ("Vasco da Gama", "null", "2017")
+      c("São Paulo FC", null, "2001 - 2004"),
+      c("FC Porto", LOGOS.porto, "2004 - 2005"),
+      c("Sevilla FC", LOGOS.sevilla, "2005 - 2011"),
+      c("São Paulo FC", null, "2011 - 2015"),
+      c("Vasco da Gama", null, "2017")
     ]
   },
   {
@@ -5163,10 +5169,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["palop", "andres palop"],
     "nacionalidad": "España",
     "clubes": [
-      ("Villarreal CF", "LOGOS.villarreal", "1997 - 1999"),
-      ("Valencia CF", "LOGOS.valencia", "1999 - 2005"),
-      ("Sevilla FC", "LOGOS.sevilla", "2005 - 2013"),
-      ("Bayer Leverkusen", "null", "2013 - 2014")
+      c("Villarreal CF", LOGOS.villarreal, "1997 - 1999"),
+      c("Valencia CF", LOGOS.valencia, "1999 - 2005"),
+      c("Sevilla FC", LOGOS.sevilla, "2005 - 2013"),
+      c("Bayer Leverkusen", null, "2013 - 2014")
     ]
   },
   {
@@ -5177,11 +5183,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["marchena"],
     "nacionalidad": "España",
     "clubes": [
-      ("Sevilla FC", "LOGOS.sevilla", "1997 - 2000"),
-      ("SL Benfica", "LOGOS.benfica", "2000 - 2001"),
-      ("Valencia CF", "LOGOS.valencia", "2001 - 2010"),
-      ("Villarreal CF", "LOGOS.villarreal", "2010 - 2012"),
-      ("Deportivo La Coruña", "LOGOS.depor", "2012 - 2014")
+      c("Sevilla FC", LOGOS.sevilla, "1997 - 2000"),
+      c("SL Benfica", LOGOS.benfica, "2000 - 2001"),
+      c("Valencia CF", LOGOS.valencia, "2001 - 2010"),
+      c("Villarreal CF", LOGOS.villarreal, "2010 - 2012"),
+      c("Deportivo La Coruña", LOGOS.depor, "2012 - 2014")
     ]
   },
   {
@@ -5192,10 +5198,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["albelda"],
     "nacionalidad": "España",
     "clubes": [
-      ("Villarreal CF", "LOGOS.villarreal", "1996 - 1997"),
-      ("Valencia CF", "LOGOS.valencia", "1997 - 1998"),
-      ("Villarreal CF", "LOGOS.villarreal", "1998 - 1999"),
-      ("Valencia CF", "LOGOS.valencia", "1999 - 2013")
+      c("Villarreal CF", LOGOS.villarreal, "1996 - 1997"),
+      c("Valencia CF", LOGOS.valencia, "1997 - 1998"),
+      c("Villarreal CF", LOGOS.villarreal, "1998 - 1999"),
+      c("Valencia CF", LOGOS.valencia, "1999 - 2013")
     ]
   },
   {
@@ -5206,9 +5212,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["baraja", "pipo baraja"],
     "nacionalidad": "España",
     "clubes": [
-      ("Real Valladolid", "null", "1993 - 1996"),
-      ("Atlético de Madrid", "LOGOS.atletico", "1996 - 2000"),
-      ("Valencia CF", "LOGOS.valencia", "2000 - 2010")
+      c("Real Valladolid", null, "1993 - 1996"),
+      c("Atlético de Madrid", LOGOS.atletico, "1996 - 2000"),
+      c("Valencia CF", LOGOS.valencia, "2000 - 2010")
     ]
   },
   {
@@ -5219,9 +5225,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["vicente", "vicente rodriguez"],
     "nacionalidad": "España",
     "clubes": [
-      ("Levante UD", "null", "1997 - 2000"),
-      ("Valencia CF", "LOGOS.valencia", "2000 - 2011"),
-      ("Brighton & Hove Albion", "null", "2011 - 2013")
+      c("Levante UD", null, "1997 - 2000"),
+      c("Valencia CF", LOGOS.valencia, "2000 - 2011"),
+      c("Brighton & Hove Albion", null, "2011 - 2013")
     ]
   },
   {
@@ -5232,11 +5238,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["mista"],
     "nacionalidad": "España",
     "clubes": [
-      ("CD Tenerife", "null", "1999 - 2001"),
-      ("Valencia CF", "LOGOS.valencia", "2001 - 2006"),
-      ("Atlético de Madrid", "LOGOS.atletico", "2006 - 2008"),
-      ("Deportivo La Coruña", "LOGOS.depor", "2008 - 2010"),
-      ("Toronto FC", "null", "2010")
+      c("CD Tenerife", null, "1999 - 2001"),
+      c("Valencia CF", LOGOS.valencia, "2001 - 2006"),
+      c("Atlético de Madrid", LOGOS.atletico, "2006 - 2008"),
+      c("Deportivo La Coruña", LOGOS.depor, "2008 - 2010"),
+      c("Toronto FC", null, "2010")
     ]
   },
   {
@@ -5247,11 +5253,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["piojo lopez", "claudio lopez"],
     "nacionalidad": "Argentina",
     "clubes": [
-      ("Racing Club", "null", "1992 - 1996"),
-      ("Valencia CF", "LOGOS.valencia", "1996 - 2000"),
-      ("Lazio", "null", "2000 - 2004"),
-      ("Club América", "null", "2004 - 2006"),
-      ("Racing Club", "null", "2007")
+      c("Racing Club", null, "1992 - 1996"),
+      c("Valencia CF", LOGOS.valencia, "1996 - 2000"),
+      c("Lazio", null, "2000 - 2004"),
+      c("Club América", null, "2004 - 2006"),
+      c("Racing Club", null, "2007")
     ]
   },
   {
@@ -5262,12 +5268,12 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["ayala", "raton ayala"],
     "nacionalidad": "Argentina",
     "clubes": [
-      ("River Plate", "LOGOS.river", "1994 - 1995"),
-      ("SSC Napoli", "LOGOS.napoli", "1995 - 1998"),
-      ("AC Milan", "LOGOS.milan", "1998 - 2000"),
-      ("Valencia CF", "LOGOS.valencia", "2000 - 2007"),
-      ("Real Zaragoza", "null", "2007 - 2010"),
-      ("Racing Club", "null", "2010")
+      c("River Plate", LOGOS.river, "1994 - 1995"),
+      c("SSC Napoli", LOGOS.napoli, "1995 - 1998"),
+      c("AC Milan", LOGOS.milan, "1998 - 2000"),
+      c("Valencia CF", LOGOS.valencia, "2000 - 2007"),
+      c("Real Zaragoza", null, "2007 - 2010"),
+      c("Racing Club", null, "2010")
     ]
   },
   {
@@ -5278,10 +5284,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["tamudo", "raul tamudo"],
     "nacionalidad": "España",
     "clubes": [
-      ("RCD Espanyol", "LOGOS.espanyol", "1996 - 2010"),
-      ("Real Sociedad", "LOGOS.sociedad", "2010 - 2011"),
-      ("Rayo Vallecano", "null", "2011 - 2012"),
-      ("CE Sabadell", "null", "2013 - 2015")
+      c("RCD Espanyol", LOGOS.espanyol, "1996 - 2010"),
+      c("Real Sociedad", LOGOS.sociedad, "2010 - 2011"),
+      c("Rayo Vallecano", null, "2011 - 2012"),
+      c("CE Sabadell", null, "2013 - 2015")
     ]
   },
   {
@@ -5292,11 +5298,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["de la pena", "ivan de la pena", "lo pelat"],
     "nacionalidad": "España",
     "clubes": [
-      ("FC Barcelona", "LOGOS.barca", "1995 - 1998"),
-      ("Lazio", "null", "1998 - 2002"),
-      ("Olympique de Marsella", "LOGOS.marseille", "1999 - 2000"),
-      ("FC Barcelona", "LOGOS.barca", "2000 - 2001"),
-      ("RCD Espanyol", "LOGOS.espanyol", "2002 - 2011")
+      c("FC Barcelona", LOGOS.barca, "1995 - 1998"),
+      c("Lazio", null, "1998 - 2002"),
+      c("Olympique de Marsella", LOGOS.marseille, "1999 - 2000"),
+      c("FC Barcelona", LOGOS.barca, "2000 - 2001"),
+      c("RCD Espanyol", LOGOS.espanyol, "2002 - 2011")
     ]
   },
   {
@@ -5307,7 +5313,7 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["xabi prieto"],
     "nacionalidad": "España",
     "clubes": [
-      ("Real Sociedad", "LOGOS.sociedad", "2003 - 2018")
+      c("Real Sociedad", LOGOS.sociedad, "2003 - 2018")
     ]
   },
   {
@@ -5318,12 +5324,12 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["kovacevic"],
     "nacionalidad": "Serbia",
     "clubes": [
-      ("Estrella Roja", "null", "1994 - 1996"),
-      ("Real Sociedad", "LOGOS.sociedad", "1996 - 1999"),
-      ("Juventus", "LOGOS.juventus", "1999 - 2001"),
-      ("Lazio", "null", "2001"),
-      ("Real Sociedad", "LOGOS.sociedad", "2002 - 2007"),
-      ("Olympiacos", "null", "2007 - 2009")
+      c("Estrella Roja", null, "1994 - 1996"),
+      c("Real Sociedad", LOGOS.sociedad, "1996 - 1999"),
+      c("Juventus", LOGOS.juventus, "1999 - 2001"),
+      c("Lazio", null, "2001"),
+      c("Real Sociedad", LOGOS.sociedad, "2002 - 2007"),
+      c("Olympiacos", null, "2007 - 2009")
     ]
   },
   {
@@ -5334,10 +5340,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["nihat"],
     "nacionalidad": "Turquía",
     "clubes": [
-      ("Besiktas", "null", "1997 - 2002"),
-      ("Real Sociedad", "LOGOS.sociedad", "2002 - 2006"),
-      ("Villarreal CF", "LOGOS.villarreal", "2006 - 2009"),
-      ("Besiktas", "null", "2009 - 2011")
+      c("Besiktas", null, "1997 - 2002"),
+      c("Real Sociedad", LOGOS.sociedad, "2002 - 2006"),
+      c("Villarreal CF", LOGOS.villarreal, "2006 - 2009"),
+      c("Besiktas", null, "2009 - 2011")
     ]
   },
   {
@@ -5348,11 +5354,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["karpin"],
     "nacionalidad": "Rusia",
     "clubes": [
-      ("Spartak de Moscú", "null", "1990 - 1994"),
-      ("Real Sociedad", "LOGOS.sociedad", "1994 - 1996"),
-      ("Valencia CF", "LOGOS.valencia", "1996 - 1997"),
-      ("Celta de Vigo", "LOGOS.celta", "1997 - 2002"),
-      ("Real Sociedad", "LOGOS.sociedad", "2002 - 2005")
+      c("Spartak de Moscú", null, "1990 - 1994"),
+      c("Real Sociedad", LOGOS.sociedad, "1994 - 1996"),
+      c("Valencia CF", LOGOS.valencia, "1996 - 1997"),
+      c("Celta de Vigo", LOGOS.celta, "1997 - 2002"),
+      c("Real Sociedad", LOGOS.sociedad, "2002 - 2005")
     ]
   },
   {
@@ -5363,11 +5369,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["mostovoi", "el zar"],
     "nacionalidad": "Rusia",
     "clubes": [
-      ("Spartak de Moscú", "null", "1987 - 1991"),
-      ("SL Benfica", "LOGOS.benfica", "1992 - 1993"),
-      ("RC Estrasburgo", "null", "1994 - 1996"),
-      ("Celta de Vigo", "LOGOS.celta", "1996 - 2004"),
-      ("Deportivo Alavés", "null", "2005")
+      c("Spartak de Moscú", null, "1987 - 1991"),
+      c("SL Benfica", LOGOS.benfica, "1992 - 1993"),
+      c("RC Estrasburgo", null, "1994 - 1996"),
+      c("Celta de Vigo", LOGOS.celta, "1996 - 2004"),
+      c("Deportivo Alavés", null, "2005")
     ]
   },
   {
@@ -5378,7 +5384,7 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["bruno soriano"],
     "nacionalidad": "España",
     "clubes": [
-      ("Villarreal CF", "LOGOS.villarreal", "2006 - 2020")
+      c("Villarreal CF", LOGOS.villarreal, "2006 - 2020")
     ]
   },
   {
@@ -5389,11 +5395,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["gabi", "gabi fernandez"],
     "nacionalidad": "España",
     "clubes": [
-      ("Atlético de Madrid", "LOGOS.atletico", "2004 - 2007"),
-      ("Getafe CF", "null", "2004 - 2005"),
-      ("Real Zaragoza", "null", "2007 - 2011"),
-      ("Atlético de Madrid", "LOGOS.atletico", "2011 - 2018"),
-      ("Al Sadd SC", "null", "2018 - 2020")
+      c("Atlético de Madrid", LOGOS.atletico, "2004 - 2007"),
+      c("Getafe CF", null, "2004 - 2005"),
+      c("Real Zaragoza", null, "2007 - 2011"),
+      c("Atlético de Madrid", LOGOS.atletico, "2011 - 2018"),
+      c("Al Sadd SC", null, "2018 - 2020")
     ]
   },
   {
@@ -5404,11 +5410,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["juanfran", "juanfran torres"],
     "nacionalidad": "España",
     "clubes": [
-      ("Real Madrid", "LOGOS.madrid", "2004 - 2005"),
-      ("RCD Espanyol", "LOGOS.espanyol", "2005 - 2006"),
-      ("CA Osasuna", "null", "2006 - 2011"),
-      ("Atlético de Madrid", "LOGOS.atletico", "2011 - 2019"),
-      ("São Paulo FC", "null", "2019 - 2021")
+      c("Real Madrid", LOGOS.madrid, "2004 - 2005"),
+      c("RCD Espanyol", LOGOS.espanyol, "2005 - 2006"),
+      c("CA Osasuna", null, "2006 - 2011"),
+      c("Atlético de Madrid", LOGOS.atletico, "2011 - 2019"),
+      c("São Paulo FC", null, "2019 - 2021")
     ]
   },
   {
@@ -5419,12 +5425,12 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["filipe luis"],
     "nacionalidad": "Brasil",
     "clubes": [
-      ("Figueirense", "null", "2003 - 2004"),
-      ("Deportivo La Coruña", "LOGOS.depor", "2006 - 2010"),
-      ("Atlético de Madrid", "LOGOS.atletico", "2010 - 2014"),
-      ("Chelsea FC", "LOGOS.chelsea", "2014 - 2015"),
-      ("Atlético de Madrid", "LOGOS.atletico", "2015 - 2019"),
-      ("Flamengo", "null", "2019 - 2023")
+      c("Figueirense", null, "2003 - 2004"),
+      c("Deportivo La Coruña", LOGOS.depor, "2006 - 2010"),
+      c("Atlético de Madrid", LOGOS.atletico, "2010 - 2014"),
+      c("Chelsea FC", LOGOS.chelsea, "2014 - 2015"),
+      c("Atlético de Madrid", LOGOS.atletico, "2015 - 2019"),
+      c("Flamengo", null, "2019 - 2023")
     ]
   },
   {
@@ -5435,12 +5441,12 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["miranda", "joao miranda"],
     "nacionalidad": "Brasil",
     "clubes": [
-      ("Coritiba", "null", "2004 - 2005"),
-      ("FC Sochaux", "null", "2005 - 2006"),
-      ("São Paulo FC", "null", "2006 - 2011"),
-      ("Atlético de Madrid", "LOGOS.atletico", "2011 - 2015"),
-      ("Inter de Milán", "LOGOS.inter", "2015 - 2019"),
-      ("São Paulo FC", "null", "2021 - 2022")
+      c("Coritiba", null, "2004 - 2005"),
+      c("FC Sochaux", null, "2005 - 2006"),
+      c("São Paulo FC", null, "2006 - 2011"),
+      c("Atlético de Madrid", LOGOS.atletico, "2011 - 2015"),
+      c("Inter de Milán", LOGOS.inter, "2015 - 2019"),
+      c("São Paulo FC", null, "2021 - 2022")
     ]
   },
   {
@@ -5451,11 +5457,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["arda turan", "arda"],
     "nacionalidad": "Turquía",
     "clubes": [
-      ("Galatasaray", "null", "2005 - 2011"),
-      ("Atlético de Madrid", "LOGOS.atletico", "2011 - 2015"),
-      ("FC Barcelona", "LOGOS.barca", "2015 - 2020"),
-      ("Istanbul Basaksehir", "null", "2018 - 2020"),
-      ("Galatasaray", "null", "2020 - 2022")
+      c("Galatasaray", null, "2005 - 2011"),
+      c("Atlético de Madrid", LOGOS.atletico, "2011 - 2015"),
+      c("FC Barcelona", LOGOS.barca, "2015 - 2020"),
+      c("Istanbul Basaksehir", null, "2018 - 2020"),
+      c("Galatasaray", null, "2020 - 2022")
     ]
   },
   {
@@ -5466,15 +5472,15 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["diego costa"],
     "nacionalidad": "España",
     "clubes": [
-      ("Celta de Vigo", "LOGOS.celta", "2007 - 2008"),
-      ("Real Valladolid", "null", "2009 - 2010"),
-      ("Atlético de Madrid", "LOGOS.atletico", "2010 - 2014"),
-      ("Rayo Vallecano", "null", "2012"),
-      ("Chelsea FC", "LOGOS.chelsea", "2014 - 2017"),
-      ("Atlético de Madrid", "LOGOS.atletico", "2018 - 2020"),
-      ("Atlético Mineiro", "null", "2021"),
-      ("Wolverhampton", "null", "2022 - 2023"),
-      ("Grêmio", "null", "2024")
+      c("Celta de Vigo", LOGOS.celta, "2007 - 2008"),
+      c("Real Valladolid", null, "2009 - 2010"),
+      c("Atlético de Madrid", LOGOS.atletico, "2010 - 2014"),
+      c("Rayo Vallecano", null, "2012"),
+      c("Chelsea FC", LOGOS.chelsea, "2014 - 2017"),
+      c("Atlético de Madrid", LOGOS.atletico, "2018 - 2020"),
+      c("Atlético Mineiro", null, "2021"),
+      c("Wolverhampton", null, "2022 - 2023"),
+      c("Grêmio", null, "2024")
     ]
   },
   {
@@ -5485,13 +5491,13 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["david luiz"],
     "nacionalidad": "Brasil",
     "clubes": [
-      ("SL Benfica", "LOGOS.benfica", "2007 - 2011"),
-      ("Chelsea FC", "LOGOS.chelsea", "2011 - 2014"),
-      ("Paris Saint-Germain", "LOGOS.psg", "2014 - 2016"),
-      ("Chelsea FC", "LOGOS.chelsea", "2016 - 2019"),
-      ("Arsenal FC", "LOGOS.arsenal", "2019 - 2021"),
-      ("Flamengo", "null", "2021 - 2024"),
-      ("Fortaleza", "null", "2025 - Presente")
+      c("SL Benfica", LOGOS.benfica, "2007 - 2011"),
+      c("Chelsea FC", LOGOS.chelsea, "2011 - 2014"),
+      c("Paris Saint-Germain", LOGOS.psg, "2014 - 2016"),
+      c("Chelsea FC", LOGOS.chelsea, "2016 - 2019"),
+      c("Arsenal FC", LOGOS.arsenal, "2019 - 2021"),
+      c("Flamengo", null, "2021 - 2024"),
+      c("Fortaleza", null, "2025 - Presente")
     ]
   },
   {
@@ -5502,14 +5508,14 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["willian"],
     "nacionalidad": "Brasil",
     "clubes": [
-      ("Corinthians", "null", "2006 - 2007"),
-      ("Shakhtar Donetsk", "null", "2007 - 2013"),
-      ("Chelsea FC", "LOGOS.chelsea", "2013 - 2020"),
-      ("Arsenal FC", "LOGOS.arsenal", "2020 - 2021"),
-      ("Corinthians", "null", "2021 - 2022"),
-      ("Fulham FC", "null", "2022 - 2024"),
-      ("Olympiacos", "null", "2024"),
-      ("Fulham FC", "null", "2025 - Presente")
+      c("Corinthians", null, "2006 - 2007"),
+      c("Shakhtar Donetsk", null, "2007 - 2013"),
+      c("Chelsea FC", LOGOS.chelsea, "2013 - 2020"),
+      c("Arsenal FC", LOGOS.arsenal, "2020 - 2021"),
+      c("Corinthians", null, "2021 - 2022"),
+      c("Fulham FC", null, "2022 - 2024"),
+      c("Olympiacos", null, "2024"),
+      c("Fulham FC", null, "2025 - Presente")
     ]
   },
   {
@@ -5520,11 +5526,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["oscar"],
     "nacionalidad": "Brasil",
     "clubes": [
-      ("São Paulo FC", "null", "2008 - 2010"),
-      ("Internacional", "null", "2010 - 2012"),
-      ("Chelsea FC", "LOGOS.chelsea", "2012 - 2016"),
-      ("Shanghai Port", "null", "2017 - 2024"),
-      ("São Paulo FC", "null", "2025 - Presente")
+      c("São Paulo FC", null, "2008 - 2010"),
+      c("Internacional", null, "2010 - 2012"),
+      c("Chelsea FC", LOGOS.chelsea, "2012 - 2016"),
+      c("Shanghai Port", null, "2017 - 2024"),
+      c("São Paulo FC", null, "2025 - Presente")
     ]
   },
   {
@@ -5535,11 +5541,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["ramires"],
     "nacionalidad": "Brasil",
     "clubes": [
-      ("Cruzeiro", "null", "2007 - 2009"),
-      ("SL Benfica", "LOGOS.benfica", "2009 - 2010"),
-      ("Chelsea FC", "LOGOS.chelsea", "2010 - 2016"),
-      ("Jiangsu Suning", "null", "2016 - 2019"),
-      ("Palmeiras", "null", "2019 - 2020")
+      c("Cruzeiro", null, "2007 - 2009"),
+      c("SL Benfica", LOGOS.benfica, "2009 - 2010"),
+      c("Chelsea FC", LOGOS.chelsea, "2010 - 2016"),
+      c("Jiangsu Suning", null, "2016 - 2019"),
+      c("Palmeiras", null, "2019 - 2020")
     ]
   },
   {
@@ -5550,10 +5556,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["fernandinho"],
     "nacionalidad": "Brasil",
     "clubes": [
-      ("Athletico Paranaense", "null", "2002 - 2005"),
-      ("Shakhtar Donetsk", "null", "2005 - 2013"),
-      ("Manchester City", "LOGOS.mancity", "2013 - 2022"),
-      ("Athletico Paranaense", "null", "2022 - 2024")
+      c("Athletico Paranaense", null, "2002 - 2005"),
+      c("Shakhtar Donetsk", null, "2005 - 2013"),
+      c("Manchester City", LOGOS.mancity, "2013 - 2022"),
+      c("Athletico Paranaense", null, "2022 - 2024")
     ]
   },
   {
@@ -5564,10 +5570,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["fabinho"],
     "nacionalidad": "Brasil",
     "clubes": [
-      ("Real Madrid", "LOGOS.madrid", "2012 - 2013"),
-      ("AS Mónaco", "LOGOS.monaco", "2013 - 2018"),
-      ("Liverpool FC", "LOGOS.liverpool", "2018 - 2023"),
-      ("Al Ittihad", "null", "2023 - Presente")
+      c("Real Madrid", LOGOS.madrid, "2012 - 2013"),
+      c("AS Mónaco", LOGOS.monaco, "2013 - 2018"),
+      c("Liverpool FC", LOGOS.liverpool, "2018 - 2023"),
+      c("Al Ittihad", null, "2023 - Presente")
     ]
   },
   {
@@ -5578,11 +5584,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["lavezzi", "pocho lavezzi"],
     "nacionalidad": "Argentina",
     "clubes": [
-      ("Estudiantes (BA)", "null", "2003 - 2004"),
-      ("San Lorenzo", "null", "2004 - 2007"),
-      ("SSC Napoli", "LOGOS.napoli", "2007 - 2012"),
-      ("Paris Saint-Germain", "LOGOS.psg", "2012 - 2016"),
-      ("Hebei China Fortune", "null", "2016 - 2019")
+      c("Estudiantes (BA)", null, "2003 - 2004"),
+      c("San Lorenzo", null, "2004 - 2007"),
+      c("SSC Napoli", LOGOS.napoli, "2007 - 2012"),
+      c("Paris Saint-Germain", LOGOS.psg, "2012 - 2016"),
+      c("Hebei China Fortune", null, "2016 - 2019")
     ]
   },
   {
@@ -5593,11 +5599,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["pastore", "flaco pastore"],
     "nacionalidad": "Argentina",
     "clubes": [
-      ("Huracán", "null", "2007 - 2009"),
-      ("Palermo", "null", "2009 - 2011"),
-      ("Paris Saint-Germain", "LOGOS.psg", "2011 - 2018"),
-      ("AS Roma", "LOGOS.roma", "2018 - 2021"),
-      ("Elche CF", "null", "2021 - 2022")
+      c("Huracán", null, "2007 - 2009"),
+      c("Palermo", null, "2009 - 2011"),
+      c("Paris Saint-Germain", LOGOS.psg, "2011 - 2018"),
+      c("AS Roma", LOGOS.roma, "2018 - 2021"),
+      c("Elche CF", null, "2021 - 2022")
     ]
   },
   {
@@ -5608,10 +5614,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["hamsik"],
     "nacionalidad": "Eslovaquia",
     "clubes": [
-      ("Brescia", "null", "2004 - 2007"),
-      ("SSC Napoli", "LOGOS.napoli", "2007 - 2019"),
-      ("Dalian Pro", "null", "2019 - 2021"),
-      ("Trabzonspor", "null", "2021 - 2023")
+      c("Brescia", null, "2004 - 2007"),
+      c("SSC Napoli", LOGOS.napoli, "2007 - 2019"),
+      c("Dalian Pro", null, "2019 - 2021"),
+      c("Trabzonspor", null, "2021 - 2023")
     ]
   },
   {
@@ -5622,10 +5628,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["mertens"],
     "nacionalidad": "Bélgica",
     "clubes": [
-      ("FC Utrecht", "null", "2009 - 2011"),
-      ("PSV Eindhoven", "null", "2011 - 2013"),
-      ("SSC Napoli", "LOGOS.napoli", "2013 - 2022"),
-      ("Galatasaray", "null", "2022 - Presente")
+      c("FC Utrecht", null, "2009 - 2011"),
+      c("PSV Eindhoven", null, "2011 - 2013"),
+      c("SSC Napoli", LOGOS.napoli, "2013 - 2022"),
+      c("Galatasaray", null, "2022 - Presente")
     ]
   },
   {
@@ -5636,9 +5642,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["insigne"],
     "nacionalidad": "Italia",
     "clubes": [
-      ("Pescara", "null", "2011 - 2012"),
-      ("SSC Napoli", "LOGOS.napoli", "2012 - 2022"),
-      ("Toronto FC", "null", "2022 - Presente")
+      c("Pescara", null, "2011 - 2012"),
+      c("SSC Napoli", LOGOS.napoli, "2012 - 2022"),
+      c("Toronto FC", null, "2022 - Presente")
     ]
   },
   {
@@ -5649,12 +5655,12 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["nainggolan"],
     "nacionalidad": "Bélgica",
     "clubes": [
-      ("Piacenza", "null", "2005 - 2010"),
-      ("Cagliari", "null", "2010 - 2014"),
-      ("AS Roma", "LOGOS.roma", "2014 - 2018"),
-      ("Inter de Milán", "LOGOS.inter", "2018 - 2021"),
-      ("Cagliari", "null", "2019 - 2021"),
-      ("Royal Antwerp", "null", "2021 - 2022")
+      c("Piacenza", null, "2005 - 2010"),
+      c("Cagliari", null, "2010 - 2014"),
+      c("AS Roma", LOGOS.roma, "2014 - 2018"),
+      c("Inter de Milán", LOGOS.inter, "2018 - 2021"),
+      c("Cagliari", null, "2019 - 2021"),
+      c("Royal Antwerp", null, "2021 - 2022")
     ]
   },
   {
@@ -5665,13 +5671,13 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["pjanic"],
     "nacionalidad": "Bosnia y Herzegovina",
     "clubes": [
-      ("FC Metz", "null", "2007 - 2008"),
-      ("Olympique de Lyon", "LOGOS.lyon", "2008 - 2011"),
-      ("AS Roma", "LOGOS.roma", "2011 - 2016"),
-      ("Juventus", "LOGOS.juventus", "2016 - 2020"),
-      ("FC Barcelona", "LOGOS.barca", "2020 - 2022"),
-      ("Besiktas", "null", "2021 - 2022"),
-      ("CSKA Moscú", "null", "2024 - 2025")
+      c("FC Metz", null, "2007 - 2008"),
+      c("Olympique de Lyon", LOGOS.lyon, "2008 - 2011"),
+      c("AS Roma", LOGOS.roma, "2011 - 2016"),
+      c("Juventus", LOGOS.juventus, "2016 - 2020"),
+      c("FC Barcelona", LOGOS.barca, "2020 - 2022"),
+      c("Besiktas", null, "2021 - 2022"),
+      c("CSKA Moscú", null, "2024 - 2025")
     ]
   },
   {
@@ -5682,12 +5688,12 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["depay", "memphis", "memphis depay"],
     "nacionalidad": "Países Bajos",
     "clubes": [
-      ("PSV Eindhoven", "null", "2011 - 2015"),
-      ("Manchester United", "LOGOS.manutd", "2015 - 2017"),
-      ("Olympique de Lyon", "LOGOS.lyon", "2017 - 2021"),
-      ("FC Barcelona", "LOGOS.barca", "2021 - 2023"),
-      ("Atlético de Madrid", "LOGOS.atletico", "2023 - 2024"),
-      ("Corinthians", "null", "2024 - Presente")
+      c("PSV Eindhoven", null, "2011 - 2015"),
+      c("Manchester United", LOGOS.manutd, "2015 - 2017"),
+      c("Olympique de Lyon", LOGOS.lyon, "2017 - 2021"),
+      c("FC Barcelona", LOGOS.barca, "2021 - 2023"),
+      c("Atlético de Madrid", LOGOS.atletico, "2023 - 2024"),
+      c("Corinthians", null, "2024 - Presente")
     ]
   },
   {
@@ -5698,9 +5704,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["lacazette"],
     "nacionalidad": "Francia",
     "clubes": [
-      ("Olympique de Lyon", "LOGOS.lyon", "2010 - 2017"),
-      ("Arsenal FC", "LOGOS.arsenal", "2017 - 2022"),
-      ("Olympique de Lyon", "LOGOS.lyon", "2022 - 2025")
+      c("Olympique de Lyon", LOGOS.lyon, "2010 - 2017"),
+      c("Arsenal FC", LOGOS.arsenal, "2017 - 2022"),
+      c("Olympique de Lyon", LOGOS.lyon, "2022 - 2025")
     ]
   },
   {
@@ -5711,9 +5717,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["fekir", "nabil fekir"],
     "nacionalidad": "Francia",
     "clubes": [
-      ("Olympique de Lyon", "LOGOS.lyon", "2013 - 2019"),
-      ("Real Betis", "LOGOS.betis", "2019 - 2024"),
-      ("Al Jazira", "null", "2024 - Presente")
+      c("Olympique de Lyon", LOGOS.lyon, "2013 - 2019"),
+      c("Real Betis", LOGOS.betis, "2019 - 2024"),
+      c("Al Jazira", null, "2024 - Presente")
     ]
   },
   {
@@ -5724,13 +5730,13 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["payet"],
     "nacionalidad": "Francia",
     "clubes": [
-      ("FC Nantes", "null", "2005 - 2007"),
-      ("Saint-Étienne", "null", "2007 - 2011"),
-      ("Lille OSC", "null", "2011 - 2013"),
-      ("Olympique de Marsella", "LOGOS.marseille", "2013 - 2015"),
-      ("West Ham United", "null", "2015 - 2017"),
-      ("Olympique de Marsella", "LOGOS.marseille", "2017 - 2023"),
-      ("Vasco da Gama", "null", "2023 - 2025")
+      c("FC Nantes", null, "2005 - 2007"),
+      c("Saint-Étienne", null, "2007 - 2011"),
+      c("Lille OSC", null, "2011 - 2013"),
+      c("Olympique de Marsella", LOGOS.marseille, "2013 - 2015"),
+      c("West Ham United", null, "2015 - 2017"),
+      c("Olympique de Marsella", LOGOS.marseille, "2017 - 2023"),
+      c("Vasco da Gama", null, "2023 - 2025")
     ]
   },
   {
@@ -5741,9 +5747,9 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["ben yedder"],
     "nacionalidad": "Francia",
     "clubes": [
-      ("Toulouse FC", "null", "2010 - 2016"),
-      ("Sevilla FC", "LOGOS.sevilla", "2016 - 2019"),
-      ("AS Mónaco", "LOGOS.monaco", "2019 - 2024")
+      c("Toulouse FC", null, "2010 - 2016"),
+      c("Sevilla FC", LOGOS.sevilla, "2016 - 2019"),
+      c("AS Mónaco", LOGOS.monaco, "2019 - 2024")
     ]
   },
   {
@@ -5754,10 +5760,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["gyokeres"],
     "nacionalidad": "Suecia",
     "clubes": [
-      ("Brighton & Hove Albion", "null", "2018 - 2021"),
-      ("Coventry City", "null", "2021 - 2023"),
-      ("Sporting CP", "LOGOS.sporting", "2023 - 2025"),
-      ("Arsenal FC", "LOGOS.arsenal", "2025 - Presente")
+      c("Brighton & Hove Albion", null, "2018 - 2021"),
+      c("Coventry City", null, "2021 - 2023"),
+      c("Sporting CP", LOGOS.sporting, "2023 - 2025"),
+      c("Arsenal FC", LOGOS.arsenal, "2025 - Presente")
     ]
   },
   {
@@ -5768,11 +5774,11 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["isak", "alexander isak"],
     "nacionalidad": "Suecia",
     "clubes": [
-      ("AIK Estocolmo", "null", "2016"),
-      ("Borussia Dortmund", "LOGOS.dortmund", "2017 - 2019"),
-      ("Willem II", "null", "2019"),
-      ("Real Sociedad", "LOGOS.sociedad", "2019 - 2022"),
-      ("Newcastle United", "null", "2022 - Presente")
+      c("AIK Estocolmo", null, "2016"),
+      c("Borussia Dortmund", LOGOS.dortmund, "2017 - 2019"),
+      c("Willem II", null, "2019"),
+      c("Real Sociedad", LOGOS.sociedad, "2019 - 2022"),
+      c("Newcastle United", null, "2022 - Presente")
     ]
   },
   {
@@ -5783,10 +5789,10 @@ export const RETOS_TRAYECTORIAS = [
     "alias": ["marmoush"],
     "nacionalidad": "Egipto",
     "clubes": [
-      ("VfL Wolfsburg", "null", "2020 - 2023"),
-      ("VfB Stuttgart", "null", "2021 - 2022"),
-      ("Eintracht Frankfurt", "null", "2023 - 2025"),
-      ("Manchester City", "LOGOS.mancity", "2025 - Presente")
+      c("VfL Wolfsburg", null, "2020 - 2023"),
+      c("VfB Stuttgart", null, "2021 - 2022"),
+      c("Eintracht Frankfurt", null, "2023 - 2025"),
+      c("Manchester City", LOGOS.mancity, "2025 - Presente")
     ]
   }
 ];

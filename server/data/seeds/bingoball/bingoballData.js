@@ -30,7 +30,7 @@ export const LISTA_BINGOS = Object.values(BINGOS).map(b => ({
   grupo: b.grupo
 }));
 
-export const getBingoPorId = (id) => BINGOS[id] || BINGOS['internacional_1'];
+export const getBingoPorId = (id) => BINGOS[id] || BINGOS.internacional_unico;
 
 // Obtiene todos los jugadores únicos de cualquiera de los 25 bingos
 export const getTodosJugadoresBingo = (bingoId) => {

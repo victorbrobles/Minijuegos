@@ -108,6 +108,17 @@ npm run dev
 - Partidas de 10, 15 o 25 rondas y 45 s por respuesta. Online, el servidor cierra la ronda al acabar el tiempo y acepta selecciones incompletas.
 - Elementos en `server/data/seeds/colores/parteN.js` (`{ id, item, colores: [...] }`, con los colores de la paleta: rojo, azul, amarillo, verde, naranja, morado, marron, blanco, negro, gris, rosa). `parte6.js` es la ampliación.
 
+## Minijuego: Modo carrera (`Trayectoria/`)
+- Online o en un único dispositivo, de 2 a 15 jugadores; 5, 10 o 15 futbolistas y dificultad mixta, fácil, media o difícil.
+- Los clubes salen uno a uno cada 6 s. Quien lo sepa pulsa «¡Lo sé!» (el reloj se para) y tiene 20 s para escribirlo. Puntos: 1 + clubes aún ocultos (máx. 5, mín. 2); con la pista (retos difíciles), 1. Fallar resta 1 y deja fuera de esa ronda.
+- Escudos: imagen conocida (Wikipedia) y, si no hay o no carga, escudo dibujado con los colores y siglas del club (`server/data/seeds/trayectoria/escudos.js`, los 336 clubes).
+- Motor en `server/trayectoria/engine.js` (copia con `npm run sync:trayectoria`). Prueba: `node server/scripts/trayectoria-sim.mjs`. En local los futbolistas se cargan en un trozo aparte.
+
+## Minijuego: Bingoball (`Bingoball/`)
+- Solo online, de 2 a 15 jugadores. Cartón de 12 categorías (4 × 3); cada 15 s sale un futbolista (cromo con equipación propia) y se marca la casilla en la que encaja.
+- Acierto +2, fallo −1 (y sin marcar hasta el siguiente), línea +5, bingo +20 (termina la partida).
+- Motor en `server/bingoball/engine.js` (copia con `npm run sync:bingoball`). Prueba: `node server/scripts/bingoball-sim.mjs`.
+
 ## Minijuego: ¡Descarta y Elimina! (`Descarte/`)
 - De 3 a 12 jugadores, online o en un único dispositivo; partidas de 3, 5 o 7 tableros con 26 letras (sin Ñ; 1, 2 o 3 puntos según lo difícil que sea la letra).
 - Turno del retador → «listo» → elige rival (alguien que no haya jugado en esta vuelta) y una de tres categorías → turno del retado → «listo» → ve la categoría y tiene 30 s para decir una palabra que empiece por una letra del tablero: acierto (la letra se elimina y suma), fallo o pasar turno (cuenta como fallo). El tablero acaba sin letras o cuando todos fallan seguidos.
