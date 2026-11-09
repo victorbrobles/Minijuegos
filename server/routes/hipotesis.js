@@ -54,8 +54,7 @@ function refrescar(sala) {
 
 function iniciarPartida(sala) {
   sala.numPartida += 1; sala.puntosAplicados = false;
-  sala.partida = E.crearPartida(sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre })), sala.config);
-  sala.partida.limite = Date.now() + E.AJUSTES.hipotesisMs;
+  sala.partida = E.crearPartida(sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre })), sala.config, { ahora: Date.now() });
   sala.estado = 'jugando';
 }
 
@@ -68,7 +67,7 @@ router.post('/online/crear', (req, res) => {
   const token = nuevoToken();
   salas[code] = {
     code, adminToken: token, estado: 'lobby', contadorIds: 1, numPartida: 0, puntosAplicados: false,
-    config: { ...E.CONFIG_DEFECTO }, partida: null, ultimaPartida: null, ultimaActividad: Date.now(),
+    config: { rondas: 5 }, partida: null, ultimaPartida: null, ultimaActividad: Date.now(),
     jugadores: [{ id: 1, token, nombre, puntos: 0, visto: Date.now() }]
   };
   res.json({ success: true, code, token, jugadorId: 1 });
@@ -98,13 +97,14 @@ router.get('/online/sala/:code', (req, res) => {
   refrescar(sala);
   const base = {
     success: true, code: sala.code, estado: sala.estado, esAdmin, yoId: jugador.id, numPartida: sala.numPartida, ahora: Date.now(),
-    config: sala.config,
+    config: sala.config, min: MIN, max: MAX,
+    anfitrionId: sala.jugadores.find((j) => j.token === sala.adminToken)?.id ?? null,
     jugadores: sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre, puntos: j.puntos, conectado: Date.now() - j.visto < 15000 })),
     ultimaPartida: sala.ultimaPartida
   };
   if (sala.estado === 'jugando' && sala.partida) {
     if (!sala.partida.jugadores.some((j) => j.id === jugador.id)) return res.status(403).json({ error: 'Ya no estás en la partida.' });
-    base.vista = E.vistaDe(sala.partida, jugador.id);
+    base.vista = E.vistaDe(sala.partida, jugador.id, Date.now());
   }
   res.json(base);
 });
@@ -117,6 +117,19 @@ router.post('/online/sala/:code/config', (req, res) => {
   if (c.sala.estado !== 'lobby') return res.status(400).json({ error: 'La partida ya ha empezado.' });
   if (E.OPCIONES_RONDAS.includes(Number(req.body?.rondas))) c.sala.config.rondas = Number(req.body.rondas);
   res.json({ success: true, config: c.sala.config });
+});
+
+router.post('/online/sala/:code/expulsar', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión.' });
+  if (c.sala.estado !== 'lobby') return res.status(400).json({ error: 'Solo se puede quitar a alguien en la sala de espera.' });
+  const id = Number(req.body?.id);
+  if (id === c.jugador.id) return res.status(400).json({ error: 'No puedes quitarte a ti mismo.' });
+  const idx = c.sala.jugadores.findIndex((j) => j.id === id);
+  if (idx === -1) return res.status(404).json({ error: 'Ese jugador ya no está en la sala.' });
+  c.sala.jugadores.splice(idx, 1);
+  res.json({ success: true });
 });
 
 // ---------------------------------------------------------------- Iniciar
@@ -133,7 +146,7 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
 });
 
 // ---------------------------------------------------------------- Acciones
-// tipo: lupa | hipotesis | apostar | detectar | reaccion | continuar
+// tipo: formular | juzgar | reaccion | continuar
 router.post('/online/sala/:code/accion', (req, res) => {
   const c = sala_y_jugador(req, res);
   if (!c) return;
@@ -143,11 +156,9 @@ router.post('/online/sala/:code/accion', (req, res) => {
   const p = sala.partida; const d = req.body || {}; const id = jugador.id; const t = Date.now();
   let r;
   switch (d.tipo) {
-    case 'lupa': r = E.usarLupa(p, id, Number(d.m)); break;
-    case 'hipotesis': r = E.enviarHipotesis(p, id, d.hipotesis, t); break;
-    case 'apostar': r = E.apostar(p, id, { posiciones: d.posiciones, doble: d.doble, censura: d.censura }, t); break;
-    case 'detectar': r = E.detectar(p, id, Number(d.a)); break;
-    case 'reaccion': r = E.reaccionar(p, id, Number(d.a), d.emoji); break;
+    case 'formular': r = E.formular(p, id, d.hipotesis, t); break;
+    case 'juzgar': r = E.juzgar(p, id, { votos: d.votos, seguro: d.seguro ?? null }, t); break;
+    case 'reaccion': r = E.reaccionar(p, id, String(d.hid), d.emoji); break;
     case 'continuar': r = E.continuar(p, id, t); break;
     default: return res.status(400).json({ error: 'Acción desconocida.' });
   }
@@ -182,6 +193,7 @@ router.post('/online/sala/:code/finalizar', (req, res) => {
   const c = sala_y_jugador(req, res);
   if (!c) return;
   if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión.' });
+  if (c.sala.estado !== 'jugando' || c.sala.partida?.fase !== 'fin') return res.status(400).json({ error: 'La partida aún no ha terminado.' });
   c.sala.estado = 'final';
   res.json({ success: true });
 });

@@ -1,495 +1,450 @@
 // client/src/games/Hipotesis/Vistas.jsx
-// Pantallas de «La Hipótesis Ganadora», compartidas por el modo online y el de un solo dispositivo.
-// Reciben `v` (vista del jugador, engine.vistaDe) y `enviar(tipo, datos)`.
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+// Pantallas de «La Hipótesis Ganadora» (las comparten el modo online y el de un solo dispositivo), con el estilo
+// de los juegos renovados: cabecera con degradado, tarjetas blancas, botones en relieve y barra abajo.
+// Reciben `v` (vista de un jugador que genera engine.vistaDe) y `enviar(tipo, datos)`.
+import React, { useEffect, useMemo, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
-import { SUSTANCIAS, FORMAS, INSTRUMENTOS, REACCIONES, textoHipotesis } from './engine.js';
+import { VARIANTES, PLANTILLAS, EVENTOS, REACCIONES, AJUSTES, rangoN, evaluar, textoHipotesis } from './engine.js';
 import './Hipotesis.css';
 
-const plural = (n, s, p) => (n === 1 ? s : p);
-const signo = (n) => (n > 0 ? `+${n}` : `${n}`);
+export const COLORES = ['#ef4444', '#2563eb', '#16a34a', '#f59e0b', '#9333ea', '#ec4899', '#0d9488', '#ea580c'];
+export const colorDe = (id) => COLORES[((Number(id) || 1) - 1) % COLORES.length];
+const inicial = (n) => (n || '?').trim().charAt(0).toUpperCase();
 
-// ---------------------------------------------------------------- Piezas pequeñas
-export function Sustancia({ id, texto }) {
-  const s = SUSTANCIAS[id];
-  return <span className="hp-sust" style={{ background: s.color }}><Icon name={s.icono} size={13} /> {texto ?? s.nombre}</span>;
+export function Avatar({ id, nombre, grande = false }) {
+  if (id == null) return <span className="hpp-avatar anon">?</span>;
+  return <span className={`hpp-avatar${grande ? ' grande' : ''}`} style={{ '--c': colorDe(id) }}>{inicial(nombre)}</span>;
 }
 
-export function Temporizador({ limite, offset = 0 }) {
+function useAhora(activo) {
   const [, setT] = useState(0);
-  const total = useRef({ limite: null, ms: 1 });
-  useEffect(() => { const i = setInterval(() => setT((x) => x + 1), 500); return () => clearInterval(i); }, []);
-  if (!limite) return null;
-  const resto = Math.max(0, limite - (Date.now() + offset));
-  if (total.current.limite !== limite) total.current = { limite, ms: Math.max(resto, 1000) };
-  const s = Math.ceil(resto / 1000);
-  return (
-    <div className={`hp-timer ${s <= 10 ? 'urgente' : ''}`}>
-      <Icon name="clock" size={16} /> {Math.floor(s / 60)}:{String(s % 60).padStart(2, '0')}
-      <div className="hp-timer-barra"><div className="hp-timer-fill" style={{ width: `${Math.min(100, (resto / total.current.ms) * 100)}%` }} /></div>
-    </div>
-  );
-}
-
-// Rejilla de muestras. conocimiento: [{m,t}] lo que sabes. verdad: [t] (solo en la resolución).
-export function Muestras({ v, verdad, sel = [], onSel, resaltar = [] }) {
-  const sabe = (m) => v.conocimiento?.find((c) => c.m === m);
-  return (
-    <div className="hp-muestras">
-      {Array.from({ length: v.M }, (_, m) => {
-        const c = verdad ? { t: verdad[m] } : sabe(m);
-        const s = c ? SUSTANCIAS[c.t] : null;
-        const clases = ['hp-muestra', c ? 'conocida' : '', sel.includes(m) ? 'sel' : '', resaltar.includes(m) ? 'res' : '', onSel ? 'click' : ''].join(' ');
-        return (
-          <button key={m} type="button" className={clases} style={s ? { '--c': s.color } : null} disabled={!onSel} onClick={() => onSel?.(m)}>
-            <b>{m + 1}</b>
-            {s ? <><Icon name={s.icono} size={18} /><small>{s.nombre}</small></> : <small>?</small>}
-            {c?.lupa && <i className="hp-lupa"><Icon name="search" size={10} /></i>}
-            {c?.publica && <i className="hp-lupa">📣</i>}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-export function Marcador({ v }) {
-  const orden = [...v.jugadores].filter((j) => !j.fuera).sort((a, b) => b.puntos - a.puntos);
-  return (
-    <div className="hp-card">
-      <h3><Icon name="trophy" size={18} /> Reputación</h3>
-      <div className="hp-marcador">
-        {orden.map((j, i) => (
-          <div key={j.id} className={`hp-fila ${j.id === v.yo.id ? 'yo' : ''}`}>
-            <span>{i === 0 && j.puntos > 0 ? <Icon name="crown" size={16} /> : <b>{i + 1}</b>} {j.nombre}{j.id === v.yo.id ? ' (tú)' : ''}</span>
-            <span className="hp-fila-der">{j.hecho !== null && j.hecho !== undefined && <i className={`hp-hecho ${j.hecho ? 'si' : ''}`}>{j.hecho ? 'listo' : '…'}</i>}<b>{j.puntos} pts</b></span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function Cabecera({ v, offset }) {
-  return (
-    <>
-      <div className="hp-top">
-        <span className="hp-chip"><Icon name="book" size={16} /> Ronda {v.ronda}/{v.rondas}</span>
-        <span className="hp-chip yo"><Icon name="star" size={16} /> {v.yo.puntos} pts</span>
-      </div>
-      {v.limite ? <Temporizador limite={v.limite} offset={offset} /> : null}
-      {v.apurando && <div className="hp-apura">⏰ ¡Casi todos han terminado! Date prisa</div>}
-      {(v.fase === 'hipotesis' || v.fase === 'apuestas') && v.evento && v.evento.clave !== 'normal' && (
-        <div className={`hp-evento ${v.evento.clave}`}><span className="hp-evento-emoji">{v.evento.emoji}</span><div><strong>{v.evento.nombre}</strong><span>{v.evento.desc}</span></div></div>
-      )}
-    </>
-  );
-}
-
-function Instrumento({ v }) {
-  const i = v.yo.instrumento;
-  return (
-    <div className={`hp-instr ${i.usado ? 'usado' : ''}`}>
-      <span className="hp-instr-ico"><Icon name={i.icono} size={22} /></span>
-      <div><strong>Tu poder esta ronda: {i.nombre}</strong> <small>({i.cuando.toLowerCase()} · úsalo o se pierde)</small><span>{i.usado ? 'Ya lo has usado.' : i.desc}</span></div>
-    </div>
-  );
-}
-
-function PanelConocimiento({ v }) {
-  return (
-    <div className="hp-card">
-      <h3><Icon name="eye" size={18} /> Lo que sabes con certeza</h3>
-      <div className="hp-gente">{v.conocimiento.map((c) => <span key={c.m} className="hp-saber">Muestra <b>{c.m + 1}</b> = <Sustancia id={c.t} />{c.lupa ? ' 🔍' : ''}{c.publica ? ' 📣' : ''}</span>)}</div>
-      <p className="hp-muted" style={{ margin: '.4rem 0 0' }}>De las demás muestras no sabes nada… salvo lo que te cuenten los otros (que pueden mentir).</p>
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------- Fase 1: formular tu hipótesis
-// Cartas rápidas: con lo que sabes se generan opciones listas para enviar (verdades, faroles y una a ciegas).
-const mulberry = (a) => () => { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
-const claveCarta = (c) => `${c.forma}-${c.i}-${c.j ?? ''}-${c.t ?? ''}`;
-function generarCartas(sabe, M, semilla) {
-  const rnd = mulberry(semilla);
-  const azar = (n) => Math.floor(rnd() * n);
-  const barajar = (arr) => { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = azar(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
-  const ver = []; const far = [];
-  sabe.forEach((c) => {
-    ver.push({ forma: 'tipo', i: c.m, j: null, t: c.t, tag: 'verdad' });
-    far.push({ forma: 'tipo', i: c.m, j: null, t: (c.t + 1 + azar(SUSTANCIAS.length - 1)) % SUSTANCIAS.length, tag: 'farol' });
-  });
-  if (sabe.length >= 2) {
-    const ia = azar(sabe.length); let ib = azar(sabe.length - 1); if (ib >= ia) ib += 1;
-    const a = sabe[ia]; const b = sabe[ib]; const igual = a.t === b.t;
-    ver.push({ forma: igual ? 'igual' : 'distinta', i: a.m, j: b.m, t: null, tag: 'verdad' });
-    far.push({ forma: igual ? 'distinta' : 'igual', i: a.m, j: b.m, t: null, tag: 'farol' });
-  }
-  const desc = Array.from({ length: M }, (_, m) => m).filter((m) => !sabe.some((c) => c.m === m));
-  const ciega = desc.length ? [{ forma: 'tipo', i: desc[azar(desc.length)], j: null, t: azar(SUSTANCIAS.length), tag: 'ciegas' }] : [];
-  return barajar([...barajar(ver).slice(0, 3), ...barajar(far).slice(0, 3), ...ciega]);
-}
-const ETIQUETA = { verdad: 'VERDAD', farol: 'FAROL', ciegas: 'A CIEGAS' };
-
-export function FaseHipotesis({ v, enviar, offset }) {
-  const [forma, setForma] = useState('tipo');
-  const [sel, setSel] = useState([]);
-  const [t, setT] = useState(null);
-  const [coartada, setCoartada] = useState(false);
-  const [lupa, setLupa] = useState('');
-  const enviada = !!v.miHipotesis;
-  const instr = v.yo.instrumento;
-  const necesarias = forma === 'tipo' ? 1 : 2;
-  const [semilla] = useState(() => Math.floor(Math.random() * 1e9));
-  const [cartaSel, setCartaSel] = useState(null);
-  const sig = JSON.stringify(v.conocimiento);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const cartas = useMemo(() => generarCartas(v.conocimiento, v.M, semilla), [sig, v.M, semilla]);
-  const carta = cartas.find((c) => claveCarta(c) === cartaSel) || null;
-
-  const alternar = (m) => setSel((s) => (s.includes(m) ? s.filter((x) => x !== m) : s.length >= necesarias ? [...s.slice(1), m] : [...s, m]));
-  const cambiarForma = (f) => { setForma(f); setSel([]); };
-  const lista = sel.length === necesarias && (forma !== 'tipo' || t !== null);
-  const borrador = lista ? { forma, i: sel[0], j: forma === 'tipo' ? null : sel[1], t: forma === 'tipo' ? t : null } : null;
-  const desconocidas = Array.from({ length: v.M }, (_, m) => m).filter((m) => !v.conocimiento.some((c) => c.m === m));
-
-  return (
-    <div className="hp-wrap">
-      <Cabecera v={v} offset={offset} />
-      <div className="hp-card hp-centro">
-        <h2>Ronda {v.ronda}: ¿verdad o farol?</h2>
-        <p className="hp-muted">En secreto y rápido. Luego se muestran todas a la vez y los demás apuestan si te creen. Puedes decir la verdad… o colarles un farol.</p>
-      </div>
-      <PanelConocimiento v={v} />
-      <Instrumento v={v} />
-      {enviada ? (
-        <div className="hp-card hp-centro">
-          <h3>Hipótesis enviada</h3>
-          <p><b>{textoHipotesis(v.miHipotesis)}</b></p>
-          <p className="hp-muted">Esperando a: {v.faltan.join(', ') || '…'}</p>
-        </div>
-      ) : (
-        <>
-          {instr.tipo === 'lupa' && !instr.usado && (
-            <div className="hp-card">
-              <h3><Icon name="search" size={18} /> Usar la lupa</h3>
-              <div className="hp-form-fila">
-                <select value={lupa} onChange={(e) => setLupa(e.target.value)}>
-                  <option value="">Elige una muestra que no conozcas…</option>
-                  {desconocidas.map((m) => <option key={m} value={m}>Muestra {m + 1}</option>)}
-                </select>
-                <button type="button" disabled={lupa === ''} onClick={() => enviar('lupa', { m: Number(lupa) })}>Mirar</button>
-              </div>
-            </div>
-          )}
-          <div className="hp-card">
-            <h3>⚡ Elige tu jugada</h3>
-            <p className="hp-muted" style={{ margin: '0 0 .6rem' }}>Un toque y listo. Las etiquetas solo las ves tú: decide si dices la verdad o si lanzas un farol.</p>
-            <div className="hp-cartas">
-              {cartas.map((c) => (
-                <button key={claveCarta(c)} type="button" className={`hp-carta ${c.tag} ${cartaSel === claveCarta(c) ? 'on' : ''}`} onClick={() => setCartaSel(claveCarta(c))}>
-                  <span className="hp-carta-tag">{ETIQUETA[c.tag]}</span>
-                  <span className="hp-carta-txt">{textoHipotesis(c)}</span>
-                  <small>vale ×{FORMAS[c.forma].peso}</small>
-                </button>
-              ))}
-            </div>
-            {instr.tipo === 'coartada' && !instr.usado && (
-              <label className="hp-check"><input type="checkbox" checked={coartada} onChange={(e) => setCoartada(e.target.checked)} /> Usar la <b>Coartada</b> (si es falsa, no pierdes puntos por las refutaciones)</label>
-            )}
-            <button type="button" className="big full" style={{ marginTop: '.8rem' }} disabled={!carta}
-              onClick={() => enviar('hipotesis', { hipotesis: { forma: carta.forma, i: carta.i, j: carta.j, t: carta.t, coartada } })}>
-              <Icon name="check" size={22} strokeWidth={2.5} /> {carta ? 'Enviar esta hipótesis' : 'Toca una carta'}
-            </button>
-          </div>
-          <details className="hp-detalle">
-            <summary>🛠 Prefiero montarla yo (personalizada)</summary>
-            <div className="hp-card" style={{ boxShadow: 'none', padding: 0 }}>
-            <h3>Tipo de hipótesis</h3>
-            <div className="hp-formas">
-              {Object.entries(FORMAS).map(([k, f]) => (
-                <button key={k} type="button" className={forma === k ? 'on' : ''} onClick={() => cambiarForma(k)}>
-                  <strong>{f.nombre}</strong><small>{f.desc} Vale ×{f.peso}.</small>
-                </button>
-              ))}
-            </div>
-            <p className="hp-muted" style={{ margin: '.8rem 0 .4rem' }}>{forma === 'tipo' ? 'Elige una muestra:' : 'Elige dos muestras:'}</p>
-            <Muestras v={v} sel={sel} onSel={alternar} />
-            {forma === 'tipo' && (
-              <>
-                <p className="hp-muted" style={{ margin: '.8rem 0 .4rem' }}>…y la sustancia que dices que es:</p>
-                <div className="hp-sustancias">{SUSTANCIAS.map((s) => <button key={s.id} type="button" className={t === s.id ? 'on' : ''} style={{ '--c': s.color }} onClick={() => setT(s.id)}><Icon name={s.icono} size={18} /> {s.nombre}</button>)}</div>
-              </>
-            )}
-            <div className="hp-previa">{borrador ? <>Tu hipótesis: <b>{textoHipotesis(borrador)}</b></> : 'Completa la hipótesis para poder enviarla.'}</div>
-            <button type="button" className="big full" disabled={!borrador} onClick={() => enviar('hipotesis', { hipotesis: { ...borrador, coartada } })}><Icon name="check" size={22} strokeWidth={2.5} /> Enviar hipótesis</button>
-            </div>
-          </details>
-        </>
-      )}
-      <Marcador v={v} />
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------- Fase 2: apostar por las hipótesis ajenas
-function veredictoPrevio(v, h) {
-  const c = (m) => v.conocimiento.find((x) => x.m === m);
-  if (h.forma === 'tipo') return c(h.i) ? c(h.i).t === h.t : null;
-  if (c(h.i) && c(h.j)) return h.forma === 'igual' ? c(h.i).t === c(h.j).t : c(h.i).t !== c(h.j).t;
-  return null;
-}
-
-export function FaseApuestas({ v, enviar, offset }) {
-  const [pos, setPos] = useState({});
-  const [doble, setDoble] = useState(null);
-  const [censura, setCensura] = useState(null);
-  const instr = v.yo.instrumento;
-  const mias = v.hipotesis.find((h) => h.autorId === v.yo.id);
-  const ajenas = v.hipotesis.filter((h) => h.autorId !== v.yo.id);
-  const algunaPos = Object.values(pos).some(Boolean);
-  const poner = (a, valor) => setPos((p) => ({ ...p, [a]: p[a] === valor ? null : valor }));
-  const puedeDoble = instr.tipo === 'doble' && !instr.usado;
-  const puedeCensura = instr.tipo === 'censura' && !instr.usado;
-  const puedeDetector = instr.tipo === 'detector' && !instr.usado;
-  const Reacciones = ({ h }) => (
-    <div className="hp-reacciones">
-      <small>Presiona:</small>
-      {REACCIONES.map((e) => (
-        <button key={e} type="button" className={h.miReaccion === e ? 'on' : ''} onClick={() => enviar('reaccion', { a: h.autorId, emoji: e })}>{e}{h.reacciones?.[e] ? <b>{h.reacciones[e]}</b> : null}</button>
-      ))}
-    </div>
-  );
-
-  if (v.listo) {
-    return (
-      <div className="hp-wrap">
-        <Cabecera v={v} offset={offset} />
-        <div className="hp-card hp-centro"><h3>Apuestas enviadas</h3><p className="hp-muted">Esperando a: {v.faltan.join(', ') || '…'}. Mientras tanto, ¡mete presión!</p></div>
-        {ajenas.map((h) => (
-          <div key={h.autorId} className="hp-hip">
-            <div className="hp-hip-cab"><strong>{h.nombre}</strong><span className="hp-peso">vale ×{h.peso}</span></div>
-            <p className="hp-hip-texto" style={{ marginBottom: '.3rem' }}>{textoHipotesis(h)}</p>
-            <Reacciones h={h} />
-          </div>
-        ))}
-        <Marcador v={v} />
-      </div>
-    );
-  }
-
-  return (
-    <div className="hp-wrap">
-      <Cabecera v={v} offset={offset} />
-      <div className="hp-card hp-centro">
-        <h2>¿Quién miente?</h2>
-        <p className="hp-muted">Respalda lo que creas cierto, refuta lo que creas falso. Posiciónate en al menos una; lo que no toques no te cuesta nada. Acertar todas tus apuestas (mínimo 2) da <b>+2</b>.</p>
-        <div className="hp-reglas">
-          <span><b>Respaldar</b>: +1 si es cierta · −2 si es falsa</span>
-          <span><b>Refutar</b>: +2 si es falsa · −2 si es cierta</span>
-          <span className="hp-muted">(Se multiplica por el valor de la hipótesis)</span>
-        </div>
-      </div>
-      <PanelConocimiento v={v} />
-      <Muestras v={v} />
-      <Instrumento v={v} />
-      {mias && <div className="hp-card hp-mia"><small>Tu hipótesis</small><b>{textoHipotesis(mias)}</b></div>}
-      {ajenas.map((h) => {
-        const pre = veredictoPrevio(v, h);
-        const p = pos[h.autorId] || null;
-        return (
-          <div key={h.autorId} className={`hp-hip ${p || ''}`}>
-            <div className="hp-hip-cab"><strong>{h.nombre}</strong><span className="hp-peso">vale ×{h.peso}</span></div>
-            <p className="hp-hip-texto">{textoHipotesis(h)}</p>
-            {pre !== null && <div className={`hp-pista ${pre ? 'si' : 'no'}`}>{pre ? 'Coincide con lo que sabes' : 'Contradice lo que sabes'}</div>}
-            {v.detector?.a === h.autorId && <div className={`hp-pista ${v.detector.verdadera ? 'si' : 'no'}`}>🔎 Detector: es {v.detector.verdadera ? 'CIERTA' : 'FALSA'}</div>}
-            <div className="hp-botones">
-              <button type="button" className={`si ${p === 'si' ? 'on' : ''}`} onClick={() => poner(h.autorId, 'si')}><Icon name="check" size={16} /> Respaldar</button>
-              <button type="button" className={`no ${p === 'no' ? 'on' : ''}`} onClick={() => poner(h.autorId, 'no')}><Icon name="x" size={16} /> Refutar</button>
-            </div>
-            <Reacciones h={h} />
-            {((puedeDoble && p) || puedeCensura || (puedeDetector && !v.detector)) && (
-              <div className="hp-extra">
-                {puedeDetector && !v.detector && <button type="button" onClick={() => enviar('detectar', { a: h.autorId })}><Icon name="eye" size={14} /> Detectar si es cierta</button>}
-                {puedeDoble && p && <button type="button" className={doble === h.autorId ? 'on' : ''} onClick={() => setDoble(doble === h.autorId ? null : h.autorId)}><Icon name="scale" size={14} /> Duplicar mi apuesta</button>}
-                {puedeCensura && <button type="button" className={censura === h.autorId ? 'on' : ''} onClick={() => setCensura(censura === h.autorId ? null : h.autorId)}><Icon name="eyeoff" size={14} /> Censurar esta hipótesis</button>}
-              </div>
-            )}
-          </div>
-        );
-      })}
-      <button type="button" className="big full" disabled={!algunaPos}
-        onClick={() => enviar('apostar', { posiciones: Object.fromEntries(Object.entries(pos).filter(([, x]) => x)), doble: doble && pos[doble] ? doble : undefined, censura: censura ?? undefined })}>
-        <Icon name="check" size={22} strokeWidth={2.5} /> {algunaPos ? 'Enviar apuestas' : 'Posiciónate en alguna'}
-      </button>
-      <Marcador v={v} />
-    </div>
-  );
-}
-
-// ---------------------------------------------------------------- Fase 3: resolución (revelación escalonada)
-const textoPremio = (p, nombre) => {
-  const n = nombre(p.id);
-  if (p.clave === 'farol') return `🎭 Farol de la ronda: ${n} coló una mentira con ${p.n} ${plural(p.n, 'respaldo', 'respaldos')}`;
-  if (p.clave === 'caza') return `🕵️ Cazamentiras: ${n} desenmascaró ${p.n} ${plural(p.n, 'farol', 'faroles')}`;
-  if (p.clave === 'ojo') return `🎯 Ojo clínico: ${n} acertó sus ${p.n} apuestas (+2)`;
-  return `🤡 Pringado de la ronda: ${n} (${p.n} pts)`;
-};
-const TITULOS = { farol: '🎭 Rey del farol', caza: '🕵️ Sabueso', ojo: '🎯 Ojo clínico', pringado: '🤡 El pringado' };
-
-export function Resolucion({ v, instantanea = false }) {
-  const r = v.resultado;
-  const nombre = (id) => v.jugadores.find((j) => j.id === id)?.nombre ?? '?';
-  // las hipótesis más «jugosas» (con más respaldos) se revelan las últimas
-  const hips = [...r.hipotesis].sort((a, b) => a.respaldos.length - b.respaldos.length);
-  const total = hips.length; const meta = total + 2;
-  const [paso, setPaso] = useState(instantanea ? meta : 0);
   useEffect(() => {
-    if (instantanea) return undefined;
-    const i = setInterval(() => setPaso((p) => (p >= meta ? p : p + 1)), 1100);
+    if (!activo) return undefined;
+    const i = setInterval(() => setT((x) => x + 1), 250);
     return () => clearInterval(i);
-  }, [instantanea, meta]);
-  const visibles = Math.max(0, Math.min(total, paso - 1));
-  const fin = paso >= meta;
-  const ev = r.evento && r.evento !== 'normal' ? v.evento : null;
+  }, [activo]);
+  return Date.now();
+}
+
+// ---------------------------------------------------------------- Cabecera
+function Hero({ v, offset = 0, onSalir, etiqueta, titulo, clase = '' }) {
+  const ahora = useAhora(Boolean(v.limite)) + offset;
+  const resto = v.limite ? Math.max(0, v.limite - ahora) : null;
+  const ev = EVENTOS[v.evento];
   return (
-    <>
-      <div className="hp-card">
-        <h3><Icon name="search" size={18} /> {paso >= 1 ? 'La verdad de esta ronda' : 'Abriendo la caja…'}</h3>
-        <Muestras v={{ M: v.M }} verdad={paso >= 1 ? r.verdad : null} />
-        {!fin && <button type="button" className="hp-saltar" onClick={() => setPaso(meta)}>Saltar revelación ⏭</button>}
-      </div>
-      {hips.slice(0, visibles).map((h) => (
-        <div key={h.autorId} className={`hp-res hp-aparece ${h.anulada ? 'anulada' : h.verdadera ? 'cierta' : 'falsa'}`}>
-          <div className="hp-hip-cab">
-            <strong>{h.nombre}{r.ganadoras.includes(h.autorId) ? ' · hipótesis ganadora +2' : ''}</strong>
-            <span className="hp-veredicto">{h.anulada ? 'CENSURADA' : h.verdadera ? '✔ CIERTA' : '✘ FARSANTE'}</span>
-          </div>
-          <p className="hp-hip-texto">{textoHipotesis(h)}{h.coartada ? ' (con Coartada)' : ''}</p>
-          <div className="hp-gente">
-            {h.respaldos.map((q) => <span key={'s' + q} className="hp-pill si">✔ {nombre(q)}{h.dobles.includes(q) ? ' ×2' : ''}</span>)}
-            {h.refutan.map((q) => <span key={'n' + q} className="hp-pill no">✘ {nombre(q)}{h.dobles.includes(q) ? ' ×2' : ''}</span>)}
-            {!h.respaldos.length && !h.refutan.length && <span className="hp-muted">Nadie se posicionó.</span>}
-          </div>
-          {!h.anulada && (
-            <div className="hp-deltas">{Object.entries(h.deltas).filter(([, x]) => x !== 0).map(([q, x]) => <span key={q} className={x > 0 ? 'mas' : 'menos'}>{nombre(Number(q))} {signo(x)}</span>)}</div>
-          )}
+    <header className={`hpp-hero ${clase}`}>
+      <span className="hpp-burbujas" aria-hidden="true" />
+      <div className="hpp-hero-top">
+        <button type="button" className="hpp-salir" onClick={onSalir}><Icon name="door" size={15} /> Salir</button>
+        <div className="hpp-chips">
+          {v.fase !== 'fin' && <span className="hpp-chip">Ronda {v.ronda}/{v.rondas}</span>}
+          {v.fase !== 'fin' && v.evento !== 'normal' && <span className="hpp-chip evento" title={ev.desc}>{ev.emoji} {ev.nombre}</span>}
+          {resto != null && <span className={`hpp-chip${resto <= 10000 ? ' urgente' : ''}`}><Icon name="clock" size={13} /> {Math.ceil(resto / 1000)} s</span>}
         </div>
-      ))}
-      {fin && (
-        <>
-          {r.premios?.length > 0 && (
-            <div className="hp-card hp-aparece">
-              <h3>🏅 Lo mejor (y lo peor) de la ronda</h3>
-              {r.premios.map((p, k) => <p key={k} className="hp-premio">{textoPremio(p, nombre)}</p>)}
-            </div>
-          )}
-          {r.usos.length > 0 && (
-            <div className="hp-card hp-aparece">
-              <h3>Poderes usados</h3>
-              {r.usos.map((u) => <p key={u.id} className="hp-muted" style={{ margin: '.2rem 0' }}><b>{nombre(u.id)}</b> usó {INSTRUMENTOS[u.tipo].nombre} sobre la hipótesis de <b>{nombre(u.objetivo)}</b>.</p>)}
-            </div>
-          )}
-          <div className="hp-card hp-aparece">
-            <h3>Puntos de la ronda {ev ? <span className="hp-pill si">{ev.emoji} {ev.nombre}</span> : null}</h3>
-            <div className="hp-marcador">
-              {Object.entries(r.totales).sort((a, b) => b[1] - a[1]).map(([id, x]) => (
-                <div key={id} className={`hp-fila ${Number(id) === v.yo.id ? 'yo' : ''}`}><span>{nombre(Number(id))}</span><b className={x > 0 ? 'mas' : x < 0 ? 'menos' : ''}>{signo(x)}</b></div>
-              ))}
-            </div>
-          </div>
-        </>
-      )}
-    </>
+      </div>
+      <p className="hpp-hero-etiqueta">{etiqueta}</p>
+      <h1 className="hpp-hero-titulo">{titulo}</h1>
+      <div className="hpp-marcador">
+        {[...v.jugadores].sort((a, b) => b.puntos - a.puntos).map((j) => (
+          <span key={j.id} className={`hpp-marca${j.id === v.yo?.id ? ' yo' : ''}${j.fuera ? ' fuera' : ''}`}>
+            <Avatar id={j.id} nombre={j.nombre} />
+            <span className="hpp-marca-nombre">{j.nombre}</span>
+            <strong>{j.puntos}</strong>
+            {v.fase !== 'fin' && v.fase !== 'revelacion' && j.listo && <b>✓</b>}
+            {v.resultado && v.fase === 'revelacion' && v.resultado.deltas[j.id] ? <em className={v.resultado.deltas[j.id] > 0 ? 'mas' : 'menos'}>{v.resultado.deltas[j.id] > 0 ? '+' : ''}{v.resultado.deltas[j.id]}</em> : null}
+          </span>
+        ))}
+      </div>
+    </header>
   );
 }
 
-export function FaseResolucion({ v, enviar, offset, accionContinuar = true }) {
-  const ultima = v.ronda >= v.rondas;
+// ---------------------------------------------------------------- Casillas
+export function Valor({ variante, v, grande = false }) {
+  const V = VARIANTES[variante];
+  const x = V.valores[v];
+  return <span className={`hpp-valor${V.numerico ? ' num' : ''}${grande ? ' grande' : ''}`} style={{ '--c': x.c }} title={x.n}>{x.e}</span>;
+}
+
+function Tablero({ v, titulo, voltear = false }) {
+  const V = VARIANTES[v.variante];
   return (
-    <div className="hp-wrap">
-      <Cabecera v={v} offset={offset} />
-      <Resolucion key={v.ronda} v={v} />
-      <Marcador v={v} />
-      {accionContinuar && (v.listo
-        ? <div className="hp-card hp-centro"><h3>Listo</h3><p className="hp-muted">Esperando a: {v.faltan.join(', ') || '…'}</p></div>
-        : <button type="button" className="big full" onClick={() => enviar('continuar')}><Icon name="forward" size={22} /> {ultima ? 'Ver resultado final' : 'Siguiente ronda'}</button>)}
+    <div className="hpp-tarjeta">
+      <p className="hpp-etiqueta"><Icon name={V.icono} size={14} /> {titulo || `${V.nombre} · ${V.intro}`}</p>
+      <div className="hpp-casillas" style={{ '--k': v.K }}>
+        {v.casillas.map((c) => (
+          <div key={c.i} className={`hpp-casilla${c.v != null ? ' vista' : ''}${c.mia ? ' mia' : ''}${c.rumor ? ' rumor' : ''}${voltear ? ' voltear' : ''}`} style={{ '--d': `${c.i * 90}ms` }}>
+            <small>{V.celda} {c.i + 1}</small>
+            {c.v != null ? <Valor variante={v.variante} v={c.v} grande /> : <span className="hpp-incognita">?</span>}
+            {c.rumor && <i>rumor</i>}
+          </div>
+        ))}
+      </div>
+      {!voltear && <p className="hpp-pista">Solo tú ves lo que hay en tus casillas. Lo demás… tendrás que deducirlo de lo que digan.</p>}
     </div>
   );
 }
 
-// ---------------------------------------------------------------- Fin
-export function PantallaFin({ v, puntosTotales, children }) {
-  const f = v.fin;
-  const nombres = f.ganadores.map((id) => v.jugadores.find((j) => j.id === id)?.nombre).join(' y ');
-  return (
-    <div className="hp-wrap">
-      <div className="hp-fin">
-        <Icon name="trophy" size={56} strokeWidth={1.7} />
-        <h1>{nombres} {f.ganadores.length > 1 ? 'tienen' : 'tiene'} la hipótesis ganadora</h1>
-        <p style={{ margin: 0, fontWeight: 600 }}>Tras {v.rondas} rondas de ciencia y mentiras.</p>
+// ---------------------------------------------------------------- Formular
+/** ¿Qué sabe el jugador de su hipótesis? true / false / null (no lo sabe seguro). */
+function loQueSabes(v, h) {
+  if (!h) return null;
+  const conocidas = Object.fromEntries(v.casillas.filter((c) => c.v != null).map((c) => [c.i, c.v]));
+  const celdas = ['i', 'j'].filter((k) => PLANTILLAS[h.pl].params.includes(k)).map((k) => h.p[k]);
+  if (celdas.length) {
+    if (!celdas.every((i) => conocidas[i] != null)) return null;
+    const t = Array.from({ length: v.K }, (_, i) => conocidas[i] ?? 0);
+    return evaluar(v.variante, h, t);
+  }
+  return null; // las de recuento dependen de casillas que no ves
+}
+
+function Constructor({ v, enviar }) {
+  const V = VARIANTES[v.variante];
+  const [pl, setPl] = useState(V.plantillas[0]);
+  const [p, setP] = useState({});
+  useEffect(() => { setPl(V.plantillas[0]); setP({}); }, [v.ronda]); // eslint-disable-line react-hooks/exhaustive-deps
+  const params = PLANTILLAS[pl].params;
+  const [lo, hi] = rangoN(v.variante, pl, v.K);
+  const completo = params.every((k) => p[k] != null);
+  const h = completo ? { pl, p } : null;
+  const error = h && ((p.i != null && p.j != null && params.includes('j') && p.i === p.j) || (p.v != null && p.w != null && params.includes('w') && p.v === p.w));
+  const sabes = h && !error ? loQueSabes(v, h) : null;
+  const texto = h && !error ? textoHipotesis(v.variante, h) : null;
+  const cambiarPl = (x) => {
+    setPl(x);
+    setP((prev) => {
+      const nuevo = {};
+      PLANTILLAS[x].params.forEach((k) => { if (k !== 'n' && prev[k] != null) nuevo[k] = prev[k]; });
+      if (PLANTILLAS[x].params.includes('n')) { const [a, b] = rangoN(v.variante, x, v.K); nuevo.n = Math.round((a + b) / 2); }
+      return nuevo;
+    });
+  };
+  const fijar = (k, x) => setP((prev) => ({ ...prev, [k]: x }));
+
+  const selCasilla = (k, etiqueta) => (
+    <div className="hpp-campo">
+      <span className="hpp-campo-titulo">{etiqueta}</span>
+      <div className="hpp-elegir-casillas">
+        {v.casillas.map((c) => (
+          <button key={c.i} type="button" className={`hpp-mini-casilla${p[k] === c.i ? ' sel' : ''}${c.v != null ? ' vista' : ''}`} onClick={() => fijar(k, c.i)}>
+            <small>{c.i + 1}</small>{c.v != null ? <Valor variante={v.variante} v={c.v} /> : <span className="hpp-incognita mini">?</span>}
+          </button>
+        ))}
       </div>
-      <div className="hp-card">
-        <h3>Clasificación</h3>
-        <div className="hp-marcador">
-          {f.tabla.map((x, i) => (
-            <div key={x.id} className={`hp-fila ${f.ganadores.includes(x.id) ? 'gan' : ''} ${x.id === v.yo.id ? 'yo' : ''}`}>
-              <span><b>{i + 1}</b> {x.nombre}{x.id === v.yo.id ? ' (tú)' : ''}<small className="hp-muted"> · {x.aciertos} {plural(x.aciertos, 'hipótesis cierta', 'hipótesis ciertas')}</small></span>
-              <b>{x.puntos} pts{puntosTotales ? ` · total ${puntosTotales[x.id] ?? 0}` : ''}</b>
+    </div>
+  );
+  const selValor = (k, etiqueta) => (
+    <div className="hpp-campo">
+      <span className="hpp-campo-titulo">{etiqueta}</span>
+      <div className="hpp-elegir-valores">
+        {V.valores.map((x, idx) => (
+          <button key={idx} type="button" className={`hpp-mini-valor${p[k] === idx ? ' sel' : ''}`} onClick={() => fijar(k, idx)}>
+            <Valor variante={v.variante} v={idx} />{!V.numerico && <span>{x.n.replace(/^una? /, '')}</span>}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
+  return (
+    <>
+    <div className="hpp-tarjeta">
+      <p className="hpp-etiqueta"><Icon name="bulb" size={14} /> Formula tu hipótesis (cierta… o un farol)</p>
+      <div className="hpp-pildoras">
+        {V.plantillas.map((x) => (
+          <button key={x} type="button" className={`hpp-pildora${pl === x ? ' activo' : ''}`} onClick={() => cambiarPl(x)}>{PLANTILLAS[x].nombre}</button>
+        ))}
+      </div>
+      {params.includes('i') && selCasilla('i', params.includes('j') ? `Primer${V.articulo === 'la' ? 'a' : ''} ${V.celda.toLowerCase()}` : V.celda)}
+      {params.includes('j') && selCasilla('j', `Segund${V.articulo === 'la' ? 'a' : 'o'} ${V.celda.toLowerCase()}`)}
+      {params.includes('v') && selValor('v', params.includes('w') ? 'Hay más de…' : V.numerico ? 'Número' : 'Valor')}
+      {params.includes('w') && selValor('w', 'que de…')}
+      {params.includes('n') && (
+        <div className="hpp-campo">
+          <span className="hpp-campo-titulo">Número</span>
+          <div className="hpp-stepper">
+            <button type="button" onClick={() => fijar('n', Math.max(lo, (p.n ?? lo) - 1))} disabled={(p.n ?? lo) <= lo}>−</button>
+            <strong>{p.n ?? lo}</strong>
+            <button type="button" onClick={() => fijar('n', Math.min(hi, (p.n ?? lo) + 1))} disabled={(p.n ?? lo) >= hi}>+</button>
+          </div>
+        </div>
+      )}
+      <div className={`hpp-vista-previa${texto ? '' : ' vacia'}`}>
+        {error ? 'Elige dos distintos.' : texto ? <>«{texto}»</> : 'Completa los huecos…'}
+        {texto && <small className={sabes === true ? 'cierta' : sabes === false ? 'falsa' : ''}>
+          {sabes === true ? 'Según lo que ves: es CIERTA' : sabes === false ? 'Según lo que ves: es FALSA (un farol)' : 'No lo sabes seguro: ¡arriésgate!'}
+        </small>}
+      </div>
+      {v.soyTopo && <p className="hpp-topo">🕵️ Eres el topo: tu misión es MENTIR y que la mayoría se lo crea (+3).</p>}
+    </div>
+    <div className="hpp-barra">
+      <button type="button" className="hpp-boton grande" disabled={!texto} onClick={() => enviar('formular', { hipotesis: h })}>
+        <Icon name="check" size={20} strokeWidth={2.5} /> {v.yo.hipotesis ? 'Cambiar mi hipótesis' : 'Formular'}
+      </button>
+    </div>
+    </>
+  );
+}
+
+function Esperando({ v, texto }) {
+  const pend = v.jugadores.filter((j) => v.faltan.includes(j.id));
+  return (
+    <div className="hpp-esperando">
+      <strong><Icon name="clock" size={16} /> {texto}</strong>
+      {pend.length > 0 && <span>Falta: {pend.map((j) => j.nombre).join(', ')}</span>}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------- Juicio
+function Juicio({ v, enviar }) {
+  const [votos, setVotos] = useState({});
+  const [seguro, setSeguro] = useState(null);
+  useEffect(() => { setVotos(v.yo.votos || {}); setSeguro(v.yo.seguro); }, [v.ronda]); // eslint-disable-line react-hooks/exhaustive-deps
+  const ajenas = v.hipotesis.filter((h) => !h.mia);
+  const hechos = ajenas.filter((h) => votos[h.hid]).length;
+  const nombre = (id) => v.jugadores.find((j) => j.id === id)?.nombre ?? 'Anónimo';
+  const enviado = v.yo.listo;
+
+  return (
+    <>
+      <div className="hpp-tarjeta">
+        <p className="hpp-etiqueta"><Icon name="scale" size={14} /> ¿Te fías? Decide en cada hipótesis · marca una con ⭐ si estás seguro (×2)</p>
+        <div className="hpp-hipotesis">
+          {v.hipotesis.map((h) => (
+            <div key={h.hid} className={`hpp-hip${h.mia ? ' mia' : ''}${votos[h.hid] === 'si' ? ' si' : votos[h.hid] === 'no' ? ' no' : ''}`}>
+              <div className="hpp-hip-cab">
+                <Avatar id={h.autorId} nombre={nombre(h.autorId)} />
+                <span>{h.mia ? 'Tu hipótesis' : h.autorId == null ? 'Alguien (a ciegas)' : nombre(h.autorId)}</span>
+                {!h.mia && !enviado && (
+                  <button type="button" className={`hpp-seguro${seguro === h.hid ? ' activo' : ''}`} disabled={!votos[h.hid]} title="¡Seguro! (doble o nada)"
+                    onClick={() => setSeguro(seguro === h.hid ? null : h.hid)}>⭐</button>
+                )}
+                {enviado && seguro === h.hid && <span className="hpp-seguro activo">⭐</span>}
+              </div>
+              <p className="hpp-hip-texto">«{h.texto}»</p>
+              {!h.mia && (
+                <div className="hpp-dos">
+                  <button type="button" className={`hpp-voto si${votos[h.hid] === 'si' ? ' activo' : ''}`} disabled={enviado} onClick={() => setVotos({ ...votos, [h.hid]: 'si' })}>✅ Me fío</button>
+                  <button type="button" className={`hpp-voto no${votos[h.hid] === 'no' ? ' activo' : ''}`} disabled={enviado} onClick={() => setVotos({ ...votos, [h.hid]: 'no' })}>❌ Es mentira</button>
+                </div>
+              )}
+              <div className="hpp-reacciones">
+                {REACCIONES.map((e) => (
+                  <button key={e} type="button" className={`hpp-reaccion${h.miReaccion === e ? ' activo' : ''}`} onClick={() => enviar('reaccion', { hid: h.hid, emoji: e })}>
+                    {e}{h.reacciones[e] ? <b>{h.reacciones[e]}</b> : null}
+                  </button>
+                ))}
+              </div>
             </div>
           ))}
         </div>
       </div>
-      {f.titulos?.length > 0 && (
-        <div className="hp-card">
-          <h3>🏆 Títulos de la partida</h3>
-          {f.titulos.map((t) => <p key={t.clave} className="hp-premio"><b>{TITULOS[t.clave]}</b>: {v.jugadores.find((j) => j.id === t.id)?.nombre} <span className="hp-muted">({t.n} {plural(t.n, 'vez', 'veces')})</span></p>)}
-        </div>
-      )}
-      {v.resultado && <details className="hp-detalle"><summary>Ver la última ronda</summary><Resolucion v={v} instantanea /></details>}
-      {children}
-    </div>
+      <div className="hpp-barra">
+        {enviado ? <Esperando v={v} texto="Veredicto enviado" /> : (
+          <button type="button" className="hpp-boton grande" disabled={hechos < ajenas.length} onClick={() => enviar('juzgar', { votos, seguro })}>
+            <Icon name="check" size={20} strokeWidth={2.5} /> {hechos < ajenas.length ? `Decide en todas (${hechos}/${ajenas.length})` : 'Enviar mi veredicto'}
+          </button>
+        )}
+      </div>
+    </>
   );
 }
 
-// ---------------------------------------------------------------- Reglas
-export function Ayuda({ onCerrar }) {
+// ---------------------------------------------------------------- Revelación
+function Revelacion({ v, enviar, local }) {
+  const r = v.resultado;
+  const [mostradas, setMostradas] = useState(0);
+  useEffect(() => {
+    setMostradas(0);
+    const id = setInterval(() => setMostradas((x) => { if (x >= r.hipotesis.length) { clearInterval(id); return x; } return x + 1; }), 1100);
+    return () => clearInterval(id);
+  }, [v.ronda, r.hipotesis.length]);
+  const nombre = (id) => v.jugadores.find((j) => j.id === id)?.nombre ?? '?';
+  const todas = mostradas >= r.hipotesis.length;
+  const mios = r.motivos[v.yo?.id] || [];
   return (
-    <div className="hp-modal-fondo" onClick={onCerrar}>
-      <div className="hp-modal" onClick={(e) => e.stopPropagation()}>
-        <h3>¿Cómo se juega a La Hipótesis Ganadora?</h3>
-        <p>Sois científicos en un congreso. Cada ronda, el laboratorio esconde una <strong>verdad</strong>: varias muestras numeradas, cada una de una sustancia (Rubí, Zafiro, Jade o Ámbar). Tú solo conoces con certeza <strong>2 de ellas</strong>. Las rondas son rápidas: ¡el reloj corre!</p>
-        <h4>Cada ronda</h4>
-        <ul>
-          <li><strong>1. Elige tu jugada (en secreto):</strong> te ofrecemos cartas con verdades, faroles y alguna a ciegas. Tú ves las etiquetas; los demás no. También puedes montar una hipótesis a mano.</li>
-          <li><strong>2. Apuesta y presiona.</strong> Se muestran todas a la vez. Respalda las que creas ciertas y refuta las que creas falsas (en al menos una). Mientras tanto puedes soltar un 🤥, 🤔 o 👍 anónimo para meter presión… o para despistar.</li>
-          <li><strong>3. Revelación.</strong> Se abre la caja y se van desvelando las hipótesis una a una. ¡Aquí caen los mentirosos!</li>
-        </ul>
-        <h4>Puntos (por el valor de la hipótesis)</h4>
-        <ul>
-          <li><strong>Hipótesis cierta:</strong> su autor gana 1 + 1 por cada respaldo; quien la respaldó gana 1; quien la refutó pierde 2.</li>
-          <li><strong>Hipótesis falsa:</strong> su autor gana 2 por cada persona que la respaldó (¡el farol funcionó!) y pierde 2 por cada refutación; quienes la respaldaron pierden 2 y quienes la refutaron ganan 2.</li>
-          <li><strong>Hipótesis ganadora de la ronda</strong> (cierta y con más respaldos): +2 extra.</li>
-          <li><strong>Ojo clínico:</strong> si aciertas todas tus apuestas (mínimo 2): +2 extra.</li>
-        </ul>
-        <h4>Eventos de ronda</h4>
-        <ul>
-          <li><strong>💥 Puntos dobles:</strong> todo vale el doble. ¡La última ronda siempre lo es!</li>
-          <li><strong>📣 Rumor:</strong> una muestra se filtra y todos la conocen.</li>
-          <li><strong>🎯 Caza de faroles:</strong> cada refutación acertada de una hipótesis falsa da +1 extra.</li>
-        </ul>
-        <h4>Poderes (uno nuevo cada ronda: úsalo o se pierde)</h4>
-        <ul>{Object.values(INSTRUMENTOS).map((i) => <li key={i.nombre}><strong>{i.nombre} ({i.cuando.toLowerCase()}):</strong> {i.desc}</li>)}</ul>
-        <p>Cuando casi todos han terminado, al resto le quedan solo 10 segundos. Gana quien tenga más reputación al final; en caso de empate, quien haya formulado más hipótesis ciertas.</p>
-        <div className="hp-modal-acciones"><button type="button" className="big full" onClick={onCerrar}>Entendido</button></div>
+    <>
+      <Tablero v={v} titulo="La verdad absoluta" voltear />
+      <div className="hpp-tarjeta">
+        <p className="hpp-etiqueta"><Icon name="search" size={14} /> Comprobando hipótesis… {Math.min(mostradas, r.hipotesis.length)}/{r.hipotesis.length}</p>
+        {r.hipotesis.length === 0 && <p className="hpp-texto">Nadie formuló ninguna hipótesis esta ronda.</p>}
+        <div className="hpp-hipotesis">
+          {r.hipotesis.map((h, k) => {
+            const visible = k < mostradas;
+            return (
+              <div key={h.hid} className={`hpp-hip resuelta${visible ? (h.cierta ? ' cierta' : ' falsa') : ' oculta'}`}>
+                <div className="hpp-hip-cab">
+                  <Avatar id={h.autorId} nombre={nombre(h.autorId)} />
+                  <span>{nombre(h.autorId)}{h.autorId === r.topoId ? ' 🕵️ (topo)' : ''}</span>
+                </div>
+                <p className="hpp-hip-texto">«{h.texto}»</p>
+                {visible ? (
+                  <>
+                    <span className={`hpp-sello ${h.cierta ? 'cierta' : 'falsa'}`}>{h.cierta ? 'CIERTA' : 'FALSA'}</span>
+                    <div className="hpp-quien">
+                      <span>✅ {h.creen.length ? h.creen.map((id) => <Avatar key={id} id={id} nombre={nombre(id)} />) : 'nadie'}</span>
+                      <span>❌ {h.dudan.length ? h.dudan.map((id) => <Avatar key={id} id={id} nombre={nombre(id)} />) : 'nadie'}</span>
+                    </div>
+                    {h.ganadora && <p className="hpp-ganadora">🏆 ¡Hipótesis ganadora! La que más gente se creyó (+{AJUSTES.ganadora})</p>}
+                  </>
+                ) : <p className="hpp-pista izquierda">🔬 Analizando…</p>}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      {todas && v.yo && !local && (
+        <div className="hpp-tarjeta">
+          <p className="hpp-etiqueta">Tus puntos esta ronda {v.evento === 'doble' ? '(×2)' : ''}</p>
+          {mios.length === 0 ? <p className="hpp-texto">Esta ronda no has sumado ni restado nada.</p> : (
+            <div className="hpp-motivos">
+              {mios.map((m, i) => <div key={i} className={m.n > 0 ? 'mas' : 'menos'}><span>{m.texto}</span><strong>{m.n > 0 ? '+' : ''}{m.n}</strong></div>)}
+            </div>
+          )}
+        </div>
+      )}
+      {todas && local && (
+        <div className="hpp-tarjeta">
+          <p className="hpp-etiqueta">Puntos de la ronda {v.evento === 'doble' ? '(×2)' : ''}</p>
+          <div className="hpp-motivos">
+            {v.jugadores.map((j) => <div key={j.id} className={(r.deltas[j.id] || 0) >= 0 ? 'mas' : 'menos'}><span><Avatar id={j.id} nombre={j.nombre} /> {j.nombre}</span><strong>{r.deltas[j.id] > 0 ? '+' : ''}{r.deltas[j.id] || 0}</strong></div>)}
+          </div>
+        </div>
+      )}
+      <div className="hpp-barra">
+        {v.yo?.listo ? <Esperando v={v} texto="Esperando a los demás" /> : (
+          <button type="button" className="hpp-boton grande" disabled={!todas} onClick={() => enviar('continuar')}>
+            <Icon name="forward" size={20} /> {v.ronda >= v.rondas ? 'Ver el resultado final' : 'Siguiente ronda'}
+          </button>
+        )}
+      </div>
+    </>
+  );
+}
+
+// ---------------------------------------------------------------- Pantallas
+export function PantallaJuego({ v, enviar, onSalir, offset = 0, local = false, admin = null }) {
+  const V = VARIANTES[v.variante];
+  const ev = EVENTOS[v.evento];
+  const fases = { formular: 'Formula tu hipótesis', juicio: '¿Verdad o farol?', revelacion: 'La hora de la verdad' };
+  const nuevaRonda = useMemo(() => v.fase === 'formular', [v.fase]);
+  return (
+    <>
+      <Hero v={v} offset={offset} onSalir={onSalir} etiqueta={`${V.nombre} · ronda ${v.ronda}`} titulo={fases[v.fase]} clase={v.fase} />
+      {nuevaRonda && (
+        <div className={`hpp-evento${v.evento === 'normal' ? ' tranquilo' : ''}`}>
+          <span className="hpp-evento-emoji">{ev.emoji}</span>
+          <div><strong>{ev.nombre}</strong><span>{ev.desc}</span></div>
+        </div>
+      )}
+      {v.fase === 'formular' && (
+        <>
+          <Tablero v={v} />
+          {v.yo.hipotesis && <div className="hpp-tarjeta hpp-mia"><p className="hpp-etiqueta">Tu hipótesis (puedes cambiarla hasta que todos terminen)</p><p className="hpp-hip-texto">«{v.yo.hipotesis.texto}»</p><Esperando v={v} texto="Esperando al resto" /></div>}
+          <Constructor v={v} enviar={enviar} />
+        </>
+      )}
+      {v.fase === 'juicio' && (
+        <>
+          <Tablero v={v} titulo={`Lo que tú sabes · ${V.nombre}`} />
+          {v.evento === 'ciegas' && <p className="hpp-aviso">🙈 Juicio a ciegas: no sabes de quién es cada hipótesis.</p>}
+          <Juicio v={v} enviar={enviar} />
+        </>
+      )}
+      {v.fase === 'revelacion' && <Revelacion v={v} enviar={enviar} local={local} />}
+      {admin?.esAdmin && v.faltan.length > 0 && v.fase !== 'revelacion' && !v.faltan.includes(v.yo.id) && (
+        <div className="hpp-barra estatica">
+          <button type="button" className="hpp-enlace" onClick={admin.onForzar}><Icon name="forward" size={15} /> Seguir sin esperar a {v.faltan.length === 1 ? v.jugadores.find((j) => j.id === v.faltan[0])?.nombre : `${v.faltan.length} jugadores`}</button>
+        </div>
+      )}
+    </>
+  );
+}
+
+export function PantallaFin({ v, onSalir, children }) {
+  const f = v.fin;
+  const nombre = (id) => v.jugadores.find((j) => j.id === id)?.nombre ?? '?';
+  const top = f.tabla.filter((x) => !x.fuera).slice(0, 3);
+  const colocacion = top.length === 3 ? [top[1], top[0], top[2]] : top.length === 2 ? [top[1], top[0]] : top;
+  const alturas = ['primero', 'segundo', 'tercero'];
+  const ganadores = f.ganadores.map(nombre);
+  return (
+    <>
+      <Hero v={v} onSalir={onSalir} etiqueta="Fin del congreso" titulo={ganadores.length > 1 ? `Empate: ${ganadores.join(' y ')}` : `¡Gana ${ganadores[0]}!`} clase="fin" />
+      <div className="hpp-tarjeta hpp-centro">
+        <div className="hpp-podio">
+          {colocacion.map((x) => {
+            // empatados (mismos puntos y aciertos) comparten puesto
+            const puesto = top.filter((o) => o.puntos > x.puntos || (o.puntos === x.puntos && o.aciertos > x.aciertos)).length;
+            return (
+              <div key={x.id} className={`hpp-podio-col ${alturas[puesto]}`} style={{ '--c': colorDe(x.id) }}>
+                <Avatar id={x.id} nombre={x.nombre} grande />
+                <span className="hpp-podio-nombre">{x.nombre}{x.id === v.yo?.id ? ' (tú)' : ''}</span>
+                <span className="hpp-podio-pts">{x.puntos} pts</span>
+                <span className="hpp-podio-base">{puesto + 1}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div className="hpp-premios">
+        {f.premios.mentiroso && <div><span>🤥</span><strong>Gran mentiroso</strong><small>{nombre(f.premios.mentiroso.id)} · {f.premios.mentiroso.n} engañados</small></div>}
+        {f.premios.detective && <div><span>🔍</span><strong>Detective</strong><small>{nombre(f.premios.detective.id)} · {f.premios.detective.n} aciertos</small></div>}
+      </div>
+      <div className="hpp-tarjeta">
+        <p className="hpp-etiqueta">Clasificación</p>
+        <ol className="hpp-ranking">
+          {f.tabla.map((x, i) => (
+            <li key={x.id} className={f.ganadores.includes(x.id) ? 'lider' : ''}>
+              <span className="hpp-pos">{i + 1}</span><Avatar id={x.id} nombre={x.nombre} />
+              <span className="hpp-ranking-nombre">{x.nombre}{x.fuera ? ' (salió)' : ''}</span>
+              <small>{x.aciertos} ✔ · {x.engaños} 🤥</small>
+              <strong>{x.puntos}</strong>
+            </li>
+          ))}
+        </ol>
+      </div>
+      {children}
+    </>
+  );
+}
+
+export function Ayuda({ onCerrar, titulo, descripcion }) {
+  return (
+    <div className="rg-modal-fondo" onClick={onCerrar}>
+      <div className="rg-modal qq-modal-ayuda" onClick={(e) => e.stopPropagation()}>
+        <div className="qq-modal-ayuda-header">
+          <span className="qq-ayuda-badge">❓ Cómo jugar</span>
+          <h3>{titulo}</h3>
+        </div>
+        <div className="qq-modal-ayuda-body">
+          {descripcion && <p>{descripcion}</p>}
+          <p className="hpp-ayuda-sub">🔬 Cada ronda</p>
+          <ol>
+            <li><strong>La verdad absoluta:</strong> hay una fila de casillas ocultas (tubos, cartas, casas o dígitos). Tú solo ves unas pocas.</li>
+            <li><strong>Formula</strong> en secreto una hipótesis sobre la verdad. Puede ser cierta… o un farol.</li>
+            <li><strong>Juicio:</strong> se desvelan todas las hipótesis y decides en cada una si te fías ✅ o es mentira ❌. Marca una con ⭐ si estás seguro.</li>
+            <li><strong>La hora de la verdad:</strong> se descubre todo y se reparten los puntos.</li>
+          </ol>
+          <p className="hpp-ayuda-sub">🏆 Puntos</p>
+          <ul>
+            <li>Aciertas tu juicio: +{AJUSTES.puntosAcierto} (con ⭐: +{AJUSTES.puntosSeguro}, pero si fallas con ⭐: {AJUSTES.penalSeguro}).</li>
+            <li>Tu hipótesis era cierta: +{AJUSTES.autorCierta} por cada uno que se la creyó.</li>
+            <li>Tu hipótesis era un farol: +{AJUSTES.autorFarol} por cada uno que picó y {AJUSTES.autorPillado} por cada uno que te pilló.</li>
+            <li>La hipótesis que más gente se cree es la <strong>hipótesis ganadora</strong>: +{AJUSTES.ganadora}.</li>
+          </ul>
+          <p className="hpp-ayuda-sub">🎲 Escenarios y sorpresas</p>
+          <ul>
+            {Object.values(VARIANTES).map((x) => <li key={x.nombre}><strong>{x.nombre}:</strong> {x.intro}</li>)}
+          </ul>
+          <ul>
+            {Object.values(EVENTOS).map((e) => <li key={e.nombre}>{e.emoji} <strong>{e.nombre}:</strong> {e.desc}</li>)}
+          </ul>
+        </div>
+        <button type="button" className="big full qq-btn-principal" onClick={onCerrar}>¡Entendido!</button>
       </div>
     </div>
   );
-}
-
-export function PantallaDeFase({ v, enviar, offset }) {
-  if (v.fase === 'hipotesis') return <FaseHipotesis key={v.ronda} v={v} enviar={enviar} offset={offset} />;
-  if (v.fase === 'apuestas') return <FaseApuestas key={v.ronda} v={v} enviar={enviar} offset={offset} />;
-  if (v.fase === 'resolucion') return <FaseResolucion v={v} enviar={enviar} offset={offset} />;
-  return null;
 }
