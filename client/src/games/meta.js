@@ -380,7 +380,7 @@ export const META = {
     icono: 'frankenstein',
     colores: ['#818cf8', '#0f172a'],
     etiquetas: 'futbol jugadores quiz clubes adivinar seleccion balon cara cabeza cuerpo',
-    descripcion: 'Una cara híbrida formada por tres partes de diferentes futbolistas (pelo, cara y barbilla). Descubre a qué futbolista pertenece cada parte de la imagen antes de que acabe el tiempo.',
+    descripcion: 'Una cara híbrida formada por tres partes de diferentes futbolistas (pelo, ojos y barbilla). Descubre a qué futbolista pertenece cada parte de la imagen antes de que acabe el tiempo.',
     categorias: ['futbol']
   },
   'jugadas': {

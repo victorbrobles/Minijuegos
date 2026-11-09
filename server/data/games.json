@@ -242,7 +242,7 @@
   {
     "id": "footballsplit",
     "name": "FrankensFootball",
-    "description": "Una cara híbrida formada por tres partes de diferentes futbolistas (pelo, cara y barbilla). Descubre a qué futbolista pertenece cada parte de la imagen antes de que acabe el tiempo.",
+    "description": "Una cara híbrida formada por tres partes de diferentes futbolistas (pelo, ojos y barbilla). Descubre a qué futbolista pertenece cada parte de la imagen antes de que acabe el tiempo.",
     "isNew": true
   },
   {

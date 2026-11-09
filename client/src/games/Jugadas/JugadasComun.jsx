@@ -1,77 +1,45 @@
 // client/src/games/Jugadas/JugadasComun.jsx
-import React, { useState } from 'react';
+// Piezas comunes de «¡Qué jugadón!»: ayuda y modal de salir.
+import React from 'react';
+import { RONDAS_POR_JUGADOR, SEGUNDOS_JUGADA } from './constantes.js';
 import './Jugadas.css';
-import '../Adivina/Adivina.css';
 
-// Con `abierto`/`onCerrar` se controla desde fuera (botón "?" de los menús unificados) y no pinta botón propio.
-export function AyudaJugadas({ online = false, abierto: abiertoExterno, onCerrar }) {
-  const [abiertoInterno, setAbiertoInterno] = useState(false);
-  const controlado = abiertoExterno !== undefined;
-  const abierto = controlado ? abiertoExterno : abiertoInterno;
-  const setAbierto = (v) => (controlado ? (!v && onCerrar?.()) : setAbiertoInterno(v));
-
+export function Ayuda({ onCerrar, titulo, descripcion }) {
   return (
-    <>
-      {!controlado && <button
-        type="button"
-        className={online ? 'btn-ayuda-flotante' : 'aprox-btn-ayuda'}
-        onClick={() => setAbierto(true)}
-        title="Reglas del juego"
-      >
-        <span className={online ? 'btn-ayuda-flotante-signo' : 'aprox-btn-ayuda-signo'}>?</span>
-      </button>}
-
-      {abierto && (
-        <div className="rg-modal-fondo" onClick={() => setAbierto(false)}>
-          <div className="rg-modal aprox-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-            <div className="aprox-modal-header">
-              {online && <span className="aprox-modal-signo-title">?</span>}
-              <h3>¿Cómo se juega a Jugadas Icónicas?</h3>
-            </div>
-
-            <div className="aprox-modal-cuerpo">
-              <p>
-                <strong>Jugadas Icónicas</strong> recrea en una pizarra táctica 2D grandes goles y jugadas históricas del fútbol mundial con las fichas y dorsales de sus protagonistas.
-              </p>
-
-              <ul>
-                <li>
-                  <strong>Turnos secuenciales:</strong> Se juega de 2 a 12 jugadores manteniendo el orden de inscripción durante <strong>3 rondas por jugador</strong>.
-                </li>
-                <li>
-                  <strong>60 segundos en bucle:</strong> En tu turno verás la recreación repetirse en bucle mientras corre el cronómetro de 60 segundos.
-                </li>
-                <li>
-                  <strong>Puntuación por velocidad:</strong> Si aciertas la jugada (por ejemplo, <em>«Maradona a Inglaterra»</em> o <em>«Iniesta a Holanda»</em>), sumas <strong>tantos puntos como segundos queden en el reloj</strong>.
-                </li>
-                <li>
-                  <strong>Un único rebote:</strong> Si fallas tu respuesta, pulsas <strong>Pasar</strong> o se agota tu tiempo, el turno rebota exclusivamente al <strong>siguiente jugador</strong>.
-                </li>
-                <li>
-                  <strong>Finalizar al acabar vuelta:</strong> Al completarse una vuelta entera de todos los jugadores, el anfitrión puede dar por finalizado el partido o continuar hasta completar las 3 vueltas.
-                </li>
-              </ul>
-
-              <div className="aprox-tabla-puntos">
-                <div className="aprox-puntos-fila acierto">
-                  <span>⏱️ Acertar en tu turno o en el rebote</span>
-                  <strong>+Segundos restantes</strong>
-                </div>
-                <div className="aprox-puntos-fila intermedia" style={{ background: '#fef3c7', color: '#92400e' }}>
-                  <span>↩️ Fallar o pulsar Pasar</span>
-                  <strong>Rebote al siguiente jugador</strong>
-                </div>
-              </div>
-            </div>
-
-            <div className="rg-modal-acciones">
-              <button className="big full" onClick={() => setAbierto(false)}>
-                Entendido
-              </button>
-            </div>
-          </div>
+    <div className="rg-modal-fondo" onClick={onCerrar}>
+      <div className="rg-modal qq-modal-ayuda" onClick={(e) => e.stopPropagation()}>
+        <div className="qq-modal-ayuda-header">
+          <span className="qq-ayuda-badge">❓ Cómo jugar</span>
+          <h3>{titulo}</h3>
         </div>
-      )}
-    </>
+        <div className="qq-modal-ayuda-body">
+          {descripcion && <p>{descripcion}</p>}
+          <ul>
+            <li>En una pizarra táctica se recrea en bucle una jugada histórica, con los colores y dorsales reales.</li>
+            <li>Por turnos, cada jugador tiene <strong>{SEGUNDOS_JUGADA} segundos</strong> para escribir qué jugada es (por ejemplo, «Iniesta a Holanda» o «Maradona a Inglaterra»).</li>
+            <li>Si aciertas, sumas <strong>tantos puntos como segundos queden</strong> en el reloj.</li>
+            <li>Si fallas, pasas o se acaba el tiempo, hay <strong>un único rebote</strong> para el siguiente jugador.</li>
+            <li>Se juegan {RONDAS_POR_JUGADOR} vueltas; al acabar cada vuelta, el anfitrión puede terminar el partido.</li>
+          </ul>
+        </div>
+        <button type="button" className="big full qq-btn-principal" onClick={onCerrar}>¡Entendido!</button>
+      </div>
+    </div>
+  );
+}
+
+export function ModalSalir({ titulo, texto, onSeguir, onSalir }) {
+  return (
+    <div className="rg-modal-fondo" onClick={onSeguir}>
+      <div className="rg-modal jgp-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="jgp-modal-icono">🚪</div>
+        <h3>{titulo}</h3>
+        <p className="hint">{texto}</p>
+        <div className="jgp-dos">
+          <button type="button" className="jgp-boton secundario" onClick={onSeguir}>Seguir</button>
+          <button type="button" className="jgp-boton peligro" onClick={onSalir}>Salir</button>
+        </div>
+      </div>
+    </div>
   );
 }

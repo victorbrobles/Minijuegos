@@ -13,6 +13,8 @@
     "sync:descarte": "node scripts/sync-descarte.mjs",
     "sync:trayectoria": "node scripts/sync-trayectoria.mjs",
     "sync:bingoball": "node scripts/sync-bingoball.mjs",
+    "sync:futbolgrid": "node scripts/sync-futbolgrid.mjs",
+    "sync:footballsplit": "node scripts/sync-footballsplit.mjs",
     "sim:fundadores": "node scripts/fundadores-sim.mjs",
     "sync:logos": "node scripts/sync-logos.mjs"
   },

@@ -108,6 +108,20 @@ npm run dev
 - Partidas de 10, 15 o 25 rondas y 45 s por respuesta. Online, el servidor cierra la ronda al acabar el tiempo y acepta selecciones incompletas.
 - Elementos en `server/data/seeds/colores/parteN.js` (`{ id, item, colores: [...] }`, con los colores de la paleta: rojo, azul, amarillo, verde, naranja, morado, marron, blanco, negro, gris, rosa). `parte6.js` es la ampliación.
 
+## Minijuego: Fútbol en raya (`FutbolGrid/`)
+- Online (2–12, dos equipos: cada uno elige el suyo en la sala de espera) o en un dispositivo (jugadores alternos en Azul ✕ y Rojo ◯).
+- El equipo en turno elige casilla y tiene 45 s para un futbolista que cumpla fila y columna; acierte o falle, turno del rival. No se repiten futbolistas. Tres en raya gana; si no queda ninguna casilla posible, empate.
+- Respuestas tolerantes (apellido, nombre conocido, tildes, erratas) y nunca se envían al cliente online. Los `grid_21`–`grid_30` no tienen respuestas y se excluyen (`server/data/seeds/futbolgrid/index.js`).
+- Motor `server/futbolgrid/engine.js` (`npm run sync:futbolgrid`). Prueba: `node server/scripts/futbolgrid-sim.mjs`.
+
+## Minijuego: FrankensFootball (`FootballSplit/`)
+- Online o en un dispositivo, 2–12 jugadores, 5/10/15 caras. Cada cara mezcla pelo, ojos y barbilla de tres futbolistas (sin repetir en la partida).
+- Por turnos de 60 s: tocas un trozo y escribes de quién es; acierto +5 (con pista +2) y sigues; fallo o pase, turno del siguiente. La ronda acaba con la cara completa o tras una vuelta.
+- Los nombres ya no se envían al cliente hasta acertarlos. Motor `server/footballsplit/engine.js` (`npm run sync:footballsplit`). Prueba: `node server/scripts/footballsplit-sim.mjs`.
+
+## Minijuego: ¡Qué jugadón! (`Jugadas/`)
+- Motor en `server/lib/jugadasEngine.js` (sin cambios de reglas). Pantallas nuevas (`JugadasPartida.jsx`), sala de espera común con conexión y «Quitar».
+
 ## Minijuego: Modo carrera (`Trayectoria/`)
 - Online o en un único dispositivo, de 2 a 15 jugadores; 5, 10 o 15 futbolistas y dificultad mixta, fácil, media o difícil.
 - Los clubes salen uno a uno cada 6 s (sin nacionalidad ni número total de clubes a la vista). Quien lo sepa pulsa «¡Lo sé!» (el reloj se para) y tiene 20 s para escribirlo. Puntos: 1 + clubes aún ocultos (máx. 5, mín. 2). Tras el último club quedan 15 s; en los retos difíciles se puede pulsar «Desvelar pista» (+15 s, acertar vale 1). Fallar resta 1 y deja fuera de esa ronda.

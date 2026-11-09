@@ -1,25 +1,15 @@
 // client/src/games/Jugadas/JugadasPartida.jsx
+// Pantallas de «¡Qué jugadón!» (online y un solo dispositivo) con el estilo de los juegos renovados.
+// Recibe la vista del motor (server/lib/jugadasEngine.js) y manda acciones con onAccion({ tipo, ... }).
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
 import './Jugadas.css';
-import '../Adivina/Adivina.css';
 
-/* ------------------------------------------------------------------ Reloj */
-function Reloj({ restante, total }) {
-  if (restante == null) return null;
-  const seg = Math.ceil(restante / 1000);
-  const pct = total ? Math.max(0, Math.min(100, (restante / total) * 100)) : 100;
-  const bajo = seg <= 10;
-  return (
-    <div className="furbo-reloj" role="timer">
-      <div className="furbo-reloj-barra">
-        <div className={`furbo-reloj-fill ${bajo ? 'low' : ''}`} style={{ width: `${pct}%` }} />
-      </div>
-      <p className={`furbo-reloj-texto ${bajo ? 'low' : ''}`}>
-        <Icon name="clock" size={16} /> {seg} s (= +{seg} pts)
-      </p>
-    </div>
-  );
+export const COLORES = ['#d97706', '#2563eb', '#dc2626', '#16a34a', '#9333ea', '#0d9488', '#ea580c', '#db2777', '#4f46e5', '#65a30d', '#0891b2', '#78716c'];
+export const colorDe = (id) => COLORES[((Number(id) || 1) - 1) % COLORES.length];
+const inicial = (n) => (n || '?').trim().charAt(0).toUpperCase();
+export function Avatar({ id, nombre }) {
+  return <span className="jgp-avatar" style={{ '--c': colorDe(id) }}>{inicial(nombre)}</span>;
 }
 
 /* -------------------------------------------------- Utilidad de color texto */
@@ -103,10 +93,10 @@ function CampoJugada({ ronda }) {
   const [colorAtq, colorDef] = ronda?.colores || ['#dc2626', '#1d4ed8'];
 
   return (
-    <div className="jugadas-campo-wrap">
+    <div className="jgp-campo">
       <svg
         viewBox="-4 -4 108 108"
-        className="jugadas-campo-svg"
+        className="jgp-campo-svg"
         preserveAspectRatio="xMidYMid meet"
       >
         <defs>
@@ -187,48 +177,74 @@ function CampoJugada({ ronda }) {
         </g>
       </svg>
 
-      {esGol && <div className="jugadas-badge-gol">⚽ ¡GOL!</div>}
+      {esGol && <div className="jgp-gol">⚽ ¡GOL!</div>}
     </div>
   );
 }
 
-/* ------------------------------------------------------------ Clasificación */
-function Clasificacion({ jugadores }) {
-  const ranking = [...jugadores].sort((a, b) => b.puntos - a.puntos);
-  const maximo = ranking.length ? ranking[0].puntos : 0;
+/* ------------------------------------------------------------------ Piezas */
+function Hero({ vista, turnoId, onSalir, etiqueta, titulo, clase = '', viewerId }) {
   return (
-    <div className="scoreboard">
-      {ranking.map((j, i) => {
-        const lider = maximo > 0 && j.puntos === maximo;
-        return (
-          <div key={j.id} className={`score-row${lider ? ' first' : ''}`}>
-            <span className="score-name">
-              {lider ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
-              {j.nombre}{j.ausente ? ' (salió)' : ''}
-            </span>
-            <span className="score-pts">{j.puntos} pts</span>
-          </div>
-        );
-      })}
+    <header className={`jgp-hero ${clase}`}>
+      <span className="jgp-pizarra-fondo" aria-hidden="true">✕ ○ →</span>
+      <div className="jgp-hero-top">
+        <button type="button" className="jgp-salir" onClick={onSalir}><Icon name="door" size={15} /> Salir</button>
+        <div className="jgp-chips">
+          <span className="jgp-chip">⚽ {Math.min(vista.rondaNum, vista.totalRondas)}/{vista.totalRondas}</span>
+          <span className="jgp-chip">Vuelta {Math.min(vista.vueltaActual, vista.totalVueltas)}/{vista.totalVueltas}</span>
+        </div>
+      </div>
+      <p className="jgp-hero-etiqueta">{etiqueta}</p>
+      <h1 className="jgp-hero-titulo">{titulo}</h1>
+      <div className="jgp-marcador">
+        {[...vista.jugadores].sort((a, b) => b.puntos - a.puntos).map((j) => (
+          <span key={j.id} className={`jgp-marca${turnoId === j.id ? ' turno' : ''}${j.id === viewerId ? ' yo' : ''}${j.ausente ? ' fuera' : ''}`}>
+            <Avatar id={j.id} nombre={j.nombre} />
+            <span className="jgp-marca-nombre">{j.nombre}</span>
+            <span className="jgp-marca-datos">{j.puntos}</span>
+          </span>
+        ))}
+      </div>
+    </header>
+  );
+}
+
+function Reloj({ restante, total }) {
+  if (restante == null) return null;
+  const seg = Math.ceil(restante / 1000);
+  const pct = total ? Math.max(0, Math.min(100, (restante / total) * 100)) : 100;
+  return (
+    <div className={`jgp-reloj${seg <= 10 ? ' critico' : ''}`} role="timer">
+      <div className="jgp-reloj-barra"><span style={{ width: `${pct}%` }} /></div>
+      <strong>{seg}s</strong>
+      <small>= +{seg} pts</small>
     </div>
   );
 }
 
-/* ----------------------------------------------------- Componente Principal */
-export default function JugadasPartida({
-  vista,
-  viewerId = null,
-  local = false,
-  esHost = false,
-  onAccion,
-  onTiempo,
-  finalAcciones = null,
-  pie = null
-}) {
+function Ranking({ jugadores, viewerId }) {
+  const orden = [...jugadores].sort((a, b) => b.puntos - a.puntos);
+  const max = orden[0]?.puntos ?? 0;
+  return (
+    <ol className="jgp-ranking">
+      {orden.map((j, i) => (
+        <li key={j.id} className={max > 0 && j.puntos === max ? 'lider' : ''}>
+          <span className="jgp-pos">{j.ausente ? '🚪' : i + 1}</span>
+          <Avatar id={j.id} nombre={j.nombre} />
+          <span className="jgp-ranking-nombre">{j.nombre}{j.id === viewerId ? ' (tú)' : ''}</span>
+          <strong>{j.puntos}</strong>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+/* ---------------------------------------------------------------- Pantalla */
+export default function JugadasPartida({ vista, viewerId = null, local = false, esHost = false, onAccion, onTiempo, onSalir, finalAcciones = null, pie = null }) {
   const ronda = vista.ronda;
   const [texto, setTexto] = useState('');
 
-  // Cuenta atrás sincronizada con el servidor
+  // Cuenta atrás a partir de lo que quedaba cuando llegó la vista
   const [, setTic] = useState(0);
   const vistaRef = useRef(null);
   const recibidoRef = useRef(Date.now());
@@ -236,214 +252,129 @@ export default function JugadasPartida({
     vistaRef.current = vista;
     recibidoRef.current = Date.now();
   }
-  const hayReloj = ronda?.restanteMs != null;
+  const hayReloj = ronda?.restanteMs != null && vista.estado === 'ronda';
   useEffect(() => {
     if (!hayReloj) return undefined;
     const id = setInterval(() => setTic((t) => t + 1), 250);
     return () => clearInterval(id);
   }, [hayReloj]);
-
   const restante = hayReloj ? Math.max(0, ronda.restanteMs - (Date.now() - recibidoRef.current)) : null;
   const claveTurno = ronda ? `${vista.rondaNum}-${ronda.etapa}` : `${vista.estado}`;
+  useEffect(() => { setTexto(''); }, [claveTurno]);
 
-  // Limpiar el input cuando cambia el turno o la ronda
-  useEffect(() => {
-    setTexto('');
-  }, [claveTurno]);
-
-  // En modo local avisa cuando el reloj llega a 0
+  // En un dispositivo, al llegar a 0 se avisa al motor
   const enviadoRef = useRef(null);
   useEffect(() => {
     if (!local || restante == null || restante > 0) return;
     if (enviadoRef.current === claveTurno) return;
     enviadoRef.current = claveTurno;
-    if (onTiempo) onTiempo();
+    onTiempo?.();
   }, [local, restante, claveTurno, onTiempo]);
 
   const jugadores = vista.jugadores;
   const nombre = (id) => jugadores.find((j) => j.id === id)?.nombre ?? '—';
-
-  const turnoId =
-    vista.estado === 'ronda' && ronda
-      ? ronda.etapa === 'j1'
-        ? ronda.activoId
-        : ronda.etapa === 'rebote'
-        ? ronda.reboteId
-        : null
-      : null;
-
+  const turnoId = vista.estado === 'ronda' && ronda ? (ronda.etapa === 'j1' ? ronda.activoId : ronda.etapa === 'rebote' ? ronda.reboteId : null) : null;
   const actorId = local ? turnoId : viewerId;
   const esMiTurno = turnoId != null && actorId === turnoId;
-
-  const enviarRespuesta = (e) => {
+  const enviar = (e) => {
     e.preventDefault();
     if (!texto.trim() || !esMiTurno) return;
     onAccion({ tipo: 'responder', jugadorId: actorId, texto: texto.trim() });
   };
 
-  const pasarTurno = () => {
-    if (!esMiTurno) return;
-    onAccion({ tipo: 'pasar', jugadorId: actorId });
-  };
-
-  /* ---------------------------------------------------------------- FINAL */
   if (vista.estado === 'fin') {
-    const ranking = [...jugadores].sort((a, b) => b.puntos - a.puntos);
-    const maximo = ranking.length ? ranking[0].puntos : 0;
-    const ganadores = maximo > 0 ? ranking.filter((j) => j.puntos === maximo) : [];
+    const orden = [...jugadores].sort((a, b) => b.puntos - a.puntos);
+    const max = orden[0]?.puntos ?? 0;
+    const ganadores = max > 0 ? orden.filter((j) => j.puntos === max) : [];
     return (
-      <section className="game">
-        <div className="end-card">
-          <span className="end-icon"><Icon name="crown" size={44} /></span>
-          <h1 className="title">Final del partido</h1>
-          <p className="final-score">
-            {ganadores.length === 0
-              ? 'Nadie ha conseguido puntos'
-              : ganadores.length === 1
-              ? <>¡Victoria para {ganadores[0].nombre} con {maximo} puntos!</>
-              : <>Empate entre {ganadores.map((g) => g.nombre).join(', ')} con {maximo} puntos</>}
-          </p>
-          <Clasificacion jugadores={jugadores} />
+      <>
+        <Hero vista={vista} onSalir={onSalir} viewerId={viewerId} etiqueta="Final del partido"
+          titulo={ganadores.length ? `¡Gana ${ganadores.map((g) => g.nombre).join(' y ')}!` : 'Nadie ha puntuado'} clase="fin" />
+        <div className="jgp-tarjeta">
+          <p className="jgp-etiqueta">Clasificación</p>
+          <Ranking jugadores={jugadores} viewerId={viewerId} />
         </div>
         {finalAcciones}
-      </section>
+      </>
     );
   }
 
-  /* ---------------------------------------------- RONDA EN CURSO / REVELADO */
   const enResultado = vista.estado === 'resultado';
   const res = ronda?.resultado || {};
+  let etiqueta; let titulo;
+  if (enResultado) {
+    etiqueta = res.ganadorId ? `¡${nombre(res.ganadorId)} lo ha sacado${res.esRebote ? ' en el rebote' : ''}!` : 'Nadie lo ha sacado';
+    titulo = res.ganadorId ? '¡Jugadón acertado!' : 'Se ha resistido';
+  } else if (ronda?.etapa === 'rebote') {
+    etiqueta = `Rebote para ${nombre(ronda.reboteId)}`;
+    titulo = esMiTurno && !local ? '¡Te llega el rebote!' : '¿Qué jugada es?';
+  } else {
+    etiqueta = local ? `Turno de ${nombre(turnoId)}` : esMiTurno ? 'Tu turno' : `Turno de ${nombre(turnoId)}`;
+    titulo = '¿Qué jugada es?';
+  }
 
   return (
-    <section className="game">
-      {/* Cabecera y Marcador */}
-      <div className="hud">
-        <span className="chip"><Icon name="flagFinish" size={18} /> ⚽ Jugadas Icónicas</span>
-        <span className="chip">Ronda {vista.rondaNum}/{vista.totalRondas}</span>
-        <span className="chip">Vuelta {vista.vueltaActual}/{vista.totalVueltas}</span>
-      </div>
-
-      <div className="scoreboard-container" style={{ justifyContent: 'center', marginBottom: '0.8rem' }}>
-        {jugadores.map((j) => (
-          <div
-            key={j.id}
-            className={`score-pill ${j.ausente ? 'locked' : ''} ${turnoId === j.id ? 'jugadas-pill-activa' : ''}`}
-          >
-            <span>{j.nombre}: <strong>{j.puntos} pts</strong></span>
-          </div>
-        ))}
-      </div>
-
-      {/* Campo 2D */}
+    <>
+      <Hero vista={vista} turnoId={turnoId} onSalir={onSalir} viewerId={viewerId} etiqueta={etiqueta} titulo={titulo}
+        clase={enResultado ? 'fin' : esMiTurno && !local ? 'mio' : ''} />
+      {!enResultado && <Reloj restante={restante} total={ronda?.totalMs} />}
       {ronda && <CampoJugada ronda={ronda} />}
+      {ronda?.pista && <div className="jgp-pista"><span>💡</span> <p><strong>Pista:</strong> {ronda.pista}</p></div>}
 
-      {/* Pista de la jugada */}
-      {ronda?.pista && (
-        <div className="jugadas-pista">
-          <span>💡 <strong>Pista:</strong> {ronda.pista}</span>
-        </div>
-      )}
-
-      {/* Estado de la ronda */}
       {!enResultado && ronda && (
         <>
-          <Reloj restante={restante} total={ronda.totalMs} />
-
           {ronda.etapa === 'rebote' && (
-            <div className="status-alert error" style={{ marginBottom: '0.8rem' }}>
-              {ronda.motivoJ1 === 'paso'
-                ? `${nombre(ronda.activoId)} ha pasado turno. ¡Rebote para ${nombre(ronda.reboteId)}!`
-                : ronda.motivoJ1 === 'tiempo'
-                ? `Se agotó el tiempo de ${nombre(ronda.activoId)}. ¡Rebote para ${nombre(ronda.reboteId)}!`
-                : `${nombre(ronda.activoId)} dijo «${ronda.intentoJ1}» y falló. ¡Rebote para ${nombre(ronda.reboteId)}!`}
+            <div className="jgp-aviso">
+              {ronda.motivoJ1 === 'paso' ? `${nombre(ronda.activoId)} ha pasado.`
+                : ronda.motivoJ1 === 'tiempo' ? `A ${nombre(ronda.activoId)} se le acabó el tiempo.`
+                  : `${nombre(ronda.activoId)} dijo «${ronda.intentoJ1}» y falló.`} ¡Rebote para {nombre(ronda.reboteId)}!
             </div>
           )}
-
-          <div className="panel" style={{ marginTop: '0.6rem' }}>
-            <p className="hint center" style={{ marginBottom: '0.6rem' }}>
-              {ronda.etapa === 'j1' ? (
-                <>🎯 Turno de <strong>{nombre(ronda.activoId)}</strong> (Rebote: {nombre(ronda.reboteId)})</>
-              ) : (
-                <>↩️ Rebote único para <strong>{nombre(ronda.reboteId)}</strong></>
-              )}
-            </p>
-
-            {esMiTurno ? (
-              <form onSubmit={enviarRespuesta}>
-                <input
-                  autoFocus
-                  type="text"
-                  className="player-text-input respuesta-input-grande"
-                  placeholder="Ej.: Maradona a Inglaterra, Iniesta a Holanda..."
-                  maxLength={60}
-                  value={texto}
-                  onChange={(e) => setTexto(e.target.value)}
-                />
-                <div className="jugadas-acciones-turno">
-                  <button type="submit" className="big full" disabled={!texto.trim()}>
-                    Adivinar jugada
-                  </button>
-                  <button type="button" className="secondary full" onClick={pasarTurno}>
-                    ⏭️ Pasar
-                  </button>
-                </div>
-              </form>
-            ) : (
-              <p className="hint center">
-                Esperando a que <strong>{nombre(turnoId)}</strong> adivine la jugada...
-              </p>
-            )}
-          </div>
+          {esMiTurno ? (
+            <form className="jgp-tarjeta jgp-respuesta" onSubmit={enviar}>
+              <p className="jgp-etiqueta">{local ? `Responde, ${nombre(turnoId)}` : 'Tu respuesta'}{ronda.etapa === 'j1' && ronda.reboteId ? ` · si fallas, rebote para ${nombre(ronda.reboteId)}` : ''}</p>
+              <input autoFocus className="jgp-input" placeholder="Ej.: Iniesta a Holanda, Maradona a Inglaterra…" maxLength={60}
+                value={texto} onChange={(e) => setTexto(e.target.value)} autoComplete="off" />
+              <div className="jgp-dos">
+                <button type="button" className="jgp-boton secundario" onClick={() => onAccion({ tipo: 'pasar', jugadorId: actorId })}>⏭️ Pasar</button>
+                <button type="submit" className="jgp-boton" disabled={!texto.trim()}><Icon name="check" size={20} /> Adivinar</button>
+              </div>
+            </form>
+          ) : (
+            <p className="jgp-esperando">⏳ {nombre(turnoId)} está pensando la jugada…</p>
+          )}
         </>
       )}
 
-      {/* Resultado de la ronda */}
       {enResultado && ronda && (
         <>
-          <div className="furbo-respuesta-real" style={{ marginTop: '0.8rem' }}>
-            ⚽ {ronda.titulo}
+          <div className={`jgp-tarjeta jgp-solucion${res.ganadorId ? ' bien' : ''}`}>
+            <span className="jgp-solucion-icono" aria-hidden="true">{res.ganadorId ? '🎉' : '⚽'}</span>
+            <p className="jgp-etiqueta centrada">Era…</p>
+            <h2>{ronda.titulo}</h2>
+            <p className="jgp-texto">{res.ganadorId ? `${nombre(res.ganadorId)} suma ${res.puntos} puntos${res.respuestaDada ? ` con «${res.respuestaDada}»` : ''}.` : 'Nadie ha acertado esta jugada.'}</p>
           </div>
-
-          {res.ganadorId ? (
-            <div className="status-alert success">
-              ¡<strong>{nombre(res.ganadorId)}</strong> acierta{res.esRebote ? ' en el rebote' : ''} y suma <strong>+{res.puntos} puntos</strong>!
-            </div>
-          ) : (
-            <div className="status-alert error">
-              Nadie ha acertado la jugada en esta ronda.
-            </div>
-          )}
-
-          <div style={{ marginTop: '1rem' }}>
-            <Clasificacion jugadores={jugadores} />
+          <div className="jgp-tarjeta">
+            <p className="jgp-etiqueta">Clasificación</p>
+            <Ranking jugadores={jugadores} viewerId={viewerId} />
           </div>
-
-          <div className="actions">
+          <div className="jgp-barra estatica">
             {esHost ? (
-              <button type="button" onClick={() => onAccion({ tipo: 'continuar' })}>
-                <Icon name="play" size={20} />{' '}
-                {vista.rondaNum < vista.totalRondas
-                  ? `Siguiente jugada (${vista.rondaNum + 1}/${vista.totalRondas})`
-                  : 'Ver clasificación final'}
-              </button>
-            ) : (
-              <p className="hint center" style={{ width: '100%' }}>Esperando al anfitrión...</p>
-            )}
-
-            {esHost && vista.puedeFinalizar && (
-              <button
-                type="button"
-                className="secondary danger"
-                onClick={() => onAccion({ tipo: 'finalizar' })}
-              >
-                <Icon name="flagFinish" size={20} /> Finalizar partida
-              </button>
-            )}
+              <>
+                <button type="button" className="jgp-boton grande" onClick={() => onAccion({ tipo: 'continuar' })}>
+                  <Icon name="play" size={20} /> {vista.rondaNum < vista.totalRondas ? `Siguiente jugada (${vista.rondaNum + 1}/${vista.totalRondas})` : 'Ver clasificación final'}
+                </button>
+                {vista.puedeFinalizar && (
+                  <button type="button" className="jgp-boton secundario" onClick={() => onAccion({ tipo: 'finalizar' })}>
+                    <Icon name="flagFinish" size={18} /> Terminar aquí (vuelta completa)
+                  </button>
+                )}
+              </>
+            ) : <p className="jgp-esperando">⏳ Esperando al anfitrión…</p>}
           </div>
         </>
       )}
-
       {pie}
-    </section>
+    </>
   );
 }

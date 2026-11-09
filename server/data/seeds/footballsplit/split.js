@@ -23,8 +23,6 @@ export const JUGADORES_SPLIT = [
   { id: 745, jugador: "Isco Alarcón", pista: "Aquel partido contra Italia... mágico" },
   { id: 746, jugador: "Marco Asensio", pista: "Capaz de no jugar por una uña infectada o de marcar golazos por la escuadra desde 25 metros" },
   { id: 747, jugador: "Casemiro", pista: "El jugador capaz de equilibrar un equipo él solo" },
-  { id: 748, jugador: "Dani Ceballos", pista: "Todos los veranos se rumoreaba que volvía al Betis, después de 7 veranos se cumplió" },
-  { id: 748, jugador: "Casemiro", pista: "Mediocentro brasileño ganador de 5 Champions con el Real Madrid" },
   { id: 749, jugador: "Dani Ceballos", pista: "Centrocampista utrerano del Real Madrid, ex del Betis" },
   { id: 752, jugador: "Toni Kroos", pista: "Todavía hay gente llorando su marcha en el Bernabéu" },
   { id: 753, jugador: "Marcos Llorente", pista: "Cambió al eterno rival para tomar mejor el sol" },
@@ -258,6 +256,28 @@ export const JUGADORES_SPLIT = [
   { id: 119, jugador: "Radamel Falcao", pista: "Delantero colombiano apodado 'El Tigre'" },
   { id: 667, jugador: "Memphis Depay", pista: "Atacante neerlandés ex del Lyon, Barça y Atlético" }
 ];
+
+/** Genera `n` retos (caras) sin repetir futbolista entre ellos mientras haya suficientes. */
+export function generarRetos(n) {
+  const copia = [...JUGADORES_SPLIT];
+  for (let i = copia.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copia[i], copia[j]] = [copia[j], copia[i]];
+  }
+  const retos = [];
+  for (let k = 0; k < n; k++) {
+    const [top, middle, bottom] = [0, 1, 2].map((x) => copia[(k * 3 + x) % copia.length]);
+    retos.push({
+      id: `split_${top.id}_${middle.id}_${bottom.id}`,
+      partes: {
+        top: { id: top.id, jugador: top.jugador, pista: top.pista, img: urlFoto(top.id) },
+        middle: { id: middle.id, jugador: middle.jugador, pista: middle.pista, img: urlFoto(middle.id) },
+        bottom: { id: bottom.id, jugador: bottom.jugador, pista: bottom.pista, img: urlFoto(bottom.id) }
+      }
+    });
+  }
+  return retos;
+}
 
 // Genera un reto mezclando 3 jugadores distintos al azar
 export function generarRetoAleatorio() {

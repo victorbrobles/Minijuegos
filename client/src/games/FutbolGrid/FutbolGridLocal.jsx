@@ -1,245 +1,120 @@
 // client/src/games/FutbolGrid/FutbolGridLocal.jsx
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+// Modo «un único dispositivo»: dos equipos con el móvil en la mesa. El equipo en turno elige casilla y escribe
+// el futbolista. Mismo motor que el online; el grid (con respuestas) se pide al servidor.
+import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
-import './FutbolGrid.css';
+import * as E from './engine.js';
+import { PantallaJuego, PantallaFin, ModalSalir } from './Vistas.jsx';
 import { SelectorJugadores } from '../../components/MenuJuego.jsx';
+import './FutbolGrid.css';
 
-const TIEMPO_S = 60; 
+export default function FutbolGridLocal({ onVolver, onExit, onAbrirAyuda }) {
+  const [paso, setPaso] = useState('config');
+  const [nombres, setNombres] = useState(['', '']);
+  const [error, setError] = useState('');
+  const [errorJuego, setErrorJuego] = useState('');
+  const [cargando, setCargando] = useState(false);
+  const [modal, setModal] = useState(false);
+  const [victorias, setVictorias] = useState({ X: 0, O: 0, empates: 0 });
+  const estRef = useRef(null);
+  const contado = useRef(false);
+  const empieza = useRef('O');
+  const [, setVer] = useState(0);
+  const refrescar = () => setVer((x) => x + 1);
 
-export default function FutbolGridLocal({ onVolver, onExit }) {
-  const navigate = useNavigate();
-  const [paso, setPaso] = useState('config'); 
-  const [modalAyuda, setModalAyuda] = useState(false);
-  const [jugadores, setJugadores] = useState([{ id: 1, nombre: 'Jugador 1' }, { id: 2, nombre: 'Jugador 2' }]);
-  const [equipos, setEquipos] = useState({ X: [], O: [] });
-  const [tablero, setTablero] = useState(Array(9).fill(null));
-  const [turno, setTurno] = useState('X');
-  const [celdaActiva, setCeldaActiva] = useState(null); 
-  const [restante, setRestante] = useState(TIEMPO_S);
-  const [ganador, setGanador] = useState(null);
-  
-  const [gridActual, setGridActual] = useState(null);
-  const [respuestaInput, setRespuestaInput] = useState("");
-  const [feedback, setFeedback] = useState(null);
+  useEffect(() => {
+    if (paso !== 'juego') return undefined;
+    const i = setInterval(() => { if (estRef.current) { E.tick(estRef.current, Date.now()); refrescar(); } }, 300);
+    return () => clearInterval(i);
+  }, [paso]);
 
-  const timerRef = useRef(null);
-
-  const handleNumJugadores = (e) => {
-    const num = parseInt(e.target.value, 10);
-    setJugadores(Array.from({ length: num }, (_, i) => ({
-      id: i + 1, nombre: jugadores[i]?.nombre ?? `Jugador ${i + 1}`
-    })));
-  };
-
-  const handleNombre = (idx, valor) => {
-    setJugadores((prev) => prev.map((j, i) => (i === idx ? { ...j, nombre: valor } : j)));
-  };
-
-  const cargarGrid = async () => {
+  const nuevaPartida = async (limpios) => {
+    setCargando(true);
     try {
-      const res = await fetch('/api/futbolgrid/grid');
-      const data = await res.json();
-      if(data.success) {
-        setGridActual(data.grid);
-      }
-    } catch(e) { console.error("Error al cargar grid", e); }
-  };
-
-  const empezar = async () => {
-    const lista = jugadores.map((j) => ({ ...j, nombre: j.nombre.trim() || `Jugador ${j.id}` }));
-    const eqX = []; const eqO = [];
-    lista.forEach((j, i) => { if (i % 2 === 0) eqX.push(j); else eqO.push(j); });
-    setEquipos({ X: eqX, O: eqO });
-    setJugadores(lista);
-    setTablero(Array(9).fill(null));
-    setTurno('X');
-    setGanador(null);
-    await cargarGrid();
-    setPaso('jugando');
-  };
-
-  const iniciarTimer = () => {
-    setRestante(TIEMPO_S);
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      setRestante((prev) => {
-        if (prev <= 1) {
-          clearInterval(timerRef.current);
-          procesarFallo("¡Tiempo agotado!");
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
-
-  const abrirCelda = (index) => {
-    if (tablero[index] !== null || ganador || !gridActual) return;
-    setCeldaActiva(index);
-    setRespuestaInput("");
-    setFeedback(null);
-    iniciarTimer();
-  };
-
-  const normalizar = (t) => t.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().trim();
-
-  const validarRespuesta = (e) => {
-    e.preventDefault();
-    if (!respuestaInput.trim()) return;
-    if (timerRef.current) clearInterval(timerRef.current);
-
-    const validos = gridActual.respuestas[Math.floor(celdaActiva / 3)][celdaActiva % 3];
-    const inputNorm = normalizar(respuestaInput);
-    const esCorrecto = validos.some(n => normalizar(n) === inputNorm || normalizar(n).includes(inputNorm) || inputNorm.includes(normalizar(n)));
-
-    if(esCorrecto) {
-      setFeedback({ tipo: 'success', msj: '¡Respuesta correcta!' });
-      setTimeout(() => procesarAcierto(), 1500);
-    } else {
-      setFeedback({ tipo: 'error', msj: 'Jugador incorrecto' });
-      setTimeout(() => procesarFallo("Fallo"), 1500);
+      const r = await fetch('/api/futbolgrid/grid');
+      const d = await r.json();
+      if (!d.success) throw new Error();
+      empieza.current = empieza.current === 'X' ? 'O' : 'X';
+      estRef.current = E.crearPartida(limpios.map((nombre, i) => ({ id: i + 1, nombre })), d.grid, empieza.current);
+      contado.current = false;
+      setErrorJuego('');
+      setPaso('juego');
+    } catch {
+      setError('No se ha podido cargar el tablero. Inténtalo de nuevo.');
+    } finally {
+      setCargando(false);
     }
   };
 
-  const procesarAcierto = () => {
-    let nuevoTablero = [...tablero];
-    nuevoTablero[celdaActiva] = turno;
-    setTablero(nuevoTablero);
-    setCeldaActiva(null);
-    comprobarVictoria(nuevoTablero);
+  const empezar = () => {
+    const limpios = nombres.map((n) => n.trim());
+    if (limpios.some((n) => !n)) return setError('Todos los jugadores necesitan un nombre.');
+    if (new Set(limpios.map((n) => n.toLowerCase())).size !== limpios.length) return setError('Hay nombres repetidos.');
+    setError('');
+    setVictorias({ X: 0, O: 0, empates: 0 });
+    nuevaPartida(limpios);
+    return undefined;
   };
 
-  const procesarFallo = (motivo) => {
-    setCeldaActiva(null);
-    setTurno(turno === 'X' ? 'O' : 'X');
-  };
+  if (paso === 'config') {
+    return (
+      <div className="fgp-contenedor">
+        <SelectorJugadores
+          onVolver={onVolver} onAyuda={onAbrirAyuda} min={E.AJUSTES.min} max={E.AJUSTES.max}
+          numJugadores={nombres.length}
+          onCambiarNum={(n) => setNombres((l) => (n > l.length ? [...l, ...Array(n - l.length).fill('')] : l.slice(0, n)))}
+          nombres={nombres}
+          onNombre={(i, valor) => setNombres((l) => l.map((x, k) => (k === i ? valor : x)))}
+          onEmpezar={empezar} textoBoton={cargando ? 'Cargando…' : '¡Empezar partida!'} error={error}
+        >
+          <p className="fgp-nota-sala oscura">Los jugadores se reparten alternos: 1.º, 3.º… al equipo Azul ✕ y 2.º, 4.º… al Rojo ◯.</p>
+        </SelectorJugadores>
+      </div>
+    );
+  }
 
-  const comprobarVictoria = (nuevoTablero) => {
-    const lineas = [[0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6]];
-    for (let [a, b, c] of lineas) {
-      if (nuevoTablero[a] && nuevoTablero[a] === nuevoTablero[b] && nuevoTablero[a] === nuevoTablero[c]) {
-        setGanador(nuevoTablero[a]);
-        return setPaso('final');
-      }
-    }
-    if (!nuevoTablero.includes(null)) { setGanador('Empate'); setPaso('final'); }
-    else { setTurno(turno === 'X' ? 'O' : 'X'); }
+  const est = estRef.current;
+  const v = E.vistaDe(est, -1);
+  if (est.fase === 'fin' && !contado.current) {
+    contado.current = true;
+    const g = est.fin.ganador;
+    setTimeout(() => setVictorias((x) => (g ? { ...x, [g]: x[g] + 1 } : { ...x, empates: x.empates + 1 })), 0);
+  }
+  const enviar = (tipo, datos = {}) => {
+    const ahora = Date.now();
+    let r;
+    if (tipo === 'casilla') r = E.elegirCasilla(est, null, datos.celda, ahora);
+    else if (tipo === 'cancelar') r = E.cancelarCasilla(est, null);
+    else if (tipo === 'responder') r = E.responder(est, null, datos.respuesta, ahora);
+    else if (tipo === 'pasar') r = E.pasar(est, null);
+    else if (tipo === 'terminar') r = E.terminar(est);
+    setErrorJuego(r && !r.ok ? r.error : '');
+    refrescar();
   };
+  const miembros = v.jugadores.filter((j) => j.equipo === v.turno).map((j) => j.nombre).join(', ');
 
   return (
-    <div className="rk-contenedor">
-      {paso === 'config' && (
-        <>
-
-          {modalAyuda && (
-            <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
-              <div className="rg-modal rk-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-                <div className="rk-modal-header">
-                  <span className="rk-modal-signo-title">?</span>
-                  <h3>¿Cómo se juega a Fútbol en Raya?</h3>
-                </div>
-                <div className="rk-modal-cuerpo">
-                  <p>El clásico Tres en Raya, pero con conocimiento futbolístico. Los jugadores se dividirán en <strong>Equipo Azul (X)</strong> y <strong>Equipo Rojo (O)</strong>.</p>
-                  <ul>
-                    <li>En tu turno, elige una casilla vacía de la cuadrícula.</li>
-                    <li>Deberéis escribir el nombre de un jugador que cumpla <strong>ambas categorías</strong> (fila y columna).</li>
-                    <li>Si acertáis, la casilla es vuestra. Si falláis o se acaba el tiempo, el turno pasa al otro equipo.</li>
-                    <li>Gana el primer equipo en alinear 3 casillas.</li>
-                  </ul>
-                </div>
-                <div className="rg-modal-acciones">
-                  <button className="big full" onClick={() => setModalAyuda(false)}>Entendido</button>
-                </div>
-              </div>
+    <div className="fgp-contenedor qq-en-partida">
+      <section className="game fgp-escena">
+        {est.fase === 'fin' ? (
+          <PantallaFin v={v} onSalir={() => setModal(true)}>
+            <div className="fgp-tarjeta fgp-centro">
+              <p className="fgp-etiqueta centrada">Marcador de la sesión</p>
+              <p className="fgp-marcador-sesion"><span className="eq-X">✕ {victorias.X}</span> <small>empates {victorias.empates}</small> <span className="eq-O">{victorias.O} ◯</span></p>
             </div>
-          )}
-
-          <SelectorJugadores
-            onVolver={onVolver}
-            onAyuda={() => setModalAyuda(true)}
-            min={2}
-            max={6}
-            numJugadores={jugadores.length}
-            onCambiarNum={(n) => handleNumJugadores({ target: { value: n } })}
-            nombres={jugadores}
-            onNombre={handleNombre}
-            onEmpezar={empezar}
-            textoBoton="Empezar Partida"
-          />
-        </>
-      )}
-
-      {paso === 'jugando' && gridActual && (
-        <section className="game">
-          <div className="hud space-between">
-            <div className={`eq-badge ${turno === 'X' ? 'active-x' : ''}`}><strong>Azul (X)</strong>: {equipos.X.map(j => j.nombre).join(', ')}</div>
-            <div className={`eq-badge ${turno === 'O' ? 'active-o' : ''}`}><strong>Rojo (O)</strong>: {equipos.O.map(j => j.nombre).join(', ')}</div>
-          </div>
-
-          <div className="grid-board-container">
-            <div className="grid-board">
-              <div className="grid-cell header empty"></div>
-              {gridActual.columnas.map((col, i) => (<div key={`c-${i}`} className="grid-cell header col-header">{col}</div>))}
-              {gridActual.filas.map((fila, fIndex) => (
-                <React.Fragment key={`row-${fIndex}`}>
-                  <div className="grid-cell header row-header">{fila}</div>
-                  {[0, 1, 2].map((cIndex) => {
-                    const index = fIndex * 3 + cIndex;
-                    const valor = tablero[index];
-                    return (
-                      <div key={index} className={`grid-cell interactable ${valor === 'X' ? 'cell-x' : valor === 'O' ? 'cell-o' : ''}`} onClick={() => abrirCelda(index)}>
-                        {valor && <span className="cell-mark">{valor}</span>}
-                      </div>
-                    );
-                  })}
-                </React.Fragment>
-              ))}
+            <div className="fgp-barra estatica">
+              <button type="button" className="fgp-boton grande" disabled={cargando} onClick={() => nuevaPartida(nombres.map((n) => n.trim()))}><Icon name="refresh" size={20} /> Otra partida (nuevo tablero)</button>
+              <button type="button" className="fgp-boton secundario" onClick={() => setPaso('config')}><Icon name="users" size={18} /> Cambiar jugadores</button>
             </div>
-          </div>
-
-          {celdaActiva !== null && (
-            <div className="rg-modal-fondo">
-              <div className="rg-modal grid-modal" onClick={(e) => e.stopPropagation()}>
-                <h3 style={{ textAlign: 'center', marginBottom: '1rem', color: '#1e293b' }}>Respuesta Equipo {turno === 'X' ? 'Azul' : 'Rojo'}</h3>
-                <div className="grid-reto">
-                  <span className="grid-reto-cat">{gridActual.filas[Math.floor(celdaActiva / 3)]}</span>
-                  <Icon name="close" size={20} color="#64748b" />
-                  <span className="grid-reto-cat">{gridActual.columnas[celdaActiva % 3]}</span>
-                </div>
-                <div className="timer" style={{ marginTop: '1.5rem' }}><div className={`timer-bar${restante <= 15 ? ' low' : ''}`} style={{ width: `${(restante / TIEMPO_S) * 100}%` }} /></div>
-                <p className="timer-text" style={{ marginBottom: '1.5rem' }}><Icon name="clock" size={16} />{restante} s</p>
-                
-                {!feedback ? (
-                  <form onSubmit={validarRespuesta}>
-                    <input type="text" placeholder="Escribe el jugador..." value={respuestaInput} onChange={(e) => setRespuestaInput(e.target.value)} autoFocus style={{ width: '100%', padding: '0.8rem', marginBottom: '1rem', border: '2px solid #cbd5e1', borderRadius: '8px' }} />
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                      <button type="submit" className="ok" disabled={!respuestaInput.trim()}><Icon name="check" size={20} /> Validar</button>
-                      <button type="button" className="secondary danger" onClick={() => procesarFallo("Pasar")}>No lo sé</button>
-                    </div>
-                  </form>
-                ) : (
-                  <div style={{ padding: '1rem', textAlign: 'center', background: feedback.tipo === 'success' ? '#dcfce7' : '#fee2e2', color: feedback.tipo === 'success' ? '#15803d' : '#991b1b', borderRadius: '8px', fontWeight: 'bold' }}>
-                    {feedback.msj}
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </section>
-      )}
-
-      {paso === 'final' && (
-        <section className="game">
-          <div className="end-card">
-            <span className="end-icon"><Icon name="trophy" size={48} /></span>
-            <h1 className="title">{ganador === 'Empate' ? '¡Es un Empate!' : `¡El Equipo ${ganador === 'X' ? 'Azul' : 'Rojo'} gana!`}</h1>
-          </div>
-          <div className="actions">
-            <button onClick={() => setPaso('config')}><Icon name="refresh" size={20} /> Jugar de nuevo</button>
-            <button className="secondary danger" onClick={() => (onExit ? onExit() : navigate('/'))}><Icon name="door" size={20} /> Salir al menú</button>
-          </div>
-        </section>
+          </PantallaFin>
+        ) : (
+          <PantallaJuego v={v} enviar={enviar} onSalir={() => setModal(true)} miEquipo error={errorJuego}
+            nombreTurno={`Turno del equipo ${E.EQUIPOS[v.turno].nombre}: ${miembros}`} admin={{ esAdmin: true, atascado: false }} />
+        )}
+      </section>
+      {modal && (
+        <ModalSalir titulo="¿Salir de la partida?" texto="Se perderá la partida en curso y volverás a la portada."
+          onSeguir={() => setModal(false)} onSalir={() => { setModal(false); onExit?.(); }} />
       )}
     </div>
   );

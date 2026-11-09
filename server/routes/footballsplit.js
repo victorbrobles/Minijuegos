@@ -1,212 +1,226 @@
-// server/routes/footballsplit.routes.js
+// server/routes/footballsplit.js
+// Salas online de «FrankensFootball». Mismo esquema que el resto de juegos: salas en memoria + sondeo HTTP.
+// La lógica vive en ../footballsplit/engine.js; los nombres de los futbolistas no salen hasta que se aciertan.
 import express from 'express';
-import crypto from 'crypto';
-import SPLIT_RETO, { generarRetoAleatorio } from '../data/seeds/footballsplit/split.js';
+import * as E from '../footballsplit/engine.js';
+import { generarRetos } from '../data/seeds/footballsplit/split.js';
 
 const router = express.Router();
 
-const normalizar = (texto) => 
-  typeof texto === 'string' ? texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim() : "";
+// Modo «un solo dispositivo»: el cliente pide las caras y juega con el motor copiado.
+router.get('/retos', (req, res) => {
+  const n = E.OPCIONES_RONDAS.includes(Number(req.query.n)) ? Number(req.query.n) : 10;
+  res.json({ success: true, retos: generarRetos(n) });
+});
+const salas = {};
+const MIN = E.AJUSTES.min;
+const MAX = E.AJUSTES.max;
+const CADUCIDAD_MS = 4 * 60 * 60 * 1000;
 
-const obtenerRetoAleatorio = () => {
-  return generarRetoAleatorio();
+const codigoSala = () => {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let c = '';
+  for (let i = 0; i < 4; i++) c += chars.charAt(Math.floor(Math.random() * chars.length));
+  return c;
+};
+const nuevoToken = () => Math.random().toString(36).slice(2) + Date.now().toString(36) + Math.random().toString(36).slice(2);
+
+setInterval(() => {
+  const ahora = Date.now();
+  Object.keys(salas).forEach((c) => { if (ahora - salas[c].ultimaActividad > CADUCIDAD_MS) delete salas[c]; });
+}, 10 * 60 * 1000).unref();
+
+function sala_y_jugador(req, res) {
+  const code = String(req.params.code || '').toUpperCase();
+  const token = req.body?.token ?? req.query?.token;
+  const sala = salas[code];
+  if (!sala) { res.status(404).json({ error: 'La sala no existe o ha caducado.' }); return null; }
+  const jugador = sala.jugadores.find((j) => j.token === token);
+  if (!jugador) { res.status(403).json({ error: 'No perteneces a esta sala.' }); return null; }
+  sala.ultimaActividad = Date.now();
+  jugador.visto = Date.now();
+  return { sala, jugador, esAdmin: sala.adminToken === token };
+}
+
+function cerrarPartida(sala) {
+  if (sala.puntosAplicados) return;
+  sala.puntosAplicados = true;
+  const g = sala.partida.fin.ganadores;
+  const pts = Object.fromEntries(sala.jugadores.map((j) => [j.id, g.includes(j.id) ? 3 : 0]));
+  sala.jugadores.forEach((j) => { j.puntos += pts[j.id] || 0; });
+  sala.ultimaPartida = { partida: sala.numPartida, puntos: pts };
+}
+const revisar = (sala) => {
+  if (sala.estado === 'jugando' && sala.partida) E.tick(sala.partida, Date.now());
+  if (sala.partida?.fase === 'fin') cerrarPartida(sala);
 };
 
-// ================= LOCAL =================
-router.get('/reto', (req, res) => {
-  res.json({ success: true, reto: obtenerRetoAleatorio() });
-});
+function iniciarPartida(sala) {
+  sala.numPartida += 1; sala.puntosAplicados = false;
+  sala.partida = E.crearPartida(sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre })), generarRetos(sala.config.rondas), Date.now());
+  sala.estado = 'jugando';
+}
 
-// ================= ONLINE =================
-const salas = new Map();
-const generarCodigo = () => crypto.randomBytes(2).toString('hex').toUpperCase();
-const generarToken = () => crypto.randomBytes(16).toString('hex');
-
+// ---------------------------------------------------------------- Crear / unirse
 router.post('/online/crear', (req, res) => {
-  const { nombre } = req.body;
-  if (!nombre) return res.status(400).json({ error: 'Nombre obligatorio' });
-
-  const code = generarCodigo();
-  const token = generarToken();
-
-  salas.set(code, {
-    code,
-    estado: 'lobby', // 'lobby' | 'jugando' | 'ronda_fin' | 'final_partida'
-    adminId: 1,
-    nextId: 2,
-    jugadores: [{ id: 1, nombre, token, puntos: 0 }],
-    rondaActual: 1,
-    maxRondas: 15,
-    retoActual: null,
-    estadoReto: { top: false, middle: false, bottom: false },
-    pistasUsadas: { top: false, middle: false, bottom: false },
-    turnoId: 1,
-    primerTurnoRondaId: 1
-  });
-
-  res.json({ success: true, code, token });
+  const nombre = String(req.body?.nombre || '').trim().slice(0, 20);
+  if (!nombre) return res.status(400).json({ error: 'Debes indicar un nombre.' });
+  let code = codigoSala();
+  while (salas[code]) code = codigoSala();
+  const token = nuevoToken();
+  salas[code] = {
+    code, adminToken: token, estado: 'lobby', contadorIds: 1, numPartida: 0, puntosAplicados: false,
+    partida: null, ultimaPartida: null, ultimaActividad: Date.now(), config: { rondas: 10 },
+    jugadores: [{ id: 1, token, nombre, puntos: 0, visto: Date.now() }]
+  };
+  res.json({ success: true, code, token, jugadorId: 1 });
 });
 
 router.post('/online/unirse', (req, res) => {
-  const { code, nombre } = req.body;
-  const sala = salas.get(code?.toUpperCase());
-  
-  if (!sala) return res.status(404).json({ error: 'Sala no encontrada' });
-  if (sala.estado !== 'lobby') return res.status(400).json({ error: 'Partida en curso' });
-
-  const token = generarToken();
-  sala.jugadores.push({ id: sala.nextId++, nombre, token, puntos: 0 });
-  res.json({ success: true, code: sala.code, token });
+  const code = String(req.body?.code || '').trim().toUpperCase();
+  const nombre = String(req.body?.nombre || '').trim().slice(0, 20);
+  const sala = salas[code];
+  if (!nombre) return res.status(400).json({ error: 'Debes indicar un nombre.' });
+  if (!sala) return res.status(404).json({ error: 'La sala no existe o el código es incorrecto.' });
+  if (sala.estado !== 'lobby') return res.status(400).json({ error: 'La partida ya ha comenzado.' });
+  if (sala.jugadores.length >= MAX) return res.status(400).json({ error: 'La sala está completa.' });
+  if (sala.jugadores.some((j) => j.nombre.toLowerCase() === nombre.toLowerCase())) return res.status(400).json({ error: 'Ya hay un jugador con ese nombre en la sala.' });
+  const token = nuevoToken();
+  sala.contadorIds += 1;
+  sala.jugadores.push({ id: sala.contadorIds, token, nombre, puntos: 0, visto: Date.now() });
+  sala.ultimaActividad = Date.now();
+  res.json({ success: true, code, token, jugadorId: sala.contadorIds });
 });
 
+// ---------------------------------------------------------------- Estado
 router.get('/online/sala/:code', (req, res) => {
-  const { token } = req.query;
-  const sala = salas.get(req.params.code?.toUpperCase());
-  if (!sala) return res.status(404).json({ error: 'Sala no encontrada' });
-  
-  const jugador = sala.jugadores.find(j => j.token === token);
-  if (!jugador) return res.status(403).json({ error: 'No autorizado' });
-
-  res.json({
-    success: true,
-    code: sala.code,
-    estado: sala.estado,
-    esAdmin: sala.adminId === jugador.id,
-    yoId: jugador.id,
-    rondaActual: sala.rondaActual,
-    maxRondas: sala.maxRondas,
-    jugadores: sala.jugadores.map(j => ({ id: j.id, nombre: j.nombre, puntos: j.puntos || 0 })),
-    retoActual: sala.retoActual,
-    estadoReto: sala.estadoReto,
-    pistasUsadas: sala.pistasUsadas,
-    turnoId: sala.turnoId
-  });
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  const { sala, jugador, esAdmin } = c;
+  revisar(sala);
+  const base = {
+    success: true, ahora: Date.now(), code: sala.code, estado: sala.estado, esAdmin, yoId: jugador.id, numPartida: sala.numPartida, config: sala.config,
+    anfitrionId: sala.jugadores.find((j) => j.token === sala.adminToken)?.id ?? null, min: MIN, max: MAX,
+    jugadores: sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre, puntos: j.puntos, conectado: Date.now() - j.visto < 15000 })),
+    ultimaPartida: sala.ultimaPartida
+  };
+  if (sala.estado === 'jugando' && sala.partida) {
+    if (!sala.partida.jugadores.some((j) => j.id === jugador.id)) return res.status(403).json({ error: 'Ya no estás en la partida.' });
+    base.vista = E.vistaDe(sala.partida, jugador.id);
+  }
+  res.json(base);
 });
 
-router.post('/online/sala/:code/:accion', (req, res) => {
-  const { code, accion } = req.params;
-  const { token, respuesta, parte } = req.body;
-  const sala = salas.get(code?.toUpperCase());
+// ---------------------------------------------------------------- Configuración y expulsar (sala de espera)
+router.post('/online/sala/:code/config', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión.' });
+  if (c.sala.estado !== 'lobby') return res.status(400).json({ error: 'La partida ya ha empezado.' });
+  if (E.OPCIONES_RONDAS.includes(Number(req.body?.rondas))) c.sala.config.rondas = Number(req.body.rondas);
+  res.json({ success: true, config: c.sala.config });
+});
 
-  if (!sala) return res.status(404).json({ error: 'Sala no encontrada' });
-  const usuario = sala.jugadores.find(j => j.token === token);
-  if (!usuario) return res.status(403).json({ error: 'No autorizado' });
+router.post('/online/sala/:code/expulsar', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión.' });
+  if (c.sala.estado !== 'lobby') return res.status(400).json({ error: 'Solo se puede quitar a alguien en la sala de espera.' });
+  const id = Number(req.body?.id);
+  if (id === c.jugador.id) return res.status(400).json({ error: 'No puedes quitarte a ti mismo.' });
+  const idx = c.sala.jugadores.findIndex((j) => j.id === id);
+  if (idx === -1) return res.status(404).json({ error: 'Ese jugador ya no está en la sala.' });
+  c.sala.jugadores.splice(idx, 1);
+  res.json({ success: true });
+});
 
-  const pasarTurno = () => {
-    const idx = sala.jugadores.findIndex(j => j.id === sala.turnoId);
-    const nextIdx = (idx + 1) % sala.jugadores.length;
-    const siguienteId = sala.jugadores[nextIdx].id;
+// ---------------------------------------------------------------- Iniciar
+router.post('/online/sala/:code/iniciar', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión puede iniciar.' });
+  if (c.sala.estado === 'jugando') return res.status(400).json({ error: 'La partida ya está en marcha.' });
+  if (c.sala.jugadores.length < MIN) return res.status(400).json({ error: `Se necesitan al menos ${MIN} jugadores.` });
+  c.sala.jugadores.forEach((j) => { j.puntos = 0; });
+  c.sala.ultimaPartida = null; c.sala.numPartida = 0;
+  iniciarPartida(c.sala);
+  res.json({ success: true });
+});
 
-    if (siguienteId === sala.primerTurnoRondaId) {
-      sala.estado = 'ronda_fin';
-    } else {
-      sala.turnoId = siguienteId;
-    }
-  };
-
-  if (accion === 'iniciar') {
-    if (sala.adminId !== usuario.id) return res.status(403).json({ error: 'Solo admin' });
-    sala.estado = 'jugando';
-    sala.rondaActual = 1;
-    sala.retoActual = obtenerRetoAleatorio();
-    sala.estadoReto = { top: false, middle: false, bottom: false };
-    sala.pistasUsadas = { top: false, middle: false, bottom: false };
-    
-    const randomIndex = Math.floor(Math.random() * sala.jugadores.length);
-    sala.turnoId = sala.jugadores[randomIndex].id;
-    sala.primerTurnoRondaId = sala.turnoId;
-    
-    sala.jugadores.forEach(j => { j.puntos = 0; });
-    return res.json({ success: true });
+// ---------------------------------------------------------------- Acciones
+// tipo: responder | pista | pasar | siguiente (anfitrión) | terminar (anfitrión)
+router.post('/online/sala/:code/accion', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  const { sala, jugador, esAdmin } = c;
+  if (sala.estado !== 'jugando' || !sala.partida) return res.status(400).json({ error: 'No hay partida en marcha.' });
+  revisar(sala);
+  const p = sala.partida; const d = req.body || {}; const id = jugador.id; const ahora = Date.now();
+  const soloAdmin = { ok: false, error: 'Solo el anfitrión puede hacerlo.' };
+  let r;
+  switch (d.tipo) {
+    case 'responder': r = E.responder(p, id, String(d.parte || ''), String(d.respuesta || '').slice(0, 60), ahora); break;
+    case 'pista': r = E.pista(p, id, String(d.parte || '')); break;
+    case 'pasar': r = E.pasar(p, id, ahora); break;
+    case 'siguiente': r = esAdmin ? E.siguiente(p, ahora) : soloAdmin; break;
+    case 'terminar': r = esAdmin ? E.terminar(p) : soloAdmin; break;
+    default: return res.status(400).json({ error: 'Acción desconocida.' });
   }
+  revisar(sala);
+  if (!r.ok) return res.status(400).json({ error: r.error });
+  res.json({ success: true, resultado: r });
+});
 
-  if (accion === 'validar') {
-    if (sala.turnoId !== usuario.id) return res.status(403).json({ error: 'No es tu turno' });
-    if (!parte || sala.estadoReto[parte]) return res.status(400).json({ error: 'Parte no válida' });
-    
-    let acierto = false;
-    const inputNorm = normalizar(respuesta);
-    const parteObj = sala.retoActual.partes && sala.retoActual.partes[parte];
-    const nombreReal = parteObj ? normalizar(parteObj.jugador) : '';
+router.post('/online/sala/:code/forzar', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión.' });
+  if (c.sala.estado !== 'jugando' || !c.sala.partida) return res.status(400).json({ error: 'No hay partida en marcha.' });
+  E.pasar(c.sala.partida, null, Date.now());
+  revisar(c.sala);
+  res.json({ success: true });
+});
 
-    if (nombreReal && (nombreReal === inputNorm || (inputNorm.length >= 4 && nombreReal.includes(inputNorm)))) {
-      sala.estadoReto[parte] = true;
-      acierto = true;
+// ---------------------------------------------------------------- Después de la partida
+router.post('/online/sala/:code/siguiente-partida', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión.' });
+  if (!c.sala.partida || c.sala.partida.fase !== 'fin') return res.status(400).json({ error: 'La partida aún no ha terminado.' });
+  if (c.sala.jugadores.length < MIN) return res.status(400).json({ error: `Se necesitan al menos ${MIN} jugadores.` });
+  iniciarPartida(c.sala);
+  res.json({ success: true });
+});
 
-      const conPista = sala.pistasUsadas[parte];
-      const pts = conPista ? 1 : 5;
-      usuario.puntos = (usuario.puntos || 0) + pts;
+router.post('/online/sala/:code/finalizar', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión.' });
+  if (c.sala.estado !== 'jugando' || c.sala.partida?.fase !== 'fin') return res.status(400).json({ error: 'La partida aún no ha terminado.' });
+  c.sala.estado = 'final';
+  res.json({ success: true });
+});
 
-      if (sala.estadoReto.top && sala.estadoReto.middle && sala.estadoReto.bottom) {
-        sala.estado = 'ronda_fin';
-      }
-    } else {
-      pasarTurno();
-    }
+router.post('/online/sala/:code/reiniciar', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión.' });
+  Object.assign(c.sala, { estado: 'lobby', partida: null, numPartida: 0, ultimaPartida: null });
+  c.sala.jugadores.forEach((j) => { j.puntos = 0; });
+  res.json({ success: true });
+});
 
-    return res.json({ success: true, acierto, puntosGanados: acierto ? (sala.pistasUsadas[parte] ? 1 : 5) : 0 });
-  }
-
-  if (accion === 'pasar-turno') {
-    if (sala.turnoId !== usuario.id) return res.status(403).json({ error: 'No es tu turno' });
-    pasarTurno();
-    return res.json({ success: true });
-  }
-
-  if (accion === 'pista') {
-    if (!parte) return res.status(400).json({ error: 'Parte requerida' });
-    sala.pistasUsadas[parte] = true;
-    return res.json({ success: true, pista: sala.retoActual.partes[parte].pista });
-  }
-
-  if (accion === 'siguiente-ronda') {
-    if (sala.adminId !== usuario.id) return res.status(403).json({ error: 'Solo admin' });
-    if (sala.rondaActual >= sala.maxRondas) {
-      sala.estado = 'final_partida';
-      return res.json({ success: true });
-    }
-    sala.rondaActual += 1;
-    sala.estado = 'jugando';
-    sala.retoActual = obtenerRetoAleatorio();
-    sala.estadoReto = { top: false, middle: false, bottom: false };
-    sala.pistasUsadas = { top: false, middle: false, bottom: false };
-    
-    const idxActual = sala.jugadores.findIndex(j => j.id === sala.primerTurnoRondaId);
-    const siguienteIdx = (idxActual + 1) % sala.jugadores.length;
-    sala.turnoId = sala.jugadores[siguienteIdx].id;
-    sala.primerTurnoRondaId = sala.turnoId;
-
-    return res.json({ success: true });
-  }
-
-  if (accion === 'finalizar-partida') {
-    if (sala.adminId !== usuario.id) return res.status(403).json({ error: 'Solo admin' });
-    sala.estado = 'final_partida';
-    return res.json({ success: true });
-  }
-
-  if (accion === 'volver-lobby') {
-    if (sala.adminId !== usuario.id) return res.status(403).json({ error: 'Solo admin' });
-    sala.estado = 'lobby';
-    sala.retoActual = null;
-    sala.jugadores.forEach(j => { j.puntos = 0; });
-    return res.json({ success: true });
-  }
-
-  if (accion === 'abandonar') {
-    const idx = sala.jugadores.findIndex(j => j.token === token);
-    if (idx !== -1) {
-      sala.jugadores.splice(idx, 1);
-      if (sala.jugadores.length === 0) {
-        salas.delete(code);
-      } else if (sala.adminId === usuario.id) {
-        sala.adminId = sala.jugadores[0].id;
-      }
-    }
-    return res.json({ success: true });
-  }
-
-  res.json({ success: false });
+router.post('/online/sala/:code/salir', (req, res) => {
+  const code = String(req.params.code || '').toUpperCase();
+  const sala = salas[code];
+  if (!sala) return res.json({ success: true });
+  const idx = sala.jugadores.findIndex((j) => j.token === req.body?.token);
+  if (idx === -1) return res.json({ success: true });
+  const [fuera] = sala.jugadores.splice(idx, 1);
+  if (sala.estado === 'jugando' && sala.partida) { E.abandonar(sala.partida, fuera.id, Date.now()); revisar(sala); }
+  if (sala.jugadores.length === 0) delete salas[code];
+  else if (sala.adminToken === fuera.token) sala.adminToken = sala.jugadores[0].token;
+  res.json({ success: true });
 });
 
 export default router;
