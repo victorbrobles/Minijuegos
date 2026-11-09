@@ -1,315 +1,222 @@
 // client/src/games/Jugadas/JugadasOnline.jsx
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+// Menú online, sala de espera y partida (el servidor lleva el motor de server/lib/jugadasEngine.js).
+import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import JugadasPartida from './JugadasPartida.jsx';
-import { AyudaJugadas } from './JugadasComun.jsx';
+import { ModalSalir } from './JugadasComun.jsx';
+import {
+  MenuModoOnline, FormCrearSala, FormUnirseSala, CabeceraSala, ListaSala, EsperandoAnfitrion
+} from '../../components/MenuJuego.jsx';
 import './Jugadas.css';
-import '../Adivina/Adivina.css';
-import { MenuInicioJuego, MenuModoOnline, FormCrearSala, FormUnirseSala, CabeceraSala, ListaSala, EsperandoAnfitrion } from '../../components/MenuJuego.jsx';
 
-const CLAVE_SESION_JUGADAS = 'jugadas_online_session';
-const MAX_JUGADORES = 12;
+export const CLAVE_SESION_JUGADAS = 'jugadas_online_session';
 const API = '/api/jugadas/online';
 
-const postJSON = (url, body) =>
-  fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
+const leerSesion = () => {
+  try {
+    return JSON.parse(sessionStorage.getItem(CLAVE_SESION_JUGADAS));
+  } catch {
+    return null;
+  }
+};
 
-export default function JugadasOnline({ onLocal }) {
-  const [vista, setVista] = useState('menu'); // 'menu' | 'crear' | 'unirse' | 'sala'
+const post = async (url, body) => {
+  const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Algo ha fallado.');
+  return data;
+};
+
+export default function JugadasOnline({ onVolver, onSalir, onAbrirAyuda }) {
+  const [sesion, setSesion] = useState(leerSesion);
+  const [menu, setMenu] = useState('menu');
   const [nombre, setNombre] = useState('');
-  const [codigoInput, setCodigoInput] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
+  const [codigo, setCodigo] = useState('');
+  const [errorMenu, setErrorMenu] = useState('');
   const [cargando, setCargando] = useState(false);
-  const [modalSalir, setModalSalir] = useState(false);
-  const [modalAyuda, setModalAyuda] = useState(false);
-  const [codigoCopiado, setCodigoCopiado] = useState(false);
-
-  const [sesion, setSesion] = useState(() => {
-    try {
-      return JSON.parse(sessionStorage.getItem(CLAVE_SESION_JUGADAS));
-    } catch {
-      return null;
-    }
-  });
   const [sala, setSala] = useState(null);
-  const intervalRef = useRef(null);
+  const [modal, setModal] = useState(null);
+  const [aviso, setAviso] = useState('');
+  const [sinRed, setSinRed] = useState(false);
+  const [offset, setOffset] = useState(0);
+  const sesionRef = useRef(sesion);
+  sesionRef.current = sesion;
+  const fallos = useRef(0);
+  const pedidas = useRef(0);
+  const aplicada = useRef(0);
+  const avisoTimer = useRef(null);
+
+  const mostrarAviso = (t) => {
+    setAviso(t);
+    clearTimeout(avisoTimer.current);
+    avisoTimer.current = setTimeout(() => setAviso(''), 3500);
+  };
+  useEffect(() => () => clearTimeout(avisoTimer.current), []);
+
+  const cerrarSesion = (mensaje = '') => {
+    try { sessionStorage.removeItem(CLAVE_SESION_JUGADAS); } catch { /* nada */ }
+    setSesion(null); setSala(null); setModal(null); setMenu('menu'); setErrorMenu(mensaje);
+  };
+
+  const consultar = async () => {
+    const s = sesionRef.current;
+    if (!s) return;
+    const n = ++pedidas.current;
+    try {
+      const r = await fetch(`${API}/sala/${s.code}?token=${encodeURIComponent(s.token)}`);
+      if (sesionRef.current !== s) return;
+      if (r.status === 403 || r.status === 404) {
+        cerrarSesion(r.status === 403 ? 'Ya no formas parte de esa sala.' : 'La sala se ha cerrado.');
+        return;
+      }
+      if (!r.ok) throw new Error('error');
+      const d = await r.json();
+      fallos.current = 0;
+      setSinRed(false);
+      if (n < aplicada.current) return;
+      aplicada.current = n;
+      if (d.ahora) setOffset(d.ahora - Date.now());
+      setSala(d);
+    } catch {
+      fallos.current += 1;
+      if (fallos.current >= 3) setSinRed(true);
+      if (fallos.current >= 40) cerrarSesion('Se ha perdido la conexión con la sala.');
+    }
+  };
 
   useEffect(() => {
-    if (!sesion) {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      setSala(null);
-      return undefined;
-    }
+    if (!sesion) return undefined;
+    consultar();
+    const i = setInterval(consultar, 600);
+    return () => clearInterval(i);
+  }, [sesion]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    const consultarEstado = () => {
-      fetch(`${API}/sala/${sesion.code}?token=${sesion.token}`)
-        .then((r) => {
-          if (!r.ok) throw new Error('Sala no disponible');
-          return r.json();
-        })
-        .then((d) => {
-          if (d.success) {
-            setSala(d);
-            setVista('sala');
-          }
-        })
-        .catch(() => {
-          sessionStorage.removeItem(CLAVE_SESION_JUGADAS);
-          setSesion(null);
-          setSala(null);
-          setVista('online_menu');
-          setErrorMsg('La sala se ha cerrado.');
-        });
-    };
-
-    consultarEstado();
-    intervalRef.current = setInterval(consultarEstado, 500);
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [sesion]);
-
-  const guardarSesion = (data) => {
-    const nueva = { code: data.code, token: data.token };
-    sessionStorage.setItem(CLAVE_SESION_JUGADAS, JSON.stringify(nueva));
-    setSesion(nueva);
-  };
-
-  const handleCrear = async () => {
-    if (!nombre.trim()) return;
-    setCargando(true);
+  const entrar = async (ruta, cuerpo) => {
+    setErrorMenu(''); setCargando(true);
     try {
-      const res = await postJSON(`${API}/crear`, { nombre: nombre.trim() });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      guardarSesion(data);
-    } catch (err) {
-      setErrorMsg(err.message);
+      const d = await post(`${API}/${ruta}`, cuerpo);
+      const nueva = { code: d.code, token: d.token };
+      try { sessionStorage.setItem(CLAVE_SESION_JUGADAS, JSON.stringify(nueva)); } catch { /* nada */ }
+      pedidas.current = 0; aplicada.current = 0;
+      setSesion(nueva);
+    } catch (e) {
+      setErrorMenu(e.message);
     } finally {
       setCargando(false);
     }
   };
 
-  const handleUnirse = async () => {
-    if (!nombre.trim() || !codigoInput.trim()) return;
-    setCargando(true);
+  const llamar = async (ruta, cuerpo = {}) => {
+    const s = sesionRef.current;
+    if (!s) return;
     try {
-      const res = await postJSON(`${API}/unirse`, {
-        code: codigoInput.trim().toUpperCase(),
-        nombre: nombre.trim()
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      guardarSesion(data);
-    } catch (err) {
-      setErrorMsg(err.message);
-    } finally {
-      setCargando(false);
+      await post(`${API}/sala/${s.code}/${ruta}`, { token: s.token, ...cuerpo });
+      await consultar();
+    } catch (e) {
+      mostrarAviso(e.message);
     }
   };
+  const enviar = (accion) => llamar('accion', { accion });
 
-  const handleIniciar = async () => {
-    try {
-      const res = await postJSON(`${API}/sala/${sesion.code}/iniciar`, { token: sesion.token });
-      if (!res.ok) {
-        const data = await res.json();
-        setErrorMsg(data.error);
-      }
-    } catch (err) {
-      setErrorMsg(err.message);
+  const salirDeSala = (aPortada) => {
+    const s = sesionRef.current;
+    if (s?.code && s?.token) {
+      fetch(`${API}/sala/${s.code}/salir`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: s.token }), keepalive: true }).catch(() => {});
     }
+    cerrarSesion('');
+    if (aPortada) onSalir?.();
   };
 
-  const enviarAccion = useCallback(async (accion) => {
-    if (!sesion) return;
-    try {
-      await postJSON(`${API}/sala/${sesion.code}/accion`, { token: sesion.token, accion });
-    } catch (err) {
-      console.error(err);
-    }
-  }, [sesion]);
+  if (!sesion) {
+    return (
+      <div className="jgp-contenedor">
+        {menu === 'menu' && (
+          <MenuModoOnline onVolver={onVolver} onCrear={() => { setMenu('crear'); setErrorMenu(''); }} onUnirse={() => { setMenu('unirse'); setErrorMenu(''); }} onAyuda={onAbrirAyuda} error={errorMenu} />
+        )}
+        {menu === 'crear' && (
+          <FormCrearSala onVolver={() => { setMenu('menu'); setErrorMenu(''); }} onAyuda={onAbrirAyuda} nombre={nombre} setNombre={setNombre}
+            onCrear={() => entrar('crear', { nombre: nombre.trim() })} cargando={cargando} error={errorMenu}
+            descripcion="Introduce tu nombre para abrir la sala y ser el anfitrión (de 2 a 12 jugadores, cada uno con su móvil)." />
+        )}
+        {menu === 'unirse' && (
+          <FormUnirseSala onVolver={() => { setMenu('menu'); setErrorMenu(''); }} onAyuda={onAbrirAyuda} codigo={codigo} setCodigo={setCodigo}
+            nombre={nombre} setNombre={setNombre} onUnirse={() => entrar('unirse', { code: codigo.trim().toUpperCase(), nombre: nombre.trim() })}
+            cargando={cargando} error={errorMenu} />
+        )}
+      </div>
+    );
+  }
 
-  const handleReiniciar = async () => {
-    try {
-      await postJSON(`${API}/sala/${sesion.code}/reiniciar`, { token: sesion.token });
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  if (!sala) {
+    return (
+      <div className="jgp-contenedor">
+        <section className="game jgp-escena">
+          <div className="jgp-tarjeta jgp-centro">
+            <span className="jgp-carga" aria-hidden="true">⚽</span>
+            <p style={{ fontWeight: 800 }}>Conectando con la sala {sesion.code}…</p>
+            <button type="button" className="jgp-boton secundario" onClick={() => salirDeSala(false)}>Cancelar</button>
+          </div>
+        </section>
+      </div>
+    );
+  }
 
-  const handleSalir = async () => {
-    try {
-      await postJSON(`${API}/sala/${sesion.code}/salir`, { token: sesion.token });
-    } catch {
-      /* ignorado */
-    }
-    sessionStorage.removeItem(CLAVE_SESION_JUGADAS);
-    setSesion(null);
-    setSala(null);
-    setErrorMsg('');
-    setVista('online_menu');
-  };
-
-  const copiarCodigo = () => {
-    if (!sala?.code) return;
-    navigator.clipboard?.writeText(sala.code);
-    setCodigoCopiado(true);
-    setTimeout(() => setCodigoCopiado(false), 2000);
-  };
-
-  const esAdmin = sala?.esAdmin;
-  const yoId = sala?.yoId;
-
+  const v = sala.vista;
+  const n = sala.jugadores.length;
+  const enPartida = sala.estado !== 'lobby';
+  
   return (
-    <div className="furbo-contenedor">
-      <AyudaJugadas online abierto={modalAyuda} onCerrar={() => setModalAyuda(false)} />
+    <div className={`jgp-contenedor ${enPartida ? 'qq-en-partida' : ''}`}>
+      {sinRed && <p className="jgp-sinred">⚠ Sin conexión con el servidor. Reintentando…</p>}
+      {aviso && <p className="jgp-toast" role="alert" onClick={() => setAviso('')}>{aviso}</p>}
 
-      {/* 1. MENÚ ONLINE */}
-      {vista === 'menu' && (
-        <MenuInicioJuego
-          juegoId="jugadas"
-          onOnline={() => { setVista('online_menu'); setErrorMsg(''); }}
-          onLocal={onLocal}
-          onAyuda={() => setModalAyuda(true)}
-          error={errorMsg}
-        />
-      )}
-
-      {vista === 'online_menu' && (
-        <MenuModoOnline
-          onVolver={() => { setVista('menu'); setErrorMsg(''); }}
-          onCrear={() => { setVista('crear'); setErrorMsg(''); }}
-          onUnirse={() => { setVista('unirse'); setErrorMsg(''); }}
-          onAyuda={() => setModalAyuda(true)}
-          error={errorMsg}
-        />
-      )}
-
-      {/* 2. CREAR SALA */}
-      {vista === 'crear' && (
-        <FormCrearSala
-          onVolver={() => { setVista('online_menu'); setErrorMsg(''); }}
-          onAyuda={() => setModalAyuda(true)}
-          nombre={nombre}
-          setNombre={setNombre}
-          onCrear={handleCrear}
-          cargando={cargando}
-          error={errorMsg}
-          descripcion="Introduce tu nombre para abrir la sala y ser el anfitrión (2 a 12 jugadores)."
-        />
-      )}
-
-      {/* 3. UNIRSE A SALA */}
-      {vista === 'unirse' && (
-        <FormUnirseSala
-          onVolver={() => { setVista('online_menu'); setErrorMsg(''); }}
-          onAyuda={() => setModalAyuda(true)}
-          codigo={codigoInput}
-          setCodigo={setCodigoInput}
-          nombre={nombre}
-          setNombre={setNombre}
-          onUnirse={handleUnirse}
-          cargando={cargando}
-          error={errorMsg}
-        />
-      )}
-
-      {/* 4. LOBBY */}
-      {vista === 'sala' && sala && sala.estado === 'lobby' && (
+      {sala.estado === 'lobby' && (
         <section className="game qq-pantalla">
-          <CabeceraSala
-            codigo={sala.code}
-            onVolver={() => setModalSalir(true)}
-            onAyuda={() => setModalAyuda(true)}
-            texto={`Pulsa el código para copiarlo y compártelo (2 a ${MAX_JUGADORES} jugadores · 3 rondas por jugador).`}
-          />
+          <CabeceraSala codigo={sala.code} onVolver={() => setModal('lobby')} onAyuda={onAbrirAyuda} />
           <ListaSala
-            jugadores={sala.jugadores.map((j, i) => ({ ...j, nombre: `${i + 1}. ${j.nombre}` }))}
-            yoId={yoId}
-            max={MAX_JUGADORES}
-            min={2}
-            anfitrionId={sala.jugadores[0]?.id}
+            jugadores={sala.jugadores} yoId={sala.yoId} max={sala.max} min={sala.min} anfitrionId={sala.anfitrionId}
+            renderExtra={(j) => (
+              <span className="jgp-sala-extra">
+                <i className={`jgp-conexion${j.conectado ? '' : ' off'}`} title={j.conectado ? 'Conectado' : 'Sin conexión'} />
+                {sala.esAdmin && j.id !== sala.anfitrionId && (
+                  <button type="button" className="jgp-quitar" onClick={() => llamar('expulsar', { id: j.id })} aria-label={`Quitar a ${j.nombre}`}>Quitar</button>
+                )}
+              </span>
+            )}
           />
-
-          {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
-
-          {esAdmin ? (
-            <button
-              type="button"
-              className="big full qq-btn-principal"
-              style={{ marginTop: '1.2rem' }}
-              disabled={sala.jugadores.length < 2}
-              onClick={handleIniciar}
-            >
-              <Icon name="play" size={22} /> {sala.jugadores.length < 2 ? 'Esperando rivales...' : '¡Comenzar partido!'}
-            </button>
-          ) : (
-            <EsperandoAnfitrion />
+          {sala.esAdmin && (
+            <div style={{ marginTop: '1.2rem' }}>
+              <button type="button" className="big full qq-btn-principal" disabled={n < sala.min} onClick={() => llamar('iniciar')}>
+                <Icon name="play" size={22} /> {n < sala.min ? `Esperando jugadores (mínimo ${sala.min})…` : '¡Empezar partido!'}
+              </button>
+            </div>
           )}
+          {!sala.esAdmin && <EsperandoAnfitrion texto="Cuando estéis todos, el anfitrión empezará la partida." />}
         </section>
       )}
 
-      {/* 5. PARTIDA */}
-      {vista === 'sala' && sala && sala.estado === 'jugando' && sala.vista && (
-        <JugadasPartida
-          vista={sala.vista}
-          viewerId={yoId}
-          esHost={Boolean(esAdmin)}
-          onAccion={enviarAccion}
-          pie={(
-            <button className="secondary danger full" style={{ marginTop: '1.2rem' }} onClick={() => setModalSalir(true)}>
-              Salir de la sala
-            </button>
-          )}
-          finalAcciones={(
-            <div className="actions">
-              {esAdmin ? (
-                <button onClick={handleReiniciar}>
-                  <Icon name="refresh" size={20} /> Volver a la sala
-                </button>
-              ) : (
-                <p className="hint center" style={{ width: '100%' }}>Esperando a que el anfitrión vuelva a la sala...</p>
-              )}
-              <button className="secondary danger" onClick={() => setModalSalir(true)}>
-                <Icon name="door" size={20} /> Salir
-              </button>
-            </div>
-          )}
-        />
+      {sala.estado === 'jugando' && v && (
+        <section className="game jgp-escena">
+          <JugadasPartida vista={v} viewerId={sala.yoId} esHost={sala.esAdmin} onAccion={enviar} onSalir={() => setModal('partida')}
+            finalAcciones={(
+              <div className="jgp-barra estatica">
+                {sala.esAdmin
+                  ? <button type="button" className="jgp-boton grande" onClick={() => llamar('reiniciar')}><Icon name="refresh" size={20} /> Volver a la sala de espera</button>
+                  : <p className="jgp-esperando">⏳ El anfitrión decidirá si jugáis otra vez</p>}
+              </div>
+            )} />
+        </section>
       )}
 
-      {/* MODAL SALIR */}
-      {modalSalir && (
-        <div className="rg-modal-fondo" onClick={() => setModalSalir(false)}>
-          <div
-            className="rg-modal"
-            onClick={(e) => e.stopPropagation()}
-            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
-          >
-            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
-            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>¿Abandonar la partida?</h3>
-            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
-              Si sales de la sala perderás tu progreso actual en la partida. ¿Estás seguro de que deseas salir?
-            </p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
-              <button type="button" className="secondary full" onClick={() => setModalSalir(false)}>
-                No, quedarme
-              </button>
-              <button
-                type="button"
-                className="secondary danger full"
-                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
-                onClick={() => { setModalSalir(false); handleSalir(); }}
-              >
-                Sí, salir
-              </button>
-            </div>
-          </div>
-        </div>
+      {modal === 'lobby' && (
+        <ModalSalir titulo="¿Salir de la sala?"
+          texto={sala.esAdmin ? 'Eres el anfitrión: si sales, otro jugador pasará a serlo (si no queda nadie, la sala se cerrará).' : 'Abandonarás la sala de espera y volverás al menú.'}
+          onSeguir={() => setModal(null)} onSalir={() => salirDeSala(false)} />
+      )}
+      {modal === 'partida' && (
+        <ModalSalir titulo="¿Salir de la partida?"
+          texto={`${sala.estado === 'jugando' && v?.estado !== 'fin' ? 'Abandonarás la partida y quedarás fuera de la clasificación. ' : ''}${sala.esAdmin ? 'Otro jugador pasará a ser el anfitrión.' : 'Volverás a la portada.'}`}
+          onSeguir={() => setModal(null)} onSalir={() => salirDeSala(true)} />
       )}
     </div>
   );

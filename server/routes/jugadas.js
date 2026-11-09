@@ -82,7 +82,9 @@ function obtenerSala(req) {
 }
 
 function jugadorPorToken(sala, token) {
-  return sala.jugadores.find((j) => j.token === token);
+  const j = sala.jugadores.find((x) => x.token === token);
+  if (j) j.visto = Date.now();
+  return j;
 }
 
 router.post('/online/crear', (req, res) => {
@@ -98,7 +100,7 @@ router.post('/online/crear', (req, res) => {
     code,
     adminToken: token,
     estado: 'lobby', // 'lobby' | 'jugando'
-    jugadores: [{ id: 1, nombre, token }],
+    jugadores: [{ id: 1, nombre, token, visto: Date.now() }],
     siguienteId: 2,
     partida: null,
     ultimaActividad: Date.now()
@@ -124,7 +126,7 @@ router.post('/online/unirse', (req, res) => {
 
   const token = nuevoToken();
   const id = sala.siguienteId++;
-  sala.jugadores.push({ id, nombre, token });
+  sala.jugadores.push({ id, nombre, token, visto: Date.now() });
   sala.ultimaActividad = Date.now();
   res.json({ success: true, code: sala.code, token, jugadorId: id });
 });
@@ -148,7 +150,10 @@ router.get('/online/sala/:code', (req, res) => {
     estado: sala.estado,
     esAdmin: sala.adminToken === req.query.token,
     yoId: yo.id,
-    jugadores: sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre })),
+    anfitrionId: sala.jugadores.find((j) => j.token === sala.adminToken)?.id ?? null,
+    min: MIN_JUGADORES,
+    max: MAX_JUGADORES,
+    jugadores: sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre, conectado: Date.now() - (j.visto || 0) < 15000 })),
     vista: v
   });
 });
@@ -157,6 +162,7 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
   const sala = obtenerSala(req);
   if (!sala) return res.status(404).json({ error: 'La sala no existe.' });
   if (sala.adminToken !== req.body?.token) return res.status(403).json({ error: 'Solo el anfitrión puede iniciar.' });
+  if (sala.estado === 'jugando') return res.status(400).json({ error: 'La partida ya está en marcha.' });
   if (sala.jugadores.length < MIN_JUGADORES) {
     return res.status(400).json({ error: `Se necesitan al menos ${MIN_JUGADORES} jugadores.` });
   }
@@ -181,6 +187,17 @@ router.post('/online/sala/:code/accion', (req, res) => {
 
   const resultado = aplicar(sala.partida, { ...accion, jugadorId: yo.id });
   if (!resultado.ok) return res.status(400).json({ error: resultado.error });
+  res.json({ success: true });
+});
+
+router.post('/online/sala/:code/expulsar', (req, res) => {
+  const sala = obtenerSala(req);
+  if (!sala || sala.adminToken !== req.body?.token) return res.status(403).json({ error: 'Solo el anfitrión.' });
+  if (sala.estado !== 'lobby') return res.status(400).json({ error: 'Solo se puede quitar a alguien en la sala de espera.' });
+  const id = Number(req.body?.id);
+  const idx = sala.jugadores.findIndex((j) => j.id === id && j.token !== sala.adminToken);
+  if (idx === -1) return res.status(404).json({ error: 'Ese jugador ya no está en la sala.' });
+  sala.jugadores.splice(idx, 1);
   res.json({ success: true });
 });
 
