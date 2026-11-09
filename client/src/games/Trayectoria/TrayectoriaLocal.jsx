@@ -145,7 +145,7 @@ export default function TrayectoriaLocal({ onVolver, onExit, onAbrirAyuda }) {
       );
     }
     contenido = (
-      <PantallaRonda v={v} onSalir={onSalir} mio={Boolean(p)}
+      <PantallaRonda onPista={() => hacer(() => E.desvelarPista(est, Date.now()))} v={v} onSalir={onSalir} mio={Boolean(p)}
         etiqueta={p ? `${quien?.nombre} ha pulsado` : `Futbolista ${v.ronda} de ${v.rondas}`}
         titulo={p ? `¡Escríbelo, ${quien?.nombre}!` : '¿Quién es el futbolista?'}
         controles={controles} />

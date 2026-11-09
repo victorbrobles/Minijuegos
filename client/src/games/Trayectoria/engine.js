@@ -12,7 +12,7 @@ export const AJUSTES = {
   max: 15,
   segClub: 6,
   segRespuesta: 20,
-  segTrasUltimo: 12,
+  segTrasUltimo: 15,
   segPista: 15,
   puntosMax: 5,
   puntosTodos: 2,
@@ -92,7 +92,6 @@ function duracionEtapa(p) {
   const r = reto(p);
   const e = p.estado;
   if (e.reveladas < r.clubes.length) return AJUSTES.segClub * 1000;
-  if (hayPista(r) && !e.pistaVisible) return AJUSTES.segTrasUltimo * 1000;
   return (e.pistaVisible ? AJUSTES.segPista : AJUSTES.segTrasUltimo) * 1000;
 }
 
@@ -167,7 +166,6 @@ export function tick(p, ahora = Date.now()) {
   while (p.fase === 'jugando' && ahora - e.desde >= duracionEtapa(p) && guard++ < 50) {
     e.desde += duracionEtapa(p);
     if (e.reveladas < r.clubes.length) e.reveladas += 1;
-    else if (hayPista(r) && !e.pistaVisible) { e.pistaVisible = true; anotar(p, '💡 Aparece la pista.'); }
     else resolver(p, 'nadie');
     cambio = true;
   }
@@ -251,6 +249,22 @@ export function responder(p, id, texto, ahora = Date.now()) {
   return { ok: true, correcto: false };
 }
 
+/** Con todos los clubes a la vista, cualquiera puede pedir la pista (vale menos acertar, y da algo más de tiempo). */
+export function desvelarPista(p, ahora = Date.now()) {
+  tick(p, ahora);
+  if (p.fase !== 'jugando') return { ok: false, error: 'La ronda ya ha terminado.' };
+  const r = reto(p);
+  const e = p.estado;
+  if (!hayPista(r)) return { ok: false, error: 'Este futbolista no tiene pista.' };
+  if (e.reveladas < r.clubes.length) return { ok: false, error: 'La pista se puede ver cuando hayan salido todos los clubes.' };
+  if (e.pistaVisible) return { ok: false, error: 'La pista ya está a la vista.' };
+  if (e.pulsado) return { ok: false, error: 'Espera a que responda quien ha pulsado.' };
+  e.pistaVisible = true;
+  if (e.pausadoEn == null) e.desde = ahora; else e.desde = e.pausadoEn;
+  anotar(p, '💡 Se desvela la pista.');
+  return { ok: true };
+}
+
 /** Se rinden todos (o el anfitrión salta el futbolista): se ve la solución. */
 export function rendirse(p) {
   if (p.fase !== 'jugando') return { ok: false, error: 'La ronda ya ha terminado.' };
@@ -297,11 +311,11 @@ export function vistaDe(p, yoId) {
     rondas: p.rondas,
     reto: {
       dificultad: r.dificultad,
-      nacionalidad: r.nacionalidad,
-      totalClubes: r.clubes.length,
       clubes: r.clubes.slice(0, n).map((c) => ({ nombre: c.nombre, logo: c.logo, colores: c.colores, siglas: c.siglas, periodo: c.periodo })),
-      hayPista: hayPista(r),
+      todos: n >= r.clubes.length,
+      hayPista: hayPista(r) && n >= r.clubes.length,
       pista: e.pistaVisible || resuelta ? (hayPista(r) ? r.pista : null) : null,
+      nacionalidad: resuelta ? r.nacionalidad : null,
       solucion: resuelta ? r.nombre : null
     },
     reveladas: n,

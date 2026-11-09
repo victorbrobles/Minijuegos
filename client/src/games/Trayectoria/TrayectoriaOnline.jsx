@@ -50,7 +50,7 @@ function RondaOnline({ v, sala, offset, enviar, onSalir, onForzar }) {
     controles = <Pulsador onPulsar={() => enviar('pulsar')} />;
   }
   return (
-    <PantallaRonda v={v} offset={offset} onSalir={onSalir} mio={p?.jugadorId === yo}
+    <PantallaRonda onPista={() => enviar('pista')} v={v} offset={offset} onSalir={onSalir} mio={p?.jugadorId === yo}
       etiqueta={p ? `${quien?.nombre} ha pulsado` : `Futbolista ${v.ronda} de ${v.rondas}`}
       titulo={p?.jugadorId === yo ? '¡Escríbelo!' : '¿Quién es el futbolista?'}
       controles={(

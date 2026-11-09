@@ -93,7 +93,6 @@ function Hero({ v, onSalir, etiqueta, titulo, clase = '' }) {
 
 // ---------------------------------------------------------------- Trayectoria
 function Clubes({ v }) {
-  const huecos = Math.max(0, v.reto.totalClubes - v.reto.clubes.length);
   const lista = useRef(null);
   useEffect(() => {
     const ultimo = lista.current?.querySelector('.mcp-club.nuevo');
@@ -111,13 +110,6 @@ function Clubes({ v }) {
           </span>
         </li>
       ))}
-      {Array.from({ length: huecos }, (_, k) => (
-        <li key={`h${k}`} className="mcp-club oculto">
-          <span className="mcp-club-num">{v.reto.clubes.length + k + 1}</span>
-          <span className="mcp-escudo"><span className="mcp-escudo-oculto">?</span></span>
-          <span className="mcp-club-datos"><strong>Club oculto</strong><small>…</small></span>
-        </li>
-      ))}
     </ol>
   );
 }
@@ -128,10 +120,9 @@ function Reloj({ v, offset }) {
   const pasado = Math.max(0, ref - v.etapa.desde);
   const quedan = Math.max(0, Math.ceil((v.etapa.duracion - pasado) / 1000));
   const pct = Math.max(0, Math.min(100, 100 - (pasado / v.etapa.duracion) * 100));
-  const todos = v.reveladas >= v.reto.totalClubes;
+  const todos = v.reto.todos;
   const texto = v.pausado ? '⏸ Reloj parado'
     : !todos ? `Siguiente club en ${quedan}s`
-      : v.reto.hayPista && !v.pistaVisible ? `Pista en ${quedan}s`
         : `Última oportunidad: ${quedan}s`;
   return (
     <div className={`mcp-reloj${v.pausado ? ' parado' : ''}${todos && quedan <= 5 && !v.pausado ? ' urgente' : ''}`}>
@@ -150,8 +141,8 @@ function Ficha({ v, offset }) {
         </span>
         <div className="mcp-ficha-datos">
           <p className="mcp-etiqueta">¿Quién es?</p>
-          <p className="mcp-ficha-nac">🌍 {v.reto.nacionalidad}</p>
-          <p className="mcp-ficha-clubes">{v.reto.totalClubes} {v.reto.totalClubes === 1 ? 'club' : 'clubes'} en su carrera</p>
+          <p className="mcp-ficha-nac">{v.fase === 'jugando' ? `${v.reto.clubes.length}º club de su carrera` : `🌍 ${v.reto.nacionalidad}`}</p>
+          <p className="mcp-ficha-clubes">{v.fase !== 'jugando' ? `${v.reto.clubes.length} clubes en su carrera` : v.reto.todos ? 'Ya han salido todos sus clubes' : 'Irán saliendo más clubes…'}</p>
         </div>
         {v.fase === 'jugando' && <span className="mcp-vale"><b>{v.puntosAhora}</b><small>pts</small></span>}
       </div>
@@ -207,13 +198,24 @@ export function FormRespuesta({ v, nombre, offset = 0, onEnviar, onCancelar }) {
 }
 
 /** Ronda en juego. `controles` es lo de abajo (pulsador, formulario…), distinto online y en un dispositivo. */
-export function PantallaRonda({ v, onSalir, offset = 0, controles, etiqueta, titulo, mio = false }) {
+export function BotonPista({ v, onPista }) {
+  if (v.fase !== 'jugando' || !v.reto.hayPista || v.pistaVisible || v.pulsado || !onPista) return null;
+  return (
+    <button type="button" className="mcp-boton-pista" onClick={onPista}>
+      <span aria-hidden="true">💡</span>
+      <span><strong>Desvelar pista</strong><small>Acertar con pista vale {AJUSTES.puntosPista} punto</small></span>
+    </button>
+  );
+}
+
+export function PantallaRonda({ v, onSalir, offset = 0, controles, etiqueta, titulo, mio = false, onPista }) {
   return (
     <>
       <Hero v={v} onSalir={onSalir} etiqueta={etiqueta} titulo={titulo} clase={mio ? 'mio' : ''} />
       <Ficha v={v} offset={offset} />
       <Clubes v={v} />
       <Pista v={v} />
+      <BotonPista v={v} onPista={onPista} />
       {controles}
     </>
   );
@@ -342,10 +344,10 @@ export function Ayuda({ onCerrar, titulo, descripcion }) {
         <div className="qq-modal-ayuda-body">
           {descripcion && <p>{descripcion}</p>}
           <ul>
-            <li>Los clubes del futbolista aparecen uno a uno, cada {AJUSTES.segClub} segundos, junto a su nacionalidad.</li>
+            <li>Los clubes del futbolista aparecen uno a uno, cada {AJUSTES.segClub} segundos (no se sabe cuántos tiene hasta que salen todos).</li>
             <li>Si crees que lo sabes, pulsa <strong>«¡Lo sé!»</strong>: el reloj se para y tienes {AJUSTES.segRespuesta} segundos para escribirlo.</li>
             <li>Si fallas, pierdes {AJUSTES.puntosFallo} punto y quedas fuera de ese futbolista.</li>
-            <li>Tras el último club queda un margen; en los retos difíciles aparece además una pista.</li>
+            <li>Tras el último club quedan {AJUSTES.segTrasUltimo} segundos. En los retos difíciles se puede pulsar «Desvelar pista» (da {AJUSTES.segPista} segundos más, pero acertar vale menos).</li>
           </ul>
           <p className="mcp-ayuda-sub">Puntuación</p>
           <ul>

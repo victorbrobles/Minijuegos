@@ -43,9 +43,16 @@ const LOGOS = {
 
 // Escudo de cada club: imagen conocida (LOGOS o «Cuatro clubes») y, siempre, colores y siglas para dibujar
 // un escudo propio en el cliente si no hay imagen o no carga.
+// Los SVG de Wikipedia se piden como miniatura PNG: algunos SVG (p. ej. el del Milan) no traen viewBox y se
+// salen de su caja; la miniatura siempre escala bien y pesa menos.
+const miniatura = (url) => {
+  const m = /^https:\/\/upload\.wikimedia\.org\/wikipedia\/(commons|en)\/([0-9a-f])\/([0-9a-f]{2})\/([^/]+\.svg)$/i.exec(url || '');
+  return m ? `https://upload.wikimedia.org/wikipedia/${m[1]}/thumb/${m[2]}/${m[3]}/${m[4]}/120px-${m[4]}.png` : url;
+};
+
 const c = (nombre, logoUrl, periodo) => ({
   nombre,
-  logo: logoUrl || CLUBES_INFO[nombre]?.escudo || null,
+  logo: miniatura(logoUrl || CLUBES_INFO[nombre]?.escudo) || null,
   colores: COLORES_CLUB[nombre] || CLUBES_INFO[nombre]?.colores || ['#475569', '#ffffff'],
   siglas: siglasDe(nombre),
   periodo

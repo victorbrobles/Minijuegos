@@ -509,3 +509,29 @@
   .mcp-club-datos strong { font-size: 0.95rem; }
 }
 @media (prefers-reduced-motion: reduce) { .mcp-pulsador-cara, .mcp-club { animation: none !important; } }
+
+/* Escudos: nunca se salen de su caja */
+.mcp-escudo { overflow: hidden; }
+.mcp-escudo-img { max-width: 100%; max-height: 100%; }
+
+/* Botón para desvelar la pista */
+.mcp-boton-pista {
+  display: flex !important;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0.75rem 0.95rem !important;
+  border: none !important;
+  border-radius: 20px !important;
+  background: linear-gradient(135deg, #fde68a, #f59e0b) !important;
+  box-shadow: 0 5px 0 #b45309 !important;
+  color: #451a03 !important;
+  text-align: left;
+  cursor: pointer;
+}
+.mcp-boton-pista > span:first-child { font-size: 1.6rem; }
+.mcp-boton-pista strong { display: block; font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.12rem; }
+.mcp-boton-pista small { display: block; font-size: 0.8rem; font-weight: 700; opacity: 0.85; }
+.mcp-boton-pista:active { transform: translateY(3px); box-shadow: 0 2px 0 #b45309 !important; }

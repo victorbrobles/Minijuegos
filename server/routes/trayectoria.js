@@ -155,7 +155,7 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
 });
 
 // ---------------------------------------------------------------- Acciones
-// tipo: pulsar | responder | rendirse (anfitrión) | siguiente (anfitrión) | terminar (anfitrión)
+// tipo: pulsar | pista | responder | rendirse (anfitrión) | siguiente (anfitrión) | terminar (anfitrión)
 router.post('/online/sala/:code/accion', (req, res) => {
   const c = sala_y_jugador(req, res);
   if (!c) return;
@@ -167,6 +167,7 @@ router.post('/online/sala/:code/accion', (req, res) => {
   let r;
   switch (d.tipo) {
     case 'pulsar': r = E.pulsar(p, id, ahora); break;
+    case 'pista': r = E.desvelarPista(p, ahora); break;
     case 'responder': r = E.responder(p, id, String(d.respuesta || '').slice(0, 80), ahora); break;
     case 'rendirse': r = esAdmin ? E.rendirse(p) : soloAdmin; break;
     case 'siguiente': r = esAdmin ? E.siguiente(p, ahora) : soloAdmin; break;
