@@ -27,6 +27,11 @@ export const CLUBES = {
   GAL: ['Galatasaray', 'tr'], FEN: ['Fenerbahce', 'tr'], BES: ['Besiktas', 'tr'],
   // Sudamérica
   RIV: ['River Plate', 'ar'], BOC: ['Boca Juniors', 'ar'], SAN: ['Santos', 'br'], FLA: ['Flamengo', 'br'], PAL: ['Palmeiras', 'br'],
+  // Clubes medianos (para detectar compañeros de equipo en «¿Con quién he jugado?»)
+  WHU: ['West Ham', 'en'], BHA: ['Brighton', 'en'], BOU: ['Bournemouth', 'en'], WOL: ['Wolverhampton', 'en'],
+  LEI: ['Leicester City', 'en'], SOU: ['Southampton', 'en'], CRY: ['Crystal Palace', 'en'], FUL: ['Fulham', 'en'],
+  S04: ['Schalke 04', 'de'], WOB: ['Wolfsburg', 'de'], BMG: ['Borussia Mönchengladbach', 'de'], RBS: ['RB Salzburg', 'at'],
+  GIR: ['Girona', 'es'], ESY: ['Espanyol', 'es'], ZEN: ['Zenit', 'ru'], SHK: ['Shakhtar Donetsk', 'ua'],
   // Otros que aparecen en categorías de país/liga
   MIA: ['Inter Miami', 'us'], LAG: ['LA Galaxy', 'us'], NAS: ['Al Nassr', 'sa'], HIL: ['Al Hilal', 'sa'], ITT: ['Al Ittihad', 'sa']
 };

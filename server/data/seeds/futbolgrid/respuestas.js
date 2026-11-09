@@ -6,6 +6,7 @@ import J1 from './jugadores1.js';
 import J2 from './jugadores2.js';
 import J3 from './jugadores3.js';
 import J4 from './jugadores4.js';
+import J5 from './jugadores5.js';
 
 const PAISES = new Set(Object.values(CLUBES).map(([, p]) => p));
 const LIGA_CAT = { 'premier league': ['en'], laliga: ['es'], 'españa': ['es'], 'serie a': ['it'], italia: ['it'], 'ligue 1': ['fr'], mls: ['us'], 'arabia saudí': ['sa'], china: ['cn'] };
@@ -33,7 +34,12 @@ function parsear(texto) {
   });
 }
 
-export const JUGADORES = [J1, J2, J3, J4].flatMap(parsear);
+export const JUGADORES = [J1, J2, J3, J4, J5].flatMap(parsear);
+
+/** ¿Coincidieron en algún club (no selección), con años solapados? */
+export function companerosDeClub(a, b, margen = 0) {
+  return a !== b && a.etapas.some((e) => e.club && b.etapas.some((o) => o.club === e.club && solapan(e.desde - margen, e.hasta + margen, o.desde, o.hasta)));
+}
 const POR_NOMBRE = new Map(JUGADORES.map((j) => [j.nombre.toLowerCase(), j]));
 const solapan = (a1, a2, b1, b2) => Math.max(a1, b1) < Math.min(a2, b2);
 

@@ -15,6 +15,8 @@
     "sync:bingoball": "node scripts/sync-bingoball.mjs",
     "sync:futbolgrid": "node scripts/sync-futbolgrid.mjs",
     "sync:footballsplit": "node scripts/sync-footballsplit.mjs",
+    "sync:jugadores": "node scripts/sync-jugadores.mjs",
+    "sync:cuatroclubes": "node scripts/sync-cuatroclubes.mjs",
     "sim:fundadores": "node scripts/fundadores-sim.mjs",
     "sync:logos": "node scripts/sync-logos.mjs"
   },

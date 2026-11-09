@@ -1,318 +1,158 @@
 // client/src/games/Jugadores/JugadoresLocal.jsx
-import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+// Modo «un único dispositivo»: el móvil queda en la mesa. Quien lo sepa pulsa, se elige quién ha sido y escribe
+// el nombre; si no está en la lista, decide el grupo. Mismo motor que el online; las parejas se piden al servidor.
+import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
-import '../Adivina/Adivina.css';
-import { SelectorJugadores } from '../../components/MenuJuego.jsx';
+import * as E from './engine.js';
+import { PantallaRonda, PantallaResultado, PantallaFin, Pulsador, FormRespuesta, Revision, ModalSalir, SelectorRondas, Avatar } from './Vistas.jsx';
+import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx';
+import './Jugadores.css';
 
-const TIEMPO_S = 120;
-const MAX_RONDAS = 20;
+const barajar = (a) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
 
-export default function JugadoresLocal({ onVolver, onExit }) {
-  const navigate = useNavigate();
-  const [paso, setPaso] = useState('config'); 
-  const [modalAyuda, setModalAyuda] = useState(false);
-  const [modalAsignar, setModalAsignar] = useState(null); // 'acierto' | 'fallo'
-  const [modalRespuestas, setModalRespuestas] = useState(false);
+export default function JugadoresLocal({ onVolver, onExit, onAbrirAyuda }) {
+  const [paso, setPaso] = useState('config');
+  const [nombres, setNombres] = useState(['', '']);
+  const [rondas, setRondas] = useState(10);
+  const [error, setError] = useState('');
+  const [cargando, setCargando] = useState(false);
+  const [aviso, setAviso] = useState(null);
+  const [modal, setModal] = useState(false);
+  const [eligiendo, setEligiendo] = useState(false);
+  const estRef = useRef(null);
+  const [, setVer] = useState(0);
+  const avisoTimer = useRef(null);
+  const refrescar = () => setVer((x) => x + 1);
 
-  const [jugadores, setJugadores] = useState([
-    { id: 1, nombre: 'Jugador 1' },
-    { id: 2, nombre: 'Jugador 2' }
-  ]);
-  const [puntos, setPuntos] = useState({});
-  const [ronda, setRonda] = useState(1);
-  const [usados, setUsados] = useState([]);
-  const [reto, setReto] = useState(null);
-  const [ultimo, setUltimo] = useState(null);
-  const [restante, setRestante] = useState(TIEMPO_S);
-  const [bloqueadosRonda, setBloqueadosRonda] = useState([]);
-  
-  const timerRef = useRef(null);
+  useEffect(() => {
+    if (paso !== 'juego') return undefined;
+    const i = setInterval(() => { if (estRef.current && E.tick(estRef.current, Date.now())) refrescar(); else refrescar(); }, 250);
+    return () => clearInterval(i);
+  }, [paso]);
+  useEffect(() => () => clearTimeout(avisoTimer.current), []);
 
-  const handleNumJugadores = (e) => {
-    const num = parseInt(e.target.value, 10);
-    setJugadores(Array.from({ length: num }, (_, i) => ({
-      id: i + 1,
-      nombre: jugadores[i]?.nombre ?? `Jugador ${i + 1}`
-    })));
-  };
+  const mostrar = (texto, tipo = '') => { setAviso({ texto, tipo }); clearTimeout(avisoTimer.current); avisoTimer.current = setTimeout(() => setAviso(null), 3000); };
 
-  const handleNombre = (index, valor) => {
-    setJugadores(jugadores.map((j, i) => (i === index ? { ...j, nombre: valor } : j)));
-  };
-
-  const cargarReto = async () => {
+  const empezar = async () => {
+    const limpios = nombres.map((n) => n.trim());
+    if (limpios.some((n) => !n)) return setError('Todos los jugadores necesitan un nombre.');
+    if (new Set(limpios.map((n) => n.toLowerCase())).size !== limpios.length) return setError('Hay nombres repetidos.');
+    setError(''); setCargando(true);
     try {
-      const res = await fetch('/api/jugadores/reto-local', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ usados })
-      });
-      const data = await res.json();
-      if (data.success) {
-        setUsados([...usados, data.reto.id]);
-        setReto(data.reto);
-        setRestante(TIEMPO_S);
-        setBloqueadosRonda([]);
-        setPaso('jugando');
-        iniciarTimer();
-      }
-    } catch (e) {
-      console.error(e);
+      const r = await fetch(`/api/jugadores/retos?n=${rondas}`);
+      const d = await r.json();
+      if (!d.success) throw new Error();
+      estRef.current = E.crearPartida(limpios.map((nombre, i) => ({ id: i + 1, nombre })), d.retos, Date.now());
+      setEligiendo(false);
+      setPaso('juego');
+    } catch {
+      setError('No se han podido cargar las parejas. Inténtalo de nuevo.');
+    } finally {
+      setCargando(false);
     }
+    return undefined;
   };
 
-  const iniciarTimer = () => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      setRestante((prev) => {
-        if (prev <= 1) {
-          clearInterval(timerRef.current);
-          setUltimo({ tipo: 'rendido' });
-          setPaso('resumen');
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-  };
+  if (paso === 'config') {
+    return (
+      <div className="cqp-contenedor">
+        <SelectorJugadores
+          onVolver={onVolver} onAyuda={onAbrirAyuda} min={E.AJUSTES.min} max={E.AJUSTES.max}
+          numJugadores={nombres.length}
+          onCambiarNum={(n) => setNombres((l) => (n > l.length ? [...l, ...Array(n - l.length).fill('')] : l.slice(0, n)))}
+          nombres={nombres}
+          onNombre={(i, valor) => setNombres((l) => l.map((x, k) => (k === i ? valor : x)))}
+          onEmpezar={empezar} textoBoton={cargando ? 'Cargando…' : '¡Empezar partida!'} error={error}
+        >
+          <BloqueConfig titulo="Número de parejas">
+            <SelectorRondas valor={rondas} onCambiar={setRondas} />
+          </BloqueConfig>
+        </SelectorJugadores>
+      </div>
+    );
+  }
 
-  const empezar = () => {
-    const lista = jugadores.map((j) => ({ ...j, nombre: j.nombre.trim() || `Jugador ${j.id}` }));
-    setJugadores(lista);
-    setPuntos(Object.fromEntries(lista.map((j) => [j.id, 0])));
-    setUsados([]);
-    setRonda(1);
-    setUltimo(null);
-    cargarReto();
-  };
+  const est = estRef.current;
+  const v = { ...E.vistaDe(est, -1), yo: null };
+  const onSalir = () => setModal(true);
+  const hacer = (fn) => { const r = fn(); if (r && !r.ok) mostrar(r.error, 'mal'); refrescar(); return r; };
 
-  const asignarPunto = (jugadorId) => {
-    const p = jugadores.find((j) => j.id === jugadorId);
-    if (!p) return;
-
-    if (modalAsignar === 'acierto') {
-      if (timerRef.current) clearInterval(timerRef.current);
-      setPuntos((prev) => ({ ...prev, [p.id]: (prev[p.id] ?? 0) + 3 }));
-      setUltimo({ tipo: 'acierto', jugador: p.nombre, puntos: 3 });
-      setModalAsignar(null);
-      setPaso('resumen');
-    } else if (modalAsignar === 'fallo') {
-      // Restar 1 punto y bloquear al jugador para lo que queda de ronda
-      setPuntos((prev) => ({ ...prev, [p.id]: (prev[p.id] ?? 0) - 1 }));
-      const nuevosBloqueados = [...bloqueadosRonda, p.id];
-      setBloqueadosRonda(nuevosBloqueados);
-      setModalAsignar(null);
-
-      // Si todos los jugadores están bloqueados, se termina la ronda
-      if (nuevosBloqueados.length >= jugadores.length) {
-        if (timerRef.current) clearInterval(timerRef.current);
-        setUltimo({ tipo: 'todos_fallaron', jugador: 'Todos fallaron' });
-        setPaso('resumen');
-      }
-    }
-  };
-
-  const rendirse = () => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    setUltimo({ tipo: 'rendido' });
-    setModalAsignar(null);
-    setPaso('resumen');
-  };
-
-  const continuar = () => {
-    if (ronda >= MAX_RONDAS) {
-      setPaso('final');
+  let contenido;
+  if (est.fase === 'fin') {
+    contenido = (
+      <PantallaFin v={v} onSalir={onSalir}>
+        <div className="cqp-barra estatica">
+          <button type="button" className="cqp-boton grande" onClick={() => setPaso('config')}><Icon name="refresh" size={20} /> Nueva partida</button>
+          <button type="button" className="cqp-boton secundario" onClick={() => onExit?.()}><Icon name="door" size={18} /> Salir a la portada</button>
+        </div>
+      </PantallaFin>
+    );
+  } else if (est.fase === 'resuelta') {
+    contenido = (
+      <PantallaResultado v={v} onSalir={onSalir}>
+        <div className="cqp-barra estatica">
+          <button type="button" className="cqp-boton grande" onClick={() => hacer(() => E.siguiente(est, Date.now()))}>
+            <Icon name="play" size={20} /> {v.ronda >= v.rondas ? 'Ver resultado final' : 'Siguiente pareja'}
+          </button>
+          {v.ronda < v.rondas && <button type="button" className="cqp-enlace" onClick={() => hacer(() => E.terminar(est))}><Icon name="flagFinish" size={15} /> Terminar la partida ya</button>}
+        </div>
+      </PantallaResultado>
+    );
+  } else {
+    const p = v.pulsado;
+    const quien = v.jugadores.find((j) => j.id === p?.jugadorId);
+    const libres = v.jugadores.filter((j) => !j.fuera && !v.bloqueados.includes(j.id));
+    let controles;
+    if (v.revision) {
+      controles = <Revision v={v} puedeJuzgar juez="el grupo" onJuzgar={(vale) => hacer(() => E.juzgar(est, vale, Date.now()))} />;
+    } else if (p) {
+      controles = (
+        <FormRespuesta key={p.hasta} v={v} nombre={quien?.nombre}
+          onEnviar={(t) => {
+            hacer(() => E.responder(est, p.jugadorId, t, Date.now()));
+          }}
+          onCancelar={() => hacer(() => E.cancelarPulsado(est, Date.now()))} />
+      );
+    } else if (eligiendo) {
+      controles = (
+        <div className="cqp-tarjeta">
+          <p className="cqp-etiqueta">¿Quién ha pulsado?</p>
+          <div className="cqp-quien">
+            {libres.map((j) => (
+              <button key={j.id} type="button" className="cqp-quien-btn" onClick={() => { setEligiendo(false); hacer(() => E.pulsar(est, j.id, Date.now())); }}>
+                <Avatar id={j.id} nombre={j.nombre} /> {j.nombre}
+              </button>
+            ))}
+          </div>
+          <button type="button" className="cqp-enlace oscuro" onClick={() => { setEligiendo(false); hacer(() => E.seguir(est, Date.now())); }}>Ha sido sin querer: seguir</button>
+        </div>
+      );
     } else {
-      setRonda(ronda + 1);
-      cargarReto();
+      controles = (
+        <>
+          <Pulsador deshabilitado={!libres.length} onPulsar={() => { hacer(() => E.pausa(est, Date.now())); setEligiendo(true); }} />
+          <div className="cqp-barra estatica">
+            <button type="button" className="cqp-enlace" onClick={() => hacer(() => E.rendirse(est))}><Icon name="flagFinish" size={15} /> Nadie lo sabe: ver respuestas</button>
+          </div>
+        </>
+      );
     }
-  };
-
-  const ranking = [...jugadores].sort((a, b) => (puntos[b.id] ?? 0) - (puntos[a.id] ?? 0));
-  const maximo = ranking.length ? (puntos[ranking[0].id] ?? 0) : 0;
-  
-  // Jugadores disponibles que aún no han fallado en esta ronda
-  const jugadoresDisponibles = jugadores.filter(j => !bloqueadosRonda.includes(j.id));
+    contenido = (
+      <PantallaRonda v={v} onSalir={onSalir} mio={Boolean(p)}
+        etiqueta={v.revision ? 'Decidís vosotros' : p ? `${quien?.nombre} ha pulsado` : `Pareja ${v.ronda} de ${v.rondas}`}
+        titulo={p ? `¡Escríbelo, ${quien?.nombre}!` : '¿Con quién han jugado los dos?'}>
+        {controles}
+      </PantallaRonda>
+    );
+  }
 
   return (
-    <div className="rk-contenedor">
-      {paso === 'config' && (
-        <>
-
-          {modalAyuda && (
-            <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
-              <div className="rg-modal rk-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-                <div className="rk-modal-header">
-                  <span className="rk-modal-signo-title">?</span>
-                  <h3>¿Cómo se juega a ¿Con quién jugaste?</h3>
-                </div>
-                <div className="rk-modal-cuerpo">
-                  <p>Aparecerá en pantalla una dupla de jugadores de fútbol[cite: 5]. Solo comparten una cosa: <strong>han tenido al menos un compañero en común a lo largo de su carrera[cite: 5].</strong></p>
-                  <ul>
-                    <li>Tenéis 120 segundos en grupo para debatir y gritar compañeros[cite: 5].</li>
-                    <li><strong>Acierto:</strong> +3 puntos y fin de la ronda[cite: 5].</li>
-                    <li><strong>Fallo:</strong> -1 punto y bloqueo del jugador para esta ronda, pero la ronda continúa si quedan más participantes[cite: 5].</li>
-                  </ul>
-                </div>
-                <div className="rg-modal-acciones">
-                  <button className="big full" onClick={() => setModalAyuda(false)}>Entendido</button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <SelectorJugadores
-            onVolver={onVolver}
-            onAyuda={() => setModalAyuda(true)}
-            min={2}
-            max={15}
-            numJugadores={jugadores.length}
-            onCambiarNum={(n) => handleNumJugadores({ target: { value: n } })}
-            nombres={jugadores}
-            onNombre={handleNombre}
-            onEmpezar={empezar}
-            textoBoton="Empezar Partida"
-          />
-        </>
-      )}
-
-      {paso === 'jugando' && reto && (
-        <section className="game">
-          <div className="hud">
-            <span className="chip"><Icon name="flagFinish" size={18} />Ronda {ronda} de {MAX_RONDAS}</span>
-          </div>
-
-          <div className="panel center" style={{ margin: '2rem 0', padding: '2rem 1rem' }}>
-            <h3 style={{ color: '#64748b', textTransform: 'uppercase', fontSize: '0.9rem', letterSpacing: '2px', marginBottom: '1rem' }}>Compañero en común</h3>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center' }}>
-              <div style={{ fontSize: '2rem', fontWeight: '900', color: '#1e293b', textAlign: 'center' }}>{reto.jugador1}</div>
-              <Icon name="refresh" size={28} color="#94a3b8" />
-              <div style={{ fontSize: '2rem', fontWeight: '900', color: '#1e293b', textAlign: 'center' }}>{reto.jugador2}</div>
-            </div>
-            
-            <button type="button" className="secondary" style={{ marginTop: '2rem', fontSize: '0.9rem', padding: '0.4rem 1rem', display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }} onClick={() => setModalRespuestas(true)}>
-               <Icon name="eye" size={16} /> Revelar algunas respuestas posibles
-            </button>
-          </div>
-
-          <div className="timer" role="timer" aria-label="Tiempo restante">
-            <div className={`timer-bar${restante <= 15 ? ' low' : ''}`} style={{ width: `${(restante / TIEMPO_S) * 100}%` }} />
-          </div>
-          <p className="timer-text"><Icon name="clock" size={16} />{restante} s</p>
-
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginTop: '2rem' }}>
-            <button className="ok" onClick={() => setModalAsignar('acierto')}><Icon name="check" size={22} /> ¡Correcto!</button>
-            <button className="secondary danger" style={{ background: '#ef4444', color: '#fff', borderColor: '#dc2626' }} onClick={() => setModalAsignar('fallo')}><Icon name="close" size={22} /> ¡Fallo!</button>
-          </div>
-          <button className="secondary full" style={{ marginTop: '1rem' }} onClick={rendirse}><Icon name="flag" size={18} /> Nadie lo sabe (Pasar)</button>
-
-          {/* Modal Respuestas Posibles */}
-          {modalRespuestas && (
-            <div className="rg-modal-fondo" onClick={() => setModalRespuestas(false)}>
-              <div className="rg-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '400px' }}>
-                <h3 style={{ marginBottom: '1rem', color: '#1e1b4b' }}>Posibles Respuestas</h3>
-                <p className="hint small" style={{ marginBottom: '1rem', fontStyle: 'italic' }}>Aquí tienes algunos jugadores que han compartido vestuario con ambos.</p>
-                
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '300px', overflowY: 'auto', marginBottom: '1.5rem', background: '#f1f5f9', padding: '1rem', borderRadius: '12px', textAlign: 'left' }}>
-                  {reto.comunes && reto.comunes.length > 0 ? (
-                    reto.comunes.map((c, i) => (
-                      <div key={i} style={{ padding: '0.4rem 0', borderBottom: i !== reto.comunes.length - 1 ? '1px solid #cbd5e1' : 'none', fontWeight: 'bold', color: '#0f172a' }}>
-                        • {c}
-                      </div>
-                    ))
-                  ) : (
-                    <div style={{ color: '#64748b' }}>No hay datos registrados.</div>
-                  )}
-                </div>
-                
-                <button className="big full" onClick={() => setModalRespuestas(false)}>Cerrar</button>
-              </div>
-            </div>
-          )}
-
-          {/* Modal Asignación */}
-          {modalAsignar && (
-            <div className="rg-modal-fondo" onClick={() => setModalAsignar(null)}>
-              <div className="rg-modal" onClick={(e) => e.stopPropagation()}>
-                <h3>¿Quién {modalAsignar === 'acierto' ? 'ha acertado (+3)?' : 'ha fallado (-1 y bloqueado)?'}</h3>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem', marginTop: '1rem' }}>
-                  {modalAsignar === 'acierto' ? (
-                    jugadores.map((j) => (
-                      <button key={j.id} className="secondary full" onClick={() => asignarPunto(j.id)}>
-                        {j.nombre}
-                      </button>
-                    ))
-                  ) : (
-                    jugadoresDisponibles.map((j) => (
-                      <button key={j.id} className="secondary full" style={{ borderColor: '#ef4444', color: '#dc2626' }} onClick={() => asignarPunto(j.id)}>
-                        {j.nombre} ❌
-                      </button>
-                    ))
-                  )}
-                </div>
-                <button className="secondary danger full" style={{ marginTop: '1rem' }} onClick={() => setModalAsignar(null)}>Cancelar</button>
-              </div>
-            </div>
-          )}
-        </section>
-      )}
-
-      {paso === 'resumen' && (
-        <section className="game">
-          <div className="end-card">
-            <span className="end-icon"><Icon name="trophy" size={44} /></span>
-            <h1 className="title">Puntuaciones</h1>
-            {ultimo && (
-              <p className="reveal" style={{ fontSize: '1.2rem', margin: '1rem 0' }}>
-                {ultimo.tipo === 'rendido' ? 'Se acabó el tiempo o nadie lo adivinó. 0 puntos.' :
-                 ultimo.tipo === 'todos_fallaron' ? '¡Todos han fallado! Fin de la ronda.' :
-                 ultimo.tipo === 'acierto' ? <><strong>{ultimo.jugador}</strong> acertó y suma <span style={{color: '#059669'}}>+3 pts</span>.</> :
-                 <><strong>{ultimo.jugador}</strong> falló (-1 pt) y queda bloqueado.</>}
-              </p>
-            )}
-            <div className="scoreboard">
-              {ranking.map((j, i) => (
-                <div key={j.id} className={`score-row${(maximo > 0 && puntos[j.id] === maximo) ? ' first' : ''}`}>
-                  <span className="score-name">
-                    {(maximo > 0 && puntos[j.id] === maximo) ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
-                    {j.nombre}
-                  </span>
-                  <span className="score-pts">{puntos[j.id] ?? 0} pts</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="actions">
-            <button onClick={continuar}><Icon name="play" size={20} />{ronda >= MAX_RONDAS ? 'Ver Podio Final' : `Continuar a la Ronda ${ronda + 1}`}</button>
-            <button className="secondary danger" onClick={() => setPaso('final')}><Icon name="flagFinish" size={20} /> Terminar partida</button>
-          </div>
-        </section>
-      )}
-
-      {paso === 'final' && (
-        <section className="game">
-          <div className="end-card">
-            <span className="end-icon"><Icon name="crown" size={48} /></span>
-            <h1 className="title">Clasificación Final</h1>
-            <div className="scoreboard" style={{ marginTop: '1.5rem' }}>
-              {ranking.map((j, i) => (
-                <div key={j.id} className={`score-row${(maximo > 0 && puntos[j.id] === maximo) ? ' first' : ''}`}>
-                  <span className="score-name">
-                    {(maximo > 0 && puntos[j.id] === maximo) ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
-                    {j.nombre}
-                  </span>
-                  <span className="score-pts">{puntos[j.id] ?? 0} pts</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="actions">
-            <button onClick={() => setPaso('config')}><Icon name="refresh" size={20} /> Nueva Partida</button>
-            <button className="secondary danger" onClick={() => (onExit ? onExit() : navigate('/'))}><Icon name="door" size={20} /> Salir al menú</button>
-          </div>
-        </section>
+    <div className="cqp-contenedor qq-en-partida">
+      {aviso && <p className="cqp-toast" role="alert" onClick={() => setAviso(null)}>{aviso.texto}</p>}
+      <section className="game cqp-escena">{contenido}</section>
+      {modal && (
+        <ModalSalir titulo="¿Salir de la partida?" texto="Se perderá la partida en curso y volverás a la portada."
+          onSeguir={() => setModal(false)} onSalir={() => { setModal(false); onExit?.(); }} />
       )}
     </div>
   );
