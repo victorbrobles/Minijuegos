@@ -130,7 +130,9 @@ npm run dev
 
 ## Minijuego: Bingoball (`Bingoball/`)
 - Solo online, de 2 a 15 jugadores. En la sala de espera solo se ven los jugadores; al pulsar «¡Jugar!» el anfitrión elige el tipo de bingo (Selecciones, Champions, LaLiga, Grandes Ligas o Leyendas). Cartón de 12 categorías (4 × 3); cada 15 s sale un futbolista (cromo con equipación propia) y se marca la casilla en la que encaja.
-- Acierto +2, fallo −1 (y sin marcar hasta el siguiente), línea +5, bingo +20 (termina la partida).
+- Acierto +2, fallo −1 (y sin marcar hasta el siguiente), bingo +20 (termina la partida).
+- Línea opcional: con una fila completa sale «Cantar línea»; el bingo se pausa para todos mientras el jugador confirma (20 s). Si la canta, +5 y la fila cambia por 3 categorías nuevas que no tenga en el cartón. Solo una línea por bingo (la primera); después el botón desaparece para todos.
+- Sorteo ponderado: peso = casillas abiertas (de todos) en las que encaja × factor de recencia (bajo si acaba de salir, alto si hace mucho o nunca ha salido); 0 si no sirve a nadie.
 - Motor en `server/bingoball/engine.js` (copia con `npm run sync:bingoball`). Prueba: `node server/scripts/bingoball-sim.mjs`.
 
 ## Minijuego: ¡Descarta y Elimina! (`Descarte/`)

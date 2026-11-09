@@ -3,7 +3,12 @@
 //
 // Cada jugador recibe un cartón de 12 categorías (4 filas de 3). Van saliendo futbolistas (uno cada pocos
 // segundos): si encaja en una categoría abierta de tu cartón, márcala. Acertar suma; fallar resta y te deja sin
-// poder marcar hasta el siguiente futbolista. Cada fila completa es una línea; quien completa el cartón canta bingo.
+// poder marcar hasta el siguiente futbolista. Con una fila completa puedes «cantar línea» (solo una por bingo, la
+// primera): el bingo se para mientras decides; si la cantas sumas y esa fila cambia por tres categorías nuevas.
+// Quien completa el cartón canta bingo.
+//
+// Qué futbolista sale: al azar, pero con pesos. Pesa más cuantas más casillas abiertas (de todos) encaja y cuanto
+// más tiempo hace que no sale; los que acaban de salir pesan poco y los que no sirven a nadie, nada.
 
 export const AJUSTES = {
   min: 2,
@@ -16,7 +21,8 @@ export const AJUSTES = {
   puntosFallo: 1,
   puntosLinea: 5,
   puntosBingo: 20,
-  sinRepetir: 15
+  segDecidirLinea: 20,
+  memoria: 12
 };
 
 const barajar = (arr) => {
@@ -62,6 +68,9 @@ export function crearPartida(jugadores, bingo, ahora = Date.now()) {
     numero: 0,
     historial: [],
     ganadorId: null,
+    lineaCantada: null,
+    pausa: null,
+    avisoLinea: null,
     log: [],
     nlog: 0,
     fin: null
@@ -70,18 +79,37 @@ export function crearPartida(jugadores, bingo, ahora = Date.now()) {
   return p;
 }
 
-/** Futbolistas que encajan en alguna casilla abierta de algún cartón (los recientes, solo si no queda otro). */
+/** Peso de cada futbolista para el próximo sorteo (0 = no puede salir). */
+export function pesos(p) {
+  const abiertas = new Map();
+  p.jugadores.filter((j) => !j.fuera).forEach((j) => j.carton.forEach((c) => {
+    if (!c.marcada) abiertas.set(c.categoriaId, (abiertas.get(c.categoriaId) || 0) + 1);
+  }));
+  const casillas = new Map();
+  p.bingo.categorias.forEach((cat) => {
+    const n = abiertas.get(cat.id) || 0;
+    if (n) cat.jugadores.forEach((f) => casillas.set(f, (casillas.get(f) || 0) + n));
+  });
+  const ultimaVez = new Map();
+  p.historial.forEach((f, i) => ultimaVez.set(f, i));
+  const total = p.historial.length;
+  const res = new Map();
+  casillas.forEach((n, f) => {
+    // Hace cuántos futbolistas salió (1 = el último). Nunca: un poco más que el máximo.
+    const hace = ultimaVez.has(f) ? total - ultimaVez.get(f) : AJUSTES.memoria * 1.5;
+    const recencia = Math.min(1.5, Math.max(0.05, hace / AJUSTES.memoria));
+    res.set(f, n * recencia);
+  });
+  return res;
+}
+
 function siguienteFutbolista(p) {
-  const abiertas = new Set();
-  activos(p).forEach((j) => j.carton.forEach((c) => { if (!c.marcada) abiertas.add(c.categoriaId); }));
-  const utiles = new Set();
-  p.bingo.categorias.forEach((cat) => { if (abiertas.has(cat.id)) cat.jugadores.forEach((f) => utiles.add(f)); });
-  const lista = [...utiles];
-  if (!lista.length) return null;
-  const recientes = p.historial.slice(-AJUSTES.sinRepetir);
-  const libres = lista.filter((f) => !recientes.includes(f));
-  const pool = libres.length ? libres : lista;
-  return pool[Math.floor(Math.random() * pool.length)];
+  const w = [...pesos(p).entries()].filter(([, x]) => x > 0);
+  if (!w.length) return null;
+  const suma = w.reduce((a, [, x]) => a + x, 0);
+  let r = Math.random() * suma;
+  for (const [f, x] of w) { r -= x; if (r <= 0) return f; }
+  return w[w.length - 1][0];
 }
 
 function sacarFutbolista(p, ahora) {
@@ -111,6 +139,11 @@ function finalizar(p, ganadorId) {
 
 /** Avanza el reloj: fin de la preparación y cambio de futbolista. Devuelve true si algo cambia. */
 export function tick(p, ahora = Date.now()) {
+  if (p.fase === 'linea') {
+    if (ahora < p.pausa.hasta) return false;
+    terminarPausa(p, false, ahora);
+    return true;
+  }
   let cambio = false;
   let guard = 0;
   while (guard++ < 20) {
@@ -128,6 +161,7 @@ export function tick(p, ahora = Date.now()) {
 
 export function marcar(p, id, casillaId, ahora = Date.now()) {
   tick(p, ahora);
+  if (p.fase === 'linea') return { ok: false, error: 'El bingo está en pausa: alguien está cantando línea.' };
   if (p.fase !== 'jugando' || !p.futbolista) return { ok: false, error: 'Ahora no se puede marcar.' };
   const j = jug(p, id);
   if (!j || j.fuera) return { ok: false, error: 'No estás en la partida.' };
@@ -152,14 +186,8 @@ export function marcar(p, id, casillaId, ahora = Date.now()) {
   j.actuado = true;
   j.aciertos += 1;
   j.puntos += AJUSTES.puntosAcierto;
-  let extra = '';
   const fila = j.carton.filter((c) => c.fila === casilla.fila);
-  if (fila.every((c) => c.marcada)) {
-    j.lineas += 1;
-    j.puntos += AJUSTES.puntosLinea;
-    extra = ` ¡Línea! (+${AJUSTES.puntosLinea})`;
-    anotar(p, `📏 ${j.nombre} canta línea.`, 'bueno');
-  }
+  const extra = fila.every((c) => c.marcada) && !p.lineaCantada ? ' ¡Fila completa: puedes cantar línea!' : '';
   j.ultimo = { ok: true, n: p.nlog + 1, texto: `¡${f} encaja en «${casilla.nombre}»! +${AJUSTES.puntosAcierto}.${extra}` };
   anotar(p, `✅ ${j.nombre} marca «${casilla.nombre}» con ${f}.`, 'bueno');
   if (j.carton.every((c) => c.marcada)) {
@@ -170,6 +198,61 @@ export function marcar(p, id, casillaId, ahora = Date.now()) {
   return { ok: true, acierto: true };
 }
 
+// ---------------------------------------------------------------- Línea
+/** Un jugador con una fila completa pide cantar línea: el bingo se para hasta que confirme o la descarte. */
+export function pedirLinea(p, id, fila, ahora = Date.now()) {
+  tick(p, ahora);
+  if (p.fase !== 'jugando') return { ok: false, error: 'Ahora no se puede cantar línea.' };
+  if (p.lineaCantada) return { ok: false, error: 'La línea ya la ha cantado otro jugador.' };
+  const j = jug(p, id);
+  if (!j || j.fuera) return { ok: false, error: 'No estás en la partida.' };
+  const f = Number(fila);
+  const casillas = j.carton.filter((c) => c.fila === f);
+  if (!casillas.length || !casillas.every((c) => c.marcada)) return { ok: false, error: 'Esa fila no está completa.' };
+  p.fase = 'linea';
+  p.pausa = { jugadorId: id, fila: f, desde: ahora, hasta: ahora + AJUSTES.segDecidirLinea * 1000 };
+  anotar(p, `⏸️ ${j.nombre} quiere cantar línea: bingo en pausa.`);
+  return { ok: true };
+}
+
+function terminarPausa(p, cantar, ahora) {
+  const { jugadorId, fila, desde } = p.pausa;
+  const j = jug(p, jugadorId);
+  p.pausa = null;
+  p.fase = 'jugando';
+  if (j) j.ultimo = null;
+  if (p.futbolista) p.futbolista.hasta += ahora - desde;
+  if (cantar && j) {
+    j.lineas += 1;
+    j.puntos += AJUSTES.puntosLinea;
+    p.lineaCantada = jugadorId;
+    // Tres categorías nuevas que no estén ya en su cartón
+    const enCarton = new Set(j.carton.map((c) => c.categoriaId));
+    const nuevas = barajar(p.bingo.categorias.filter((c) => !enCarton.has(c.id))).slice(0, AJUSTES.columnas);
+    j.carton.filter((c) => c.fila === fila).forEach((c, k) => {
+      const cat = nuevas[k];
+      if (!cat) return;
+      c.id = `c${fila}_${p.nlog}_${k}`;
+      c.categoriaId = cat.id;
+      c.nombre = cat.nombre;
+      c.marcada = false;
+      c.futbolista = null;
+    });
+    anotar(p, `📣 ¡${j.nombre} canta LÍNEA! (+${AJUSTES.puntosLinea})`, 'bueno');
+  } else {
+    anotar(p, `▶️ ${j?.nombre ?? 'El jugador'} no canta la línea. Sigue el bingo.`);
+  }
+  p.avisoLinea = { n: p.nlog, jugadorId, cantada: Boolean(cantar && j) };
+}
+
+/** Respuesta a la pantalla de confirmación: cantar la línea (sí) o seguir sin cantarla (no). */
+export function decidirLinea(p, id, cantar, ahora = Date.now()) {
+  if (p.fase !== 'linea' || !p.pausa) return { ok: false, error: 'No hay ninguna línea pendiente.' };
+  if (p.pausa.jugadorId !== id) return { ok: false, error: 'No eres quien está cantando línea.' };
+  terminarPausa(p, Boolean(cantar), ahora);
+  return { ok: true };
+}
+
 export function terminar(p) {
   if (p.fase === 'fin') return { ok: false, error: 'La partida ya ha terminado.' };
   finalizar(p, null);
@@ -178,6 +261,7 @@ export function terminar(p) {
 
 /** El anfitrión pasa al siguiente futbolista sin esperar. */
 export function saltar(p, ahora = Date.now()) {
+  if (p.fase === 'linea') { terminarPausa(p, false, ahora); return { ok: true }; }
   if (p.fase !== 'jugando') return { ok: false, error: 'Ahora no se puede.' };
   sacarFutbolista(p, ahora);
   return { ok: true };
@@ -188,6 +272,7 @@ export function abandonar(p, id) {
   if (!j || j.fuera || p.fase === 'fin') return;
   j.fuera = true;
   anotar(p, `🚪 ${j.nombre} abandona la partida.`, 'malo');
+  if (p.fase === 'linea' && p.pausa?.jugadorId === id) terminarPausa(p, false, Date.now());
   if (!activos(p).length) finalizar(p, null);
 }
 
@@ -197,6 +282,7 @@ export function vistaDe(p, yoId) {
     fase: p.fase,
     titulo: p.bingo.titulo,
     hasta: p.fase === 'preparacion' ? p.hasta : p.futbolista?.hasta ?? null,
+    pausadoEn: p.pausa?.desde ?? null,
     futbolista: p.futbolista ? { nombre: p.futbolista.nombre, n: p.futbolista.n } : null,
     jugadores: p.jugadores.map((j) => ({
       id: j.id, nombre: j.nombre, puntos: j.puntos, lineas: j.lineas, fuera: j.fuera,
@@ -207,6 +293,9 @@ export function vistaDe(p, yoId) {
       bloqueado: yo.bloqueado, actuado: yo.actuado, ultimo: yo.ultimo
     } : null,
     total: AJUSTES.filas * AJUSTES.columnas,
+    lineaCantada: p.lineaCantada,
+    pausa: p.pausa ? { jugadorId: p.pausa.jugadorId, fila: p.pausa.jugadorId === yoId ? p.pausa.fila : null, hasta: p.pausa.hasta } : null,
+    avisoLinea: p.avisoLinea,
     ganadorId: p.ganadorId,
     log: p.log.slice(-30),
     fin: p.fin

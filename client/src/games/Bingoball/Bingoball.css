@@ -515,3 +515,32 @@
   .bbp-cromo-foto svg { width: 146px; height: 134px; }
 }
 @media (prefers-reduced-motion: reduce) { .bbp-cromo, .bbp-aviso, .bbp-cromo-tiempo { animation: none !important; } }
+
+/* Línea */
+.bbp-chip.libre { background: #fde68a; color: #92400e; }
+.bbp-cantar {
+  position: absolute;
+  top: -12px;
+  right: 8px;
+  z-index: 2;
+  width: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0.35rem 0.8rem !important;
+  border: none !important;
+  border-radius: 999px !important;
+  background: linear-gradient(135deg, #fbbf24, #ea580c) !important;
+  box-shadow: 0 3px 0 #9a3412 !important;
+  color: #ffffff !important;
+  font-size: 0.8rem !important;
+  font-weight: 900 !important;
+  cursor: pointer;
+  animation: bbpLatir 1s ease-in-out infinite;
+}
+.bbp-fila:has(.bbp-cantar) { margin-top: 0.5rem; }
+.bbp-aviso-linea { padding: 0.7rem 0.9rem; border-radius: 16px; background: #e0f2fe; color: #0c4a6e; font-weight: 800; text-align: center; box-shadow: 0 4px 0 rgba(0, 0, 0, 0.15); animation: bbpSalir 0.3s ease-out both; }
+.bbp-aviso-linea.cantada { background: linear-gradient(135deg, #fde68a, #fbbf24); color: #451a03; }
+.bbp-pausa { border: 3px solid #f59e0b; }
+.bbp-modal-linea .bbp-modal-fila { display: flex; flex-direction: column; gap: 0.3rem; margin: 0.4rem 0 0.8rem; }
+.bbp-modal-fila span { padding: 0.4rem 0.6rem; border-radius: 12px; background: #dcfce7; color: #14532d; font-size: 0.85rem; font-weight: 800; }
+.bbp-modal-tiempo { margin: 0 0 0.9rem !important; color: #b45309 !important; font-weight: 800; }

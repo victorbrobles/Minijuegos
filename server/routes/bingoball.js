@@ -176,7 +176,7 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
 });
 
 // ---------------------------------------------------------------- Acciones
-// tipo: marcar | saltar (anfitrión) | terminar (anfitrión)
+// tipo: marcar | linea | decidir | saltar (anfitrión) | terminar (anfitrión)
 router.post('/online/sala/:code/accion', (req, res) => {
   const c = sala_y_jugador(req, res);
   if (!c) return;
@@ -188,6 +188,8 @@ router.post('/online/sala/:code/accion', (req, res) => {
   let r;
   switch (d.tipo) {
     case 'marcar': r = E.marcar(p, jugador.id, String(d.casillaId || ''), ahora); break;
+    case 'linea': r = E.pedirLinea(p, jugador.id, Number(d.fila), ahora); break;
+    case 'decidir': r = E.decidirLinea(p, jugador.id, Boolean(d.cantar), ahora); break;
     case 'saltar': r = esAdmin ? E.saltar(p, ahora) : soloAdmin; break;
     case 'terminar': r = esAdmin ? E.terminar(p) : soloAdmin; break;
     default: return res.status(400).json({ error: 'Acción desconocida.' });

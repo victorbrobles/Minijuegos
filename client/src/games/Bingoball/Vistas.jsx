@@ -37,8 +37,9 @@ function useRestante(hasta, offset) {
 }
 
 /** Cromo del futbolista que acaba de salir (silueta con una equipación propia de cada nombre). */
-export function Cromo({ futbolista, hasta, offset = 0 }) {
-  const restante = useRestante(hasta, offset);
+export function Cromo({ futbolista, hasta, offset = 0, pausadoEn = null }) {
+  const vivo = useRestante(pausadoEn ? null : hasta, offset);
+  const restante = pausadoEn ? Math.max(0, (hasta - pausadoEn) / 1000) : vivo;
   const [c1, c2] = EQUIPACIONES[hash(futbolista.nombre) % EQUIPACIONES.length];
   const pct = Math.min(100, (restante / AJUSTES.segFutbolista) * 100);
   return (
@@ -71,6 +72,9 @@ function Hero({ v, onSalir, etiqueta, titulo, clase = '' }) {
         <button type="button" className="bbp-salir" onClick={onSalir}><Icon name="door" size={15} /> Salir</button>
         <div className="bbp-chips">
           {v.futbolista && <span className="bbp-chip">⚽ Nº {v.futbolista.n}</span>}
+          {v.fase !== 'preparacion' && v.fase !== 'fin' && (
+            <span className={`bbp-chip${v.lineaCantada ? '' : ' libre'}`}>📣 {v.lineaCantada ? `Línea: ${v.jugadores.find((j) => j.id === v.lineaCantada)?.nombre ?? '—'}` : 'Línea libre'}</span>
+          )}
         </div>
       </div>
       <p className="bbp-hero-etiqueta">{etiqueta}</p>
@@ -88,7 +92,7 @@ function Hero({ v, onSalir, etiqueta, titulo, clase = '' }) {
   );
 }
 
-function Carton({ v, onMarcar, activo }) {
+function Carton({ v, onMarcar, activo, onLinea = null }) {
   const filas = Array.from({ length: AJUSTES.filas }, (_, f) => v.yo.carton.filter((c) => c.fila === f));
   return (
     <div className="bbp-carton">
@@ -103,7 +107,10 @@ function Carton({ v, onMarcar, activo }) {
                 {c.marcada && <span className="bbp-sello"><b>✓</b><small>{c.futbolista}</small></span>}
               </button>
             ))}
-            {linea && <span className="bbp-linea-tag">¡Línea!</span>}
+            {linea && onLinea && (
+              <button type="button" className="bbp-cantar" onClick={() => onLinea(f)}>📣 Cantar línea</button>
+            )}
+            {linea && !onLinea && <span className="bbp-linea-tag">Fila completa</span>}
           </div>
         );
       })}
@@ -125,6 +132,59 @@ export function PantallaPreparacion({ v, onSalir, offset }) {
   );
 }
 
+/** Aviso para todos de lo que ha pasado con la última línea (se ve unos segundos). */
+function AvisoLinea({ v }) {
+  const a = v.avisoLinea;
+  const [visible, setVisible] = useState(null);
+  useEffect(() => {
+    if (!a) return undefined;
+    setVisible(a);
+    const t = setTimeout(() => setVisible(null), 4500);
+    return () => clearTimeout(t);
+  }, [a?.n]); // eslint-disable-line react-hooks/exhaustive-deps
+  if (!visible) return null;
+  const quien = v.jugadores.find((j) => j.id === visible.jugadorId)?.nombre ?? 'Alguien';
+  const yo = visible.jugadorId === v.yo?.id;
+  return (
+    <div className={`bbp-aviso-linea${visible.cantada ? ' cantada' : ''}`}>
+      {visible.cantada
+        ? (yo ? `📣 ¡Has cantado línea! +${AJUSTES.puntosLinea}. Tu fila tiene 3 categorías nuevas.` : `📣 ¡${quien} ha cantado línea! Ya no se puede cantar otra en este bingo.`)
+        : (yo ? '▶️ No has cantado la línea. Sigue el bingo.' : `▶️ ${quien} no ha cantado la línea. Sigue el bingo.`)}
+    </div>
+  );
+}
+
+/** Pantalla de confirmación (para quien canta) o de pausa (para el resto). */
+function PausaLinea({ v, offset, enviar }) {
+  const s = useRestante(v.pausa?.hasta, offset);
+  const quien = v.jugadores.find((j) => j.id === v.pausa.jugadorId)?.nombre ?? 'Un jugador';
+  if (v.pausa.jugadorId === v.yo?.id) {
+    const fila = v.yo.carton.filter((c) => c.fila === v.pausa.fila);
+    return (
+      <div className="rg-modal-fondo">
+        <div className="rg-modal bbp-modal bbp-modal-linea">
+          <div className="bbp-modal-icono">📣</div>
+          <h3>¿Cantar línea?</h3>
+          <div className="bbp-modal-fila">{fila.map((c) => <span key={c.id}>✓ {c.nombre}</span>)}</div>
+          <p className="hint">Sumarás <strong>{AJUSTES.puntosLinea} puntos</strong> y esa fila se cambiará por <strong>3 categorías nuevas</strong> que tendrás que volver a rellenar para cantar bingo. Solo se puede cantar una línea por bingo.</p>
+          <p className="bbp-modal-tiempo">El bingo está en pausa para todos · {Math.ceil(s)} s</p>
+          <div className="bbp-dos">
+            <button type="button" className="bbp-boton secundario" onClick={() => enviar('decidir', { cantar: false })}>No, seguir</button>
+            <button type="button" className="bbp-boton" onClick={() => enviar('decidir', { cantar: true })}>¡Sí, cantar!</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className="bbp-tarjeta bbp-centro bbp-pausa">
+      <span className="bbp-carga" aria-hidden="true">⏸️</span>
+      <p className="bbp-texto"><strong>{quien}</strong> tiene línea y está decidiendo si la canta.</p>
+      <p className="bbp-pista">El bingo está en pausa para todos ({Math.ceil(s)} s).</p>
+    </div>
+  );
+}
+
 export function PantallaJuego({ v, enviar, onSalir, offset = 0, admin = null }) {
   const [aviso, setAviso] = useState(null);
   const u = v.yo?.ultimo;
@@ -134,21 +194,27 @@ export function PantallaJuego({ v, enviar, onSalir, offset = 0, admin = null }) 
     const t = setTimeout(() => setAviso(null), 3200);
     return () => clearTimeout(t);
   }, [u?.n]); // eslint-disable-line react-hooks/exhaustive-deps
+  const pausa = v.fase === 'linea';
   const puede = v.fase === 'jugando' && !v.yo.bloqueado && !v.yo.actuado;
-  const estado = v.yo.bloqueado ? '❌ Has fallado: espera al siguiente futbolista'
-    : v.yo.actuado ? '✅ Ya has marcado con este futbolista'
-      : 'Toca la casilla en la que encaja (si encaja en alguna)';
+  const puedeLinea = v.fase === 'jugando' && !v.lineaCantada;
+  const estado = pausa ? '⏸️ Bingo en pausa'
+    : v.yo.bloqueado ? '❌ Has fallado: espera al siguiente futbolista'
+      : v.yo.actuado ? '✅ Ya has marcado con este futbolista'
+        : 'Toca la casilla en la que encaja (si encaja en alguna)';
   return (
     <>
-      <Hero v={v} onSalir={onSalir} etiqueta={v.titulo} titulo="¿Dónde encaja?" />
-      {v.futbolista && <Cromo futbolista={v.futbolista} hasta={v.hasta} offset={offset} />}
-      {aviso && <div className={`bbp-aviso ${aviso.ok ? 'bien' : 'mal'}`}>{aviso.texto}</div>}
+      <Hero v={v} onSalir={onSalir} etiqueta={v.titulo} titulo={pausa ? '¡Alguien tiene línea!' : '¿Dónde encaja?'} />
+      {v.futbolista && <Cromo futbolista={v.futbolista} hasta={v.hasta} offset={offset} pausadoEn={v.pausadoEn} />}
+      <AvisoLinea v={v} />
+      {pausa && <PausaLinea v={v} offset={offset} enviar={enviar} />}
+      {aviso && !pausa && <div className={`bbp-aviso ${aviso.ok ? 'bien' : 'mal'}`}>{aviso.texto}</div>}
       <p className={`bbp-estado${puede ? '' : ' parado'}`}>{estado}</p>
-      <Carton v={v} activo={puede} onMarcar={(c) => enviar('marcar', { casillaId: c.id })} />
+      <Carton v={v} activo={puede} onMarcar={(c) => enviar('marcar', { casillaId: c.id })}
+        onLinea={puedeLinea ? (f) => enviar('linea', { fila: f }) : null} />
       {admin?.esAdmin && (
         <div className="bbp-barra estatica">
           <div className="bbp-dos">
-            <button type="button" className="bbp-enlace" onClick={() => enviar('saltar')}><Icon name="forward" size={15} /> Siguiente futbolista</button>
+            <button type="button" className="bbp-enlace" onClick={() => enviar('saltar')}><Icon name="forward" size={15} /> {pausa ? 'Seguir sin la línea' : 'Siguiente futbolista'}</button>
             <button type="button" className="bbp-enlace" onClick={() => enviar('terminar')}><Icon name="flagFinish" size={15} /> Terminar</button>
           </div>
         </div>
@@ -296,7 +362,9 @@ export function Ayuda({ onCerrar, titulo, descripcion }) {
             <li>Cada jugador recibe un cartón con {AJUSTES.filas * AJUSTES.columnas} categorías ({AJUSTES.filas} filas de {AJUSTES.columnas}).</li>
             <li>Cada {AJUSTES.segFutbolista} segundos sale un futbolista. Si encaja en una casilla abierta de tu cartón, tócala (una por futbolista).</li>
             <li>Acertar suma <strong>{AJUSTES.puntosAcierto}</strong>. Fallar resta <strong>{AJUSTES.puntosFallo}</strong> y te deja sin marcar hasta el siguiente futbolista.</li>
-            <li>Cada fila completa es una <strong>línea</strong> (+{AJUSTES.puntosLinea}). Quien completa el cartón canta <strong>bingo</strong> (+{AJUSTES.puntosBingo}) y termina la partida.</li>
+            <li>Con una fila completa aparece el botón <strong>«Cantar línea»</strong>. El bingo se para mientras decides: si la cantas sumas <strong>{AJUSTES.puntosLinea}</strong> y esa fila cambia por 3 categorías nuevas; si no, todo sigue igual. Solo hay <strong>una línea por bingo</strong>: la primera que se cante.</li>
+            <li>Quien completa el cartón canta <strong>bingo</strong> (+{AJUSTES.puntosBingo}) y termina la partida.</li>
+            <li>Los futbolistas salen al azar, pero salen más los que encajan en más casillas abiertas y los que hace más que no salen; los que no sirven a nadie ya no salen.</li>
           </ul>
         </div>
         <button type="button" className="big full qq-btn-principal" onClick={onCerrar}>¡Entendido!</button>
