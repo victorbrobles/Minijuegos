@@ -592,12 +592,17 @@ export default function PistasLocal({ onVolver, onExit }) {
             <div className="ptp-barra">
               <button
                 type="button"
-                className="ptp-pulsador-rojo"
+                className="ptp-pulsador"
                 onClick={handlePulsarBotonRojo}
                 disabled={jugadoresDisponibles.length === 0}
               >
-                <span className="ptp-pulsador-circulo">🔴</span>
-                <span>¡PULSAR PARA RESPONDER!</span>
+                <span className="ptp-pulsador-base" aria-hidden="true">
+                  <span className="ptp-pulsador-cupula" />
+                </span>
+                <span className="ptp-pulsador-texto">
+                  <strong>¡Lo sé!</strong>
+                  <small>{jugadoresDisponibles.length === 0 ? 'Ya no queda nadie por responder' : 'Pulsa para responder: el reloj se para'}</small>
+                </span>
               </button>
 
               {pistasReveladas === MAX_PISTAS && (

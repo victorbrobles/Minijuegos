@@ -244,7 +244,7 @@ export default function DescarteOnline({ onVolver, onSalir, onAbrirAyuda }) {
               </div>
             </PantallaTablero>
           ) : v.fase !== 'fin' ? (
-            <PantallaJuego v={v} enviar={enviar} offset={offset} onSalir={() => setModal('partida')} admin={{ esAdmin: sala.esAdmin, onForzar: () => llamar('forzar'), desconectados: sala.jugadores.filter((j) => !j.conectado).map((j) => j.id) }} />
+            <PantallaJuego v={v} enviar={enviar} offset={offset} onSalir={() => setModal('partida')} admin={{ esAdmin: sala.esAdmin, juezId: sala.juezId, onForzar: () => llamar('forzar'), desconectados: sala.jugadores.filter((j) => !j.conectado).map((j) => j.id) }} />
           ) : (
             <PantallaFin v={v} onSalir={() => setModal('partida')}>
               <div className="dsp-barra estatica">

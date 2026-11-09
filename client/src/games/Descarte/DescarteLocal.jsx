@@ -1,6 +1,6 @@
 // client/src/games/Descarte/DescarteLocal.jsx
-// Modo «un único dispositivo»: el móvil queda en la mesa. El retador elige rival y categoría, el rival dice la
-// palabra en voz alta y el grupo toca su letra en el tablero (o marca fallo). El motor es el mismo que el online.
+// Modo «un único dispositivo»: el móvil pasa del retador (elige rival y categoría) al retado, que ve su categoría,
+// dice la palabra en voz alta y marca acierto (tocando la letra), fallo o pasar turno. Mismo motor que el online.
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import * as E from './engine.js';
@@ -11,8 +11,9 @@ import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx'
 import './Descarte.css';
 
 const ACCIONES = {
-  retar: (est, d) => E.retar(est, est.retadorId, d, Date.now()),
-  marcar: (est, d) => E.marcar(est, d.letra ?? null),
+  retar: (est, d) => E.retar(est, est.retadorId, d),
+  empezar: (est) => E.empezar(est, est.rivalId, Date.now()),
+  marcar: (est, d) => E.marcar(est, d.letra ?? null, Boolean(d.pasa)),
   'siguiente-tablero': (est) => E.siguienteTablero(est),
   terminar: (est) => E.terminar(est)
 };

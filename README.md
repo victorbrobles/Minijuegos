@@ -109,12 +109,13 @@ npm run dev
 - Elementos en `server/data/seeds/colores/parteN.js` (`{ id, item, colores: [...] }`, con los colores de la paleta: rojo, azul, amarillo, verde, naranja, morado, marron, blanco, negro, gris, rosa). `parte6.js` es la ampliación.
 
 ## Minijuego: ¡Descarta y Elimina! (`Descarte/`)
-- De 3 a 12 jugadores, online o en un único dispositivo; partidas de 3, 5 o 7 tableros con las 27 letras (1, 2 o 3 puntos según lo difícil que sea la letra).
-- El retador elige rival (alguien que no haya jugado en esta vuelta) y una de tres categorías. El rival tiene 30 s para dar una palabra que empiece por una letra que siga en el tablero: si vale, la letra se elimina y suma sus puntos; después el rival pasa a retar. El tablero acaba sin letras o cuando todos fallan seguidos.
-- Online la palabra se escribe y los demás votan 12 s (mayoría para rechazar; si nadie protesta, vale; el anfitrión puede arbitrar). En un dispositivo se dice en voz alta y el grupo toca la letra.
+- De 3 a 12 jugadores, online o en un único dispositivo; partidas de 3, 5 o 7 tableros con 26 letras (sin Ñ; 1, 2 o 3 puntos según lo difícil que sea la letra).
+- Turno del retador → «listo» → elige rival (alguien que no haya jugado en esta vuelta) y una de tres categorías → turno del retado → «listo» → ve la categoría y tiene 30 s para decir una palabra que empiece por una letra del tablero: acierto (la letra se elimina y suma), fallo o pasar turno (cuenta como fallo). El tablero acaba sin letras o cuando todos fallan seguidos.
+- Online el retado toca la letra de su palabra y el anfitrión decide si es correcta (si el retado es el anfitrión, decide el retador).
 - Motor en `server/descarte/engine.js` con copia en el cliente (`npm run sync:descarte`). Prueba: `node server/scripts/descarte-sim.mjs`.
 
 ## Minijuego: 6 Pistas (`Pistas/`)
+- Colores grises del juego (antes salían morados) y pulsador rediseñado en el modo un dispositivo.
 - Online: ids de jugador únicos aunque alguien salga, nombre obligatorio, solo el anfitrión revela la solución, sala de espera común (quitar jugadores, estado de conexión) y reconexión si falla la red.
 
 ## Minijuego: El Golpe (`Golpe/`)

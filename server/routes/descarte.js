@@ -101,6 +101,7 @@ router.get('/online/sala/:code', (req, res) => {
   if (sala.estado === 'jugando' && sala.partida) {
     if (!sala.partida.jugadores.some((j) => j.id === jugador.id)) return res.status(403).json({ error: 'Ya no estás en la partida.' });
     base.vista = E.vistaDe(sala.partida, jugador.id);
+    base.juezId = juezDe(sala);
   }
   res.json(base);
 });
@@ -142,7 +143,14 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
 });
 
 // ---------------------------------------------------------------- Acciones
-// tipo: retar | proponer | votar | arbitrar | rendirse | siguiente-tablero | terminar
+// tipo: retar | empezar | letra | validar | pasar | siguiente-tablero | terminar
+// Valida el anfitrión; si el anfitrión es quien responde, valida el retador.
+const juezDe = (sala) => {
+  const p = sala.partida;
+  const admin = sala.jugadores.find((j) => j.token === sala.adminToken)?.id;
+  return admin === p?.rivalId ? p?.retadorId : admin;
+};
+
 router.post('/online/sala/:code/accion', (req, res) => {
   const c = sala_y_jugador(req, res);
   if (!c) return;
@@ -153,11 +161,11 @@ router.post('/online/sala/:code/accion', (req, res) => {
   const soloAdmin = { ok: false, error: 'Solo el anfitrión puede hacerlo.' };
   let r;
   switch (d.tipo) {
-    case 'retar': r = E.retar(p, id, { rivalId: Number(d.rivalId), categoria: String(d.categoria || '') }, ahora); break;
-    case 'proponer': r = E.proponer(p, id, String(d.palabra || ''), ahora); break;
-    case 'votar': r = E.votar(p, id, Boolean(d.valida)); break;
-    case 'arbitrar': r = esAdmin ? E.arbitrar(p, Boolean(d.valida)) : soloAdmin; break;
-    case 'rendirse': r = E.rendirse(p, id); break;
+    case 'retar': r = E.retar(p, id, { rivalId: Number(d.rivalId), categoria: String(d.categoria || '') }); break;
+    case 'empezar': r = E.empezar(p, id, ahora); break;
+    case 'letra': r = E.elegirLetra(p, id, String(d.letra || '')); break;
+    case 'validar': r = juezDe(sala) === id ? E.validar(p, Boolean(d.valida)) : { ok: false, error: 'Solo el anfitrión valida las respuestas.' }; break;
+    case 'pasar': r = E.pasar(p, id); break;
     case 'siguiente-tablero': r = esAdmin ? E.siguienteTablero(p) : soloAdmin; break;
     case 'terminar': r = esAdmin ? E.terminar(p) : soloAdmin; break;
     default: return res.status(400).json({ error: 'Acción desconocida.' });
@@ -172,7 +180,7 @@ router.post('/online/sala/:code/forzar', (req, res) => {
   if (!c) return;
   if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión.' });
   if (c.sala.estado !== 'jugando' || !c.sala.partida) return res.status(400).json({ error: 'No hay partida en marcha.' });
-  E.forzar(c.sala.partida, Date.now());
+  E.forzar(c.sala.partida);
   revisar(c.sala);
   res.json({ success: true });
 });
