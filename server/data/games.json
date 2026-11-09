@@ -156,6 +156,12 @@
     "isNew": true
   },
   {
+    "id": "golpe",
+    "name": "El Golpe",
+    "description": "Toda la banda participa en el mismo golpe, pero cada uno conoce solo parte de la información y tiene un objetivo secreto… y no todos quieren que salga bien. Propón un plan, convence a los demás, detecta faroles y descubre al traidor.",
+    "isNew": true
+  },
+  {
     "id": "unoadiez",
     "name": "Del 1 al 10...",
     "description": "Adivina el número secreto del 1 al 10. Para ello tus compañeros opinarán sobre ciertas categorías dando ejemplos basados en ese número secreto. Guíate por tu intuición y los gustos de tus amigos, y acierta el número.",

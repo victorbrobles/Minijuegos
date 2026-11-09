@@ -108,6 +108,13 @@ npm run dev
 - Partidas de 10, 15 o 25 rondas y 45 s por respuesta. Online, el servidor cierra la ronda al acabar el tiempo y acepta selecciones incompletas.
 - Elementos en `server/data/seeds/colores/parteN.js` (`{ id, item, colores: [...] }`, con los colores de la paleta: rojo, azul, amarillo, verde, naranja, morado, marron, blanco, negro, gris, rosa). `parte6.js` es la ampliación.
 
+## Minijuego: El Golpe (`Golpe/`)
+- Solo online, de 3 a 8 jugadores, 3 o 5 misiones (museo, banco, prisión y central eléctrica). Cada misión tiene 3 pasos con 4 opciones; en secreto cada opción es segura, peligrosa (funciona, pero arriesgada) o imposible (el plan fracasa).
+- Fases: encargo (pistas privadas y objetivo secreto) → plan (una opción por paso) → debate con chat → votación del mejor plan (no el tuyo) y acusación del traidor → resolución (se ejecuta el más votado y se revela todo).
+- Objetivos secretos: traidor (uno por misión), ambicioso, oportunista, manipulador e infiltrado.
+- Puntos: +3 plan viable, +2 si alguien vota tu plan, +3 objetivo cumplido, +2 por acertar al traidor, +2 al traidor que sabotea sin que la mitad de los demás le acuse.
+- Motor en `server/golpe/engine.js` (copia en el cliente con `npm run sync:golpe`). Pruebas: `node server/scripts/golpe-sim.mjs` y `node server/scripts/golpe-e2e.mjs [jugadores]`. Portada provisional.
+
 ## Minijuego: Lleva la cuenta (`Cuentas/`)
 - Solo online, de 2 a 8 jugadores. Cada uno recibe unos números del 1 al 100 (secretos) y hay que colocarlos en orden ascendente sin hablar. Gana quien se queda antes sin números (puntos de sala 3/2/1).
 - Turno: soltar un número, usar una carta de acción al azar (3 por jugador en toda la partida) o pasar. Soltar uno que no toca: −1 vida (el número vuelve a la mano). Pasar o usar una acción dos turnos seguidos teniendo el número que tocaba: −1 vida. Con 2 vidas perdidas quedas eliminado.

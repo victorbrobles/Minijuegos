@@ -24,6 +24,7 @@ import Ciegas from './Ciegas/Ciegas.jsx';
 import Traiciones from './Traiciones/Traiciones.jsx';
 import Coleccion from './Coleccion/Coleccion.jsx';
 import SumaCero from './SumaCero/SumaCero.jsx';
+import Golpe from './Golpe/Golpe.jsx';
 import UnoADiez from './UnoADiez/UnoADiez.jsx';
 import Fundadores from './Fundadores/Fundadores.jsx';
 import Telepatia from './Telepatia/Telepatia.jsx';
@@ -90,6 +91,7 @@ const registry = {
   'bingoball': Bingoball,
   'cuentas': Cuentas,
   'sumacero': SumaCero,
+  'golpe': Golpe,
   'conoce': Conoce,
   'logos': Logos,
   'hipotesis': Hipotesis,

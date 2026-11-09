@@ -59,6 +59,15 @@ export const META = {
     descripcion: 'Cada uno tiene un encargo secreto: la colección que debe reunir antes que nadie. Puede que otro vaya a por la misma sin que lo sepas. Roba, bombardea, espía, cambia encargos y arriésgate con las cartas de acción.',
     categorias: ['estrategia']
   },
+  'golpe': {
+    titulo: 'El Golpe',
+    imagen: '/covers/golpe.webp',
+    icono: 'lock',
+    colores: ['#fbbf24', '#1c1917'],
+    etiquetas: 'golpe atraco robo plan traidor objetivos secretos debate votar engano online',
+    descripcion: 'Toda la banda participa en el mismo golpe, pero cada uno conoce solo parte de la información y tiene un objetivo secreto… y no todos quieren que salga bien. Propón un plan, convence a los demás, detecta faroles y descubre al traidor.',
+    categorias: ['estrategia']
+  },
   'sumacero': {
     titulo: 'Suma Cero',
     imagen: '/covers/sumacero.webp',
