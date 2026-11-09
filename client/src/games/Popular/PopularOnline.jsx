@@ -1,32 +1,54 @@
 // client/src/games/Popular/PopularOnline.jsx
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import './Popular.css';
-import { MenuInicioJuego, MenuModoOnline, FormCrearSala, FormUnirseSala, CabeceraSala, EsperandoAnfitrion } from '../../components/MenuJuego.jsx';
+import {
+  Aviso,
+  Cabecera,
+  Avatar,
+  OrdenTurnos,
+  BotonPrincipal,
+  EnlaceSecundario,
+  PUNTOS_POR_PUESTO,
+  colorJugador,
+  indiceColor
+} from './PopularLocal.jsx';
 
 const CLAVE_SESION_POPULAR = 'popular_online_session';
 const TIEMPO_TURNO = 45;
 
-const PUNTOS_POR_PUESTO = {
-  1: 2,
-  2: 4,
-  3: 6,
-  4: 8,
-  5: 10
-};
+function BotonVolver({ onClick, texto = 'Volver' }) {
+  return (
+    <button type="button" className="qq-link-volver" onClick={onClick}>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M19 12H5M12 19l-7-7 7-7" />
+      </svg>
+      <span>{texto}</span>
+    </button>
+  );
+}
 
-const COLORES_JUGADOR = ['#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316', '#84cc16', '#6366f1'];
-const colorJugador = (id) => COLORES_JUGADOR[(Number(id) - 1 + COLORES_JUGADOR.length * 10) % COLORES_JUGADOR.length];
-const inicial = (n = '?') => n.trim().charAt(0).toUpperCase() || '?';
-
-export default function PopularOnline({ onLocal, onSalir }) {
+export default function PopularOnline({
+  tituloJuego = 'Sigue la moda',
+  descripcionJuego,
+  onLocal,
+  onSalir,
+  onAbrirAyuda
+}) {
+  const navigate = useNavigate();
   const [vista, setVista] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
   const [nombre, setNombre] = useState('');
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
-  const [modalSalir, setModalSalir] = useState(false);
-  const [modalAyuda, setModalAyuda] = useState(false);
+
+  const [modalSalirLobby, setModalSalirLobby] = useState(false);
+  const [modalSalirPortada, setModalSalirPortada] = useState(false);
+  const [codigoCopiado, setCodigoCopiado] = useState(false);
+
+  // Sub-paso en la fase de resolución online: 1 (Soluciones del Top 5), 2 (Clasificación general)
+  const [pasoResolucionOnline, setPasoResolucionOnline] = useState(1);
 
   const [sesion, setSesion] = useState(() => {
     try {
@@ -40,6 +62,10 @@ export default function PopularOnline({ onLocal, onSalir }) {
   const [inputTexto, setInputTexto] = useState('');
   const [tiempoRestante, setTiempoRestante] = useState(TIEMPO_TURNO);
 
+  const [eventoAviso, setEventoAviso] = useState(null);
+  const avisoSeqRef = useRef(0);
+  const ultimoFeedbackMsgRef = useRef('');
+
   const intervalRef = useRef(null);
   const timerRef = useRef(null);
 
@@ -47,7 +73,7 @@ export default function PopularOnline({ onLocal, onSalir }) {
     if (!sesion) {
       if (intervalRef.current) clearInterval(intervalRef.current);
       setSala(null);
-      return;
+      return undefined;
     }
 
     const consultarEstado = () => {
@@ -67,7 +93,7 @@ export default function PopularOnline({ onLocal, onSalir }) {
           setSesion(null);
           setSala(null);
           setVista('online_menu');
-          setErrorMsg('La sala se ha cerrado.');
+          setErrorMsg('La sala se ha cerrado o se ha perdido la conexión.');
         });
     };
 
@@ -79,9 +105,59 @@ export default function PopularOnline({ onLocal, onSalir }) {
     };
   }, [sesion]);
 
+  const ronda = sala?.ronda;
+  const esAdmin = Boolean(sala?.esAdmin);
+  const yoId = sala?.yoId;
+  const esMiTurno = ronda?.jugadorActivoId === yoId;
+  const misPistas = ronda?.misPistas || {};
+
+  // Siempre que entra en resolución de ronda, empieza mostrando primero las 5 respuestas (paso 1)
+  useEffect(() => {
+    if (ronda?.faseRonda === 'resolucion') {
+      setPasoResolucionOnline(1);
+    }
+  }, [ronda?.faseRonda, sala?.rondaNum]);
+
+  const redirigirAPortada = () => {
+    if (typeof onSalir === 'function') {
+      onSalir();
+    } else {
+      try {
+        navigate('/');
+      } catch {
+        window.location.href = '/';
+      }
+    }
+  };
+
+  const handleCerrarSalaYSalirAPortada = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    sessionStorage.removeItem(CLAVE_SESION_POPULAR);
+    setSesion(null);
+    setSala(null);
+    setModalSalirPortada(false);
+    redirigirAPortada();
+  };
+
+  const handleVolverMenuOnline = () => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+    sessionStorage.removeItem(CLAVE_SESION_POPULAR);
+    setSesion(null);
+    setSala(null);
+    setModalSalirLobby(false);
+    setVista('online_menu');
+  };
+
   const handleCrear = async () => {
     if (!nombre.trim()) return;
     setCargando(true);
+    setErrorMsg('');
     try {
       const res = await fetch('/api/popular/online/crear', {
         method: 'POST',
@@ -104,6 +180,7 @@ export default function PopularOnline({ onLocal, onSalir }) {
   const handleUnirse = async () => {
     if (!nombre.trim() || !codigoInput.trim()) return;
     setCargando(true);
+    setErrorMsg('');
     try {
       const res = await fetch('/api/popular/online/unirse', {
         method: 'POST',
@@ -173,18 +250,25 @@ export default function PopularOnline({ onLocal, onSalir }) {
     handlePasarTurnoRef.current = handlePasarTurno;
   });
 
-  const ronda = sala?.ronda;
-  const esAdmin = sala?.esAdmin;
-  const yoId = sala?.yoId;
-  const esMiTurno = ronda?.jugadorActivoId === yoId;
-  const misPistas = ronda?.misPistas || {};
+  useEffect(() => {
+    const fb = ronda?.feedback;
+    if (!fb || !fb.msg) return;
+    if (fb.msg === ultimoFeedbackMsgRef.current) return;
+    ultimoFeedbackMsgRef.current = fb.msg;
 
-  // Temporizador sincronizado durante el turno
+    avisoSeqRef.current += 1;
+    setEventoAviso({
+      n: avisoSeqRef.current,
+      tipo: fb.tipo === 'acierto' ? 'acierto' : 'fallo',
+      texto: fb.msg
+    });
+  }, [ronda?.feedback]);
+
   useEffect(() => {
     const isJugando = sala?.estado === 'jugando' && ronda?.faseRonda === 'jugando';
     if (!isJugando || ronda?.feedback !== null) {
       if (timerRef.current) clearInterval(timerRef.current);
-      return;
+      return undefined;
     }
 
     setTiempoRestante(TIEMPO_TURNO);
@@ -208,7 +292,6 @@ export default function PopularOnline({ onLocal, onSalir }) {
     };
   }, [sala?.estado, ronda?.faseRonda, ronda?.jugadorActivoId, esMiTurno, ronda?.feedback]);
 
-  // Pide directamente desde la fila del puesto la siguiente pista disponible
   const handlePedirPistaPuesto = async (puesto) => {
     if (!esMiTurno || ronda?.feedback !== null) return;
     const actual = misPistas[puesto] || {};
@@ -264,455 +347,760 @@ export default function PopularOnline({ onLocal, onSalir }) {
     }
   };
 
-  const handleSalir = () => {
-    sessionStorage.removeItem(CLAVE_SESION_POPULAR);
-    setSesion(null);
-    setSala(null);
-    setVista('online_menu');
+  const copiarCodigo = () => {
+    if (!sala?.code) return;
+    navigator.clipboard?.writeText(sala.code);
+    setCodigoCopiado(true);
+    setTimeout(() => setCodigoCopiado(false), 2000);
   };
 
   const ranking = sala?.jugadores ? [...sala.jugadores].sort((a, b) => b.puntos - a.puntos) : [];
   const maximo = ranking.length ? ranking[0].puntos : 0;
   const ganadores = maximo > 0 ? ranking.filter((j) => j.puntos === maximo) : [];
+
+  const totalDescubiertos = Object.keys(ronda?.acertados || {}).length;
   const enPartidaActiva = vista === 'sala' && sala && sala.estado !== 'lobby';
-
-  const cabeceraOnline = sala && ronda && (
-    <header className="popp-hero">
-      <span className="popp-hero-deco" aria-hidden="true">
-        <Icon name="trophy" size={140} strokeWidth={1.3} />
-      </span>
-      <div className="popp-hero-top">
-        <button type="button" className="popp-salir" onClick={() => setModalSalir(true)}>
-          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M19 12H5M12 19l-7-7 7-7" />
-          </svg>
-          <span>Portada</span>
-        </button>
-        <div className="popp-hero-chips">
-          <span className="popp-chip"><Icon name="flagFinish" size={14} /> Ronda {sala.rondaNum}/{sala.maxRondas}</span>
-          <span className="popp-chip">{Object.keys(ronda.acertados || {}).length} / 5 descubiertos</span>
-        </div>
-      </div>
-
-      <ol className="popp-marcador" aria-label="Jugadores">
-        {sala.jugadores.map((j) => {
-          const activo = j.id === ronda.jugadorActivoId && ronda.faseRonda === 'jugando';
-          return (
-            <li
-              key={j.id}
-              className={`popp-jugador${activo ? ' activo' : ''}`}
-              style={{ '--c': colorJugador(j.id) }}
-            >
-              <span className="popp-jugador-avatar">{inicial(j.nombre)}</span>
-              <span className="popp-jugador-datos">
-                <span className="popp-jugador-nombre">
-                  {j.nombre}{j.id === yoId ? ' (tú)' : ''}
-                </span>
-                <strong className="popp-jugador-pts">{j.puntos} pts</strong>
-              </span>
-            </li>
-          );
-        })}
-      </ol>
-    </header>
-  );
 
   return (
     <div className={`pop-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
-      {/* MODAL DE AYUDA */}
-      {modalAyuda && (
-        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
-          <div className="rg-modal popp-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-            <div className="popp-modal-ayuda-header">
-              <span className="popp-ayuda-badge">❓ Cómo jugar</span>
-              <h3>Sigue la moda</h3>
-            </div>
+      <Aviso evento={eventoAviso} />
 
-            <div className="popp-modal-ayuda-body">
-              <p>Adivina <strong>las 5 respuestas más populares</strong> de cada categoría propuesta.</p>
-              <ul>
-                <li><strong>Por turnos (45 s):</strong> Cuando sea tu turno, escribe una respuesta o palabra clave para cualquiera de los 5 puestos.</li>
-                <li><strong>Pistas en cada fila (-1 pt):</strong> Pulsa el botón <strong>💡 Pista</strong> a la derecha del puesto que quieras desbloquear.</li>
-                <li><strong>Puntuación:</strong> Top #1 (+2 pts), Top #2 (+4 pts), Top #3 (+6 pts), Top #4 (+8 pts) y Top #5 (+10 pts).</li>
-              </ul>
-            </div>
-
-            <button type="button" className="popp-boton" onClick={() => setModalAyuda(false)}>
-              ¡Entendido!
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* 1. MENÚ ONLINE */}
+      {/* 1. MENÚ PRINCIPAL */}
       {vista === 'menu' && (
-        <MenuInicioJuego
-          juegoId="popular"
-          onOnline={() => { setVista('online_menu'); setErrorMsg(''); }}
-          onLocal={onLocal}
-          onAyuda={() => setModalAyuda(true)}
-          error={errorMsg}
-        />
+        <section className="game">
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top solo-derecha">
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
+
+            <div className="qq-hero-icono">
+              <Icon name="trophy" size={44} strokeWidth={1.7} />
+            </div>
+            <h1 className="title qq-main-title">{tituloJuego}</h1>
+            <p className="hint qq-main-desc">{descripcionJuego}</p>
+
+            {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
+
+            <div className="qq-menu-opciones">
+              <button
+                type="button"
+                className="qq-opcion-card principal"
+                onClick={() => {
+                  setVista('online_menu');
+                  setErrorMsg('');
+                }}
+              >
+                <span className="qq-opcion-icono">
+                  <Icon name="globe" size={26} />
+                </span>
+                <div className="qq-opcion-textos">
+                  <strong>Jugar online</strong>
+                  <span>Cada jugador desde su propio móvil con código de sala</span>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                className="qq-opcion-card secundaria"
+                onClick={onLocal}
+              >
+                <span className="qq-opcion-icono">
+                  <Icon name="users" size={26} />
+                </span>
+                <div className="qq-opcion-textos">
+                  <strong>Jugar en un único dispositivo</strong>
+                  <span>Pasando el móvil por turnos entre los jugadores</span>
+                </div>
+              </button>
+            </div>
+          </div>
+        </section>
       )}
 
+      {/* 1B. SUBMENÚ ONLINE */}
       {vista === 'online_menu' && (
-        <MenuModoOnline
-          onVolver={() => { setVista('menu'); setErrorMsg(''); }}
-          onCrear={() => { setVista('crear'); setErrorMsg(''); }}
-          onUnirse={() => { setVista('unirse'); setErrorMsg(''); }}
-          onAyuda={() => setModalAyuda(true)}
-          error={errorMsg}
-        />
+        <section className="game">
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver
+                onClick={() => {
+                  setVista('menu');
+                  setErrorMsg('');
+                }}
+              />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
+
+            <div className="qq-hero-icono">
+              <Icon name="globe" size={40} strokeWidth={1.7} />
+            </div>
+            <h2 className="title qq-main-title">Modo Online</h2>
+            <p className="hint qq-main-desc">
+              Crea una sala nueva para compartir el código con tus amigos o únete a una ya creada.
+            </p>
+
+            {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
+
+            <div className="qq-menu-opciones">
+              <button
+                type="button"
+                className="qq-opcion-card principal"
+                onClick={() => {
+                  setVista('crear');
+                  setErrorMsg('');
+                }}
+              >
+                <span className="qq-opcion-icono">
+                  <Icon name="crown" size={26} />
+                </span>
+                <div className="qq-opcion-textos">
+                  <strong>Crear partida</strong>
+                  <span>Sé el anfitrión y genera un código para tu grupo</span>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                className="qq-opcion-card secundaria"
+                onClick={() => {
+                  setVista('unirse');
+                  setErrorMsg('');
+                }}
+              >
+                <span className="qq-opcion-icono">
+                  <Icon name="users" size={26} />
+                </span>
+                <div className="qq-opcion-textos">
+                  <strong>Unirse con código</strong>
+                  <span>Introduce el código de 4 letras de tu anfitrión</span>
+                </div>
+              </button>
+            </div>
+          </div>
+        </section>
       )}
 
       {/* 2. CREAR SALA */}
       {vista === 'crear' && (
-        <FormCrearSala
-          onVolver={() => { setVista('online_menu'); setErrorMsg(''); }}
-          onAyuda={() => setModalAyuda(true)}
-          nombre={nombre}
-          setNombre={setNombre}
-          onCrear={handleCrear}
-          cargando={cargando}
-          error={errorMsg}
-        />
+        <section className="game">
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver
+                onClick={() => {
+                  setVista('online_menu');
+                  setErrorMsg('');
+                }}
+              />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
+
+            <div className="qq-hero-icono">
+              <Icon name="crown" size={40} strokeWidth={1.6} />
+            </div>
+            <h2 className="title qq-main-title">Crear partida</h2>
+            <p className="hint qq-main-desc">
+              Introduce tu nombre para abrir la sala y ser el anfitrión.
+            </p>
+
+            <div className="lb-form qq-form-estilizado">
+              <label className="field-label" htmlFor="pop-host-nombre">Tu nombre</label>
+              <input
+                id="pop-host-nombre"
+                className="qq-input-moderno"
+                type="text"
+                placeholder="Ej. Alex"
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value)}
+                maxLength={20}
+                autoFocus
+              />
+              {errorMsg && <p className="error">{errorMsg}</p>}
+
+              <button
+                type="button"
+                className="big full qq-btn-principal"
+                disabled={cargando || !nombre.trim()}
+                onClick={handleCrear}
+              >
+                <Icon name="check" size={22} strokeWidth={2.5} /> Crear sala
+              </button>
+            </div>
+          </div>
+        </section>
       )}
 
       {/* 3. UNIRSE A SALA */}
       {vista === 'unirse' && (
-        <FormUnirseSala
-          onVolver={() => { setVista('online_menu'); setErrorMsg(''); }}
-          onAyuda={() => setModalAyuda(true)}
-          codigo={codigoInput}
-          setCodigo={setCodigoInput}
-          nombre={nombre}
-          setNombre={setNombre}
-          onUnirse={handleUnirse}
-          cargando={cargando}
-          error={errorMsg}
-        />
+        <section className="game">
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver
+                onClick={() => {
+                  setVista('online_menu');
+                  setErrorMsg('');
+                }}
+              />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
+
+            <div className="qq-hero-icono">
+              <Icon name="users" size={40} strokeWidth={1.6} />
+            </div>
+            <h2 className="title qq-main-title">Unirse a partida</h2>
+            <p className="hint qq-main-desc">
+              Introduce el código que te ha compartido el anfitrión y tu nombre.
+            </p>
+
+            <div className="lb-form qq-form-estilizado">
+              <label className="field-label" htmlFor="pop-code-input">Código de la partida</label>
+              <input
+                id="pop-code-input"
+                className="lb-input-codigo qq-input-moderno"
+                type="text"
+                placeholder="ABCD"
+                value={codigoInput}
+                onChange={(e) => setCodigoInput(e.target.value.toUpperCase())}
+                maxLength={4}
+                autoFocus
+              />
+
+              <label className="field-label" htmlFor="pop-guest-nombre" style={{ marginTop: '1rem' }}>
+                Tu nombre
+              </label>
+              <input
+                id="pop-guest-nombre"
+                className="qq-input-moderno"
+                type="text"
+                placeholder="Tu nombre"
+                value={nombre}
+                onChange={(e) => setNombre(e.target.value)}
+                maxLength={20}
+              />
+              {errorMsg && <p className="error">{errorMsg}</p>}
+
+              <button
+                type="button"
+                className="big full qq-btn-principal"
+                disabled={cargando || !nombre.trim() || codigoInput.trim().length < 4}
+                onClick={handleUnirse}
+              >
+                <Icon name="check" size={22} strokeWidth={2.5} /> Entrar en la partida
+              </button>
+            </div>
+          </div>
+        </section>
       )}
 
-      {/* 4. LOBBY */}
+      {/* 4. SALA DE ESPERA (LOBBY) */}
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
-        <section className="game qq-pantalla">
-          <CabeceraSala codigo={sala.code} onVolver={() => setModalSalir(true)} onAyuda={() => setModalAyuda(true)} />
+        <section className="game">
+          <div className="panel center qq-menu-panel">
+            <div className="qq-card-top">
+              <BotonVolver onClick={() => setModalSalirLobby(true)} />
+              <button
+                type="button"
+                className="qq-btn-ayuda"
+                onClick={onAbrirAyuda}
+                title="Cómo jugar"
+                aria-label="Cómo jugar"
+              >
+                ?
+              </button>
+            </div>
+
+            <span className="qq-badge-sala"><Icon name="lock" size={15} /> Sala de espera</span>
+            <p className="hint">Código de la partida</p>
+            <button
+              type="button"
+              className="qq-codigo-btn"
+              onClick={copiarCodigo}
+              title="Copiar código"
+            >
+              {sala.code}
+            </button>
+            <p className="hint small">
+              {codigoCopiado
+                ? '¡Copiado al portapapeles!'
+                : 'Pulsa el código para copiarlo y compártelo con los demás.'}
+            </p>
+          </div>
 
           <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
-            <h3 className="qq-sala-titulo"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length}/12)</h3>
+            <h3 className="qq-sala-titulo">
+              <Icon name="users" size={20} /> Jugadores ({sala.jugadores.length}/12)
+            </h3>
             <div className="lb-lista qq-sala-lista">
               {sala.jugadores.map((j) => (
                 <div key={j.id} className={`lb-jug ${j.id === yoId ? 'yo' : ''}`}>
-                  <span className="lb-jug-nombre">{j.nombre}{j.id === yoId ? ' (Tú)' : ''}{j.id === 1 ? ' 👑' : ''}</span>
+                  <span className="lb-jug-nombre">
+                    {j.nombre}{j.id === yoId ? ' (tú)' : ''}{j.id === 1 ? ' 👑' : ''}
+                  </span>
                 </div>
               ))}
             </div>
+            {sala.jugadores.length < 2 && (
+              <p className="hint" style={{ marginTop: '0.8rem' }}>
+                Se necesitan al menos 2 jugadores para empezar la partida.
+              </p>
+            )}
           </div>
 
           {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
 
           {esAdmin ? (
             <button
+              type="button"
               className="big full qq-btn-principal"
-              style={{ marginTop: '1.2rem' }}
+              style={{ marginTop: '1rem' }}
               disabled={sala.jugadores.length < 2}
               onClick={handleIniciarPartida}
             >
-              <Icon name="play" size={22} /> {sala.jugadores.length < 2 ? 'Esperando rivales (mínimo 2)...' : '¡Empezar Partida!'}
+              <Icon name="play" size={22} />
+              {sala.jugadores.length < 2 ? 'Esperando rivales (mínimo 2)...' : '¡Iniciar juego!'}
             </button>
           ) : (
-            <EsperandoAnfitrion />
+            <div className="panel center" style={{ padding: '1.8rem 1.4rem', marginTop: '1rem' }}>
+              <span className="lb-luna chica"><Icon name="hourglass" size={36} /></span>
+              <h3 style={{ margin: '0.4rem 0' }}>Esperando al anfitrión...</h3>
+              <p className="hint">
+                El anfitrión iniciará la partida cuando estéis todos listos.
+              </p>
+            </div>
           )}
         </section>
       )}
 
       {/* 5. JUGANDO ONLINE */}
       {vista === 'sala' && sala && sala.estado === 'jugando' && ronda && ronda.faseRonda === 'jugando' && (
-        <section className="game popp-escena">
-          {cabeceraOnline}
-
-          {/* Banner de quién tiene el turno */}
-          <div
-            className={`popp-turno-banner ${esMiTurno ? 'mio' : ''}`}
-            style={{ '--c': colorJugador(ronda.jugadorActivoId || 1) }}
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            categoria={{ nombre: 'Top 5 más popular', icono: 'trophy' }}
+            etiqueta={
+              esMiTurno
+                ? `Ronda ${sala.rondaNum} de ${sala.maxRondas} · ¡Es tu turno!`
+                : `Ronda ${sala.rondaNum} de ${sala.maxRondas} · Turno en curso`
+            }
+            titulo={esMiTurno ? '¡Te toca responder!' : `Turno de ${ronda.jugadorActivoNombre}`}
+            avatar={
+              <Avatar
+                nombre={ronda.jugadorActivoNombre}
+                color={colorJugador((ronda.jugadorActivoId ?? 1) - 1)}
+              />
+            }
           >
-            <span className="popp-jugador-avatar">{inicial(ronda.jugadorActivoNombre)}</span>
-            <div className="popp-turno-textos">
-              <span className="popp-etiqueta">{esMiTurno ? '¡Te toca a ti!' : 'Turno en curso'}</span>
-              <strong>
-                {esMiTurno
-                  ? 'Escribe una respuesta o pide pista en un puesto'
-                  : `${ronda.jugadorActivoNombre} está pensando una respuesta…`}
-              </strong>
-            </div>
-          </div>
+            <div className="qqp-identidad pop-consigna-box">
+              <div className="pop-consigna-top">
+                <span className="qqp-identidad-icono">
+                  <Icon name="trophy" size={16} strokeWidth={2.4} />
+                </span>
+                <span className="pop-consigna-texto">«{ronda.pregunta}»</span>
+              </div>
 
-          {/* Barra de tiempo */}
-          <div className={`popp-tiempo ${tiempoRestante <= 10 ? 'critico' : ''}`} role="timer">
-            <div className="popp-tiempo-barra">
-              <span style={{ width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%` }} />
-            </div>
-            <span className="popp-tiempo-num">
-              <Icon name="clock" size={15} /> {tiempoRestante}s
-            </span>
-          </div>
+              <div className="pop-hero-stats">
+                <span className="pop-hero-stat ok">✅ {totalDescubiertos}/5 descubiertos</span>
+                <span className={`pop-hero-stat timer${tiempoRestante <= 10 ? ' low' : ''}`}>
+                  <Icon name="clock" size={14} /> {tiempoRestante}s
+                </span>
+              </div>
 
-          {/* Tarjeta de la pregunta */}
-          <div className="popp-tarjeta popp-pregunta-box">
-            <span className="popp-badge-tema">Top 5 más popular</span>
-            <h2 className="popp-pregunta-titulo">«{ronda.pregunta}»</h2>
-          </div>
+              <div className="pop-timer-track" role="timer">
+                <div
+                  className={`pop-timer-fill${tiempoRestante <= 10 ? ' low' : ''}`}
+                  style={{ width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%` }}
+                />
+              </div>
+            </div>
+
+            <OrdenTurnos
+              jugadores={sala.jugadores}
+              activoId={ronda.jugadorActivoId}
+            />
+          </Cabecera>
 
           {ronda.feedback && (
-            <div className={`popp-feedback ${ronda.feedback.tipo}`} role="status">
+            <div className={`pop-feedback-banner ${ronda.feedback.tipo}`} role="status">
               {ronda.feedback.msg}
             </div>
           )}
 
-          {/* Los 5 puestos con botón de pista integrado en cada puesto */}
-          <div className="popp-slots-lista">
-            {[1, 2, 3, 4, 5].map((puesto) => {
-              const descubierto = ronda.acertados?.[puesto];
-              const pistaPuesto = misPistas[puesto];
-              const tieneLongitud = Boolean(pistaPuesto?.longitud);
-              const tieneLetras = Boolean(pistaPuesto?.letras);
-              const esqueletoVisible = pistaPuesto?.letras || pistaPuesto?.longitud;
+          <div className="qqp-tarjeta">
+            <p className="qqp-carta-cara-titulo" style={{ marginBottom: '0.7rem' }}>
+              <Icon name="eye" size={16} /> Respuestas más populares (Top 1 a 5)
+            </p>
 
-              return (
-                <div key={puesto} className={`popp-slot-card ${descubierto ? 'revelado' : ''}`}>
-                  <div className="popp-slot-main">
-                    <span className={`popp-puesto-num p-${puesto}`}>#{puesto}</span>
+            <div className="popp-slots-lista">
+              {[1, 2, 3, 4, 5].map((puesto) => {
+                const descubierto = ronda.acertados?.[puesto];
+                const pistaPuesto = misPistas[puesto];
+                const tieneLongitud = Boolean(pistaPuesto?.longitud);
+                const tieneLetras = Boolean(pistaPuesto?.letras);
+                const esqueletoVisible = pistaPuesto?.letras || pistaPuesto?.longitud;
 
-                    <div className="popp-slot-contenido">
-                      {descubierto ? (
-                        <>
-                          <span className="popp-slot-texto">{descubierto.texto}</span>
-                          <span className="popp-slot-autor">Acertado por {descubierto.jugador}</span>
-                        </>
-                      ) : esqueletoVisible ? (
-                        <div className="popp-ahorcado-wrap">
-                          {esqueletoVisible.split('   /   ').map((palabra, pIdx) => (
-                            <span key={pIdx} className="popp-palabra-chip">
-                              {palabra}
-                            </span>
-                          ))}
-                        </div>
-                      ) : (
-                        <span className="popp-slot-incognita">Respuesta oculta</span>
+                return (
+                  <div key={puesto} className={`popp-slot-card ${descubierto ? 'revelado' : ''}`}>
+                    <div className="popp-slot-main">
+                      <span className={`popp-puesto-num p-${puesto}`}>#{puesto}</span>
+
+                      <div className="popp-slot-contenido">
+                        {descubierto ? (
+                          <>
+                            <span className="popp-slot-texto">{descubierto.texto}</span>
+                            <span className="popp-slot-autor">Acertado por {descubierto.jugador}</span>
+                          </>
+                        ) : esqueletoVisible ? (
+                          <div className="popp-ahorcado-wrap">
+                            {esqueletoVisible.split('   /   ').map((palabra, pIdx) => (
+                              <span key={pIdx} className="popp-palabra-chip">
+                                {palabra}
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="popp-slot-incognita">Respuesta oculta</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="popp-slot-derecha">
+                      {!descubierto && !tieneLetras && esMiTurno && (
+                        <button
+                          type="button"
+                          className={`popp-btn-pista-slot ${tieneLongitud ? 'fase2' : ''}`}
+                          onClick={() => handlePedirPistaPuesto(puesto)}
+                          disabled={ronda.feedback !== null}
+                          title={
+                            !tieneLongitud
+                              ? `Ver huecos de letras del Top #${puesto} (-1 pt)`
+                              : `Revelar letras del Top #${puesto} (-1 pt)`
+                          }
+                        >
+                          <span>{!tieneLongitud ? '💡 Pista' : '🔤 +Letras'}</span>
+                          <small>-1 pt</small>
+                        </button>
                       )}
+                      <span className="popp-puntos-badge">+{PUNTOS_POR_PUESTO[puesto]} pts</span>
                     </div>
                   </div>
+                );
+              })}
+            </div>
 
-                  <div className="popp-slot-derecha">
-                    {!descubierto && !tieneLetras && esMiTurno && (
-                      <button
-                        type="button"
-                        className={`popp-btn-pista-slot ${tieneLongitud ? 'fase2' : ''}`}
-                        onClick={() => handlePedirPistaPuesto(puesto)}
-                        disabled={ronda.feedback !== null}
-                        title={
-                          !tieneLongitud
-                            ? `Ver huecos de letras del Top #${puesto} (-1 pt)`
-                            : `Revelar letras del Top #${puesto} (-1 pt)`
-                        }
-                      >
-                        <span>{!tieneLongitud ? '💡 Pista' : '🔤 +Letras'}</span>
-                        <small>-1 pt</small>
-                      </button>
-                    )}
-                    <span className="popp-puntos-badge">+{PUNTOS_POR_PUESTO[puesto]} pts</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Formulario (solo visible cuando es tu turno) */}
-          {esMiTurno && (
-            <form onSubmit={handleValidarRespuesta} className="popp-tarjeta popp-form-card">
-              <label className="popp-etiqueta" htmlFor="popp-input-online">
-                Tu respuesta para cualquier puesto del Top 5
+            <form onSubmit={handleValidarRespuesta} className="pop-form-respuesta">
+              <label className="qq-label-destacado" htmlFor="popp-input-online">
+                {esMiTurno
+                  ? 'Escribe una respuesta para cualquier puesto del Top 5'
+                  : `Esperando la respuesta de ${ronda.jugadorActivoNombre}…`}
               </label>
-              <input
-                id="popp-input-online"
-                type="text"
-                autoFocus
-                className="popp-input"
-                placeholder="Escribe una palabra clave o respuesta…"
-                value={inputTexto}
-                onChange={(e) => setInputTexto(e.target.value)}
-                disabled={ronda.feedback !== null}
-                autoComplete="off"
-              />
-
-              <div className="popp-fila-botones">
-                <button
-                  type="button"
-                  className="popp-boton secundario"
-                  onClick={handlePasarTurno}
-                  disabled={ronda.feedback !== null}
-                >
-                  Pasar turno
-                </button>
+              <div className="pop-form-row">
+                <input
+                  id="popp-input-online"
+                  type="text"
+                  autoFocus={esMiTurno}
+                  className="qq-input-moderno"
+                  placeholder={esMiTurno ? 'Escribe una palabra clave o respuesta…' : 'No es tu turno'}
+                  value={inputTexto}
+                  onChange={(e) => setInputTexto(e.target.value)}
+                  disabled={!esMiTurno || ronda.feedback !== null}
+                  autoComplete="off"
+                />
                 <button
                   type="submit"
-                  className="popp-boton"
-                  disabled={!inputTexto.trim() || ronda.feedback !== null}
+                  className="pop-btn-comprobar"
+                  disabled={!esMiTurno || !inputTexto.trim() || ronda.feedback !== null}
                 >
-                  <Icon name="check" size={20} /> Comprobar
+                  <Icon name="check" size={18} strokeWidth={2.5} /> Comprobar
                 </button>
               </div>
             </form>
-          )}
+          </div>
 
-          {esAdmin && (
-            <div className="popp-pie-acciones">
-              <button type="button" className="popp-enlace peligro" onClick={handleRendirse}>
+          <div className="qqp-barra">
+            {esMiTurno && (
+              <EnlaceSecundario onClick={handlePasarTurno} disabled={ronda.feedback !== null}>
+                <Icon name="refresh" size={16} /> Pasar turno
+              </EnlaceSecundario>
+            )}
+            {esAdmin && (
+              <EnlaceSecundario onClick={handleRendirse}>
                 <Icon name="flagFinish" size={16} /> Rendirse y resolver los 5 puestos
-              </button>
-            </div>
-          )}
-        </section>
-      )}
-
-      {/* 6. RESOLUCIÓN DE RONDA ONLINE (Se abre automáticamente al acertar los 5 o al rendirse) */}
-      {vista === 'sala' && sala && sala.estado === 'jugando' && ronda && ronda.faseRonda === 'resolucion' && (
-        <section className="game popp-escena">
-          {cabeceraOnline}
-
-          <div className="popp-tarjeta">
-            <p className="popp-etiqueta">Soluciones · Ronda {sala.rondaNum}</p>
-            <h3 className="popp-pregunta-resumen">«{ronda.pregunta}»</h3>
-
-            <div className="popp-slots-lista" style={{ marginTop: '0.8rem' }}>
-              {(ronda.solucionFinal || [1, 2, 3, 4, 5].map((p) => ({
-                puesto: p,
-                texto: ronda.acertados?.[p]?.texto || '',
-                puntos: PUNTOS_POR_PUESTO[p]
-              }))).map((resp) => {
-                const acertador = ronda.acertados?.[resp.puesto];
-                return (
-                  <div
-                    key={resp.puesto}
-                    className={`popp-slot-card ${acertador ? 'revelado' : 'no-acertado'}`}
-                  >
-                    <div className="popp-slot-main">
-                      <span className={`popp-puesto-num p-${resp.puesto}`}>#{resp.puesto}</span>
-                      <div className="popp-slot-contenido">
-                        <span className="popp-slot-texto">{resp.texto}</span>
-                        <span className="popp-slot-autor">
-                          {acertador ? `🎉 Acertado por ${acertador.jugador}` : 'Sin descubrir'}
-                        </span>
-                      </div>
-                    </div>
-                    <span className="popp-puntos-badge">+{resp.puntos} pts</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          <div className="popp-tarjeta">
-            <p className="popp-etiqueta">Clasificación general</p>
-            <ol className="popp-ranking">
-              {ranking.map((j, i) => {
-                const lider = maximo > 0 && j.puntos === maximo;
-                return (
-                  <li key={j.id} className={lider ? 'lider' : ''} style={{ '--c': colorJugador(j.id) }}>
-                    <span className="popp-ranking-pos">{lider ? <Icon name="crown" size={18} /> : i + 1}</span>
-                    <span className="popp-jugador-avatar">{inicial(j.nombre)}</span>
-                    <span className="popp-ranking-nombre">
-                      {j.nombre}{j.id === yoId ? ' (tú)' : ''}
-                    </span>
-                    <strong>{j.puntos} pts</strong>
-                  </li>
-                );
-              })}
-            </ol>
-          </div>
-
-          <div className="popp-barra estatica">
-            {esAdmin ? (
-              <>
-                {sala.rondaNum < sala.maxRondas ? (
-                  <button type="button" className="popp-boton grande" onClick={handleSiguienteRonda}>
-                    <Icon name="play" size={20} /> Siguiente ronda ({sala.rondaNum + 1})
-                  </button>
-                ) : (
-                  <button type="button" className="popp-boton grande" onClick={handleFinalizar}>
-                    <Icon name="trophy" size={20} /> Ver podio final
-                  </button>
-                )}
-                <button type="button" className="popp-enlace" onClick={handleFinalizar}>
-                  <Icon name="flagFinish" size={16} /> Finalizar partida
-                </button>
-              </>
-            ) : (
-              <p className="popp-espera">Esperando a que el anfitrión inicie la siguiente ronda o finalice la partida…</p>
+              </EnlaceSecundario>
             )}
           </div>
         </section>
       )}
 
+      {/* 6. RESOLUCIÓN DE RONDA ONLINE (DIVIDIDA EN 2 PANTALLAS: 1. RESPUESTAS -> 2. PUNTUACIONES) */}
+      {vista === 'sala' && sala && sala.estado === 'jugando' && ronda && ronda.faseRonda === 'resolucion' && (
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            categoria={{
+              nombre: pasoResolucionOnline === 1 ? 'Paso 1 de 2 · Soluciones' : 'Paso 2 de 2 · Clasificación',
+              icono: pasoResolucionOnline === 1 ? 'eye' : 'trophy'
+            }}
+            etiqueta={`Ronda ${sala.rondaNum} de ${sala.maxRondas} completada`}
+            titulo={pasoResolucionOnline === 1 ? 'Soluciones del Top 5' : 'Puntuaciones actuales'}
+          >
+            <div className="qqp-identidad">
+              <span className="qqp-identidad-icono"><Icon name="check" size={16} strokeWidth={2.5} /></span>
+              <span>«{ronda.pregunta}»</span>
+            </div>
+          </Cabecera>
+
+          {pasoResolucionOnline === 1 ? (
+            <>
+              <div className="qqp-tarjeta">
+                <p className="qqp-carta-cara-titulo" style={{ marginBottom: '0.75rem' }}>
+                  <Icon name="eye" size={16} /> Las 5 respuestas más populares
+                </p>
+
+                <div className="popp-slots-lista">
+                  {(ronda.solucionFinal || [1, 2, 3, 4, 5].map((p) => ({
+                    puesto: p,
+                    texto: ronda.acertados?.[p]?.texto || '',
+                    puntos: PUNTOS_POR_PUESTO[p]
+                  }))).map((resp) => {
+                    const acertador = ronda.acertados?.[resp.puesto];
+                    return (
+                      <div
+                        key={resp.puesto}
+                        className={`popp-slot-card ${acertador ? 'revelado' : 'no-acertado'}`}
+                      >
+                        <div className="popp-slot-main">
+                          <span className={`popp-puesto-num p-${resp.puesto}`}>#{resp.puesto}</span>
+                          <div className="popp-slot-contenido">
+                            <span className="popp-slot-texto">{resp.texto}</span>
+                            <span className="popp-slot-autor">
+                              {acertador ? `🎉 Acertado por ${acertador.jugador}` : 'Sin descubrir'}
+                            </span>
+                          </div>
+                        </div>
+                        <span className="popp-puntos-badge">+{resp.puntos} pts</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="qqp-barra">
+                <BotonPrincipal onClick={() => setPasoResolucionOnline(2)}>
+                  <Icon name="trophy" size={20} /> Continuar a las puntuaciones
+                </BotonPrincipal>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="qqp-tarjeta">
+                <p className="qqp-carta-cara-titulo" style={{ marginBottom: '0.8rem' }}>
+                  <Icon name="trophy" size={16} /> Clasificación general
+                </p>
+                <ul className="qqp-rivales">
+                  {ranking.map((j, i) => {
+                    const lider = maximo > 0 && j.puntos === maximo;
+                    return (
+                      <li key={j.id} className="qqp-rival" style={{ '--c': colorJugador(indiceColor(j, i)) }}>
+                        <span className="qqp-rival-avatar">{lider ? '👑' : i + 1}</span>
+                        <span className="qqp-rival-datos">
+                          <span className="qqp-rival-nombre">{lider ? 'Líder actual' : `Puesto ${i + 1}`}</span>
+                          <strong className="qqp-rival-tarjeta">
+                            {j.nombre}{j.id === yoId ? ' (tú)' : ''}
+                          </strong>
+                        </span>
+                        <span className="pop-ranking-pts">{j.puntos} pts</span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+
+              <div className="qqp-barra">
+                {esAdmin ? (
+                  <>
+                    {sala.rondaNum < sala.maxRondas ? (
+                      <BotonPrincipal onClick={handleSiguienteRonda}>
+                        <Icon name="play" size={20} /> Siguiente ronda ({sala.rondaNum + 1} de {sala.maxRondas})
+                      </BotonPrincipal>
+                    ) : (
+                      <BotonPrincipal onClick={handleFinalizar}>
+                        <Icon name="trophy" size={20} /> Ver podio final
+                      </BotonPrincipal>
+                    )}
+                    <EnlaceSecundario onClick={() => setPasoResolucionOnline(1)}>
+                      ← Volver a ver las 5 respuestas
+                    </EnlaceSecundario>
+                    <EnlaceSecundario onClick={handleFinalizar}>
+                      Finalizar partida anticipadamente
+                    </EnlaceSecundario>
+                  </>
+                ) : (
+                  <>
+                    <p className="qqp-estado">
+                      <span className="qqp-spinner" aria-hidden="true" /> Esperando a que el anfitrión lance la siguiente ronda…
+                    </p>
+                    <EnlaceSecundario onClick={() => setPasoResolucionOnline(1)}>
+                      ← Volver a ver las 5 respuestas
+                    </EnlaceSecundario>
+                  </>
+                )}
+              </div>
+            </>
+          )}
+        </section>
+      )}
+
       {/* 7. PODIO FINAL ONLINE */}
       {vista === 'sala' && sala && sala.estado === 'final' && (
-        <section className="game popp-escena">
-          <div className="end-card">
-            <span className="end-icon"><Icon name="crown" size={48} /></span>
-            <h1 className="title">Clasificación Final</h1>
-            <p className="final-score">
-              {ganadores.length === 0
-                ? 'Nadie ha conseguido puntos'
-                : ganadores.length === 1
-                ? <>¡Victoria para {ganadores[0].nombre} con {maximo} puntos!</>
-                : <>Empate entre {ganadores.map((g) => g.nombre).join(', ')} con {maximo} puntos</>}
-            </p>
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            etiqueta="Partida terminada"
+            titulo="Clasificación Final"
+            avatar={<span className="qqp-avatar" style={{ '--c': '#f59e0b' }}>🏆</span>}
+          >
+            <div className="qqp-identidad">
+              <span className="qqp-identidad-icono"><Icon name="crown" size={16} /></span>
+              <span>
+                {ganadores.length === 0
+                  ? 'Nadie ha conseguido puntos en esta partida.'
+                  : ganadores.length === 1
+                  ? <>¡Victoria para <strong>{ganadores[0].nombre}</strong> con <strong>{maximo} pts</strong>!</>
+                  : <>Empate entre <strong>{ganadores.map((g) => g.nombre).join(', ')}</strong> con <strong>{maximo} pts</strong></>}
+              </span>
+            </div>
+          </Cabecera>
 
-            <div className="scoreboard">
+          <div className="qqp-tarjeta">
+            <p className="qqp-carta-cara-titulo" style={{ marginBottom: '0.8rem' }}>
+              <Icon name="users" size={16} /> Podio de jugadores
+            </p>
+            <ul className="qqp-rivales">
               {ranking.map((j, i) => {
                 const lider = maximo > 0 && j.puntos === maximo;
                 return (
-                  <div key={j.id} className={`score-row ${lider ? 'first' : ''}`}>
-                    <span className="score-name">
-                      {lider ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
-                      {j.nombre}
+                  <li key={j.id} className="qqp-rival" style={{ '--c': colorJugador(indiceColor(j, i)) }}>
+                    <span className="qqp-rival-avatar">{lider ? '👑' : i + 1}</span>
+                    <span className="qqp-rival-datos">
+                      <span className="qqp-rival-nombre">{lider ? '¡Ganador!' : `Puesto ${i + 1}`}</span>
+                      <strong className="qqp-rival-tarjeta">
+                        {j.nombre}{j.id === yoId ? ' (tú)' : ''}
+                      </strong>
                     </span>
-                    <span className="score-pts">{j.puntos} pts</span>
-                  </div>
+                    <span className="pop-ranking-pts">{j.puntos} pts</span>
+                  </li>
                 );
               })}
-            </div>
+            </ul>
           </div>
 
-          <div className="popp-barra estatica">
-            <button type="button" className="popp-boton secundario" onClick={() => setModalSalir(true)}>
-              <Icon name="door" size={20} /> Salir al menú
-            </button>
+          <div className="qqp-barra">
+            <BotonPrincipal onClick={() => setModalSalirPortada(true)}>
+              <Icon name="door" size={20} /> Salir a la portada
+            </BotonPrincipal>
           </div>
         </section>
       )}
 
-      {/* MODAL DE CONFIRMACIÓN PARA SALIR */}
-      {modalSalir && (
-        <div className="rg-modal-fondo" onClick={() => setModalSalir(false)}>
-          <div className="rg-modal popp-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="popp-modal-icono">🚪</div>
-            <h3>¿Salir de la sala?</h3>
-            <p className="hint">Si sales de la sala perderás tu progreso actual en la partida. ¿Estás seguro?</p>
+      {/* MODAL DE CONFIRMACIÓN PARA SALIR DEL LOBBY AL SUBMENÚ */}
+      {modalSalirLobby && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalirLobby(false)}>
+          <div
+            className="rg-modal"
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
+          >
+            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
+            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
+              ¿Salir de la sala?
+            </h3>
+            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
+              Si sales ahora abandonarás la sala de espera y volverás al menú anterior. ¿Estás seguro?
+            </p>
 
-            <div className="popp-fila-botones">
-              <button type="button" className="popp-boton secundario" onClick={() => setModalSalir(false)}>
-                Quedarme
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+              <button
+                type="button"
+                className="secondary full"
+                onClick={() => setModalSalirLobby(false)}
+              >
+                No, quedarme
               </button>
               <button
                 type="button"
-                className="popp-boton peligro"
-                onClick={() => {
-                  setModalSalir(false);
-                  handleSalir();
-                }}
+                className="secondary danger full"
+                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
+                onClick={handleVolverMenuOnline}
               >
                 Sí, salir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE CERRAR SALA Y SALIR A PORTADA */}
+      {modalSalirPortada && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalirPortada(false)}>
+          <div
+            className="rg-modal"
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
+          >
+            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
+            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
+              ¿Salir a la portada?
+            </h3>
+            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
+              Abandonarás la partida actual y volverás a la portada principal. ¿Estás seguro?
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
+              <button
+                type="button"
+                className="secondary full"
+                onClick={() => setModalSalirPortada(false)}
+              >
+                No, quedarme
+              </button>
+              <button
+                type="button"
+                className="secondary danger full"
+                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
+                onClick={handleCerrarSalaYSalirAPortada}
+              >
+                Sí, salir de la sala
               </button>
             </div>
           </div>
