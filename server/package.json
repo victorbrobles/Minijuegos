@@ -8,6 +8,8 @@
     "sync:fundadores": "node scripts/sync-fundadores.mjs",
     "sync:coleccion": "node scripts/sync-coleccion.mjs",
     "sync:sumacero": "node scripts/sync-sumacero.mjs",
+    "sync:cuentas": "node scripts/sync-cuentas.mjs",
+    "sync:golpe": "node scripts/sync-golpe.mjs",
     "sim:fundadores": "node scripts/fundadores-sim.mjs",
     "sync:logos": "node scripts/sync-logos.mjs"
   },

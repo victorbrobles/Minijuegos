@@ -1,498 +1,281 @@
 // client/src/games/Cuentas/CuentasOnline.jsx
-import React, { useState, useEffect, useRef } from 'react';
+// Menú online, sala de espera, partida y clasificación (el servidor guarda el estado; cada móvil ve solo lo suyo).
+import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
+import { PantallaJuego, PantallaFin, Avatar } from './Vistas.jsx';
+import {
+  MenuInicioJuego, FormCrearSala, FormUnirseSala, CabeceraSala, ListaSala, EsperandoAnfitrion
+} from '../../components/MenuJuego.jsx';
 import './Cuentas.css';
-import '../Adivina/Adivina.css';
-import { MenuInicioJuego, FormCrearSala, FormUnirseSala, CabeceraSala, EsperandoAnfitrion } from '../../components/MenuJuego.jsx';
 
-const CLAVE_SESION_CNT = 'cuentas_online_session';
+export const CLAVE_SESION_CUENTAS = 'cuentas_online_session';
+const API = '/api/cuentas/online';
 
-export default function CuentasOnline({ onSalir }) {
-  const [vista, setVista] = useState('menu'); // menu | crear | unirse | sala
+const leerSesion = () => {
+  try {
+    return JSON.parse(sessionStorage.getItem(CLAVE_SESION_CUENTAS));
+  } catch {
+    return null;
+  }
+};
+
+const post = async (url, body) => {
+  const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Algo ha fallado.');
+  return data;
+};
+
+export function ModalSalir({ titulo, texto, onSeguir, onSalir }) {
+  return (
+    <div className="rg-modal-fondo" onClick={onSeguir}>
+      <div className="rg-modal ctp-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="ctp-modal-icono">🚪</div>
+        <h3>{titulo}</h3>
+        <p className="hint">{texto}</p>
+        <div className="ctp-dos">
+          <button type="button" className="ctp-boton secundario" onClick={onSeguir}>Seguir</button>
+          <button type="button" className="ctp-boton peligro" onClick={onSalir}>Salir</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function CuentasOnline({ onVolver, onSalir, onAbrirAyuda }) {
+  const [sesion, setSesion] = useState(leerSesion);
+  const [menu, setMenu] = useState('menu');
   const [nombre, setNombre] = useState('');
-  const [codigoInput, setCodigoInput] = useState('');
-  const [errorMsg, setErrorMsg] = useState('');
+  const [codigo, setCodigo] = useState('');
+  const [errorMenu, setErrorMenu] = useState('');
   const [cargando, setCargando] = useState(false);
-  const [modalSalir, setModalSalir] = useState(false);
-  const [modalAyuda, setModalAyuda] = useState(false);
-  const [codigoCopiado, setCodigoCopiado] = useState(false);
-
-  // Modal de acción / selección
-  const [modalAccion, setModalAccion] = useState(null);
-  const [accionResultado, setAccionResultado] = useState(null);
-
   const [sala, setSala] = useState(null);
-  const [sesion, setSesion] = useState(() => {
-    try { return JSON.parse(sessionStorage.getItem(CLAVE_SESION_CNT)); } catch { return null; }
-  });
+  const [modal, setModal] = useState(null);
+  const [aviso, setAviso] = useState('');
+  const [sinRed, setSinRed] = useState(false);
+  const [offset, setOffset] = useState(0);
+  const sesionRef = useRef(sesion);
+  sesionRef.current = sesion;
+  const fallos = useRef(0);
+  const pedidas = useRef(0);
+  const aplicada = useRef(0);
+  const avisoTimer = useRef(null);
 
-  const intervalRef = useRef(null);
+  const mostrarAviso = (t) => {
+    setAviso(t);
+    clearTimeout(avisoTimer.current);
+    avisoTimer.current = setTimeout(() => setAviso(''), 3500);
+  };
+  useEffect(() => () => clearTimeout(avisoTimer.current), []);
 
-  useEffect(() => {
-    if (!sesion) {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      setSala(null);
-      return;
-    }
+  const cerrarSesion = (mensaje = '') => {
+    try { sessionStorage.removeItem(CLAVE_SESION_CUENTAS); } catch { /* nada */ }
+    setSesion(null); setSala(null); setModal(null); setMenu('menu'); setErrorMenu(mensaje);
+  };
 
-    const consultarEstado = () => {
-      fetch(`/api/cuentas/sala/${sesion.code}?token=${sesion.token}`)
-        .then(r => r.ok ? r.json() : Promise.reject('Sala no disponible'))
-        .then(d => {
-          if (d.success) {
-            setSala(d);
-            setVista('sala');
-          }
-        }).catch(() => {
-          sessionStorage.removeItem(CLAVE_SESION_CNT);
-          setSesion(null);
-          setSala(null);
-          setVista('menu');
-        });
-    };
-
-    consultarEstado();
-    intervalRef.current = setInterval(consultarEstado, 800);
-    return () => clearInterval(intervalRef.current);
-  }, [sesion]);
-
-  useEffect(() => {
-    if (sala && sala.estado !== 'lobby') {
-      setModalAyuda(false);
-    }
-  }, [sala?.estado]);
-
-  const peticionPost = async (endpoint, extraBody = {}) => {
-    setCargando(true);
-    setErrorMsg('');
+  const consultar = async () => {
+    const s = sesionRef.current;
+    if (!s) return;
+    const n = ++pedidas.current;
     try {
-      const res = await fetch(`/api/cuentas/${endpoint}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion?.token, code: sesion?.code, ...extraBody })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
-      if (data.token) {
-        const nueva = { code: data.code, token: data.token };
-        sessionStorage.setItem(CLAVE_SESION_CNT, JSON.stringify(nueva));
-        setSesion(nueva);
+      const r = await fetch(`${API}/sala/${s.code}?token=${encodeURIComponent(s.token)}`);
+      if (sesionRef.current !== s) return;
+      if (r.status === 403 || r.status === 404) {
+        cerrarSesion(r.status === 403 ? 'Ya no formas parte de esa sala.' : 'La sala se ha cerrado.');
+        return;
       }
-      return data;
-    } catch (err) {
-      setErrorMsg(err.message);
-      return null;
+      if (!r.ok) throw new Error('error');
+      const d = await r.json();
+      fallos.current = 0;
+      setSinRed(false);
+      if (n < aplicada.current) return;
+      aplicada.current = n;
+      if (d.ahora) setOffset(d.ahora - Date.now());
+      setSala(d);
+    } catch {
+      fallos.current += 1;
+      if (fallos.current >= 3) setSinRed(true);
+      if (fallos.current >= 40) cerrarSesion('Se ha perdido la conexión con la sala.');
+    }
+  };
+
+  useEffect(() => {
+    if (!sesion) return undefined;
+    consultar();
+    const i = setInterval(consultar, 600);
+    return () => clearInterval(i);
+  }, [sesion]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const entrar = async (ruta, cuerpo) => {
+    setErrorMenu(''); setCargando(true);
+    try {
+      const d = await post(`${API}/${ruta}`, cuerpo);
+      const nueva = { code: d.code, token: d.token };
+      try { sessionStorage.setItem(CLAVE_SESION_CUENTAS, JSON.stringify(nueva)); } catch { /* nada */ }
+      pedidas.current = 0; aplicada.current = 0;
+      setSesion(nueva);
+    } catch (e) {
+      setErrorMenu(e.message);
     } finally {
       setCargando(false);
     }
   };
 
-  const handleCrear = () => nombre.trim() && peticionPost('crear', { nombre });
-  const handleUnirse = () => nombre.trim() && codigoInput && peticionPost('unirse', { nombre, joinCode: codigoInput.toUpperCase() });
-
-  const handleSalir = () => {
-    if (sesion) peticionPost(`sala/${sesion.code}/salir`);
-    sessionStorage.removeItem(CLAVE_SESION_CNT);
-    setSesion(null);
-    setSala(null);
-    setVista('menu');
-    setModalSalir(false);
-  };
-
-  const copiarCodigo = () => {
-    if (!sala?.code) return;
-    navigator.clipboard?.writeText(sala.code);
-    setCodigoCopiado(true);
-    setTimeout(() => setCodigoCopiado(false), 2000);
-  };
-
-  const jugarCarta = (numero) => {
-    peticionPost(`sala/${sesion.code}/jugar-carta`, { numero });
-  };
-
-  const robarAccion = async (extra = {}) => {
-    const d = await peticionPost(`sala/${sesion.code}/robar-accion`, extra);
-    if (d?.accion) {
-      setAccionResultado({ accion: d.accion, detalle: d.detalle });
-      setModalAccion(null);
+  const llamar = async (ruta, cuerpo = {}) => {
+    const s = sesionRef.current;
+    if (!s) return;
+    try {
+      await post(`${API}/sala/${s.code}/${ruta}`, { token: s.token, ...cuerpo });
+      await consultar();
+    } catch (e) {
+      mostrarAviso(e.message);
     }
   };
+  const enviar = (tipo, datos = {}) => llamar('accion', { tipo, ...datos });
 
-  const yo = sala?.jugadores?.find(j => j.esTu);
-  const esAdmin = yo?.esAdmin;
-  const miTurno = sala?.turnoId === yo?.id;
-  const rivales = sala?.jugadores?.filter(j => !j.esTu && j.cantidadCartas > 0) || [];
+  const salirDeSala = (aPortada) => {
+    const s = sesionRef.current;
+    if (s?.code && s?.token) {
+      fetch(`${API}/sala/${s.code}/salir`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: s.token }), keepalive: true }).catch(() => {});
+    }
+    cerrarSesion('');
+    if (aPortada) onSalir?.();
+  };
 
-  const ranking = [...(sala?.jugadores || [])].sort((a, b) => b.puntos - a.puntos);
-  const maxPuntos = ranking.length > 0 ? ranking[0].puntos : 0;
-  const ganadores = maxPuntos > 0 ? ranking.filter(j => j.puntos === maxPuntos) : [];
-
-  const BotonAyudaCard = () => (
-    <button
-      type="button"
-      onClick={() => setModalAyuda(true)}
-      title="Reglas del juego"
-      style={{
-        position: 'absolute',
-        top: '1rem',
-        right: '1rem',
-        width: '38px',
-        height: '38px',
-        borderRadius: '50%',
-        border: '1.5px solid #c7d2fe',
-        backgroundColor: '#ffffff',
-        color: '#4338ca',
-        fontSize: '1.2rem',
-        fontWeight: '700',
-        cursor: 'pointer',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        boxShadow: '0 2px 8px rgba(99, 102, 241, 0.12)',
-        padding: 0,
-        zIndex: 5
-      }}
-    >
-      ?
-    </button>
-  );
-
-  const ModalAyuda = () => modalAyuda ? (
-    <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
-      <div
-        className="rg-modal aprox-modal-ayuda"
-        onClick={(e) => e.stopPropagation()}
-        style={{ maxWidth: '560px', maxHeight: '88vh', overflowY: 'auto', textAlign: 'left' }}
-      >
-        <div className="aprox-modal-header">
-          <span className="aprox-modal-signo-title">?</span>
-          <h3>¿Cómo se juega a Lleva la cuenta?</h3>
-        </div>
-
-        <div className="aprox-modal-cuerpo">
-          <p><strong>1. Reparto inicial de cartas (del 1 al 100):</strong></p>
-          <ul>
-            <li><strong>2 jugadores:</strong> 15 cartas cada uno.</li>
-            <li><strong>3 o 4 jugadores:</strong> 8 cartas cada uno.</li>
-            <li><strong>5 o 6 jugadores:</strong> 5 cartas cada uno.</li>
-            <li><strong>7 u 8 jugadores:</strong> 4 cartas cada uno.</li>
-            <li><strong>9 o 10 jugadores:</strong> 3 cartas cada uno.</li>
-          </ul>
-
-          <p><strong>2. Objetivo y Dinámica:</strong></p>
-          <ul>
-            <li>Hay que ir colocando las cartas de todos de <strong>menor a mayor</strong> en el centro de la mesa, sin saber las cartas que tienen tus compañeros.</li>
-            <li><strong>Acierto:</strong> Si sueltas una carta y nadie tiene una menor que ella (y mayor que la del centro), te la quitas de encima, suma +1 pto y se convierte en la nueva referencia.</li>
-            <li><strong>Fallo:</strong> Si resulta que otro jugador tenía una carta menor, restas 1 pto y debes robar una nueva carta del mazo (mayor a la que haya en el centro).</li>
-          </ul>
-
-          <p><strong>3. Regla de Retención:</strong></p>
-          <ul>
-            <li>Si en cualquier momento tienes la carta más baja de la partida y <strong>no la sueltas durante 2 turnos consecutivos</strong>, perderás 1 punto y robarás otra carta obligatoriamente.</li>
-          </ul>
-
-          <p><strong>4. Cartas de Acción y Puntuación final:</strong></p>
-          <ul>
-            <li>Durante la partida se pueden robar hasta <strong>5 cartas de acción</strong> (buenas, malas y neutras como ver cartas, intercambiar, radares numéricos, etc.).</li>
-            <li><strong>Puntos finales:</strong> El primer jugador en quedarse sin cartas se lleva tantos puntos como jugadores haya en la sala, el 2º un punto menos, y así sucesivamente hasta el último, que suma 1 pto.</li>
-          </ul>
-        </div>
-
-        <div className="rg-modal-acciones" style={{ marginTop: '1.2rem' }}>
-          <button className="big full" onClick={() => setModalAyuda(false)}>
-            Entendido
-          </button>
-        </div>
-      </div>
-    </div>
-  ) : null;
-
-  if (vista === 'menu') {
+  if (!sesion) {
     return (
-      <div className="cnt-contenedor" style={{ position: 'relative' }}>
-        <ModalAyuda />
-        <MenuInicioJuego
-            juegoId="cuentas"
-            onCrear={() => { setVista('crear'); setErrorMsg(''); }}
-            onUnirse={() => { setVista('unirse'); setErrorMsg(''); }}
-            onAyuda={() => setModalAyuda(true)}
-            error={errorMsg}
-          />
-      </div>
-    );
-  }
-
-  if (vista === 'crear' || vista === 'unirse') {
-    return (
-      <div className="cnt-contenedor" style={{ position: 'relative' }}>
-        <ModalAyuda />
-        {vista === 'crear' ? (
-          <FormCrearSala
-            onVolver={() => { setVista('menu'); setErrorMsg(''); }}
-            onAyuda={() => setModalAyuda(true)}
-            nombre={nombre}
-            setNombre={setNombre}
-            onCrear={handleCrear}
-            cargando={cargando}
-            error={errorMsg}
-            maxLength={15}
-          />
-        ) : (
-          <FormUnirseSala
-            onVolver={() => { setVista('menu'); setErrorMsg(''); }}
-            onAyuda={() => setModalAyuda(true)}
-            codigo={codigoInput}
-            setCodigo={setCodigoInput}
-            nombre={nombre}
-            setNombre={setNombre}
-            onUnirse={handleUnirse}
-            cargando={cargando}
-            error={errorMsg}
-            maxLength={15}
-          />
+      <div className="ctp-contenedor">
+        {menu === 'menu' && (
+          <MenuInicioJuego juegoId="cuentas" onCrear={() => { setMenu('crear'); setErrorMenu(''); }} onUnirse={() => { setMenu('unirse'); setErrorMenu(''); }} onAyuda={onAbrirAyuda} error={errorMenu} />
+        )}
+        {menu === 'crear' && (
+          <FormCrearSala onVolver={() => { setMenu('menu'); setErrorMenu(''); }} onAyuda={onAbrirAyuda} nombre={nombre} setNombre={setNombre}
+            onCrear={() => entrar('crear', { nombre: nombre.trim() })} cargando={cargando} error={errorMenu}
+            descripcion="Introduce tu nombre para abrir la sala y ser el anfitrión (de 2 a 8 jugadores, cada uno con su móvil)." />
+        )}
+        {menu === 'unirse' && (
+          <FormUnirseSala onVolver={() => { setMenu('menu'); setErrorMenu(''); }} onAyuda={onAbrirAyuda} codigo={codigo} setCodigo={setCodigo}
+            nombre={nombre} setNombre={setNombre} onUnirse={() => entrar('unirse', { code: codigo.trim().toUpperCase(), nombre: nombre.trim() })}
+            cargando={cargando} error={errorMenu} />
         )}
       </div>
     );
   }
 
-  if (!sala) return <div className="panel center"><p>Cargando sala...</p></div>;
+  if (!sala) {
+    return (
+      <div className="ctp-contenedor">
+        <section className="game ctp-escena">
+          <div className="ctp-tarjeta ctp-centro">
+            <span className="ctp-carga" aria-hidden="true">🔢</span>
+            <p style={{ fontWeight: 800 }}>Conectando con la sala {sesion.code}…</p>
+            <button type="button" className="ctp-boton secundario" onClick={() => salirDeSala(false)}>Cancelar</button>
+          </div>
+        </section>
+      </div>
+    );
+  }
+
+  const v = sala.vista;
+  const n = sala.jugadores.length;
+  const enPartida = sala.estado !== 'lobby';
+  const ranking = [...sala.jugadores].sort((a, b) => b.puntos - a.puntos);
 
   return (
-    <div className="cnt-contenedor" style={{ position: 'relative' }}>
-      <ModalAyuda />
+    <div className={`ctp-contenedor ${enPartida ? 'qq-en-partida' : ''}`}>
+      {sinRed && <p className="ctp-sinred">⚠ Sin conexión con el servidor. Reintentando…</p>}
+      {aviso && <p className="ctp-toast" role="alert" onClick={() => setAviso('')}>{aviso}</p>}
 
-      {/* 1. LOBBY */}
       {sala.estado === 'lobby' && (
         <section className="game qq-pantalla">
-          <CabeceraSala codigo={sala.code} onVolver={() => setModalSalir(true)} onAyuda={() => setModalAyuda(true)} />
-
+          <CabeceraSala codigo={sala.code} onVolver={() => setModal('lobby')} onAyuda={onAbrirAyuda} />
+          <ListaSala
+            jugadores={sala.jugadores} yoId={sala.yoId} max={sala.max} min={sala.min} anfitrionId={sala.anfitrionId}
+            renderExtra={(j) => (
+              <span className="ctp-sala-extra">
+                <i className={`ctp-conexion${j.conectado ? '' : ' off'}`} title={j.conectado ? 'Conectado' : 'Sin conexión'} />
+                {sala.esAdmin && j.id !== sala.anfitrionId && (
+                  <button type="button" className="ctp-quitar" onClick={() => llamar('expulsar', { id: j.id })} aria-label={`Quitar a ${j.nombre}`}>Quitar</button>
+                )}
+              </span>
+            )}
+          />
           <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
-            <h3 className="qq-sala-titulo"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length}/10)</h3>
-            <div className="lb-lista qq-sala-lista">
-              {sala.jugadores.map((j) => (
-                <div key={j.id} className={`lb-jug ${j.esTu ? 'yo' : ''}`}>
-                  <span className="lb-jug-nombre">{j.nombre} {j.esTu && '(tú)'} {j.esAdmin && '👑'}</span>
-                </div>
-              ))}
-            </div>
-
-            {sala.jugadores.length < 2 && (
-              <p className="hint" style={{ marginTop: '0.8rem' }}>Falta al menos 1 jugador para empezar (mínimo 2).</p>
-            )}
-          </div>
-
-          <div className="actions" style={{ marginTop: '1rem' }}>
-            {esAdmin && (
-              <button
-                className="big full qq-btn-principal"
-                disabled={sala.jugadores.length < 2}
-                onClick={() => peticionPost(`sala/${sesion.code}/iniciar`)}
-              >
-                <Icon name="play" size={22} /> Empezar Partida
+            <h3 className="qq-sala-titulo"><Icon name="scale" size={20} /> La partida</h3>
+            <p className="hint" style={{ textAlign: 'left' }}>Cada uno recibirá sus números en secreto. Colocadlos en orden ascendente sin hablar: gana quien se quede antes sin números.</p>
+            {sala.esAdmin && (
+              <button type="button" className="big full qq-btn-principal" disabled={n < sala.min} onClick={() => llamar('iniciar')}>
+                <Icon name="play" size={22} /> {n < sala.min ? `Esperando jugadores (mínimo ${sala.min})…` : '¡Repartir números!'}
               </button>
             )}
           </div>
-
-          {!esAdmin && <EsperandoAnfitrion />}
+          {!sala.esAdmin && <EsperandoAnfitrion texto="Cuando estéis todos, el anfitrión empezará la partida." />}
         </section>
       )}
 
-      {/* 2. EN JUEGO */}
-      {sala.estado === 'jugando' && (
-        <section className="game">
-          <div className="hud">
-            <span className="chip"><Icon name="cards" size={18} />En juego</span>
-            <span className="chip alt">Puntos: {sala.misPuntos || 0} pts</span>
-          </div>
-
-          {/* Estado de la mesa: Carta central de referencia */}
-          <div className="cnt-mesa-display">
-            <span className="cnt-mesa-subtitulo">Número actual en la mesa</span>
-            <div className="cnt-mesa-numero">
-              {sala.cartaActual > 0 ? sala.cartaActual : '—'}
-            </div>
-            <span className="cnt-mesa-alerta">
-              {sala.cartaActual > 0 
-                ? `La próxima carta debe ser estrictamente mayor que ${sala.cartaActual}` 
-                : 'Empieza la partida: colocad la carta más baja posible'}
-            </span>
-          </div>
-
-          {/* Turno actual */}
-          <div className="panel center" style={{ padding: '0.9rem', marginBottom: '1rem' }}>
-            {miTurno ? (
-              <span className="badge" style={{ background: '#dcfce7', color: '#166534', fontSize: '1rem', padding: '0.4rem 1rem', fontWeight: 800 }}>
-                👉 ¡ES TU TURNO! Juega la carta que creas más baja
-              </span>
-            ) : (
-              <span className="hint">
-                Turno de: <strong>{sala.jugadores.find(j => j.id === sala.turnoId)?.nombre || '...'}</strong>
-              </span>
-            )}
-          </div>
-
-          {/* Mano de cartas del jugador */}
-          <div className="panel" style={{ padding: '1.2rem 1rem' }}>
-            <h3 className="panel-title" style={{ textAlign: 'center', marginBottom: '0.6rem' }}>
-              Tus cartas ({sala.misCartas?.length || 0})
-            </h3>
-            
-            <div className="cnt-mano-grid">
-              {sala.misCartas?.map(n => (
-                <button
-                  key={n}
-                  type="button"
-                  className="cnt-carta-btn"
-                  disabled={!miTurno || sala.bloqueado}
-                  onClick={() => jugarCarta(n)}
-                >
-                  {n}
-                </button>
-              ))}
-              {sala.misCartas?.length === 0 && (
-                <p className="hint ok" style={{ width: '100%', textAlign: 'center' }}>
-                  🎉 ¡Te has quedado sin cartas! Esperando a que finalicen los demás.
-                </p>
-              )}
-            </div>
-
-            {/* Acción de robar carta de acción */}
-            {miTurno && sala.misCartas?.length > 0 && sala.accionesRestantes > 0 && (
-              <button
-                type="button"
-                className="cnt-btn-accion"
-                onClick={() => setModalAccion(true)}
-              >
-                ✨ Robar Carta de Acción ({sala.accionesRestantes} disponibles)
-              </button>
-            )}
-          </div>
-
-          {/* Historial de eventos */}
-          {sala.log?.length > 0 && (
-            <div className="panel" style={{ marginTop: '1rem' }}>
-              <h4 style={{ margin: '0 0 0.5rem', color: '#1e293b' }}>Registro de jugadas:</h4>
-              {sala.log.slice(0, 4).map((l, idx) => (
-                <p key={idx} className="hint small" style={{ margin: '0.3rem 0' }}>{l}</p>
-              ))}
-            </div>
-          )}
-
-          {/* Marcador en vivo */}
-          <div className="scoreboard-container" style={{ justifyContent: 'center', marginTop: '0.8rem' }}>
-            {sala.jugadores?.map(j => (
-              <div key={j.id} className="score-pill">
-                <span>{j.nombre}: <strong>{j.cantidadCartas} cartas</strong> ({j.puntos} pts)</span>
+      {sala.estado === 'jugando' && v && (
+        <section className="game ctp-escena">
+          {v.fase !== 'fin' ? (
+            <PantallaJuego v={v} enviar={enviar} onSalir={() => setModal('partida')} admin={{ esAdmin: sala.esAdmin, onForzar: () => llamar('forzar'), desconectados: sala.jugadores.filter((j) => !j.conectado).map((j) => j.id) }} />
+          ) : (
+            <PantallaFin v={v} onSalir={() => setModal('partida')}>
+              <div className="ctp-barra estatica">
+                {sala.esAdmin ? (
+                  <>
+                    <button type="button" className="ctp-boton grande" disabled={n < sala.min} onClick={() => llamar('siguiente-partida')}>
+                      <Icon name="refresh" size={20} /> Otra partida (mismos jugadores)
+                    </button>
+                    <button type="button" className="ctp-boton secundario" onClick={() => llamar('finalizar')}>
+                      <Icon name="trophy" size={18} /> Terminar y ver la clasificación
+                    </button>
+                  </>
+                ) : <p className="ctp-esperando">⏳ Esperando a que el anfitrión decida qué hacer…</p>}
               </div>
-            ))}
-          </div>
-
-          <button className="secondary danger full" style={{ marginTop: '1.2rem' }} onClick={() => setModalSalir(true)}>
-            <Icon name="door" size={20} /> Salir de la sala
-          </button>
+            </PantallaFin>
+          )}
         </section>
       )}
 
-      {/* 3. PODIO FINAL */}
-      {sala.estado === 'fin' && (
-        <section className="game">
-          <div className="end-card">
-            <span className="end-icon"><Icon name="trophy" size={44} /></span>
-            <h1 className="title">¡Partida Terminada!</h1>
-            <p className="final-score" style={{ color: '#16a34a' }}>
-              🏆 Ganador: {ganadores.map(g => g.nombre).join(', ')} con {maxPuntos} pts
-            </p>
-          </div>
-
-          <div className="panel reveal-panel" style={{ marginTop: '1rem' }}>
-            <h3 className="reveal-title"><Icon name="podium" size={20} /> Clasificación Final</h3>
-            <div className="scoreboard">
+      {sala.estado === 'final' && (
+        <section className="game ctp-escena">
+          <header className="ctp-hero fin">
+            <span className="ctp-numeros-fondo" aria-hidden="true" />
+            <div className="ctp-hero-top">
+              <button type="button" className="ctp-salir" onClick={() => setModal('partida')}><Icon name="door" size={15} /> Salir</button>
+              <div className="ctp-chips"><span className="ctp-chip">{sala.numPartida} {sala.numPartida === 1 ? 'partida' : 'partidas'}</span></div>
+            </div>
+            <p className="ctp-hero-etiqueta">Clasificación de la sala</p>
+            <h1 className="ctp-hero-titulo">{ranking[0]?.puntos > 0 ? `¡Gana ${ranking.filter((j) => j.puntos === ranking[0].puntos).map((j) => j.nombre).join(' y ')}!` : 'Nadie ha puntuado'}</h1>
+          </header>
+          <div className="ctp-tarjeta">
+            <p className="ctp-etiqueta">Puntos por partida: 3 al primero, 2 al segundo y 1 al tercero</p>
+            <ol className="ctp-ranking">
               {ranking.map((j, i) => (
-                <div key={j.id} className={`score-row ${j.puntos === maxPuntos && maxPuntos > 0 ? 'first' : ''}`}>
-                  <span className="score-name">{i + 1}. {j.nombre} {j.esTu && '(Tú)'}</span>
-                  <span className="score-pts">{j.puntos} pts</span>
-                </div>
+                <li key={j.id} className={i === 0 && j.puntos > 0 ? 'lider' : ''}>
+                  <span className="ctp-pos">{i + 1}</span><Avatar id={j.id} nombre={j.nombre} />
+                  <span className="ctp-ranking-nombre">{j.nombre}{j.id === sala.yoId ? ' (tú)' : ''}</span>
+                  <strong>{j.puntos}</strong>
+                </li>
               ))}
-            </div>
+            </ol>
           </div>
-
-          <div className="actions" style={{ marginTop: '1.2rem' }}>
-            {esAdmin && (
-              <button className="big full" onClick={() => peticionPost(`sala/${sesion.code}/iniciar`)}>
-                <Icon name="refresh" size={20} /> Jugar otra vez
-              </button>
-            )}
-            <button className="secondary danger full" onClick={handleSalir}>
-              <Icon name="door" size={20} /> Salir al menú
-            </button>
+          <div className="ctp-barra estatica">
+            {sala.esAdmin
+              ? <button type="button" className="ctp-boton grande" onClick={() => llamar('reiniciar')}><Icon name="refresh" size={20} /> Volver a la sala de espera</button>
+              : <p className="ctp-esperando">⏳ El anfitrión decidirá si jugáis otra vez</p>}
           </div>
         </section>
       )}
 
-      {/* Modal de selección para robar acción */}
-      {modalAccion && (
-        <div className="rg-modal-fondo" onClick={() => setModalAccion(null)}>
-          <div className="rg-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '440px', padding: '1.6rem' }}>
-            <h3 style={{ margin: '0 0 0.8rem', color: '#1e1b4b' }}>Robar Carta de Acción</h3>
-            <p className="hint small" style={{ marginBottom: '1.2rem' }}>
-              Si la carta requiere elegir a un rival, selecciona con quién interactuar:
-            </p>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-              {rivales.map(r => (
-                <button
-                  key={r.id}
-                  className="secondary full"
-                  onClick={() => robarAccion({ rivalId: r.id })}
-                >
-                  Seleccionar a {r.nombre} ({r.cantidadCartas} cartas)
-                </button>
-              ))}
-              {rivales.length === 0 && (
-                <button className="big full" onClick={() => robarAccion()}>
-                  Robar acción
-                </button>
-              )}
-            </div>
-
-            <button className="secondary danger full" style={{ marginTop: '1rem' }} onClick={() => setModalAccion(null)}>
-              Cancelar
-            </button>
-          </div>
-        </div>
+      {modal === 'lobby' && (
+        <ModalSalir titulo="¿Salir de la sala?"
+          texto={sala.esAdmin ? 'Eres el anfitrión: si sales, otro jugador pasará a serlo (si no queda nadie, la sala se cerrará).' : 'Abandonarás la sala de espera y volverás al menú.'}
+          onSeguir={() => setModal(null)} onSalir={() => salirDeSala(false)} />
       )}
-
-      {/* Modal resultado de carta de acción */}
-      {accionResultado && (
-        <div className="rg-modal-fondo" onClick={() => setAccionResultado(null)}>
-          <div className="rg-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '440px', textAlign: 'center', padding: '1.8rem' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '0.4rem' }}>{accionResultado.accion.icono}</div>
-            <h2 style={{ margin: '0 0 0.5rem', color: '#1e1b4b' }}>{accionResultado.accion.nombre}</h2>
-            <p className="hint" style={{ fontSize: '1rem', lineHeight: '1.4', marginBottom: '1.4rem' }}>
-              {accionResultado.detalle}
-            </p>
-            <button className="big full" onClick={() => setAccionResultado(null)}>
-              Entendido
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Modal Confirmación Salir */}
-      {modalSalir && (
-        <div className="rg-modal-fondo" onClick={() => setModalSalir(false)}>
-          <div className="rg-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}>
-            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
-            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>¿Abandonar la partida?</h3>
-            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
-              Perderás tus cartas y tu puntuación actual. ¿Deseas salir?
-            </p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
-              <button type="button" className="secondary full" onClick={() => setModalSalir(false)}>Quedarme</button>
-              <button type="button" className="secondary danger full" onClick={handleSalir}>Salir</button>
-            </div>
-          </div>
-        </div>
+      {modal === 'partida' && (
+        <ModalSalir titulo="¿Salir de la partida?"
+          texto={`${sala.estado === 'jugando' && v?.fase !== 'fin' ? 'Abandonarás la partida y quedarás fuera de la clasificación. ' : ''}${sala.esAdmin ? 'Otro jugador pasará a ser el anfitrión.' : 'Volverás a la portada.'}`}
+          onSeguir={() => setModal(null)} onSalir={() => salirDeSala(true)} />
       )}
     </div>
   );
