@@ -589,19 +589,16 @@ export default function PistasLocal({ onVolver, onExit }) {
 
           {/* Controles: Pulsador Rojo o Modal de Respuesta de 30s */}
           {!pulsadorActivo ? (
-            <div className="ptp-barra">
+            <div className="ptp-barra estatica">
               <button
                 type="button"
                 className="ptp-pulsador"
                 onClick={handlePulsarBotonRojo}
                 disabled={jugadoresDisponibles.length === 0}
               >
-                <span className="ptp-pulsador-base" aria-hidden="true">
-                  <span className="ptp-pulsador-cupula" />
-                </span>
-                <span className="ptp-pulsador-texto">
-                  <strong>¡Lo sé!</strong>
-                  <small>{jugadoresDisponibles.length === 0 ? 'Ya no queda nadie por responder' : 'Pulsa para responder: el reloj se para'}</small>
+                <span className="ptp-pulsador-cara">
+                  <Icon name="zap" size={30} />
+                  ¡Lo sé!
                 </span>
               </button>
 
