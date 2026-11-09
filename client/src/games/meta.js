@@ -317,7 +317,7 @@ export const META = {
     icono: 'bulb',
     colores: ['#60a5fa', '#1e3a8a'],
     etiquetas: 'hipotesis farol engano deduccion apostar laboratorio ciencia muestras mentir online',
-    descripcion: 'Cada ronda el laboratorio esconde una verdad y tú solo conoces un trocito. Formula una hipótesis (cierta o de farol), apuesta por las de los demás y descubre quién miente.',
+    descripcion: 'Cada ronda hay una verdad oculta y tú solo conoces un trocito. Formula una hipótesis, cierta o de farol, y después decide en qué hipótesis de los demás confías. Escenarios distintos y sorpresas en cada ronda.',
     categorias: ['estrategia']
   },
   'trescientosuno': {

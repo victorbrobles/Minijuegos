@@ -108,6 +108,12 @@ npm run dev
 - Partidas de 10, 15 o 25 rondas y 45 s por respuesta. Online, el servidor cierra la ronda al acabar el tiempo y acepta selecciones incompletas.
 - Elementos en `server/data/seeds/colores/parteN.js` (`{ id, item, colores: [...] }`, con los colores de la paleta: rojo, azul, amarillo, verde, naranja, morado, marron, blanco, negro, gris, rosa). `parte6.js` es la ampliación.
 
+## Minijuego: La Hipótesis Ganadora (`Hipotesis/`)
+- Cada ronda hay una verdad absoluta oculta (una fila de casillas) y cada jugador ve solo 2 o 3. Todos formulan en secreto una hipótesis, cierta o de farol; después se desvelan y cada uno decide en cuáles confía (✅/❌, y una con ⭐ «¡Seguro!» que vale doble). Al final se revela la verdad hipótesis a hipótesis.
+- Escenarios (cambian cada ronda, con sus propios tipos de hipótesis): laboratorio, baraja, barrio y caja fuerte. Eventos sorpresa: ronda doble, rumor, topo, ronda sincera, juicio a ciegas, chismorreo y relámpago.
+- Puntos: acertar el juicio +1 (⭐ +2 / −1); autor +1 por creyente si era cierta, +2 por creyente y −1 por quien le pilla si era farol; +1 a la hipótesis ganadora (la más creída).
+- Motor en `server/hipotesis/engine.js` con copia idéntica en el cliente (`npm run sync:hipotesis`). Pruebas: `node server/scripts/hipotesis-sim.mjs` y `node server/scripts/hipotesis-e2e.mjs [jugadores]`.
+
 ## Minijuego: Fundadores (`Fundadores/`)
 - Cada jugador (2 a 9) levanta su propio pueblo. Empieza con 2 monedas y 4 planos.
 - Cada ronda se retiran al azar oficios hasta que quedan tantos como jugadores (los retirados son públicos); por orden, empezando por quien tiene el sello, cada uno elige uno en secreto. Los 10 oficios se llaman por número y quien tenga el llamado juega su turno: cobrar 2 monedas o robar 2 planos y quedarse 1 → habilidad del oficio → construir.
