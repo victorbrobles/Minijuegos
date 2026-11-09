@@ -92,7 +92,7 @@ export const META = {
     icono: 'x',
     colores: ['#f43f5e', '#881337'],
     etiquetas: 'palabra ingenio velocidad letras categorias',
-    descripcion: 'Un tablero con todas las letras del abecedario, cada respuesta correcta elimina la letra elegida hasta que no quede ninguna. Elige categoría y rival, ¡y envíale un regalo envenenado!',
+    descripcion: 'El retador elige rival y una de tres categorías; el rival tiene 30 segundos para decir una palabra que empiece por una letra que siga en el tablero. Cada acierto elimina su letra y suma 1, 2 o 3 puntos. Online, los demás votan si la palabra vale.',
     categorias: ['prueba']
   },
   'lobos': {

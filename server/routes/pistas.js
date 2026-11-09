@@ -125,6 +125,18 @@ function iniciarNuevaRondaOnline(sala) {
   };
 }
 
+// Si ya no queda nadie con vida por responder, se cierra la ronda
+function comprobarPendientes(sala) {
+  if (sala.estado !== 'jugando' || sala.ronda?.estadoRonda !== 'activa') return;
+  const pendientes = sala.jugadores.filter((j) => {
+    const acertoJ = sala.ronda.acertados.some((a) => a.jugadorId === j.id);
+    const bloqueadoJ = sala.ronda.bloqueados.includes(j.id);
+    const sinVidas = sala.modo === 'supervivencia' && j.vidas <= 0;
+    return !acertoJ && !bloqueadoJ && !sinVidas;
+  });
+  if (pendientes.length === 0) resolverRondaOnline(sala);
+}
+
 // Aplica los puntos y cambios de vidas al cerrar la ronda para no dar pistas en directo
 function resolverRondaOnline(sala) {
   if (!sala?.ronda || sala.ronda.estadoRonda === 'resuelta') return;
@@ -171,7 +183,9 @@ router.post('/online/crear', (req, res) => {
     modo: 'estandar', // 'estandar' | 'supervivencia'
     rondaNum: 1,
     usados: [],
-    jugadores: [{ id: 1, token: tokenAdmin, nombre, puntos: 0, vidas: 3, conectado: true }],
+    siguienteId: 2,
+    creada: Date.now(),
+    jugadores: [{ id: 1, token: tokenAdmin, nombre: nombre.slice(0, 20), puntos: 0, vidas: 3, visto: Date.now() }],
     ronda: null
   };
 
@@ -186,14 +200,15 @@ router.post('/online/unirse', (req, res) => {
   const sala = salasOnline[code];
   if (!sala) return res.status(404).json({ error: 'La sala no existe o el código es incorrecto.' });
   if (sala.estado !== 'lobby') return res.status(400).json({ error: 'La partida ya ha comenzado.' });
+  if (!nombre) return res.status(400).json({ error: 'Debes indicar un nombre.' });
   if (sala.jugadores.length >= 15) return res.status(400).json({ error: 'La sala está completa.' });
   if (sala.jugadores.some((j) => j.nombre.toLowerCase() === nombre.toLowerCase())) {
     return res.status(400).json({ error: 'Ya hay un jugador con ese nombre en la sala.' });
   }
 
   const token = generarToken();
-  const nuevoId = sala.jugadores.length + 1;
-  sala.jugadores.push({ id: nuevoId, token, nombre, puntos: 0, vidas: 3, conectado: true });
+  const nuevoId = sala.siguienteId++;
+  sala.jugadores.push({ id: nuevoId, token, nombre: nombre.slice(0, 20), puntos: 0, vidas: 3, visto: Date.now() });
 
   res.json({ success: true, code, token, jugadorId: nuevoId });
 });
@@ -204,6 +219,7 @@ router.post('/online/sala/:code/modo', (req, res) => {
   const { token, modo } = req.body || {};
   const sala = salasOnline[code];
   if (!sala || sala.adminToken !== token) return res.status(403).json({ error: 'No autorizado.' });
+  if (sala.estado !== 'lobby') return res.status(400).json({ error: 'La partida ya ha comenzado.' });
 
   sala.modo = modo === 'supervivencia' ? 'supervivencia' : 'estandar';
   res.json({ success: true, modo: sala.modo });
@@ -221,6 +237,8 @@ router.get('/online/sala/:code', (req, res) => {
   if (!jugadorActual) return res.status(403).json({ error: 'No perteneces a esta sala.' });
 
   const esAdmin = sala.adminToken === token;
+  jugadorActual.visto = Date.now();
+  const anfitrion = sala.jugadores.find((j) => j.token === sala.adminToken);
 
   // Avance automático de pistas cada 10 s cuando la ronda está activa
   if (sala.estado === 'jugando' && sala.ronda && sala.ronda.estadoRonda === 'activa') {
@@ -248,6 +266,7 @@ router.get('/online/sala/:code', (req, res) => {
     estado: sala.estado,
     modo: sala.modo,
     esAdmin,
+    anfitrionId: anfitrion ? anfitrion.id : null,
     yoId: jugadorActual.id,
     rondaNum: sala.rondaNum,
     jugadores: sala.jugadores.map((j) => {
@@ -261,6 +280,7 @@ router.get('/online/sala/:code', (req, res) => {
         nombre: j.nombre,
         puntos: j.puntos,
         vidas: j.vidas,
+        conectado: Date.now() - (j.visto || 0) < 15000,
         respondido: haRespondido,
         // Mientras la ronda está activa, solo el propio jugador sabe si ha acertado o ha fallado
         bloqueado: rondaActiva ? (esYo ? bloqueadoReal : false) : bloqueadoReal,
@@ -289,6 +309,8 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
   const sala = salasOnline[code];
   if (!sala) return res.status(404).json({ error: 'La sala no existe.' });
   if (sala.adminToken !== token) return res.status(403).json({ error: 'Solo el anfitrión puede iniciar.' });
+  if (sala.estado === 'jugando') return res.json({ success: true });
+  if (sala.jugadores.length < 2) return res.status(400).json({ error: 'Hacen falta al menos 2 jugadores.' });
 
   sala.estado = 'jugando';
   sala.rondaNum = 1;
@@ -351,17 +373,7 @@ router.post('/online/sala/:code/responder', (req, res) => {
     sala.ronda.bloqueados.push(jugador.id);
   }
 
-  // Comprobar si todos los jugadores con vida ya han respondido en esta ronda
-  const pendientes = sala.jugadores.filter((j) => {
-    const acertoJ = sala.ronda.acertados.some((a) => a.jugadorId === j.id);
-    const bloqueadoJ = sala.ronda.bloqueados.includes(j.id);
-    const sinVidas = sala.modo === 'supervivencia' && j.vidas <= 0;
-    return !acertoJ && !bloqueadoJ && !sinVidas;
-  });
-
-  if (pendientes.length === 0) {
-    resolverRondaOnline(sala);
-  }
+  comprobarPendientes(sala);
 
   res.json({ success: true, acierto });
 });
@@ -369,8 +381,10 @@ router.post('/online/sala/:code/responder', (req, res) => {
 // 7. Finalizar ronda manualmente y ver solución
 router.post('/online/sala/:code/solucion', (req, res) => {
   const code = req.params.code.toUpperCase();
+  const { token } = req.body || {};
   const sala = salasOnline[code];
   if (!sala || !sala.ronda) return res.status(404).json({ error: 'Ronda no activa.' });
+  if (sala.adminToken !== token) return res.status(403).json({ error: 'Solo el anfitrión puede revelar la solución.' });
 
   resolverRondaOnline(sala);
   res.json({ success: true, nombre: sala.ronda.solucion });
@@ -384,6 +398,7 @@ router.post('/online/sala/:code/siguiente-ronda', (req, res) => {
   const sala = salasOnline[code];
   if (!sala) return res.status(404).json({ error: 'La sala no existe.' });
   if (sala.adminToken !== token) return res.status(403).json({ error: 'Solo el anfitrión puede avanzar.' });
+  if (sala.estado !== 'jugando' || sala.ronda?.estadoRonda !== 'resuelta') return res.json({ success: true });
 
   if (sala.modo === 'supervivencia') {
     const vivos = sala.jugadores.filter((j) => j.vidas > 0);
@@ -443,12 +458,34 @@ router.post('/online/sala/:code/salir', (req, res) => {
     sala.jugadores.splice(idx, 1);
     if (sala.jugadores.length === 0) {
       delete salasOnline[code];
-    } else if (sala.adminToken === token) {
-      sala.adminToken = sala.jugadores[0].token;
+    } else {
+      if (sala.adminToken === token) sala.adminToken = sala.jugadores[0].token;
+      comprobarPendientes(sala);
     }
   }
 
   res.json({ success: true });
 });
+
+// 12. Expulsar a un jugador (sólo anfitrión, en el lobby)
+router.post('/online/sala/:code/expulsar', (req, res) => {
+  const code = req.params.code.toUpperCase();
+  const { token, jugadorId } = req.body || {};
+  const sala = salasOnline[code];
+  if (!sala || sala.adminToken !== token) return res.status(403).json({ error: 'No autorizado.' });
+  if (sala.estado !== 'lobby') return res.status(400).json({ error: 'Solo se puede quitar jugadores antes de empezar.' });
+  const idx = sala.jugadores.findIndex((j) => j.id === Number(jugadorId) && j.token !== token);
+  if (idx !== -1) sala.jugadores.splice(idx, 1);
+  res.json({ success: true });
+});
+
+// Limpieza de salas abandonadas (nadie consulta en 2 horas)
+setInterval(() => {
+  const limite = Date.now() - 2 * 60 * 60 * 1000;
+  Object.keys(salasOnline).forEach((c) => {
+    const s = salasOnline[c];
+    if (!s.jugadores.some((j) => (j.visto || 0) > limite)) delete salasOnline[c];
+  });
+}, 10 * 60 * 1000).unref();
 
 export default router;
