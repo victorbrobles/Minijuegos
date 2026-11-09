@@ -108,6 +108,12 @@ npm run dev
 - Partidas de 10, 15 o 25 rondas y 45 s por respuesta. Online, el servidor cierra la ronda al acabar el tiempo y acepta selecciones incompletas.
 - Elementos en `server/data/seeds/colores/parteN.js` (`{ id, item, colores: [...] }`, con los colores de la paleta: rojo, azul, amarillo, verde, naranja, morado, marron, blanco, negro, gris, rosa). `parte6.js` es la ampliación.
 
+## Minijuego: Colecciona con cabeza (`Coleccion/`)
+- Cada jugador (2 a 6) recibe un encargo secreto: la colección que debe reunir en su vitrina (pleno, doble pareja, trío y uno, familia o arcoíris de 5 palos). Varios pueden ir a por lo mismo sin saberlo. Gana quien cumpla su encargo (en cualquier momento, aunque sea por culpa de otro).
+- Turno: robar 2 y hacer 2 jugadas (poner carta en la vitrina, devolverla a la mano o jugar acción). Mano máx. 7, vitrina máx. 6. 🌟 Comodines valen por cualquier palo.
+- 14 cartas de acción: Mapache, Bomba, Trueque, Regalo envenenado, Congelar, Espía, Cambiazo de encargo, Nuevo encargo, Imán, Doble o nada, Rebuscar, Tornado, Turbo y Escudo (se activa solo).
+- Motor en `server/coleccion/engine.js` con copia idéntica en el cliente (`npm run sync:coleccion`). Pruebas: `node server/scripts/coleccion-sim.mjs` y `node server/scripts/coleccion-e2e.mjs [jugadores]`.
+
 ## Minijuego: La Hipótesis Ganadora (`Hipotesis/`)
 - Cada ronda hay una verdad absoluta oculta (una fila de casillas) y cada jugador ve solo 2 o 3. Todos formulan en secreto una hipótesis, cierta o de farol; después se desvelan y cada uno decide en cuáles confía (✅/❌, y una con ⭐ «¡Seguro!» que vale doble). Al final se revela la verdad hipótesis a hipótesis.
 - Escenarios (cambian cada ronda, con sus propios tipos de hipótesis): laboratorio, baraja, barrio y caja fuerte. Eventos sorpresa: ronda doble, rumor, topo, ronda sincera, juicio a ciegas, chismorreo y relámpago.

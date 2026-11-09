@@ -56,7 +56,7 @@ export const META = {
     icono: 'cards',
     colores: ['#06b6d4', '#1e40af'],
     etiquetas: 'cartas azar coleccion estrategia numeros baraja',
-    descripcion: 'Una colección de cartas con 8 palos diferentes y muchas cartas de acción. Consigue cinco cartas del mismo palo y ganarás, pero ojo, si acumulas cinco diferentes perderás. ¡Usa bien las cartas de acción!',
+    descripcion: 'Cada uno tiene un encargo secreto: la colección que debe reunir antes que nadie. Puede que otro vaya a por la misma sin que lo sepas. Roba, bombardea, espía, cambia encargos y arriésgate con las cartas de acción.',
     categorias: ['estrategia']
   },
   'cuentas': {

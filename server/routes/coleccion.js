@@ -1,407 +1,203 @@
+// server/routes/coleccion.js
+// Salas online de «Colecciona con cabeza». Mismo esquema que el resto de juegos: salas en memoria + sondeo HTTP.
+// La lógica vive en ../coleccion/engine.js; cada jugador recibe solo SU vista (nadie ve manos ni encargos ajenos).
 import express from 'express';
-import crypto from 'crypto';
+import * as E from '../coleccion/engine.js';
 
 const router = express.Router();
 const salas = {};
+const MIN = E.AJUSTES.min;
+const MAX = E.AJUSTES.max;
+const CADUCIDAD_MS = 4 * 60 * 60 * 1000;
 
-const generarCodigo = () => Math.random().toString(36).substring(2, 6).toUpperCase();
-
-const PALOS = [
-  { id: 'manzana', nombre: 'Manzana', icono: '🍎' },
-  { id: 'seta', nombre: 'Seta', icono: '🍄' },
-  { id: 'diamante', nombre: 'Diamante', icono: '💎' },
-  { id: 'espada', nombre: 'Espada', icono: '🗡️' },
-  { id: 'pocion', nombre: 'Poción', icono: '🧪' },
-  { id: 'corona', nombre: 'Corona', icono: '👑' },
-  { id: 'luna', nombre: 'Luna', icono: '🌙' },
-  { id: 'rayo', nombre: 'Rayo', icono: '⚡' }
-];
-
-const ACCIONES = [
-  { id: 'intercambio_azar', nombre: 'Ruleta', icono: '🔀', desc: 'Intercambias 1 carta al azar con un rival.' },
-  { id: 'robar_tres', nombre: 'Suministros', icono: '📦', desc: 'Robas 3 cartas de una en una. Al robar la 3ª acaba tu turno.' },
-  { id: 'descartar_tres', nombre: 'Purga', icono: '🗑️', desc: 'Descarta hasta 3 cartas de tu mano.' },
-  { id: 'robar_elegida', nombre: 'Robo Preciso', icono: '🎯', desc: 'Miras la mano de un rival y le robas la que elijas.' },
-  { id: 'dar_carta', nombre: 'Regalo Envenenado', icono: '🎁', desc: 'Obligas a un rival a recibir una carta de tu mano.' },
-  { id: 'ver_mano', nombre: 'Espionaje', icono: '👁️‍🗨️', desc: 'Miras todas las cartas que tiene un rival.' },
-  { id: 'retar', nombre: 'Duelo', icono: '⚔️', desc: 'Pides un palo a un rival. Si lo tiene te lo da; si no, te roba él a ti.' },
-  { id: 'cambiar_mano', nombre: 'Torbellino', icono: '🌪️', desc: 'Intercambias tu mano completa con la de un rival.' }
-];
-
-const generarMazo = () => {
-  let mazo = [];
-  let uid = 1;
-  // 80 Cartas de recursos (8 palos x 10)
-  PALOS.forEach(p => {
-    for (let i = 0; i < 10; i++) {
-      mazo.push({ uid: uid++, tipo: 'palo', palo: p.id, icono: p.icono, nombre: p.nombre });
-    }
-  });
-  // 13 cartas de Suministros (3 + 10 extras)
-  for (let i = 0; i < 13; i++) {
-    mazo.push({ uid: uid++, tipo: 'accion', accion: 'robar_tres', icono: '📦', nombre: 'Suministros', desc: 'Robas 3 cartas de una en una.' });
-  }
-  // 3 copias de las otras 7 acciones (21 cartas)
-  ACCIONES.filter(a => a.id !== 'robar_tres').forEach(a => {
-    for (let i = 0; i < 3; i++) {
-      mazo.push({ uid: uid++, tipo: 'accion', accion: a.id, icono: a.icono, nombre: a.nombre, desc: a.desc });
-    }
-  });
-  return mazo.sort(() => Math.random() - 0.5);
+const codigoSala = () => {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let c = '';
+  for (let i = 0; i < 4; i++) c += chars.charAt(Math.floor(Math.random() * chars.length));
+  return c;
 };
+const nuevoToken = () => Math.random().toString(36).slice(2) + Date.now().toString(36) + Math.random().toString(36).slice(2);
 
-const rellenarMazo = (sala) => {
-  if (sala.mazo.length === 0) {
-    const top = sala.descarte.pop();
-    const cartasReutilizables = [...sala.descarte, ...(sala.accionesGastadas || [])];
-    sala.mazo = cartasReutilizables.sort(() => Math.random() - 0.5);
-    sala.descarte = top ? [top] : [];
-    sala.accionesGastadas = [];
-  }
-};
+setInterval(() => {
+  const ahora = Date.now();
+  Object.keys(salas).forEach((c) => { if (ahora - salas[c].ultimaActividad > CADUCIDAD_MS) delete salas[c]; });
+}, 10 * 60 * 1000).unref();
 
-const comprobarVictoriaDerrota = (sala) => {
-  sala.jugadores.filter(j => j.vivo).forEach(j => {
-    const palosCount = {};
-    let palosDistintos = 0;
-    j.mano.forEach(c => {
-      if (c.tipo === 'palo') {
-        if (!palosCount[c.palo]) { palosCount[c.palo] = 0; palosDistintos++; }
-        palosCount[c.palo]++;
-      }
-    });
+function sala_y_jugador(req, res) {
+  const code = String(req.params.code || '').toUpperCase();
+  const token = req.body?.token ?? req.query?.token;
+  const sala = salas[code];
+  if (!sala) { res.status(404).json({ error: 'La sala no existe o ha caducado.' }); return null; }
+  const jugador = sala.jugadores.find((j) => j.token === token);
+  if (!jugador) { res.status(403).json({ error: 'No perteneces a esta sala.' }); return null; }
+  sala.ultimaActividad = Date.now();
+  jugador.visto = Date.now();
+  return { sala, jugador, esAdmin: sala.adminToken === token };
+}
 
-    const maxMismoPalo = Math.max(0, ...Object.values(palosCount));
+function cerrarPartida(sala) {
+  if (sala.puntosAplicados) return;
+  sala.puntosAplicados = true;
+  const g = sala.partida.fin.ganadorId;
+  const pts = Object.fromEntries(sala.jugadores.map((j) => [j.id, j.id === g ? 3 : 0]));
+  sala.jugadores.forEach((j) => { j.puntos += pts[j.id] || 0; });
+  sala.ultimaPartida = { partida: sala.numPartida, puntos: pts };
+}
+const revisar = (sala) => { if (sala.partida?.fase === 'fin') cerrarPartida(sala); };
 
-    if (maxMismoPalo >= 5) {
-      sala.ganador = j.nombre;
-      sala.log.unshift(`🏆 ¡${j.nombre} ha reunido 5 cartas iguales y gana!`);
-    } else if (palosDistintos >= 5) {
-      j.vivo = false;
-      // Las cartas de palo al descarte; las acciones van a accionesGastadas
-      j.mano.forEach(c => {
-        if (c.tipo === 'palo') sala.descarte.push(c);
-        else (sala.accionesGastadas = sala.accionesGastadas || []).push(c);
-      });
-      j.mano = [];
-      sala.log.unshift(`💀 ¡${j.nombre} acumuló 5 tipos distintos y fue eliminado!`);
-    }
-  });
-
-  const vivos = sala.jugadores.filter(j => j.vivo);
-  if (vivos.length === 1 && !sala.ganador) {
-    sala.ganador = vivos[0].nombre;
-    sala.log.unshift(`🏆 ¡${vivos[0].nombre} es el único superviviente!`);
-  }
-
-  if (sala.ganador) sala.estado = 'fin';
-};
-
-const avanzarTurno = (sala) => {
-  let next = (sala.turnoActivoIdx + 1) % sala.jugadores.length;
-  while (!sala.jugadores[next].vivo && sala.jugadores.filter(j => j.vivo).length > 1) {
-    next = (next + 1) % sala.jugadores.length;
-  }
-  sala.turnoActivoIdx = next;
-  sala.turnoActivoId = sala.jugadores[next].id;
-  sala.faseTurno = 'robar';
-  sala.robosSuministros = 0;
-};
-
-router.post('/crear', (req, res) => {
-  const { nombre } = req.body;
-  const code = generarCodigo();
-  const token = crypto.randomUUID();
-
-  salas[code] = {
-    code, estado: 'lobby', mazo: [], descarte: [], accionesGastadas: [], log: [],
-    turnoActivoIdx: 0, turnoActivoId: null, faseTurno: 'robar', robosSuministros: 0, ganador: null,
-    jugadores: [{ id: 1, nombre, token, esAdmin: true, vivo: true, mano: [] }]
-  };
-  res.json({ success: true, code, token });
-});
-
-router.post('/unirse', (req, res) => {
-  const { nombre, joinCode } = req.body;
-  const sala = salas[joinCode];
-  if (!sala || sala.estado !== 'lobby' || sala.jugadores.length >= 8) return res.status(400).json({ error: 'No se puede unir a la sala' });
-  const token = crypto.randomUUID();
-  sala.jugadores.push({ id: sala.jugadores.length + 1, nombre, token, esAdmin: false, vivo: true, mano: [] });
-  res.json({ success: true, code: joinCode, token });
-});
-
-router.get('/sala/:code', (req, res) => {
-  const sala = salas[req.params.code];
-  if (!sala) return res.status(404).json({ error: 'Sala no encontrada' });
-  const yo = sala.jugadores.find(j => j.token === req.query.token);
-  if (!yo) return res.status(403).json({ error: 'No autorizado' });
-
-  const data = {
-    code: sala.code, estado: sala.estado, log: sala.log, ganador: sala.ganador,
-    turnoActivo: sala.turnoActivoId, faseTurno: sala.faseTurno,
-    robosSuministros: sala.robosSuministros || 0,
-    mazoCount: sala.mazo.length, topDescarte: sala.descarte[sala.descarte.length - 1] || null,
-    jugadores: sala.jugadores.map(j => ({
-      id: j.id, nombre: j.nombre, vivo: j.vivo, esAdmin: j.esAdmin, esTu: j.id === yo.id,
-      cartasCount: j.mano.length, mano: j.id === yo.id ? j.mano : []
-    }))
-  };
-  res.json({ success: true, ...data });
-});
-
-router.post('/iniciar', (req, res) => {
-  const sala = salas[req.body.code];
-  if (!sala || !sala.jugadores.find(j => j.token === req.body.token)?.esAdmin) return res.status(403).json({ error: 'Prohibido' });
-
-  sala.mazo = generarMazo();
-  sala.jugadores.forEach(j => { j.vivo = true; j.mano = sala.mazo.splice(0, 4); });
-  
-  // Garantizar que la primera carta del descarte sea un palo normal
-  const primerPaloIdx = sala.mazo.findIndex(c => c.tipo === 'palo');
-  sala.descarte = [sala.mazo.splice(primerPaloIdx, 1)[0]];
-  sala.accionesGastadas = [];
-  
+function iniciarPartida(sala) {
+  sala.numPartida += 1; sala.puntosAplicados = false;
+  sala.partida = E.crearPartida(sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre })));
   sala.estado = 'jugando';
-  sala.ganador = null;
-  sala.log = ['Partida iniciada. ¡Cada jugador comienza con 4 cartas!'];
-  sala.turnoActivoIdx = 0;
-  sala.turnoActivoId = sala.jugadores[0].id;
-  sala.faseTurno = 'robar';
-  sala.robosSuministros = 0;
+}
 
-  res.json({ success: true });
-});
-
-router.post('/robar', (req, res) => {
-  const { code, token, origen } = req.body;
-  const sala = salas[code];
-  const yo = sala?.jugadores.find(j => j.token === token);
-
-  if (!yo || sala.turnoActivoId !== yo.id || sala.faseTurno !== 'robar') return res.status(400).json({ error: 'No es momento de robar' });
-
-  rellenarMazo(sala);
-  const carta = origen === 'mazo' ? sala.mazo.pop() : sala.descarte.pop();
-  if (carta) {
-    yo.mano.push(carta);
-    sala.log.unshift(`📥 ${yo.nombre} robó del ${origen}.`);
-  }
-
-  comprobarVictoriaDerrota(sala);
-  if (sala.estado === 'fin') return res.json({ success: true });
-
-  if (!yo.vivo) {
-    avanzarTurno(sala);
-    return res.json({ success: true });
-  }
-
-  // Si está bajo efecto de Suministros
-  if (sala.robosSuministros > 0) {
-    sala.robosSuministros -= 1;
-    if (sala.robosSuministros > 0) {
-      sala.faseTurno = 'robar';
-    } else {
-      avanzarTurno(sala);
-    }
-    return res.json({ success: true });
-  }
-
-  sala.faseTurno = 'jugar';
-  res.json({ success: true });
-});
-
-router.post('/espiar', (req, res) => {
-  const { code, token, targetId } = req.body;
-  const sala = salas[code];
-  const yo = sala?.jugadores.find(j => j.token === token);
-  if (!yo || sala.turnoActivoId !== yo.id) return res.status(400).json({ error: 'No autorizado' });
-  const target = sala.jugadores.find(j => j.id === targetId);
-  res.json({ success: true, mano: target ? target.mano : [] });
-});
-
-router.post('/jugar', (req, res) => {
-  const { code, token, cartaId, targetId, miCartaId, purgaIds, paloPedido } = req.body;
-  const sala = salas[code];
-  const yo = sala?.jugadores.find(j => j.token === token);
-
-  if (!yo || sala.turnoActivoId !== yo.id || sala.faseTurno !== 'jugar') return res.status(400).json({ error: 'No es momento de jugar' });
-
-  const cartaIdx = yo.mano.findIndex(c => c.uid === cartaId);
-  if (cartaIdx === -1) return res.status(400).json({ error: 'Carta no encontrada' });
-  const carta = yo.mano.splice(cartaIdx, 1)[0];
-
-  // Las cartas de acción NUNCA van al descarte
-  if (carta.tipo === 'palo') {
-    sala.descarte.push(carta);
-  } else {
-    (sala.accionesGastadas = sala.accionesGastadas || []).push(carta);
-  }
-
-  let resultado = {
-    titulo: 'Acción realizada',
-    icono: carta.icono || '✨',
-    mensaje: ''
+// ---------------------------------------------------------------- Crear / unirse
+router.post('/online/crear', (req, res) => {
+  const nombre = String(req.body?.nombre || '').trim().slice(0, 20);
+  if (!nombre) return res.status(400).json({ error: 'Debes indicar un nombre.' });
+  let code = codigoSala();
+  while (salas[code]) code = codigoSala();
+  const token = nuevoToken();
+  salas[code] = {
+    code, adminToken: token, estado: 'lobby', contadorIds: 1, numPartida: 0, puntosAplicados: false,
+    partida: null, ultimaPartida: null, ultimaActividad: Date.now(), config: {},
+    jugadores: [{ id: 1, token, nombre, puntos: 0, visto: Date.now() }]
   };
-
-  if (carta.tipo === 'palo') {
-    sala.log.unshift(`📤 ${yo.nombre} descartó un(a) ${carta.nombre}.`);
-    resultado = {
-      titulo: 'Palo descartado',
-      icono: carta.icono,
-      mensaje: `Has descartado ${carta.nombre}.`
-    };
-  } else {
-    switch (carta.accion) {
-      case 'robar_tres': {
-        sala.robosSuministros = 3;
-        sala.faseTurno = 'robar';
-        sala.log.unshift(`📦 ${yo.nombre} activó Suministros: debe robar 3 cartas de una en una.`);
-        // No se muestra modal de resultado: se pasa a robar de inmediato
-        return res.json({ success: true });
-      }
-
-      case 'descartar_tres': {
-        if (Array.isArray(purgaIds)) {
-          const descartadas = yo.mano.filter(c => purgaIds.includes(c.uid));
-          yo.mano = yo.mano.filter(c => !purgaIds.includes(c.uid));
-          descartadas.forEach(c => {
-            if (c.tipo === 'palo') sala.descarte.push(c);
-            else (sala.accionesGastadas = sala.accionesGastadas || []).push(c);
-          });
-          sala.log.unshift(`🗑️ ${yo.nombre} purgó ${descartadas.length} carta(s).`);
-          resultado = {
-            titulo: 'Purga completada',
-            icono: '🗑️',
-            mensaje: `Has descartado ${descartadas.length} carta(s).`
-          };
-        }
-        break;
-      }
-
-      case 'intercambio_azar': {
-        const target = sala.jugadores.find(j => j.id === targetId);
-        if (target && target.mano.length > 0 && yo.mano.length > 0) {
-          const miC = yo.mano.splice(Math.floor(Math.random() * yo.mano.length), 1)[0];
-          const suC = target.mano.splice(Math.floor(Math.random() * target.mano.length), 1)[0];
-          yo.mano.push(suC);
-          target.mano.push(miC);
-          sala.log.unshift(`🔀 ${yo.nombre} intercambió cartas a ciegas con ${target.nombre}.`);
-          resultado = {
-            titulo: 'Ruleta completada',
-            icono: '🔀',
-            mensaje: `Has entregado un(a) ${miC.nombre} y recibido ${suC.icono} ${suC.nombre} de ${target.nombre}.`
-          };
-        }
-        break;
-      }
-
-      case 'robar_elegida': {
-        const target = sala.jugadores.find(j => j.id === targetId);
-        if (target && target.mano.length > 0) {
-          const robada = target.mano.splice(Math.floor(Math.random() * target.mano.length), 1)[0];
-          yo.mano.push(robada);
-          sala.log.unshift(`🎯 ${yo.nombre} le quitó un(a) ${robada.nombre} a ${target.nombre}.`);
-          resultado = {
-            titulo: 'Robo preciso completado',
-            icono: '🎯',
-            mensaje: `Le has quitado ${robada.icono} ${robada.nombre} a ${target.nombre}.`
-          };
-        }
-        break;
-      }
-
-      case 'dar_carta': {
-        const target = sala.jugadores.find(j => j.id === targetId);
-        const cartaIdx = yo.mano.findIndex(c => c.uid === miCartaId);
-        if (target && cartaIdx !== -1) {
-          const regalada = yo.mano.splice(cartaIdx, 1)[0];
-          target.mano.push(regalada);
-          sala.log.unshift(`🎁 ${yo.nombre} le endosó un(a) ${regalada.nombre} a ${target.nombre}.`);
-          resultado = {
-            titulo: 'Regalo entregado',
-            icono: '🎁',
-            mensaje: `Le has metido ${regalada.icono} ${regalada.nombre} a ${target.nombre}.`
-          };
-        }
-        break;
-      }
-
-      case 'retar': {
-        const target = sala.jugadores.find(j => j.id === targetId);
-        if (target) {
-          const idxPalo = target.mano.findIndex(x => x.palo === paloPedido);
-          if (idxPalo !== -1) {
-            const ganada = target.mano.splice(idxPalo, 1)[0];
-            yo.mano.push(ganada);
-            sala.log.unshift(`⚔️ Duelo: ${yo.nombre} acertó y le quitó ${ganada.nombre} a ${target.nombre}!`);
-            resultado = {
-              titulo: '¡HAS GANADO EL DUELO!',
-              dueloGanado: true,
-              icono: '⚔️',
-              mensaje: `¡Acertaste! ${target.nombre} tenía ese palo y te ha entregado ${ganada.icono} ${ganada.nombre}.`
-            };
-          } else {
-            let perdida = null;
-            if (yo.mano.length > 0) {
-              perdida = yo.mano.splice(Math.floor(Math.random() * yo.mano.length), 1)[0];
-              target.mano.push(perdida);
-            }
-            sala.log.unshift(`⚔️ Duelo: ${target.nombre} no tenía ese palo. ¡${yo.nombre} perdió una carta!`);
-            resultado = {
-              titulo: '¡HAS PERDIDO EL DUELO!',
-              dueloGanado: false,
-              icono: '❌',
-              mensaje: `${target.nombre} NO tenía ese palo. Has perdido una carta de tu mano.`
-            };
-          }
-        }
-        break;
-      }
-
-      case 'cambiar_mano': {
-        const target = sala.jugadores.find(j => j.id === targetId);
-        if (target) {
-          const temp = [...yo.mano];
-          yo.mano = [...target.mano];
-          target.mano = temp;
-          sala.log.unshift(`🌪️ ¡Torbellino! ${yo.nombre} y ${target.nombre} intercambiaron sus manos.`);
-          resultado = {
-            titulo: '¡Torbellino ejecutado!',
-            icono: '🌪️',
-            mensaje: `Has intercambiado todas tus cartas con ${target.nombre}.`
-          };
-        }
-        break;
-      }
-
-      default:
-        break;
-    }
-  }
-
-  comprobarVictoriaDerrota(sala);
-  res.json({ success: true, resultado });
+  res.json({ success: true, code, token, jugadorId: 1 });
 });
 
-router.post('/finalizarTurno', (req, res) => {
-  const { code, token } = req.body;
+router.post('/online/unirse', (req, res) => {
+  const code = String(req.body?.code || '').trim().toUpperCase();
+  const nombre = String(req.body?.nombre || '').trim().slice(0, 20);
   const sala = salas[code];
-  const yo = sala?.jugadores.find(j => j.token === token);
+  if (!nombre) return res.status(400).json({ error: 'Debes indicar un nombre.' });
+  if (!sala) return res.status(404).json({ error: 'La sala no existe o el código es incorrecto.' });
+  if (sala.estado !== 'lobby') return res.status(400).json({ error: 'La partida ya ha comenzado.' });
+  if (sala.jugadores.length >= MAX) return res.status(400).json({ error: 'La sala está completa.' });
+  if (sala.jugadores.some((j) => j.nombre.toLowerCase() === nombre.toLowerCase())) return res.status(400).json({ error: 'Ya hay un jugador con ese nombre en la sala.' });
+  const token = nuevoToken();
+  sala.contadorIds += 1;
+  sala.jugadores.push({ id: sala.contadorIds, token, nombre, puntos: 0, visto: Date.now() });
+  sala.ultimaActividad = Date.now();
+  res.json({ success: true, code, token, jugadorId: sala.contadorIds });
+});
 
-  if (!yo || sala.turnoActivoId !== yo.id) return res.status(400).json({ error: 'No es tu turno' });
-
-  if (sala.estado !== 'fin') {
-    avanzarTurno(sala);
+// ---------------------------------------------------------------- Estado
+router.get('/online/sala/:code', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  const { sala, jugador, esAdmin } = c;
+  const base = {
+    success: true, code: sala.code, estado: sala.estado, esAdmin, yoId: jugador.id, numPartida: sala.numPartida, config: sala.config,
+    anfitrionId: sala.jugadores.find((j) => j.token === sala.adminToken)?.id ?? null, min: MIN, max: MAX,
+    jugadores: sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre, puntos: j.puntos, conectado: Date.now() - j.visto < 15000 })),
+    ultimaPartida: sala.ultimaPartida
+  };
+  if (sala.estado === 'jugando' && sala.partida) {
+    if (!sala.partida.jugadores.some((j) => j.id === jugador.id)) return res.status(403).json({ error: 'Ya no estás en la partida.' });
+    base.vista = E.vistaDe(sala.partida, jugador.id);
   }
+  res.json(base);
+});
+
+// ---------------------------------------------------------------- Configuración y expulsar (sala de espera)
+router.post('/online/sala/:code/expulsar', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión.' });
+  if (c.sala.estado !== 'lobby') return res.status(400).json({ error: 'Solo se puede quitar a alguien en la sala de espera.' });
+  const id = Number(req.body?.id);
+  if (id === c.jugador.id) return res.status(400).json({ error: 'No puedes quitarte a ti mismo.' });
+  const idx = c.sala.jugadores.findIndex((j) => j.id === id);
+  if (idx === -1) return res.status(404).json({ error: 'Ese jugador ya no está en la sala.' });
+  c.sala.jugadores.splice(idx, 1);
   res.json({ success: true });
 });
 
-router.post('/salir', (req, res) => {
-  const { code, token } = req.body;
-  const sala = salas[code];
-  if (sala) {
-    sala.jugadores = sala.jugadores.filter(j => j.token !== token);
-    if (sala.jugadores.length === 0) delete salas[code];
+// ---------------------------------------------------------------- Iniciar
+router.post('/online/sala/:code/iniciar', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión puede iniciar.' });
+  if (c.sala.estado === 'jugando') return res.status(400).json({ error: 'La partida ya está en marcha.' });
+  if (c.sala.jugadores.length < MIN) return res.status(400).json({ error: `Se necesitan al menos ${MIN} jugadores.` });
+  c.sala.jugadores.forEach((j) => { j.puntos = 0; });
+  c.sala.ultimaPartida = null; c.sala.numPartida = 0;
+  iniciarPartida(c.sala);
+  res.json({ success: true });
+});
+
+// ---------------------------------------------------------------- Acciones
+// tipo: colocar | retirar | accion | terminar | descartar
+router.post('/online/sala/:code/accion', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  const { sala, jugador } = c;
+  if (sala.estado !== 'jugando' || !sala.partida) return res.status(400).json({ error: 'No hay partida en marcha.' });
+  const p = sala.partida; const d = req.body || {}; const id = jugador.id;
+  let r;
+  switch (d.tipo) {
+    case 'colocar': r = E.colocar(p, id, Number(d.uid)); break;
+    case 'retirar': r = E.retirar(p, id, Number(d.uid)); break;
+    case 'accion': r = E.jugarAccion(p, id, Number(d.uid), d.params || {}); break;
+    case 'terminar': r = E.terminarTurno(p, id); break;
+    case 'descartar': r = E.descartar(p, id, Number(d.uid)); break;
+    default: return res.status(400).json({ error: 'Acción desconocida.' });
   }
+  revisar(sala);
+  if (!r.ok) return res.status(400).json({ error: r.error });
+  res.json({ success: true, resultado: r });
+});
+
+router.post('/online/sala/:code/forzar', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión.' });
+  if (c.sala.estado !== 'jugando' || !c.sala.partida) return res.status(400).json({ error: 'No hay partida en marcha.' });
+  E.forzar(c.sala.partida);
+  revisar(c.sala);
+  res.json({ success: true });
+});
+
+// ---------------------------------------------------------------- Después de la partida
+router.post('/online/sala/:code/siguiente-partida', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión.' });
+  if (!c.sala.partida || c.sala.partida.fase !== 'fin') return res.status(400).json({ error: 'La partida aún no ha terminado.' });
+  if (c.sala.jugadores.length < MIN) return res.status(400).json({ error: `Se necesitan al menos ${MIN} jugadores.` });
+  iniciarPartida(c.sala);
+  res.json({ success: true });
+});
+
+router.post('/online/sala/:code/finalizar', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión.' });
+  if (c.sala.estado !== 'jugando' || c.sala.partida?.fase !== 'fin') return res.status(400).json({ error: 'La partida aún no ha terminado.' });
+  c.sala.estado = 'final';
+  res.json({ success: true });
+});
+
+router.post('/online/sala/:code/reiniciar', (req, res) => {
+  const c = sala_y_jugador(req, res);
+  if (!c) return;
+  if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión.' });
+  Object.assign(c.sala, { estado: 'lobby', partida: null, numPartida: 0, ultimaPartida: null });
+  c.sala.jugadores.forEach((j) => { j.puntos = 0; });
+  res.json({ success: true });
+});
+
+router.post('/online/sala/:code/salir', (req, res) => {
+  const code = String(req.params.code || '').toUpperCase();
+  const sala = salas[code];
+  if (!sala) return res.json({ success: true });
+  const idx = sala.jugadores.findIndex((j) => j.token === req.body?.token);
+  if (idx === -1) return res.json({ success: true });
+  const [fuera] = sala.jugadores.splice(idx, 1);
+  if (sala.estado === 'jugando' && sala.partida) { E.abandonar(sala.partida, fuera.id); revisar(sala); }
+  if (sala.jugadores.length === 0) delete salas[code];
+  else if (sala.adminToken === fuera.token) sala.adminToken = sala.jugadores[0].token;
   res.json({ success: true });
 });
 
