@@ -11,6 +11,7 @@ for (let k = 0; k < 300; k++) {
   while (p.fase !== 'fin' && pasos++ < 3000) {
     t += 3000;
     if (p.fase === 'resuelta') { E.siguiente(p, t); continue; }
+    if (!p.listo && Math.random() < 0.9) { E.listo(p, p.turno, t); continue; }
     const r = Math.random();
     if (r < 0.01 && p.jugadores.filter((j) => !j.fuera).length > 1) { E.abandonar(p, p.turno, t); continue; }
     const libres = ['top', 'middle', 'bottom'].filter((x) => !p.resueltas[x]);
@@ -21,7 +22,7 @@ for (let k = 0; k < 300; k++) {
     else {
       const real = retos[p.ronda - 1].partes[parte].jugador;
       const res = E.responder(p, p.turno, parte, r < 0.6 ? real.split(' ').pop() : 'Nadie', t);
-      if (!res.ok) throw new Error(res.error);
+      if (!res.ok && !/listo/.test(res.error)) throw new Error(res.error);
     }
     if (p.fase === 'jugando' && p.jugadores.find((j) => j.id === p.turno)?.fuera) throw new Error('turno de alguien fuera');
   }

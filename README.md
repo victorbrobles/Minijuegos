@@ -118,7 +118,7 @@ npm run dev
 
 ## Minijuego: FrankensFootball (`FootballSplit/`)
 - Online o en un dispositivo, 2–12 jugadores, 5/10/15 caras. Cada cara mezcla pelo, ojos y barbilla de tres futbolistas (sin repetir en la partida).
-- Por turnos de 60 s: tocas un trozo y escribes de quién es; acierto +5 (con pista +2) y sigues; fallo o pase, turno del siguiente. La ronda acaba con la cara completa o tras una vuelta.
+- Cada vez que cambia el turno sale «Turno de…» con «¡Listo!» (ahí empieza el reloj de 60 s). Tocas un trozo y escribes de quién es; acierto +5 (con pista +2) y sigues; fallo o pase, turno del siguiente. La ronda acaba con la cara completa o tras una vuelta: primero pantalla de soluciones y después la de puntuaciones con «Nueva ronda».
 - Los nombres ya no se envían al cliente hasta acertarlos. Motor `server/footballsplit/engine.js` (`npm run sync:footballsplit`). Prueba: `node server/scripts/footballsplit-sim.mjs`.
 
 ## Minijuego: ¡Qué jugadón! (`Jugadas/`)

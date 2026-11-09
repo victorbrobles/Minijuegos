@@ -210,7 +210,7 @@ export default function FootballSplitOnline({ onVolver, onSalir, onAbrirAyuda })
                 {sala.esAdmin ? (
                   <>
                     <button type="button" className="ffp-boton grande" onClick={() => enviar('siguiente')}>
-                      <Icon name="play" size={20} /> {v.ronda >= v.rondas ? 'Ver resultado final' : 'Siguiente cara'}
+                      <Icon name="play" size={20} /> {v.ronda >= v.rondas ? 'Ver resultado final' : 'Nueva ronda: siguiente cara'}
                     </button>
                     {v.ronda < v.rondas && <button type="button" className="ffp-enlace" onClick={() => enviar('terminar')}><Icon name="flagFinish" size={15} /> Terminar la partida ya</button>}
                   </>
