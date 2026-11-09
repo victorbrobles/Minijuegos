@@ -74,7 +74,7 @@ export const META = {
     icono: 'numcards',
     colores: ['#38bdf8', '#0369a1'],
     etiquetas: 'numeros orden cartas mayor menor cuenta deduccion cartas accion',
-    descripcion: 'Colocad números del 1 al 100 en orden ascendente sin comunicaros. Si colocas uno cuando no te toca, pierdes, pero si pasas demasiados turnos, también. Utiliza las cartas de acción para ser el primero en quedarse sin cartas.',
+    descripcion: 'Colocad números del 1 al 100 en orden ascendente sin comunicaros. En tu turno sueltas un número, usas una carta de acción al azar o pasas. Si sueltas uno que no tocaba o retienes el que tocaba, pierdes una vida. Gana quien se quede antes sin números.',
     categorias: ['estrategia']
   },
   'descarte': {
