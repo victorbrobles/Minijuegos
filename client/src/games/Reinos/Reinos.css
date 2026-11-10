@@ -1,0 +1,85 @@
+/* client/src/games/Reinos/Reinos.css
+   «Los Siete Reinos». Todo el CSS de la web va en un único fichero: aquí solo hay clases rnp- (y la paleta para las
+   pantallas comunes pzp-). */
+
+.pzp-contenedor.reinos { --pz0: #fef3c7; --pz1: #fbbf24; --pz2: #b45309; --pz3: #451a03; }
+
+.rnp-escudo { display: inline-grid; place-items: center; flex: none; width: 34px; height: 38px; border-radius: 8px 8px 16px 16px; background: var(--c); font-size: 1.1rem; box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.2), 0 2px 0 rgba(0, 0, 0, 0.2); }
+.rnp-escudo.chico { width: 24px; height: 26px; border-radius: 6px 6px 11px 11px; font-size: 0.78rem; }
+
+/* Mapa */
+.rnp-mapa-tarjeta { padding: 0.5rem !important; background: linear-gradient(180deg, #e0f2fe, #bae6fd) !important; }
+.rnp-mapa { display: block; width: 100%; height: auto; max-height: 62vh; user-select: none; }
+.rnp-hex polygon { transition: filter 0.15s ease; }
+.rnp-hex.tocable { cursor: pointer; }
+.rnp-hex.mio polygon { stroke: #0f172a; stroke-width: 3; }
+.rnp-hex.destino polygon { stroke: #f59e0b; stroke-width: 3.5; stroke-dasharray: 4 3; }
+.rnp-hex.origen polygon, .rnp-hex.objetivo polygon { stroke: #dc2626; stroke-width: 4.5; filter: drop-shadow(0 0 4px rgba(220, 38, 38, 0.6)); }
+.rnp-leyenda { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.25rem 0.6rem; margin-top: 0.3rem; color: #0c4a6e; font-size: 0.68rem; font-weight: 700; }
+
+/* Recursos y objetivos */
+.rnp-recursos { display: flex; flex-direction: column; gap: 0.45rem; }
+.rnp-reino { display: flex; align-items: center; gap: 0.6rem; }
+.rnp-reino strong { display: block; color: #0f172a; }
+.rnp-reino small { color: #64748b; font-weight: 700; }
+.rnp-cifras { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.35rem; }
+.rnp-cifras span { display: flex; flex-direction: column; align-items: center; padding: 0.35rem 0.2rem; border-radius: 12px; background: var(--pz0); color: var(--pz3); font-size: 0.85rem; }
+.rnp-cifras strong { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.25rem; }
+.rnp-cifras small { color: #78716c; font-size: 0.62rem; font-weight: 800; }
+.rnp-objetivos { display: flex; flex-direction: column; gap: 0.3rem; margin: 0; padding: 0; list-style: none; }
+.rnp-objetivos li { display: flex; flex-direction: column; padding: 0.4rem 0.6rem; border-radius: 12px; background: #f1f5f9; }
+.rnp-objetivos li.si { background: #dcfce7; }
+.rnp-objetivos small { color: #64748b; }
+
+/* Órdenes */
+.rnp-tipos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.45rem; }
+.rnp-tipo {
+  display: flex !important; align-items: center; gap: 0.45rem; width: 100% !important; min-height: 50px !important; margin: 0 !important; padding: 0.5rem 0.65rem !important;
+  border: 2px solid #e7e5e4 !important; border-radius: 14px !important; background: #fffbeb !important; color: #451a03 !important; font-weight: 800 !important; text-align: left; box-shadow: 0 3px 0 #e7e5e4 !important; cursor: pointer;
+}
+.rnp-tipo span { font-size: 1.3rem; }
+.rnp-tipo:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.rnp-lista-ordenes { display: flex; flex-direction: column; gap: 0.35rem; margin: 0 0 0.5rem; padding: 0; list-style: none; }
+.rnp-lista-ordenes li { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 0.65rem; border-radius: 12px; background: #fef3c7; color: #451a03; font-size: 0.9rem; font-weight: 700; }
+.rnp-lista-ordenes li span:nth-child(2) { flex: 1; }
+.rnp-quitar { width: 28px !important; height: 28px; min-height: 0 !important; margin: 0 !important; padding: 0 !important; border: none !important; border-radius: 50% !important; background: #fee2e2 !important; color: #b91c1c !important; font-weight: 900 !important; cursor: pointer; }
+.rnp-paso { margin: 0 !important; color: #0f172a !important; font-weight: 800; }
+.rnp-aviso { margin: 0 !important; padding: 0.5rem 0.7rem; border-radius: 12px; background: #fee2e2; color: #991b1b !important; font-size: 0.85rem; font-weight: 800; }
+.rnp-coste { margin: 0 !important; color: #92400e !important; font-weight: 800; }
+.rnp-coste.caro { color: #b91c1c !important; }
+.rnp-stepper { display: flex; align-items: center; justify-content: center; gap: 0.6rem; }
+.rnp-stepper button { width: 40px !important; height: 40px; min-height: 0 !important; margin: 0 !important; padding: 0 !important; border: 2px solid #e2e8f0 !important; border-radius: 12px !important; background: #f8fafc !important; color: #334155 !important; font-size: 1.3rem !important; font-weight: 900 !important; cursor: pointer; }
+.rnp-stepper button:disabled { opacity: 0.4; }
+.rnp-stepper strong { min-width: 6.5rem; color: #0f172a; font-size: 1.05rem; text-align: center; }
+.rnp-trato { display: grid; grid-template-columns: auto 1fr 1fr; align-items: center; gap: 0.35rem; }
+.rnp-trato > span { color: #64748b; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; }
+.rnp-trato .rnp-stepper { gap: 0.25rem; }
+.rnp-trato .rnp-stepper strong { min-width: 2.6rem; font-size: 0.92rem; }
+.rnp-trato .rnp-stepper button { width: 32px !important; height: 32px; font-size: 1.05rem !important; }
+
+/* Propuestas, espera y crónica */
+.rnp-propuestas { border: 3px solid var(--pz1); }
+.rnp-propuesta { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.5rem 0; }
+.rnp-propuesta > div { flex: 1; }
+.rnp-propuesta p { margin: 0.2rem 0 0.5rem !important; color: #475569 !important; font-size: 0.88rem; }
+.rnp-listos { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.35rem; margin-top: 0.5rem; }
+.rnp-listos span { padding: 0.25rem 0.6rem; border-radius: 999px; background: #f1f5f9; color: #475569; font-size: 0.8rem; font-weight: 800; }
+.rnp-listos span.si { background: #dcfce7; color: #166534; }
+.rnp-cronica { display: flex; flex-direction: column; gap: 0.35rem; margin: 0; padding: 0; list-style: none; }
+.rnp-cronica li { padding: 0.45rem 0.65rem; border-left: 4px solid #cbd5e1; border-radius: 10px; background: #f8fafc; color: #334155; font-size: 0.86rem; font-weight: 600; line-height: 1.35; }
+.rnp-cronica li.bueno { border-left-color: #16a34a; }
+.rnp-cronica li.malo { border-left-color: #dc2626; }
+.rnp-cronica li.mia { background: #fef9c3; font-weight: 800; }
+
+/* Final */
+.rnp-final { display: flex; flex-direction: column; gap: 0.5rem; margin: 0; padding: 0; list-style: none; }
+.rnp-final > li { padding: 0.55rem 0.7rem; border-radius: 14px; background: #f8fafc; }
+.rnp-final > li.lider { background: linear-gradient(135deg, #fef9c3, #fde68a); }
+.rnp-final-cab { display: flex; align-items: center; gap: 0.45rem; }
+.rnp-final-cab strong { color: #0f172a; }
+.rnp-final-cab small { flex: 1; color: #64748b; font-size: 0.72rem; }
+.rnp-final-cab b { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.4rem; color: #0f172a; }
+.rnp-final p { margin: 0.2rem 0 !important; color: #475569 !important; font-size: 0.82rem; }
+.rnp-final ul { margin: 0; padding: 0; list-style: none; font-size: 0.8rem; }
+.rnp-final ul li { color: #94a3b8; }
+.rnp-final ul li.si { color: #166534; font-weight: 700; }

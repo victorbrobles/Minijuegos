@@ -175,6 +175,7 @@ export default function PulsadorOnline({ juego, onVolver, onSalir, onAbrirAyuda 
   }
 
   const v = sala.vista;
+  const Fin = juego.Fin || PantallaFin;
   const n = sala.jugadores.length;
   const enPartida = sala.estado !== 'lobby';
   const ranking = [...sala.jugadores].sort((a, b) => b.puntos - a.puntos);
@@ -200,7 +201,7 @@ export default function PulsadorOnline({ juego, onVolver, onSalir, onAbrirAyuda 
           />
           <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
             <h3 className="qq-sala-titulo"><Icon name="dice" size={20} /> La partida</h3>
-            {(() => { const C = juego.Config || ConfigJuego; return <C juego={juego} config={sala.config} onCambiar={sala.esAdmin ? (c) => llamar('config', { ...sala.config, ...c }) : null} />; })()}
+            {(() => { const C = juego.Config || ConfigJuego; return <C juego={juego} sala={sala} config={sala.config} onCambiar={sala.esAdmin ? (c) => llamar('config', { ...sala.config, ...c }) : null} />; })()}
             <p className="pzp-nota-sala">{juego.notaSala ?? '🔴 Cada uno tiene su pulsador en el móvil: el primero que pulse, responde.'}</p>
             {sala.esAdmin && (
               <button type="button" className="big full qq-btn-principal" disabled={n < sala.min || sala.preparando} onClick={() => llamar('iniciar')}>
@@ -232,7 +233,7 @@ export default function PulsadorOnline({ juego, onVolver, onSalir, onAbrirAyuda 
               </div>
             </PantallaResultado>
           ) : (
-            <PantallaFin v={v} juego={juego} onSalir={() => setModal('partida')}>
+            <Fin v={v} juego={juego} onSalir={() => setModal('partida')}>
               <div className="pzp-barra estatica">
                 {sala.esAdmin ? (
                   <>
@@ -245,7 +246,7 @@ export default function PulsadorOnline({ juego, onVolver, onSalir, onAbrirAyuda 
                   </>
                 ) : <p className="pzp-esperando">⏳ Esperando a que el anfitrión decida qué hacer…</p>}
               </div>
-            </PantallaFin>
+            </Fin>
           )}
         </section>
       )}

@@ -340,5 +340,17 @@
     "name": "Un Solo Trazo",
     "description": "Repasa todas las líneas de la figura sin levantar el dedo ni pasar dos veces por la misma. Y si es imposible… ¡demuéstralo!",
     "isNew": true
+  },
+  {
+    "id": "mus",
+    "name": "Mus",
+    "description": "El clásico juego de cartas español por parejas: mus o no hay mus, envites a grande, chica, pares y juego, faroles y órdagos. Juega online con tus amigos o contra la máquina.",
+    "isNew": true
+  },
+  {
+    "id": "reinos",
+    "name": "Los Siete Reinos",
+    "description": "Cada jugador gobierna un reino con territorios, soldados, oro y alimento. Cada ronda das dos órdenes en secreto que se resuelven a la vez. Controla los tronos y cumple tus objetivos secretos… sin fiarte de nadie.",
+    "isNew": true
   }
 ]

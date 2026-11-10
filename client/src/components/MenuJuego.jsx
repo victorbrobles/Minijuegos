@@ -87,7 +87,7 @@ export function CabeceraJuego({ juegoId }) {
  * - Con `onLocal`: "Jugar online" + "Jugar en un único dispositivo".
  * - Sin `onLocal` (juegos solo online): "Crear partida" + "Unirse con código".
  */
-export function MenuInicioJuego({ juegoId, onOnline, onLocal, onCrear, onUnirse, onAyuda, error, onVolver, textoVolver }) {
+export function MenuInicioJuego({ juegoId, onOnline, onLocal, onCrear, onUnirse, onAyuda, error, onVolver, textoVolver, local }) {
   const m = metaDe(juegoId);
   const soloOnline = typeof onLocal !== 'function';
   return (
@@ -104,7 +104,7 @@ export function MenuInicioJuego({ juegoId, onOnline, onLocal, onCrear, onUnirse,
           ) : (
             <>
               <OpcionMenu principal icono="globe" titulo="Jugar online" texto="Cada jugador desde su propio móvil con código de sala" onClick={onOnline} />
-              <OpcionMenu icono="users" titulo="Jugar en un único dispositivo" texto="Pasando el móvil por turnos entre los jugadores" onClick={onLocal} />
+              <OpcionMenu icono={local?.icono || 'users'} titulo={local?.titulo || 'Jugar en un único dispositivo'} texto={local?.texto || 'Pasando el móvil por turnos entre los jugadores'} onClick={onLocal} />
             </>
           )}
         </div>

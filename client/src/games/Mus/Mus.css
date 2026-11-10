@@ -1,0 +1,111 @@
+/* client/src/games/Mus/Mus.css
+   Mesa del Mus. Todo el CSS de la web va en un único fichero: aquí solo hay clases msp- (y la paleta verde de tapete
+   para las pantallas comunes pzp-). */
+
+.pzp-contenedor.mus { --pz0: #dcfce7; --pz1: #4ade80; --pz2: #15803d; --pz3: #14532d; }
+
+.msp-mesa-cont { display: flex; flex-direction: column; gap: 0.65rem; }
+
+/* Marcador */
+.msp-marcador {
+  display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; padding: 0.55rem 0.65rem;
+  border-radius: 22px; background: linear-gradient(150deg, #166534, #14532d); color: #ffffff; box-shadow: 0 5px 0 rgba(0, 0, 0, 0.3);
+}
+.msp-tanteo { display: flex; align-items: center; gap: 0.5rem; }
+.msp-tanteo > span:not(.msp-a) { display: flex; flex-direction: column; align-items: center; min-width: 58px; padding: 0.15rem 0.5rem; border-radius: 14px; line-height: 1.05; }
+.msp-tanteo .nos { background: #2563eb; }
+.msp-tanteo .ellos { background: #dc2626; }
+.msp-tanteo small { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.4px; text-transform: uppercase; opacity: 0.9; }
+.msp-tanteo strong { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.45rem; }
+.msp-tanteo em { font-size: 0.6rem; font-style: normal; font-weight: 800; opacity: 0.85; }
+.msp-a { color: #bbf7d0; font-size: 0.72rem; font-weight: 800; }
+
+/* Lances */
+.msp-lances { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.3rem; margin: 0; padding: 0; list-style: none; }
+.msp-lances li { display: flex; flex-direction: column; align-items: center; padding: 0.3rem 0.2rem; border-radius: 12px; background: rgba(255, 255, 255, 0.85); color: #334155; text-align: center; line-height: 1.1; }
+.msp-lances strong { font-size: 0.78rem; }
+.msp-lances small { min-height: 0.8rem; color: #64748b; font-size: 0.62rem; font-weight: 700; }
+.msp-lances li.actual { background: #fef08a; color: #713f12; box-shadow: 0 0 0 2px #facc15; }
+.msp-lances li.hecho { opacity: 0.75; }
+
+/* Tapete */
+.msp-mesa {
+  position: relative; display: grid; grid-template-areas: '. arriba .' 'izquierda centro derecha' '. abajo .';
+  grid-template-columns: 1fr 1.1fr 1fr; gap: 0.35rem; padding: 0.6rem 0.4rem; border-radius: 26px;
+  background: radial-gradient(circle at 50% 40%, #16a34a 0%, #15803d 55%, #14532d 100%); box-shadow: inset 0 0 0 6px #713f12, inset 0 0 0 9px #a16207, 0 6px 0 rgba(0, 0, 0, 0.3);
+}
+.msp-asiento { position: relative; display: flex; flex-direction: column; align-items: center; gap: 0.25rem; min-width: 0; padding: 0.35rem 0.25rem; border-radius: 16px; background: rgba(0, 0, 0, 0.18); color: #ffffff; }
+.msp-asiento.arriba { grid-area: arriba; }
+.msp-asiento.izquierda { grid-area: izquierda; }
+.msp-asiento.derecha { grid-area: derecha; }
+.msp-asiento.abajo { grid-area: abajo; }
+.msp-asiento.turno { background: rgba(254, 240, 138, 0.35); box-shadow: 0 0 0 2px #fde047; }
+.msp-asiento-cab { display: flex; align-items: center; gap: 0.3rem; max-width: 100%; }
+.msp-avatar { display: grid; place-items: center; flex: none; width: 24px; height: 24px; border-radius: 8px; color: #ffffff; font-size: 0.8rem; font-weight: 900; }
+.msp-asiento.nos .msp-avatar { background: #2563eb; }
+.msp-asiento.ellos .msp-avatar { background: #dc2626; }
+.msp-asiento-nombre { min-width: 0; overflow: hidden; font-size: 0.78rem; font-weight: 800; white-space: nowrap; text-overflow: ellipsis; }
+.msp-mano { display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: #fde047; color: #713f12; font-size: 0.62rem; }
+.msp-mini-cartas { display: flex; gap: 2px; }
+.msp-decl { padding: 0.08rem 0.4rem; border-radius: 999px; background: rgba(255, 255, 255, 0.9); color: #14532d; font-size: 0.62rem; font-weight: 800; white-space: nowrap; }
+.msp-bocadillo {
+  position: absolute; top: -10px; right: -4px; z-index: 3; max-width: 120px; padding: 0.15rem 0.5rem; border-radius: 12px 12px 4px 12px;
+  background: #ffffff; color: #0f172a; font-size: 0.72rem; font-weight: 900; white-space: nowrap; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3); animation: mspBocadillo 0.3s ease-out;
+}
+@keyframes mspBocadillo { from { transform: scale(0.6); opacity: 0; } to { transform: none; opacity: 1; } }
+.msp-centro { grid-area: centro; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; min-width: 0; color: #dcfce7; text-align: center; }
+.msp-fase { font-family: 'Bricolage Grotesque', sans-serif; color: #ffffff; font-size: 1.05rem; font-weight: 800; }
+.msp-centro small { font-size: 0.66rem; font-weight: 700; line-height: 1.2; opacity: 0.9; }
+
+/* Cartas españolas */
+.msp-carta {
+  position: relative; display: inline-flex !important; flex-direction: column; align-items: center; justify-content: center; gap: 0.05rem;
+  width: 64px !important; height: 96px; min-height: 0 !important; margin: 0 !important; padding: 0.2rem !important;
+  border: 2px solid #e7e5e4 !important; border-radius: 10px !important; background: #fffdf7 !important; color: var(--c) !important;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.25) !important; line-height: 1; transition: transform 0.12s ease;
+}
+button.msp-carta { cursor: pointer; }
+.msp-carta.sel { transform: translateY(-12px); border-color: #ef4444 !important; box-shadow: 0 0 0 3px #fecaca, 0 6px 0 rgba(0, 0, 0, 0.25) !important; }
+.msp-carta-num { position: absolute; top: 4px; left: 6px; font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.05rem; font-weight: 900; }
+.msp-carta-palo { font-size: 1.9rem; }
+.msp-carta-fig { color: #57534e; font-size: 0.58rem; font-weight: 800; text-transform: capitalize; }
+.msp-carta-vale { position: absolute; right: 4px; bottom: 3px; color: #a8a29e; font-size: 0.52rem; font-weight: 800; }
+.msp-carta.chica { width: 22px !important; height: 32px; padding: 0 !important; border-width: 1px !important; border-radius: 4px !important; box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3) !important; }
+.msp-carta.chica .msp-carta-num { top: 1px; left: 2px; font-size: 0.6rem; }
+.msp-carta.chica .msp-carta-palo { margin-top: 0.4rem; font-size: 0.7rem; }
+.msp-carta.dorso { border-color: #fde68a !important; background: repeating-linear-gradient(45deg, #b91c1c 0 4px, #991b1b 4px 8px) !important; }
+
+.msp-mano-mia { display: flex; flex-direction: column; align-items: center; gap: 0.35rem; padding-top: 0.4rem; }
+.msp-cartas { display: flex; justify-content: center; gap: 0.4rem; }
+.msp-info { margin: 0; padding: 0.2rem 0.7rem; border-radius: 999px; background: rgba(255, 255, 255, 0.92); color: #14532d; font-size: 0.78rem; font-weight: 800; }
+
+/* Acciones */
+.msp-acciones { display: flex; flex-direction: column; gap: 0.5rem; padding: 0.85rem; border-radius: 22px; background: #ffffff; box-shadow: 0 5px 0 rgba(0, 0, 0, 0.2); }
+.msp-pregunta { margin: 0; color: #0f172a; font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.1rem; font-weight: 800; text-align: center; }
+.msp-subir { display: grid; grid-template-columns: 40px 1fr 40px 1fr; gap: 0.35rem; align-items: center; }
+.msp-paso {
+  display: grid !important; place-items: center; width: 40px !important; height: 44px; min-height: 0 !important; margin: 0 !important; padding: 0 !important;
+  border: 2px solid #e2e8f0 !important; border-radius: 12px !important; background: #f8fafc !important; color: #334155 !important; font-size: 1.3rem !important; font-weight: 900 !important; cursor: pointer;
+}
+.msp-subir .pzp-boton { min-height: 44px; font-size: 0.92rem !important; }
+.msp-espera { margin: 0; padding: 0.8rem 1rem; border-radius: 18px; background: rgba(255, 255, 255, 0.95); color: #14532d; font-weight: 800; text-align: center; }
+
+/* Conteo */
+.msp-conteo { display: flex; flex-direction: column; gap: 0.5rem; }
+.msp-filas { display: flex; flex-direction: column; gap: 0.35rem; margin: 0; padding: 0; list-style: none; }
+.msp-filas li { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 0.5rem; padding: 0.45rem 0.65rem; border-left: 5px solid; border-radius: 12px; background: #f8fafc; color: #0f172a; font-size: 0.86rem; }
+.msp-filas li.nos { border-left-color: #2563eb; }
+.msp-filas li.ellos { border-left-color: #dc2626; }
+.msp-filas li span { color: #64748b; font-size: 0.78rem; }
+.msp-juego { margin: 0; padding: 0.5rem; border-radius: 14px; background: #fef9c3; color: #713f12; font-weight: 900; text-align: center; }
+.msp-seguir { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
+.msp-log summary { color: #334155; font-weight: 800; cursor: pointer; }
+.msp-log p { margin: 0.25rem 0 0; color: #475569; font-size: 0.82rem; }
+.msp-log p.bueno { color: #166534; font-weight: 700; }
+.msp-log p.malo { color: #b91c1c; font-weight: 700; }
+
+@media (max-width: 380px) {
+  .msp-carta { width: 58px !important; height: 88px; }
+  .msp-mesa { grid-template-columns: 1fr 0.9fr 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { .msp-bocadillo { animation: none; } }

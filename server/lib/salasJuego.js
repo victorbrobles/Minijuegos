@@ -5,7 +5,7 @@
 // opciones = {
 //   engine: motor con crearPartida(jugadores, items, reglas, ahora) / tick / vistaDe / abandonar (por defecto, el de pulsador),
 //   accion(M, p, d, { id, esAdmin, ahora }) -> resultado | undefined (acciones propias de otro motor),
-//   min, max: jugadores por sala,
+//   min, max: jugadores por sala, sinItems: el juego no usa lista de contenido (mus, reinos),
 //   config: { rondas: 10, ... },            // configuración inicial de la sala
 //   validarConfig(body, config) -> config,  // aplica lo que manda el anfitrión
 //   reglas(config) -> reglas del motor,
@@ -68,7 +68,7 @@ export function montarSalas(router, opciones) {
       const preparado = await opciones.prepararItems(sala);
       const items = Array.isArray(preparado) ? preparado : preparado.items;
       const reglas = Array.isArray(preparado) ? opciones.reglas(sala.config) : preparado.reglas;
-      if (!items.length) throw new Error('No hay contenido para jugar.');
+      if (!opciones.sinItems && !items.length) throw new Error('No hay contenido para jugar.');
       sala.numPartida += 1;
       sala.puntosAplicados = false;
       sala.partida = M.crearPartida(sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre })), items, reglas, Date.now());
@@ -131,7 +131,7 @@ export function montarSalas(router, opciones) {
       ultimaPartida: sala.ultimaPartida
     };
     if (sala.estado === 'jugando' && sala.partida) {
-      if (!sala.partida.jugadores.some((j) => j.id === jugador.id)) return res.status(403).json({ error: 'Ya no estás en la partida.' });
+      if (!(sala.partida.jugadores || sala.partida.reinos || []).some((j) => j.id === jugador.id)) return res.status(403).json({ error: 'Ya no estás en la partida.' });
       base.vista = M.vistaDe(sala.partida, jugador.id, ahora);
     }
     res.json(base);

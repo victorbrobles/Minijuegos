@@ -22,7 +22,9 @@
     "sync:pulsador": "node scripts/sync-pulsador.mjs",
     "sync:masmenos": "node scripts/sync-masmenos.mjs",
     "sync:unoadiez": "node scripts/sync-unoadiez.mjs",
-    "sync:logos-motor": "node scripts/sync-logos-motor.mjs"
+    "sync:logos-motor": "node scripts/sync-logos-motor.mjs",
+    "sync:mus": "node scripts/sync-mus.mjs",
+    "sync:reinos": "node scripts/sync-reinos.mjs"
   },
   "dependencies": {
     "better-sqlite3": "^13.0.3",

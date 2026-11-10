@@ -77,6 +77,24 @@ export const META = {
     descripcion: 'Empiezas con 5 cartas positivas y negativas: consigue que tu mano sume exactamente 0. Roba, descarta, usa cartas especiales para fastidiar al resto y plántate a tiempo… porque te pueden destrozar la mano justo antes del final.',
     categorias: ['estrategia']
   },
+  'mus': {
+    titulo: 'Mus',
+    imagen: '/covers/mus.webp',
+    icono: 'cards',
+    colores: ['#16a34a', '#14532d'],
+    etiquetas: 'mus cartas baraja española parejas envido ordago grande chica pares juego clasico bar',
+    descripcion: 'El clásico juego de cartas español por parejas: mus o no hay mus, envites a grande, chica, pares y juego, faroles y órdagos. Juega online con tus amigos o contra la máquina.',
+    categorias: ['estrategia', 'favoritos']
+  },
+  'reinos': {
+    titulo: 'Los Siete Reinos',
+    imagen: '/covers/reinos.webp',
+    icono: 'shield',
+    colores: ['#b45309', '#451a03'],
+    etiquetas: 'reinos estrategia conquista territorios mapa diplomacia alianzas traicion comercio oro soldados simultaneo',
+    descripcion: 'Cada jugador gobierna un reino con territorios, soldados, oro y alimento. Cada ronda das dos órdenes en secreto: conquistar, comerciar, fortificar, entrenar tropas o negociar alianzas, y todas se resuelven a la vez. Controla los tronos y cumple tus objetivos secretos… sin fiarte de nadie.',
+    categorias: ['estrategia']
+  },
   'cuentas': {
     titulo: 'Lleva la cuenta',
     imagen: '/covers/cuentas.webp',

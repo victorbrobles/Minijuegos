@@ -31,6 +31,8 @@ import Telepatia from './Telepatia/Telepatia.jsx';
 import Descarte from './Descarte/Descarte.jsx';
 import Bingoball from './Bingoball/Bingoball.jsx';
 import Cuentas from './Cuentas/Cuentas.jsx';
+import Mus from './Mus/Mus.jsx';
+import Reinos from './Reinos/Reinos.jsx';
 import Conoce from './Conoce/Conoce.jsx';
 import Logos from './Logos/Logos.jsx';
 import Hipotesis from './Hipotesis/Hipotesis.jsx';
@@ -90,6 +92,8 @@ const registry = {
   'descarte': Descarte,
   'bingoball': Bingoball,
   'cuentas': Cuentas,
+  'mus': Mus,
+  'reinos': Reinos,
   'sumacero': SumaCero,
   'golpe': Golpe,
   'conoce': Conoce,

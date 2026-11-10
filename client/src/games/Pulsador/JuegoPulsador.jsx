@@ -31,7 +31,7 @@ export default function JuegoPulsador({ juegoId: id, juego: propio, onExit }) {
   return (
     <>
       {modo === 'menu' && (
-        <MenuInicioJuego juegoId={juegoId} onOnline={() => setModo('online')} onLocal={() => setModo('local')} onAyuda={() => setAyuda(true)} />
+        <MenuInicioJuego juegoId={juegoId} local={juego.menuLocal} onOnline={() => setModo('online')} onLocal={() => setModo('local')} onAyuda={() => setAyuda(true)} />
       )}
       {modo === 'local' && <Local juego={juego} onVolver={() => setModo('menu')} onExit={irAPortada} onAbrirAyuda={() => setAyuda(true)} />}
       {modo === 'online' && <PulsadorOnline juego={juego} onVolver={() => setModo('menu')} onSalir={irAPortada} onAbrirAyuda={() => setAyuda(true)} />}
