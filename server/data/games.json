@@ -394,5 +394,23 @@
     "name": "Una Pieza Más",
     "description": "Un tablero compartido con una figura incompleta. Por turnos, cada jugador coloca una pieza geométrica (girándola o volteándola): cierra filas, cumple tu objetivo secreto, pon la última pieza o deja al siguiente sin sitio.",
     "isNew": true
+  },
+  {
+    "id": "datosobra",
+    "name": "El Dato que Sobra",
+    "description": "Cuatro afirmaciones sobre un futbolista: tres son ciertas y una es mentira. Por turnos, uno la señala y los demás pueden desafiar su respuesta para ganar puntos extra.",
+    "isNew": true
+  },
+  {
+    "id": "pareja",
+    "name": "La Pareja Perfecta",
+    "description": "Sale un actor, un inventor, un país, un personaje, un cantante o un pintor: encuentra su pareja entre cuatro opciones antes que nadie. La dificultad sube y los puntos se multiplican.",
+    "isNew": true
+  },
+  {
+    "id": "tablero",
+    "name": "El Tablero de Puntos",
+    "description": "Un tablero de preguntas de cultura general con casillas de 100, 200, 300 y 500 puntos. Elige cuánto arriesgas: si aciertas sumas y si fallas restas. Hay una casilla doble escondida.",
+    "isNew": true
   }
 ]

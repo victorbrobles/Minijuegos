@@ -26,7 +26,8 @@ export const REGLAS = {
   adivina: { segRonda: 75, segRespuesta: 20, segPistas: [0, 20, 40], puntos: 'pista', puntosPista: [10, 5, 3], fallo: 0, respuesta: 'texto' },
   frasescelebres: { segRonda: 30, segRespuesta: 10, segPistas: [0], puntos: 'fijo', acierto: 3, fallo: 1, respuesta: 'opciones' },
   hemeroteca: { segRonda: 75, segRespuesta: 20, segPistas: [0, 15, 30, 45], puntos: 'pista', puntosPista: [10, 7, 5, 3], fallo: 0, respuesta: 'texto' },
-  acta: { segRonda: 80, segRespuesta: 20, segPistas: [0, 12, 24, 36, 48], puntos: 'pista', puntosPista: [10, 8, 6, 4, 2], fallo: 0, respuesta: 'texto' }
+  acta: { segRonda: 80, segRespuesta: 20, segPistas: [0, 12, 24, 36, 48], puntos: 'pista', puntosPista: [10, 8, 6, 4, 2], fallo: 0, respuesta: 'texto' },
+  pareja: { segRonda: 25, segRespuesta: 10, segPistas: [0], puntos: 'fijo', acierto: 2, fallo: 1, respuesta: 'opciones' }
 };
 
 // ---------------------------------------------------------------- Respuestas
@@ -94,6 +95,9 @@ export function pistasVisibles(p, ahora = Date.now()) {
   return Math.max(1, Math.min(item(p).pistas.length, p.fase === 'jugando' ? n : item(p).pistas.length));
 }
 function puntosAhora(p, ahora) {
+  return puntosBase(p, ahora) * (item(p).multiplicador || 1);
+}
+function puntosBase(p, ahora) {
   const r = p.reglas;
   if (r.puntos === 'segundos') return Math.max(1, Math.ceil(restanteMs(p, ahora) / 1000));
   if (r.puntos === 'pista') {

@@ -95,6 +95,33 @@ export const META = {
     descripcion: 'Dirige un club con presupuesto limitado: puja en secreto por futbolistas reales, monta una plantilla equilibrada, elige táctica y compite en una liga simulada. No basta con fichar a los mejores.',
     categorias: ['futbol', 'estrategia']
   },
+  'datosobra': {
+    titulo: 'El Dato que Sobra',
+    imagen: '/covers/datosobra.webp',
+    icono: 'detective',
+    colores: ['#f97316', '#431407'],
+    etiquetas: 'dato sobra mentira verdad futbolista afirmaciones desafiar falsa trayectoria futbol',
+    descripcion: 'Cuatro afirmaciones sobre un futbolista: tres son ciertas y una es mentira. Por turnos, uno la señala y los demás pueden desafiar su respuesta para ganar puntos extra.',
+    categorias: ['futbol']
+  },
+  'pareja': {
+    titulo: 'La Pareja Perfecta',
+    imagen: '/covers/pareja.webp',
+    icono: 'heart',
+    colores: ['#ec4899', '#500724'],
+    etiquetas: 'pareja relacionar actor pelicula inventor invento pais moneda personaje creador cantante grupo pintor cuadro',
+    descripcion: 'Sale un actor, un inventor, un país, un personaje, un cantante o un pintor: encuentra su pareja entre cuatro opciones antes que nadie. La dificultad sube y los puntos se multiplican.',
+    categorias: ['prueba']
+  },
+  'tablero': {
+    titulo: 'El Tablero de Puntos',
+    imagen: '/covers/tablero.webp',
+    icono: 'target',
+    colores: ['#8b5cf6', '#1e1b4b'],
+    etiquetas: 'tablero puntos casillas preguntas cultura general cine historia ciencia musica deporte geografia arriesgar',
+    descripcion: 'Un tablero de preguntas de cultura general con casillas de 100, 200, 300 y 500 puntos. Elige cuánto arriesgas: si aciertas sumas y si fallas restas. Hay una casilla doble escondida.',
+    categorias: ['prueba']
+  },
   'hemeroteca': {
     titulo: 'La Hemeroteca',
     imagen: '/covers/hemeroteca.webp',

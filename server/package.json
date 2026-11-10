@@ -29,7 +29,9 @@
     "sync:director": "node scripts/sync-director.mjs",
     "sync:laberinto": "node scripts/sync-laberinto.mjs",
     "sync:oncefantasma": "node scripts/sync-oncefantasma.mjs",
-    "sync:unapieza": "node scripts/sync-unapieza.mjs"
+    "sync:unapieza": "node scripts/sync-unapieza.mjs",
+    "sync:datosobra": "node scripts/sync-datosobra.mjs",
+    "sync:tablero": "node scripts/sync-tablero.mjs"
   },
   "dependencies": {
     "better-sqlite3": "^13.0.3",

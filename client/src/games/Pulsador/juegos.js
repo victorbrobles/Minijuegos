@@ -85,6 +85,26 @@ export const JUEGOS = {
       `Acertar con una pista da ${r.hemeroteca.puntosPista[0]} puntos; con dos, ${r.hemeroteca.puntosPista[1]}; con tres, ${r.hemeroteca.puntosPista[2]}; con todas, ${r.hemeroteca.puntosPista[3]}. Fallar no resta, pero te deja fuera de ese titular.`
     ]
   },
+  pareja: {
+    id: 'pareja',
+    api: '/api/pareja',
+    emoji: '💞',
+    unidad: 'parejas',
+    config: { rondas: 10 },
+    etiqueta: (v) => v.pistas[0]?.etiqueta?.replace(/^\S+ /, '') || '',
+    pregunta: () => '¿Cuál es su pareja?',
+    era: 'Su pareja era…',
+    placeholder: '',
+    notaRespuesta: '',
+    textoPulsador: '¡La sé!',
+    ganador: (n) => (n.length > 1 ? `¡Empate entre ${n.join(' y ')}!` : `¡${n[0]} encuentra pareja a todo!`),
+    reglas: [
+      'Sale un elemento (un actor, un inventor, un país, un personaje, un cantante o un pintor) y cuatro posibles parejas: su película más famosa, su invento, su moneda, su creador, su grupo o su cuadro.',
+      `El reloj corre ${r.pareja.segRonda} segundos. Quien lo sepa, que pulse: tiene ${r.pareja.segRespuesta} segundos para elegir la pareja.`,
+      `Acertar suma ${r.pareja.acierto} puntos y fallar resta ${r.pareja.fallo} (y te deja fuera de esa ronda).`,
+      'La dificultad sube: el primer tercio de la partida son parejas fáciles, luego medias (los puntos valen ×2) y al final difíciles (×3).'
+    ]
+  },
   acta: {
     id: 'acta',
     api: '/api/acta',

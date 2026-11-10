@@ -1,0 +1,40 @@
+/* El Dato que Sobra (prefijo dsx-) */
+.pzp-contenedor.datosobra { --pz0: #ffedd5; --pz1: #fdba74; --pz2: #c2410c; --pz3: #431407; }
+
+.dsx-futbolista { display: flex; align-items: center; gap: 0.6rem; justify-content: center; padding: 0.8rem 1rem; }
+.dsx-futbolista span { font-size: 1.6rem; }
+.dsx-futbolista strong { font-size: 1.35rem; color: #0f172a; }
+
+.dsx-lista { list-style: none; margin: 0.6rem 0; padding: 0; display: grid; gap: 0.5rem; }
+.dsx-afirmacion {
+  width: 100%; display: flex; align-items: center; gap: 0.7rem; text-align: left; padding: 0.75rem 0.8rem; margin: 0;
+  border: 3px solid #e2e8f0; border-radius: 16px; background: #fff; color: #0f172a; font: inherit; font-size: 0.95rem; font-weight: 600; cursor: pointer;
+}
+.dsx-afirmacion:disabled { cursor: default; opacity: 1; }
+.dsx-afirmacion.marcada { border-color: var(--pz2); background: #fff7ed; box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.25); }
+.dsx-afirmacion.respuesta { border-color: #2563eb; background: #eff6ff; }
+.dsx-afirmacion.falsa { border-color: #dc2626; background: #fef2f2; }
+.dsx-afirmacion.cierta { border-color: #bbf7d0; background: #f0fdf4; opacity: 0.85; }
+.dsx-letra { flex: 0 0 auto; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; background: var(--pz2); color: #fff; font-weight: 900; }
+.dsx-texto { flex: 1; }
+.dsx-sello { flex: 0 0 auto; font-size: 0.75rem; font-weight: 800; white-space: nowrap; }
+
+.dsx-botones { display: grid; grid-template-columns: 1fr 1.4fr; gap: 0.5rem; }
+.dsx-botones .pzp-boton { margin: 0 !important; width: 100% !important; }
+.dsx-nota { text-align: center; font-size: 0.85rem; color: rgba(255, 255, 255, 0.88); margin: 0.6rem 0; }
+.dsx-nota.oscura { color: #475569; margin-bottom: 0; }
+.dsx-listo { margin-left: 0.25rem; color: #16a34a; font-weight: 900; }
+
+.dsx-retos { display: grid; gap: 0.5rem; }
+.dsx-reto { display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; flex-wrap: wrap; color: #0f172a; }
+.dsx-reto.hecho { opacity: 0.6; font-weight: 700; font-size: 0.85rem; }
+.dsx-reto-nombre { display: inline-flex; align-items: center; gap: 0.4rem; font-weight: 700; }
+.dsx-reto-op { display: flex; gap: 0.3rem; }
+.dsx-reto-op button { width: 38px; height: 38px; border-radius: 10px; border: 2px solid #e2e8f0; background: #fff; font: inherit; font-weight: 900; color: var(--pz2); cursor: pointer; }
+
+.dsx-porque { margin: 0.2rem 0 0.6rem; color: #0f172a; font-weight: 600; }
+.dsx-detalle { list-style: none; padding: 0; margin: 0 0 0.6rem; display: grid; gap: 0.4rem; color: #0f172a; }
+.dsx-detalle li { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
+.dsx-detalle small { opacity: 0.7; flex: 1; }
+.dsx-detalle b { color: #16a34a; }
+.dsx-detalle b.menos { color: #dc2626; }

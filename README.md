@@ -234,6 +234,18 @@ Cada club elige formación y, en varios mercados, puja en secreto por futbolista
 ## Minijuego: El Laberinto (`Laberinto/`)
 Tablero de 7×7 salas generado como laberinto con atajos y puertas cerradas, que se descubre al entrar. En el centro está el Corazón; gana quien lo saque por una esquina (o, si se acaban las rondas, quien más oro tenga). Trampas, tesoros, llaves, pociones, mapas, cepos y barricadas; robos entre jugadores de la misma sala y pactos temporales. Personajes: Guerrera (rompe puertas, +2), Ladrón (roba siempre, ve trampas, salta barricadas), Exploradora (4 pasos, no se detiene) y Mago (teletransporte, ve salas vecinas). Motor en `server/laberinto/engine.js` (`npm run sync:laberinto`), online en `/api/laberinto` (de 2 a 4); en un dispositivo, el móvil pasa cada turno. Simulación: `node scripts/laberinto-sim.mjs`.
 
+## Minijuego: El Dato que Sobra (`DatoSobra/`)
+
+Cuatro afirmaciones sobre un futbolista, tres ciertas y una falsa (34 futbolistas en `server/data/seeds/datosobra/futbolistas.js`, cada uno con la explicación de la mentira). Por turnos, un jugador señala la mentira (+3 si acierta); después los demás deciden en secreto si aceptan o desafían señalando otra: ganar un desafío da +4 y perderlo resta 1 (y suma 1 a quien aguantó). Motor en `server/datosobra/engine.js` (`npm run sync:datosobra`), simulación en `server/scripts/datosobra-sim.mjs`; ruta `/api/datosobra`.
+
+## Minijuego: La Pareja Perfecta (`Pareja/`)
+
+Sale un elemento (actor, inventor, país, personaje, cantante o pintor) y cuatro posibles parejas. Usa el motor de pulsador (reglas `pareja`, respuesta por opciones) con un `multiplicador` por ítem: el primer tercio de la partida es fácil (×1), luego medio (×2) y al final difícil (×3). Datos en `server/data/seeds/pareja/parejas.js` (los distractores salen de la misma categoría); ruta `/api/pareja`.
+
+## Minijuego: El Tablero de Puntos (`Tablero/`)
+
+Tablero de 3 a 6 categorías (cine, historia, ciencia, música, deporte, geografía) con casillas de 100, 200, 300 y 500. Por turnos se elige casilla y se responde entre cuatro opciones: acertar suma su valor y fallar lo resta. Una casilla oculta (nunca de 100) vale el doble. Preguntas en `server/data/seeds/tablero/preguntas.js`; motor en `server/tablero/engine.js` (`npm run sync:tablero`), simulación en `server/scripts/tablero-sim.mjs`; ruta `/api/tablero`.
+
 ## Minijuego: La Hemeroteca (`Hemeroteca/`)
 
 Titulares históricos de periódico a los que les faltan palabras. Usa el motor de pulsador (`server/pulsador/engine.js`, reglas `hemeroteca`): las pistas se destapan cada 15 s (titular con huecos, época, pista con el año e iniciales) y acertar da 10, 7, 5 o 3 puntos según las pistas vistas. Las respuestas aceptan grupos de palabras clave (`coincideClaves`). Datos en `server/data/seeds/hemeroteca/titulares.js`; ruta `/api/hemeroteca`.
