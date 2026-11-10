@@ -159,8 +159,8 @@ router.post('/online/sala/:code/iniciar-ronda', (req, res) => {
   const sala = salasCiegas.get(req.params.code?.toUpperCase());
   if (!sala || sala.adminToken !== req.body?.token) return res.status(403).json({ error: 'No autorizado.' });
 
-  if (sala.jugadores.length < 4) {
-    return res.status(400).json({ error: 'Se necesitan mínimo 4 jugadores.' });
+  if (sala.jugadores.length < 3) {
+    return res.status(400).json({ error: 'Se necesitan mínimo 3 jugadores.' });
   }
 
   // Elegir jugador activo al azar
