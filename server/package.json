@@ -25,7 +25,8 @@
     "sync:logos-motor": "node scripts/sync-logos-motor.mjs",
     "sync:mus": "node scripts/sync-mus.mjs",
     "sync:reinos": "node scripts/sync-reinos.mjs",
-    "sync:invento": "node scripts/sync-invento.mjs"
+    "sync:invento": "node scripts/sync-invento.mjs",
+    "sync:director": "node scripts/sync-director.mjs"
   },
   "dependencies": {
     "better-sqlite3": "^13.0.3",
