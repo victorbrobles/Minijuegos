@@ -138,6 +138,7 @@ router.post('/online/sala/:code/accion', (req, res) => {
   switch (d.tipo) {
     case 'soltar': r = E.soltar(p, id, Number(d.numero)); break;
     case 'accion': r = E.usarAccion(p, id); break;
+    case 'visto': r = E.visto(p, id, d.n); break;
     case 'pasar': r = E.pasar(p, id); break;
     default: return res.status(400).json({ error: 'Acción desconocida.' });
   }

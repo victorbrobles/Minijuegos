@@ -62,6 +62,19 @@ const activos = (est) => est.jugadores.filter((j) => !j.fuera);
 const ok = (extra = {}) => ({ ok: true, ...extra });
 const err = (error) => ({ ok: false, error });
 const log = (est, texto) => { est.log.push({ n: ++est.nlog, texto }); if (est.log.length > 60) est.log.shift(); };
+// Avisos personales: cada implicado en una carta de acción ve qué le ha pasado (lo que gana y lo que pierde).
+function avisar(est, id, a) {
+  est.avisos ||= {};
+  est.nav = (est.nav || 0) + 1;
+  (est.avisos[id] ||= []).push({ n: est.nav, ...a });
+  if (est.avisos[id].length > 8) est.avisos[id].shift();
+}
+/** El jugador ya ha leído sus avisos hasta el número `n`. */
+export function visto(est, id, n) {
+  if (est.avisos?.[id]) est.avisos[id] = est.avisos[id].filter((x) => x.n > Number(n));
+  return ok();
+}
+const nombres = (cartas) => cartas.map((c) => nombreCarta(c));
 export const esColeccion = (c) => c.clase === 'palo' || c.clase === 'comodin';
 export const nombreCarta = (c) => (c.clase === 'accion' ? `${ACCIONES[c.accion].e} ${ACCIONES[c.accion].nombre}` : c.clase === 'comodin' ? `${COMODIN.e} Comodín` : `${PALO[c.palo].e} ${PALO[c.palo].nombre}`);
 
@@ -218,6 +231,9 @@ function escudo(est, atacante, victima, accion) {
   const [c] = victima.mano.splice(k, 1);
   est.descarte.push(c);
   log(est, `🛡️ ¡${victima.nombre} tenía un Escudo! La ${ACCIONES[accion].nombre} de ${atacante.nombre} no tiene efecto.`);
+  const A = ACCIONES[accion];
+  avisar(est, atacante.id, { e: '🛡️', titulo: `${victima.nombre} tenía un Escudo`, texto: `Tu ${A.e} ${A.nombre} no tiene efecto.` });
+  avisar(est, victima.id, { e: '🛡️', titulo: '¡Tu Escudo te ha protegido!', texto: `${atacante.nombre} te ha atacado con ${A.e} ${A.nombre}, pero tu Escudo lo ha parado (se gasta).`, pierde: [nombreCarta(c)] });
   return true;
 }
 
@@ -275,29 +291,41 @@ function aplicarAccion(est, p, v, accion, { cartaSuya, cartaMia, palo }) {
       v.vitrina = v.vitrina.filter((x) => x.uid !== cartaSuya.uid);
       p.mano.push(cartaSuya);
       log(est, `🦝 ${p.nombre} le roba ${nombreCarta(cartaSuya)} a ${v.nombre}.`);
+      avisar(est, p.id, { e: A.e, titulo: `${A.e} ${A.nombre}`, texto: `Le robas una carta de la vitrina a ${v.nombre} (va a tu mano).`, gana: nombres([cartaSuya]) });
+      avisar(est, v.id, { e: A.e, titulo: `¡${p.nombre} te ha robado!`, texto: `${p.nombre} ha usado ${A.nombre} y se lleva una carta de tu vitrina.`, pierde: nombres([cartaSuya]), ataque: true });
       break;
     case 'bomba':
       v.vitrina = v.vitrina.filter((x) => x.uid !== cartaSuya.uid);
       est.descarte.push(cartaSuya);
       log(est, `💣 ${p.nombre} destruye ${nombreCarta(cartaSuya)} de la vitrina de ${v.nombre}.`);
+      avisar(est, p.id, { e: A.e, titulo: `${A.e} ${A.nombre}`, texto: `Destruyes ${nombreCarta(cartaSuya)} de la vitrina de ${v.nombre}.` });
+      avisar(est, v.id, { e: A.e, titulo: `¡${p.nombre} te ha bombardeado!`, texto: `${p.nombre} ha usado ${A.nombre} contra tu vitrina.`, pierde: nombres([cartaSuya]), ataque: true });
       break;
     case 'trueque':
       v.vitrina = v.vitrina.map((x) => (x.uid === cartaSuya.uid ? cartaMia : x));
       p.vitrina = p.vitrina.map((x) => (x.uid === cartaMia.uid ? cartaSuya : x));
       log(est, `🔄 ${p.nombre} cambia su ${nombreCarta(cartaMia)} por ${nombreCarta(cartaSuya)} de ${v.nombre}.`);
+      avisar(est, p.id, { e: A.e, titulo: `${A.e} ${A.nombre}`, texto: `Cambias una carta de tu vitrina con la de ${v.nombre}.`, gana: nombres([cartaSuya]), pierde: nombres([cartaMia]) });
+      avisar(est, v.id, { e: A.e, titulo: `¡${p.nombre} te ha hecho un trueque!`, texto: `${p.nombre} ha cambiado una carta de tu vitrina por otra de la suya.`, gana: nombres([cartaMia]), pierde: nombres([cartaSuya]), ataque: true });
       break;
     case 'regalo':
       p.mano = p.mano.filter((x) => x.uid !== cartaMia.uid);
       v.vitrina.push(cartaMia);
       log(est, `🎁 ${p.nombre} coloca ${nombreCarta(cartaMia)} en la vitrina de ${v.nombre}.`);
+      avisar(est, p.id, { e: A.e, titulo: `${A.e} ${A.nombre}`, texto: `Colocas tu carta en la vitrina de ${v.nombre}.`, pierde: nombres([cartaMia]) });
+      avisar(est, v.id, { e: A.e, titulo: `¡${p.nombre} te ha hecho un regalo envenenado!`, texto: `${p.nombre} ha colocado una carta en tu vitrina (ocupa un hueco).`, gana: nombres([cartaMia]), ataque: true });
       break;
     case 'congelar':
       v.congelado = true;
       log(est, `❄️ ${p.nombre} congela a ${v.nombre}: se saltará su próximo turno.`);
+      avisar(est, p.id, { e: A.e, titulo: `${A.e} ${A.nombre}`, texto: `${v.nombre} se saltará su próximo turno.` });
+      avisar(est, v.id, { e: A.e, titulo: `¡${p.nombre} te ha congelado!`, texto: 'Te saltas tu próximo turno.', ataque: true });
       break;
     case 'espia':
       p.espiados[v.id] = { ...v.encargo };
       log(est, `🔍 ${p.nombre} espía el encargo de ${v.nombre}.`);
+      avisar(est, p.id, { e: A.e, titulo: `${A.e} ${A.nombre}`, texto: `El encargo de ${v.nombre} es: ${textoEncargo(v.encargo)}.` });
+      avisar(est, v.id, { e: A.e, titulo: `¡${p.nombre} te ha espiado!`, texto: `${p.nombre} ha visto tu encargo secreto.`, ataque: true });
       return { espiado: { id: v.id, encargo: v.encargo } };
     case 'robaEncargo': {
       const mio = p.encargo; p.encargo = v.encargo; v.encargo = mio;
@@ -305,19 +333,27 @@ function aplicarAccion(est, p, v, accion, { cartaSuya, cartaMia, palo }) {
       est.jugadores.forEach((j) => { delete j.espiados[p.id]; delete j.espiados[v.id]; });
       p.espiados[v.id] = { ...v.encargo };
       log(est, `🎭 ¡Cambiazo! ${p.nombre} intercambia su encargo con el de ${v.nombre}.`);
+      avisar(est, p.id, { e: A.e, titulo: `${A.e} ${A.nombre}`, texto: `Te quedas el encargo de ${v.nombre}: ${textoEncargo(p.encargo)}.`, gana: [textoEncargo(p.encargo)], pierde: [textoEncargo(v.encargo)] });
+      avisar(est, v.id, { e: A.e, titulo: `¡${p.nombre} te ha cambiado el encargo!`, texto: `Ahora tu encargo es: ${textoEncargo(v.encargo)}.`, gana: [textoEncargo(v.encargo)], pierde: [textoEncargo(p.encargo)], ataque: true });
       break;
     }
     case 'nuevoEncargo':
       p.encargo = nuevoEncargo(est.rng);
       est.jugadores.forEach((j) => { delete j.espiados[p.id]; });
       log(est, `📜 ${p.nombre} cambia su encargo por uno nuevo.`);
+      avisar(est, p.id, { e: A.e, titulo: `${A.e} ${A.nombre}`, texto: `Tu nuevo encargo: ${textoEncargo(p.encargo)}.` });
       break;
     case 'iman': {
       const recibidas = [];
+      const cartas = [];
       activos(est).filter((q) => q.id !== p.id).forEach((q) => {
         const c = q.vitrina.find((x) => x.clase === 'palo' && x.palo === palo);
-        if (c) { q.vitrina = q.vitrina.filter((x) => x.uid !== c.uid); p.mano.push(c); recibidas.push(q.nombre); }
+        if (c) {
+          q.vitrina = q.vitrina.filter((x) => x.uid !== c.uid); p.mano.push(c); recibidas.push(q.nombre); cartas.push(c);
+          avisar(est, q.id, { e: A.e, titulo: `¡${p.nombre} te ha quitado una carta!`, texto: `${p.nombre} ha usado ${A.nombre} con ${PALO[palo].e} ${PALO[palo].nombre}.`, pierde: nombres([c]), ataque: true });
+        }
       });
+      avisar(est, p.id, { e: A.e, titulo: `${A.e} ${A.nombre}`, texto: recibidas.length ? `Te dan una carta ${recibidas.join(', ').replace(/, ([^,]*)$/, ' y $1')} (van a tu mano).` : 'Nadie tenía ese palo en su vitrina.', gana: nombres(cartas) });
       log(est, `🧲 ${p.nombre} atrae ${PALO[palo].e} ${PALO[palo].nombre}: ${recibidas.length ? `se lo dan ${recibidas.join(', ')}` : 'nadie tenía'}.`);
       break;
     }
@@ -327,6 +363,7 @@ function aplicarAccion(est, p, v, accion, { cartaSuya, cartaMia, palo }) {
       if (acierto) {
         p.mano.push(...destapadas);
         log(est, `🎲 ${p.nombre} apuesta por ${PALO[palo].e} y ¡acierta! Se queda: ${destapadas.map(nombreCarta).join(', ')}.`);
+        avisar(est, p.id, { e: A.e, titulo: '¡Apuesta ganada!', texto: `Salió ${PALO[palo].e}: te quedas las 3 cartas.`, gana: nombres(destapadas) });
       } else {
         est.descarte.push(...destapadas);
         let perdida = null;
@@ -336,6 +373,7 @@ function aplicarAccion(est, p, v, accion, { cartaSuya, cartaMia, palo }) {
           est.descarte.push(perdida);
         }
         log(est, `🎲 ${p.nombre} apuesta por ${PALO[palo].e} y falla${perdida ? `: pierde ${nombreCarta(perdida)} de su vitrina` : ''}.`);
+        avisar(est, p.id, { e: A.e, titulo: 'Apuesta perdida', texto: `No salió ${PALO[palo].e} (salieron ${destapadas.map(nombreCarta).join(', ') || 'ninguna'}).`, pierde: perdida ? nombres([perdida]) : null });
       }
       return { apuesta: { acierto, destapadas } };
     }
@@ -343,17 +381,26 @@ function aplicarAccion(est, p, v, accion, { cartaSuya, cartaMia, palo }) {
       est.descarte = est.descarte.filter((x) => x.uid !== cartaSuya.uid);
       p.mano.push(cartaSuya);
       log(est, `🗑️ ${p.nombre} rebusca en los descartes y se lleva ${nombreCarta(cartaSuya)}.`);
+      avisar(est, p.id, { e: A.e, titulo: `${A.e} ${A.nombre}`, texto: 'Te llevas una carta de los descartes.', gana: nombres([cartaSuya]) });
       break;
     case 'tornado': {
       const act = activos(est);
       const manos = act.map((j) => j.mano);
-      act.forEach((j, k) => { j.mano = manos[(k - 1 + act.length) % act.length]; });
+      act.forEach((j, k) => {
+        const de = act[(k - 1 + act.length) % act.length];
+        j.mano = manos[(k - 1 + act.length) % act.length];
+        avisar(est, j.id, {
+          e: A.e, titulo: j.id === p.id ? `${A.e} ${A.nombre}` : `¡${p.nombre} ha desatado un Tornado!`,
+          texto: `Pasas tu mano a la derecha y recibes la de ${de.nombre}.`, gana: nombres(j.mano), pierde: nombres(manos[k]), ataque: j.id !== p.id
+        });
+      });
       log(est, `🌪️ ¡Tornado! Todos pasan su mano al jugador de la izquierda.`);
       break;
     }
     case 'turbo':
       est.turno.jugadas += 2;
       log(est, `⚡ ${p.nombre} activa el Turbo: 2 jugadas más.`);
+      avisar(est, p.id, { e: A.e, titulo: `${A.e} ${A.nombre}`, texto: 'Tienes 2 jugadas más este turno.' });
       break;
     default:
       break;
@@ -431,7 +478,7 @@ export function vistaDe(est, id) {
       encargo: fin || j.id === id ? j.encargo : (yo?.espiados[j.id] || null),
       progreso: fin || j.id === id || yo?.espiados[j.id] ? progresoEncargo(j.vitrina, j.encargo) : null
     })),
-    yo: yo ? { id: yo.id, mano: yo.mano, encargo: yo.encargo, progreso: progresoEncargo(yo.vitrina, yo.encargo) } : null,
+    yo: yo ? { id: yo.id, mano: yo.mano, encargo: yo.encargo, progreso: progresoEncargo(yo.vitrina, yo.encargo), avisos: est.avisos?.[id] || [] } : null,
     ultimo: est.ultimo,
     log: est.log.slice(-25),
     fin: est.fin

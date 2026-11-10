@@ -38,6 +38,19 @@ const err = (error) => ({ ok: false, error });
 const log = (est, texto, extra = {}) => { est.log.push({ n: ++est.nlog, texto, ...extra }); if (est.log.length > 60) est.log.shift(); };
 const ordenar = (m) => m.sort((a, b) => a - b);
 
+// Avisos personales: cada implicado en una carta de acción ve qué le ha pasado (lo que gana y lo que pierde).
+function avisar(est, id, a) {
+  est.avisos ||= {};
+  est.nav = (est.nav || 0) + 1;
+  (est.avisos[id] ||= []).push({ n: est.nav, ...a });
+  if (est.avisos[id].length > 8) est.avisos[id].shift();
+}
+/** El jugador ya ha leído sus avisos hasta el número `n`. */
+export function visto(est, id, n) {
+  if (est.avisos?.[id]) est.avisos[id] = est.avisos[id].filter((x) => x.n > Number(n));
+  return ok();
+}
+
 /** El número que toca colocar: el más bajo que queda en las manos de los que siguen jugando. */
 export function siguienteNumero(est) {
   let min = null;
@@ -181,6 +194,8 @@ export function usarAccion(est, id) {
   const sig = siguienteNumero(est);
   const rivales = est.jugadores.filter((q) => q.id !== id && !q.fuera && !q.eliminado && q.mano.length);
   let secreto = null;
+  let gana = null; let pierde = null;
+  const ataque = (v, titulo, texto, extra = {}) => avisar(est, v.id, { e: A.e, titulo, texto, ataque: true, ...extra });
   const siguiente = () => {
     const lista = est.jugadores; let idx = lista.findIndex((j) => j.id === id);
     for (let k = 0; k < lista.length; k++) { idx = (idx + 1) % lista.length; const j = lista[idx]; if (!j.fuera && !j.eliminado && j.mano.length) return j; }
@@ -205,18 +220,29 @@ export function usarAccion(est, id) {
         const alto = p.mano[p.mano.length - 1];
         p.mano = p.mano.filter((x) => x !== alto); v.mano = ordenar([...v.mano, alto]);
         secreto = `Le has dado tu ${alto} a ${v.nombre}.`;
+        pierde = [alto];
+        ataque(v, `¡${p.nombre} te ha encasquetado un número!`, `${p.nombre} ha usado ${A.nombre}: te da su número más alto.`, { gana: [alto] });
       } else secreto = 'No había a quién dárselo (o solo te queda un número).';
       break;
     }
     case 'quemar':
-      if (p.mano.length > 1) { const alto = p.mano.pop(); secreto = `Tu ${alto} sale del juego.`; } else secreto = 'Solo te queda un número: no se quema.';
+      if (p.mano.length > 1) { const alto = p.mano.pop(); secreto = `Tu ${alto} sale del juego.`; pierde = [alto]; } else secreto = 'Solo te queda un número: no se quema.';
       break;
     case 'espia': {
       const v = rivales[Math.floor(est.rng() * rivales.length)];
       secreto = v ? `El número más bajo de ${v.nombre} es el ${v.mano[0]}.` : 'No hay nadie a quien espiar.';
+      if (v) ataque(v, `¡${p.nombre} te ha espiado!`, `${p.nombre} ha usado ${A.nombre} y ha visto tu número más bajo (el ${v.mano[0]}).`);
       break;
     }
-    case 'congelar': { const v = siguiente(); if (v && v.id !== id) { v.congelado = true; secreto = `${v.nombre} se saltará su próximo turno.`; } break; }
+    case 'congelar': {
+      const v = siguiente();
+      if (v && v.id !== id) {
+        v.congelado = true;
+        secreto = `${v.nombre} se saltará su próximo turno.`;
+        ataque(v, `¡${p.nombre} te ha congelado!`, 'Te saltas tu próximo turno.');
+      } else secreto = 'No había nadie a quien congelar.';
+      break;
+    }
     case 'ruleta': {
       const v = rivales[Math.floor(est.rng() * rivales.length)];
       if (v) {
@@ -225,12 +251,14 @@ export function usarAccion(est, id) {
         p.mano = ordenar([...p.mano.filter((x) => x !== mio), suyo]);
         v.mano = ordenar([...v.mano.filter((x) => x !== suyo), mio]);
         secreto = `Cambias tu ${mio} por el ${suyo} de ${v.nombre}.`;
-      }
+        gana = [suyo]; pierde = [mio];
+        ataque(v, `¡${p.nombre} te ha cambiado un número!`, `${p.nombre} ha usado ${A.nombre}: cambiáis un número al azar.`, { gana: [mio], pierde: [suyo] });
+      } else secreto = 'No había con quién cambiar.';
       break;
     }
     case 'carga': {
       const k = est.mazo.findIndex((x) => x > est.ultimo);
-      if (k >= 0) { const nuevo = est.mazo.splice(k, 1)[0]; p.mano = ordenar([...p.mano, nuevo]); secreto = `Robas el ${nuevo}.`; }
+      if (k >= 0) { const nuevo = est.mazo.splice(k, 1)[0]; p.mano = ordenar([...p.mano, nuevo]); secreto = `Robas el ${nuevo}.`; gana = [nuevo]; } else secreto = 'No quedan números en el mazo: te libras.';
       break;
     }
     case 'apagon':
@@ -240,6 +268,7 @@ export function usarAccion(est, id) {
   }
   log(est, `${A.e} ${p.nombre} usa una carta de acción: ${A.nombre}.`, { tipo: A.tipo });
   p.privado.push({ n: est.nlog, texto: `${A.e} ${A.nombre}: ${secreto || A.desc}` });
+  avisar(est, id, { e: A.e, titulo: `Tu carta: ${A.nombre}`, texto: secreto || A.desc, gana, pierde, tipo: A.tipo });
   if (p.privado.length > 10) p.privado.shift();
   // usar una acción no es soltar número: cuenta para la retención
   finTurnoSinSoltar(est, p, sig);
@@ -277,7 +306,7 @@ export function vistaDe(est, id) {
       eliminado: j.eliminado, fuera: j.fuera, terminado: est.terminados.indexOf(j.id) + 1 || null,
       mano: fin ? j.mano : undefined
     })),
-    yo: yo ? { id: yo.id, mano: yo.mano, vidas: yo.vidas, acciones: yo.acciones, escudo: yo.escudo, privado: yo.privado.slice(-5) } : null,
+    yo: yo ? { id: yo.id, mano: yo.mano, vidas: yo.vidas, acciones: yo.acciones, escudo: yo.escudo, privado: yo.privado.slice(-5), avisos: est.avisos?.[id] || [] } : null,
     log: est.log.slice(-25),
     fin: est.fin
   };

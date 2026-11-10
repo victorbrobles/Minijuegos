@@ -2,6 +2,7 @@
 // Menú online, sala de espera, partida y clasificación (el servidor guarda el estado; cada móvil ve solo lo suyo).
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
+import AvisoEfecto from '../../components/AvisoEfecto.jsx';
 import { PantallaJuego, PantallaFin, Avatar } from './Vistas.jsx';
 import { textoEncargo } from './engine.js';
 import {
@@ -148,9 +149,8 @@ export default function ColeccionOnline({ onVolver, onSalir, onAbrirAyuda }) {
     }
   };
   const enviar = async (tipo, datos = {}) => {
-    const d = await llamar('accion', { tipo, ...datos });
-    const aviso = textoResultado(d?.resultado, sala?.vista);
-    if (aviso) mostrarAviso(aviso, 'info');
+    // El efecto de las cartas de acción llega como aviso personal (AvisoEfecto)
+    await llamar('accion', { tipo, ...datos });
   };
 
   const salirDeSala = (aPortada) => {
@@ -203,6 +203,9 @@ export default function ColeccionOnline({ onVolver, onSalir, onAbrirAyuda }) {
 
   return (
     <div className={`cxp-contenedor ${enPartida ? 'qq-en-partida' : ''}`}>
+      {sala.estado === 'jugando' && v?.yo?.avisos?.length > 0 && (
+        <AvisoEfecto avisos={v.yo.avisos} onVisto={(n) => enviar('visto', { n })} />
+      )}
       {sinRed && <p className="cxp-sinred">⚠ Sin conexión con el servidor. Reintentando…</p>}
       {aviso && <p className={`cxp-toast ${tipoAviso}`} role="alert" onClick={() => setAviso('')}>{aviso}</p>}
 

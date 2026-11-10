@@ -3,9 +3,10 @@
 // (la mano y el encargo de cada uno son secretos).
 import React, { useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
+import AvisoEfecto from '../../components/AvisoEfecto.jsx';
 import * as E from './engine.js';
 import { PantallaJuego, PantallaFin, Avatar } from './Vistas.jsx';
-import { ModalSalir, textoResultado } from './ColeccionOnline.jsx';
+import { ModalSalir } from './ColeccionOnline.jsx';
 import { SelectorJugadores } from '../../components/MenuJuego.jsx';
 import './Coleccion.css';
 
@@ -25,6 +26,8 @@ export default function ColeccionLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [modal, setModal] = useState(false);
   const [confirmado, setConfirmado] = useState(null);
   const estRef = useRef(null);
+  // Quién tenía el móvil en la última jugada: ve los avisos de su carta antes de pasarlo
+  const enManoRef = useRef(null);
   const [, setVer] = useState(0);
   const avisoTimer = useRef(null);
 
@@ -82,8 +85,14 @@ export default function ColeccionLocal({ onVolver, onExit, onAbrirAyuda }) {
   const claveTurno = `${quienId}-${est.ronda}`;
   if (confirmado !== claveTurno) {
     const v = E.vistaDe(est, -1);
+    const previo = enManoRef.current;
+    const avisosPrevio = previo != null ? (est.avisos?.[previo] || []) : [];
     return (
       <div className="cxp-contenedor qq-en-partida">
+        {avisosPrevio.length > 0 && (
+          <AvisoEfecto avisos={avisosPrevio} nombre={est.jugadores.find((j) => j.id === previo)?.nombre}
+            onVisto={(n) => { E.visto(est, previo, n); setVer((x) => x + 1); }} />
+        )}
         <section className="game cxp-escena">
           <div className="cxp-tarjeta cxp-gate">
             <Avatar id={quien.id} nombre={quien.nombre} grande />
@@ -106,13 +115,11 @@ export default function ColeccionLocal({ onVolver, onExit, onAbrirAyuda }) {
   }
 
   const v = E.vistaDe(est, quienId);
+  enManoRef.current = quienId;
   const enviar = (tipo, datos = {}) => {
+    // El efecto de las cartas de acción se ve en el aviso personal (AvisoEfecto)
     const r = ACCIONES[tipo]?.(est, quienId, datos);
     if (r && !r.ok) mostrar(r.error, 'error');
-    else {
-      const texto = textoResultado(r, v);
-      if (texto) mostrar(texto, 'info');
-    }
     setVer((x) => x + 1);
   };
   return (
@@ -121,6 +128,7 @@ export default function ColeccionLocal({ onVolver, onExit, onAbrirAyuda }) {
       <section className="game cxp-escena">
         <PantallaJuego v={v} enviar={enviar} onSalir={() => setModal(true)} />
       </section>
+      {v.yo.avisos.length > 0 && <AvisoEfecto avisos={v.yo.avisos} onVisto={(n) => { E.visto(est, quienId, n); setVer((x) => x + 1); }} />}
       {salir}
     </div>
   );

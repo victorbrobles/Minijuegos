@@ -207,7 +207,6 @@ export function Estimulo({ v, reloj, pistas = v.pistas, todas = false }) {
   if (!multiples) {
     return (
       <div className="pzp-tarjeta pzp-estimulo">
-        {pistas[0]?.tipo === 'imagen' && <p className="pzp-etiqueta centrada">{pistas[0].etiqueta}</p>}
         <Pista pista={pistas[0]} n={1} sonar={sonar} />
       </div>
     );

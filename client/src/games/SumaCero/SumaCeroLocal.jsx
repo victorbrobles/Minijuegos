@@ -3,6 +3,7 @@
 // El resultado de cada ronda se ve todos juntos.
 import React, { useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
+import AvisoEfecto from '../../components/AvisoEfecto.jsx';
 import * as E from './engine.js';
 import { PantallaJuego, PantallaResultado, PantallaFin, Avatar } from './Vistas.jsx';
 import { ModalSalir, SelectorRondas } from './SumaCeroOnline.jsx';
@@ -25,6 +26,8 @@ export default function SumaCeroLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [modal, setModal] = useState(false);
   const [confirmado, setConfirmado] = useState(null);
   const estRef = useRef(null);
+  // Quién tenía el móvil en la última jugada: ve los avisos de su carta antes de pasarlo
+  const enManoRef = useRef(null);
   const [, setVer] = useState(0);
   const avisoTimer = useRef(null);
 
@@ -64,10 +67,16 @@ export default function SumaCeroLocal({ onVolver, onExit, onAbrirAyuda }) {
     <ModalSalir titulo="¿Salir de la partida?" texto="Se perderá la partida en curso y volverás a la portada." onSeguir={() => setModal(false)} onSalir={() => { setModal(false); onExit?.(); }} />
   );
   const mostrar = (texto) => { setAviso(texto); clearTimeout(avisoTimer.current); avisoTimer.current = setTimeout(() => setAviso(null), 3000); };
-  const envoltorio = (contenido) => (
+  const previo = enManoRef.current;
+  const avisosPrevio = previo != null ? (est.avisos?.[previo] || []) : [];
+  const envoltorio = (contenido, conAvisoPrevio = true) => (
     <div className="szp-contenedor qq-en-partida">
       {aviso && <p className="szp-toast" role="alert" onClick={() => setAviso(null)}>{aviso}</p>}
       <section className="game szp-escena">{contenido}</section>
+      {conAvisoPrevio && avisosPrevio.length > 0 && (
+        <AvisoEfecto avisos={avisosPrevio} nombre={est.jugadores.find((j) => j.id === previo)?.nombre}
+          onVisto={(n) => { E.visto(est, previo, n); refrescar(); }} />
+      )}
       {salir}
     </div>
   );
@@ -117,12 +126,20 @@ export default function SumaCeroLocal({ onVolver, onExit, onAbrirAyuda }) {
   }
 
   const v = E.vistaDe(est, quienId);
+  enManoRef.current = quienId;
   const enviar = (tipo, datos = {}) => {
+    enManoRef.current = quienId;
     const r = ACCIONES[tipo]?.(est, quienId, datos);
     if (r && !r.ok) mostrar(r.error);
     // al acabar el turno (cambia de jugador) se vuelve a pedir que se pase el móvil
     if (est.turno?.jugadorId !== quienId) setConfirmado(null);
     refrescar();
   };
-  return envoltorio(<PantallaJuego key={clave} v={v} enviar={enviar} onSalir={() => setModal(true)} />);
+  return envoltorio(
+    <>
+      <PantallaJuego key={clave} v={v} enviar={enviar} onSalir={() => setModal(true)} />
+      {v.yo.avisos.length > 0 && <AvisoEfecto avisos={v.yo.avisos} onVisto={(n) => { E.visto(est, quienId, n); refrescar(); }} />}
+    </>,
+    false
+  );
 }

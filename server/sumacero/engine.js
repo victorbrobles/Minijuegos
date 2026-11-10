@@ -35,6 +35,19 @@ const activos = (est) => est.jugadores.filter((j) => !j.fuera);
 const ok = (extra = {}) => ({ ok: true, ...extra });
 const err = (error) => ({ ok: false, error });
 const log = (est, texto) => { est.log.push({ n: ++est.nlog, texto }); if (est.log.length > 60) est.log.shift(); };
+// Avisos personales: cada implicado en una carta especial ve qué le ha pasado (lo que gana y lo que pierde).
+function avisar(est, id, a) {
+  est.avisos ||= {};
+  est.nav = (est.nav || 0) + 1;
+  (est.avisos[id] ||= []).push({ n: est.nav, ...a });
+  if (est.avisos[id].length > 8) est.avisos[id].shift();
+}
+/** El jugador ya ha leído sus avisos hasta el número `n`. */
+export function visto(est, id, n) {
+  if (est.avisos?.[id]) est.avisos[id] = est.avisos[id].filter((x) => x.n > Number(n));
+  return ok();
+}
+const nombres = (cartas) => cartas.map((c) => nombreCarta(c));
 export const valor = (c) => (c.tipo === 'numero' ? c.valor : 0);
 export const suma = (mano) => mano.reduce((a, c) => a + valor(c), 0);
 export const nombreCarta = (c) => (c.tipo === 'numero' ? (c.valor > 0 ? `+${c.valor}` : String(c.valor)) : `${ESPECIALES[c.especial].e} ${ESPECIALES[c.especial].nombre}`);
@@ -215,47 +228,75 @@ export function jugarEspecial(est, id, uid, params = {}) {
   p.mano = p.mano.filter((x) => x.uid !== carta.uid);
   aDescarte(est, carta);
   let resultado = {};
+  const tit = `${E.e} ${E.nombre}`;
   switch (carta.especial) {
     case 'robar': {
-      if (!v.mano.length) { log(est, `🫳 ${p.nombre} intenta robar a ${v.nombre}, pero no tiene cartas.`); break; }
+      if (!v.mano.length) {
+        log(est, `🫳 ${p.nombre} intenta robar a ${v.nombre}, pero no tiene cartas.`);
+        avisar(est, id, { e: E.e, titulo: tit, texto: `${v.nombre} no tenía cartas: no le robas nada.` });
+        break;
+      }
       const c = v.mano[Math.floor(est.rng() * v.mano.length)];
       v.mano = v.mano.filter((x) => x.uid !== c.uid);
       p.mano.push(c);
       resultado = { robada: c };
       log(est, `🫳 ${p.nombre} le roba una carta a ${v.nombre}.`);
+      avisar(est, id, { e: E.e, titulo: tit, texto: `Le robas una carta a ${v.nombre}.`, gana: nombres([c]) });
+      avisar(est, v.id, { e: E.e, titulo: `¡${p.nombre} te ha robado!`, texto: `${p.nombre} ha usado ${E.nombre} contra ti y se lleva una de tus cartas.`, pierde: nombres([c]), ataque: true });
       break;
     }
     case 'purga': {
       const nums = v.mano.filter((x) => x.tipo === 'numero');
-      if (!nums.length) { log(est, `🔥 ${v.nombre} no tenía números que descartar.`); break; }
+      if (!nums.length) {
+        log(est, `🔥 ${v.nombre} no tenía números que descartar.`);
+        avisar(est, id, { e: E.e, titulo: tit, texto: `${v.nombre} no tenía números: no pasa nada.` });
+        break;
+      }
       const alta = nums.reduce((a, b) => (b.valor > a.valor ? b : a));
       v.mano = v.mano.filter((x) => x.uid !== alta.uid);
       aDescarte(est, alta);
       log(est, `🔥 ${p.nombre} obliga a ${v.nombre} a descartar su carta más alta: ${nombreCarta(alta)}.`);
+      avisar(est, id, { e: E.e, titulo: tit, texto: `${v.nombre} tira su carta más alta: ${nombreCarta(alta)}.` });
+      avisar(est, v.id, { e: E.e, titulo: `¡${p.nombre} te ha atacado!`, texto: `${p.nombre} ha usado ${E.nombre}: tiras tu carta más alta.`, pierde: nombres([alta]), ataque: true });
       break;
     }
     case 'cambio': {
       const m = p.mano; p.mano = v.mano; v.mano = m;
       log(est, `🔀 ${p.nombre} intercambia su mano con la de ${v.nombre}.`);
+      avisar(est, id, { e: E.e, titulo: tit, texto: `Cambias tu mano entera con la de ${v.nombre}.`, gana: nombres(p.mano), pierde: nombres(v.mano) });
+      avisar(est, v.id, { e: E.e, titulo: `¡${p.nombre} te ha cambiado la mano!`, texto: `${p.nombre} ha usado ${E.nombre}: os intercambiáis las manos enteras.`, gana: nombres(v.mano), pierde: nombres(p.mano), ataque: true });
       break;
     }
-    case 'doble':
+    case 'doble': {
+      const antes = nombreCarta(propia);
       propia.valor *= 2;
       propia.doble = (propia.doble || 1) * 2;
       log(est, `✖️2 ${p.nombre} duplica una de sus cartas.`);
+      avisar(est, id, { e: E.e, titulo: tit, texto: `Tu ${antes} pasa a valer ${nombreCarta(propia)}.` });
       break;
+    }
     case 'espejo':
       p.mano.forEach((c) => { if (c.tipo === 'numero') c.valor = -c.valor; });
       log(est, `🪞 ${p.nombre} cambia el signo de todas sus cartas.`);
+      avisar(est, id, { e: E.e, titulo: tit, texto: `Todas tus cartas cambian de signo: ahora sumas ${suma(p.mano)}.` });
       break;
     case 'congelar':
       v.congelado = true;
       log(est, `❄️ ${p.nombre} congela a ${v.nombre}.`);
+      avisar(est, id, { e: E.e, titulo: tit, texto: `${v.nombre} se saltará su próximo turno.` });
+      avisar(est, v.id, { e: E.e, titulo: `¡${p.nombre} te ha congelado!`, texto: 'Te saltas tu próximo turno.', ataque: true });
       break;
-    case 'avalancha':
-      activos(est).filter((q) => q.id !== id).forEach((q) => { q.mano.push(...robarDelMazo(est, 2)); });
-      log(est, `🌊 ¡Avalancha! Todos los demás roban 2 cartas.`);
+    case 'avalancha': {
+      const rivales = activos(est).filter((q) => q.id !== id);
+      rivales.forEach((q) => {
+        const nuevas = robarDelMazo(est, 2);
+        q.mano.push(...nuevas);
+        avisar(est, q.id, { e: E.e, titulo: `¡${p.nombre} te ha atacado!`, texto: `${p.nombre} ha usado ${E.nombre}: robas ${nuevas.length} ${nuevas.length === 1 ? 'carta' : 'cartas'}.`, gana: nombres(nuevas), ataque: true });
+      });
+      log(est, `🌊 ¡Avalancha! ${p.nombre} hace que todos los demás roben 2 cartas.`);
+      avisar(est, id, { e: E.e, titulo: tit, texto: `${rivales.map((q) => q.nombre).join(', ').replace(/, ([^,]*)$/, ' y $1')} ${rivales.length === 1 ? 'roba' : 'roban'} 2 cartas.` });
       break;
+    }
     default: break;
   }
   est.ultimo = { tipo: 'especial', por: id, especial: carta.especial, objetivo: v?.id ?? null };
@@ -348,7 +389,7 @@ export function vistaDe(est, id) {
     turno: est.turno ? { jugadorId: est.turno.jugadorId, paso: est.turno.paso, robada: est.turno.jugadorId === id ? est.turno.robada : null } : null,
     plantado: est.plantado, ultimosTurnos: est.pendientesFinal,
     jugadores: est.jugadores.map((j) => ({ id: j.id, nombre: j.nombre, nMano: j.mano.length, total: j.total, congelado: j.congelado, fuera: j.fuera, listo: j.listo })),
-    yo: yo ? { id: yo.id, mano: yo.mano, ...puntosMano(yo.mano) } : null,
+    yo: yo ? { id: yo.id, mano: yo.mano, ...puntosMano(yo.mano), avisos: est.avisos?.[id] || [] } : null,
     ultimo: est.ultimo,
     resultado: revelado ? est.resultado : null,
     historial: est.historial,

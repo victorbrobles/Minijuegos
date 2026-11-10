@@ -151,6 +151,7 @@ router.post('/online/sala/:code/accion', (req, res) => {
     case 'descartar': r = E.descartar(p, id, Number(d.uid)); break;
     case 'especial': r = E.jugarEspecial(p, id, Number(d.uid), d.params || {}); break;
     case 'continuar': r = E.continuar(p, id); break;
+    case 'visto': r = E.visto(p, id, d.n); break;
     default: return res.status(400).json({ error: 'Acción desconocida.' });
   }
   revisar(sala);

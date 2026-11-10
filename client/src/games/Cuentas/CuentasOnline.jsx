@@ -2,6 +2,7 @@
 // Menú online, sala de espera, partida y clasificación (el servidor guarda el estado; cada móvil ve solo lo suyo).
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
+import AvisoEfecto from '../../components/AvisoEfecto.jsx';
 import { PantallaJuego, PantallaFin, Avatar } from './Vistas.jsx';
 import {
   MenuInicioJuego, FormCrearSala, FormUnirseSala, CabeceraSala, ListaSala, EsperandoAnfitrion
@@ -183,6 +184,9 @@ export default function CuentasOnline({ onVolver, onSalir, onAbrirAyuda }) {
 
   return (
     <div className={`ctp-contenedor ${enPartida ? 'qq-en-partida' : ''}`}>
+      {sala.estado === 'jugando' && v?.yo?.avisos?.length > 0 && (
+        <AvisoEfecto avisos={v.yo.avisos} onVisto={(n) => enviar('visto', { n })} />
+      )}
       {sinRed && <p className="ctp-sinred">⚠ Sin conexión con el servidor. Reintentando…</p>}
       {aviso && <p className="ctp-toast" role="alert" onClick={() => setAviso('')}>{aviso}</p>}
 

@@ -2,6 +2,7 @@
 // Menú online, sala de espera, partida y clasificación (el servidor guarda el estado; cada móvil ve solo lo suyo).
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
+import AvisoEfecto from '../../components/AvisoEfecto.jsx';
 import { OPCIONES_RONDAS } from './engine.js';
 import { PantallaJuego, PantallaResultado, PantallaFin, Avatar } from './Vistas.jsx';
 import {
@@ -194,6 +195,9 @@ export default function SumaCeroOnline({ onVolver, onSalir, onAbrirAyuda }) {
 
   return (
     <div className={`szp-contenedor ${enPartida ? 'qq-en-partida' : ''}`}>
+      {sala.estado === 'jugando' && v?.yo?.avisos?.length > 0 && (
+        <AvisoEfecto avisos={v.yo.avisos} onVisto={(n) => enviar('visto', { n })} />
+      )}
       {sinRed && <p className="szp-sinred">⚠ Sin conexión con el servidor. Reintentando…</p>}
       {aviso && <p className="szp-toast" role="alert" onClick={() => setAviso('')}>{aviso}</p>}
 
