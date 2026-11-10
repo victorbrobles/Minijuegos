@@ -3,14 +3,25 @@ import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
 import CategoryCard from '../../components/CategoryCard.jsx';
 import './MasMenos.css';
-import '../Adivina/Adivina.css';
-import { MenuInicioJuego, MenuModoOnline, FormCrearSala, FormUnirseSala, CabeceraSala, EsperandoAnfitrion } from '../../components/MenuJuego.jsx';
+import {
+  MenuInicioJuego,
+  MenuModoOnline,
+  FormCrearSala,
+  FormUnirseSala,
+  CabeceraSala,
+  ListaSala,
+  EsperandoAnfitrion
+} from '../../components/MenuJuego.jsx';
 
 const CLAVE_SESION_MM = 'masmenos_online_session';
 const TIEMPO_TURNO = 30;
 
-export default function MasMenosOnline({ onLocal, onSalir }) {
-  const [vista, setVista] = useState('menu'); // 'menu' | 'crear' | 'unirse' | 'sala'
+const COLORES_JUGADOR = ['#4d7c0f', '#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316', '#84cc16'];
+const colorJugador = (id) => COLORES_JUGADOR[(Number(id) - 1 + COLORES_JUGADOR.length * 10) % COLORES_JUGADOR.length];
+const inicial = (n = '?') => n.trim().charAt(0).toUpperCase() || '?';
+
+export default function MasMenosOnline({ onLocal }) {
+  const [vista, setVista] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
   const [nombre, setNombre] = useState('');
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -28,7 +39,7 @@ export default function MasMenosOnline({ onLocal, onSalir }) {
   });
 
   const [sala, setSala] = useState(null);
-  const [codigoCopiado, setCodigoCopiado] = useState(false);
+  const [sinRed, setSinRed] = useState(false);
   const [tiempoRestante, setTiempoRestante] = useState(TIEMPO_TURNO);
 
   const intervalRef = useRef(null);
@@ -50,29 +61,47 @@ export default function MasMenosOnline({ onLocal, onSalir }) {
       return;
     }
 
+    let fallos = 0;
+    let pedidas = 0;
+    let aplicada = 0;
+    const cerrar = (msg) => {
+      sessionStorage.removeItem(CLAVE_SESION_MM);
+      setSesion(null);
+      setSala(null);
+      setSinRed(false);
+      setVista('online_menu');
+      setErrorMsg(msg);
+    };
+
     const consultarEstado = () => {
+      const n = ++pedidas;
       fetch(`/api/masmenos/online/sala/${sesion.code}?token=${sesion.token}`)
-        .then((r) => {
-          if (!r.ok) throw new Error('Sala no disponible');
-          return r.json();
-        })
-        .then((d) => {
+        .then(async (r) => {
+          if (r.status === 404 || r.status === 403) {
+            const d = await r.json().catch(() => ({}));
+            cerrar(d.error || 'La sala se ha cerrado.');
+            return;
+          }
+          if (!r.ok) throw new Error('red');
+          const d = await r.json();
+          if (n < aplicada) return;
+          aplicada = n;
+          fallos = 0;
+          setSinRed(false);
           if (d.success) {
             setSala(d);
             setVista('sala');
           }
         })
         .catch(() => {
-          sessionStorage.removeItem(CLAVE_SESION_MM);
-          setSesion(null);
-          setSala(null);
-          setVista('online_menu');
-          setErrorMsg('La sala se ha cerrado.');
+          fallos += 1;
+          if (fallos >= 3) setSinRed(true);
+          if (fallos >= 40) cerrar('Se ha perdido la conexión con la sala.');
         });
     };
 
     consultarEstado();
-    intervalRef.current = setInterval(consultarEstado, 550);
+    intervalRef.current = setInterval(consultarEstado, 500);
 
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
@@ -123,6 +152,19 @@ export default function MasMenosOnline({ onLocal, onSalir }) {
     }
   };
 
+  const handleExpulsar = async (jugadorId) => {
+    if (!sesion) return;
+    try {
+      await fetch(`/api/masmenos/online/sala/${sesion.code}/expulsar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: sesion.token, jugadorId })
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const handleIniciarPartida = async () => {
     try {
       const res = await fetch(`/api/masmenos/online/sala/${sesion.code}/iniciar-partida`, {
@@ -167,7 +209,7 @@ export default function MasMenosOnline({ onLocal, onSalir }) {
 
   const handleTimeOutRef = useRef();
   useEffect(() => {
-    handleTimeOutRef.current = () => handleElegirTarjeta('TIMEOUT'); // Forzamos respuesta incorrecta
+    handleTimeOutRef.current = () => handleElegirTarjeta('TIMEOUT');
   });
 
   const ronda = sala?.ronda;
@@ -228,18 +270,35 @@ export default function MasMenosOnline({ onLocal, onSalir }) {
     }
   };
 
-  const handleSalir = () => {
+  const handleReiniciarPartida = async () => {
+    try {
+      await fetch(`/api/masmenos/online/sala/${sesion.code}/reiniciar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: sesion.token })
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleSalir = async () => {
+    if (sesion) {
+      try {
+        await fetch(`/api/masmenos/online/sala/${sesion.code}/salir`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token: sesion.token }),
+          keepalive: true
+        });
+      } catch {
+        /* ignorar */
+      }
+    }
     sessionStorage.removeItem(CLAVE_SESION_MM);
     setSesion(null);
     setSala(null);
     setVista('online_menu');
-  };
-
-  const copiarCodigo = () => {
-    if (!sala?.code) return;
-    navigator.clipboard?.writeText(sala.code);
-    setCodigoCopiado(true);
-    setTimeout(() => setCodigoCopiado(false), 2000);
   };
 
   const formatearCifra = (num) => {
@@ -250,39 +309,36 @@ export default function MasMenosOnline({ onLocal, onSalir }) {
   const ranking = sala?.jugadores ? [...sala.jugadores].sort((a, b) => b.puntos - a.puntos) : [];
   const maximo = ranking.length ? ranking[0].puntos : 0;
   const ganadores = maximo > 0 ? ranking.filter((j) => j.puntos === maximo) : [];
-
+  const enPartidaActiva = vista === 'sala' && sala && sala.estado !== 'lobby';
 
   return (
-    <div className="mm-contenedor">
-      {/* ---------------- BOTÓN Y MODAL DE AYUDA ---------------- */}
+    <div className={`mm-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+      {sinRed && <div className="ptp-sin-red">📶 Reconectando con la sala…</div>}
 
+      {/* AYUDA */}
       {modalAyuda && (
         <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
-          <div className="rg-modal aprox-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-            <div className="aprox-modal-header">
-              <span className="aprox-modal-signo-title">?</span>
-              <h3>¿Cómo se juega a Entre dos aguas?</h3>
+          <div className="rg-modal ptp-modal-ayuda" onClick={(e) => e.stopPropagation()}>
+            <div className="ptp-modal-ayuda-header">
+              <span className="ptp-ayuda-badge">❓ Cómo jugar</span>
+              <h3>Entre dos aguas</h3>
             </div>
 
-            <div className="aprox-modal-cuerpo">
-              <p><strong>1. Dinámica del reto:</strong></p>
+            <div className="ptp-modal-ayuda-body">
+              <p>Compite en la sala multijugador para adivinar qué cifra es mayor.</p>
               <ul>
-                <li>Eliges una categoría y se sortea quién empieza la partida.</li>
-                <li>Aparecen dos datos frente a frente. Tienes <strong>30 segundos</strong> para <strong>elegir la cifra más alta</strong>.</li>
-                <li>Si aciertas, sumas <strong>+1 punto</strong>, se desvelan las cifras reales y la tarjeta perdedora o más antigua se sustituye por una nueva.</li>
-                <li>¡Encadena tantos aciertos consecutivos como puedas hasta fallar (o quedarte sin tiempo)!</li>
+                <li><strong>Dinámica:</strong> Aparecen dos tarjetas con datos frente a frente. Tienes <strong>30 segundos</strong> para elegir la cifra más alta en tu turno.</li>
+                <li><strong>Racha:</strong> Si aciertas, sumas +1 punto a tu racha, se desvelan las cifras y la tarjeta perdedora se renueva.</li>
+                <li><strong>Fin de turno:</strong> Tu turno termina en cuanto fallas o se agota el tiempo, pasando el relevo al siguiente jugador.</li>
               </ul>
             </div>
 
-            <div className="rg-modal-acciones">
-              <button className="big full" onClick={() => setModalAyuda(false)}>
-                Entendido
-              </button>
-            </div>
+            <button type="button" className="ptp-boton" onClick={() => setModalAyuda(false)}>
+              ¡Entendido!
+            </button>
           </div>
         </div>
       )}
-      {/* ---------------- FIN AYUDA ---------------- */}
 
       {/* 1. MENÚ ONLINE */}
       {vista === 'menu' && (
@@ -338,45 +394,53 @@ export default function MasMenosOnline({ onLocal, onSalir }) {
         <section className="game qq-pantalla">
           <CabeceraSala codigo={sala.code} onVolver={() => setModalSalir(true)} onAyuda={() => setModalAyuda(true)} />
 
-          <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
-            <h3 className="qq-sala-titulo"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length}/10)</h3>
-            <div className="lb-lista qq-sala-lista">
-              {sala.jugadores.map((j) => (
-                <div key={j.id} className={`lb-jug ${j.id === yoId ? 'yo' : ''}`}>
-                  <span className="lb-jug-nombre">{j.nombre}{j.id === yoId ? ' (Tú)' : ''}{j.id === 1 ? ' 👑' : ''}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+          <ListaSala
+            jugadores={sala.jugadores}
+            yoId={yoId}
+            min={2}
+            max={10}
+            anfitrionId={sala.anfitrionId}
+            renderExtra={(j) => (
+              <span className="ptp-sala-extra">
+                {!j.conectado && <span className="ptp-sin-conexion" title="Sin conexión">📵</span>}
+                {esAdmin && j.id !== yoId && (
+                  <button type="button" className="ptp-quitar" onClick={() => handleExpulsar(j.id)}>
+                    Quitar
+                  </button>
+                )}
+              </span>
+            )}
+          />
 
           {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
 
           {esAdmin ? (
-            <button
-              className="big full qq-btn-principal"
-              style={{ marginTop: '1.2rem' }}
-              disabled={sala.jugadores.length < 2}
-              onClick={handleIniciarPartida}
-            >
-              <Icon name="play" size={22} /> {sala.jugadores.length < 2 ? 'Esperando rivales (mínimo 2)...' : '¡Elegir Categoría!'}
-            </button>
+            <div style={{ marginTop: '1.2rem' }}>
+              <button
+                className="big full qq-btn-principal"
+                disabled={sala.jugadores.length < 2}
+                onClick={handleIniciarPartida}
+              >
+                <Icon name="play" size={22} />
+                {sala.jugadores.length < 2 ? 'Esperando rivales (mínimo 2)...' : '¡Elegir Categoría!'}
+              </button>
+            </div>
           ) : (
-            <EsperandoAnfitrion />
+            <EsperandoAnfitrion texto="El anfitrión está a punto de elegir la categoría para iniciar la partida." />
           )}
-
         </section>
       )}
 
       {/* 5. SELECTOR DE CATEGORÍA */}
       {vista === 'sala' && sala && sala.estado === 'categoria' && (
-        <section className="game">
+        <section className="game qq-pantalla">
           <div className="hud">
             <span className="chip"><Icon name="target" size={18} />Selector de categoría</span>
           </div>
 
           {esAdmin ? (
             <>
-              <h3 className="section-title" style={{ textAlign: 'center', marginBottom: '1rem' }}>
+              <h3 className="section-title" style={{ textAlign: 'center', marginBottom: '1rem', color: '#0f172a' }}>
                 ¿Qué temática queréis comparar?
               </h3>
               <div className="rf-opciones conecta-categories-grid">
@@ -392,73 +456,79 @@ export default function MasMenosOnline({ onLocal, onSalir }) {
               </div>
             </>
           ) : (
-            <div className="panel center" style={{ padding: '2.5rem 1.5rem' }}>
+            <div className="panel center qq-menu-panel" style={{ padding: '2.5rem 1.5rem', marginTop: '1rem' }}>
               <span className="end-icon"><Icon name="target" size={44} /></span>
               <h2 className="title" style={{ marginTop: '0.8rem' }}>Eligiendo categoría...</h2>
               <p className="hint">El anfitrión está seleccionando la temática para esta partida.</p>
             </div>
           )}
-
-          <button className="secondary danger full" style={{ marginTop: '1.5rem' }} onClick={() => setModalSalir(true)}>
-            Salir de la sala
-          </button>
         </section>
       )}
 
       {/* 6. JUGANDO ONLINE */}
       {vista === 'sala' && sala && sala.estado === 'jugando' && ronda && ronda.faseRonda === 'jugando' && (
-        <section className="game">
-          <div className="hud">
-            <span className="chip">
-              <Icon name="users" size={18} />
-              {esMiTurno ? (
-                <strong>¡Es tu turno!</strong>
-              ) : (
-                <>Turno de: <strong>{ronda.jugadorActivoNombre}</strong></>
-              )}
+        <section className="game ptp-escena">
+          <header className="ptp-hero">
+            <span className="ptp-hero-deco" aria-hidden="true">
+              <Icon name="scale" size={140} strokeWidth={1.3} />
             </span>
-            <span className="mm-streak-pill">
-              🔥 Racha: {ronda.puntosTurno} {ronda.puntosTurno === 1 ? 'acierto' : 'aciertos'}
+            <div className="ptp-hero-top">
+              <button type="button" className="ptp-salir" onClick={() => setModalSalir(true)}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                <span>Salir</span>
+              </button>
+              <div className="ptp-hero-chips">
+                <span className="ptp-chip">
+                  <Icon name="users" size={14} /> {esMiTurno ? '¡Tu turno!' : ronda.jugadorActivoNombre}
+                </span>
+                <span className="ptp-chip">
+                  <Icon name="flame" size={14} /> Racha: {ronda.puntosTurno}
+                </span>
+              </div>
+            </div>
+
+            <ol className="ptp-marcador" aria-label="Jugadores">
+              {sala.jugadores.map((j) => {
+                const esTurnoDeEste = j.id === ronda.jugadorActivoId;
+                const pts = esTurnoDeEste ? ronda.puntosTurno : j.puntos;
+                return (
+                  <li
+                    key={j.id}
+                    className={`ptp-jugador${j.jugo ? ' respondido' : ''}${j.id === yoId ? ' yo' : ''}`}
+                    style={{ '--c': colorJugador(j.id) }}
+                  >
+                    <span className="ptp-jugador-avatar">{inicial(j.nombre)}</span>
+                    <span className="ptp-jugador-datos">
+                      <span className="ptp-jugador-nombre">{j.nombre}{j.id === yoId ? ' (tú)' : ''}</span>
+                      <span className="ptp-jugador-linea">
+                        <strong>{j.jugo || esTurnoDeEste ? `${pts} pts` : 'Pendiente'}</strong>
+                      </span>
+                    </span>
+                    <span className="ptp-jugador-estado">
+                      {j.jugo ? '✅' : esTurnoDeEste ? '⚡' : '⏳'}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+          </header>
+
+          {/* Temporizador */}
+          <div className={`ptp-tiempo ${tiempoRestante <= 10 ? 'critico' : ''}`} role="timer">
+            <div className="ptp-tiempo-barra">
+              <span style={{ width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%` }} />
+            </div>
+            <span className="ptp-tiempo-num">
+              <Icon name="clock" size={15} /> {tiempoRestante}s
             </span>
           </div>
 
-          <h2 className="title center" style={{ margin: '0.5rem 0 0.2rem', fontSize: '1.45rem' }}>
-            ¿Cuál tiene la cifra más grande?
-          </h2>
-          <p className="hint small center" style={{ marginBottom: '1rem' }}>
-            {esMiTurno
-              ? 'Pulsa sobre la tarjeta que consideres mayor'
-              : `Observando en directo las elecciones de ${ronda.jugadorActivoNombre}...`}
-          </p>
-
-          {/* Temporizador de 30 segundos */}
-          <div style={{ padding: '0 1rem', marginTop: '0.5rem', marginBottom: '1rem' }}>
-            <div
-              className="timer"
-              role="timer"
-              style={{ margin: '0.4rem 0', background: '#e2e8f0', borderRadius: '9999px', height: '8px', overflow: 'hidden' }}
-            >
-              <div
-                className={`timer-bar ${tiempoRestante <= 10 ? 'low' : ''}`}
-                style={{
-                  width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%`,
-                  height: '100%',
-                  backgroundColor: tiempoRestante <= 10 ? '#ef4444' : '#16a34a',
-                  borderRadius: '9999px',
-                  transition: 'width 0.1s linear, background-color 0.3s ease'
-                }}
-              />
-            </div>
-            <p
-              className="timer-text"
-              style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem',
-                color: tiempoRestante <= 10 ? '#dc2626' : '#64748b', fontSize: '0.9rem', fontWeight: 700, margin: '0'
-              }}
-            >
-              <Icon name="clock" size={16} />
-              {tiempoRestante} s
-            </p>
+          <div className="ptp-tarjeta" style={{ padding: '0.8rem 1rem', textAlign: 'center' }}>
+            <h2 className="title" style={{ margin: '0.2rem 0', fontSize: '1.25rem', color: '#0f172a' }}>
+              {esMiTurno ? '¿Cuál tiene la cifra más grande?' : `Observando a ${ronda.jugadorActivoNombre}...`}
+            </h2>
           </div>
 
           <div className="mm-versus-wrapper">
@@ -512,61 +582,75 @@ export default function MasMenosOnline({ onLocal, onSalir }) {
               )}
             </button>
           </div>
-
-          <button className="secondary danger full" style={{ marginTop: '1.5rem' }} onClick={() => setModalSalir(true)}>
-            Salir de la sala
-          </button>
         </section>
       )}
 
       {/* 7. FIN DE TURNO INDIVIDUAL */}
       {vista === 'sala' && sala && sala.estado === 'jugando' && ronda && ronda.faseRonda === 'turno_fin' && (
-        <section className="game center">
-          <div className="end-card">
-            <span className="end-icon"><Icon name="hourglass" size={44} /></span>
-            <h1 className="title">¡Racha terminada!</h1>
-            <p className="reveal" style={{ fontSize: '1.4rem', margin: '0.8rem 0' }}>
-              <strong>{ronda.jugadorActivoNombre}</strong> ha conseguido{' '}
-              <strong>{ronda.puntosTurno} aciertos consecutivos</strong>.
-            </p>
-
-            <div className="scoreboard">
-              {sala.jugadores.map((j) => (
-                <div key={j.id} className={`score-row ${j.id === ronda.jugadorActivoId ? 'first' : ''}`}>
-                  <span className="score-name">{j.nombre}</span>
-                  <span className="score-pts">{j.jugo ? `${j.puntos} pts` : 'Pendiente'}</span>
-                </div>
-              ))}
+        <section className="game ptp-escena">
+          <header className="ptp-hero">
+            <span className="ptp-hero-deco" aria-hidden="true">
+              <Icon name="hourglass" size={140} strokeWidth={1.3} />
+            </span>
+            <div className="ptp-hero-top">
+              <button type="button" className="ptp-salir" onClick={() => setModalSalir(true)}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                <span>Salir</span>
+              </button>
+              <span className="ptp-chip"><Icon name="flagFinish" size={14} /> ¡Racha terminada!</span>
             </div>
+            <p className="ptp-etiqueta" style={{ color: 'rgba(255,255,255,0.85)' }}>
+              Resultado de {ronda.jugadorActivoNombre}
+            </p>
+            <h2 className="ptp-solucion-titulo">
+              {ronda.puntosTurno} aciertos
+            </h2>
+          </header>
+
+          <div className="ptp-tarjeta">
+            <p className="ptp-etiqueta">Clasificación provisional</p>
+            <ol className="ptp-ranking">
+              {sala.jugadores.map((j, i) => {
+                const esActual = j.id === ronda.jugadorActivoId;
+                return (
+                  <li key={j.id} className={esActual ? 'lider' : ''} style={{ '--c': colorJugador(j.id) }}>
+                    <span className="ptp-ranking-pos">{j.jugo ? '✅' : i + 1}</span>
+                    <span className="ptp-jugador-avatar">{inicial(j.nombre)}</span>
+                    <span className="ptp-ranking-nombre">
+                      {j.nombre}{j.id === yoId ? ' (tú)' : ''}
+                    </span>
+                    <strong>{j.jugo ? `${j.puntos} pts` : 'Pendiente'}</strong>
+                  </li>
+                );
+              })}
+            </ol>
           </div>
 
-          <div className="actions" style={{ marginTop: '1.5rem' }}>
+          <div className="ptp-barra estatica">
             {esAdmin ? (
               sala.jugadores.some((j) => !j.jugo) ? (
-                <button className="big full" onClick={handleSiguienteJugador}>
+                <button type="button" className="ptp-boton grande" onClick={handleSiguienteJugador}>
                   <Icon name="play" size={20} /> Turno del siguiente jugador
                 </button>
               ) : (
-                <button className="big full" onClick={handleFinalizar}>
+                <button type="button" className="ptp-boton grande" onClick={handleFinalizar}>
                   <Icon name="trophy" size={20} /> Ver podio final
                 </button>
               )
             ) : (
-              <p className="hint">Esperando a que el anfitrión lance el siguiente turno...</p>
+              <p className="ptp-espera">Esperando a que el anfitrión lance el siguiente turno...</p>
             )}
-
-            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
-              Salir de la sala
-            </button>
           </div>
         </section>
       )}
 
       {/* 8. PODIO FINAL ONLINE */}
       {vista === 'sala' && sala && sala.estado === 'final' && (
-        <section className="game">
+        <section className="game ptp-escena">
           <div className="end-card">
-            <span className="end-icon"><Icon name="crown" size={48} /></span>
+            <span className="end-icon"><Icon name="crown" size={44} /></span>
             <h1 className="title">Clasificación Final</h1>
             <p className="final-score">
               {ganadores.length === 0
@@ -583,7 +667,7 @@ export default function MasMenosOnline({ onLocal, onSalir }) {
                   <div key={j.id} className={`score-row ${lider ? 'first' : ''}`}>
                     <span className="score-name">
                       {lider ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
-                      {j.nombre}
+                      {j.nombre} {j.id === yoId ? '(Tú)' : ''}
                     </span>
                     <span className="score-pts">{j.puntos} pts</span>
                   </div>
@@ -592,8 +676,13 @@ export default function MasMenosOnline({ onLocal, onSalir }) {
             </div>
           </div>
 
-          <div className="actions" style={{ marginTop: '1.5rem' }}>
-            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
+          <div className="ptp-barra estatica">
+            {esAdmin && (
+              <button type="button" className="ptp-boton grande" onClick={handleReiniciarPartida}>
+                <Icon name="refresh" size={20} /> Otra partida (mismos jugadores)
+              </button>
+            )}
+            <button type="button" className="ptp-boton secundario" onClick={() => setModalSalir(true)}>
               <Icon name="door" size={20} /> Salir al menú
             </button>
           </div>
@@ -603,31 +692,18 @@ export default function MasMenosOnline({ onLocal, onSalir }) {
       {/* MODAL DE CONFIRMACIÓN PARA SALIR */}
       {modalSalir && (
         <div className="rg-modal-fondo" onClick={() => setModalSalir(false)}>
-          <div 
-            className="rg-modal" 
-            onClick={(e) => e.stopPropagation()} 
-            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
-          >
-            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
-            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
-              ¿Abandonar la partida?
-            </h3>
-            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
-              Si sales de la sala perderás tu progreso actual en la partida. ¿Estás seguro de que deseas salir?
-            </p>
+          <div className="rg-modal ptp-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="ptp-modal-icono">🚪</div>
+            <h3>¿Abandonar la partida?</h3>
+            <p className="hint">Si sales de la sala perderás tu progreso actual en la partida. ¿Estás seguro de que deseas salir?</p>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
-              <button 
-                type="button" 
-                className="secondary full" 
-                onClick={() => setModalSalir(false)}
-              >
+            <div className="ptp-fila-botones">
+              <button type="button" className="ptp-boton secundario" onClick={() => setModalSalir(false)}>
                 No, quedarme
               </button>
-              <button 
-                type="button" 
-                className="secondary danger full" 
-                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
+              <button
+                type="button"
+                className="ptp-boton peligro"
                 onClick={() => {
                   setModalSalir(false);
                   handleSalir();

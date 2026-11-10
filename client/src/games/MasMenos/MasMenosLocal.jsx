@@ -10,11 +10,16 @@ const MIN_JUGADORES = 1;
 const MAX_JUGADORES = 10;
 const TIEMPO_TURNO = 30;
 
+const COLORES_JUGADOR = ['#4d7c0f', '#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316', '#84cc16'];
+const colorJugador = (id) => COLORES_JUGADOR[(Number(id) - 1 + COLORES_JUGADOR.length * 10) % COLORES_JUGADOR.length];
+const inicial = (n = '?') => n.trim().charAt(0).toUpperCase() || '?';
+
 export default function MasMenosLocal({ onVolver, onExit }) {
   const navigate = useNavigate();
 
-  const [fase, setFase] = useState('setup');
+  const [fase, setFase] = useState('setup'); // 'setup' | 'categoria' | 'pasar_turno' | 'jugando' | 'turno_fin' | 'final'
   const [modalAyuda, setModalAyuda] = useState(false);
+  const [modalSalirPortada, setModalSalirPortada] = useState(false);
 
   const [numJugadores, setNumJugadores] = useState(3);
   const [jugadores, setJugadores] = useState([
@@ -48,6 +53,20 @@ export default function MasMenosLocal({ onVolver, onExit }) {
       })
       .catch((e) => console.error('Error cargando categorías de masmenos:', e));
   }, []);
+
+  const handleSalirAPortada = () => {
+    setModalSalirPortada(false);
+    clearInterval(timerRef.current);
+    if (typeof onExit === 'function') {
+      onExit();
+    } else {
+      try {
+        navigate('/');
+      } catch {
+        window.location.href = '/';
+      }
+    }
+  };
 
   const handleNumJugadoresChange = (e) => {
     const num = parseInt(e.target.value, 10);
@@ -214,7 +233,7 @@ export default function MasMenosLocal({ onVolver, onExit }) {
       setTiempoRestante((prev) => {
         if (prev <= 1) {
           clearInterval(timerRef.current);
-          if (handleTimeOutRef.current) handleTimeOutRef.current(); // Agota el tiempo y falla
+          if (handleTimeOutRef.current) handleTimeOutRef.current();
           return 0;
         }
         return prev - 1;
@@ -239,39 +258,33 @@ export default function MasMenosLocal({ onVolver, onExit }) {
   const ranking = [...jugadores].sort((a, b) => b.puntos - a.puntos);
   const maximo = ranking.length ? ranking[0].puntos : 0;
   const ganadores = maximo > 0 ? ranking.filter((j) => j.puntos === maximo) : [];
+  const enPartidaActiva = fase === 'pasar_turno' || fase === 'jugando' || fase === 'turno_fin';
 
   return (
-    <div className="mm-contenedor">
+    <div className={`mm-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
       {/* AYUDA */}
-      {fase === 'setup' && (
-        <>
-
-          {modalAyuda && (
-            <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
-              <div className="rg-modal aprox-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-                <div className="aprox-modal-header">
-                  <h3>¿Cómo se juega a Entre dos aguas?</h3>
-                </div>
-
-                <div className="aprox-modal-cuerpo">
-                  <p><strong>1. Dinámica del reto:</strong></p>
-                  <ul>
-                    <li>Eliges una categoría y se sortea quién empieza la partida.</li>
-                    <li>Aparecen dos datos frente a frente. Tienes <strong>30 segundos</strong> para <strong>elegir la cifra más alta</strong>.</li>
-                    <li>Si aciertas, sumas <strong>+1 punto</strong>, se desvelan las cifras reales y la tarjeta perdedora o más antigua se sustituye por una nueva.</li>
-                    <li>¡Encadena tantos aciertos consecutivos como puedas hasta fallar (o quedarte sin tiempo)!</li>
-                  </ul>
-                </div>
-
-                <div className="rg-modal-acciones">
-                  <button className="big full" onClick={() => setModalAyuda(false)}>
-                    Entendido
-                  </button>
-                </div>
-              </div>
+      {modalAyuda && (
+        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
+          <div className="rg-modal ptp-modal-ayuda" onClick={(e) => e.stopPropagation()}>
+            <div className="ptp-modal-ayuda-header">
+              <span className="ptp-ayuda-badge">❓ Cómo jugar</span>
+              <h3>Entre dos aguas</h3>
             </div>
-          )}
-        </>
+
+            <div className="ptp-modal-ayuda-body">
+              <p>Compite por turnos para adivinar qué cifra es mayor.</p>
+              <ul>
+                <li><strong>Dinámica:</strong> Aparecen dos tarjetas con datos frente a frente. Tienes <strong>30 segundos</strong> para elegir la cifra más alta.</li>
+                <li><strong>Racha:</strong> Si aciertas, sumas +1 punto a tu racha, se desvelan las cifras reales y la tarjeta perdedora se renueva.</li>
+                <li><strong>Fin de turno:</strong> Tu turno termina en cuanto fallas o se agota el tiempo. ¡Gana quien acumule más puntos!</li>
+              </ul>
+            </div>
+
+            <button type="button" className="ptp-boton" onClick={() => setModalAyuda(false)}>
+              ¡Entendido!
+            </button>
+          </div>
+        </div>
       )}
 
       {/* 1. SETUP */}
@@ -293,12 +306,12 @@ export default function MasMenosLocal({ onVolver, onExit }) {
 
       {/* 2. CATEGORÍA */}
       {fase === 'categoria' && (
-        <section className="game">
+        <section className="game qq-pantalla">
           <div className="hud">
             <span className="chip"><Icon name="target" size={18} />Selector de categoría</span>
           </div>
 
-          <h3 className="section-title" style={{ textAlign: 'center', marginBottom: '1rem' }}>
+          <h3 className="section-title" style={{ textAlign: 'center', marginBottom: '1rem', color: '#0f172a' }}>
             ¿Qué temática queréis comparar?
           </h3>
 
@@ -318,16 +331,57 @@ export default function MasMenosLocal({ onVolver, onExit }) {
 
       {/* 3. PASAR TURNO */}
       {fase === 'pasar_turno' && jugadorActivo && (
-        <section className="game center">
-          <div className="panel aprox-pregunta-card" style={{ padding: '3.2rem 1.5rem' }}>
-            <span className="chip alt">Turno individual contrarreloj</span>
-            <h1 style={{ fontSize: '2.4rem', fontWeight: '900', color: '#4f46e5', margin: '0.6rem 0 1.2rem' }}>
-              ¡Turno de {jugadorActivo.nombre}!
-            </h1>
-            <p className="hint" style={{ fontSize: '1.05rem', marginBottom: '1.8rem' }}>
+        <section className="game ptp-escena">
+          <header className="ptp-hero">
+            <span className="ptp-hero-deco" aria-hidden="true">
+              <Icon name="scale" size={140} strokeWidth={1.3} />
+            </span>
+            <div className="ptp-hero-top">
+              <button type="button" className="ptp-salir" onClick={() => setModalSalirPortada(true)}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                <span>Portada</span>
+              </button>
+              <div className="ptp-hero-chips">
+                <span className="ptp-chip"><Icon name="dice" size={14} /> Turno individual</span>
+              </div>
+            </div>
+
+            <ol className="ptp-marcador" aria-label="Jugadores">
+              {jugadores.map((j) => {
+                const esActual = j.id === jugadorActivo.id;
+                return (
+                  <li
+                    key={j.id}
+                    className={`ptp-jugador${j.jugo ? ' respondido' : ''}${esActual ? ' yo' : ''}`}
+                    style={{ '--c': colorJugador(j.id) }}
+                  >
+                    <span className="ptp-jugador-avatar">{inicial(j.nombre)}</span>
+                    <span className="ptp-jugador-datos">
+                      <span className="ptp-jugador-nombre">{j.nombre}</span>
+                      <span className="ptp-jugador-linea">
+                        <strong>{j.jugo ? `${j.puntos} pts` : esActual ? 'Su turno' : 'Pendiente'}</strong>
+                      </span>
+                    </span>
+                    <span className="ptp-jugador-estado">
+                      {j.jugo ? '✅' : esActual ? '⚡' : '⏳'}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+          </header>
+
+          <div className="ptp-tarjeta" style={{ textAlign: 'center', padding: '1.8rem 1.4rem' }}>
+            <p className="ptp-etiqueta">Pasad el dispositivo</p>
+            <h2 style={{ fontSize: '1.8rem', fontWeight: '900', color: '#0f172a', margin: '0.4rem 0 0.8rem' }}>
+              ¡Turno de <span style={{ color: colorJugador(jugadorActivo.id) }}>{jugadorActivo.nombre}</span>!
+            </h2>
+            <p className="hint" style={{ fontSize: '0.96rem', marginBottom: '1.5rem' }}>
               Pasad el móvil a <strong>{jugadorActivo.nombre}</strong> para conseguir la mayor racha de aciertos.
             </p>
-            <button className="big full" onClick={() => setFase('jugando')}>
+            <button type="button" className="ptp-boton grande" onClick={() => setFase('jugando')}>
               <Icon name="zap" size={22} /> ¡Empezar mi turno!
             </button>
           </div>
@@ -336,46 +390,66 @@ export default function MasMenosLocal({ onVolver, onExit }) {
 
       {/* 4. EN JUEGO */}
       {fase === 'jugando' && tarjetaA && tarjetaB && (
-        <section className="game">
-          <div className="hud">
-            <span className="chip"><Icon name="users" size={18} />Jugando: <strong>{jugadorActivo?.nombre}</strong></span>
-            <span className="mm-streak-pill">
-              🔥 Racha: {puntosTurno} {puntosTurno === 1 ? 'acierto' : 'aciertos'}
+        <section className="game ptp-escena">
+          <header className="ptp-hero">
+            <span className="ptp-hero-deco" aria-hidden="true">
+              <Icon name="scale" size={140} strokeWidth={1.3} />
+            </span>
+            <div className="ptp-hero-top">
+              <button type="button" className="ptp-salir" onClick={() => setModalSalirPortada(true)}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                <span>Portada</span>
+              </button>
+              <div className="ptp-hero-chips">
+                <span className="ptp-chip"><Icon name="users" size={14} /> {jugadorActivo?.nombre}</span>
+                <span className="ptp-chip">
+                  <Icon name="flame" size={14} /> Racha: {puntosTurno}
+                </span>
+              </div>
+            </div>
+
+            <ol className="ptp-marcador" aria-label="Jugadores">
+              {jugadores.map((j) => {
+                const esActual = j.id === jugadorActivo?.id;
+                const pts = esActual ? puntosTurno : j.puntos;
+                return (
+                  <li
+                    key={j.id}
+                    className={`ptp-jugador${j.jugo ? ' respondido' : ''}${esActual ? ' yo' : ''}`}
+                    style={{ '--c': colorJugador(j.id) }}
+                  >
+                    <span className="ptp-jugador-avatar">{inicial(j.nombre)}</span>
+                    <span className="ptp-jugador-datos">
+                      <span className="ptp-jugador-nombre">{j.nombre}</span>
+                      <span className="ptp-jugador-linea">
+                        <strong>{j.jugo || esActual ? `${pts} pts` : 'Pendiente'}</strong>
+                      </span>
+                    </span>
+                    <span className="ptp-jugador-estado">
+                      {j.jugo ? '✅' : esActual ? '⚡' : '⏳'}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+          </header>
+
+          {/* Temporizador */}
+          <div className={`ptp-tiempo ${tiempoRestante <= 10 ? 'critico' : ''}`} role="timer">
+            <div className="ptp-tiempo-barra">
+              <span style={{ width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%` }} />
+            </div>
+            <span className="ptp-tiempo-num">
+              <Icon name="clock" size={15} /> {tiempoRestante}s
             </span>
           </div>
 
-          <h2 className="title center" style={{ margin: '0.5rem 0 1rem', fontSize: '1.45rem' }}>
-            ¿Cuál tiene la cifra más grande?
-          </h2>
-
-          {/* Temporizador de 30 segundos */}
-          <div style={{ padding: '0 1rem', marginTop: '0.5rem', marginBottom: '1rem' }}>
-            <div
-              className="timer"
-              role="timer"
-              style={{ margin: '0.4rem 0', background: '#e2e8f0', borderRadius: '9999px', height: '8px', overflow: 'hidden' }}
-            >
-              <div
-                className={`timer-bar ${tiempoRestante <= 10 ? 'low' : ''}`}
-                style={{
-                  width: `${(tiempoRestante / TIEMPO_TURNO) * 100}%`,
-                  height: '100%',
-                  backgroundColor: tiempoRestante <= 10 ? '#ef4444' : '#16a34a',
-                  borderRadius: '9999px',
-                  transition: 'width 0.1s linear, background-color 0.3s ease'
-                }}
-              />
-            </div>
-            <p
-              className="timer-text"
-              style={{
-                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.35rem',
-                color: tiempoRestante <= 10 ? '#dc2626' : '#64748b', fontSize: '0.9rem', fontWeight: 700, margin: '0'
-              }}
-            >
-              <Icon name="clock" size={16} />
-              {tiempoRestante} s
-            </p>
+          <div className="ptp-tarjeta" style={{ padding: '0.8rem 1rem', textAlign: 'center' }}>
+            <h2 className="title" style={{ margin: '0.2rem 0', fontSize: '1.25rem', color: '#0f172a' }}>
+              ¿Cuál tiene la cifra más grande?
+            </h2>
           </div>
 
           <div className="mm-versus-wrapper">
@@ -432,32 +506,53 @@ export default function MasMenosLocal({ onVolver, onExit }) {
 
       {/* 5. FIN DEL TURNO */}
       {fase === 'turno_fin' && jugadorActivo && (
-        <section className="game center">
-          <div className="end-card">
-            <span className="end-icon"><Icon name="hourglass" size={44} /></span>
-            <h1 className="title">¡Racha terminada!</h1>
-            <p className="reveal" style={{ fontSize: '1.4rem', margin: '0.8rem 0' }}>
-              <strong>{jugadorActivo.nombre}</strong> ha conseguido <strong>{puntosTurno} aciertos consecutivos</strong>.
-            </p>
-
-            <div className="scoreboard">
-              {jugadores.map((j) => (
-                <div key={j.id} className={`score-row ${j.id === jugadorActivo.id ? 'first' : ''}`}>
-                  <span className="score-name">{j.nombre}</span>
-                  <span className="score-pts">{j.jugo ? `${j.puntos} pts` : 'Pendiente'}</span>
-                </div>
-              ))}
+        <section className="game ptp-escena">
+          <header className="ptp-hero">
+            <span className="ptp-hero-deco" aria-hidden="true">
+              <Icon name="hourglass" size={140} strokeWidth={1.3} />
+            </span>
+            <div className="ptp-hero-top">
+              <button type="button" className="ptp-salir" onClick={() => setModalSalirPortada(true)}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                <span>Portada</span>
+              </button>
+              <span className="ptp-chip"><Icon name="flagFinish" size={14} /> ¡Racha terminada!</span>
             </div>
+            <p className="ptp-etiqueta" style={{ color: 'rgba(255,255,255,0.85)' }}>
+              Resultado de {jugadorActivo.nombre}
+            </p>
+            <h2 className="ptp-solucion-titulo">
+              {puntosTurno} {puntosTurno === 1 ? 'acierto' : 'aciertos'}
+            </h2>
+          </header>
+
+          <div className="ptp-tarjeta">
+            <p className="ptp-etiqueta">Clasificación provisional</p>
+            <ol className="ptp-ranking">
+              {jugadores.map((j, i) => {
+                const esActual = j.id === jugadorActivo.id;
+                return (
+                  <li key={j.id} className={esActual ? 'lider' : ''} style={{ '--c': colorJugador(j.id) }}>
+                    <span className="ptp-ranking-pos">{j.jugo ? '✅' : i + 1}</span>
+                    <span className="ptp-jugador-avatar">{inicial(j.nombre)}</span>
+                    <span className="ptp-ranking-nombre">{j.nombre}</span>
+                    <strong>{j.jugo ? `${j.puntos} pts` : 'Pendiente'}</strong>
+                  </li>
+                );
+              })}
+            </ol>
           </div>
 
-          <div className="actions" style={{ marginTop: '1.5rem' }}>
+          <div className="ptp-barra estatica">
             {jugadores.some((j) => !j.jugo) ? (
-              <button className="big full" onClick={continuarTrasFallo}>
+              <button type="button" className="ptp-boton grande" onClick={continuarTrasFallo}>
                 <Icon name="play" size={20} /> Siguiente participante
               </button>
             ) : (
-              <button className="big full" onClick={() => setFase('final')}>
-                <Icon name="trophy" size={20} /> Ver podio final
+              <button type="button" className="ptp-boton grande" onClick={() => setFase('final')}>
+                <Icon name="trophy" size={20} /> Ver podio y resultados finales
               </button>
             )}
           </div>
@@ -466,9 +561,9 @@ export default function MasMenosLocal({ onVolver, onExit }) {
 
       {/* 6. FINAL */}
       {fase === 'final' && (
-        <section className="game">
+        <section className="game ptp-escena">
           <div className="end-card">
-            <span className="end-icon"><Icon name="crown" size={48} /></span>
+            <span className="end-icon"><Icon name="crown" size={44} /></span>
             <h1 className="title">Clasificación Final</h1>
             <p className="final-score">
               {ganadores.length === 0
@@ -494,15 +589,34 @@ export default function MasMenosLocal({ onVolver, onExit }) {
             </div>
           </div>
 
-          <div className="actions" style={{ marginTop: '1.5rem' }}>
-            <button onClick={() => setFase('setup')}>
+          <div className="ptp-barra estatica">
+            <button type="button" className="ptp-boton grande" onClick={() => setFase('setup')}>
               <Icon name="refresh" size={20} /> Nueva partida
             </button>
-            <button className="secondary danger" onClick={() => (onExit ? onExit() : navigate('/'))}>
+            <button type="button" className="ptp-boton secundario" onClick={() => (onExit ? onExit() : navigate('/'))}>
               <Icon name="door" size={20} /> Salir al menú principal
             </button>
           </div>
         </section>
+      )}
+
+      {/* MODAL SALIR A PORTADA */}
+      {modalSalirPortada && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalirPortada(false)}>
+          <div className="rg-modal ptp-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="ptp-modal-icono">🚪</div>
+            <h3>¿Salir a la portada?</h3>
+            <p className="hint">Se cancelará la partida actual y volverás a la portada principal.</p>
+            <div className="ptp-fila-botones">
+              <button type="button" className="ptp-boton secundario" onClick={() => setModalSalirPortada(false)}>
+                Continuar
+              </button>
+              <button type="button" className="ptp-boton peligro" onClick={handleSalirAPortada}>
+                Salir a portada
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
