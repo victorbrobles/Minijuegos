@@ -234,6 +234,22 @@ Cada club elige formación y, en varios mercados, puja en secreto por futbolista
 ## Minijuego: El Laberinto (`Laberinto/`)
 Tablero de 7×7 salas generado como laberinto con atajos y puertas cerradas, que se descubre al entrar. En el centro está el Corazón; gana quien lo saque por una esquina (o, si se acaban las rondas, quien más oro tenga). Trampas, tesoros, llaves, pociones, mapas, cepos y barricadas; robos entre jugadores de la misma sala y pactos temporales. Personajes: Guerrera (rompe puertas, +2), Ladrón (roba siempre, ve trampas, salta barricadas), Exploradora (4 pasos, no se detiene) y Mago (teletransporte, ve salas vecinas). Motor en `server/laberinto/engine.js` (`npm run sync:laberinto`), online en `/api/laberinto` (de 2 a 4); en un dispositivo, el móvil pasa cada turno. Simulación: `node scripts/laberinto-sim.mjs`.
 
+## Minijuego: La Hemeroteca (`Hemeroteca/`)
+
+Titulares históricos de periódico a los que les faltan palabras. Usa el motor de pulsador (`server/pulsador/engine.js`, reglas `hemeroteca`): las pistas se destapan cada 15 s (titular con huecos, época, pista con el año e iniciales) y acertar da 10, 7, 5 o 3 puntos según las pistas vistas. Las respuestas aceptan grupos de palabras clave (`coincideClaves`). Datos en `server/data/seeds/hemeroteca/titulares.js`; ruta `/api/hemeroteca`.
+
+## Minijuego: Acta del Partido (`Acta/`)
+
+Un partido histórico contado con su acta incompleta (cinco datos de más vagos a más reveladores). Motor de pulsador con reglas `acta`: 10, 8, 6, 4 o 2 puntos según los datos vistos. Vale escribir los dos equipos o el nombre del partido. Datos en `server/data/seeds/acta/partidos.js`; ruta `/api/acta`.
+
+## Minijuego: El Once Fantasma (`OnceFantasma/`)
+
+Reconstruye el once titular de una final histórica (14 alineaciones en `server/data/seeds/oncefantasma/onces.js`). Todos escriben a la vez; el primero que acierta un hueco se lo queda (10/7/5/3 puntos según sus pistas) y su acierto destapa una pista de otro compañero. El reloj destapa otra cada 25 s y completar el once da 5 puntos extra a quien más huecos haya descubierto. Motor puro en `server/oncefantasma/engine.js` (`npm run sync:oncefantasma`), simulación en `server/scripts/oncefantasma-sim.mjs`; ruta `/api/oncefantasma`. En un dispositivo, quien escribe elige a quién se apunta el acierto.
+
+## Minijuego: Una Pieza Más (`UnaPieza/`)
+
+Tablero 8×8 con una silueta (casa, cohete, pez…) que se rellena por turnos con piezas de 1 a 5 casillas que se pueden girar y voltear. Puntúan las casillas, cerrar filas/columnas (+2), el objetivo secreto de cada figura (+4), la última pieza (+5) y bloquear al siguiente (+2, solo si antes podía colocar). Quien no puede colocar nada rellena una casilla suelta, así que toda figura se completa. Motor en `server/unapieza/engine.js` (`npm run sync:unapieza`), simulación en `server/scripts/unapieza-sim.mjs`; ruta `/api/unapieza`.
+
 ## Minijuego: Afina ese oído (`Cancion/`)
 - El fragmento de 30 s se busca en Deezer (intentando que coincida el artista) y se sirve desde `/api/cancion/audio/:clave`, para que el volumen progresivo funcione también en móviles. Si una canción no tiene fragmento, se elige otra.
 - Online, el servidor lleva el reloj de la canción (`posicionMs`) y cada móvil se sincroniza; la canción se pausa al pulsar, se reanuda tras un fallo y la ronda termina sola al acabar el fragmento o el tiempo de respuesta (20 s).

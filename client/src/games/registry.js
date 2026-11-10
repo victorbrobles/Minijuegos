@@ -36,6 +36,10 @@ import Reinos from './Reinos/Reinos.jsx';
 import Invento from './Invento/Invento.jsx';
 import Director from './Director/Director.jsx';
 import Laberinto from './Laberinto/Laberinto.jsx';
+import Hemeroteca from './Hemeroteca/Hemeroteca.jsx';
+import Acta from './Acta/Acta.jsx';
+import OnceFantasma from './OnceFantasma/OnceFantasma.jsx';
+import UnaPieza from './UnaPieza/UnaPieza.jsx';
 import Conoce from './Conoce/Conoce.jsx';
 import Logos from './Logos/Logos.jsx';
 import Hipotesis from './Hipotesis/Hipotesis.jsx';
@@ -100,6 +104,10 @@ const registry = {
   'invento': Invento,
   'director': Director,
   'laberinto': Laberinto,
+  'hemeroteca': Hemeroteca,
+  'acta': Acta,
+  'oncefantasma': OnceFantasma,
+  'unapieza': UnaPieza,
   'sumacero': SumaCero,
   'golpe': Golpe,
   'conoce': Conoce,

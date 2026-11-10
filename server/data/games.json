@@ -370,5 +370,29 @@
     "name": "El Laberinto",
     "description": "Un laberinto de salas que se descubren poco a poco, con trampas, tesoros y puertas cerradas. Cada jugador tiene un personaje con habilidades distintas: roba, deja trampas, bloquea pasillos y escapa con el tesoro antes que nadie.",
     "isNew": true
+  },
+  {
+    "id": "hemeroteca",
+    "name": "La Hemeroteca",
+    "description": "Titulares históricos de periódico a los que les faltan palabras. Las pistas se destapan poco a poco (época, contexto, iniciales): cuanto antes completes el titular, más puntos.",
+    "isNew": true
+  },
+  {
+    "id": "acta",
+    "name": "Acta del Partido",
+    "description": "Un partido histórico contado con su acta incompleta: resultados parciales, minutos clave, tarjetas, estadio y goleadores. Adivina de qué partido se trata antes que nadie.",
+    "isNew": true
+  },
+  {
+    "id": "oncefantasma",
+    "name": "El Once Fantasma",
+    "description": "La alineación oculta de una final histórica: reconstruye el once a partir del dorsal, la posición, el club o el país y la trayectoria. Cada futbolista que descubres destapa una pista de otro compañero.",
+    "isNew": true
+  },
+  {
+    "id": "unapieza",
+    "name": "Una Pieza Más",
+    "description": "Un tablero compartido con una figura incompleta. Por turnos, cada jugador coloca una pieza geométrica (girándola o volteándola): cierra filas, cumple tu objetivo secreto, pon la última pieza o deja al siguiente sin sitio.",
+    "isNew": true
   }
 ]

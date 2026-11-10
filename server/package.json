@@ -27,7 +27,9 @@
     "sync:reinos": "node scripts/sync-reinos.mjs",
     "sync:invento": "node scripts/sync-invento.mjs",
     "sync:director": "node scripts/sync-director.mjs",
-    "sync:laberinto": "node scripts/sync-laberinto.mjs"
+    "sync:laberinto": "node scripts/sync-laberinto.mjs",
+    "sync:oncefantasma": "node scripts/sync-oncefantasma.mjs",
+    "sync:unapieza": "node scripts/sync-unapieza.mjs"
   },
   "dependencies": {
     "better-sqlite3": "^13.0.3",

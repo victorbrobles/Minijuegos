@@ -1,0 +1,190 @@
+// server/data/seeds/oncefantasma/onces.js
+// Alineaciones titulares de «El Once Fantasma». Cada futbolista: [nombre, alias, posición, dorsal, dato, pista].
+// `dato`: el club en el que jugaba (selecciones) o su país (clubes).
+
+const J = (nombre, alias, pos, dorsal, dato, pista) => ({ nombre, alias, pos, dorsal, dato, pista });
+
+export const ONCES = [
+  { id: 'esp2010', equipo: 'España', partido: 'Final del Mundial 2010 · España 1-0 Holanda', entrenador: 'Vicente del Bosque', tipo: 'seleccion', jugadores: [
+    J('Iker Casillas', ['casillas', 'iker'], 'POR', 1, 'Real Madrid', 'Capitán; le paró un mano a mano a Robben.'),
+    J('Sergio Ramos', ['ramos'], 'DEF', 15, 'Real Madrid', 'Jugaba de lateral derecho; luego fue central.'),
+    J('Gerard Piqué', ['pique'], 'DEF', 3, 'Barcelona', 'Central formado en La Masía y en el Manchester United.'),
+    J('Carles Puyol', ['puyol'], 'DEF', 5, 'Barcelona', 'Marcó de cabeza el gol de la semifinal contra Alemania.'),
+    J('Joan Capdevila', ['capdevila'], 'DEF', 11, 'Villarreal', 'Lateral izquierdo catalán.'),
+    J('Sergio Busquets', ['busquets'], 'MED', 16, 'Barcelona', 'Mediocentro; su padre fue portero del Barça.'),
+    J('Xabi Alonso', ['xabi', 'alonso'], 'MED', 14, 'Real Madrid', 'Se llevó una patada en el pecho de De Jong.'),
+    J('Xavi Hernández', ['xavi'], 'MED', 8, 'Barcelona', 'El cerebro del tiqui-taca.'),
+    J('Andrés Iniesta', ['iniesta'], 'MED', 6, 'Barcelona', 'Marcó el gol de la final en el 116.'),
+    J('Pedro Rodríguez', ['pedro'], 'DEL', 18, 'Barcelona', 'Canario; delantero de banda.'),
+    J('David Villa', ['villa'], 'DEL', 7, 'Barcelona', 'Máximo goleador de España en el torneo.')
+  ] },
+  { id: 'bar2011', equipo: 'Barcelona', partido: 'Final de la Champions 2011 · Barcelona 3-1 Manchester United', entrenador: 'Pep Guardiola', tipo: 'club', jugadores: [
+    J('Víctor Valdés', ['valdes'], 'POR', 1, 'España', 'Portero de la cantera.'),
+    J('Dani Alves', ['alves'], 'DEF', 2, 'Brasil', 'Lateral derecho que llegó del Sevilla.'),
+    J('Gerard Piqué', ['pique'], 'DEF', 3, 'España', 'Central que volvió del Manchester United.'),
+    J('Javier Mascherano', ['mascherano'], 'DEF', 14, 'Argentina', 'Mediocentro reconvertido a central.'),
+    J('Éric Abidal', ['abidal'], 'DEF', 22, 'Francia', 'Levantó la copa tras superar un cáncer.'),
+    J('Sergio Busquets', ['busquets'], 'MED', 16, 'España', 'Mediocentro canterano.'),
+    J('Xavi Hernández', ['xavi'], 'MED', 6, 'España', 'El cerebro del equipo.'),
+    J('Andrés Iniesta', ['iniesta'], 'MED', 8, 'España', 'Manchego de Fuentealbilla.'),
+    J('Pedro Rodríguez', ['pedro'], 'DEL', 17, 'España', 'Marcó el primer gol de la final.'),
+    J('Lionel Messi', ['messi', 'leo'], 'DEL', 10, 'Argentina', 'Marcó el segundo gol desde fuera del área.'),
+    J('David Villa', ['villa'], 'DEL', 7, 'España', 'Marcó el tercero con una rosca a la escuadra.')
+  ] },
+  { id: 'rma2014', equipo: 'Real Madrid', partido: 'Final de la Champions 2014 · Real Madrid 4-1 Atlético', entrenador: 'Carlo Ancelotti', tipo: 'club', jugadores: [
+    J('Iker Casillas', ['casillas', 'iker'], 'POR', 1, 'España', 'Falló en el gol de Godín.'),
+    J('Dani Carvajal', ['carvajal'], 'DEF', 15, 'España', 'Lateral canterano que volvió del Leverkusen.'),
+    J('Raphaël Varane', ['varane'], 'DEF', 2, 'Francia', 'Central fichado del Lens con 18 años.'),
+    J('Sergio Ramos', ['ramos'], 'DEF', 4, 'España', 'Empató en el minuto 92:48.'),
+    J('Fábio Coentrão', ['coentrao'], 'DEF', 5, 'Portugal', 'Lateral izquierdo que llegó del Benfica.'),
+    J('Sami Khedira', ['khedira'], 'MED', 6, 'Alemania', 'Volvía de una lesión de rodilla.'),
+    J('Luka Modrić', ['modric'], 'MED', 19, 'Croacia', 'Botó el córner del gol de Ramos.'),
+    J('Ángel Di María', ['di maria', 'dimaria'], 'MED', 22, 'Argentina', 'Su jugada acabó en el 2-1 de Bale.'),
+    J('Gareth Bale', ['bale'], 'DEL', 11, 'Gales', 'Marcó de cabeza el 2-1 en la prórroga.'),
+    J('Karim Benzema', ['benzema'], 'DEL', 9, 'Francia', 'Delantero centro llegado del Lyon.'),
+    J('Cristiano Ronaldo', ['cristiano', 'ronaldo'], 'DEL', 7, 'Portugal', 'Marcó el 4-1 de penalti y se quitó la camiseta.')
+  ] },
+  { id: 'liv2005', equipo: 'Liverpool', partido: 'Final de la Champions 2005 · Liverpool 3-3 Milan', entrenador: 'Rafa Benítez', tipo: 'club', jugadores: [
+    J('Jerzy Dudek', ['dudek'], 'POR', 1, 'Polonia', 'Hizo bailes en la línea en los penaltis.'),
+    J('Steve Finnan', ['finnan'], 'DEF', 3, 'Irlanda', 'Lateral derecho; se lesionó en la primera parte.'),
+    J('Jamie Carragher', ['carragher'], 'DEF', 23, 'Inglaterra', 'Central de toda la vida del club.'),
+    J('Sami Hyypiä', ['hyypia'], 'DEF', 4, 'Finlandia', 'Central nórdico muy alto.'),
+    J('Djimi Traoré', ['traore'], 'DEF', 21, 'Mali', 'Lateral izquierdo nacido en Francia.'),
+    J('Steven Gerrard', ['gerrard'], 'MED', 8, 'Inglaterra', 'Capitán; marcó el 3-1 de cabeza.'),
+    J('Xabi Alonso', ['xabi', 'alonso'], 'MED', 14, 'España', 'Marcó el 3-3 en el rechace de su penalti.'),
+    J('John Arne Riise', ['riise'], 'MED', 6, 'Noruega', 'Zurdo con un disparo tremendo.'),
+    J('Luis García', ['luis garcia', 'garcia'], 'MED', 10, 'España', 'Mediapunta catalán.'),
+    J('Harry Kewell', ['kewell'], 'MED', 7, 'Australia', 'Se lesionó y lo cambiaron en la primera parte.'),
+    J('Milan Baroš', ['baros'], 'DEL', 5, 'República Checa', 'Delantero; llevaba el dorsal 5.')
+  ] },
+  { id: 'fra1998', equipo: 'Francia', partido: 'Final del Mundial 1998 · Francia 3-0 Brasil', entrenador: 'Aimé Jacquet', tipo: 'seleccion', jugadores: [
+    J('Fabien Barthez', ['barthez'], 'POR', 16, 'Mónaco', 'Blanc le besaba la calva antes de cada partido.'),
+    J('Lilian Thuram', ['thuram'], 'DEF', 15, 'Parma', 'Marcó los dos goles de la semifinal.'),
+    J('Marcel Desailly', ['desailly'], 'DEF', 8, 'Chelsea', 'Nacido en Ghana; expulsado en la final.'),
+    J('Frank Leboeuf', ['leboeuf'], 'DEF', 18, 'Chelsea', 'Sustituyó al sancionado Blanc.'),
+    J('Bixente Lizarazu', ['lizarazu'], 'DEF', 3, 'Bayern de Múnich', 'Lateral vasco-francés que jugó en el Athletic.'),
+    J('Didier Deschamps', ['deschamps'], 'MED', 7, 'Juventus', 'El capitán; luego fue campeón como seleccionador.'),
+    J('Christian Karembeu', ['karembeu'], 'MED', 19, 'Real Madrid', 'Nacido en Nueva Caledonia.'),
+    J('Emmanuel Petit', ['petit'], 'MED', 17, 'Arsenal', 'Marcó el 3-0 en el descuento.'),
+    J('Zinedine Zidane', ['zidane', 'zizou'], 'MED', 10, 'Juventus', 'Dos goles de cabeza en la final.'),
+    J('Youri Djorkaeff', ['djorkaeff'], 'MED', 6, 'Inter', 'Mediapunta de origen armenio.'),
+    J("Stéphane Guivarc'h", ['guivarch'], 'DEL', 9, 'Auxerre', 'Delantero centro que no marcó en todo el Mundial.')
+  ] },
+  { id: 'arg2022', equipo: 'Argentina', partido: 'Final del Mundial 2022 · Argentina 3-3 Francia', entrenador: 'Lionel Scaloni', tipo: 'seleccion', jugadores: [
+    J('Emiliano Martínez', ['dibu', 'martinez emiliano', 'emiliano'], 'POR', 23, 'Aston Villa', 'El «Dibu»; paró un mano a mano a Kolo Muani en el 123.'),
+    J('Nahuel Molina', ['molina'], 'DEF', 26, 'Atlético', 'Lateral derecho.'),
+    J('Cristian Romero', ['romero', 'cuti'], 'DEF', 13, 'Tottenham', 'El «Cuti»; central.'),
+    J('Nicolás Otamendi', ['otamendi'], 'DEF', 19, 'Benfica', 'Central veterano; jugó en el Valencia.'),
+    J('Nicolás Tagliafico', ['tagliafico'], 'DEF', 3, 'Olympique de Lyon', 'Lateral izquierdo.'),
+    J('Rodrigo De Paul', ['de paul', 'depaul'], 'MED', 7, 'Atlético', 'El «guardaespaldas» de Messi.'),
+    J('Enzo Fernández', ['enzo'], 'MED', 24, 'Benfica', 'Mejor jugador joven del torneo.'),
+    J('Alexis Mac Allister', ['mac allister', 'macallister'], 'MED', 20, 'Brighton', 'Dio el pase del 2-0.'),
+    J('Lionel Messi', ['messi', 'leo'], 'DEL', 10, 'PSG', 'Marcó dos goles y fue el mejor del torneo.'),
+    J('Julián Álvarez', ['julian', 'alvarez'], 'DEL', 9, 'Manchester City', 'La «Araña».'),
+    J('Ángel Di María', ['di maria', 'dimaria'], 'DEL', 11, 'Juventus', 'Provocó un penalti y marcó el 2-0.')
+  ] },
+  { id: 'bra2002', equipo: 'Brasil', partido: 'Final del Mundial 2002 · Brasil 2-0 Alemania', entrenador: 'Luiz Felipe Scolari', tipo: 'seleccion', jugadores: [
+    J('Marcos', ['marcos'], 'POR', 1, 'Palmeiras', 'Portero conocido solo por su nombre.'),
+    J('Lúcio', ['lucio'], 'DEF', 3, 'Bayer Leverkusen', 'Central que jugaba en Alemania.'),
+    J('Edmílson', ['edmilson'], 'DEF', 5, 'Olympique de Lyon', 'Central que luego jugó en el Barça.'),
+    J('Roque Júnior', ['roque junior', 'roque'], 'DEF', 4, 'Milan', 'Central; ganó la Champions de 2003.'),
+    J('Cafú', ['cafu'], 'DEF', 2, 'Roma', 'Capitán; jugó tres finales de Mundial seguidas.'),
+    J('Gilberto Silva', ['gilberto'], 'MED', 8, 'Atlético Mineiro', 'Mediocentro; luego, «invencible» del Arsenal.'),
+    J('Kléberson', ['kleberson'], 'MED', 15, 'Atlético Paranaense', 'Mediocentro que fichó por el United.'),
+    J('Roberto Carlos', ['roberto carlos'], 'DEF', 6, 'Real Madrid', 'Lateral izquierdo de las faltas imposibles.'),
+    J('Ronaldinho', ['ronaldinho'], 'MED', 11, 'PSG', 'Le marcó una falta a Seaman en cuartos.'),
+    J('Rivaldo', ['rivaldo'], 'MED', 10, 'Milan', 'Balón de Oro 1999.'),
+    J('Ronaldo', ['ronaldo nazario', 'ronaldo'], 'DEL', 9, 'Inter', 'Marcó los dos goles de la final con un corte de pelo famoso.')
+  ] },
+  { id: 'mun1999', equipo: 'Manchester United', partido: 'Final de la Champions 1999 · Manchester United 2-1 Bayern', entrenador: 'Alex Ferguson', tipo: 'club', jugadores: [
+    J('Peter Schmeichel', ['schmeichel'], 'POR', 1, 'Dinamarca', 'Capitán en su último partido con el club.'),
+    J('Gary Neville', ['gary neville', 'neville'], 'DEF', 2, 'Inglaterra', 'Lateral derecho canterano.'),
+    J('Jaap Stam', ['stam'], 'DEF', 6, 'Países Bajos', 'Central llegado del PSV.'),
+    J('Ronny Johnsen', ['johnsen'], 'DEF', 5, 'Noruega', 'Central nórdico.'),
+    J('Denis Irwin', ['irwin'], 'DEF', 3, 'Irlanda', 'Lateral izquierdo de toda la década.'),
+    J('David Beckham', ['beckham'], 'MED', 7, 'Inglaterra', 'Jugó de mediocentro por las sanciones; sacó los córners de los goles.'),
+    J('Nicky Butt', ['butt'], 'MED', 8, 'Inglaterra', 'Mediocentro de la «clase del 92».'),
+    J('Jesper Blomqvist', ['blomqvist'], 'MED', 15, 'Suecia', 'Extremo izquierdo sueco.'),
+    J('Ryan Giggs', ['giggs'], 'MED', 11, 'Gales', 'Jugó por la derecha en la final.'),
+    J('Andy Cole', ['cole'], 'DEL', 9, 'Inglaterra', 'Delantero que formaba pareja con Yorke.'),
+    J('Dwight Yorke', ['yorke'], 'DEL', 19, 'Trinidad y Tobago', 'Delantero caribeño.')
+  ] },
+  { id: 'ita2006', equipo: 'Italia', partido: 'Final del Mundial 2006 · Italia 1-1 Francia', entrenador: 'Marcello Lippi', tipo: 'seleccion', jugadores: [
+    J('Gianluigi Buffon', ['buffon'], 'POR', 1, 'Juventus', 'Paró un cabezazo de Zidane en la prórroga.'),
+    J('Gianluca Zambrotta', ['zambrotta'], 'DEF', 19, 'Juventus', 'Lateral que fichó por el Barça ese verano.'),
+    J('Fabio Cannavaro', ['cannavaro'], 'DEF', 5, 'Juventus', 'Capitán; Balón de Oro ese año.'),
+    J('Marco Materazzi', ['materazzi'], 'DEF', 23, 'Inter', 'Marcó el empate y recibió el cabezazo de Zidane.'),
+    J('Fabio Grosso', ['grosso'], 'DEF', 3, 'Palermo', 'Marcó el último penalti.'),
+    J('Gennaro Gattuso', ['gattuso'], 'MED', 8, 'Milan', '«Rino», el pulmón del centro del campo.'),
+    J('Andrea Pirlo', ['pirlo'], 'MED', 21, 'Milan', 'Mejor jugador de la final.'),
+    J('Mauro Camoranesi', ['camoranesi'], 'MED', 16, 'Juventus', 'Nacido en Argentina.'),
+    J('Simone Perrotta', ['perrotta'], 'MED', 20, 'Roma', 'Nacido en Inglaterra.'),
+    J('Francesco Totti', ['totti'], 'MED', 10, 'Roma', 'El «Pupone», capitán de la Roma.'),
+    J('Luca Toni', ['toni'], 'DEL', 9, 'Fiorentina', 'Delantero que celebraba girándose la mano junto a la oreja.')
+  ] },
+  { id: 'ale2014', equipo: 'Alemania', partido: 'Final del Mundial 2014 · Alemania 1-0 Argentina', entrenador: 'Joachim Löw', tipo: 'seleccion', jugadores: [
+    J('Manuel Neuer', ['neuer'], 'POR', 1, 'Bayern de Múnich', 'Portero-líbero; Guante de Oro del torneo.'),
+    J('Philipp Lahm', ['lahm'], 'DEF', 16, 'Bayern de Múnich', 'Capitán; se retiró de la selección tras la final.'),
+    J('Jérôme Boateng', ['boateng'], 'DEF', 20, 'Bayern de Múnich', 'Central; su hermano jugó con Ghana.'),
+    J('Mats Hummels', ['hummels'], 'DEF', 5, 'Borussia Dortmund', 'Central que marcó a Francia en cuartos.'),
+    J('Benedikt Höwedes', ['howedes', 'hoewedes'], 'DEF', 4, 'Schalke 04', 'Central que jugó de lateral izquierdo.'),
+    J('Bastian Schweinsteiger', ['schweinsteiger'], 'MED', 7, 'Bayern de Múnich', 'Acabó la final con la cara ensangrentada.'),
+    J('Christoph Kramer', ['kramer'], 'MED', 23, 'Borussia Mönchengladbach', 'Se conmocionó y no recordaba la final.'),
+    J('Toni Kroos', ['kroos'], 'MED', 18, 'Bayern de Múnich', 'Fichó por el Real Madrid ese verano.'),
+    J('Thomas Müller', ['muller', 'mueller'], 'DEL', 13, 'Bayern de Múnich', 'Bota de Plata del torneo.'),
+    J('Mesut Özil', ['ozil', 'oezil'], 'MED', 8, 'Arsenal', 'Mediapunta que había jugado en el Madrid.'),
+    J('Miroslav Klose', ['klose'], 'DEL', 11, 'Lazio', 'Máximo goleador de la historia de los Mundiales.')
+  ] },
+  { id: 'esp2008', equipo: 'España', partido: 'Final de la Eurocopa 2008 · España 1-0 Alemania', entrenador: 'Luis Aragonés', tipo: 'seleccion', jugadores: [
+    J('Iker Casillas', ['casillas', 'iker'], 'POR', 1, 'Real Madrid', 'Capitán; paró dos penaltis a Italia en cuartos.'),
+    J('Sergio Ramos', ['ramos'], 'DEF', 15, 'Real Madrid', 'Lateral derecho.'),
+    J('Carlos Marchena', ['marchena'], 'DEF', 4, 'Valencia', 'Central sevillano.'),
+    J('Carles Puyol', ['puyol'], 'DEF', 5, 'Barcelona', 'Central de melena.'),
+    J('Joan Capdevila', ['capdevila'], 'DEF', 11, 'Villarreal', 'Lateral izquierdo.'),
+    J('Marcos Senna', ['senna'], 'MED', 19, 'Villarreal', 'Mediocentro nacido en Brasil.'),
+    J('Xavi Hernández', ['xavi'], 'MED', 8, 'Barcelona', 'Mejor jugador del torneo.'),
+    J('Cesc Fàbregas', ['cesc', 'fabregas'], 'MED', 10, 'Arsenal', 'Marcó el último penalti contra Italia.'),
+    J('Andrés Iniesta', ['iniesta'], 'MED', 6, 'Barcelona', 'Jugaba por la banda izquierda.'),
+    J('David Silva', ['silva'], 'MED', 21, 'Valencia', 'Canario; luego leyenda del City.'),
+    J('Fernando Torres', ['torres'], 'DEL', 9, 'Liverpool', 'Marcó el gol de la final con una vaselina.')
+  ] },
+  { id: 'bar2009', equipo: 'Barcelona', partido: 'Final de la Champions 2009 · Barcelona 2-0 Manchester United', entrenador: 'Pep Guardiola', tipo: 'club', jugadores: [
+    J('Víctor Valdés', ['valdes'], 'POR', 1, 'España', 'Portero de la cantera.'),
+    J('Carles Puyol', ['puyol'], 'DEF', 5, 'España', 'Capitán; jugó de lateral derecho.'),
+    J('Gerard Piqué', ['pique'], 'DEF', 3, 'España', 'Jugó contra su exequipo.'),
+    J('Yaya Touré', ['toure', 'yaya'], 'DEF', 24, 'Costa de Marfil', 'Mediocentro que jugó de central.'),
+    J('Sylvinho', ['sylvinho'], 'DEF', 16, 'Brasil', 'Lateral izquierdo en su último partido con el club.'),
+    J('Sergio Busquets', ['busquets'], 'MED', 28, 'España', 'Mediocentro en su primera temporada.'),
+    J('Xavi Hernández', ['xavi'], 'MED', 6, 'España', 'Dio el pase del 2-0.'),
+    J('Andrés Iniesta', ['iniesta'], 'MED', 8, 'España', 'Llegó a la final tras el «iniestazo» de Stamford Bridge.'),
+    J('Lionel Messi', ['messi', 'leo'], 'DEL', 10, 'Argentina', 'Marcó de cabeza el 2-0.'),
+    J("Samuel Eto'o", ['etoo', 'eto o'], 'DEL', 9, 'Camerún', 'Marcó el 1-0 en el minuto 10.'),
+    J('Thierry Henry', ['henry'], 'DEL', 14, 'Francia', 'Leyenda del Arsenal.')
+  ] },
+  { id: 'rma2002', equipo: 'Real Madrid', partido: 'Final de la Champions 2002 · Real Madrid 2-1 Bayer Leverkusen', entrenador: 'Vicente del Bosque', tipo: 'club', jugadores: [
+    J('César Sánchez', ['cesar'], 'POR', 13, 'España', 'Se lesionó y salió Casillas.'),
+    J('Míchel Salgado', ['salgado', 'michel salgado'], 'DEF', 2, 'España', 'Lateral derecho gallego.'),
+    J('Fernando Hierro', ['hierro'], 'DEF', 4, 'España', 'Capitán y central goleador.'),
+    J('Iván Helguera', ['helguera'], 'DEF', 6, 'España', 'Central cántabro.'),
+    J('Roberto Carlos', ['roberto carlos'], 'DEF', 3, 'Brasil', 'Su centro alto acabó en la volea de Zidane.'),
+    J('Claude Makélélé', ['makelele'], 'MED', 24, 'Francia', 'Mediocentro defensivo que llegó del Celta.'),
+    J('Luis Figo', ['figo'], 'MED', 10, 'Portugal', 'Llegó del Barça en 2000.'),
+    J('Zinedine Zidane', ['zidane', 'zizou'], 'MED', 5, 'Francia', 'Marcó la volea de la final.'),
+    J('Santiago Solari', ['solari'], 'MED', 21, 'Argentina', 'Zurdo argentino.'),
+    J('Raúl González', ['raul'], 'DEL', 7, 'España', 'Marcó el 1-0 en el minuto 8.'),
+    J('Fernando Morientes', ['morientes'], 'DEL', 9, 'España', 'Delantero de cabeza prodigiosa.')
+  ] },
+  { id: 'por2016', equipo: 'Portugal', partido: 'Final de la Eurocopa 2016 · Portugal 1-0 Francia', entrenador: 'Fernando Santos', tipo: 'seleccion', jugadores: [
+    J('Rui Patrício', ['patricio', 'rui patricio'], 'POR', 1, 'Sporting de Portugal', 'Portero; luego jugó en la Roma.'),
+    J('Cédric Soares', ['cedric'], 'DEF', 21, 'Southampton', 'Lateral derecho.'),
+    J('Pepe', ['pepe'], 'DEF', 3, 'Real Madrid', 'Central nacido en Brasil.'),
+    J('José Fonte', ['fonte'], 'DEF', 4, 'Southampton', 'Central.'),
+    J('Raphaël Guerreiro', ['guerreiro'], 'DEF', 5, 'Lorient', 'Lateral izquierdo nacido en Francia.'),
+    J('William Carvalho', ['william', 'carvalho'], 'MED', 14, 'Sporting de Portugal', 'Mediocentro; luego jugó en el Betis.'),
+    J('Renato Sanches', ['renato', 'sanches'], 'MED', 16, 'Benfica', 'Mejor jugador joven del torneo.'),
+    J('Adrien Silva', ['adrien'], 'MED', 23, 'Sporting de Portugal', 'Mediocentro nacido en Francia.'),
+    J('João Mário', ['joao mario'], 'MED', 10, 'Sporting de Portugal', 'Fichó por el Inter ese verano.'),
+    J('Nani', ['nani'], 'DEL', 17, 'Valencia', 'Extremo que había jugado en el United.'),
+    J('Cristiano Ronaldo', ['cristiano', 'ronaldo'], 'DEL', 7, 'Real Madrid', 'Se lesionó en el minuto 25 y dirigió desde la banda.')
+  ] }
+];

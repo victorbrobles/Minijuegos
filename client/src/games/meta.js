@@ -95,6 +95,42 @@ export const META = {
     descripcion: 'Dirige un club con presupuesto limitado: puja en secreto por futbolistas reales, monta una plantilla equilibrada, elige táctica y compite en una liga simulada. No basta con fichar a los mejores.',
     categorias: ['futbol', 'estrategia']
   },
+  'hemeroteca': {
+    titulo: 'La Hemeroteca',
+    imagen: '/covers/hemeroteca.webp',
+    icono: 'book',
+    colores: ['#a8a29e',  '#292524'],
+    etiquetas: 'hemeroteca titulares periodico noticias historia huecos pistas actualidad prensa',
+    descripcion: 'Titulares históricos de periódico a los que les faltan palabras. Las pistas se destapan poco a poco (época, contexto, iniciales): cuanto antes completes el titular, más puntos.',
+    categorias: ['prueba']
+  },
+  'acta': {
+    titulo: 'Acta del Partido',
+    imagen: '/covers/acta.webp',
+    icono: 'edit',
+    colores: ['#22c55e',  '#052e16'],
+    etiquetas: 'acta partido futbol historico resultado goleadores tarjetas estadio minutos final',
+    descripcion: 'Un partido histórico contado con su acta incompleta: resultados parciales, minutos clave, tarjetas, estadio y goleadores. Adivina de qué partido se trata antes que nadie.',
+    categorias: ['futbol']
+  },
+  'oncefantasma': {
+    titulo: 'El Once Fantasma',
+    imagen: '/covers/oncefantasma.webp',
+    icono: 'soccer',
+    colores: ['#3b82f6',  '#0b1437'],
+    etiquetas: 'once alineacion titular final historica futbolistas dorsal posicion entrenador pistas mundial champions',
+    descripcion: 'La alineación oculta de una final histórica: reconstruye el once a partir del dorsal, la posición, el club o el país y la trayectoria. Cada futbolista que descubres destapa una pista de otro compañero.',
+    categorias: ['futbol']
+  },
+  'unapieza': {
+    titulo: 'Una Pieza Más',
+    imagen: '/covers/unapieza.webp',
+    icono: 'box',
+    colores: ['#f59e0b',  '#78350f'],
+    etiquetas: 'piezas tablero silueta figura encajar tetris puzle geometria turnos bloquear objetivo',
+    descripcion: 'Un tablero compartido con una figura incompleta. Por turnos, cada jugador coloca una pieza geométrica (girándola o volteándola): cierra filas, cumple tu objetivo secreto, pon la última pieza o deja al siguiente sin sitio.',
+    categorias: ['estrategia']
+  },
   'laberinto': {
     titulo: 'El Laberinto',
     imagen: '/covers/laberinto.webp',

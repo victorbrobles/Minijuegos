@@ -64,6 +64,46 @@ export const JUEGOS = {
       `El reloj corre ${r.frasescelebres.segRonda} segundos. Quien lo sepa, que pulse: tiene ${r.frasescelebres.segRespuesta} segundos para elegir el autor.`,
       `Acertar suma ${r.frasescelebres.acierto} puntos. Fallar resta ${r.frasescelebres.fallo} y te deja fuera de esa frase.`
     ]
+  },
+  hemeroteca: {
+    id: 'hemeroteca',
+    api: '/api/hemeroteca',
+    emoji: '📰',
+    unidad: 'titulares',
+    config: { rondas: 10 },
+    etiqueta: (v) => (v.fase === 'jugando' ? `Pista ${v.pistas.length} de ${v.totalPistas}` : ''),
+    pregunta: () => '¿Qué falta en el titular?',
+    era: 'El titular era…',
+    placeholder: 'Las palabras que faltan',
+    notaRespuesta: 'Basta con las palabras clave de lo que falta. Se perdonan tildes y erratas.',
+    textoPulsador: '¡Lo sé!',
+    ganador: (n) => (n.length > 1 ? `¡Empate entre ${n.join(' y ')}!` : `¡${n[0]} es una hemeroteca andante!`),
+    reglas: [
+      'Sale un titular de periódico al que le faltan palabras: historia, deporte, cine, ciencia, música y actualidad.',
+      `Las pistas se destapan solas cada ${r.hemeroteca.segPistas[1]} segundos: primero el titular con huecos, luego la época, después una pista con el año y al final las iniciales de lo que falta.`,
+      `Quien lo sepa, que pulse: tiene ${r.hemeroteca.segRespuesta} segundos para escribir lo que falta (basta con las palabras clave).`,
+      `Acertar con una pista da ${r.hemeroteca.puntosPista[0]} puntos; con dos, ${r.hemeroteca.puntosPista[1]}; con tres, ${r.hemeroteca.puntosPista[2]}; con todas, ${r.hemeroteca.puntosPista[3]}. Fallar no resta, pero te deja fuera de ese titular.`
+    ]
+  },
+  acta: {
+    id: 'acta',
+    api: '/api/acta',
+    emoji: '📋',
+    unidad: 'partidos',
+    config: { rondas: 10 },
+    etiqueta: (v) => (v.fase === 'jugando' ? `Dato ${v.pistas.length} de ${v.totalPistas}` : ''),
+    pregunta: () => '¿Qué partido es?',
+    era: 'Era…',
+    placeholder: 'Los dos equipos (o el nombre del partido)',
+    notaRespuesta: 'Escribe los dos equipos (por ejemplo «Liverpool Milan») o el nombre con el que se conoce el partido.',
+    textoPulsador: '¡Lo sé!',
+    ganador: (n) => (n.length > 1 ? `¡Empate entre ${n.join(' y ')}!` : `¡${n[0]} se sabe todas las actas!`),
+    reglas: [
+      'Se presenta un partido histórico mediante su acta incompleta: resultados parciales, minutos clave, tarjetas, cambios, estadio y goleadores.',
+      `Los datos se destapan solos cada ${r.acta.segPistas[1]} segundos, de más vagos a más reveladores.`,
+      `Quien lo sepa, que pulse y escriba los dos equipos (o el nombre del partido, como «Maracanazo»). Tiene ${r.acta.segRespuesta} segundos.`,
+      `Cuanto antes aciertes, más puntos: ${r.acta.puntosPista.join(', ')} según los datos que se hayan visto. Fallar no resta, pero te deja fuera de ese partido.`
+    ]
   }
 };
 

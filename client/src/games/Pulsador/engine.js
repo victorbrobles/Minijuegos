@@ -24,7 +24,9 @@ export const OPCIONES_RONDAS = [5, 10, 15];
 export const REGLAS = {
   rasgos: { segRonda: 60, segRespuesta: 15, segPistas: [0], puntos: 'segundos', fallo: 'segundos', respuesta: 'texto' },
   adivina: { segRonda: 75, segRespuesta: 20, segPistas: [0, 20, 40], puntos: 'pista', puntosPista: [10, 5, 3], fallo: 0, respuesta: 'texto' },
-  frasescelebres: { segRonda: 30, segRespuesta: 10, segPistas: [0], puntos: 'fijo', acierto: 3, fallo: 1, respuesta: 'opciones' }
+  frasescelebres: { segRonda: 30, segRespuesta: 10, segPistas: [0], puntos: 'fijo', acierto: 3, fallo: 1, respuesta: 'opciones' },
+  hemeroteca: { segRonda: 75, segRespuesta: 20, segPistas: [0, 15, 30, 45], puntos: 'pista', puntosPista: [10, 7, 5, 3], fallo: 0, respuesta: 'texto' },
+  acta: { segRonda: 80, segRespuesta: 20, segPistas: [0, 12, 24, 36, 48], puntos: 'pista', puntosPista: [10, 8, 6, 4, 2], fallo: 0, respuesta: 'texto' }
 };
 
 // ---------------------------------------------------------------- Respuestas
@@ -56,6 +58,22 @@ export function coincide(texto, validas = []) {
   const mias = formas(texto);
   if (!mias.length) return false;
   return validas.some((v) => formas(v).some((b) => mias.some((a) => a === b || distancia(a, b) <= tolerancia(b.length))));
+}
+
+/**
+ * Respuesta por palabras clave: vale si contiene todas las palabras de alguno de los grupos
+ * (claves: [['liverpool', 'milan'], ['estambul']]). Se perdonan erratas pequeñas en cada palabra.
+ */
+export function coincideClaves(texto, claves = []) {
+  const palabras = base(texto).split(' ').filter(Boolean);
+  const unido = palabras.join('');
+  const esta = (k) => {
+    const kk = base(k).replace(/ /g, '');
+    if (!kk) return false;
+    if (unido.includes(kk)) return true;
+    return palabras.some((w) => w.length >= 4 && distancia(w, kk) <= (kk.length >= 8 ? 2 : kk.length >= 5 ? 1 : 0));
+  };
+  return claves.some((grupo) => grupo.every(esta));
 }
 
 // ---------------------------------------------------------------- Partida
@@ -203,7 +221,8 @@ export function responder(p, id, respuesta, ahora = Date.now()) {
   const texto = String(respuesta ?? '').trim().slice(0, 100);
   if (!texto) return { ok: false, error: 'Escribe una respuesta.' };
   const it = item(p);
-  const bien = p.reglas.respuesta === 'opciones' ? texto === it.correcta : coincide(texto, it.respuestas);
+  const bien = p.reglas.respuesta === 'opciones' ? texto === it.correcta
+    : coincide(texto, it.respuestas || []) || (it.claves ? coincideClaves(texto, it.claves) : false);
   if (!bien) {
     fallo(p, quien, ahora, 'mal');
     return { ok: true, correcto: false, texto };
