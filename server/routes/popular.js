@@ -415,18 +415,22 @@ router.post('/online/unirse', (req, res) => {
 
 // GET /api/popular/online/sala/:code
 router.get('/online/sala/:code', (req, res) => {
-  const todosDescubiertos = Object.keys(sala.ronda.acertados || {}).length >= 5;
-  if (todosDescubiertos && sala.ronda.faseRonda !== 'resolucion') {
-    sala.ronda.solucionFinal = sala.ronda.respuestasOriginales.map((r) => ({
-      ...r,
-      puntos: PUNTUACION_PUESTOS[r.puesto] || 2
-    }));
-    sala.ronda.feedback = null;
-    sala.ronda.faseRonda = 'resolucion';
-  }
-
+  // 1. PRIMERO buscamos la sala
   const sala = salasOnline.get(req.params.code?.toUpperCase());
   if (!sala) return res.status(404).json({ error: 'Sala no disponible.' });
+
+  // 2. LUEGO comprobamos si hay una ronda activa para procesar la resolución
+  if (sala.ronda) {
+    const todosDescubiertos = Object.keys(sala.ronda.acertados || {}).length >= 5;
+    if (todosDescubiertos && sala.ronda.faseRonda !== 'resolucion') {
+      sala.ronda.solucionFinal = sala.ronda.respuestasOriginales.map((r) => ({
+        ...r,
+        puntos: PUNTUACION_PUESTOS[r.puesto] || 2
+      }));
+      sala.ronda.feedback = null;
+      sala.ronda.faseRonda = 'resolucion';
+    }
+  }
 
   const token = req.query.token;
   const jugador = sala.jugadores.find((j) => j.token === token);
