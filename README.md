@@ -207,6 +207,12 @@ npm run dev
 - La lógica vive en `server/traiciones/engine.js`; el cliente usa una copia idéntica (`node server/scripts/sync-traiciones.mjs` tras cambiarlo). Si una prueba se supera antes del tiempo mínimo de la sala, la tarea se remata sola al llegar a ese tiempo.
 - Pruebas: `node server/scripts/traiciones-sim.mjs` (equilibrio) y `node server/scripts/traiciones-e2e.mjs [jugadores]` (salas online con bots y reloj acelerado).
 
+## Juegos de pulsador: El paparazzi, Luces, Cámara... ¡Música! y Frases Célebres (`Pulsador/`)
+Los tres comparten motor (`server/pulsador/engine.js`, copiado al cliente con `npm run sync:pulsador`), salas online (`server/lib/salasPulsador.js`) y pantallas (`client/src/games/Pulsador/`); `juegos.js` tiene los textos de cada uno y `REGLAS` en el motor, sus tiempos y puntos. Cada ronda empieza con una cuenta atrás de 3 s; el reloj corre y quien pulsa lo para y tiene unos segundos para responder. Online cada uno tiene su pulsador (los demás ven lo que escribe); en un dispositivo hay un pulsador común y se elige quién ha pulsado. Simulación: `node scripts/pulsador-sim.mjs`.
+- **El paparazzi** (`/api/rasgos`): recorte de la foto de un famoso (el servidor recorta; la foto completa solo se sirve al resolver la ronda). 60 s; acertar suma los segundos que quedaban y fallar los resta. Para probar sin red: `RASGOS_IMAGEN_PRUEBA=/ruta/a/una.jpg`.
+- **Luces, Cámara... ¡Música!** (`/api/adivina`): canciones (modernas, antiguas o de todo) o películas, con tres pistas que se destapan solas cada 20 s (10/5/3 puntos). La tercera pista de las canciones es el fragmento de Deezer (se pide al momento por `/audio`, porque sus URLs caducan); si no hay audio, se muestra el título con huecos.
+- **Frases Célebres** (`/api/frasescelebres`): frase y cuatro autores; quien pulsa elige (+3 / −1).
+
 ## Minijuego: Afina ese oído (`Cancion/`)
 - El fragmento de 30 s se busca en Deezer (intentando que coincida el artista) y se sirve desde `/api/cancion/audio/:clave`, para que el volumen progresivo funcione también en móviles. Si una canción no tiene fragmento, se elige otra.
 - Online, el servidor lleva el reloj de la canción (`posicionMs`) y cada móvil se sincroniza; la canción se pausa al pulsar, se reanuda tras un fallo y la ronda termina sola al acabar el fragmento o el tiempo de respuesta (20 s).

@@ -34,7 +34,7 @@ export const FAMOSOS = [
   },
   {
     id: 'rosalia',
-    nombre: 'Rosalia',
+    nombre: 'Rosalía',
     alias: [
       'Rosalia',
       'Rosalía',
@@ -167,7 +167,7 @@ export const FAMOSOS = [
   },
   {
     id: 'kendallJenner',
-    nombre: 'Kendal Jenner',
+    nombre: 'Kendall Jenner',
     alias: [
       'Kendall jenner',
       'Kendalljenner',
@@ -314,7 +314,7 @@ export const FAMOSOS = [
   },
   {
     id: 'nikolaJokic',
-    nombre: 'Nikola Jokic',
+    nombre: 'Nikola Jokić',
     alias: [
       'Nikola Jokic',
       'NikolaJokic',
@@ -586,7 +586,7 @@ export const FAMOSOS = [
   },
   {
     id: 'pauCubarsi',
-    nombre: 'Pau Cubarsi',
+    nombre: 'Pau Cubarsí',
     alias: [
       'pauCubarsi',
       'pau Cubarsi',
@@ -710,7 +710,7 @@ export const FAMOSOS = [
   },
   {
     id: 'margotRobbie',
-    nombre: 'margotRobbie',
+    nombre: 'Margot Robbie',
     alias: [
       'margotRobbie',
       'margot Robbie',
@@ -728,7 +728,7 @@ export const FAMOSOS = [
   },
   {
     id: 'anaDeArmas',
-    nombre: 'Ana De rmas',
+    nombre: 'Ana de Armas',
     alias: [
       'anaDeArmas',
       'ana De Armas',

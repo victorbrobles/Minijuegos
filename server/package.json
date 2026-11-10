@@ -18,7 +18,8 @@
     "sync:jugadores": "node scripts/sync-jugadores.mjs",
     "sync:cuatroclubes": "node scripts/sync-cuatroclubes.mjs",
     "sim:fundadores": "node scripts/fundadores-sim.mjs",
-    "sync:logos": "node scripts/sync-logos.mjs"
+    "sync:logos": "node scripts/sync-logos.mjs",
+    "sync:pulsador": "node scripts/sync-pulsador.mjs"
   },
   "dependencies": {
     "better-sqlite3": "^13.0.3",

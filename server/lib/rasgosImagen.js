@@ -12,11 +12,22 @@ const CARPETA_IMAGENES = path.resolve(__dirname, '../data/seeds/rasgos');
 // Memoria caché para no descargar la misma imagen dos veces
 const cacheBuffer = new Map();
 
-async function obtenerBufferImagen(famoso) {
-  if (cacheBuffer.has(famoso.id)) {
-    return cacheBuffer.get(famoso.id);
+// Se guarda la promesa para que varias peticiones simultáneas (todos los móviles de una sala) descarguen una sola vez.
+function obtenerBufferImagen(famoso) {
+  if (!cacheBuffer.has(famoso.id)) {
+    const promesa = descargar(famoso).catch(async (e) => {
+      cacheBuffer.delete(famoso.id);
+      // Solo para pruebas sin red: una imagen local cualquiera en lugar de la de Wikimedia.
+      if (process.env.RASGOS_IMAGEN_PRUEBA) return fs.readFile(process.env.RASGOS_IMAGEN_PRUEBA);
+      throw e;
+    });
+    cacheBuffer.set(famoso.id, promesa);
+    if (cacheBuffer.size > 120) cacheBuffer.delete(cacheBuffer.keys().next().value);
   }
+  return cacheBuffer.get(famoso.id);
+}
 
+async function descargar(famoso) {
   let buffer;
 
   if (famoso.imagen.startsWith('http://') || famoso.imagen.startsWith('https://')) {
@@ -29,6 +40,7 @@ async function obtenerBufferImagen(famoso) {
 
     const res = await fetch(url, {
       redirect: 'follow',
+      signal: AbortSignal.timeout(12000),
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
         'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8'
@@ -46,7 +58,6 @@ async function obtenerBufferImagen(famoso) {
     buffer = await fs.readFile(rutaLocal);
   }
 
-  cacheBuffer.set(famoso.id, buffer);
   return buffer;
 }
 
