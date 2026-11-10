@@ -3,6 +3,7 @@
 // (engine.js) y llama a onAccion(tipo, datos) -> Promise<resultado | { error }>.
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
+import { centrarActivo } from '../../lib/centrarActivo.js';
 
 const COLORES_JUGADOR = ['#0ea5e9', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316', '#84cc16', '#6366f1', '#14b8a6', '#d946ef'];
 const colorJugador = (id) => COLORES_JUGADOR[(Number(id) - 1 + COLORES_JUGADOR.length * 10) % COLORES_JUGADOR.length];
@@ -42,7 +43,7 @@ function Vidas({ n, max = 3 }) {
 function Marcador({ jugadores, turnoId, yoId, supervivencia, vidasMax }) {
   const ref = useRef(null);
   useEffect(() => {
-    ref.current?.querySelector('.activo')?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+    centrarActivo(ref.current);
   }, [turnoId]);
   return (
     <ol className="gq-marcador" ref={ref} aria-label="Jugadores">

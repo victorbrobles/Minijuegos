@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import './Trescientosuno.css';
+import { centrarActivo } from '../../lib/centrarActivo.js';
 
 const MIN_JUGADORES = 2;
 const MAX_JUGADORES = 12;
@@ -208,7 +209,7 @@ export function Cabecera({ onSalir, textoSalir = 'Portada', chips, etiqueta, tit
 export function OrdenTurnos({ jugadores, activoId, yoId = null, eventoResta = null }) {
   const ref = useRef(null);
   useEffect(() => {
-    ref.current?.querySelector('.activo')?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+    centrarActivo(ref.current);
   }, [activoId]);
 
   return (

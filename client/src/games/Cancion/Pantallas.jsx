@@ -4,6 +4,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { DURACION_S, volumenEn } from './audioPlayerCancion.js';
+import { centrarActivo } from '../../lib/centrarActivo.js';
 
 export const OPCIONES_RONDAS = [5, 10, 15, 20];
 export const SEGUNDOS_RESPUESTA = 20;
@@ -31,7 +32,7 @@ function BotonSalir({ onClick }) {
 export function Hero({ onSalir, ronda, total, jugadores = [], yoId, turnoId }) {
   const ref = useRef(null);
   useEffect(() => {
-    ref.current?.querySelector('.activo')?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+    centrarActivo(ref.current);
   }, [turnoId]);
   return (
     <header className="afp-hero">

@@ -3,6 +3,7 @@
 // Recibe la «vista» del motor (engine.js) y llama a onAccion(tipo, datos).
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
+import { centrarActivo } from '../../lib/centrarActivo.js';
 
 // Colores de los grupos según el orden en que se resuelven
 export const COLORES_GRUPO = ['#f59e0b', '#22c55e', '#3b82f6', '#a855f7'];
@@ -50,7 +51,7 @@ function Vidas({ n, max = 3 }) {
 function Marcador({ jugadores, turnoId, yoId }) {
   const ref = useRef(null);
   useEffect(() => {
-    ref.current?.querySelector('.activo')?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+    centrarActivo(ref.current);
   }, [turnoId]);
   return (
     <ol className="cnp-marcador" ref={ref} aria-label="Jugadores">

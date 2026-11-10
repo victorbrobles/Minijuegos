@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import './Rankings.css';
+import { centrarActivo } from '../../lib/centrarActivo.js';
 
 const TIEMPO_TURNO = 90;
 const PREPARACION_S = 3;
@@ -104,7 +105,7 @@ export function Cabecera({ onSalir, textoSalir = 'Portada', onAyuda, categoria, 
 export function OrdenTurnos({ jugadores, activoId, puntosMap = null }) {
   const ref = useRef(null);
   useEffect(() => {
-    ref.current?.querySelector('.activo')?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+    centrarActivo(ref.current);
   }, [activoId]);
 
   return (

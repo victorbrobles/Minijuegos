@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import { getPreguntaAleatoria } from '../../../../server/data/seeds/conoce/conoceData.js';
 import './Conoce.css';
+import { centrarActivo } from '../../lib/centrarActivo.js';
 
 const MIN_JUGADORES = 4;
 const MAX_JUGADORES = 16;
@@ -154,7 +155,7 @@ export function Cabecera({ onSalir, textoSalir = 'Portada', onAyuda, categoria, 
 export function OrdenTurnos({ jugadores, activoId, completadosCount = null }) {
   const ref = useRef(null);
   useEffect(() => {
-    ref.current?.querySelector('.activo')?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+    centrarActivo(ref.current);
   }, [activoId]);
 
   return (

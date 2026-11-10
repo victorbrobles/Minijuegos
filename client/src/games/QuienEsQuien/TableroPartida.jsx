@@ -4,6 +4,7 @@
 // tarjetas blancas y botones en relieve. Pensado sobre todo para el móvil.
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
+import { centrarActivo } from '../../lib/centrarActivo.js';
 
 const COLORES = ['#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316'];
 export const colorJugador = (i) => COLORES[((i % COLORES.length) + COLORES.length) % COLORES.length];
@@ -62,7 +63,7 @@ export function OrdenTurnos({ jugadores, turnoIdx }) {
   const ref = useRef(null);
   useEffect(() => {
     // Mantiene visible al jugador activo cuando hay muchos
-    ref.current?.querySelector('.activo')?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+    centrarActivo(ref.current);
   }, [turnoIdx]);
   return (
     <ol className="qqp-orden" ref={ref} aria-label="Orden de turnos">

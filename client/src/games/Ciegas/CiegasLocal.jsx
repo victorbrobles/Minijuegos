@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import './Ciegas.css';
+import { centrarActivo } from '../../lib/centrarActivo.js';
 
 const MIN_JUGADORES = 3;
 const MAX_JUGADORES = 10;
@@ -104,7 +105,7 @@ export function CajaTemaRanking({ categoriaNombre, tema }) {
 export function OrdenTurnos({ jugadores, activoId, votadosMap = {}, puntosMap = null }) {
   const ref = useRef(null);
   useEffect(() => {
-    ref.current?.querySelector('.activo')?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+    centrarActivo(ref.current);
   }, [activoId]);
 
   return (

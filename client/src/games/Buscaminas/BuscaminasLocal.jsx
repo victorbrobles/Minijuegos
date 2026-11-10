@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import './Buscaminas.css';
+import { centrarActivo } from '../../lib/centrarActivo.js';
 
 const MIN_JUGADORES = 3;
 const MAX_JUGADORES = 8;
@@ -105,7 +106,7 @@ export function Cabecera({ onSalir, textoSalir = 'Portada', onAyuda, categoria, 
 export function OrdenTurnos({ jugadores, activoId, eliminados = [], puntosMap = null }) {
   const ref = useRef(null);
   useEffect(() => {
-    ref.current?.querySelector('.activo')?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+    centrarActivo(ref.current);
   }, [activoId]);
 
   return (

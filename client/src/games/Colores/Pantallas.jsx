@@ -3,6 +3,7 @@
 // Conecta o Test del viajero: cabecera con el degradado del juego, tarjetas blancas y botones en relieve.
 import React, { useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
+import { centrarActivo } from '../../lib/centrarActivo.js';
 
 export const PALETA = [
   { id: 'rojo', nombre: 'Rojo', hex: '#ef4444' },
@@ -41,7 +42,7 @@ function BotonSalir({ onClick }) {
 export function Hero({ onSalir, ronda, total, jugadores = [], yoId, turnoId, listos = [], children }) {
   const ref = useRef(null);
   useEffect(() => {
-    ref.current?.querySelector('.activo')?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+    centrarActivo(ref.current);
   }, [turnoId]);
   return (
     <header className="clp-hero">

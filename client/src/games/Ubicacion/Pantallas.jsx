@@ -5,6 +5,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { formatearKm, formatearPuntos, PENALIZACION_SIN_MARCA } from './geo.js';
+import { centrarActivo } from '../../lib/centrarActivo.js';
 
 export const inicial = (n = '?') => n.trim().charAt(0).toUpperCase() || '?';
 const urlWiki = (l) => (l?.wiki ? `https://en.wikipedia.org/wiki/${encodeURIComponent(l.wiki)}` : null);
@@ -24,7 +25,7 @@ function BotonSalir({ onClick, texto = 'Portada' }) {
 export function Hero({ onSalir, ronda, total, jugadores = [], yoId, turnoId, confirmados, chipExtra, children }) {
   const ref = useRef(null);
   useEffect(() => {
-    ref.current?.querySelector('.activo')?.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'smooth' });
+    centrarActivo(ref.current);
   }, [turnoId]);
   return (
     <header className="ubp-hero">
