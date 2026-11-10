@@ -33,6 +33,9 @@ import Bingoball from './Bingoball/Bingoball.jsx';
 import Cuentas from './Cuentas/Cuentas.jsx';
 import Mus from './Mus/Mus.jsx';
 import Reinos from './Reinos/Reinos.jsx';
+import Invento from './Invento/Invento.jsx';
+import Director from './Director/Director.jsx';
+import Laberinto from './Laberinto/Laberinto.jsx';
 import Conoce from './Conoce/Conoce.jsx';
 import Logos from './Logos/Logos.jsx';
 import Hipotesis from './Hipotesis/Hipotesis.jsx';
@@ -94,6 +97,9 @@ const registry = {
   'cuentas': Cuentas,
   'mus': Mus,
   'reinos': Reinos,
+  'invento': Invento,
+  'director': Director,
+  'laberinto': Laberinto,
   'sumacero': SumaCero,
   'golpe': Golpe,
   'conoce': Conoce,

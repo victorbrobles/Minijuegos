@@ -352,5 +352,23 @@
     "name": "Los Siete Reinos",
     "description": "Cada jugador gobierna un reino con territorios, soldados, oro y alimento. Cada ronda das dos órdenes en secreto que se resuelven a la vez. Controla los tronos y cumple tus objetivos secretos… sin fiarte de nadie.",
     "isNew": true
+  },
+  {
+    "id": "invento",
+    "name": "El Invento del Siglo",
+    "description": "Recibes un objeto, un problema y una característica absurda, y tienes que inventar un producto que combine los tres. Después todos votan qué invento comprarían, cuál es más absurdo y cuál triunfará.",
+    "isNew": true
+  },
+  {
+    "id": "director",
+    "name": "Director Deportivo",
+    "description": "Dirige un club con presupuesto limitado: puja en secreto por futbolistas reales, monta una plantilla equilibrada, elige táctica y compite en una liga simulada. No basta con fichar a los mejores.",
+    "isNew": true
+  },
+  {
+    "id": "laberinto",
+    "name": "El Laberinto",
+    "description": "Un laberinto de salas que se descubren poco a poco, con trampas, tesoros y puertas cerradas. Cada jugador tiene un personaje con habilidades distintas: roba, deja trampas, bloquea pasillos y escapa con el tesoro antes que nadie.",
+    "isNew": true
   }
 ]

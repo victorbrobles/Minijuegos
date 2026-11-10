@@ -26,7 +26,8 @@
     "sync:mus": "node scripts/sync-mus.mjs",
     "sync:reinos": "node scripts/sync-reinos.mjs",
     "sync:invento": "node scripts/sync-invento.mjs",
-    "sync:director": "node scripts/sync-director.mjs"
+    "sync:director": "node scripts/sync-director.mjs",
+    "sync:laberinto": "node scripts/sync-laberinto.mjs"
   },
   "dependencies": {
     "better-sqlite3": "^13.0.3",

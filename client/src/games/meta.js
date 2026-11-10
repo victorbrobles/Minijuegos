@@ -77,6 +77,33 @@ export const META = {
     descripcion: 'Empiezas con 5 cartas positivas y negativas: consigue que tu mano sume exactamente 0. Roba, descarta, usa cartas especiales para fastidiar al resto y plántate a tiempo… porque te pueden destrozar la mano justo antes del final.',
     categorias: ['estrategia']
   },
+  'invento': {
+    titulo: 'El Invento del Siglo',
+    imagen: '/covers/invento.webp',
+    icono: 'bulb',
+    colores: ['#a78bfa', '#5b21b6'],
+    etiquetas: 'inventos creatividad humor absurdo votar objeto problema teletienda risas',
+    descripcion: 'Recibes un objeto, un problema y una característica absurda, y tienes que inventar un producto que combine los tres. Después todos votan qué invento comprarían, cuál es más absurdo y cuál triunfará.',
+    categorias: ['chill']
+  },
+  'director': {
+    titulo: 'Director Deportivo',
+    imagen: '/covers/director.webp',
+    icono: 'soccer',
+    colores: ['#38bdf8', '#0c4a6e'],
+    etiquetas: 'futbol fichajes mercado presupuesto plantilla manager liga tactica pujas',
+    descripcion: 'Dirige un club con presupuesto limitado: puja en secreto por futbolistas reales, monta una plantilla equilibrada, elige táctica y compite en una liga simulada. No basta con fichar a los mejores.',
+    categorias: ['futbol', 'estrategia']
+  },
+  'laberinto': {
+    titulo: 'El Laberinto',
+    imagen: '/covers/laberinto.webp',
+    icono: 'key',
+    colores: ['#2dd4bf', '#134e4a'],
+    etiquetas: 'laberinto tablero explorar tesoro trampas llaves personajes robar escapar mazmorra',
+    descripcion: 'Un laberinto de salas que se descubren poco a poco, con trampas, tesoros y puertas cerradas. Cada jugador tiene un personaje con habilidades distintas: roba, deja trampas, bloquea pasillos y escapa con el tesoro antes que nadie.',
+    categorias: ['estrategia']
+  },
   'mus': {
     titulo: 'Mus',
     imagen: '/covers/mus.webp',
