@@ -29,7 +29,7 @@ export const NOMBRES_BOT = ['Real Gamonal', 'Atlético Patatal', 'Unión Gazpach
 // ---------------------------------------------------------------- Precios
 /** Precio de mercado en millones (media, edad y potencial). */
 export function precio(f) {
-  const base = 180 * Math.pow(0.9, 92 - f.media);
+  const base = 60 * Math.pow(0.85, 92 - f.media);
   const edad = f.edad <= 21 ? 1.3 : f.edad <= 25 ? 1.15 : f.edad <= 29 ? 1 : f.edad <= 32 ? 0.7 : 0.45;
   const pot = 1 + Math.max(0, f.potencial - f.media) * 0.04;
   return Math.max(2, Math.round(base * edad * pot * 2) / 2);
@@ -146,13 +146,16 @@ function necesidades(c) {
 function pujasBot(p, c) {
   const nec = necesidades(c);
   const quedan = p.mercados - p.mercado + 1;
-  let caja = c.presupuesto / quedan * 1.15;
+  let caja = (c.presupuesto / quedan) * 1.6;
   const pujas = {};
-  const opciones = p.oferta.map((id) => fut(p, id)).filter((f) => nec[f.pos] > 0)
-    .sort((a, b) => (mediaTemporada(b) / Math.sqrt(b.precio)) - (mediaTemporada(a) / Math.sqrt(a.precio)));
+  // Reparte el dinero entre los huecos que le faltan: no se gasta todo en una estrella
+  const huecos = Math.max(1, Object.values(nec).reduce((a, x) => a + x, 0));
+  const porHueco = c.presupuesto / huecos;
+  const opciones = p.oferta.map((id) => fut(p, id)).filter((f) => nec[f.pos] > 0 && f.precio <= porHueco * 1.8)
+    .sort((a, b) => (mediaTemporada(b) - b.precio * 0.08) - (mediaTemporada(a) - a.precio * 0.08));
   for (const f of opciones) {
-    if (Object.keys(pujas).length >= 3 || c.plantilla.length + Object.keys(pujas).length >= AJUSTES.maxPlantilla) break;
-    const oferta = Math.round(f.precio * (1 + azar(p) * 0.3) * 2) / 2;
+    if (Object.keys(pujas).length >= AJUSTES.maxPujas || c.plantilla.length + Object.keys(pujas).length >= AJUSTES.maxPlantilla) break;
+    const oferta = Math.round(f.precio * (1.15 + azar(p) * 0.45) * 2) / 2;
     if (oferta <= caja && nec[f.pos] > 0) { pujas[f.id] = oferta; caja -= oferta; nec[f.pos] -= 1; }
   }
   return pujas;
@@ -340,7 +343,7 @@ function finalizar(p) {
   p.hasta = null;
   const tabla = clasificacion(p);
   const goles = {};
-  (p.liga?.jornadas || []).flat().forEach((m) => m.goles.forEach((g) => { const k = `${g.n}|${g.c}`; goles[k] = (goles[k] || 0) + 1; }));
+  (p.liga?.jornadas || []).flat().forEach((m) => m.goles.forEach((g) => { if (g.n === 'Canterano') return; const k = `${g.n}|${g.c}`; goles[k] = (goles[k] || 0) + 1; }));
   const pichichi = Object.entries(goles).sort((a, b) => b[1] - a[1])[0];
   // Mejor fichaje: más media por millón (entre los humanos)
   const fichajes = p.clubes.filter((c) => !c.bot).flatMap((c) => c.plantilla.map((f) => ({ ...f, clubId: c.id })));

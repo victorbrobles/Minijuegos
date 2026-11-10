@@ -37,7 +37,7 @@
 .ivp-votacion { border-color: var(--pz2); }
 .ivp-mi-voto { margin: 0.2rem 0 0 !important; color: #334155 !important; }
 .ivp-votos { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-top: 0.6rem; padding-top: 0.5rem; border-top: 1px solid #e2e8f0; color: #334155; font-weight: 800; }
-.ivp-votos span:first-child { display: inline-flex; flex: 1; align-items: center; gap: 0.35rem; min-width: 0; }
+.ivp-votos > span:first-child { display: inline-flex; flex: 1; align-items: center; gap: 0.35rem; min-width: 0; }
 .ivp-votos b { padding: 0.1rem 0.55rem; border-radius: 999px; background: #dcfce7; color: #166534; }
 .ivp-podio-cats { display: grid; gap: 0.45rem; }
 .ivp-podio-cats > div { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 0.6rem; align-items: center; padding: 0.45rem 0.6rem; border-radius: 14px; background: var(--pz0); }
