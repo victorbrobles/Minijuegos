@@ -1,13 +1,24 @@
 // client/src/games/Velocidad/VelocidadOnline.jsx
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Icon from '../../components/Icon.jsx';
 import './Velocidad.css';
-import { MenuInicioJuego, MenuModoOnline, FormCrearSala, FormUnirseSala, CabeceraSala } from '../../components/MenuJuego.jsx';
+import {
+  MenuInicioJuego,
+  MenuModoOnline,
+  FormCrearSala,
+  FormUnirseSala,
+  CabeceraSala,
+  ListaSala,
+  EsperandoAnfitrion
+} from '../../components/MenuJuego.jsx';
 
 const CLAVE_SESION_VEL = 'velocidad_online_session';
+const COLORES_JUGADOR = ['#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316', '#84cc16', '#6366f1'];
+const colorJugador = (id) => COLORES_JUGADOR[(Number(id) - 1 + COLORES_JUGADOR.length * 10) % COLORES_JUGADOR.length];
+const inicial = (n = '?') => n.trim().charAt(0).toUpperCase() || '?';
 
-export default function VelocidadOnline({ onLocal, onSalir }) {
-  const [vista, setVista] = useState('menu'); // 'menu' | 'crear' | 'unirse' | 'sala'
+export default function VelocidadOnline({ onLocal }) {
+  const [vista, setVista] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
   const [nombre, setNombre] = useState('');
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
@@ -24,7 +35,7 @@ export default function VelocidadOnline({ onLocal, onSalir }) {
   });
 
   const [sala, setSala] = useState(null);
-  const [codigoCopiado, setCodigoCopiado] = useState(false);
+  const [sinRed, setSinRed] = useState(false);
 
   // Estados de la partida activa en mi teléfono (cuando es mi turno)
   const [preguntas, setPreguntas] = useState([]);
@@ -41,6 +52,12 @@ export default function VelocidadOnline({ onLocal, onSalir }) {
 
   const timerRef = useRef(null);
   const intervalRef = useRef(null);
+  const arrancandoRef = useRef(false);
+  const aciertosRef = useRef(0);
+
+  useEffect(() => {
+    aciertosRef.current = aciertosActuales;
+  }, [aciertosActuales]);
 
   useEffect(() => {
     if (!sesion) {
@@ -49,24 +66,42 @@ export default function VelocidadOnline({ onLocal, onSalir }) {
       return;
     }
 
+    let fallos = 0;
+    let pedidas = 0;
+    let aplicada = 0;
+    const cerrar = (msg) => {
+      sessionStorage.removeItem(CLAVE_SESION_VEL);
+      setSesion(null);
+      setSala(null);
+      setSinRed(false);
+      setVista('online_menu');
+      setErrorMsg(msg);
+    };
+
     const consultarEstado = () => {
+      const n = ++pedidas;
       fetch(`/api/velocidad/online/sala/${sesion.code}?token=${sesion.token}`)
-        .then((r) => {
-          if (!r.ok) throw new Error('Sala no disponible');
-          return r.json();
-        })
-        .then((d) => {
+        .then(async (r) => {
+          if (r.status === 404 || r.status === 403) {
+            const d = await r.json().catch(() => ({}));
+            cerrar(d.error || 'La sala se ha cerrado.');
+            return;
+          }
+          if (!r.ok) throw new Error('red');
+          const d = await r.json();
+          if (n < aplicada) return;
+          aplicada = n;
+          fallos = 0;
+          setSinRed(false);
           if (d.success) {
             setSala(d);
             setVista('sala');
           }
         })
         .catch(() => {
-          sessionStorage.removeItem(CLAVE_SESION_VEL);
-          setSesion(null);
-          setSala(null);
-          setVista('online_menu');
-          setErrorMsg('La sala se ha cerrado o se ha perdido la conexión.');
+          fallos += 1;
+          if (fallos >= 3) setSinRed(true);
+          if (fallos >= 40) cerrar('Se ha perdido la conexión con la sala.');
         });
     };
 
@@ -78,11 +113,82 @@ export default function VelocidadOnline({ onLocal, onSalir }) {
     };
   }, [sesion]);
 
-  const esMiTurno = Boolean(sala?.jugadorActualId === sala?.yoId);
+  const esMiTurno = Boolean(sala && sala.jugadorActualId === sala.yoId);
 
-  // Arrastre y cronómetro del jugador activo en su propio turno
+  const reportarProgreso = useCallback((aciertos, tiempo, numPreg, preguntaTxt, esp) => {
+    if (!sesion) return;
+    fetch(`/api/velocidad/online/sala/${sesion.code}/reportar-progreso`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        token: sesion.token,
+        aciertos,
+        tiempoRestante: tiempo,
+        preguntaNum: numPreg,
+        preguntaTexto: preguntaTxt,
+        mostrandoEspecial: esp
+      })
+    }).catch(() => {});
+  }, [sesion]);
+
+  const handleArrancarMiTurnoEnVivo = useCallback(async () => {
+    if (!sesion || arrancandoRef.current) return;
+    arrancandoRef.current = true;
+    try {
+      const res = await fetch(`/api/velocidad/online/sala/${sesion.code}/arrancar-turno`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: sesion.token })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setPreguntas(data.preguntas || []);
+        setPreguntaEspecial(data.especial || null);
+        setPreguntaIdx(0);
+        setAciertosActuales(0);
+        aciertosRef.current = 0;
+        setTiempoRestante(60);
+        setEspecialUsada(false);
+        setMostrandoEspecial(false);
+        setInputEspecial('');
+        setFeedbackEspecial(null);
+        setFeedbackOpcion(null);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      arrancandoRef.current = false;
+    }
+  }, [sesion]);
+
+  // Auto-arrancar el turno cuando la cuenta atrás de 10s llega a 0 o al reconectar en 'jugando'
   useEffect(() => {
-    if (sala?.estado !== 'jugando' || !esMiTurno || mostrandoEspecial) return;
+    if (!sala || !esMiTurno) return;
+
+    if (sala.estado === 'cuenta_atras' && sala.cuentaAtrasSegundos <= 0) {
+      handleArrancarMiTurnoEnVivo();
+    } else if (sala.estado === 'jugando' && preguntas.length === 0) {
+      handleArrancarMiTurnoEnVivo();
+    }
+  }, [sala?.estado, sala?.cuentaAtrasSegundos, esMiTurno, preguntas.length, handleArrancarMiTurnoEnVivo]);
+
+  const finalizarMiTurno = useCallback(async () => {
+    clearInterval(timerRef.current);
+    if (!sesion) return;
+    try {
+      await fetch(`/api/velocidad/online/sala/${sesion.code}/finalizar-turno`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: sesion.token, aciertos: aciertosRef.current })
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  }, [sesion]);
+
+  // Cronómetro del jugador activo en su propio turno
+  useEffect(() => {
+    if (sala?.estado !== 'jugando' || !esMiTurno || mostrandoEspecial || preguntas.length === 0) return;
 
     timerRef.current = setInterval(() => {
       setTiempoRestante((prev) => {
@@ -90,7 +196,7 @@ export default function VelocidadOnline({ onLocal, onSalir }) {
           clearInterval(timerRef.current);
           setMostrandoEspecial(true);
           setEspecialUsada(true);
-          reportarProgreso(aciertosActuales, 30, preguntas[preguntaIdx]?.pregunta, true);
+          reportarProgreso(aciertosRef.current, 30, preguntaIdx + 1, preguntas[preguntaIdx]?.pregunta, true);
           return 30;
         }
 
@@ -101,28 +207,13 @@ export default function VelocidadOnline({ onLocal, onSalir }) {
         }
 
         const nuevo = prev - 1;
-        reportarProgreso(aciertosActuales, nuevo, preguntas[preguntaIdx]?.pregunta, false);
+        reportarProgreso(aciertosRef.current, nuevo, preguntaIdx + 1, preguntas[preguntaIdx]?.pregunta, false);
         return nuevo;
       });
     }, 1000);
 
     return () => clearInterval(timerRef.current);
-  }, [sala?.estado, esMiTurno, mostrandoEspecial, especialUsada, aciertosActuales, preguntaIdx, preguntas]);
-
-  const reportarProgreso = (aciertos, tiempo, preguntaTxt, esp) => {
-    if (!sesion) return;
-    fetch(`/api/velocidad/online/sala/${sesion.code}/reportar-progreso`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        token: sesion.token,
-        aciertos,
-        tiempoRestante: tiempo,
-        preguntaTexto: preguntaTxt,
-        mostrandoEspecial: esp
-      })
-    }).catch(() => {});
-  };
+  }, [sala?.estado, esMiTurno, mostrandoEspecial, especialUsada, preguntaIdx, preguntas, reportarProgreso, finalizarMiTurno]);
 
   const handleCrear = async () => {
     if (!nombre.trim()) return;
@@ -170,6 +261,19 @@ export default function VelocidadOnline({ onLocal, onSalir }) {
     }
   };
 
+  const handleExpulsar = async (jugadorId) => {
+    if (!sesion) return;
+    try {
+      await fetch(`/api/velocidad/online/sala/${sesion.code}/expulsar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: sesion.token, jugadorId })
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const handleIniciarJuego = async () => {
     if (!sesion) return;
     try {
@@ -183,58 +287,35 @@ export default function VelocidadOnline({ onLocal, onSalir }) {
     }
   };
 
-  const handleArrancarMiTurnoEnVivo = async () => {
-    if (!sesion) return;
-    try {
-      const res = await fetch(`/api/velocidad/online/sala/${sesion.code}/arrancar-turno`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion.token })
-      });
-      const data = await res.json();
-
-      setPreguntas(data.preguntas);
-      setPreguntaEspecial(data.especial);
-      setPreguntaIdx(0);
-      setAciertosActuales(0);
-      setTiempoRestante(60);
-      setEspecialUsada(false);
-      setMostrandoEspecial(false);
-      setInputEspecial('');
-      setFeedbackEspecial(null);
-      setFeedbackOpcion(null);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
   const responderOpcionOnline = (opcIndex) => {
     if (feedbackOpcion !== null || mostrandoEspecial) return;
 
     const actual = preguntas[preguntaIdx];
-    const esCorrecta = opcIndex === actual.correcta;
+    if (!actual) return;
 
+    const esCorrecta = opcIndex === actual.correcta;
     setFeedbackOpcion({ idx: opcIndex, correcta: esCorrecta });
 
-    let nuevosAciertos = aciertosActuales;
+    let nuevosAciertos = aciertosRef.current;
     if (esCorrecta) {
       nuevosAciertos += 1;
+      aciertosRef.current = nuevosAciertos;
       setAciertosActuales(nuevosAciertos);
     }
 
-    reportarProgreso(nuevosAciertos, tiempoRestante, actual.pregunta, false);
+    reportarProgreso(nuevosAciertos, tiempoRestante, preguntaIdx + 1, actual.pregunta, false);
 
     setTimeout(() => {
       setFeedbackOpcion(null);
       const sigIdx = preguntaIdx + 1 < preguntas.length ? preguntaIdx + 1 : 0;
       setPreguntaIdx(sigIdx);
-      reportarProgreso(nuevosAciertos, tiempoRestante, preguntas[sigIdx]?.pregunta, false);
+      reportarProgreso(nuevosAciertos, tiempoRestante, sigIdx + 1, preguntas[sigIdx]?.pregunta, false);
     }, 220);
   };
 
   const enviarRespuestaEspecialOnline = async (e) => {
     e.preventDefault();
-    if (!inputEspecial.trim() || !sesion) return;
+    if (!inputEspecial.trim() || !sesion || feedbackEspecial) return;
 
     try {
       const res = await fetch(`/api/velocidad/online/sala/${sesion.code}/validar-especial`, {
@@ -244,9 +325,11 @@ export default function VelocidadOnline({ onLocal, onSalir }) {
       });
       const data = await res.json();
 
+      let nuevoTiempo = tiempoRestante;
       if (data.acierto) {
+        nuevoTiempo = tiempoRestante + 30;
         setFeedbackEspecial({ acierto: true, texto: '¡CORRECTO! +30 SEGUNDOS AL CRONÓMETRO' });
-        setTiempoRestante((t) => t + 30);
+        setTiempoRestante(nuevoTiempo);
       } else {
         setFeedbackEspecial({
           acierto: false,
@@ -257,23 +340,10 @@ export default function VelocidadOnline({ onLocal, onSalir }) {
       setTimeout(() => {
         setMostrandoEspecial(false);
         setFeedbackEspecial(null);
+        reportarProgreso(aciertosRef.current, nuevoTiempo, preguntaIdx + 1, preguntas[preguntaIdx]?.pregunta, false);
       }, 1600);
     } catch {
       setMostrandoEspecial(false);
-    }
-  };
-
-  const finalizarMiTurno = async () => {
-    clearInterval(timerRef.current);
-    if (!sesion) return;
-    try {
-      await fetch(`/api/velocidad/online/sala/${sesion.code}/finalizar-turno`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion.token, aciertos: aciertosActuales })
-      });
-    } catch (err) {
-      console.error(err);
     }
   };
 
@@ -304,12 +374,14 @@ export default function VelocidadOnline({ onLocal, onSalir }) {
   };
 
   const handleSalir = async () => {
+    clearInterval(timerRef.current);
     if (sesion) {
       try {
         await fetch(`/api/velocidad/online/sala/${sesion.code}/salir`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token: sesion.token })
+          body: JSON.stringify({ token: sesion.token }),
+          keepalive: true
         });
       } catch {
         /* ignorar */
@@ -321,56 +393,46 @@ export default function VelocidadOnline({ onLocal, onSalir }) {
     setVista('online_menu');
   };
 
-  const copiarCodigo = () => {
-    if (!sala?.code) return;
-    navigator.clipboard?.writeText(sala.code);
-    setCodigoCopiado(true);
-    setTimeout(() => setCodigoCopiado(false), 2000);
-  };
-
   const esAdmin = Boolean(sala?.esAdmin);
+  const yoId = sala?.yoId;
   const preguntaActual = preguntas[preguntaIdx];
   const ranking = [...(sala?.jugadores || [])].sort((a, b) => b.aciertos - a.aciertos);
   const maximoAciertos = ranking.length ? ranking[0].aciertos : 0;
   const ganadores = maximoAciertos > 0 ? ranking.filter((j) => j.aciertos === maximoAciertos) : [];
+  const enPartidaActiva = vista === 'sala' && sala && sala.estado !== 'lobby';
 
-  // Mostrar ayuda en los menús y en la sala de espera (lobby), desaparece al iniciar la partida
+  const tiempoMostrado = esMiTurno ? tiempoRestante : (sala?.progresoEnVivo?.tiempoRestante ?? 60);
+  const aciertosMostrados = esMiTurno ? aciertosActuales : (sala?.progresoEnVivo?.aciertos ?? 0);
+  const enEspecialActual = esMiTurno ? mostrandoEspecial : Boolean(sala?.progresoEnVivo?.mostrandoEspecial);
 
   return (
-    <div className="vel-contenedor">
-      {/* ---------------- BOTÓN Y MODAL DE AYUDA ---------------- */}
+    <div className={`vel-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+      {sinRed && <div className="ptp-sin-red">📶 Reconectando con la sala…</div>}
 
+      {/* MODAL DE AYUDA */}
       {modalAyuda && (
         <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
-          <div className="rg-modal modal-ayuda-juego" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-ayuda-header">
-              <span className="modal-ayuda-signo-title">?</span>
-              <h3>¿Cómo se juega al Test de Velocidad?</h3>
+          <div className="rg-modal ptp-modal-ayuda" onClick={(e) => e.stopPropagation()}>
+            <div className="ptp-modal-ayuda-header">
+              <span className="ptp-ayuda-badge">❓ Cómo jugar</span>
+              <h3>Test de Velocidad</h3>
             </div>
 
-            <div className="modal-ayuda-cuerpo">
-              <p><strong>1. Dinámica del reto:</strong></p>
+            <div className="ptp-modal-ayuda-body">
+              <p>Compite por turnos de 60 segundos desde cada móvil mientras el resto sigue tu ronda en directo.</p>
               <ul>
-                <li>El juego sortea quién empieza con una cuenta atrás de 10 segundos.</li>
-                <li>Dispones de <strong>60 segundos</strong> en tu turno. Cada acierto suma <strong>+1 punto</strong>.</li>
-                <li>Cada pregunta tiene 4 opciones. Si fallas, pasa de inmediato a la siguiente.</li>
-              </ul>
-              <p><strong>2. ¡Pregunta Especial en el segundo 30!</strong></p>
-              <ul>
-                <li>A los 30 segundos el cronómetro se detiene y aparece una pregunta abierta.</li>
-                <li>Si aciertas, ¡ganas <strong>+30 segundos extra</strong> al cronómetro!</li>
+                <li><strong>Turnos sorteados:</strong> El juego sortea quién empieza con una cuenta atrás de <strong>10 segundos</strong>.</li>
+                <li><strong>60 segundos contrarreloj:</strong> Cada pregunta tiene 4 opciones y suma <strong>+1 punto</strong> por acierto. Todos ven tus preguntas y aciertos en tiempo real.</li>
+                <li><strong>⭐ Pregunta Especial (30s):</strong> A los 30 segundos el cronómetro se pausa y aparece una pregunta abierta que otorga <strong>+30 segundos extra</strong> si aciertas.</li>
               </ul>
             </div>
 
-            <div className="rg-modal-acciones">
-              <button className="big full" onClick={() => setModalAyuda(false)}>
-                Entendido
-              </button>
-            </div>
+            <button type="button" className="ptp-boton" onClick={() => setModalAyuda(false)}>
+              ¡Entendido!
+            </button>
           </div>
         </div>
       )}
-      {/* ---------------- FIN AYUDA ---------------- */}
 
       {/* 1. MENÚ PRINCIPAL */}
       {vista === 'menu' && (
@@ -424,25 +486,29 @@ export default function VelocidadOnline({ onLocal, onSalir }) {
       {/* 4. SALA: LOBBY */}
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
         <section className="game qq-pantalla">
-          <CabeceraSala codigo={sala.code} onVolver={() => setModalSalir(true)} onAyuda={() => setModalAyuda(true)} />
+          <CabeceraSala
+            codigo={sala.code}
+            onVolver={() => setModalSalir(true)}
+            onAyuda={() => setModalAyuda(true)}
+          />
 
-          <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
-            <h3 className="qq-sala-titulo"><Icon name="users" size={20} /> Jugadores ({sala.jugadores.length})</h3>
-            <div className="lb-lista qq-sala-lista">
-              {sala.jugadores.map((j) => (
-                <div key={j.id} className={`lb-jug ${j.id === sala.yoId ? 'yo' : ''}`}>
-                  <span className="lb-jug-nombre">
-                    {j.nombre}{j.id === sala.yoId ? ' (tú)' : ''}{j.id === 1 ? ' 👑' : ''}
-                  </span>
-                </div>
-              ))}
-            </div>
-            {sala.jugadores.length < 2 && (
-              <p className="hint" style={{ marginTop: '0.8rem' }}>
-                Falta al menos 1 jugador más para poder empezar.
-              </p>
+          <ListaSala
+            jugadores={sala.jugadores}
+            yoId={yoId}
+            min={2}
+            max={15}
+            anfitrionId={sala.anfitrionId}
+            renderExtra={(j) => (
+              <span className="ptp-sala-extra">
+                {!j.conectado && <span className="ptp-sin-conexion" title="Sin conexión">📵</span>}
+                {esAdmin && j.id !== yoId && (
+                  <button type="button" className="ptp-quitar" onClick={() => handleExpulsar(j.id)}>
+                    Quitar
+                  </button>
+                )}
+              </span>
             )}
-          </div>
+          />
 
           {esAdmin ? (
             <div style={{ marginTop: '1.2rem' }}>
@@ -456,72 +522,197 @@ export default function VelocidadOnline({ onLocal, onSalir }) {
               </button>
             </div>
           ) : (
-            <div className="panel center qq-menu-panel" style={{ padding: '2rem 1.5rem', marginTop: '1rem' }}>
-              <span className="lb-luna chica"><Icon name="hourglass" size={40} /></span>
-              <h3 style={{ margin: '0.5rem 0' }}>Esperando al anfitrión...</h3>
-              <p className="hint">El anfitrión sorteará quién empieza el minuto contrarreloj.</p>
-            </div>
+            <EsperandoAnfitrion texto="El anfitrión sorteará quién empieza el minuto contrarreloj." />
           )}
-
         </section>
       )}
 
       {/* 5. SALA: CUENTA ATRÁS PREVIA */}
       {vista === 'sala' && sala && sala.estado === 'cuenta_atras' && (
-        <section className="game center">
-          <p className="categoria">Turno sorteado al azar</p>
-          {esMiTurno ? (
-            <>
-              <h1 className="title">¡Es tu turno, <span className="hl">{sala.jugadorActualNombre}</span>!</h1>
-              <p className="hint">Prepárate: dispondrás de 60 segundos contrarreloj.</p>
-            </>
-          ) : (
-            <>
-              <h1 className="title">¡Turno de <span className="hl">{sala.jugadorActualNombre}</span>!</h1>
-              <p className="hint">Prepárate para ver su ronda contrarreloj en directo.</p>
-            </>
-          )}
+        <section className="game ptp-escena">
+          <header className="ptp-hero">
+            <span className="ptp-hero-deco" aria-hidden="true">
+              <Icon name="zap" size={140} strokeWidth={1.3} />
+            </span>
+            <div className="ptp-hero-top">
+              <button type="button" className="ptp-salir" onClick={() => setModalSalir(true)}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                <span>Portada</span>
+              </button>
+              <div className="ptp-hero-chips">
+                <span className="ptp-chip"><Icon name="dice" size={14} /> Turno sorteado</span>
+              </div>
+            </div>
 
-          <div className="vel-cuenta-circulo">
-            <span>{sala.cuentaAtrasSegundos}</span>
+            <ol className="ptp-marcador" aria-label="Jugadores">
+              {sala.jugadores.map((j) => {
+                const esTurnoDeEste = j.id === sala.jugadorActualId;
+                return (
+                  <li
+                    key={j.id}
+                    className={`ptp-jugador${j.jugo ? ' respondido' : ''}${j.id === yoId ? ' yo' : ''}`}
+                    style={{ '--c': colorJugador(j.id) }}
+                  >
+                    <span className="ptp-jugador-avatar">{inicial(j.nombre)}</span>
+                    <span className="ptp-jugador-datos">
+                      <span className="ptp-jugador-nombre">{j.nombre}{j.id === yoId ? ' (tú)' : ''}</span>
+                      <span className="ptp-jugador-linea">
+                        <strong>{j.jugo ? `${j.aciertos} pts` : esTurnoDeEste ? 'En turno' : 'Pendiente'}</strong>
+                      </span>
+                    </span>
+                    <span className="ptp-jugador-estado">
+                      {j.jugo ? '✅' : esTurnoDeEste ? '⚡' : '⏳'}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+          </header>
+
+          <div className="ptp-tarjeta vel-prep-card">
+            <p className="ptp-etiqueta">Siguiente participante</p>
+            {esMiTurno ? (
+              <>
+                <h2 className="vel-prep-titulo">
+                  ¡Es tu turno, <span style={{ color: colorJugador(yoId) }}>{sala.jugadorActualNombre}</span>!
+                </h2>
+                <p className="vel-prep-sub">Prepárate: dispondrás de 60 segundos contrarreloj.</p>
+              </>
+            ) : (
+              <>
+                <h2 className="vel-prep-titulo">
+                  Turno de <span style={{ color: colorJugador(sala.jugadorActualId) }}>{sala.jugadorActualNombre}</span>
+                </h2>
+                <p className="vel-prep-sub">Prepárate para seguir su ronda contrarreloj en directo.</p>
+              </>
+            )}
+
+            <div className="vel-cuenta-circulo">
+              <span>{sala.cuentaAtrasSegundos}</span>
+            </div>
+
+            {esMiTurno ? (
+              <button type="button" className="ptp-boton grande" onClick={handleArrancarMiTurnoEnVivo}>
+                <Icon name="zap" size={22} /> ¡Empezar ya sin esperar!
+              </button>
+            ) : (
+              <p className="vel-prep-sub" style={{ margin: 0, fontWeight: 700 }}>
+                Comenzando en breve…
+              </p>
+            )}
           </div>
-
-          {esMiTurno ? (
-            <button className="big full" onClick={handleArrancarMiTurnoEnVivo}>
-              <Icon name="zap" size={22} /> ¡Empezar ya sin esperar!
-            </button>
-          ) : (
-            <p className="hint center">Comenzando en breve...</p>
-          )}
         </section>
       )}
 
       {/* 6. SALA: JUGANDO ONLINE */}
       {vista === 'sala' && sala && sala.estado === 'jugando' && (
-        <section className="game">
-          {esMiTurno ? (
-            <>
-              <div className="hud">
-                <span className="chip"><Icon name="users" size={18} />{sala.jugadorActualNombre} (Tú)</span>
-                <span className="chip alt">
-                  <Icon name="check" size={18} strokeWidth={2.5} /> {aciertosActuales} aciertos
+        <section className="game ptp-escena">
+          <header className="ptp-hero">
+            <span className="ptp-hero-deco" aria-hidden="true">
+              <Icon name="zap" size={140} strokeWidth={1.3} />
+            </span>
+            <div className="ptp-hero-top">
+              <button type="button" className="ptp-salir" onClick={() => setModalSalir(true)}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                <span>Portada</span>
+              </button>
+              <div className="ptp-hero-chips">
+                <span className="ptp-chip">
+                  <Icon name="zap" size={14} /> {esMiTurno ? 'Tu turno' : sala.jugadorActualNombre}
+                </span>
+                <span className="ptp-chip">
+                  <Icon name="check" size={14} strokeWidth={2.5} /> {aciertosMostrados} {aciertosMostrados === 1 ? 'acierto' : 'aciertos'}
                 </span>
               </div>
+            </div>
 
-              <div className="timer" role="timer">
-                <div
-                  className={`timer-bar ${tiempoRestante <= 15 ? 'low' : ''}`}
-                  style={{ width: `${Math.min(100, (tiempoRestante / 60) * 100)}%` }}
-                />
+            <ol className="ptp-marcador" aria-label="Estado de los jugadores">
+              {sala.jugadores.map((j) => {
+                const esTurnoDeEste = j.id === sala.jugadorActualId;
+                const pts = esTurnoDeEste ? aciertosMostrados : j.aciertos;
+                return (
+                  <li
+                    key={j.id}
+                    className={`ptp-jugador${j.jugo ? ' respondido' : ''}${j.id === yoId ? ' yo' : ''}`}
+                    style={{ '--c': colorJugador(j.id) }}
+                  >
+                    <span className="ptp-jugador-avatar">{inicial(j.nombre)}</span>
+                    <span className="ptp-jugador-datos">
+                      <span className="ptp-jugador-nombre">{j.nombre}{j.id === yoId ? ' (tú)' : ''}</span>
+                      <span className="ptp-jugador-linea">
+                        <strong>{j.jugo || esTurnoDeEste ? `${pts} pts` : 'Pendiente'}</strong>
+                      </span>
+                    </span>
+                    <span className="ptp-jugador-estado">
+                      {j.jugo ? '✅' : esTurnoDeEste ? '⚡' : '⏳'}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+          </header>
+
+          {/* Barra de tiempo */}
+          <div className={`ptp-tiempo ${tiempoMostrado <= 12 && !enEspecialActual ? 'critico' : ''}`} role="timer">
+            <div className="ptp-tiempo-barra">
+              <span style={{ width: `${Math.min(100, (tiempoMostrado / 60) * 100)}%` }} />
+            </div>
+            <span className="ptp-tiempo-num">
+              <Icon name="clock" size={15} />
+              {enEspecialActual ? 'Pausado' : `${tiempoMostrado}s`}
+            </span>
+          </div>
+
+          {esMiTurno ? (
+            mostrandoEspecial && preguntaEspecial ? (
+              <div className="ptp-tarjeta vel-especial-panel">
+                <div className="vel-especial-header">
+                  <span className="vel-especial-estrella">⭐</span>
+                  <h3>¡PREGUNTA ESPECIAL!</h3>
+                </div>
+
+                <p className="vel-especial-sub">
+                  El cronómetro está pausado. Acierta sin opciones para ganar <strong>+30 segundos extra</strong>.
+                </p>
+
+                <div className="vel-especial-caja-pregunta">
+                  <p>{preguntaEspecial.pregunta}</p>
+                </div>
+
+                {feedbackEspecial ? (
+                  <div className={`vel-feedback-esp ${feedbackEspecial.acierto ? 'exito' : 'fallo'}`}>
+                    {feedbackEspecial.texto}
+                  </div>
+                ) : (
+                  <form onSubmit={enviarRespuestaEspecialOnline} className="ptp-form-online">
+                    <input
+                      type="text"
+                      autoFocus
+                      autoComplete="off"
+                      className="ptp-input"
+                      placeholder="Escribe la respuesta exacta…"
+                      value={inputEspecial}
+                      onChange={(e) => setInputEspecial(e.target.value)}
+                      required
+                    />
+                    <button type="submit" className="ptp-boton" disabled={!inputEspecial.trim()}>
+                      <Icon name="check" size={20} strokeWidth={2.5} /> Responder (+30s)
+                    </button>
+                  </form>
+                )}
               </div>
-              <p className="timer-text">
-                <Icon name="clock" size={18} />
-                <strong>{tiempoRestante} s</strong>
-              </p>
+            ) : (
+              preguntaActual && (
+                <div className="ptp-tarjeta vel-tarjeta-pregunta">
+                  <div className="ptp-tarjeta-cab">
+                    <p className="ptp-etiqueta">Test contrarreloj</p>
+                    <span className="ptp-badge-pista">Pregunta #{preguntaIdx + 1}</span>
+                  </div>
 
-              {preguntaActual && (
-                <div className="panel vel-tarjeta-pregunta">
-                  <span className="vel-pregunta-num">Pregunta #{preguntaIdx + 1}</span>
                   <h2 className="vel-pregunta-texto">{preguntaActual.pregunta}</h2>
 
                   <div className="vel-opciones-grid">
@@ -547,149 +738,103 @@ export default function VelocidadOnline({ onLocal, onSalir }) {
                     })}
                   </div>
                 </div>
-              )}
-
-              {mostrandoEspecial && preguntaEspecial && (
-                <div className="rg-modal-fondo">
-                  <div className="rg-modal vel-modal-especial" onClick={(e) => e.stopPropagation()}>
-                    <div className="vel-especial-header">
-                      <span className="vel-especial-estrella">⭐</span>
-                      <h3>¡PREGUNTA ESPECIAL!</h3>
-                    </div>
-
-                    <p className="vel-especial-sub">
-                      El cronómetro está pausado. Acierta sin opciones para ganar <strong>+30 segundos extra</strong>.
-                    </p>
-
-                    <div className="vel-especial-caja-pregunta">
-                      <p>{preguntaEspecial.pregunta}</p>
-                    </div>
-
-                    {feedbackEspecial ? (
-                      <div className={`vel-feedback-esp ${feedbackEspecial.acierto ? 'exito' : 'fallo'}`}>
-                        {feedbackEspecial.texto}
-                      </div>
-                    ) : (
-                      <form onSubmit={enviarRespuestaEspecialOnline}>
-                        <input
-                          type="text"
-                          autoFocus
-                          autoComplete="off"
-                          placeholder="Escribe la respuesta exacta..."
-                          value={inputEspecial}
-                          onChange={(e) => setInputEspecial(e.target.value)}
-                          required
-                        />
-                        <div className="rg-modal-acciones">
-                          <button type="submit" className="big full ok">
-                            <Icon name="check" size={20} strokeWidth={2.5} /> Responder
-                          </button>
-                        </div>
-                      </form>
-                    )}
-                  </div>
-                </div>
-              )}
-            </>
+              )
+            )
           ) : (
-            <>
-              <div className="hud">
-                <span className="chip"><Icon name="zap" size={18} />Jugando: <strong>{sala.jugadorActualNombre}</strong></span>
-                <span className="chip alt">
-                  <Icon name="check" size={18} strokeWidth={2.5} /> {sala.progresoEnVivo?.aciertos ?? 0} aciertos
-                </span>
-              </div>
-
-              <div className="timer" role="timer">
-                <div
-                  className={`timer-bar ${((sala.progresoEnVivo?.tiempoRestante ?? 60) <= 15) ? 'low' : ''}`}
-                  style={{ width: `${Math.min(100, ((sala.progresoEnVivo?.tiempoRestante ?? 60) / 60) * 100)}%` }}
-                />
-              </div>
-              <p className="timer-text">
-                <Icon name="clock" size={18} />
-                <strong>{sala.progresoEnVivo?.tiempoRestante ?? 60} s</strong>
-              </p>
-
-              <div className="panel vel-tarjeta-pregunta" style={{ textAlign: 'center', padding: '2rem 1.4rem' }}>
-                {sala.progresoEnVivo?.mostrandoEspecial ? (
-                  <div className="vel-especial-caja-pregunta" style={{ margin: '1rem auto' }}>
-                    <span style={{ fontSize: '2rem' }}>⭐</span>
-                    <h3 style={{ margin: '0.4rem 0', color: '#78350f' }}>¡Pregunta Especial de 30s en curso!</h3>
-                    <p style={{ margin: 0 }}>El tiempo está pausado mientras responde la pregunta abierta.</p>
+            <div className="ptp-tarjeta vel-espectador-card">
+              {sala.progresoEnVivo?.mostrandoEspecial ? (
+                <div className="vel-especial-caja-pregunta" style={{ margin: 0 }}>
+                  <span style={{ fontSize: '2rem', display: 'block' }}>⭐</span>
+                  <h3 style={{ margin: '0.35rem 0', color: '#78350f' }}>¡Pregunta Especial de 30s en curso!</h3>
+                  <p style={{ margin: 0, fontWeight: 600 }}>
+                    El tiempo está pausado mientras {sala.jugadorActualNombre} responde la pregunta abierta.
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div className="ptp-tarjeta-cab">
+                    <p className="ptp-etiqueta">Viendo en directo a {sala.jugadorActualNombre}</p>
+                    <span className="ptp-badge-pista">Pregunta #{sala.progresoEnVivo?.preguntaNum ?? 1}</span>
                   </div>
-                ) : (
-                  <>
-                    <span className="vel-pregunta-num">Pregunta en pantalla</span>
-                    <h2 className="vel-pregunta-texto" style={{ margin: '1rem 0' }}>
-                      {sala.progresoEnVivo?.preguntaTexto || 'Respondiendo preguntas a toda velocidad...'}
-                    </h2>
-                    <p className="hint">
-                      {sala.jugadorActualNombre} está seleccionando su respuesta en directo.
-                    </p>
-                  </>
-                )}
-              </div>
-            </>
+                  <h2 className="vel-pregunta-texto" style={{ margin: '0.6rem 0 0.9rem' }}>
+                    {sala.progresoEnVivo?.preguntaTexto || 'Respondiendo preguntas a toda velocidad…'}
+                  </h2>
+                  <p className="vel-prep-sub" style={{ margin: 0 }}>
+                    {sala.jugadorActualNombre} está seleccionando su respuesta en directo.
+                  </p>
+                </>
+              )}
+            </div>
           )}
-
-          <div className="actions" style={{ marginTop: '1.2rem' }}>
-            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
-              <Icon name="door" size={20} /> Salir de la sala
-            </button>
-          </div>
         </section>
       )}
 
       {/* 7. SALA: RESUMEN DEL TURNO */}
       {vista === 'sala' && sala && sala.estado === 'resumen_turno' && (
-        <section className="game center">
-          <div className="end-card">
-            <span className="end-icon"><Icon name="hourglass" size={44} /></span>
-            <h1 className="title">¡Fin del turno!</h1>
-            <p className="reveal" style={{ fontSize: '1.4rem', margin: '0.8rem 0' }}>
-              <strong>{sala.jugadorActualNombre}</strong> ha conseguido <strong>{sala.jugadores.find((j) => j.id === sala.jugadorActualId)?.aciertos ?? 0} aciertos</strong>.
-            </p>
-
-            <div className="scoreboard">
-              {sala.jugadores.map((j) => (
-                <div key={j.id} className={`score-row ${j.id === sala.jugadorActualId ? 'first' : ''}`}>
-                  <span className="score-name">{j.nombre} {j.id === sala.yoId ? '(Tú)' : ''}</span>
-                  <span className="score-pts">
-                    {j.jugo ? `${j.aciertos} pts` : 'Pendiente'}
-                  </span>
-                </div>
-              ))}
+        <section className="game ptp-escena">
+          <header className="ptp-hero">
+            <span className="ptp-hero-deco" aria-hidden="true">
+              <Icon name="hourglass" size={140} strokeWidth={1.3} />
+            </span>
+            <div className="ptp-hero-top">
+              <button type="button" className="ptp-salir" onClick={() => setModalSalir(true)}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                <span>Salir</span>
+              </button>
+              <span className="ptp-chip"><Icon name="flagFinish" size={14} /> ¡Fin del turno!</span>
             </div>
+            <p className="ptp-etiqueta" style={{ color: 'rgba(255,255,255,0.85)' }}>
+              Marca de {sala.jugadorActualNombre || 'este turno'}
+            </p>
+            <h2 className="ptp-solucion-titulo">
+              {sala.jugadores.find((j) => j.id === sala.jugadorActualId)?.aciertos ?? 0} aciertos
+            </h2>
+          </header>
+
+          <div className="ptp-tarjeta">
+            <p className="ptp-etiqueta">Clasificación general</p>
+            <ol className="ptp-ranking">
+              {sala.jugadores.map((j, i) => {
+                const esReciente = j.id === sala.jugadorActualId;
+                return (
+                  <li key={j.id} className={esReciente ? 'lider' : ''} style={{ '--c': colorJugador(j.id) }}>
+                    <span className="ptp-ranking-pos">{j.jugo ? '✅' : i + 1}</span>
+                    <span className="ptp-jugador-avatar">{inicial(j.nombre)}</span>
+                    <span className="ptp-ranking-nombre">
+                      {j.nombre}{j.id === yoId ? ' (tú)' : ''}
+                    </span>
+                    <strong>{j.jugo ? `${j.aciertos} pts` : 'Pendiente'}</strong>
+                  </li>
+                );
+              })}
+            </ol>
           </div>
 
-          <div className="actions" style={{ marginTop: '1.5rem' }}>
+          <div className="ptp-barra estatica">
             {esAdmin ? (
               sala.jugadores.some((j) => !j.jugo) ? (
-                <button className="big full" onClick={handleSiguienteJugador}>
+                <button type="button" className="ptp-boton grande" onClick={handleSiguienteJugador}>
                   <Icon name="dice" size={20} /> Sortear siguiente jugador
                 </button>
               ) : (
-                <button className="big full" onClick={handleSiguienteJugador}>
+                <button type="button" className="ptp-boton grande" onClick={handleSiguienteJugador}>
                   <Icon name="trophy" size={20} /> Ver podio y resultados finales
                 </button>
               )
             ) : (
-              <p className="hint center">Esperando a que el anfitrión continúe...</p>
+              <p className="ptp-espera">Esperando a que el anfitrión continúe con el siguiente jugador…</p>
             )}
-
-            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
-              <Icon name="door" size={20} /> Salir de la sala
-            </button>
           </div>
         </section>
       )}
 
       {/* 8. SALA: FINAL */}
       {vista === 'sala' && sala && sala.estado === 'final' && (
-        <section className="game">
+        <section className="game ptp-escena">
           <div className="end-card">
-            <span className="end-icon"><Icon name="crown" size={48} /></span>
+            <span className="end-icon"><Icon name="crown" size={44} /></span>
             <h1 className="title">Clasificación Final</h1>
             <p className="final-score">
               {ganadores.length === 0
@@ -706,7 +851,7 @@ export default function VelocidadOnline({ onLocal, onSalir }) {
                   <div key={j.id} className={`score-row ${lider ? 'first' : ''}`}>
                     <span className="score-name">
                       {lider ? <Icon name="crown" size={22} /> : <span className="pos">{i + 1}</span>}
-                      {j.nombre} {j.id === sala.yoId ? '(Tú)' : ''}
+                      {j.nombre} {j.id === yoId ? '(Tú)' : ''}
                     </span>
                     <span className="score-pts">{j.aciertos} pts</span>
                   </div>
@@ -715,14 +860,14 @@ export default function VelocidadOnline({ onLocal, onSalir }) {
             </div>
           </div>
 
-          <div className="actions" style={{ marginTop: '1.5rem' }}>
+          <div className="ptp-barra estatica">
             {esAdmin && (
-              <button className="big full" onClick={handleReiniciarPartida}>
+              <button type="button" className="ptp-boton grande" onClick={handleReiniciarPartida}>
                 <Icon name="refresh" size={20} /> Otra partida (mismos jugadores)
               </button>
             )}
-            <button className="secondary danger full" onClick={() => setModalSalir(true)}>
-              <Icon name="door" size={20} /> Salir al menú principal
+            <button type="button" className="ptp-boton secundario" onClick={() => setModalSalir(true)}>
+              <Icon name="door" size={20} /> Salir de la sala
             </button>
           </div>
         </section>
@@ -731,31 +876,18 @@ export default function VelocidadOnline({ onLocal, onSalir }) {
       {/* MODAL DE CONFIRMACIÓN PARA SALIR */}
       {modalSalir && (
         <div className="rg-modal-fondo" onClick={() => setModalSalir(false)}>
-          <div 
-            className="rg-modal" 
-            onClick={(e) => e.stopPropagation()} 
-            style={{ maxWidth: '420px', textAlign: 'center', padding: '1.8rem 1.4rem' }}
-          >
-            <div style={{ fontSize: '2.4rem', marginBottom: '0.4rem' }}>🚪</div>
-            <h3 style={{ margin: '0 0 0.6rem', color: '#1e1b4b', fontSize: '1.3rem' }}>
-              ¿Abandonar la partida?
-            </h3>
-            <p className="hint" style={{ fontSize: '0.95rem', marginBottom: '1.4rem', lineHeight: '1.4' }}>
-              Si sales de la sala perderás tu progreso actual en la partida. ¿Estás seguro de que deseas salir?
-            </p>
+          <div className="rg-modal ptp-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="ptp-modal-icono">🚪</div>
+            <h3>¿Salir de la sala?</h3>
+            <p className="hint">Si sales ahora abandonarás la partida en curso. ¿Estás seguro?</p>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem' }}>
-              <button 
-                type="button" 
-                className="secondary full" 
-                onClick={() => setModalSalir(false)}
-              >
-                No, quedarme
+            <div className="ptp-fila-botones">
+              <button type="button" className="ptp-boton secundario" onClick={() => setModalSalir(false)}>
+                Quedarme
               </button>
-              <button 
-                type="button" 
-                className="secondary danger full" 
-                style={{ background: '#ef4444', color: '#ffffff', borderColor: '#dc2626' }}
+              <button
+                type="button"
+                className="ptp-boton peligro"
                 onClick={() => {
                   setModalSalir(false);
                   handleSalir();

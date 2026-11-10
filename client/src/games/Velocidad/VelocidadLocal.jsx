@@ -1,5 +1,6 @@
 // client/src/games/Velocidad/VelocidadLocal.jsx
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import './Velocidad.css';
 import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx';
@@ -9,9 +10,15 @@ const TIEMPO_PREPARACION = 10;
 const MIN_JUGADORES = 1;
 const MAX_JUGADORES = 15;
 
+const COLORES_JUGADOR = ['#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316', '#84cc16', '#6366f1'];
+const colorJugador = (id) => COLORES_JUGADOR[(Number(id) - 1 + COLORES_JUGADOR.length * 10) % COLORES_JUGADOR.length];
+const inicial = (n = '?') => n.trim().charAt(0).toUpperCase() || '?';
+
 export default function VelocidadLocal({ onVolver, onExit }) {
+  const navigate = useNavigate();
   const [fase, setFase] = useState('setup'); // 'setup' | 'cuenta_atras' | 'jugando' | 'resumen_turno' | 'final'
   const [modalAyuda, setModalAyuda] = useState(false);
+  const [modalSalirPortada, setModalSalirPortada] = useState(false);
 
   const [numJugadores, setNumJugadores] = useState(3);
   const [jugadores, setJugadores] = useState([
@@ -46,6 +53,31 @@ export default function VelocidadLocal({ onVolver, onExit }) {
 
   const timerRef = useRef(null);
   const prepTimerRef = useRef(null);
+  const aciertosRef = useRef(0);
+  const jugadorActualRef = useRef(null);
+
+  useEffect(() => {
+    aciertosRef.current = aciertosActuales;
+  }, [aciertosActuales]);
+
+  useEffect(() => {
+    jugadorActualRef.current = jugadorActual;
+  }, [jugadorActual]);
+
+  const handleSalirAPortada = () => {
+    setModalSalirPortada(false);
+    clearInterval(timerRef.current);
+    clearInterval(prepTimerRef.current);
+    if (typeof onExit === 'function') {
+      onExit();
+    } else {
+      try {
+        navigate('/');
+      } catch {
+        window.location.href = '/';
+      }
+    }
+  };
 
   useEffect(() => {
     if (fase !== 'cuenta_atras') return;
@@ -109,7 +141,7 @@ export default function VelocidadLocal({ onVolver, onExit }) {
   const elegirSiguienteJugador = () => {
     const pendientes = jugadores.filter((j) => !j.jugo);
     if (pendientes.length === 0) {
-      terminarJuegoCompleto();
+      setFase('final');
       return;
     }
 
@@ -128,8 +160,7 @@ export default function VelocidadLocal({ onVolver, onExit }) {
     }));
     setJugadores(actualizados);
 
-    const pendientes = [...actualizados];
-    const elegido = pendientes[Math.floor(Math.random() * pendientes.length)];
+    const elegido = actualizados[Math.floor(Math.random() * actualizados.length)];
     setJugadorActual(elegido);
     setCuentaAtras(TIEMPO_PREPARACION);
     setFase('cuenta_atras');
@@ -143,10 +174,11 @@ export default function VelocidadLocal({ onVolver, onExit }) {
       });
       const data = await res.json();
 
-      setPreguntas(data.preguntas);
-      setPreguntaEspecial(data.especial);
+      setPreguntas(data.preguntas || []);
+      setPreguntaEspecial(data.especial || null);
       setPreguntaIdx(0);
       setAciertosActuales(0);
+      aciertosRef.current = 0;
       setTiempoRestante(TIEMPO_TURNO);
       setEspecialUsada(false);
       setMostrandoEspecial(false);
@@ -163,27 +195,28 @@ export default function VelocidadLocal({ onVolver, onExit }) {
     if (feedbackOpcion !== null || mostrandoEspecial) return;
 
     const actual = preguntas[preguntaIdx];
-    const esCorrecta = opcIndex === actual.correcta;
+    if (!actual) return;
 
+    const esCorrecta = opcIndex === actual.correcta;
     setFeedbackOpcion({ idx: opcIndex, correcta: esCorrecta });
 
     if (esCorrecta) {
-      setAciertosActuales((prev) => prev + 1);
+      setAciertosActuales((prev) => {
+        const sig = prev + 1;
+        aciertosRef.current = sig;
+        return sig;
+      });
     }
 
     setTimeout(() => {
       setFeedbackOpcion(null);
-      if (preguntaIdx + 1 < preguntas.length) {
-        setPreguntaIdx((prev) => prev + 1);
-      } else {
-        setPreguntaIdx(0);
-      }
+      setPreguntaIdx((prev) => (prev + 1 < preguntas.length ? prev + 1 : 0));
     }, 220);
   };
 
   const enviarRespuestaEspecial = async (e) => {
     e.preventDefault();
-    if (!inputEspecial.trim()) return;
+    if (!inputEspecial.trim() || !preguntaEspecial || feedbackEspecial) return;
 
     try {
       const res = await fetch('/api/velocidad/validar-especial', {
@@ -218,69 +251,62 @@ export default function VelocidadLocal({ onVolver, onExit }) {
   const finalizarTurno = () => {
     clearInterval(timerRef.current);
 
-    setJugadores((prev) =>
-      prev.map((j) =>
-        j.id === jugadorActual.id ? { ...j, aciertos: aciertosActuales, jugo: true } : j
-      )
-    );
+    const puntosFinales = aciertosRef.current;
+    const jugAct = jugadorActualRef.current;
 
-    if (aciertosActuales > record.puntos) {
-      const nuevoRecord = { puntos: aciertosActuales, jugador: jugadorActual.nombre };
-      setRecord(nuevoRecord);
-      try {
-        localStorage.setItem('test_velocidad_record', JSON.stringify(nuevoRecord));
-      } catch (_) {}
+    if (jugAct) {
+      setJugadores((prev) =>
+        prev.map((j) =>
+          j.id === jugAct.id ? { ...j, aciertos: puntosFinales, jugo: true } : j
+        )
+      );
+
+      setRecord((prevRecord) => {
+        if (puntosFinales > prevRecord.puntos) {
+          const nuevoRecord = { puntos: puntosFinales, jugador: jugAct.nombre };
+          try {
+            localStorage.setItem('test_velocidad_record', JSON.stringify(nuevoRecord));
+          } catch (_) {}
+          return nuevoRecord;
+        }
+        return prevRecord;
+      });
     }
 
     setFase('resumen_turno');
-  };
-
-  const terminarJuegoCompleto = () => {
-    setFase('final');
   };
 
   const preguntaActual = preguntas[preguntaIdx];
   const ranking = [...jugadores].sort((a, b) => b.aciertos - a.aciertos);
   const maximoAciertos = ranking.length ? ranking[0].aciertos : 0;
   const ganadores = maximoAciertos > 0 ? ranking.filter((j) => j.aciertos === maximoAciertos) : [];
+  const enPartidaActiva = fase === 'cuenta_atras' || fase === 'jugando' || fase === 'resumen_turno';
 
   return (
-    <div className="vel-contenedor">
-      {/* AYUDA */}
-      {fase === 'setup' && (
-        <>
-
-          {modalAyuda && (
-            <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
-              <div className="rg-modal modal-ayuda-juego" onClick={(e) => e.stopPropagation()}>
-                <div className="modal-ayuda-header">
-                  <span className="modal-ayuda-signo-title">?</span>
-                  <h3>¿Cómo se juega al Test de Velocidad?</h3>
-                </div>
-
-                <div className="modal-ayuda-cuerpo">
-                  <p><strong>1. Dinámica del reto:</strong></p>
-                  <ul>
-                    <li>El juego sortea quién empieza con una cuenta atrás de 10 segundos.</li>
-                    <li>Dispones de <strong>60 segundos</strong> en tu turno. Cada acierto suma <strong>+1 punto</strong>.</li>
-                    <li>Cada pregunta tiene 4 opciones. Si fallas, pasa de inmediato a la siguiente.</li>
-                  </ul>
-                  <p><strong>2. ¡Pregunta Especial en el segundo 30!</strong></p>
-                  <ul>
-                    <li>A los 30 segundos el cronómetro se detiene y aparece una pregunta abierta.</li>
-                    <li>Si aciertas, ¡ganas <strong>+30 segundos extra</strong> al cronómetro!</li>
-                  </ul>
-                </div>
-
-                <div className="rg-modal-acciones">
-                  <button className="big full" onClick={() => setModalAyuda(false)}>
-                    Entendido
-                  </button>
-                </div>
-              </div>
+    <div className={`vel-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
+      {/* MODAL DE AYUDA */}
+      {modalAyuda && (
+        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
+          <div className="rg-modal ptp-modal-ayuda" onClick={(e) => e.stopPropagation()}>
+            <div className="ptp-modal-ayuda-header">
+              <span className="ptp-ayuda-badge">❓ Cómo jugar</span>
+              <h3>Test de Velocidad</h3>
             </div>
-          )}
-        </>
+
+            <div className="ptp-modal-ayuda-body">
+              <p>Responde tantas preguntas de cultura general como puedas antes de que se agote tu minuto.</p>
+              <ul>
+                <li><strong>Sorteo y preparación:</strong> El juego elige al azar quién juega cada turno con una cuenta atrás de <strong>10 segundos</strong>.</li>
+                <li><strong>60 segundos contrarreloj:</strong> Cada pregunta tiene 4 opciones y cada acierto suma <strong>+1 punto</strong>. Si fallas, pasas de inmediato a la siguiente.</li>
+                <li><strong>⭐ Pregunta Especial (30s):</strong> Cuando queden 30 segundos, el reloj se detiene con una pregunta abierta. Si la aciertas sin opciones, ganas <strong>+30 segundos extra</strong>.</li>
+              </ul>
+            </div>
+
+            <button type="button" className="ptp-boton" onClick={() => setModalAyuda(false)}>
+              ¡Entendido!
+            </button>
+          </div>
+        </div>
       )}
 
       {/* 1. SETUP */}
@@ -299,162 +325,270 @@ export default function VelocidadLocal({ onVolver, onExit }) {
           iconoBoton="play"
         >
           <BloqueConfig>
-          <Icon name="trophy" size={20} />
-          <span>
-            Récord histórico: <strong>{record.puntos} aciertos</strong> ({record.jugador})
-          </span>
+            <div className="vel-record-box">
+              <Icon name="trophy" size={20} />
+              <span>
+                Récord histórico: <strong>{record.puntos} aciertos</strong> ({record.jugador})
+              </span>
+            </div>
           </BloqueConfig>
         </SelectorJugadores>
       )}
 
       {/* 2. CUENTA ATRÁS PREVIA */}
       {fase === 'cuenta_atras' && jugadorActual && (
-        <section className="game center">
-          <p className="categoria">Turno sorteado al azar</p>
-          <h1 className="title">
-            ¡Pasad el móvil a <span className="hl">{jugadorActual.nombre}</span>!
-          </h1>
-          <p className="hint">
-            Tienes 60 segundos para acertar tantas preguntas como puedas.
-          </p>
+        <section className="game ptp-escena">
+          <header className="ptp-hero">
+            <span className="ptp-hero-deco" aria-hidden="true">
+              <Icon name="zap" size={140} strokeWidth={1.3} />
+            </span>
+            <div className="ptp-hero-top">
+              <button type="button" className="ptp-salir" onClick={() => setModalSalirPortada(true)}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                <span>Portada</span>
+              </button>
+              <div className="ptp-hero-chips">
+                <span className="ptp-chip"><Icon name="dice" size={14} /> Turno sorteado</span>
+              </div>
+            </div>
 
-          <div className="vel-cuenta-circulo">
-            <span>{cuentaAtras}</span>
+            <ol className="ptp-marcador" aria-label="Jugadores">
+              {jugadores.map((j) => {
+                const esActual = j.id === jugadorActual.id;
+                return (
+                  <li
+                    key={j.id}
+                    className={`ptp-jugador${j.jugo ? ' respondido' : ''}${esActual ? ' yo' : ''}`}
+                    style={{ '--c': colorJugador(j.id) }}
+                  >
+                    <span className="ptp-jugador-avatar">{inicial(j.nombre)}</span>
+                    <span className="ptp-jugador-datos">
+                      <span className="ptp-jugador-nombre">{j.nombre}</span>
+                      <span className="ptp-jugador-linea">
+                        <strong>{j.jugo ? `${j.aciertos} pts` : esActual ? 'Su turno' : 'Pendiente'}</strong>
+                      </span>
+                    </span>
+                    <span className="ptp-jugador-estado">
+                      {j.jugo ? '✅' : esActual ? '⚡' : '⏳'}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+          </header>
+
+          <div className="ptp-tarjeta vel-prep-card">
+            <p className="ptp-etiqueta">¡Pasad el dispositivo!</p>
+            <h2 className="vel-prep-titulo">
+              Turno de <span style={{ color: colorJugador(jugadorActual.id) }}>{jugadorActual.nombre}</span>
+            </h2>
+            <p className="vel-prep-sub">
+              Tienes 60 segundos para acertar tantas preguntas como puedas.
+            </p>
+
+            <div className="vel-cuenta-circulo">
+              <span>{cuentaAtras}</span>
+            </div>
+
+            <button
+              type="button"
+              className="ptp-boton grande"
+              onClick={() => {
+                clearInterval(prepTimerRef.current);
+                iniciarPartidaEnVivo();
+              }}
+            >
+              <Icon name="zap" size={22} /> ¡Empezar ya sin esperar!
+            </button>
           </div>
-
-          <button className="big full" onClick={() => {
-            clearInterval(prepTimerRef.current);
-            iniciarPartidaEnVivo();
-          }}>
-            <Icon name="zap" size={22} /> ¡Empezar ya sin esperar!
-          </button>
         </section>
       )}
 
       {/* 3. JUEGO EN VIVO */}
       {fase === 'jugando' && (
-        <section className="game">
-          <div className="hud">
-            <span className="chip"><Icon name="users" size={18} />{jugadorActual?.nombre}</span>
-            <span className="chip alt">
-              <Icon name="check" size={18} strokeWidth={2.5} /> {aciertosActuales} {aciertosActuales === 1 ? 'acierto' : 'aciertos'}
+        <section className="game ptp-escena">
+          <header className="ptp-hero">
+            <span className="ptp-hero-deco" aria-hidden="true">
+              <Icon name="zap" size={140} strokeWidth={1.3} />
+            </span>
+            <div className="ptp-hero-top">
+              <button type="button" className="ptp-salir" onClick={() => setModalSalirPortada(true)}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                <span>Portada</span>
+              </button>
+              <div className="ptp-hero-chips">
+                <span className="ptp-chip"><Icon name="users" size={14} /> {jugadorActual?.nombre}</span>
+                <span className="ptp-chip">
+                  <Icon name="check" size={14} strokeWidth={2.5} /> {aciertosActuales} {aciertosActuales === 1 ? 'acierto' : 'aciertos'}
+                </span>
+              </div>
+            </div>
+
+            <ol className="ptp-marcador" aria-label="Jugadores">
+              {jugadores.map((j) => {
+                const esActual = j.id === jugadorActual?.id;
+                const pts = esActual ? aciertosActuales : j.aciertos;
+                return (
+                  <li
+                    key={j.id}
+                    className={`ptp-jugador${j.jugo ? ' respondido' : ''}${esActual ? ' yo' : ''}`}
+                    style={{ '--c': colorJugador(j.id) }}
+                  >
+                    <span className="ptp-jugador-avatar">{inicial(j.nombre)}</span>
+                    <span className="ptp-jugador-datos">
+                      <span className="ptp-jugador-nombre">{j.nombre}</span>
+                      <span className="ptp-jugador-linea">
+                        <strong>{j.jugo || esActual ? `${pts} pts` : 'Pendiente'}</strong>
+                      </span>
+                    </span>
+                    <span className="ptp-jugador-estado">
+                      {j.jugo ? '✅' : esActual ? '⚡' : '⏳'}
+                    </span>
+                  </li>
+                );
+              })}
+            </ol>
+          </header>
+
+          {/* Barra de tiempo */}
+          <div className={`ptp-tiempo ${tiempoRestante <= 12 && !mostrandoEspecial ? 'critico' : ''}`} role="timer">
+            <div className="ptp-tiempo-barra">
+              <span style={{ width: `${Math.min(100, (tiempoRestante / TIEMPO_TURNO) * 100)}%` }} />
+            </div>
+            <span className="ptp-tiempo-num">
+              <Icon name="clock" size={15} />
+              {mostrandoEspecial ? 'Pausado' : `${tiempoRestante}s`}
             </span>
           </div>
 
-          <div className="timer" role="timer">
-            <div
-              className={`timer-bar ${tiempoRestante <= 15 ? 'low' : ''}`}
-              style={{ width: `${Math.min(100, (tiempoRestante / TIEMPO_TURNO) * 100)}%` }}
-            />
-          </div>
-          <p className="timer-text">
-            <Icon name="clock" size={18} />
-            <strong>{tiempoRestante} s</strong>
-          </p>
-
-          {preguntaActual && (
-            <div className="panel vel-tarjeta-pregunta">
-              <span className="vel-pregunta-num">Pregunta #{preguntaIdx + 1}</span>
-              <h2 className="vel-pregunta-texto">{preguntaActual.pregunta}</h2>
-
-              <div className="vel-opciones-grid">
-                {preguntaActual.opciones.map((opcion, idx) => {
-                  let clase = 'vel-btn-opcion';
-                  if (feedbackOpcion !== null) {
-                    if (idx === preguntaActual.correcta) clase += ' acierto-flash';
-                    else if (idx === feedbackOpcion.idx) clase += ' fallo-flash';
-                  }
-
-                  return (
-                    <button
-                      key={idx}
-                      type="button"
-                      className={clase}
-                      disabled={feedbackOpcion !== null}
-                      onClick={() => responderOpcion(idx)}
-                    >
-                      <span className="vel-letra-opcion">{String.fromCharCode(65 + idx)}</span>
-                      <span className="vel-texto-opcion">{opcion}</span>
-                    </button>
-                  );
-                })}
+          {/* Tarjeta de Pregunta Especial (30s) o Pregunta Normal */}
+          {mostrandoEspecial && preguntaEspecial ? (
+            <div className="ptp-tarjeta vel-especial-panel">
+              <div className="vel-especial-header">
+                <span className="vel-especial-estrella">⭐</span>
+                <h3>¡PREGUNTA ESPECIAL!</h3>
               </div>
+
+              <p className="vel-especial-sub">
+                El cronómetro está pausado. Acierta sin opciones para ganar <strong>+30 segundos extra</strong>.
+              </p>
+
+              <div className="vel-especial-caja-pregunta">
+                <p>{preguntaEspecial.pregunta}</p>
+              </div>
+
+              {feedbackEspecial ? (
+                <div className={`vel-feedback-esp ${feedbackEspecial.acierto ? 'exito' : 'fallo'}`}>
+                  {feedbackEspecial.texto}
+                </div>
+              ) : (
+                <form onSubmit={enviarRespuestaEspecial} className="ptp-form-online">
+                  <input
+                    type="text"
+                    autoFocus
+                    autoComplete="off"
+                    className="ptp-input"
+                    placeholder="Escribe la respuesta exacta…"
+                    value={inputEspecial}
+                    onChange={(e) => setInputEspecial(e.target.value)}
+                    required
+                  />
+                  <button type="submit" className="ptp-boton" disabled={!inputEspecial.trim()}>
+                    <Icon name="check" size={20} strokeWidth={2.5} /> Responder (+30s)
+                  </button>
+                </form>
+              )}
             </div>
-          )}
-
-          {mostrandoEspecial && preguntaEspecial && (
-            <div className="rg-modal-fondo">
-              <div className="rg-modal vel-modal-especial" onClick={(e) => e.stopPropagation()}>
-                <div className="vel-especial-header">
-                  <span className="vel-especial-estrella">⭐</span>
-                  <h3>¡PREGUNTA ESPECIAL!</h3>
+          ) : (
+            preguntaActual && (
+              <div className="ptp-tarjeta vel-tarjeta-pregunta">
+                <div className="ptp-tarjeta-cab">
+                  <p className="ptp-etiqueta">Test contrarreloj</p>
+                  <span className="ptp-badge-pista">Pregunta #{preguntaIdx + 1}</span>
                 </div>
 
-                <p className="vel-especial-sub">
-                  El cronómetro está pausado. Acierta sin opciones para ganar <strong>+30 segundos extra</strong>.
-                </p>
+                <h2 className="vel-pregunta-texto">{preguntaActual.pregunta}</h2>
 
-                <div className="vel-especial-caja-pregunta">
-                  <p>{preguntaEspecial.pregunta}</p>
-                </div>
+                <div className="vel-opciones-grid">
+                  {preguntaActual.opciones.map((opcion, idx) => {
+                    let clase = 'vel-btn-opcion';
+                    if (feedbackOpcion !== null) {
+                      if (idx === preguntaActual.correcta) clase += ' acierto-flash';
+                      else if (idx === feedbackOpcion.idx) clase += ' fallo-flash';
+                    }
 
-                {feedbackEspecial ? (
-                  <div className={`vel-feedback-esp ${feedbackEspecial.acierto ? 'exito' : 'fallo'}`}>
-                    {feedbackEspecial.texto}
-                  </div>
-                ) : (
-                  <form onSubmit={enviarRespuestaEspecial}>
-                    <input
-                      type="text"
-                      autoFocus
-                      autoComplete="off"
-                      placeholder="Escribe la respuesta exacta..."
-                      value={inputEspecial}
-                      onChange={(e) => setInputEspecial(e.target.value)}
-                      required
-                    />
-                    <div className="rg-modal-acciones">
-                      <button type="submit" className="big full ok">
-                        <Icon name="check" size={20} strokeWidth={2.5} /> Responder
+                    return (
+                      <button
+                        key={idx}
+                        type="button"
+                        className={clase}
+                        disabled={feedbackOpcion !== null}
+                        onClick={() => responderOpcion(idx)}
+                      >
+                        <span className="vel-letra-opcion">{String.fromCharCode(65 + idx)}</span>
+                        <span className="vel-texto-opcion">{opcion}</span>
                       </button>
-                    </div>
-                  </form>
-                )}
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            )
           )}
         </section>
       )}
 
       {/* 4. RESUMEN DEL TURNO */}
       {fase === 'resumen_turno' && jugadorActual && (
-        <section className="game center">
-          <div className="end-card">
-            <span className="end-icon"><Icon name="hourglass" size={44} /></span>
-            <h1 className="title">¡Tiempo agotado!</h1>
-            <p className="reveal" style={{ fontSize: '1.4rem', margin: '0.8rem 0' }}>
-              <strong>{jugadorActual.nombre}</strong> ha conseguido <strong>{aciertosActuales} aciertos</strong>.
-            </p>
-
-            <div className="scoreboard">
-              {jugadores.map((j) => (
-                <div key={j.id} className={`score-row ${j.id === jugadorActual.id ? 'first' : ''}`}>
-                  <span className="score-name">{j.nombre}</span>
-                  <span className="score-pts">
-                    {j.jugo ? `${j.aciertos} pts` : 'Pendiente'}
-                  </span>
-                </div>
-              ))}
+        <section className="game ptp-escena">
+          <header className="ptp-hero">
+            <span className="ptp-hero-deco" aria-hidden="true">
+              <Icon name="hourglass" size={140} strokeWidth={1.3} />
+            </span>
+            <div className="ptp-hero-top">
+              <button type="button" className="ptp-salir" onClick={() => setModalSalirPortada(true)}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                <span>Portada</span>
+              </button>
+              <span className="ptp-chip"><Icon name="flagFinish" size={14} /> ¡Tiempo agotado!</span>
             </div>
+            <p className="ptp-etiqueta" style={{ color: 'rgba(255,255,255,0.85)' }}>
+              Resultado de {jugadorActual.nombre}
+            </p>
+            <h2 className="ptp-solucion-titulo">
+              {aciertosActuales} {aciertosActuales === 1 ? 'acierto' : 'aciertos'}
+            </h2>
+          </header>
+
+          <div className="ptp-tarjeta">
+            <p className="ptp-etiqueta">Clasificación provisional</p>
+            <ol className="ptp-ranking">
+              {jugadores.map((j, i) => {
+                const esActual = j.id === jugadorActual.id;
+                return (
+                  <li key={j.id} className={esActual ? 'lider' : ''} style={{ '--c': colorJugador(j.id) }}>
+                    <span className="ptp-ranking-pos">{j.jugo ? '✅' : i + 1}</span>
+                    <span className="ptp-jugador-avatar">{inicial(j.nombre)}</span>
+                    <span className="ptp-ranking-nombre">{j.nombre}</span>
+                    <strong>{j.jugo ? `${j.aciertos} pts` : 'Pendiente'}</strong>
+                  </li>
+                );
+              })}
+            </ol>
           </div>
 
-          <div className="actions">
+          <div className="ptp-barra estatica">
             {jugadores.some((j) => !j.jugo) ? (
-              <button className="big full" onClick={elegirSiguienteJugador}>
+              <button type="button" className="ptp-boton grande" onClick={elegirSiguienteJugador}>
                 <Icon name="dice" size={20} /> Sortear siguiente jugador
               </button>
             ) : (
-              <button className="big full" onClick={terminarJuegoCompleto}>
+              <button type="button" className="ptp-boton grande" onClick={() => setFase('final')}>
                 <Icon name="trophy" size={20} /> Ver podio y resultados finales
               </button>
             )}
@@ -464,9 +598,9 @@ export default function VelocidadLocal({ onVolver, onExit }) {
 
       {/* 5. PODIO FINAL */}
       {fase === 'final' && (
-        <section className="game">
+        <section className="game ptp-escena">
           <div className="end-card">
-            <span className="end-icon"><Icon name="crown" size={48} /></span>
+            <span className="end-icon"><Icon name="crown" size={44} /></span>
             <h1 className="title">Clasificación Final</h1>
             <p className="final-score">
               {ganadores.length === 0
@@ -492,15 +626,34 @@ export default function VelocidadLocal({ onVolver, onExit }) {
             </div>
           </div>
 
-          <div className="actions">
-            <button onClick={() => setFase('setup')}>
+          <div className="ptp-barra estatica">
+            <button type="button" className="ptp-boton grande" onClick={() => setFase('setup')}>
               <Icon name="refresh" size={20} /> Nueva partida
             </button>
-            <button className="secondary danger" onClick={onVolver}>
+            <button type="button" className="ptp-boton secundario" onClick={onVolver}>
               <Icon name="door" size={20} /> Volver al menú
             </button>
           </div>
         </section>
+      )}
+
+      {/* MODAL SALIR A PORTADA */}
+      {modalSalirPortada && (
+        <div className="rg-modal-fondo" onClick={() => setModalSalirPortada(false)}>
+          <div className="rg-modal ptp-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="ptp-modal-icono">🚪</div>
+            <h3>¿Salir a la portada?</h3>
+            <p className="hint">Se cancelará la partida actual y volverás a la portada principal.</p>
+            <div className="ptp-fila-botones">
+              <button type="button" className="ptp-boton secundario" onClick={() => setModalSalirPortada(false)}>
+                Continuar
+              </button>
+              <button type="button" className="ptp-boton peligro" onClick={handleSalirAPortada}>
+                Salir a portada
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

@@ -15,8 +15,13 @@ function normalizar(txt) {
     .trim();
 }
 
+function sanitizarEspecial(esp) {
+  if (!esp) return null;
+  return { id: esp.id, pregunta: esp.pregunta };
+}
+
 // ==========================================
-// ENDPOINTS OFFLINE / LOCAL (INTACTOS)
+// ENDPOINTS OFFLINE / LOCAL
 // ==========================================
 router.post('/iniciar-turno', (req, res) => {
   const preguntasBarajadas = barajar([...PREGUNTAS_NORMALES]).slice(0, 70);
@@ -24,7 +29,7 @@ router.post('/iniciar-turno', (req, res) => {
 
   res.json({
     preguntas: preguntasBarajadas,
-    especial: especialElegida
+    especial: sanitizarEspecial(especialElegida)
   });
 });
 
@@ -74,8 +79,11 @@ router.post('/online/crear', (req, res) => {
   salasOnline[code] = {
     code,
     adminToken: tokenAdmin,
+    nextId: 2,
     estado: 'lobby', // 'lobby' | 'cuenta_atras' | 'jugando' | 'resumen_turno' | 'final'
-    jugadores: [{ id: 1, token: tokenAdmin, nombre, aciertos: 0, jugo: false, conectado: true }],
+    jugadores: [
+      { id: 1, token: tokenAdmin, nombre, aciertos: 0, jugo: false, lastSeen: Date.now() }
+    ],
     jugadorActualId: null,
     cuentaAtrasInicioTs: null,
     progresoEnVivo: null,
@@ -91,17 +99,26 @@ router.post('/online/unirse', (req, res) => {
   const code = (req.body?.code || '').trim().toUpperCase();
   const nombre = (req.body?.nombre || '').trim();
 
+  if (!nombre) return res.status(400).json({ error: 'Debes indicar un nombre.' });
+
   const sala = salasOnline[code];
   if (!sala) return res.status(404).json({ error: 'La sala no existe o el código es incorrecto.' });
   if (sala.estado !== 'lobby') return res.status(400).json({ error: 'La partida ya ha comenzado.' });
-  if (sala.jugadores.length >= 10) return res.status(400).json({ error: 'La sala está completa.' });
+  if (sala.jugadores.length >= 15) return res.status(400).json({ error: 'La sala está completa.' });
   if (sala.jugadores.some((j) => j.nombre.toLowerCase() === nombre.toLowerCase())) {
     return res.status(400).json({ error: 'Ya hay un jugador con ese nombre en la sala.' });
   }
 
   const token = generarToken();
-  const nuevoId = sala.jugadores.length + 1;
-  sala.jugadores.push({ id: nuevoId, token, nombre, aciertos: 0, jugo: false, conectado: true });
+  const nuevoId = sala.nextId++;
+  sala.jugadores.push({
+    id: nuevoId,
+    token,
+    nombre,
+    aciertos: 0,
+    jugo: false,
+    lastSeen: Date.now()
+  });
 
   res.json({ success: true, code, token, jugadorId: nuevoId });
 });
@@ -117,12 +134,15 @@ router.get('/online/sala/:code', (req, res) => {
   const jugadorActual = sala.jugadores.find((j) => j.token === token);
   if (!jugadorActual) return res.status(403).json({ error: 'No perteneces a esta sala.' });
 
-  const esAdmin = sala.adminToken === token;
+  const ahora = Date.now();
+  jugadorActual.lastSeen = ahora;
 
-  // Cálculo de cuenta atrás si estamos en fase previa
+  const esAdmin = sala.adminToken === token;
+  const adminJug = sala.jugadores.find((j) => j.token === sala.adminToken);
+
   let cuentaAtrasSegundos = 10;
   if (sala.estado === 'cuenta_atras' && sala.cuentaAtrasInicioTs) {
-    const transcurrido = (Date.now() - sala.cuentaAtrasInicioTs) / 1000;
+    const transcurrido = (ahora - sala.cuentaAtrasInicioTs) / 1000;
     cuentaAtrasSegundos = Math.max(0, Math.ceil(10 - transcurrido));
   }
 
@@ -133,6 +153,7 @@ router.get('/online/sala/:code', (req, res) => {
     code: sala.code,
     estado: sala.estado,
     esAdmin,
+    anfitrionId: adminJug ? adminJug.id : null,
     yoId: jugadorActual.id,
     jugadorActualId: sala.jugadorActualId,
     jugadorActualNombre: jugadorEnTurno ? jugadorEnTurno.nombre : null,
@@ -142,12 +163,41 @@ router.get('/online/sala/:code', (req, res) => {
       id: j.id,
       nombre: j.nombre,
       aciertos: j.aciertos,
-      jugo: j.jugo
+      jugo: j.jugo,
+      conectado: ahora - (j.lastSeen || ahora) < 8000
     }))
   });
 });
 
-// 4. Iniciar partida y sortear primer jugador (sólo anfitrión)
+// 4. Expulsar jugador (sólo anfitrión)
+router.post('/online/sala/:code/expulsar', (req, res) => {
+  const code = req.params.code.toUpperCase();
+  const { token, jugadorId } = req.body || {};
+
+  const sala = salasOnline[code];
+  if (!sala) return res.status(404).json({ error: 'La sala no existe.' });
+  if (sala.adminToken !== token) return res.status(403).json({ error: 'Solo el anfitrión puede expulsar.' });
+
+  const idx = sala.jugadores.findIndex((j) => j.id === Number(jugadorId) && j.token !== token);
+  if (idx !== -1) {
+    const expulsado = sala.jugadores[idx];
+    sala.jugadores.splice(idx, 1);
+
+    if (
+      expulsado.id === sala.jugadorActualId &&
+      (sala.estado === 'cuenta_atras' || sala.estado === 'jugando')
+    ) {
+      sala.estado = 'resumen_turno';
+      sala.progresoEnVivo = null;
+      sala.preguntasTurno = null;
+      sala.especialTurno = null;
+    }
+  }
+
+  res.json({ success: true });
+});
+
+// 5. Iniciar partida y sortear primer jugador (sólo anfitrión)
 router.post('/online/sala/:code/iniciar', (req, res) => {
   const code = req.params.code.toUpperCase();
   const { token } = req.body || {};
@@ -155,6 +205,7 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
   const sala = salasOnline[code];
   if (!sala) return res.status(404).json({ error: 'La sala no existe.' });
   if (sala.adminToken !== token) return res.status(403).json({ error: 'Solo el anfitrión puede iniciar.' });
+  if (sala.jugadores.length < 2) return res.status(400).json({ error: 'Se necesitan al menos 2 jugadores.' });
 
   sala.jugadores.forEach((j) => {
     j.aciertos = 0;
@@ -163,14 +214,22 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
 
   const elegido = sala.jugadores[Math.floor(Math.random() * sala.jugadores.length)];
   sala.jugadorActualId = elegido.id;
+  sala.preguntasTurno = null;
+  sala.especialTurno = null;
   sala.estado = 'cuenta_atras';
   sala.cuentaAtrasInicioTs = Date.now();
-  sala.progresoEnVivo = { aciertos: 0, tiempoRestante: 60, preguntaTexto: '', mostrandoEspecial: false };
+  sala.progresoEnVivo = {
+    aciertos: 0,
+    tiempoRestante: 60,
+    preguntaNum: 1,
+    preguntaTexto: '',
+    mostrandoEspecial: false
+  };
 
   res.json({ success: true, jugadorActualId: elegido.id });
 });
 
-// 5. Cargar preguntas para el jugador activo al arrancar su turno
+// 6. Cargar preguntas para el jugador activo al arrancar su turno (idempotente ante reconexión)
 router.post('/online/sala/:code/arrancar-turno', (req, res) => {
   const code = req.params.code.toUpperCase();
   const { token } = req.body || {};
@@ -183,6 +242,14 @@ router.post('/online/sala/:code/arrancar-turno', (req, res) => {
     return res.status(403).json({ error: 'No es tu turno de jugar.' });
   }
 
+  if (sala.estado === 'jugando' && sala.preguntasTurno) {
+    return res.json({
+      success: true,
+      preguntas: sala.preguntasTurno,
+      especial: sanitizarEspecial(sala.especialTurno)
+    });
+  }
+
   const preguntasBarajadas = barajar([...PREGUNTAS_NORMALES]).slice(0, 70);
   const especialElegida = barajar([...PREGUNTAS_ESPECIALES])[0];
 
@@ -193,6 +260,7 @@ router.post('/online/sala/:code/arrancar-turno', (req, res) => {
   sala.progresoEnVivo = {
     aciertos: 0,
     tiempoRestante: 60,
+    preguntaNum: 1,
     preguntaTexto: preguntasBarajadas[0]?.pregunta || '',
     mostrandoEspecial: false
   };
@@ -200,14 +268,14 @@ router.post('/online/sala/:code/arrancar-turno', (req, res) => {
   res.json({
     success: true,
     preguntas: preguntasBarajadas,
-    especial: especialElegida
+    especial: sanitizarEspecial(especialElegida)
   });
 });
 
-// 6. El jugador activo reporta su progreso en vivo (para los espectadores)
+// 7. El jugador activo reporta su progreso en vivo (para los espectadores)
 router.post('/online/sala/:code/reportar-progreso', (req, res) => {
   const code = req.params.code.toUpperCase();
-  const { token, aciertos, tiempoRestante, preguntaTexto, mostrandoEspecial } = req.body || {};
+  const { token, aciertos, tiempoRestante, preguntaNum, preguntaTexto, mostrandoEspecial } = req.body || {};
 
   const sala = salasOnline[code];
   if (!sala || sala.estado !== 'jugando') return res.json({ success: true });
@@ -218,6 +286,7 @@ router.post('/online/sala/:code/reportar-progreso', (req, res) => {
   sala.progresoEnVivo = {
     aciertos: Number(aciertos || 0),
     tiempoRestante: Number(tiempoRestante || 0),
+    preguntaNum: Number(preguntaNum || 1),
     preguntaTexto: String(preguntaTexto || ''),
     mostrandoEspecial: Boolean(mostrandoEspecial)
   };
@@ -225,10 +294,10 @@ router.post('/online/sala/:code/reportar-progreso', (req, res) => {
   res.json({ success: true });
 });
 
-// 7. Validar pregunta especial online
+// 8. Validar pregunta especial online
 router.post('/online/sala/:code/validar-especial', (req, res) => {
   const code = req.params.code.toUpperCase();
-  const { token, id, respuesta } = req.body || {};
+  const { token, respuesta } = req.body || {};
 
   const sala = salasOnline[code];
   if (!sala || !sala.especialTurno) return res.status(404).json({ error: 'Turno no activo.' });
@@ -246,7 +315,7 @@ router.post('/online/sala/:code/validar-especial', (req, res) => {
   });
 });
 
-// 8. Finalizar turno individual
+// 9. Finalizar turno individual
 router.post('/online/sala/:code/finalizar-turno', (req, res) => {
   const code = req.params.code.toUpperCase();
   const { token, aciertos } = req.body || {};
@@ -261,11 +330,13 @@ router.post('/online/sala/:code/finalizar-turno', (req, res) => {
   jugador.jugo = true;
   sala.estado = 'resumen_turno';
   sala.progresoEnVivo = null;
+  sala.preguntasTurno = null;
+  sala.especialTurno = null;
 
   res.json({ success: true });
 });
 
-// 9. Sortear siguiente jugador o finalizar partida
+// 10. Sortear siguiente jugador o finalizar partida
 router.post('/online/sala/:code/siguiente-jugador', (req, res) => {
   const code = req.params.code.toUpperCase();
   const { token } = req.body || {};
@@ -283,14 +354,22 @@ router.post('/online/sala/:code/siguiente-jugador', (req, res) => {
 
   const elegido = pendientes[Math.floor(Math.random() * pendientes.length)];
   sala.jugadorActualId = elegido.id;
+  sala.preguntasTurno = null;
+  sala.especialTurno = null;
   sala.estado = 'cuenta_atras';
   sala.cuentaAtrasInicioTs = Date.now();
-  sala.progresoEnVivo = { aciertos: 0, tiempoRestante: 60, preguntaTexto: '', mostrandoEspecial: false };
+  sala.progresoEnVivo = {
+    aciertos: 0,
+    tiempoRestante: 60,
+    preguntaNum: 1,
+    preguntaTexto: '',
+    mostrandoEspecial: false
+  };
 
   res.json({ success: true, jugadorActualId: elegido.id });
 });
 
-// 10. Reiniciar para otra partida
+// 11. Reiniciar para otra partida
 router.post('/online/sala/:code/reiniciar', (req, res) => {
   const code = req.params.code.toUpperCase();
   const { token } = req.body || {};
@@ -301,6 +380,8 @@ router.post('/online/sala/:code/reiniciar', (req, res) => {
   sala.estado = 'lobby';
   sala.jugadorActualId = null;
   sala.progresoEnVivo = null;
+  sala.preguntasTurno = null;
+  sala.especialTurno = null;
   sala.jugadores.forEach((j) => {
     j.aciertos = 0;
     j.jugo = false;
@@ -309,7 +390,7 @@ router.post('/online/sala/:code/reiniciar', (req, res) => {
   res.json({ success: true });
 });
 
-// 11. Salir
+// 12. Salir
 router.post('/online/sala/:code/salir', (req, res) => {
   const code = req.params.code.toUpperCase();
   const { token } = req.body || {};
@@ -319,11 +400,26 @@ router.post('/online/sala/:code/salir', (req, res) => {
 
   const idx = sala.jugadores.findIndex((j) => j.token === token);
   if (idx !== -1) {
+    const saliente = sala.jugadores[idx];
     sala.jugadores.splice(idx, 1);
+
     if (sala.jugadores.length === 0) {
       delete salasOnline[code];
-    } else if (sala.adminToken === token) {
+      return res.json({ success: true });
+    }
+
+    if (sala.adminToken === token) {
       sala.adminToken = sala.jugadores[0].token;
+    }
+
+    if (
+      saliente.id === sala.jugadorActualId &&
+      (sala.estado === 'cuenta_atras' || sala.estado === 'jugando')
+    ) {
+      sala.estado = 'resumen_turno';
+      sala.progresoEnVivo = null;
+      sala.preguntasTurno = null;
+      sala.especialTurno = null;
     }
   }
 
