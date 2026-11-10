@@ -412,5 +412,11 @@
     "name": "El Tablero de Puntos",
     "description": "Un tablero de preguntas de cultura general con casillas de 100, 200, 300 y 500 puntos. Elige cuánto arriesgas: si aciertas sumas y si fallas restas. Hay una casilla doble escondida.",
     "isNew": true
+  },
+  {
+    "id": "musavanzado",
+    "name": "Mus Avanzado",
+    "description": "Mus de faroles con baraja pactada: comodines, bombas o espejos si todos aceptan. Cada ronda es una categoría distinta (la grande, parejas, escalera, colores…) y en cada una se anuncia, se sube, se pasa o se desafía. Individual o por parejas.",
+    "isNew": true
   }
 ]

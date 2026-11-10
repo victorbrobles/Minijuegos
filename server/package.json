@@ -31,7 +31,8 @@
     "sync:oncefantasma": "node scripts/sync-oncefantasma.mjs",
     "sync:unapieza": "node scripts/sync-unapieza.mjs",
     "sync:datosobra": "node scripts/sync-datosobra.mjs",
-    "sync:tablero": "node scripts/sync-tablero.mjs"
+    "sync:tablero": "node scripts/sync-tablero.mjs",
+    "sync:musavanzado": "node scripts/sync-musavanzado.mjs"
   },
   "dependencies": {
     "better-sqlite3": "^13.0.3",

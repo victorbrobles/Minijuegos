@@ -95,6 +95,15 @@ export const META = {
     descripcion: 'Dirige un club con presupuesto limitado: puja en secreto por futbolistas reales, monta una plantilla equilibrada, elige táctica y compite en una liga simulada. No basta con fichar a los mejores.',
     categorias: ['futbol', 'estrategia']
   },
+  'musavanzado': {
+    titulo: 'Mus Avanzado',
+    imagen: '/covers/musavanzado.webp',
+    icono: 'cards',
+    colores: ['#10b981', '#022c22'],
+    etiquetas: 'mus avanzado cartas baraja española faroles apuestas fichas desafiar categorias comodines parejas poker',
+    descripcion: 'Mus de faroles con baraja pactada: comodines, bombas o espejos si todos aceptan. Cada ronda es una categoría distinta (la grande, parejas, escalera, colores…) y en cada una se anuncia, se sube, se pasa o se desafía. Individual o por parejas.',
+    categorias: ['estrategia', 'favoritos']
+  },
   'datosobra': {
     titulo: 'El Dato que Sobra',
     imagen: '/covers/datosobra.webp',

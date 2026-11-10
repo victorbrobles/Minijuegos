@@ -1,0 +1,79 @@
+/* Mus Avanzado (prefijo mav-) */
+.pzp-contenedor.musavanzado { --pz0: #d1fae5; --pz1: #6ee7b7; --pz2: #065f46; --pz3: #022c22; }
+
+.mav-categoria { display: flex; gap: 0.8rem; align-items: center; padding: 0.8rem 1rem; color: #0f172a; }
+.mav-cat-e { font-size: 2.2rem; }
+.mav-categoria strong { font-size: 1.15rem; }
+.mav-categoria p { margin: 0.1rem 0 0; font-size: 0.85rem; opacity: 0.8; }
+.mav-categoria .mav-cat-detalle { opacity: 1; font-weight: 800; color: var(--pz2); }
+
+.mav-mano { display: flex; justify-content: center; gap: 0.35rem; margin: 0.7rem 0; flex-wrap: wrap; }
+.mav-mano.chica { justify-content: flex-start; gap: 0.25rem; margin: 0.25rem 0; }
+.mav-carta {
+  position: relative; width: 58px; height: 84px; margin: 0; padding: 0; border-radius: 10px; border: 2px solid #cbd5e1;
+  background: #fffdf5; color: #0f172a; font: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.1rem;
+  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.25); transition: transform 0.12s; cursor: default;
+}
+.mav-carta:not(:disabled) { cursor: pointer; }
+.mav-carta.chica { width: 38px; height: 54px; border-radius: 7px; box-shadow: none; }
+.mav-carta.sel { transform: translateY(-10px); border-color: #dc2626; box-shadow: 0 8px 14px rgba(220, 38, 38, 0.35); }
+.mav-carta-r { font-size: 1.45rem; font-weight: 900; line-height: 1; }
+.mav-carta.chica .mav-carta-r { font-size: 1rem; }
+.mav-carta-p { font-size: 1.1rem; line-height: 1; }
+.mav-carta.chica .mav-carta-p { font-size: 0.8rem; }
+.mav-carta.oros .mav-carta-r { color: #b45309; }
+.mav-carta.copas .mav-carta-r { color: #b91c1c; }
+.mav-carta.espadas .mav-carta-r { color: #1d4ed8; }
+.mav-carta.bastos .mav-carta-r { color: #15803d; }
+.mav-carta-marca { position: absolute; top: 2px; right: 3px; font-size: 0.7rem; }
+.mav-carta-esp { display: flex; flex-direction: column; align-items: center; font-size: 1.5rem; }
+.mav-carta-esp small { font-size: 0.55rem; font-weight: 800; text-transform: uppercase; }
+.mav-carta.chica .mav-carta-esp { font-size: 1rem; }
+.mav-carta.chica .mav-carta-esp small { display: none; }
+.mav-carta.especial { background: linear-gradient(160deg, #fef9c3, #fde68a); }
+.mav-carta.esp-bomba { background: linear-gradient(160deg, #fee2e2, #fca5a5); }
+
+.mav-nota { text-align: center; font-size: 0.85rem; color: rgba(255, 255, 255, 0.88); margin: 0.4rem 0; }
+.mav-minivel { text-align: center; font-size: 0.82rem; color: #fde68a; margin: 0.2rem 0 0.6rem; }
+.mav-ayuda-osc { font-size: 0.86rem; color: #334155; margin: 0.3rem 0; }
+
+.mav-pacto h3 { margin: 0.9rem 0 0.35rem; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--pz2); }
+.mav-opcion { width: 100%; display: flex; align-items: center; gap: 0.6rem; margin: 0 0 0.35rem; padding: 0.5rem 0.6rem; border-radius: 12px; border: 2px solid #e2e8f0; background: #fff; color: #0f172a; font: inherit; text-align: left; cursor: pointer; }
+.mav-opcion.on { border-color: var(--pz2); background: #ecfdf5; }
+.mav-opcion-e { font-size: 1.3rem; }
+.mav-opcion-txt { flex: 1; display: flex; flex-direction: column; }
+.mav-opcion-txt small { font-size: 0.74rem; opacity: 0.75; }
+.mav-opcion-check { width: 24px; height: 24px; border-radius: 7px; border: 2px solid #cbd5e1; display: grid; place-items: center; font-weight: 900; color: #fff; }
+.mav-opcion.on .mav-opcion-check { background: var(--pz2); border-color: var(--pz2); }
+.mav-aceptan { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.7rem; }
+.mav-acepta { border: 2px solid var(--c); border-radius: 999px; padding: 0.3rem 0.7rem; font: inherit; font-weight: 700; font-size: 0.85rem; background: #fff; color: #0f172a; }
+button.mav-acepta { cursor: pointer; }
+.mav-acepta.ok { background: var(--c); color: #fff; }
+
+.mav-mesa { display: grid; gap: 0.25rem; margin: 0.6rem 0 0; padding: 0.6rem 0.8rem; border-radius: 16px; background: #064e3b; color: #ecfdf5; border: 3px solid #fbbf24; text-align: center; }
+.mav-bote { font-size: 1.05rem; }
+.mav-dice { font-size: 0.9rem; }
+.mav-dice b { filter: brightness(1.6); }
+.mav-acciones { color: #0f172a; }
+.mav-niveles { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0.3rem 0 0.6rem; }
+.mav-niveles button, .mav-subida button { border: 2px solid #e2e8f0; border-radius: 999px; background: #fff; padding: 0.3rem 0.65rem; font: inherit; font-size: 0.82rem; font-weight: 700; color: #0f172a; cursor: pointer; }
+.mav-niveles button.on, .mav-subida button.on { background: var(--pz2); border-color: var(--pz2); color: #fff; }
+.mav-subida { display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.6rem; font-size: 0.85rem; font-weight: 700; }
+.mav-acciones .pzp-boton { margin-top: 0 !important; }
+.mav-botones { display: grid; grid-template-columns: 1fr 1.4fr; gap: 0.5rem; margin-top: 0.5rem; }
+.mav-botones .pzp-boton { margin: 0 !important; width: 100% !important; }
+.mav-botones .pzp-boton:only-child { grid-column: 1 / -1; }
+.pzp-boton.peligro { background: linear-gradient(180deg, #ef4444, #b91c1c) !important; color: #fff !important; }
+.mav-registro { list-style: none; padding: 0.5rem 0.7rem; margin: 0.6rem 0 0; display: grid; gap: 0.15rem; font-size: 0.82rem; background: rgba(255, 255, 255, 0.92); color: #0f172a; border-radius: 14px; }
+
+.mav-manos { display: grid; gap: 0.5rem; margin: 0.6rem 0; }
+.mav-bando { padding: 0.6rem 0.8rem; color: #0f172a; }
+.mav-bando.gana { box-shadow: 0 0 0 3px #fbbf24; }
+.mav-bando-tit { display: flex; align-items: baseline; gap: 0.4rem; flex-wrap: wrap; margin: 0 0 0.2rem; font-weight: 700; font-size: 0.9rem; }
+.mav-bando-tit b { color: var(--pz2); font-size: 0.82rem; }
+.mav-bando-tit em { margin-left: auto; font-style: normal; font-weight: 900; color: #16a34a; }
+.mav-bando-tit em.menos { color: #dc2626; }
+/* Las cartas que no se pueden tocar no deben verse apagadas */
+.mav-carta:disabled { opacity: 1 !important; filter: none !important; cursor: default; background: #fffdf5; color: #0f172a; }
+.mav-carta.especial:disabled { background: linear-gradient(160deg, #fef9c3, #fde68a); }
+.mav-carta.esp-bomba:disabled { background: linear-gradient(160deg, #fee2e2, #fca5a5); }

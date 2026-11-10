@@ -234,6 +234,17 @@ Cada club elige formación y, en varios mercados, puja en secreto por futbolista
 ## Minijuego: El Laberinto (`Laberinto/`)
 Tablero de 7×7 salas generado como laberinto con atajos y puertas cerradas, que se descubre al entrar. En el centro está el Corazón; gana quien lo saque por una esquina (o, si se acaban las rondas, quien más oro tenga). Trampas, tesoros, llaves, pociones, mapas, cepos y barricadas; robos entre jugadores de la misma sala y pactos temporales. Personajes: Guerrera (rompe puertas, +2), Ladrón (roba siempre, ve trampas, salta barricadas), Exploradora (4 pasos, no se detiene) y Mago (teletransporte, ve salas vecinas). Motor en `server/laberinto/engine.js` (`npm run sync:laberinto`), online en `/api/laberinto` (de 2 a 4); en un dispositivo, el móvil pasa cada turno. Simulación: `node scripts/laberinto-sim.mjs`.
 
+## Minijuego: Mus Avanzado (`MusAvanzado/`)
+
+Mus de faroles con baraja española, individual (4-8) o por parejas (4 o 6, con fichas compartidas y la mejor combinación de 5 entre las 10 cartas de la pareja).
+
+1. **Pacto**: cualquiera puede activar cartas especiales (comodines, ases y reyes invertidos, dobles, bombas, mutantes, espejos), reglas especiales (farol caro, cambio de 3 cartas, subidas grandes) y elegir las categorías (6 normales + exactitud y caos). Al cambiar algo se borran las aceptaciones: solo se juega cuando todos aceptan.
+2. Por categoría (en orden aleatorio): 5 cartas nuevas y **cambio** secreto de hasta 2 (o 3).
+3. **Apuestas**: ante de 1 ficha por jugador; por turnos se anuncia un nivel de la categoría (puede ser mentira) poniendo fichas, se sube con un nivel mejor, se pasa o se desafía igualando la apuesta. Si quien anuncia decía la verdad, gana el bote; si iba de farol, lo gana quien desafió. Si nadie desafía, se lo lleva sin enseñar nada.
+4. **Revelación** de todas las manos con su nivel real; las bombas cuestan 2 fichas.
+
+Motor en `server/musavanzado/engine.js` (`evaluar` prueba comodines, espejos y dobles por fuerza bruta), `npm run sync:musavanzado`; simulación en `server/scripts/musavanzado-sim.mjs`; ruta `/api/musavanzado`. En un dispositivo se pasa el móvil en el cambio y en cada turno de apuesta.
+
 ## Minijuego: El Dato que Sobra (`DatoSobra/`)
 
 Cuatro afirmaciones sobre un futbolista, tres ciertas y una falsa (34 futbolistas en `server/data/seeds/datosobra/futbolistas.js`, cada uno con la explicación de la mentira). Por turnos, un jugador señala la mentira (+3 si acierta); después los demás deciden en secreto si aceptan o desafían señalando otra: ganar un desafío da +4 y perderlo resta 1 (y suma 1 a quien aguantó). Motor en `server/datosobra/engine.js` (`npm run sync:datosobra`), simulación en `server/scripts/datosobra-sim.mjs`; ruta `/api/datosobra`.

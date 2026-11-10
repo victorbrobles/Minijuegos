@@ -43,6 +43,7 @@ import UnaPieza from './UnaPieza/UnaPieza.jsx';
 import DatoSobra from './DatoSobra/DatoSobra.jsx';
 import Pareja from './Pareja/Pareja.jsx';
 import Tablero from './Tablero/Tablero.jsx';
+import MusAvanzado from './MusAvanzado/MusAvanzado.jsx';
 import Conoce from './Conoce/Conoce.jsx';
 import Logos from './Logos/Logos.jsx';
 import Hipotesis from './Hipotesis/Hipotesis.jsx';
@@ -114,6 +115,7 @@ const registry = {
   'datosobra': DatoSobra,
   'pareja': Pareja,
   'tablero': Tablero,
+  'musavanzado': MusAvanzado,
   'sumacero': SumaCero,
   'golpe': Golpe,
   'conoce': Conoce,
