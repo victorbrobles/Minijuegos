@@ -115,18 +115,12 @@ export function FormRespuesta({ v, offset = 0, onEnviar, onCancelar, onPasar, er
   const [texto, setTexto] = useState('');
   const ref = useRef(null);
   useEffect(() => { ref.current?.focus(); }, []);
-  const restante = useRestante(v.hasta, offset);
-  const pct = Math.max(0, Math.min(100, (restante / AJUSTES.segRespuesta) * 100));
   const fila = v.filas[Math.floor(v.celda / 3)];
   const col = v.columnas[v.celda % 3];
   return (
     <form className="fgp-tarjeta fgp-respuesta" onSubmit={(e) => { e.preventDefault(); if (texto.trim()) onEnviar(texto); }}>
       <p className="fgp-etiqueta">Un futbolista que cumpla…</p>
       <div className="fgp-requisitos"><span>{fila}</span><b>+</b><span>{col}</span></div>
-      <div className={`fgp-cuenta${restante <= 10 ? ' critico' : ''}`}>
-        <div className="fgp-cuenta-barra"><span style={{ width: `${pct}%` }} /></div>
-        <strong>{Math.ceil(restante)}s</strong>
-      </div>
       <input ref={ref} className="fgp-input" value={texto} onChange={(e) => setTexto(e.target.value)} placeholder="Nombre del futbolista"
         autoComplete="off" autoCorrect="off" spellCheck={false} maxLength={60} />
       {error && <p className="fgp-error">{error}</p>}
@@ -137,6 +131,19 @@ export function FormRespuesta({ v, offset = 0, onEnviar, onCancelar, onPasar, er
       </div>
       <button type="button" className="fgp-enlace oscuro" onClick={onPasar}>⏭️ No sé ninguno: pasar turno</button>
     </form>
+  );
+}
+
+/** Reloj del turno: corre desde que empieza el turno, se elija casilla o no. */
+function RelojTurno({ v, offset }) {
+  const restante = useRestante(v.hasta, offset);
+  const pct = Math.max(0, Math.min(100, (restante / AJUSTES.segTurno) * 100));
+  return (
+    <div className={`fgp-tarjeta fgp-reloj-turno fgp-cuenta${restante <= 15 ? ' critico' : ''}`}>
+      <span>⏱️ Turno del equipo {EQUIPOS[v.turno].nombre}</span>
+      <div className="fgp-cuenta-barra"><span style={{ width: `${pct}%` }} /></div>
+      <strong>{Math.ceil(restante)}s</strong>
+    </div>
   );
 }
 
@@ -153,10 +160,11 @@ export function PantallaJuego({ v, enviar, onSalir, offset = 0, miEquipo, nombre
   return (
     <>
       <Hero v={v} onSalir={onSalir} etiqueta={nombreTurno || `Turno del equipo ${eq.nombre}`} titulo={titulo} clase={miEquipo ? `mio eq-${v.turno}` : ''} />
+      <RelojTurno v={v} offset={offset} />
       <Ultimo v={v} />
       <Tablero v={v} puedeElegir={miEquipo && v.fase === 'elegir'} onElegir={(i) => enviar('casilla', { celda: i })} />
       {v.fase === 'responder' && miEquipo && (
-        <FormRespuesta key={v.hasta} v={v} offset={offset} error={error}
+        <FormRespuesta key={`${v.hasta}-${v.celda}`} v={v} offset={offset} error={error}
           onEnviar={(t) => enviar('responder', { respuesta: t })}
           onCancelar={() => enviar('cancelar')} onPasar={() => enviar('pasar')} />
       )}
@@ -182,13 +190,11 @@ export function PantallaJuego({ v, enviar, onSalir, offset = 0, miEquipo, nombre
   );
 }
 
-function EsperaRival({ v, offset, fila, col }) {
-  const restante = useRestante(v.hasta, offset);
+function EsperaRival({ v, fila, col }) {
   return (
     <div className="fgp-tarjeta fgp-centro">
       <span className="fgp-carga" aria-hidden="true">🤔</span>
       <p className="fgp-texto">El equipo <strong>{EQUIPOS[v.turno].nombre}</strong> busca un futbolista para <strong>{fila}</strong> + <strong>{col}</strong>.</p>
-      <p className="fgp-pista">Le quedan {Math.ceil(restante)} segundos.</p>
     </div>
   );
 }
@@ -249,7 +255,7 @@ export function Ayuda({ onCerrar, titulo, descripcion }) {
           {descripcion && <p>{descripcion}</p>}
           <ul>
             <li>Dos equipos: <strong>Azul ✕</strong> y <strong>Rojo ◯</strong>. Cada fila y cada columna del tablero es una categoría.</li>
-            <li>En su turno, el equipo elige una casilla libre y tiene {AJUSTES.segRespuesta} segundos para decir un futbolista que cumpla la categoría de su fila y la de su columna.</li>
+            <li>Cada equipo tiene {AJUSTES.segTurno} segundos por turno para elegir una casilla libre y decir un futbolista que cumpla la categoría de su fila y la de su columna (puede cambiar de casilla sin que se pare el reloj).</li>
             <li>Si acierta, la casilla es suya. Acierte o falle, el turno pasa al otro equipo. Un futbolista no puede repetirse en el tablero.</li>
             <li>Gana el primero que hace <strong>tres en raya</strong>. Si se llena el tablero sin raya, es empate.</li>
             <li>Si nadie consigue la raya, podéis <strong>rendiros</strong>: se desvelan futbolistas válidos para cada casilla libre.</li>

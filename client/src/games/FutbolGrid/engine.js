@@ -3,10 +3,10 @@
 // `npm run sync:futbolgrid`, el modo «un solo dispositivo».
 //
 // Tres en raya por equipos (azul y rojo). Cada fila y cada columna es una categoría. En su turno, el equipo elige
-// una casilla libre y tiene unos segundos para decir un futbolista que cumpla las dos categorías. Si acierta, la
+// una casilla libre y dice un futbolista que cumpla las dos categorías; el turno entero dura AJUSTES.segTurno. Si acierta, la
 // casilla es suya. Acierte o falle, el turno pasa al otro equipo. Un futbolista no se puede repetir en el tablero.
 
-export const AJUSTES = { min: 2, max: 12, segRespuesta: 90, ejemplos: 8 };
+export const AJUSTES = { min: 2, max: 12, segTurno: 120, ejemplos: 8 };
 export const EQUIPOS = {
   X: { nombre: 'Azul', simbolo: '✕' },
   O: { nombre: 'Rojo', simbolo: '◯' }
@@ -72,7 +72,7 @@ function anotar(p, texto, tipo = '') {
 }
 
 /** jugadores: [{ id, nombre, equipo? }] — sin equipo, se reparten alternos. */
-export function crearPartida(jugadores, grid, empieza = 'X') {
+export function crearPartida(jugadores, grid, empieza = 'X', ahora = Date.now()) {
   const p = {
     grid: { id: grid.id, dificultad: grid.dificultad, filas: grid.filas, columnas: grid.columnas, respuestas: grid.respuestas, alias: grid.alias || {} },
     jugadores: jugadores.map((j, i) => ({ id: j.id, nombre: j.nombre, equipo: j.equipo || (i % 2 === 0 ? 'X' : 'O'), aciertos: 0, fuera: false })),
@@ -81,7 +81,7 @@ export function crearPartida(jugadores, grid, empieza = 'X') {
     turno: empieza,
     fase: 'elegir', // elegir | responder | fin
     celda: null,
-    hasta: null,
+    hasta: ahora + AJUSTES.segTurno * 1000, // el reloj es del turno entero (elegir casilla y responder)
     ultimo: null,
     log: [],
     nlog: 0,
@@ -123,11 +123,11 @@ function comprobar(p) {
   return false;
 }
 
-function pasarTurno(p) {
+function pasarTurno(p, ahora = Date.now()) {
   p.turno = rival(p.turno);
   p.fase = 'elegir';
   p.celda = null;
-  p.hasta = null;
+  p.hasta = ahora + AJUSTES.segTurno * 1000;
   if (!p.jugadores.some((j) => !j.fuera && j.equipo === p.turno) && p.jugadores.some((j) => !j.fuera)) p.turno = rival(p.turno);
 }
 
@@ -136,9 +136,9 @@ export function elegirCasilla(p, id, celda, ahora = Date.now()) {
   if (id != null && equipoDe(p, id) !== p.turno) return { ok: false, error: 'No es el turno de tu equipo.' };
   const c = Number(celda);
   if (!Number.isInteger(c) || c < 0 || c > 8 || p.tablero[c]) return { ok: false, error: 'Esa casilla no está libre.' };
+  if (ahora >= p.hasta) { tick(p, ahora); return { ok: false, error: 'Se ha acabado el tiempo del turno.' }; }
   p.fase = 'responder';
   p.celda = c;
-  p.hasta = ahora + AJUSTES.segRespuesta * 1000;
   return { ok: true };
 }
 
@@ -147,7 +147,6 @@ export function cancelarCasilla(p, id) {
   if (id != null && equipoDe(p, id) !== p.turno) return { ok: false, error: 'No es el turno de tu equipo.' };
   p.fase = 'elegir';
   p.celda = null;
-  p.hasta = null;
   return { ok: true };
 }
 
@@ -169,30 +168,30 @@ export function responder(p, id, texto, ahora = Date.now()) {
     if (id != null) jug(p, id).aciertos += 1;
     p.ultimo = { ok: true, equipo: p.turno, celda: c, futbolista: nombre, quien };
     anotar(p, `✅ ${quien ? `${quien} (${EQUIPOS[p.turno].nombre})` : `Equipo ${EQUIPOS[p.turno].nombre}`}: ${nombre}.`, 'bueno');
-    if (!comprobar(p)) pasarTurno(p);
+    if (!comprobar(p)) pasarTurno(p, ahora);
     return { ok: true, correcto: true, futbolista: nombre };
   }
   p.ultimo = { ok: false, equipo: p.turno, celda: c, texto: String(texto).trim().slice(0, 40), quien };
   anotar(p, `❌ «${String(texto).trim().slice(0, 40)}» no vale para esa casilla.`, 'malo');
-  pasarTurno(p);
+  pasarTurno(p, ahora);
   return { ok: true, correcto: false };
 }
 
-export function pasar(p, id) {
+export function pasar(p, id, ahora = Date.now()) {
   if (p.fase === 'fin') return { ok: false, error: 'La partida ha terminado.' };
   if (id != null && equipoDe(p, id) !== p.turno) return { ok: false, error: 'No es el turno de tu equipo.' };
   p.ultimo = { ok: false, equipo: p.turno, celda: p.celda, pasa: true };
   anotar(p, `⏭️ El equipo ${EQUIPOS[p.turno].nombre} pasa.`);
-  pasarTurno(p);
+  pasarTurno(p, ahora);
   return { ok: true };
 }
 
-/** Se acaba el tiempo para responder: el turno pasa al rival. */
+/** Se acaba el tiempo del turno (haya elegido casilla o no): pasa al rival. */
 export function tick(p, ahora = Date.now()) {
-  if (p.fase !== 'responder' || ahora < p.hasta) return false;
+  if ((p.fase !== 'responder' && p.fase !== 'elegir') || !p.hasta || ahora < p.hasta) return false;
   p.ultimo = { ok: false, equipo: p.turno, celda: p.celda, tiempo: true };
   anotar(p, `⏰ Se acabó el tiempo del equipo ${EQUIPOS[p.turno].nombre}.`, 'malo');
-  pasarTurno(p);
+  pasarTurno(p, ahora);
   return true;
 }
 

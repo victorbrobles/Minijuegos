@@ -156,7 +156,7 @@ export function PantallaJuego({ v, enviar, onSalir, admin = null }) {
           {v.yo.mano.map((c) => {
             let accion = null; let fn;
             if (miTurno && t.paso === 'jugar' && !especial) {
-              if (c.tipo === 'especial') { accion = '▶ Usar'; fn = () => setEspecial(c); }
+              if (c.tipo === 'especial' && !ESPECIALES[c.especial].pasiva) { accion = '▶ Usar'; fn = () => setEspecial(c); }
               else { accion = '🗑 Descartar'; fn = () => enviar('descartar', { uid: c.uid }); }
             }
             return <Carta key={c.uid} c={c} nueva={c.uid === t?.robada} onClick={fn} accion={accion} />;
@@ -191,7 +191,7 @@ export function PantallaJuego({ v, enviar, onSalir, admin = null }) {
               ✋ Plantarme con {conSigno(v.yo.suma)}
             </button>
           )}
-          {v.plantado == null && <p className="szp-pista">Si te plantas, los demás tienen un último turno… y pueden fastidiarte. Si al final no eres el mejor de la ronda: +{AJUSTES.penalPlanton}.</p>}
+          {v.plantado == null && <p className="szp-pista">Si te plantas, los demás tienen un último turno… y pueden fastidiarte. Si al final no eres el mejor de la ronda: +{AJUSTES.penalPlanton}.{v.yo.mano.some((c) => c.especial === 'escudo') ? ' Tu 🛡️ Escudo parará el primer ataque.' : ''}</p>}
         </div>
       )}
 
@@ -327,12 +327,13 @@ export function Ayuda({ onCerrar, titulo, descripcion }) {
           <p className="szp-ayuda-sub">🔁 Tu turno</p>
           <ol>
             <li><strong>Roba</strong> una carta del mazo (a ciegas) o coge la de arriba del descarte… o <strong>plántate</strong>.</li>
-            <li>Después, <strong>descarta</strong> una carta o <strong>usa una especial</strong>.</li>
+            <li>Después, <strong>descarta</strong> una carta o <strong>usa una especial</strong>. Las especiales usadas salen del juego; al descarte solo va lo que descartas.</li>
           </ol>
           <p className="szp-ayuda-sub">✋ Plantarse</p>
           <ul>
             <li>Cuando creas que tu mano es buena, plántate en lugar de robar: cada rival juega un último turno… y puede destrozarte la mano justo antes de terminar.</li>
-            <li>Si te plantas y al final no tienes la mejor mano de la ronda: +{AJUSTES.penalPlanton} puntos.</li>
+            <li>Si te plantas y al final no tienes la mejor mano de la ronda: +{AJUSTES.penalPlanton} puntos (salvo que te hayan cambiado la mano después de plantarte).</li>
+            <li>Para plantarte tranquilo, guárdate un 🛡️ Escudo: para el primer ataque (aunque si no lo gastas, cuenta +{AJUSTES.penalEspecial} al final). Y con 🔍 Rayos X puedes ver si alguien se guarda un Cambio de manos.</li>
           </ul>
           <p className="szp-ayuda-sub">🃏 Cartas especiales</p>
           <ul>{Object.values(ESPECIALES).map((e) => <li key={e.nombre}>{e.e} <strong>{e.nombre}:</strong> {e.desc}</li>)}</ul>

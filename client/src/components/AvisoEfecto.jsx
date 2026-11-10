@@ -15,8 +15,14 @@ export default function AvisoEfecto({ avisos, onVisto, nombre }) {
         <div className="afx-icono" aria-hidden="true">{a.e}</div>
         <h3>{a.titulo}</h3>
         {a.texto && <p className="afx-texto">{a.texto}</p>}
-        {(a.gana?.length > 0 || a.pierde?.length > 0) && (
+        {(a.gana?.length > 0 || a.pierde?.length > 0 || a.ve?.length > 0) && (
           <div className="afx-cambios">
+            {a.ve?.length > 0 && (
+              <div className="afx-col ve">
+                <span>Sus cartas</span>
+                <div>{a.ve.map((x, i) => <b key={i}>{x}</b>)}</div>
+              </div>
+            )}
             {a.gana?.length > 0 && (
               <div className="afx-col gana">
                 <span>Ganas</span>

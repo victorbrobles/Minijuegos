@@ -497,3 +497,8 @@
 .fgp-sol-cats b { color: #9333ea; }
 .fgp-sol-nombres { margin: 0 !important; color: #0f172a !important; font-size: 0.88rem; font-weight: 700; line-height: 1.4; }
 .fgp-sol-nombres small { color: #64748b; font-weight: 700; }
+
+/* Reloj del turno (corre desde que empieza el turno) */
+.fgp-reloj-turno { display: flex; align-items: center; gap: 0.6rem; padding: 0.6rem 0.85rem !important; }
+.fgp-reloj-turno > span { flex: none; color: #334155; font-size: 0.8rem; font-weight: 800; }
+@media (max-width: 380px) { .fgp-reloj-turno > span { display: none; } }

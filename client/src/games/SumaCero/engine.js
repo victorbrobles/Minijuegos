@@ -4,6 +4,11 @@
 //   - client/src/games/SumaCero/engine.js (modo un solo dispositivo)  <-- COPIA IDÉNTICA de este archivo
 // Si cambias algo aquí:  npm run sync:sumacero  (en /server)
 //
+// Las especiales que se USAN salen del juego; al descarte solo va lo que se descarta de verdad.
+// Equilibrio del plantón: el Escudo protege al que se planta (pero si te lo quedas, cuenta +2 como especial),
+// Rayos X permite ver si un rival se guarda un Cambio de manos, y si te cambian la mano después de plantarte
+// no pagas la penalización de plantón.
+//
 // IDEA: cada jugador empieza con 5 cartas con valores positivos y negativos. El objetivo es que la suma de tu
 // mano sea exactamente 0 (o lo más cercana posible). En tu turno robas una carta (del mazo o la de arriba del
 // descarte) y después juegas una carta especial o descartas una carta. Cuando creas que tu mano es buena,
@@ -17,8 +22,12 @@ export const ESPECIALES = {
   doble: { nombre: 'Doble', e: '✖️2', objetivo: 'propia', desc: 'Duplica el valor de una de tus cartas (también si es negativa).' },
   espejo: { nombre: 'Espejo', e: '🪞', objetivo: null, desc: 'Cambia el signo de todas tus cartas.' },
   congelar: { nombre: 'Congelar', e: '❄️', objetivo: 'jugador', desc: 'Ese jugador se salta su próximo turno.' },
-  avalancha: { nombre: 'Avalancha', e: '🌊', objetivo: null, desc: 'Todos los demás roban 2 cartas.' }
+  avalancha: { nombre: 'Avalancha', e: '🌊', objetivo: null, desc: 'Todos los demás roban 2 cartas.' },
+  rayos: { nombre: 'Rayos X', e: '🔍', objetivo: 'jugador', desc: 'Mira en secreto la mano entera de otro jugador (¿se guarda un Cambio de manos?).' },
+  escudo: { nombre: 'Escudo', e: '🛡️', objetivo: null, pasiva: true, desc: 'No se juega: si te atacan (Mano rápida, Purga, Cambio, Congelar o Avalancha), se gasta solo y lo anula.' }
 };
+// Cartas que el Escudo detiene
+const ATAQUES = new Set(['robar', 'purga', 'cambio', 'congelar', 'avalancha']);
 
 export const OPCIONES_RONDAS = [3, 5, 7];
 export const AJUSTES = {
@@ -107,7 +116,7 @@ function empezarRonda(est) {
   est.fase = 'juego';
   est.mazo = barajar(crearMazo(est.jugadores.length), est.rng);
   est.descarte = [];
-  est.plantado = null; est.pendientesFinal = []; est.turnosRonda = 0; est.resultado = null; est.ultimo = null;
+  est.plantado = null; est.pendientesFinal = []; est.turnosRonda = 0; est.resultado = null; est.ultimo = null; est.cambiadoAlPlantado = false;
   activos(est).forEach((j) => { j.mano = robarDelMazo(est, AJUSTES.manoInicial); j.congelado = false; j.listo = false; });
   // la primera carta del descarte siempre es un número
   const k = est.mazo.findIndex((c) => c.tipo === 'numero');
@@ -225,10 +234,28 @@ export function jugarEspecial(est, id, uid, params = {}) {
     propia = p.mano.find((x) => x.uid === Number(params.cartaUid) && x.tipo === 'numero');
     if (!propia) return err('Elige una carta numérica de tu mano.');
   }
+  if (E.pasiva) return err('El Escudo no se juega: se activa solo cuando te atacan.');
+  // La carta usada sale del juego (no va al descarte)
   p.mano = p.mano.filter((x) => x.uid !== carta.uid);
-  aDescarte(est, carta);
+  est.usadas = (est.usadas || 0) + 1;
   let resultado = {};
   const tit = `${E.e} ${E.nombre}`;
+  // Escudo: un ataque contra quien lo tiene se anula y el escudo se gasta
+  const protegido = (q) => {
+    if (!ATAQUES.has(carta.especial)) return false;
+    const k = q.mano.findIndex((x) => x.tipo === 'especial' && x.especial === 'escudo');
+    if (k === -1) return false;
+    q.mano.splice(k, 1);
+    log(est, `🛡️ ¡${q.nombre} tenía un Escudo! ${E.nombre} de ${p.nombre} no le afecta.`);
+    avisar(est, q.id, { e: '🛡️', titulo: '¡Tu Escudo te ha protegido!', texto: `${p.nombre} te ha atacado con ${E.e} ${E.nombre}, pero tu Escudo lo ha parado (se gasta).`, pierde: ['🛡️ Escudo'] });
+    return true;
+  };
+  if (v && protegido(v)) {
+    avisar(est, id, { e: '🛡️', titulo: `${v.nombre} tenía un Escudo`, texto: `Tu ${E.e} ${E.nombre} no tiene efecto.` });
+    est.ultimo = { tipo: 'especial', por: id, especial: carta.especial, objetivo: v.id, bloqueada: true };
+    finTurno(est, id);
+    return ok({ bloqueada: true });
+  }
   switch (carta.especial) {
     case 'robar': {
       if (!v.mano.length) {
@@ -262,6 +289,7 @@ export function jugarEspecial(est, id, uid, params = {}) {
     }
     case 'cambio': {
       const m = p.mano; p.mano = v.mano; v.mano = m;
+      if (est.plantado === v.id) est.cambiadoAlPlantado = true;
       log(est, `🔀 ${p.nombre} intercambia su mano con la de ${v.nombre}.`);
       avisar(est, id, { e: E.e, titulo: tit, texto: `Cambias tu mano entera con la de ${v.nombre}.`, gana: nombres(p.mano), pierde: nombres(v.mano) });
       avisar(est, v.id, { e: E.e, titulo: `¡${p.nombre} te ha cambiado la mano!`, texto: `${p.nombre} ha usado ${E.nombre}: os intercambiáis las manos enteras.`, gana: nombres(v.mano), pierde: nombres(p.mano), ataque: true });
@@ -287,16 +315,21 @@ export function jugarEspecial(est, id, uid, params = {}) {
       avisar(est, v.id, { e: E.e, titulo: `¡${p.nombre} te ha congelado!`, texto: 'Te saltas tu próximo turno.', ataque: true });
       break;
     case 'avalancha': {
-      const rivales = activos(est).filter((q) => q.id !== id);
+      const rivales = activos(est).filter((q) => q.id !== id && !protegido(q));
       rivales.forEach((q) => {
         const nuevas = robarDelMazo(est, 2);
         q.mano.push(...nuevas);
         avisar(est, q.id, { e: E.e, titulo: `¡${p.nombre} te ha atacado!`, texto: `${p.nombre} ha usado ${E.nombre}: robas ${nuevas.length} ${nuevas.length === 1 ? 'carta' : 'cartas'}.`, gana: nombres(nuevas), ataque: true });
       });
-      log(est, `🌊 ¡Avalancha! ${p.nombre} hace que todos los demás roben 2 cartas.`);
-      avisar(est, id, { e: E.e, titulo: tit, texto: `${rivales.map((q) => q.nombre).join(', ').replace(/, ([^,]*)$/, ' y $1')} ${rivales.length === 1 ? 'roba' : 'roban'} 2 cartas.` });
+      log(est, `🌊 ¡Avalancha! ${p.nombre} hace que ${rivales.length ? 'los demás roben' : 'nadie robe'} 2 cartas.`);
+      avisar(est, id, { e: E.e, titulo: tit, texto: rivales.length ? `${rivales.map((q) => q.nombre).join(', ').replace(/, ([^,]*)$/, ' y $1')} ${rivales.length === 1 ? 'roba' : 'roban'} 2 cartas.` : 'Todos tenían Escudo: nadie roba.' });
       break;
     }
+    case 'rayos':
+      log(est, `🔍 ${p.nombre} mira la mano de ${v.nombre} con Rayos X.`);
+      avisar(est, id, { e: E.e, titulo: tit, texto: v.mano.length ? `La mano de ${v.nombre} (suma ${suma(v.mano)}):` : `${v.nombre} no tiene cartas.`, ve: nombres(v.mano) });
+      avisar(est, v.id, { e: E.e, titulo: `¡${p.nombre} ha visto tu mano!`, texto: `${p.nombre} ha usado Rayos X: ya sabe qué cartas tienes.`, ataque: true });
+      break;
     default: break;
   }
   est.ultimo = { tipo: 'especial', por: id, especial: carta.especial, objetivo: v?.id ?? null };
@@ -317,7 +350,8 @@ function resolverRonda(est) {
   const mejor = Math.min(...filas.map((f) => f.puntos));
   filas.forEach((f) => {
     f.planton = false;
-    if (f.id === est.plantado && f.puntos > mejor) { f.puntos += AJUSTES.penalPlanton; f.planton = true; }
+    // Si te cambiaron la mano después de plantarte, no pagas el plantón
+    if (f.id === est.plantado && f.puntos > mejor && !est.cambiadoAlPlantado) { f.puntos += AJUSTES.penalPlanton; f.planton = true; }
     jug(est, f.id).total += f.puntos;
   });
   filas.sort((a, b) => a.puntos - b.puntos);

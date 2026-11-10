@@ -1710,3 +1710,4 @@ body:has(.home-view) {
 .afx-boton { margin: 0 !important; }
 @keyframes afxEntra { from { transform: translateY(12px) scale(0.96); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes afxSacudir { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-12deg); } 75% { transform: rotate(12deg); } }
+.afx-col.ve { background: #e0f2fe; color: #075985; }

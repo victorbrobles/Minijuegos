@@ -9,6 +9,7 @@
 // colección se ponen boca arriba en tu VITRINA (máx. 6) y ganas en cuanto tu vitrina cumple tu encargo.
 // La gracia está en las CARTAS DE ACCIÓN: robar, bombardear o intercambiar vitrinas, espiar encargos,
 // cambiar el tuyo, congelar rivales, apostar para remontar… y el escudo, que se activa solo.
+// Las cartas de acción que se USAN salen del juego; al descarte solo va lo que se descarta de verdad.
 
 // ---------------------------------------------------------------- Datos
 export const PALOS = [
@@ -228,8 +229,7 @@ export function retirar(est, id, uid) {
 function escudo(est, atacante, victima, accion) {
   const k = victima.mano.findIndex((c) => c.clase === 'accion' && c.accion === 'escudo');
   if (k === -1) return false;
-  const [c] = victima.mano.splice(k, 1);
-  est.descarte.push(c);
+  const [c] = victima.mano.splice(k, 1); // el Escudo gastado sale del juego
   log(est, `🛡️ ¡${victima.nombre} tenía un Escudo! La ${ACCIONES[accion].nombre} de ${atacante.nombre} no tiene efecto.`);
   const A = ACCIONES[accion];
   avisar(est, atacante.id, { e: '🛡️', titulo: `${victima.nombre} tenía un Escudo`, texto: `Tu ${A.e} ${A.nombre} no tiene efecto.` });
@@ -277,8 +277,8 @@ export function jugarAccion(est, id, uid, params = {}) {
   p.mano = p.mano.filter((x) => x.uid !== carta.uid);
   gastarJugada(est);
   est.ultimo = { tipo: 'accion', por: id, accion: carta.accion, objetivo: v?.id ?? null };
+  // La carta usada sale del juego: al descarte solo va lo que se descarta de verdad
   const r = aplicarAccion(est, p, v, carta.accion, { cartaSuya, cartaMia, palo: params.palo });
-  est.descarte.push(carta);
   comprobarVictoria(est);
   return ok(r);
 }
