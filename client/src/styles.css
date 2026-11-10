@@ -1711,3 +1711,17 @@ body:has(.home-view) {
 @keyframes afxEntra { from { transform: translateY(12px) scale(0.96); opacity: 0; } to { transform: none; opacity: 1; } }
 @keyframes afxSacudir { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-12deg); } 75% { transform: rotate(12deg); } }
 .afx-col.ve { background: #e0f2fe; color: #075985; }
+
+/* ═══ Botón «i» de las cartas y su ventana (InfoCarta.jsx) ═══ */
+.icx-boton {
+  position: absolute; top: 4px; left: 4px; z-index: 2; display: grid; place-items: center; width: 20px; height: 20px;
+  border-radius: 50%; background: #0f172a; color: #ffffff; font-family: Georgia, serif; font-size: 0.72rem; font-style: italic; font-weight: 900;
+  line-height: 1; box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2); cursor: pointer;
+}
+.icx-boton::before { content: ''; position: absolute; inset: -8px; }
+.icx-fondo { z-index: 80; }
+.icx-modal { max-width: 360px !important; padding: 1.4rem 1.2rem 1.2rem !important; text-align: center; }
+.icx-modal h3 { margin: 0.2rem 0 0.4rem !important; color: #0f172a !important; }
+.icx-icono { font-size: 2.6rem; line-height: 1.1; }
+.icx-texto { margin: 0 0 0.6rem; color: #334155; font-size: 1rem; font-weight: 600; line-height: 1.45; }
+.icx-nota { margin: 0 0 1rem; color: #64748b; font-size: 0.85rem; }

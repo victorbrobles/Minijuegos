@@ -3,6 +3,7 @@
 // Reciben `v` (vista de un jugador que genera engine.vistaDe) y `enviar(tipo, datos)`.
 import React, { useEffect, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
+import InfoCarta from '../../components/InfoCarta.jsx';
 import { ESPECIALES, AJUSTES } from './engine.js';
 import './SumaCero.css';
 
@@ -26,7 +27,10 @@ export function Carta({ c, mini = false, nueva = false, sel = false, onClick, ac
     <>
       <span className="szp-carta-e">{ESPECIALES[c.especial].e}</span>
       <strong>{ESPECIALES[c.especial].nombre}</strong>
-      {!mini && <small>{ESPECIALES[c.especial].desc}</small>}
+      {!mini && (
+        <InfoCarta e={ESPECIALES[c.especial].e} nombre={ESPECIALES[c.especial].nombre} desc={ESPECIALES[c.especial].desc}
+          nota={`Si te la quedas al final de la ronda, suma +${AJUSTES.penalEspecial}.`} />
+      )}
     </>
   );
   const cls = `szp-carta ${clase}${mini ? ' mini' : ''}${nueva ? ' nueva' : ''}${sel ? ' sel' : ''}`;

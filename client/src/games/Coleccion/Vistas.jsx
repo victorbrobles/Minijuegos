@@ -3,6 +3,7 @@
 // Reciben `v` (vista de un jugador que genera engine.vistaDe) y `enviar(tipo, datos)`.
 import React, { useEffect, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
+import InfoCarta from '../../components/InfoCarta.jsx';
 import { PALOS, PALO, COMODIN, ACCIONES, AJUSTES, textoEncargo, esColeccion } from './engine.js';
 import './Coleccion.css';
 
@@ -26,7 +27,7 @@ export function Carta({ c, mini = false, onClick, accion, sel = false, deshabili
       {util && <span className="cxp-util" title="Te sirve para tu encargo">★</span>}
       <span className="cxp-carta-e">{e}</span>
       <strong>{nombre}</strong>
-      {!mini && texto && <small>{texto}</small>}
+      {!mini && texto && <InfoCarta e={e} nombre={nombre} desc={texto} />}
       {accion && <span className="cxp-carta-accion">{accion}</span>}
     </>
   );
