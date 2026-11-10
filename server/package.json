@@ -24,7 +24,8 @@
     "sync:unoadiez": "node scripts/sync-unoadiez.mjs",
     "sync:logos-motor": "node scripts/sync-logos-motor.mjs",
     "sync:mus": "node scripts/sync-mus.mjs",
-    "sync:reinos": "node scripts/sync-reinos.mjs"
+    "sync:reinos": "node scripts/sync-reinos.mjs",
+    "sync:invento": "node scripts/sync-invento.mjs"
   },
   "dependencies": {
     "better-sqlite3": "^13.0.3",

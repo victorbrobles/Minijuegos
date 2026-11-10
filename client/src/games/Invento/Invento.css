@@ -1,0 +1,48 @@
+/* client/src/games/Invento/Invento.css
+   «El Invento del Siglo». Todo el CSS de la web va en un único fichero: aquí solo hay clases ivp- (y la paleta para
+   las pantallas comunes pzp-). */
+
+.pzp-contenedor.invento { --pz0: #ede9fe; --pz1: #a78bfa; --pz2: #7c3aed; --pz3: #3b0764; }
+
+.ivp-cartas { display: grid; gap: 0.45rem; }
+.ivp-carta { position: relative; display: flex; flex-direction: column; gap: 0.2rem; padding: 0.8rem 0.9rem; border-radius: 18px; color: #ffffff; box-shadow: 0 5px 0 rgba(0, 0, 0, 0.25); animation: ivpEntra 0.35s ease-out; }
+.ivp-carta.objeto { background: linear-gradient(135deg, #0ea5e9, #0369a1); }
+.ivp-carta.problema { background: linear-gradient(135deg, #f97316, #c2410c); }
+.ivp-carta.rasgo { background: linear-gradient(135deg, #ec4899, #9d174d); }
+.ivp-carta-tipo { font-size: 0.72rem; font-weight: 900; letter-spacing: 0.6px; opacity: 0.9; text-transform: uppercase; }
+.ivp-carta strong { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.25rem; line-height: 1.15; }
+.ivp-cambiar {
+  position: absolute; top: 0.55rem; right: 0.6rem; width: auto !important; min-height: 0 !important; margin: 0 !important; padding: 0.25rem 0.6rem !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.5) !important; border-radius: 999px !important; background: rgba(255, 255, 255, 0.18) !important; color: #ffffff !important; font-size: 0.75rem !important; font-weight: 800 !important; cursor: pointer;
+}
+.ivp-cartas.chicas { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.3rem; margin-top: 0.4rem; }
+.ivp-cartas.chicas .ivp-carta { padding: 0.4rem 0.45rem; border-radius: 12px; box-shadow: none; animation: none; }
+.ivp-cartas.chicas .ivp-carta-tipo { font-size: 0.55rem; }
+.ivp-cartas.chicas .ivp-carta strong { font-size: 0.74rem; line-height: 1.2; }
+.ivp-ayuda { margin: 0; color: #ede9fe; font-size: 0.8rem; font-weight: 700; text-align: center; }
+.ivp-textarea { min-height: 96px; resize: vertical; line-height: 1.4; }
+.ivp-nombre { margin: 0.1rem 0 0.25rem; color: #0f172a !important; font-size: 1.35rem; line-height: 1.15; }
+.ivp-desc { margin: 0 !important; color: #334155 !important; font-size: 0.95rem; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; }
+.ivp-listos { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.35rem; margin-top: 0.5rem; }
+.ivp-listos span { padding: 0.25rem 0.6rem; border-radius: 999px; background: #f1f5f9; color: #475569; font-size: 0.8rem; font-weight: 800; }
+.ivp-listos span.si { background: #dcfce7; color: #166534; }
+
+.ivp-invento.mio { border: 3px dashed var(--pz1); }
+.ivp-invento-cab { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.4rem; }
+.ivp-invento-cab > div { flex: 1; min-width: 0; }
+.ivp-invento-cab strong { display: block; color: #0f172a; font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.15rem; line-height: 1.15; overflow-wrap: anywhere; }
+.ivp-invento-cab small { color: var(--pz2); font-weight: 800; }
+.ivp-letra { display: grid; place-items: center; flex: none; width: 38px; height: 38px; border-radius: 12px; background: linear-gradient(135deg, var(--pz1), var(--pz2)); color: #ffffff; font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.3rem; font-weight: 800; }
+.ivp-medallas { font-size: 1.4rem; }
+.ivp-votacion { border-color: var(--pz2); }
+.ivp-mi-voto { margin: 0.2rem 0 0 !important; color: #334155 !important; }
+.ivp-votos { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin-top: 0.6rem; padding-top: 0.5rem; border-top: 1px solid #e2e8f0; color: #334155; font-weight: 800; }
+.ivp-votos span:first-child { display: inline-flex; flex: 1; align-items: center; gap: 0.35rem; min-width: 0; }
+.ivp-votos b { padding: 0.1rem 0.55rem; border-radius: 999px; background: #dcfce7; color: #166534; }
+.ivp-podio-cats { display: grid; gap: 0.45rem; }
+.ivp-podio-cats > div { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 0.6rem; align-items: center; padding: 0.45rem 0.6rem; border-radius: 14px; background: var(--pz0); }
+.ivp-podio-cats > div > span { grid-row: span 2; font-size: 1.7rem; }
+.ivp-podio-cats small { color: var(--pz2); font-size: 0.72rem; font-weight: 900; text-transform: uppercase; }
+.ivp-podio-cats strong { color: #0f172a; font-size: 0.9rem; line-height: 1.25; }
+@keyframes ivpEntra { from { transform: translateY(10px) rotate(-1deg); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .ivp-carta { animation: none; } }
