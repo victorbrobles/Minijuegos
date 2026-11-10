@@ -1,10 +1,10 @@
 // server/routes/adivina.js
 // «Luces, Cámara... ¡Música!»: adivina una película o una canción con pistas que se destapan solas cada pocos
 // segundos (cuantas menos necesites, más puntos). En canciones, la última pista es el fragmento de audio (Deezer).
-// Motor común de pulsador (../pulsador/engine.js) y salas de ../lib/salasPulsador.js.
+// Motor común de pulsador (../pulsador/engine.js) y salas de ../lib/salasJuego.js.
 import { Router } from 'express';
 import { CANCIONES_MODERNAS, CANCIONES_ANTIGUAS, CANCIONES, PELICULAS } from '../data/seeds/adivina/adivina.js';
-import { montarSalas, elegirSinRepetir } from '../lib/salasPulsador.js';
+import { montarSalas, elegirSinRepetir } from '../lib/salasJuego.js';
 import { REGLAS, OPCIONES_RONDAS } from '../pulsador/engine.js';
 
 const router = Router();

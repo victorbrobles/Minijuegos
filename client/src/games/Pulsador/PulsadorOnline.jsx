@@ -200,8 +200,8 @@ export default function PulsadorOnline({ juego, onVolver, onSalir, onAbrirAyuda 
           />
           <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
             <h3 className="qq-sala-titulo"><Icon name="dice" size={20} /> La partida</h3>
-            <ConfigJuego juego={juego} config={sala.config} onCambiar={sala.esAdmin ? (c) => llamar('config', { ...sala.config, ...c }) : null} />
-            <p className="pzp-nota-sala">🔴 Cada uno tiene su pulsador en el móvil: el primero que pulse, responde.</p>
+            {(() => { const C = juego.Config || ConfigJuego; return <C juego={juego} config={sala.config} onCambiar={sala.esAdmin ? (c) => llamar('config', { ...sala.config, ...c }) : null} />; })()}
+            <p className="pzp-nota-sala">{juego.notaSala ?? '🔴 Cada uno tiene su pulsador en el móvil: el primero que pulse, responde.'}</p>
             {sala.esAdmin && (
               <button type="button" className="big full qq-btn-principal" disabled={n < sala.min || sala.preparando} onClick={() => llamar('iniciar')}>
                 <Icon name="play" size={22} /> {sala.preparando ? 'Preparando la partida…' : n < sala.min ? `Esperando jugadores (mínimo ${sala.min})…` : '¡Empezar partida!'}
@@ -214,7 +214,9 @@ export default function PulsadorOnline({ juego, onVolver, onSalir, onAbrirAyuda 
 
       {sala.estado === 'jugando' && v && (
         <section className="game pzp-escena">
-          {v.fase === 'jugando' ? (
+          {v.fase !== 'fin' && juego.Partida ? (
+            <juego.Partida v={v} sala={sala} enviar={enviar} t0={t0} offset={offset} onSalir={() => setModal('partida')} />
+          ) : v.fase === 'jugando' ? (
             <PantallaJuego key={v.ronda} v={v} juego={juego} t0={t0} offset={offset} enviar={enviar} onSalir={() => setModal('partida')} controles={sala.esAdmin} />
           ) : v.fase === 'resuelta' ? (
             <PantallaResultado v={v} juego={juego} onSalir={() => setModal('partida')}>

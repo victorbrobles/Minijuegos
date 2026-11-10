@@ -1,11 +1,11 @@
 // server/routes/rasgos.js
 // «El paparazzi»: se ve un recorte de la foto de un famoso y hay que reconocerlo antes que nadie.
-// Motor común de pulsador (../pulsador/engine.js) y salas de ../lib/salasPulsador.js. El servidor recorta la foto
+// Motor común de pulsador (../pulsador/engine.js) y salas de ../lib/salasJuego.js. El servidor recorta la foto
 // para que la imagen completa (y el nombre del archivo) no lleguen al navegador hasta que se resuelve la ronda.
 import express from 'express';
 import { randomUUID } from 'node:crypto';
 import { famosos, recorte, fotoCompleta } from '../lib/rasgosImagen.js';
-import { montarSalas, elegirSinRepetir } from '../lib/salasPulsador.js';
+import { montarSalas, elegirSinRepetir } from '../lib/salasJuego.js';
 import { REGLAS, OPCIONES_RONDAS } from '../pulsador/engine.js';
 
 const router = express.Router();

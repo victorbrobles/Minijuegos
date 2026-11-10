@@ -1,8 +1,11 @@
-// server/lib/salasPulsador.js
-// Salas online comunes a los juegos de pulsador (El paparazzi, Luces, Cámara... ¡Música! y Frases Célebres).
+// server/lib/salasJuego.js
+// Salas online comunes: juegos de pulsador (El paparazzi, Luces, Cámara..., Frases Célebres) y otros con motor propio.
 // Mismo esquema que el resto de juegos: salas en memoria + sondeo HTTP. La lógica vive en ../pulsador/engine.js.
 //
 // opciones = {
+//   engine: motor con crearPartida(jugadores, items, reglas, ahora) / tick / vistaDe / abandonar (por defecto, el de pulsador),
+//   accion(M, p, d, { id, esAdmin, ahora }) -> resultado | undefined (acciones propias de otro motor),
+//   min, max: jugadores por sala,
 //   config: { rondas: 10, ... },            // configuración inicial de la sala
 //   validarConfig(body, config) -> config,  // aplica lo que manda el anfitrión
 //   reglas(config) -> reglas del motor,
@@ -24,6 +27,9 @@ const nuevoToken = () => Math.random().toString(36).slice(2) + Date.now().toStri
 
 export function montarSalas(router, opciones) {
   const salas = {};
+  const M = opciones.engine || E;
+  const MIN_S = opciones.min ?? MIN;
+  const MAX_S = opciones.max ?? MAX;
 
   setInterval(() => {
     const ahora = Date.now();
@@ -51,18 +57,21 @@ export function montarSalas(router, opciones) {
     sala.ultimaPartida = { partida: sala.numPartida, puntos: pts };
   }
   const revisar = (sala) => {
-    if (sala.estado === 'jugando' && sala.partida) E.tick(sala.partida, Date.now());
+    if (sala.estado === 'jugando' && sala.partida) M.tick(sala.partida, Date.now());
     if (sala.partida?.fase === 'fin') cerrarPartida(sala);
   };
 
   async function iniciarPartida(sala) {
     sala.preparando = true;
     try {
-      const items = await opciones.prepararItems(sala);
+      // prepararItems puede devolver la lista o { items, reglas } (si las reglas dependen de lo sorteado)
+      const preparado = await opciones.prepararItems(sala);
+      const items = Array.isArray(preparado) ? preparado : preparado.items;
+      const reglas = Array.isArray(preparado) ? opciones.reglas(sala.config) : preparado.reglas;
       if (!items.length) throw new Error('No hay contenido para jugar.');
       sala.numPartida += 1;
       sala.puntosAplicados = false;
-      sala.partida = E.crearPartida(sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre })), items, opciones.reglas(sala.config), Date.now());
+      sala.partida = M.crearPartida(sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre })), items, reglas, Date.now());
       sala.estado = 'jugando';
     } finally {
       sala.preparando = false;
@@ -99,7 +108,7 @@ export function montarSalas(router, opciones) {
     if (!nombre) return res.status(400).json({ error: 'Debes indicar un nombre.' });
     if (!sala) return res.status(404).json({ error: 'La sala no existe o el código es incorrecto.' });
     if (sala.estado !== 'lobby') return res.status(400).json({ error: 'La partida ya ha comenzado.' });
-    if (sala.jugadores.length >= MAX) return res.status(400).json({ error: 'La sala está completa.' });
+    if (sala.jugadores.length >= MAX_S) return res.status(400).json({ error: 'La sala está completa.' });
     if (sala.jugadores.some((j) => j.nombre.toLowerCase() === nombre.toLowerCase())) return res.status(400).json({ error: 'Ya hay un jugador con ese nombre en la sala.' });
     const token = nuevoToken();
     sala.contadorIds += 1;
@@ -117,13 +126,13 @@ export function montarSalas(router, opciones) {
     const base = {
       success: true, ahora, code: sala.code, estado: sala.estado, esAdmin, yoId: jugador.id, numPartida: sala.numPartida,
       config: sala.config, preparando: sala.preparando,
-      anfitrionId: sala.jugadores.find((j) => j.token === sala.adminToken)?.id ?? null, min: MIN, max: MAX,
+      anfitrionId: sala.jugadores.find((j) => j.token === sala.adminToken)?.id ?? null, min: MIN_S, max: MAX_S,
       jugadores: sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre, puntos: j.puntos, conectado: ahora - j.visto < 15000 })),
       ultimaPartida: sala.ultimaPartida
     };
     if (sala.estado === 'jugando' && sala.partida) {
       if (!sala.partida.jugadores.some((j) => j.id === jugador.id)) return res.status(403).json({ error: 'Ya no estás en la partida.' });
-      base.vista = E.vistaDe(sala.partida, jugador.id, ahora);
+      base.vista = M.vistaDe(sala.partida, jugador.id, ahora);
     }
     res.json(base);
   });
@@ -158,7 +167,7 @@ export function montarSalas(router, opciones) {
     if (sala.preparando) return res.status(409).json({ error: 'Ya se está preparando la partida.' });
     if (primera && sala.estado === 'jugando') return res.status(400).json({ error: 'La partida ya está en marcha.' });
     if (!primera && sala.partida?.fase !== 'fin') return res.status(400).json({ error: 'La partida aún no ha terminado.' });
-    if (sala.jugadores.length < MIN) return res.status(400).json({ error: `Se necesitan al menos ${MIN} jugadores.` });
+    if (sala.jugadores.length < MIN_S) return res.status(400).json({ error: `Se necesitan al menos ${MIN_S} jugadores.` });
     if (primera) {
       sala.jugadores.forEach((j) => { j.puntos = 0; });
       sala.ultimaPartida = null;
@@ -183,17 +192,20 @@ export function montarSalas(router, opciones) {
     revisar(sala);
     const p = sala.partida; const d = req.body || {}; const id = jugador.id; const ahora = Date.now();
     const soloAdmin = { ok: false, error: 'Solo el anfitrión puede hacerlo.' };
-    let r;
-    switch (d.tipo) {
-      case 'pulsar': r = E.pulsar(p, id, ahora); break;
-      case 'teclear': r = E.teclear(p, id, d.texto); break;
-      case 'responder': r = E.responder(p, id, String(d.respuesta ?? '').slice(0, 100), ahora); break;
-      case 'pista': r = esAdmin ? E.adelantarPista(p, ahora) : soloAdmin; break;
-      case 'rendirse': r = esAdmin ? E.rendirse(p, ahora) : soloAdmin; break;
-      case 'siguiente': r = esAdmin ? E.siguiente(p, ahora) : soloAdmin; break;
-      case 'terminar': r = esAdmin ? E.terminar(p) : soloAdmin; break;
-      default: return res.status(400).json({ error: 'Acción desconocida.' });
+    let r = opciones.accion ? opciones.accion(M, p, d, { id, esAdmin, ahora }) : undefined;
+    if (r === undefined) {
+      switch (d.tipo) {
+        case 'pulsar': r = M.pulsar(p, id, ahora); break;
+        case 'teclear': r = M.teclear(p, id, d.texto); break;
+        case 'responder': r = M.responder(p, id, String(d.respuesta ?? '').slice(0, 100), ahora); break;
+        case 'pista': r = esAdmin ? M.adelantarPista(p, ahora) : soloAdmin; break;
+        case 'rendirse': r = esAdmin ? M.rendirse(p, ahora) : soloAdmin; break;
+        case 'siguiente': r = esAdmin ? M.siguiente(p, ahora) : soloAdmin; break;
+        case 'terminar': r = esAdmin ? M.terminar(p) : soloAdmin; break;
+        default: return res.status(400).json({ error: 'Acción desconocida.' });
+      }
     }
+    if (r === null) return res.status(400).json({ error: 'Acción desconocida.' });
     revisar(sala);
     if (!r.ok) return res.status(400).json({ error: r.error });
     res.json({ success: true, resultado: r });
@@ -224,7 +236,7 @@ export function montarSalas(router, opciones) {
     const idx = sala.jugadores.findIndex((j) => j.token === req.body?.token);
     if (idx === -1) return res.json({ success: true });
     const [fuera] = sala.jugadores.splice(idx, 1);
-    if (sala.estado === 'jugando' && sala.partida) { E.abandonar(sala.partida, fuera.id, Date.now()); revisar(sala); }
+    if (sala.estado === 'jugando' && sala.partida) { M.abandonar(sala.partida, fuera.id, Date.now()); revisar(sala); }
     if (sala.jugadores.length === 0) delete salas[code];
     else if (sala.adminToken === fuera.token) sala.adminToken = sala.jugadores[0].token;
     res.json({ success: true });

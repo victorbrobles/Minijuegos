@@ -1,11 +1,11 @@
 // server/routes/frasescelebres.js
 // «Frases Célebres»: sale una frase y cuatro posibles autores; quien pulsa primero elige uno (+3 si acierta, −1 si falla).
-// Motor común de pulsador (../pulsador/engine.js) y salas de ../lib/salasPulsador.js.
+// Motor común de pulsador (../pulsador/engine.js) y salas de ../lib/salasJuego.js.
 import express from 'express';
 import parte1 from '../data/seeds/frasescelebres/parte1.js';
 import parte2 from '../data/seeds/frasescelebres/parte2.js';
 import parte3 from '../data/seeds/frasescelebres/parte3.js';
-import { montarSalas, elegirSinRepetir } from '../lib/salasPulsador.js';
+import { montarSalas, elegirSinRepetir } from '../lib/salasJuego.js';
 import { REGLAS, OPCIONES_RONDAS } from '../pulsador/engine.js';
 
 const router = express.Router();

@@ -1,5 +1,5 @@
 // client/src/games/Pulsador/JuegoPulsador.jsx
-// Menú inicial común (online / un dispositivo) de los juegos de pulsador y paso a cada modo.
+// Menú inicial común (online / un dispositivo) de los juegos de pulsador y de otros que comparten sus pantallas.
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MenuInicioJuego } from '../../components/MenuJuego.jsx';
@@ -17,8 +17,11 @@ const haySesion = (id) => {
   }
 };
 
-export default function JuegoPulsador({ juegoId, onExit }) {
-  const juego = JUEGOS[juegoId];
+/** `juegoId` para los de pulsador; otros juegos pasan su propio `juego` (con `Local`, `Partida`, `Config`…). */
+export default function JuegoPulsador({ juegoId: id, juego: propio, onExit }) {
+  const juego = propio || JUEGOS[id];
+  const juegoId = juego.id;
+  const Local = juego.Local || PulsadorLocal;
   const { titulo, descripcion } = metaDe(juegoId);
   const [modo, setModo] = useState(() => (haySesion(juegoId) ? 'online' : 'menu'));
   const [ayuda, setAyuda] = useState(false);
@@ -30,7 +33,7 @@ export default function JuegoPulsador({ juegoId, onExit }) {
       {modo === 'menu' && (
         <MenuInicioJuego juegoId={juegoId} onOnline={() => setModo('online')} onLocal={() => setModo('local')} onAyuda={() => setAyuda(true)} />
       )}
-      {modo === 'local' && <PulsadorLocal juego={juego} onVolver={() => setModo('menu')} onExit={irAPortada} onAbrirAyuda={() => setAyuda(true)} />}
+      {modo === 'local' && <Local juego={juego} onVolver={() => setModo('menu')} onExit={irAPortada} onAbrirAyuda={() => setAyuda(true)} />}
       {modo === 'online' && <PulsadorOnline juego={juego} onVolver={() => setModo('menu')} onSalir={irAPortada} onAbrirAyuda={() => setAyuda(true)} />}
       {ayuda && <Ayuda titulo={titulo} descripcion={descripcion} reglas={juego.reglas} onCerrar={() => setAyuda(false)} />}
     </>

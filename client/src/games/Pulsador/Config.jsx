@@ -21,7 +21,7 @@ export default function ConfigJuego({ juego, config, onCambiar }) {
         </BloqueConfig>
       )}
       <BloqueConfig titulo={`Número de ${juego.unidad}`}>
-        <Pildoras opciones={opcionesRondas(juego.unidad)} valor={config.rondas} onCambiar={onCambiar && cambiar('rondas')} />
+        <Pildoras opciones={opcionesRondas(juego.unidad, juego.opcionesRondas)} valor={config.rondas} onCambiar={onCambiar && cambiar('rondas')} />
       </BloqueConfig>
     </>
   );

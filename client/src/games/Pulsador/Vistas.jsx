@@ -15,8 +15,30 @@ export function Avatar({ id, nombre, grande = false }) {
   return <span className={`pzp-avatar${grande ? ' grande' : ''}`} style={{ '--c': colorDe(id) }}>{inicial(nombre)}</span>;
 }
 
+/** Milisegundos que faltan para `hasta` (hora del servidor; `offset` = servidor − cliente). */
+export function useRestante(hasta, offset = 0) {
+  useLatido(200);
+  return hasta ? Math.max(0, hasta - (Date.now() + offset)) : 0;
+}
+
+/** Pantalla «Turno de…» con el botón ¡Listo! (o la espera, si no es tu turno). */
+export function TurnoDe({ v, id, puedo, onListo, texto, children, boton = '¡Listo!' }) {
+  const j = v.jugadores.find((x) => x.id === id);
+  return (
+    <div className="pzp-tarjeta pzp-gate">
+      <p className="pzp-etiqueta centrada">{puedo ? 'Te toca' : 'Turno de'}</p>
+      <Avatar id={id} nombre={j?.nombre} grande />
+      <h2>{j?.nombre ?? '¿?'}{v.yo?.id === id ? ' (tú)' : ''}</h2>
+      {texto && <p className="pzp-texto">{texto}</p>}
+      {children}
+      {puedo ? <button type="button" className="pzp-boton grande" onClick={onListo}><Icon name="play" size={20} /> {boton}</button>
+        : <p className="pzp-esperando-txt">⏳ Esperando a {j?.nombre}…</p>}
+    </div>
+  );
+}
+
 /** Se vuelve a pintar cada `ms` (relojes). */
-function useLatido(ms = 200) {
+export function useLatido(ms = 200) {
   const [, set] = useState(0);
   useEffect(() => {
     const i = setInterval(() => set((x) => x + 1), ms);
@@ -40,27 +62,34 @@ export function relojDe(v, t0, offset = 0) {
   };
 }
 
-export function Hero({ v, juego, onSalir, etiqueta, titulo, clase = '' }) {
+/**
+ * Cabecera con el degradado del juego y el marcador. `chip` sustituye a «Ronda x/y»; `turno` resalta a un jugador;
+ * `extra(j)` pinta algo más en su marca.
+ */
+export function Hero({ v, juego, onSalir, etiqueta, titulo, clase = '', chip, turno, extra, orden = 'desc' }) {
+  const bloqueados = v.bloqueados || [];
+  const lista = [...v.jugadores].sort((a, b) => (orden === 'asc' ? a.puntos - b.puntos : b.puntos - a.puntos));
   return (
     <header className={`pzp-hero ${clase}`}>
       <span className="pzp-hero-fondo" aria-hidden="true">{juego.emoji}</span>
       <div className="pzp-hero-top">
         <button type="button" className="pzp-salir" onClick={onSalir}><Icon name="door" size={15} /> Salir</button>
-        <span className="pzp-chip">{juego.emoji} Ronda {Math.min(v.ronda, v.rondas)}/{v.rondas}</span>
+        <span className="pzp-chip">{chip ?? `${juego.emoji} Ronda ${Math.min(v.ronda, v.rondas)}/${v.rondas}`}</span>
       </div>
-      <p className="pzp-hero-etiqueta">{etiqueta}</p>
+      {etiqueta && <p className="pzp-hero-etiqueta">{etiqueta}</p>}
       <h1 className="pzp-hero-titulo">{titulo}</h1>
       <div className="pzp-marcador">
-        {[...v.jugadores].sort((a, b) => b.puntos - a.puntos).map((j) => {
-          const pulsa = v.pulsado?.jugadorId === j.id;
-          const fuera = v.fase === 'jugando' && v.bloqueados.includes(j.id);
+        {lista.map((j) => {
+          const pulsa = v.pulsado?.jugadorId === j.id || turno === j.id;
+          const fuera = v.fase === 'jugando' && bloqueados.includes(j.id);
           const suma = v.sumas?.[j.id];
           return (
-            <span key={j.id} className={`pzp-marca${pulsa ? ' pulsa' : ''}${fuera ? ' bloqueado' : ''}${j.id === v.yo?.id ? ' yo' : ''}${j.fuera ? ' fuera' : ''}`}>
+            <span key={j.id} className={`pzp-marca${pulsa ? (v.pulsado ? ' pulsa' : ' turno') : ''}${fuera ? ' bloqueado' : ''}${j.id === v.yo?.id ? ' yo' : ''}${j.fuera ? ' fuera' : ''}`}>
               {fuera ? <span className="pzp-avatar" style={{ '--c': '#64748b' }}>✗</span> : <Avatar id={j.id} nombre={j.nombre} />}
               <span className="pzp-marca-nombre">{j.nombre}{j.id === v.yo?.id ? ' (tú)' : ''}</span>
               <span className="pzp-marca-datos">{j.puntos}</span>
               {suma ? <b className={suma > 0 ? 'mas' : 'menos'}>{suma > 0 ? '+' : ''}{suma}</b> : null}
+              {extra?.(j)}
             </span>
           );
         })}
@@ -233,7 +262,7 @@ export function Pulsador({ onPulsar, deshabilitado, texto = '¡Lo sé!', motivo 
   );
 }
 
-function Cuenta({ ms, total }) {
+export function Cuenta({ ms, total }) {
   const pct = Math.max(0, Math.min(100, (ms / total) * 100));
   const s = Math.ceil(ms / 1000);
   return (
@@ -415,14 +444,17 @@ function Foto({ src, alt }) {
 
 export function PantallaFin({ v, juego, onSalir, children }) {
   const f = v.fin;
+  const detalle = juego.detalleFin || ((j) => `${j.aciertos} ${j.aciertos === 1 ? 'acierto' : 'aciertos'}`);
+  const unidad = juego.unidadPuntos || 'pts';
   const nombres = f.ganadores.map((id) => nombreDe(v, id));
   const top = f.tabla.filter((j) => !j.fuera).slice(0, 3);
   const colocacion = top.length === 3 ? [top[1], top[0], top[2]] : top.length === 2 ? [top[1], top[0]] : top;
   const alturas = ['primero', 'segundo', 'tercero'];
   return (
     <>
-      <Hero v={v} juego={juego} onSalir={onSalir} etiqueta="Fin de la partida" titulo={nombres.length ? juego.ganador(nombres) : 'Nadie ha sumado puntos'} clase="fin" />
-      {top.length > 1 && f.max > 0 && (
+      <Hero v={v} juego={juego} onSalir={onSalir} etiqueta="Fin de la partida" titulo={nombres.length ? juego.ganador(nombres) : 'Nadie ha sumado puntos'} clase="fin"
+        chip={juego.chipFin ?? `${juego.emoji} Fin`} orden={juego.menosEsMejor ? 'asc' : 'desc'} />
+      {top.length > 1 && (f.max > 0 || juego.menosEsMejor) && (
         <div className="pzp-tarjeta">
           <div className="pzp-podio">
             {colocacion.map((j) => {
@@ -431,7 +463,7 @@ export function PantallaFin({ v, juego, onSalir, children }) {
                 <div key={j.id} className={`pzp-podio-col ${alturas[puesto]}`} style={{ '--c': colorDe(j.id) }}>
                   <Avatar id={j.id} nombre={j.nombre} grande />
                   <span className="pzp-podio-nombre">{j.nombre}</span>
-                  <span className="pzp-podio-pts">{j.puntos} pts</span>
+                  <span className="pzp-podio-pts">{j.puntos} {unidad}</span>
                   <span className="pzp-podio-base">{j.puesto}</span>
                 </div>
               );
@@ -443,10 +475,10 @@ export function PantallaFin({ v, juego, onSalir, children }) {
         <p className="pzp-etiqueta">Clasificación</p>
         <ol className="pzp-ranking">
           {f.tabla.map((j) => (
-            <li key={j.id} className={j.puesto === 1 && j.puntos > 0 ? 'lider' : ''}>
-              <span className="pzp-pos">{j.fuera ? '🚪' : j.puesto === 1 && j.puntos > 0 ? <Icon name="crown" size={16} /> : j.puesto}</span>
+            <li key={j.id} className={f.ganadores.includes(j.id) ? 'lider' : ''}>
+              <span className="pzp-pos">{j.fuera ? '🚪' : f.ganadores.includes(j.id) ? <Icon name="crown" size={16} /> : j.puesto}</span>
               <Avatar id={j.id} nombre={j.nombre} />
-              <span className="pzp-ranking-nombre">{j.nombre}{j.id === v.yo?.id ? ' (tú)' : ''}<small>{j.aciertos} {j.aciertos === 1 ? 'acierto' : 'aciertos'}</small></span>
+              <span className="pzp-ranking-nombre">{j.nombre}{j.id === v.yo?.id ? ' (tú)' : ''}<small>{detalle(j)}</small></span>
               <strong>{j.puntos}</strong>
             </li>
           ))}
@@ -482,7 +514,7 @@ export function Pildoras({ opciones, valor, onCambiar }) {
     </div>
   );
 }
-export const opcionesRondas = (unidad) => OPCIONES_RONDAS.map((n) => [n, `${n} ${unidad}`]);
+export const opcionesRondas = (unidad, lista = OPCIONES_RONDAS) => lista.map((n) => [n, `${n} ${unidad}`]);
 
 export function Ayuda({ onCerrar, titulo, descripcion, reglas }) {
   return (
