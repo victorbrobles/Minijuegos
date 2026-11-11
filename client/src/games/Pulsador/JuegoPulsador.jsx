@@ -18,7 +18,7 @@ const haySesion = (id) => {
 };
 
 /** `juegoId` para los de pulsador; otros juegos pasan su propio `juego` (con `Local`, `Partida`, `Config`…). */
-export default function JuegoPulsador({ juegoId: id, juego: propio, onExit }) {
+export default function JuegoPulsador({ juegoId: id, juego: propio, onExit, onVolverMenu, textoVolverMenu }) {
   const juego = propio || JUEGOS[id];
   const juegoId = juego.id;
   const Local = juego.Local || PulsadorLocal;
@@ -31,7 +31,7 @@ export default function JuegoPulsador({ juegoId: id, juego: propio, onExit }) {
   return (
     <>
       {modo === 'menu' && (
-        <MenuInicioJuego juegoId={juegoId} local={juego.menuLocal} onOnline={() => setModo('online')} onLocal={() => setModo('local')} onAyuda={() => setAyuda(true)} />
+        <MenuInicioJuego juegoId={juegoId} local={juego.menuLocal} onOnline={() => setModo('online')} onLocal={() => setModo('local')} onAyuda={() => setAyuda(true)} onVolver={onVolverMenu} textoVolver={textoVolverMenu} />
       )}
       {modo === 'local' && <Local juego={juego} onVolver={() => setModo('menu')} onExit={irAPortada} onAbrirAyuda={() => setAyuda(true)} />}
       {modo === 'online' && <PulsadorOnline juego={juego} onVolver={() => setModo('menu')} onSalir={irAPortada} onAbrirAyuda={() => setAyuda(true)} />}

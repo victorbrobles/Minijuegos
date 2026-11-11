@@ -368,7 +368,7 @@
   {
     "id": "laberinto",
     "name": "El Laberinto",
-    "description": "Un laberinto de salas que se descubren poco a poco, con trampas, tesoros y puertas cerradas. Cada jugador tiene un personaje con habilidades distintas: roba, deja trampas, bloquea pasillos y escapa con el tesoro antes que nadie.",
+    "description": "Dos juegos de laberinto en uno. El Minotauro: uno caza en secreto y los demás buscan las llaves y escapan en la niebla. Constructores y corredores: diseña el laberinto más retorcido para tu rival y recorre el suyo antes que nadie.",
     "isNew": true
   },
   {
