@@ -2,7 +2,7 @@
 // Cada reto: 6 elementos; 5 cumplen un criterio oculto y uno no (intruso).
 // La «trampa» es el elemento que parece sobrar a simple vista pero sí cumple el criterio.
 // items: [emoji, texto]; intruso y trampa son índices dentro de items.
-export default [
+const BASE = [
   {
     items: [['🐋', 'Ballena'], ['🐬', 'Delfín'], ['🦈', 'Tiburón'], ['🦭', 'Foca'], ['🦇', 'Murciélago'], ['🐄', 'Vaca']],
     intruso: 2, trampa: 4,
@@ -221,3 +221,8 @@ export default [
     trampaTxt: 'El helado es un postre, pero se hace con leche.'
   }
 ];
+
+import EXTRA from './retosExtra.js';
+import EXTRA2 from './retosExtra2.js';
+
+export default [...BASE, ...EXTRA, ...EXTRA2];
