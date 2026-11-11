@@ -67,6 +67,7 @@ export const JUEGOS = {
   },
   hemeroteca: {
     id: 'hemeroteca',
+    pantallaTurno: true,
     api: '/api/hemeroteca',
     emoji: '📰',
     unidad: 'titulares',
@@ -87,6 +88,7 @@ export const JUEGOS = {
   },
   pareja: {
     id: 'pareja',
+    pantallaTurno: true,
     api: '/api/pareja',
     emoji: '💞',
     unidad: 'parejas',
@@ -107,6 +109,7 @@ export const JUEGOS = {
   },
   acta: {
     id: 'acta',
+    pantallaTurno: true,
     api: '/api/acta',
     emoji: '📋',
     unidad: 'partidos',

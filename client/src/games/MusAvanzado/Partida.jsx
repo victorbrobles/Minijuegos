@@ -4,8 +4,9 @@ import React, { useEffect, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { Hero, Cuenta, useRestante, Avatar, Pildoras, PantallaFin, colorDe } from '../Pulsador/Vistas.jsx';
 import { BloqueConfig } from '../../components/MenuJuego.jsx';
-import { CATEGORIAS, CATEGORIAS_NORMALES, MODIFICADORES, REGLAS_ESPECIALES, ICONO_PALO, CORTO_RANGO, NOMBRE_RANGO, OPCIONES } from './engine.js';
+import { CATEGORIAS, CATEGORIAS_NORMALES, MODIFICADORES, REGLAS_ESPECIALES, OPCIONES } from './engine.js';
 import './MusAvanzado.css';
+import CartaEspanola from '../../components/CartaEspanola.jsx';
 
 const HERO = { emoji: '🂡' };
 const nombreDe = (v, id) => v.jugadores.find((j) => j.id === id)?.nombre ?? '¿?';
@@ -20,17 +21,11 @@ const ESPECIAL = { comodin: { e: '🃏', t: 'Comodín' }, bomba: { e: '💣', t:
 export function Carta({ c, sel, onClick, chica }) {
   const esp = ESPECIAL[c.esp];
   const sinValor = c.esp === 'comodin' || c.esp === 'bomba' || c.esp === 'espejo';
+  // En el motor la sota, el caballo y el rey son 8, 9 y 10; en la carta se ven como 10, 11 y 12
+  const carta = sinValor ? null : { p: c.p, n: c.r <= 7 ? c.r : c.r + 2 };
   return (
-    <button type="button" className={`mav-carta ${c.p || 'especial'}${sel ? ' sel' : ''}${chica ? ' chica' : ''}${c.esp ? ` esp-${c.esp}` : ''}`}
-      onClick={onClick} disabled={!onClick} aria-label={sinValor ? esp.t : `${NOMBRE_RANGO[c.r]} de ${c.p}${esp ? ` (${esp.t})` : ''}`}>
-      {sinValor ? <span className="mav-carta-esp">{esp.e}<small>{esp.t}</small></span> : (
-        <>
-          <span className="mav-carta-r">{CORTO_RANGO[c.r]}</span>
-          <span className="mav-carta-p">{ICONO_PALO[c.p]}</span>
-          {esp && <span className="mav-carta-marca" title={esp.t}>{esp.e}</span>}
-        </>
-      )}
-    </button>
+    <CartaEspanola c={carta} sel={sel} chica={chica} onClick={onClick || undefined}
+      especial={sinValor ? { ...esp, clase: c.esp } : null} marca={!sinValor && esp ? esp : null} />
   );
 }
 

@@ -39,7 +39,7 @@ export function Tablero({ v, marcadas = {}, onTocar }) {
         const salida = v.esquinas.includes(s.id);
         return (
           <button key={s.id} type="button" disabled={!marca || !onTocar} onClick={() => onTocar?.(s.id)}
-            className={`lbr-sala${s.descubierta ? '' : ' niebla'}${salida ? ' salida' : ''}${marca ? ` ${marca}` : ''}`}
+            className={`lbr-sala${s.descubierta ? '' : ' niebla'}${salida ? ' salida' : ''}${s.descubierta && s.contenido === 'corazon' ? ' corazon' : ''}${marca ? ` ${marca}` : ''}`}
             data-n={l.N} data-s={l.S} data-e={l.E} data-o={l.O} aria-label={`Sala ${s.id}`}>
             {s.descubierta && s.contenido !== 'vacia' && s.contenido !== 'salida' && <span className="lbr-cont">{CONTENIDO[s.contenido].e}{s.oro > 1 ? <sub>{s.oro}</sub> : null}</span>}
             {salida && <span className="lbr-cont salida">🚪</span>}
@@ -47,7 +47,7 @@ export function Tablero({ v, marcadas = {}, onTocar }) {
             {cepo && <span className="lbr-micepo">🪤</span>}
             {aqui.length > 0 && (
               <span className="lbr-fichas">
-                {aqui.map((j) => <i key={j.id} style={{ '--c': colorDe(v, j.id) }} title={j.nombre}>{PERSONAJES[j.personaje].e}{j.corazon ? '💎' : ''}</i>)}
+                {aqui.map((j) => <i key={j.id} className={j.corazon ? 'lleva' : ''} style={{ '--c': colorDe(v, j.id) }} title={j.nombre}>{PERSONAJES[j.personaje].e}{j.corazon ? '💎' : ''}</i>)}
               </span>
             )}
           </button>
@@ -67,7 +67,7 @@ function Estado({ v }) {
             <span className="lbr-pj">{P.e}</span>
             <div>
               <strong>{j.nombre}{j.id === v.yo?.id ? ' (tú)' : ''}</strong>
-              <small>{'❤️'.repeat(Math.max(0, j.vidas))} · 💰{j.oro}{j.llaves ? ` · 🔑${j.llaves}` : ''}{j.corazon ? ' · 💎' : ''}</small>
+              <small>{'❤️'.repeat(Math.max(0, j.vidas))} · 💰{j.oro}{j.llaves ? ` · 🔑${j.llaves}` : ''}{j.corazon ? ' · 💎' : ''}{j.escudo > 0 ? ' · 🛡️' : ''}</small>
             </div>
           </div>
         );
@@ -135,6 +135,18 @@ function Propuestas({ v, enviar }) {
   );
 }
 
+/** Qué hay que hacer ahora mismo, en una frase. */
+function Objetivo({ v }) {
+  const lleva = v.jugadores.find((j) => j.corazon);
+  const yo = v.yo && v.jugadores.find((j) => j.id === v.yo.id);
+  let texto;
+  if (!lleva) texto = '🎯 Llega al 💎 del centro y sácalo por cualquiera de las 🚪 salidas de las esquinas.';
+  else if (yo && lleva.id === yo.id) texto = `🏃 ¡Lo llevas tú! Corre hacia una 🚪 esquina (das un paso menos).${yo.escudo > 0 ? ' 🛡️ Nadie puede robarte todavía.' : ' Cuidado: si te alcanzan, te lo pueden robar.'}`;
+  else texto = lleva.escudo > 0 ? `🛡️ ${lleva.nombre} acaba de robar el Corazón y está protegido: no se le puede robar hasta dentro de ${lleva.escudo === 1 ? 'su próximo turno' : '2 rondas'}. ¡Córtale el paso a las salidas!`
+    : `🦹 ${lleva.nombre} lleva el Corazón: alcánzale y róbaselo antes de que llegue a una 🚪 esquina.`;
+  return <p className={`lbr-objetivo${lleva ? ' alerta' : ''}`}>{texto}</p>;
+}
+
 /** La partida (todo salvo el final). */
 export function Partida({ v, enviar, onSalir, offset = 0, local = false, admin = false }) {
   const [modo, setModo] = useState(null);
@@ -162,6 +174,7 @@ export function Partida({ v, enviar, onSalir, offset = 0, local = false, admin =
         <h1 className="pzp-hero-titulo">{v.jugadores.some((j) => j.corazon) ? `💎 ¡${v.jugadores.find((j) => j.corazon).nombre} lleva el Corazón!` : 'Encuentra el Corazón 💎'}</h1>
       </header>
       {!local && v.hasta && <div className="pzp-tarjeta" style={{ padding: '0.5rem 0.8rem' }}><Cuenta ms={restante} total={AJUSTES.segTurno * 1000} /></div>}
+      <Objetivo v={v} />
       <Estado v={v} />
       <div className="pzp-tarjeta lbr-tablero-tarjeta"><Tablero v={v} marcadas={marcadas} onTocar={miTurno ? tocar : null} /></div>
       <Propuestas v={v} enviar={enviar} />
@@ -170,7 +183,10 @@ export function Partida({ v, enviar, onSalir, offset = 0, local = false, admin =
         <summary>📖 Lo último</summary>
         <div>{[...v.log].reverse().slice(0, 8).map((l) => <p key={l.n} className={l.tipo}>{l.texto}</p>)}</div>
       </details>
-      <p className="lbr-leyenda">🚪 salida · 💎 Corazón · 💰 tesoro · 🕳️ trampa · 🔑 llave · 🧪 poción · 📜 mapa · 🪤 cepo · 🚧 barricada · las puertas cerradas, en marrón</p>
+      <details className="pzp-tarjeta lbr-leyenda">
+        <summary>🗺️ Leyenda</summary>
+        <p>🚪 salida · 💎 Corazón · 💰 tesoro · 🕳️ trampa · 🔑 llave · 🧪 poción · 📜 mapa · 🪤 cepo · 🚧 barricada · 🛡️ protegido tras robar el Corazón. Las puertas cerradas son las rayas marrones; las barricadas, naranjas.</p>
+      </details>
       {admin && (
         <div className="pzp-barra estatica">
           <div className="pzp-dos">

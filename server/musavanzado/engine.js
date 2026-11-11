@@ -10,13 +10,13 @@ export const AJUSTES = { min: 4, max: 8, cartas: 5, ante: 1, segTurno: 45, segCa
 export const OPCIONES = { modo: ['individual', 'parejas'], fichas: [15, 20, 30] };
 export const PALOS = ['oros', 'copas', 'espadas', 'bastos'];
 export const ICONO_PALO = { oros: '🪙', copas: '🏆', espadas: '🗡️', bastos: '🪵' };
-export const NOMBRE_RANGO = { 1: 'As', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: 'Sota', 9: 'Caballo', 10: 'Rey' };
-export const CORTO_RANGO = { 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: 'S', 9: 'C', 10: 'R' };
+export const NOMBRE_RANGO = { 1: 'As', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: 'Sota (10)', 9: 'Caballo (11)', 10: 'Rey (12)' };
+export const CORTO_RANGO = { 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '10', 9: '11', 10: '12' };
 
 export const CATEGORIAS = {
-  grande: { nombre: 'La grande', e: '👑', desc: 'Tener la carta más alta.', niveles: ['Un 5 o más', 'Un 6 o más', 'Un 7 o más', 'Una sota o más', 'Un caballo o más', 'Un rey', 'Dos reyes', 'Tres reyes o más'] },
+  grande: { nombre: 'La grande', e: '👑', desc: 'Tener la carta más alta.', niveles: ['Un 5 o más', 'Un 6 o más', 'Un 7 o más', 'Una sota (10) o más', 'Un caballo (11) o más', 'Un rey (12)', 'Dos reyes', 'Tres reyes o más'] },
   parejas: { nombre: 'Parejas', e: '👯', desc: 'Parejas, dobles parejas, tríos, full o póker.', niveles: ['Una pareja', 'Doble pareja', 'Trío', 'Full (trío y pareja)', 'Póker'] },
-  escalera: { nombre: 'Escalera', e: '🪜', desc: 'La secuencia de cartas seguidas más larga (… 6, 7, sota, caballo, rey).', niveles: ['Dos seguidas', 'Tres seguidas', 'Cuatro seguidas', 'Cinco seguidas'] },
+  escalera: { nombre: 'Escalera', e: '🪜', desc: 'La secuencia de cartas seguidas más larga (… 6, 7, 10, 11, 12: la sota va justo después del 7).', niveles: ['Dos seguidas', 'Tres seguidas', 'Cuatro seguidas', 'Cinco seguidas'] },
   colores: { nombre: 'Colores', e: '🎨', desc: 'Reunir cartas del mismo palo.', niveles: ['Dos del mismo palo', 'Tres del mismo palo', 'Cuatro del mismo palo', 'Cinco del mismo palo'] },
   suma: { nombre: 'La suma', e: '➕', desc: 'Que tus cartas sumen lo más cerca posible del objetivo (las figuras valen 10).', niveles: ['A 8 o menos', 'A 5 o menos', 'A 3 o menos', 'A 1 o menos', 'Exacto'] },
   pequena: { nombre: 'La pequeña', e: '🐜', desc: 'Que tus tres cartas más bajas sumen lo menos posible (figuras = 10).', niveles: ['12 o menos', '9 o menos', '7 o menos', '5 o menos', 'Tres ases'] },

@@ -4,7 +4,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import * as E from './engine.js';
-import { PantallaJuego, PantallaResultado, PantallaFin, ModalSalir } from './Vistas.jsx';
+import { PantallaJuego, PantallaResultado, PantallaFin, ModalSalir, TurnoDe } from './Vistas.jsx';
 import ConfigJuego from './Config.jsx';
 import { urlLocal } from './juegos.js';
 import { SelectorJugadores } from '../../components/MenuJuego.jsx';
@@ -21,12 +21,24 @@ export default function PulsadorLocal({ juego, onVolver, onExit, onAbrirAyuda })
   const [, setVer] = useState(0);
   const avisoTimer = useRef(null);
   const refrescar = () => setVer((x) => x + 1);
+  // Pantalla de turno antes de responder (juegos con `pantallaTurno`): mientras se ve, el reloj de respuesta espera
+  const [listo, setListo] = useState(null);
+  const listoRef = useRef(null);
+  listoRef.current = listo;
+  const claveTurno = (est) => (est?.fase === 'jugando' && est.pulsado?.jugadorId != null ? `${est.ronda}-${est.pulsado.jugadorId}-${est.bloqueados.length}` : null);
+  const enPantallaTurno = (est) => Boolean(juego.pantallaTurno && claveTurno(est) && listoRef.current !== claveTurno(est));
 
   useEffect(() => {
     if (paso !== 'juego') return undefined;
-    const i = setInterval(() => { if (estRef.current) { E.tick(estRef.current, Date.now()); refrescar(); } }, 200);
+    const i = setInterval(() => {
+      const est = estRef.current;
+      if (!est) return;
+      if (enPantallaTurno(est)) est.pulsado.hasta = Date.now() + est.reglas.segRespuesta * 1000;
+      E.tick(est, Date.now());
+      refrescar();
+    }, 200);
     return () => clearInterval(i);
-  }, [paso]);
+  }, [paso]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => () => clearTimeout(avisoTimer.current), []);
 
   const empezar = async () => {
@@ -103,6 +115,14 @@ export default function PulsadorLocal({ juego, onVolver, onExit, onAbrirAyuda })
           {v.ronda < v.rondas && <button type="button" className="pzp-enlace" onClick={() => enviar('terminar')}><Icon name="flagFinish" size={15} /> Terminar la partida ya</button>}
         </div>
       </PantallaResultado>
+    );
+  } else if (enPantallaTurno(est)) {
+    const id = est.pulsado.jugadorId;
+    const nombre = v.jugadores.find((j) => j.id === id)?.nombre;
+    contenido = (
+      <TurnoDe v={v} id={id} puedo boton={`Soy ${nombre}: ¡a responder!`}
+        onListo={() => { est.pulsado.hasta = Date.now() + est.reglas.segRespuesta * 1000; setListo(claveTurno(est)); }}
+        texto={`Ha pulsado ${nombre}. Pásale el móvil para que responda: el reloj no corre hasta que pulse el botón.`} />
     );
   } else {
     contenido = <PantallaJuego key={v.ronda} v={v} juego={juego} t0={ahora} enviar={enviar} onSalir={onSalir} local controles />;

@@ -2,7 +2,7 @@
 // Pantallas de «El Dato que Sobra» (online y en un dispositivo) con las piezas comunes de ../Pulsador.
 import React, { useState } from 'react';
 import Icon from '../../components/Icon.jsx';
-import { Hero, Cuenta, useRestante, Avatar, Pildoras, PantallaFin, colorDe } from '../Pulsador/Vistas.jsx';
+import { Hero, Cuenta, useRestante, Avatar, Pildoras, PantallaFin, AvisoTurno } from '../Pulsador/Vistas.jsx';
 import { BloqueConfig } from '../../components/MenuJuego.jsx';
 import { AJUSTES, OPCIONES, LETRAS } from './engine.js';
 import './DatoSobra.css';
@@ -71,33 +71,6 @@ function Desafiar({ v, enviar }) {
   );
 }
 
-/** En un dispositivo: cada retador elige en voz alta en una fila. */
-function DesafiarLocal({ v, enviar }) {
-  const retadores = v.jugadores.filter((j) => !j.fuera && j.id !== v.turno);
-  return (
-    <>
-      <Afirmaciones v={v} />
-      <div className="pzp-tarjeta dsx-retos">
-        <p className="pzp-etiqueta">¿Quién desafía a {nombreDe(v, v.turno)}?</p>
-        {retadores.map((j) => (j.decidido ? (
-          <div key={j.id} className="dsx-reto hecho"><span className="dsx-reto-nombre"><Avatar id={j.id} nombre={j.nombre} /> {j.nombre}</span><span>✓ Decidido</span></div>
-        ) : (
-          <div key={j.id} className="dsx-reto">
-            <span className="dsx-reto-nombre"><Avatar id={j.id} nombre={j.nombre} /> {j.nombre}</span>
-            <div className="dsx-reto-op">
-              <button type="button" onClick={() => enviar('desafiar', { jugador: j.id, indice: null })}>🤝</button>
-              {LETRAS.map((l, i) => (i === v.respuesta ? null : (
-                <button key={l} type="button" onClick={() => enviar('desafiar', { jugador: j.id, indice: i })}>{l}</button>
-              )))}
-            </div>
-          </div>
-        )))}
-        <p className="dsx-nota oscura">🤝 acepta su respuesta · una letra = desafía señalando esa como la falsa. Las decisiones quedan en secreto hasta el final.</p>
-      </div>
-    </>
-  );
-}
-
 function Resultado({ v, enviar, puedeSeguir }) {
   const r = v.resultado;
   const textos = { acepta: '🤝 aceptó', gana: '⚔️ ganó el desafío', pierde: '⚔️ perdió el desafío', falla: '⚔️ desafió, pero tampoco era esa' };
@@ -135,27 +108,33 @@ export function Partida({ v, enviar, offset = 0, onSalir, local = false, admin =
   const restante = useRestante(v.hasta, offset);
   const quien = nombreDe(v, v.turno);
   const esTurno = v.yo && v.yo.id === v.turno;
-  const titulo = v.fase === 'responder' ? (local ? `Responde ${quien}` : esTurno ? '¿Cuál es la mentira?' : `${quien} busca la mentira`)
-    : v.fase === 'desafiar' ? (local ? '¿Alguien desafía?' : esTurno ? 'Los demás deciden…' : '¿Aceptas o desafías?') : 'La verdad';
+  const titulo = v.fase === 'responder' ? (esTurno ? '¿Cuál es la mentira?' : `${quien} busca la mentira`)
+    : v.fase === 'desafiar' ? (esTurno ? 'Los demás deciden…' : '¿Aceptas o desafías?') : 'La verdad';
   return (
     <>
       <Hero v={v} juego={HERO} onSalir={onSalir} chip={`🕵️ ${v.ronda}/${v.rondas}`} etiqueta={`Tres verdades y una mentira sobre…`} titulo={titulo}
         turno={v.fase !== 'resultado' ? v.turno : undefined}
         extra={v.fase === 'desafiar' ? (j) => (j.decidido ? <span className="dsx-listo" aria-label="Ha decidido">✓</span> : null) : undefined} />
+      {!local && v.yo && (
+        <AvisoTurno id={v.yo.id} emoji={v.fase === 'responder' ? '🕵️' : '⚔️'}
+          clave={v.fase === 'responder' && esTurno ? `r${v.ronda}` : v.fase === 'desafiar' && !esTurno && v.yo.decision === null ? `d${v.ronda}` : null}
+          texto={v.fase === 'responder' ? '¡Te toca!' : '¿Aceptas o desafías?'}
+          sub={v.fase === 'responder' ? `Busca la mentira sobre ${v.futbolista}.` : `${quien} dice que la falsa es la ${v.respuesta === null ? '…' : LETRAS[v.respuesta]}.`} />
+      )}
       <div className="pzp-tarjeta dsx-futbolista"><span>⚽</span><strong>{v.futbolista}</strong></div>
       {v.hasta && v.fase !== 'resultado' && <Cuenta ms={restante} total={v.segundos * 1000} />}
-      {v.fase === 'responder' && (esTurno || local ? <Responder key={v.ronda} v={v} enviar={enviar} /> : (
+      {v.fase === 'responder' && (esTurno ? <Responder key={v.ronda} v={v} enviar={enviar} /> : (
         <>
           <Afirmaciones v={v} />
           <p className="dsx-nota">Piensa cuál es la falsa: cuando {quien} responda, podrás aceptar o desafiar.</p>
         </>
       ))}
-      {v.fase === 'desafiar' && (local ? <DesafiarLocal v={v} enviar={enviar} /> : esTurno ? (
+      {v.fase === 'desafiar' && (esTurno ? (
         <>
           <Afirmaciones v={v} />
           <p className="dsx-nota">Los demás están decidiendo si te desafían…</p>
         </>
-      ) : <Desafiar key={v.ronda} v={v} enviar={enviar} />)}
+      ) : <Desafiar key={`${v.ronda}-${v.yo?.id}`} v={v} enviar={enviar} />)}
       {v.fase === 'resultado' && <Resultado v={v} enviar={enviar} puedeSeguir={admin} />}
     </>
   );

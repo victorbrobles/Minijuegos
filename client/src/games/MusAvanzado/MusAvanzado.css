@@ -9,29 +9,6 @@
 
 .mav-mano { display: flex; justify-content: center; gap: 0.35rem; margin: 0.7rem 0; flex-wrap: wrap; }
 .mav-mano.chica { justify-content: flex-start; gap: 0.25rem; margin: 0.25rem 0; }
-.mav-carta {
-  position: relative; width: 58px; height: 84px; margin: 0; padding: 0; border-radius: 10px; border: 2px solid #cbd5e1;
-  background: #fffdf5; color: #0f172a; font: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.1rem;
-  box-shadow: 0 3px 8px rgba(15, 23, 42, 0.25); transition: transform 0.12s; cursor: default;
-}
-.mav-carta:not(:disabled) { cursor: pointer; }
-.mav-carta.chica { width: 38px; height: 54px; border-radius: 7px; box-shadow: none; }
-.mav-carta.sel { transform: translateY(-10px); border-color: #dc2626; box-shadow: 0 8px 14px rgba(220, 38, 38, 0.35); }
-.mav-carta-r { font-size: 1.45rem; font-weight: 900; line-height: 1; }
-.mav-carta.chica .mav-carta-r { font-size: 1rem; }
-.mav-carta-p { font-size: 1.1rem; line-height: 1; }
-.mav-carta.chica .mav-carta-p { font-size: 0.8rem; }
-.mav-carta.oros .mav-carta-r { color: #b45309; }
-.mav-carta.copas .mav-carta-r { color: #b91c1c; }
-.mav-carta.espadas .mav-carta-r { color: #1d4ed8; }
-.mav-carta.bastos .mav-carta-r { color: #15803d; }
-.mav-carta-marca { position: absolute; top: 2px; right: 3px; font-size: 0.7rem; }
-.mav-carta-esp { display: flex; flex-direction: column; align-items: center; font-size: 1.5rem; }
-.mav-carta-esp small { font-size: 0.55rem; font-weight: 800; text-transform: uppercase; }
-.mav-carta.chica .mav-carta-esp { font-size: 1rem; }
-.mav-carta.chica .mav-carta-esp small { display: none; }
-.mav-carta.especial { background: linear-gradient(160deg, #fef9c3, #fde68a); }
-.mav-carta.esp-bomba { background: linear-gradient(160deg, #fee2e2, #fca5a5); }
 
 .mav-nota { text-align: center; font-size: 0.85rem; color: rgba(255, 255, 255, 0.88); margin: 0.4rem 0; }
 .mav-minivel { text-align: center; font-size: 0.82rem; color: #fde68a; margin: 0.2rem 0 0.6rem; }
@@ -73,7 +50,23 @@ button.mav-acepta { cursor: pointer; }
 .mav-bando-tit b { color: var(--pz2); font-size: 0.82rem; }
 .mav-bando-tit em { margin-left: auto; font-style: normal; font-weight: 900; color: #16a34a; }
 .mav-bando-tit em.menos { color: #dc2626; }
-/* Las cartas que no se pueden tocar no deben verse apagadas */
-.mav-carta:disabled { opacity: 1 !important; filter: none !important; cursor: default; background: #fffdf5; color: #0f172a; }
-.mav-carta.especial:disabled { background: linear-gradient(160deg, #fef9c3, #fde68a); }
-.mav-carta.esp-bomba:disabled { background: linear-gradient(160deg, #fee2e2, #fca5a5); }
+
+/* Mesa de tapete y mano en abanico */
+.pzp-contenedor.musavanzado {
+  background: radial-gradient(ellipse at 50% 30%, #15803d 0%, #14532d 55%, #052e16 100%) !important;
+}
+.pzp-contenedor.musavanzado::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; opacity: 0.12;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.6) 0.6px, transparent 0.6px); background-size: 5px 5px;
+}
+.mav-mano { gap: 0; padding: 0.6rem 0 0.3rem; }
+.mav-mano .cesp { width: 66px !important; margin: 0 -4px !important; }
+.mav-mano .cesp:nth-child(1) { transform: rotate(-10deg) translateY(8px); }
+.mav-mano .cesp:nth-child(2) { transform: rotate(-5deg) translateY(2px); }
+.mav-mano .cesp:nth-child(4) { transform: rotate(5deg) translateY(2px); }
+.mav-mano .cesp:nth-child(5) { transform: rotate(10deg) translateY(8px); }
+.mav-mano .cesp.sel { transform: translateY(-14px) !important; z-index: 1; }
+.mav-mano.chica { padding: 0.15rem 0; gap: 0.2rem; }
+.mav-mano.chica .cesp { width: 34px !important; margin: 0 !important; transform: none !important; }
+.mav-mesa { background: radial-gradient(ellipse, #166534, #064e3b) !important; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.15), 0 8px 18px rgba(0, 0, 0, 0.35); }
+.mav-bote b { display: inline-block; min-width: 2.2rem; padding: 0 0.4rem; border-radius: 999px; background: #fbbf24; color: #422006; }

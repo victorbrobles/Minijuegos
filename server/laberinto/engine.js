@@ -8,7 +8,7 @@
 // que esté en su sala, dejar un cepo, poner una barricada, teletransportarse (Mago) o proponer un pacto.
 // Hay trampas, tesoros, llaves para las puertas cerradas, pociones, mapas y caminos alternativos.
 
-export const AJUSTES = { lado: 7, min: 2, max: 4, rondasMax: 30, segTurno: 75, maxObjetos: 4, rondasPacto: 3, rondasBarricada: 3, recargaTeleporte: 3 };
+export const AJUSTES = { lado: 7, min: 2, max: 4, rondasMax: 30, segTurno: 75, maxObjetos: 4, rondasPacto: 3, rondasBarricada: 3, recargaTeleporte: 3, rondasEscudo: 2 };
 export const PERSONAJES = {
   guerrera: { nombre: 'La Guerrera', e: '🛡️', vidas: 4, pasos: 3, desc: 'Rompe las puertas cerradas sin llave y suma +2 al robar y al defenderse.' },
   ladron: { nombre: 'El Ladrón', e: '🗝️', vidas: 3, pasos: 3, desc: 'Sus robos siempre salen bien, ve las trampas de las salas vecinas y salta las barricadas.' },
@@ -105,7 +105,7 @@ export function crearPartida(jugadores, reglas = {}, ahora = Date.now(), rng = M
     pasos, salas, ronda: 1, rondasMax: Number(reglas.rondasMax) || AJUSTES.rondasMax,
     jugadores: jugadores.map((j, i) => ({
       id: j.id, nombre: j.nombre, personaje: asignados[i], sala: esquinas[i], inicio: esquinas[i], vidas: PERSONAJES[asignados[i]].vidas, oro: 0,
-      llaves: 0, objetos: [], corazon: false, recarga: 0, fuera: false
+      llaves: 0, objetos: [], corazon: false, recarga: 0, escudo: 0, fuera: false
     })),
     turnoIdx: 0, turno: null, cepos: [], barricadas: [], pactos: [], propuestas: [], nprop: 0,
     log: [], nlog: 0, fin: null, fase: 'jugando', hasta: null
@@ -121,6 +121,7 @@ function empezarTurno(p, ahora) {
   p.turno = { jugadorId: j.id, pasos: base, accion: true, movido: false };
   p.hasta = ahora + AJUSTES.segTurno * 1000;
   if (j.recarga > 0) j.recarga -= 1;
+  if (j.escudo > 0) j.escudo -= 1;
 }
 
 function finTurno(p, ahora) {
@@ -257,6 +258,8 @@ export function robar(p, id, victimaId, ahora = Date.now()) {
   if (!v || v.id === id || v.fuera || v.sala !== j.sala) return { ok: false, error: 'Solo puedes robar a alguien de tu sala.' };
   if (enPacto(p, id, v.id)) return { ok: false, error: `Tienes un pacto con ${v.nombre}.` };
   if (!v.corazon && !v.oro) return { ok: false, error: `${v.nombre} no lleva nada.` };
+  // Quien acaba de robar el Corazón está protegido un tiempo: así puede huir y no se lo quitan de vuelta
+  if (v.escudo > 0) return { ok: false, error: `${v.nombre} está protegido 🛡️ ${v.escudo === 1 ? 'hasta que acabe su turno' : 'durante 2 rondas'}: acaba de robar el Corazón.` };
   p.turno.accion = false;
   const fuerza = (x) => x.vidas + (x.personaje === 'guerrera' ? 2 : 0);
   const sale = j.personaje === 'ladron' || fuerza(j) >= fuerza(v);
@@ -267,8 +270,9 @@ export function robar(p, id, victimaId, ahora = Date.now()) {
   }
   if (v.corazon) {
     v.corazon = false; j.corazon = true;
+    j.escudo = AJUSTES.rondasEscudo;
     p.turno.pasos = Math.max(0, p.turno.pasos - 1);
-    anotar(p, `🦹 ¡${j.nombre} le roba el Corazón del Laberinto a ${v.nombre}!`, 'malo');
+    anotar(p, `🦹 ¡${j.nombre} le roba el Corazón del Laberinto a ${v.nombre}! Nadie podrá robarle durante ${AJUSTES.rondasEscudo} rondas 🛡️.`, 'malo');
     if (ESQUINAS.includes(j.sala)) finalizar(p, j.id);
   } else {
     const q = Math.min(3, v.oro); v.oro -= q; j.oro += q;
@@ -319,6 +323,7 @@ export function teletransporte(p, id, destino, ahora = Date.now()) {
   const s = p.salas[Number(destino)];
   if (!s?.descubierta || s.id === j.sala) return { ok: false, error: 'Elige una sala descubierta.' };
   if (j.corazon) return { ok: false, error: 'Con el Corazón encima la magia no funciona.' };
+  if (p.jugadores.some((x) => x.id !== id && !x.fuera && x.sala === s.id)) return { ok: false, error: 'No puedes aparecer en una sala donde hay alguien.' };
   j.sala = s.id;
   j.recarga = AJUSTES.recargaTeleporte;
   p.turno.accion = false;
@@ -422,7 +427,7 @@ export function vistaDe(p, id) {
     }).filter(Boolean),
     salas: p.salas.map((s) => (fin || s.descubierta ? { id: s.id, descubierta: true, contenido: s.contenido, oro: s.oro } : { id: s.id, descubierta: false })),
     turno: p.turno ? { jugadorId: p.turno.jugadorId, pasos: p.turno.pasos, accion: p.turno.accion } : null,
-    jugadores: p.jugadores.map((j) => ({ id: j.id, nombre: j.nombre, personaje: j.personaje, sala: j.sala, inicio: j.inicio, vidas: j.vidas, oro: j.oro, llaves: j.llaves, corazon: j.corazon, fuera: j.fuera, nObjetos: j.objetos.length })),
+    jugadores: p.jugadores.map((j) => ({ id: j.id, nombre: j.nombre, personaje: j.personaje, sala: j.sala, inicio: j.inicio, vidas: j.vidas, oro: j.oro, llaves: j.llaves, corazon: j.corazon, escudo: j.escudo, fuera: j.fuera, nObjetos: j.objetos.length })),
     yo: yo ? {
       id: yo.id, objetos: [...yo.objetos], recarga: yo.recarga, opciones: p.turno?.jugadorId === id ? opciones(p, yo) : [],
       misCepos: p.cepos.filter((c) => c.de === id).map((c) => c.sala), pistas,

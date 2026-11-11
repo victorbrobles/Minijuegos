@@ -6,30 +6,11 @@ import { Pildoras } from '../Pulsador/Vistas.jsx';
 import { BloqueConfig } from '../../components/MenuJuego.jsx';
 import { NOMBRE_LANCE, OPCIONES } from './engine.js';
 import './Mus.css';
+import CartaEspanola from '../../components/CartaEspanola.jsx';
 
-const PALO = {
-  oros: { e: '🪙', c: '#b45309' },
-  copas: { e: '🏆', c: '#dc2626' },
-  espadas: { e: '🗡️', c: '#1d4ed8' },
-  bastos: { e: '🪵', c: '#15803d' }
-};
-const FIGURA = { 10: 'Sota', 11: 'Caballo', 12: 'Rey' };
-const etiqueta = (n) => ({ 1: 'A', 10: 'S', 11: 'C', 12: 'R' }[n] || String(n));
-
+/** Carta española (dibujo común con el Mus Avanzado): números 1-7, 10, 11 y 12. */
 export function CartaEsp({ c, sel = false, onClick, chica = false, oculta = false }) {
-  if (oculta || !c) return <span className={`msp-carta dorso${chica ? ' chica' : ''}`} aria-hidden="true" />;
-  const P = PALO[c.p];
-  const contenido = (
-    <>
-      <span className="msp-carta-num">{etiqueta(c.n)}</span>
-      <span className="msp-carta-palo" aria-hidden="true">{P.e}</span>
-      {!chica && <span className="msp-carta-fig">{FIGURA[c.n] || c.p}</span>}
-      {(c.n === 3 || c.n === 2) && !chica && <span className="msp-carta-vale">{c.n === 3 ? '= rey' : '= as'}</span>}
-    </>
-  );
-  const cls = `msp-carta${sel ? ' sel' : ''}${chica ? ' chica' : ''}`;
-  if (!onClick) return <span className={cls} style={{ '--c': P.c }}>{contenido}</span>;
-  return <button type="button" className={cls} style={{ '--c': P.c }} onClick={onClick} aria-pressed={sel}>{contenido}</button>;
+  return <CartaEspanola c={c} sel={sel} onClick={onClick} chica={chica} oculta={oculta || !c} className="msp-carta-esp" />;
 }
 
 const rel = (v, s) => (s - (v.yo?.asiento ?? 0) + 4) % 4; // 0 yo, 1 derecha, 2 compañero, 3 izquierda

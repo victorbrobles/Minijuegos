@@ -570,3 +570,40 @@
 .pzp-contenedor.hemeroteca { --pz0: #f5f5f4; --pz1: #a8a29e; --pz2: #57534e; --pz3: #1c1917; }
 .pzp-contenedor.acta { --pz0: #dcfce7; --pz1: #86efac; --pz2: #166534; --pz3: #052e16; }
 .pzp-contenedor.pareja { --pz0: #fce7f3; --pz1: #f9a8d4; --pz2: #be185d; --pz3: #500724; }
+
+/* La frase dentro de una lista de pistas (titulares de La Hemeroteca) */
+.pzp-pista.frase { display: block; padding: 0.9rem 1rem 1rem; }
+.pzp-frase.en-tarjeta { margin-top: 0.35rem; padding: 0.2rem 0 0 1.9rem; font-size: clamp(1.15rem, 5vw, 1.45rem); }
+.pzp-frase.en-tarjeta::before { top: -0.45rem; font-size: 3.4rem; }
+
+/* La Hemeroteca: papel de periódico */
+.pzp-contenedor.hemeroteca { --pz0: #fef3c7; --pz1: #d6b98c; --pz2: #7c2d12; --pz3: #292524; }
+.pzp-contenedor.hemeroteca .pzp-pista.frase {
+  background: #fbf6e9 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23fbf6e9'/%3E%3Ccircle cx='1' cy='1' r='.4' fill='%23e7dcc3'/%3E%3C/svg%3E");
+  border: 1px solid #d6c7a6; border-radius: 6px; box-shadow: 0 6px 0 rgba(0, 0, 0, 0.25), 0 0 0 4px #fbf6e9;
+}
+.pzp-contenedor.hemeroteca .pzp-pista.frase .pzp-pista-etiqueta {
+  padding-bottom: 0.35rem; border-bottom: 3px double #292524; color: #292524; font-family: Georgia, 'Times New Roman', serif; font-size: 0.8rem; letter-spacing: 0.12em; text-align: center;
+}
+.pzp-contenedor.hemeroteca .pzp-frase.en-tarjeta { padding-left: 0; color: #1c1917; font-family: Georgia, 'Times New Roman', serif; font-weight: 800; letter-spacing: -0.01em; text-align: center; }
+.pzp-contenedor.hemeroteca .pzp-frase.en-tarjeta::before { content: none; }
+.pzp-contenedor.hemeroteca .pzp-hueco { color: #7c2d12 !important; }
+
+/* Pantalla intermedia de turno (online) */
+.pzp-aviso-turno {
+  position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 1.5rem;
+  background: rgba(15, 23, 42, 0.62); backdrop-filter: blur(3px); animation: pzpAvisoFondo 0.2s ease-out; cursor: pointer;
+}
+.pzp-aviso-caja {
+  --c: var(--pz2);
+  display: flex; flex-direction: column; align-items: center; gap: 0.35rem; width: min(340px, 100%); padding: 1.6rem 1.2rem 1.1rem;
+  border-radius: 28px; background: #fff; border-top: 8px solid var(--c); box-shadow: 0 24px 50px rgba(0, 0, 0, 0.45); text-align: center;
+  animation: pzpAvisoCaja 0.35s cubic-bezier(0.2, 1.4, 0.4, 1);
+}
+.pzp-aviso-emoji { font-size: 3rem; line-height: 1; }
+.pzp-aviso-caja strong { color: #0f172a; font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.7rem; font-weight: 800; line-height: 1.1; }
+.pzp-aviso-caja p { margin: 0 !important; color: #475569 !important; font-size: 0.95rem; font-weight: 600; }
+.pzp-aviso-caja small { margin-top: 0.4rem; color: #94a3b8; font-size: 0.72rem; font-weight: 700; }
+@keyframes pzpAvisoFondo { from { opacity: 0; } }
+@keyframes pzpAvisoCaja { from { transform: scale(0.6); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .pzp-aviso-turno, .pzp-aviso-caja { animation: none; } }

@@ -49,3 +49,24 @@ const q = E.crearPartida([{ id: 1, nombre: 'A' }, { id: 2, nombre: 'B' }]);
 const v = E.vistaDe(q, 2);
 assert.ok(v.salas.filter((s) => !s.descubierta).every((s) => !('contenido' in s)));
 console.log(`laberinto-sim OK (300 partidas: ${escapes} escapes con el Corazón, ${tiempo} por tiempo, ${robos} robos)`);
+
+// El bucle de robos: quien roba el Corazón no puede ser robado de vuelta en seguida
+{
+  const p = E.crearPartida([{ id: 1, nombre: 'A', personaje: 'guerrera' }, { id: 2, nombre: 'B', personaje: 'ladron' }], {}, 0);
+  const [a, b] = p.jugadores;
+  a.corazon = true; a.sala = 24; b.sala = 24;
+  p.turnoIdx = 1; p.turno = { jugadorId: 2, pasos: 3, accion: true };
+  if (!E.robar(p, 2, 1, 0).ok || !b.corazon) throw new Error('el ladrón debería robar el Corazón');
+  E.terminarTurno(p, 2, 0);
+  const r = E.robar(p, 1, 2, 0);
+  if (r.ok) throw new Error('no se debería poder robar de vuelta en seguida');
+  E.terminarTurno(p, 1, 0); E.terminarTurno(p, 2, 0);
+  if (E.robar(p, 1, 2, 0).ok) throw new Error('el escudo dura dos rondas');
+  E.terminarTurno(p, 1, 0); E.terminarTurno(p, 2, 0);
+  if (!E.robar(p, 1, 2, 0).ok) throw new Error('después del escudo ya se puede robar');
+  // El Mago no puede aparecer donde hay alguien
+  const q = E.crearPartida([{ id: 1, nombre: 'A', personaje: 'mago' }, { id: 2, nombre: 'B', personaje: 'guerrera' }], {}, 0);
+  q.salas[q.jugadores[1].sala].descubierta = true;
+  if (E.teletransporte(q, 1, q.jugadores[1].sala, 0).ok) throw new Error('el Mago no puede aparecer encima de otro');
+  console.log('laberinto-sim: escudo tras robar el Corazón y teletransporte OK');
+}

@@ -11,21 +11,21 @@ const JUEGO = {
   id: 'oncefantasma',
   api: '/api/oncefantasma',
   emoji: '👻',
-  config: { rondas: 2, segundos: 240 },
+  config: { onces: 1, segundos: 180 },
   Local: OnceFantasmaLocal,
   Partida: PartidaOnline,
   Fin,
   Config,
-  menuLocal: { icono: 'users', titulo: 'En un dispositivo', texto: 'Todos miran la misma pantalla y gritan nombres; quien escribe apunta a quién se le ocurrió.' },
-  notaSala: '👻 Todos escribís a la vez desde vuestro móvil: el primero que acierta un hueco se lo queda.',
-  detalleFin: (j) => `${j.aciertos} ${j.aciertos === 1 ? 'futbolista' : 'futbolistas'}`,
+  menuLocal: { icono: 'users', titulo: 'En un dispositivo', texto: 'Por turnos, cada uno reconstruye su once; si deja huecos, los demás tienen rebote.' },
+  notaSala: '👻 Por turnos, cada uno reconstruye un once desde su móvil; si deja huecos, los demás tienen rebote.',
+  detalleFin: (j) => `${j.aciertos} en su turno · ${j.rebotes} de rebote${j.plenos ? ` · ${j.plenos} ${j.plenos === 1 ? 'once completo' : 'onces completos'}` : ''}`,
   ganador: (n) => (n.length > 1 ? `¡Empate entre ${n.join(' y ')}!` : `¡${n[0]} ve fantasmas en el campo!`),
   reglas: [
-    'Cada ronda sale un partido histórico con su entrenador y los once huecos de la alineación titular: solo se ve la posición y el dorsal.',
-    'Escribid nombres a la vez. El primero que acierta un hueco se lo queda y su acierto destapa una pista de otro compañero (club o país, trayectoria e iniciales).',
-    `Cuantas menos pistas tuviera el hueco, más puntos: ${AJUSTES.puntosNivel.join(', ')}. Fallar no resta, pero te hace esperar un segundo y medio.`,
-    `Cada ${AJUSTES.segPista} segundos el reloj destapa otra pista. Si se completa el once, quien más huecos haya descubierto gana ${AJUSTES.bonusOnce} puntos extra.`,
-    'El anfitrión puede destapar pistas o rendirse para ver el once completo.'
+    'Cada partido histórico tiene sus dos onces titulares. Por turnos, a cada uno le toca reconstruir un once: los dos onces de un mismo partido van a jugadores seguidos.',
+    `Al principio solo se ven la posición y el dorsal de cada hueco (y el entrenador). Durante tu turno solo adivinas tú: cada acierto destapa una pista de otro compañero (club o país, trayectoria e iniciales) y el reloj destapa otra cada ${AJUSTES.segPista} segundos.`,
+    `Cuantas menos pistas tuviera el hueco, más puntos: ${AJUSTES.puntosNivel.join(', ')}. Si completas tú solo tu once, ${AJUSTES.bonusPleno} puntos extra.`,
+    `Si se te acaba el tiempo o te plantas con huecos, hay REBOTE: los demás pueden adivinar los que faltan (${AJUSTES.puntosRebote.join(', ')} puntos).`,
+    'Las alineaciones se ven como en la tele: el lateral izquierdo, a la izquierda.'
   ]
 };
 

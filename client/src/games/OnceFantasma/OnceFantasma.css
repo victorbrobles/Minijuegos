@@ -1,56 +1,68 @@
 /* El Once Fantasma (prefijo ofx-) */
 .pzp-contenedor.oncefantasma { --pz0: #e0f2fe; --pz1: #7dd3fc; --pz2: #1e3a8a; --pz3: #0b1437; }
 
-.ofx-cabecera { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; font-size: 0.9rem; padding: 0.6rem 0.9rem; }
-.ofx-cabecera span:last-child { font-weight: 800; background: var(--pz2); color: #fff; border-radius: 999px; padding: 0.1rem 0.6rem; }
+.ofx-estado {
+  display: flex; align-items: center; gap: 0.5rem; margin: 0; padding: 0.55rem 0.8rem; border-radius: 16px;
+  background: rgba(255, 255, 255, 0.95); color: #0f172a; font-size: 0.86rem; font-weight: 700; line-height: 1.3;
+}
+.ofx-estado.rebote { background: linear-gradient(135deg, #fef3c7, #fde68a); border: 2px solid #f59e0b; }
+.ofx-estado.rebote > span:last-child { flex: 1; }
+.ofx-cabecera { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; padding: 0.55rem 0.9rem !important; color: #0f172a; font-size: 0.9rem; }
+.ofx-contador { font-weight: 900; background: var(--pz2); color: #fff; border-radius: 999px; padding: 0.15rem 0.7rem; }
 
 .ofx-campo {
-  position: relative; display: flex; flex-direction: column; justify-content: space-around; gap: 0.5rem;
-  margin: 0.6rem 0; padding: 0.9rem 0.3rem; border-radius: 18px; overflow: hidden;
-  background: repeating-linear-gradient(180deg, #15803d 0 44px, #16a34a 44px 88px);
-  border: 3px solid rgba(255, 255, 255, 0.55); box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.12);
+  position: relative; display: flex; flex-direction: column; justify-content: space-around; gap: 0.35rem;
+  margin: 0.6rem 0; padding: 1.1rem 0.25rem; border-radius: 18px; overflow: hidden; min-height: 420px;
+  background: repeating-linear-gradient(180deg, #15803d 0 52px, #16a34a 52px 104px);
+  border: 4px solid rgba(255, 255, 255, 0.85); box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35), inset 0 0 40px rgba(0, 0, 0, 0.2);
 }
-.ofx-circulo { position: absolute; left: 50%; top: 50%; width: 90px; height: 90px; transform: translate(-50%, -50%); border: 2px solid rgba(255, 255, 255, 0.35); border-radius: 50%; pointer-events: none; }
-.ofx-campo::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; border-top: 2px solid rgba(255, 255, 255, 0.35); pointer-events: none; }
-.ofx-linea { position: relative; z-index: 1; display: flex; justify-content: space-evenly; gap: 0.2rem; }
+.ofx-circulo { position: absolute; left: 50%; top: 50%; width: 92px; height: 92px; transform: translate(-50%, -50%); border: 2px solid rgba(255, 255, 255, 0.45); border-radius: 50%; pointer-events: none; }
+.ofx-campo::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; border-top: 2px solid rgba(255, 255, 255, 0.45); pointer-events: none; }
+.ofx-area { position: absolute; left: 22%; right: 22%; height: 58px; border: 2px solid rgba(255, 255, 255, 0.45); pointer-events: none; }
+.ofx-area.arriba { top: -2px; border-top: 0; }
+.ofx-area.abajo { bottom: -2px; border-bottom: 0; }
+.ofx-linea { position: relative; z-index: 1; display: flex; justify-content: space-evenly; gap: 0.15rem; }
 
 .ofx-hueco {
-  display: flex; flex-direction: column; align-items: center; gap: 0.1rem; min-width: 0; flex: 0 1 70px;
-  background: none; border: 0; padding: 0.15rem; color: #fff; cursor: pointer; font: inherit; border-radius: 10px;
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 0.05rem; min-width: 0; flex: 0 1 68px;
+  background: none !important; border: 0 !important; padding: 0.15rem !important; margin: 0 !important; color: #fff; cursor: pointer; font: inherit; border-radius: 12px; box-shadow: none !important;
 }
-.ofx-hueco.marcado { background: rgba(255, 255, 255, 0.22); }
-.ofx-camiseta {
-  display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px 10px 14px 14px;
-  background: rgba(15, 23, 42, 0.55); border: 2px dashed rgba(255, 255, 255, 0.75); font-weight: 900; font-size: 1.05rem;
-}
-.ofx-hueco.visto .ofx-camiseta { background: #f8fafc; color: #0f172a; border: 2px solid #fff; }
-.ofx-hueco.cazado .ofx-camiseta { background: var(--c); color: #fff; border-color: #fff; }
-.ofx-nombre { font-size: 0.72rem; font-weight: 800; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6); }
-.ofx-dato { font-size: 0.6rem; line-height: 1.1; max-width: 100%; text-align: center; background: rgba(0, 0, 0, 0.35); border-radius: 6px; padding: 0.05rem 0.25rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.ofx-hueco.marcado { background: rgba(255, 255, 255, 0.22) !important; }
+.ofx-camiseta { width: 44px; height: 40px; filter: drop-shadow(0 3px 3px rgba(0, 0, 0, 0.35)); }
+.ofx-hueco.cazado .ofx-camiseta path { stroke: var(--c); stroke-width: 3; }
+.ofx-nombre { max-width: 100%; overflow: hidden; padding: 0 0.25rem; border-radius: 6px; font-size: 0.72rem; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7); }
+.ofx-hueco.visto .ofx-nombre { background: rgba(15, 23, 42, 0.75); text-shadow: none; }
+.ofx-dato { max-width: 100%; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; padding: 0.05rem 0.3rem; border-radius: 6px; background: rgba(255, 255, 255, 0.92); color: #0f172a; font-size: 0.58rem; font-weight: 800; line-height: 1.15; text-align: center; }
 .ofx-nivel { display: flex; gap: 2px; }
-.ofx-nivel i { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, 0.3); }
-.ofx-nivel i.on { background: #fde047; }
+.ofx-nivel i { width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, 0.35); }
+.ofx-nivel i.on { background: #fde047; box-shadow: 0 0 4px #fde047; }
+.ofx-quien { position: absolute; top: 0; right: 6px; display: grid; place-items: center; min-width: 18px; height: 18px; padding: 0 3px; border-radius: 999px; background: var(--c); border: 2px solid #fff; color: #fff; font-size: 0.6rem; font-weight: 900; }
 
-.ofx-ayuda { text-align: center; font-size: 0.85rem; color: rgba(255, 255, 255, 0.85); margin: 0.2rem 0 0.6rem; }
-.ofx-ficha ul { list-style: none; margin: 0.3rem 0 0; padding: 0; display: grid; gap: 0.35rem; font-size: 0.9rem; }
-.ofx-ficha b { display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; opacity: 0.7; }
-.ofx-ficha-nombre { margin: 0.1rem 0 0.2rem; font-size: 1.3rem; }
+.ofx-ayuda { margin: 0.2rem 0 0.6rem; color: rgba(255, 255, 255, 0.88); font-size: 0.85rem; text-align: center; }
+.ofx-ficha { position: relative; color: #0f172a; }
+.ofx-ficha-cerrar { position: absolute; top: 0.6rem; right: 0.7rem; width: 30px !important; height: 30px; padding: 0 !important; border: 0 !important; border-radius: 50% !important; background: #f1f5f9 !important; color: #475569 !important; font-size: 0.9rem; cursor: pointer; }
+.ofx-ficha ul { list-style: none; margin: 0.3rem 0 0; padding: 0; display: grid; gap: 0.45rem; font-size: 0.92rem; }
+.ofx-ficha li { padding: 0.4rem 0.6rem; border-radius: 12px; background: #f0f9ff; }
+.ofx-ficha li.oculta { background: #f8fafc; color: #94a3b8; font-style: italic; }
+.ofx-ficha b { display: block; font-size: 0.7rem; font-style: normal; letter-spacing: 0.04em; text-transform: uppercase; color: #1e3a8a; }
+.ofx-ficha-nombre { margin: 0.1rem 0 0.2rem; font-size: 1.35rem; }
 
 .ofx-buscador { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0.5rem; align-items: stretch; margin: 0.6rem 0; }
 .ofx-buscador .pzp-input { min-width: 0; }
 .ofx-buscador .pzp-boton { width: auto !important; min-width: 0 !important; padding-left: 0.9rem; padding-right: 0.9rem; margin: 0 !important; }
-.ofx-aviso { position: absolute; left: 0; right: 0; bottom: calc(100% + 0.35rem); margin: 0; padding: 0.45rem 0.7rem; border-radius: 10px; font-weight: 700; font-size: 0.9rem; text-align: center; color: #fff; z-index: 2; }
+.ofx-aviso { position: absolute; left: 0; right: 0; bottom: calc(100% + 0.35rem); z-index: 2; margin: 0; padding: 0.45rem 0.7rem; border-radius: 10px; color: #fff; font-size: 0.9rem; font-weight: 700; text-align: center; }
 .ofx-aviso.bien { background: #16a34a; }
 .ofx-aviso.mal { background: #dc2626; }
 
-.ofx-quien { margin-top: 0.4rem; }
-.ofx-quien .pzp-etiqueta { color: rgba(255, 255, 255, 0.85); }
+.ofx-quien-lo-dice .pzp-etiqueta { color: rgba(255, 255, 255, 0.85); }
 .ofx-quien-lista { display: flex; flex-wrap: wrap; gap: 0.35rem; }
-.ofx-quien-lista button { border: 2px solid var(--c); background: #fff; color: #0f172a; border-radius: 999px; padding: 0.3rem 0.75rem; font: inherit; font-weight: 700; font-size: 0.85rem; cursor: pointer; }
+.ofx-quien-lista button { border: 2px solid var(--c); background: #fff; color: #0f172a; border-radius: 999px; padding: 0.35rem 0.8rem; font: inherit; font-weight: 700; font-size: 0.86rem; cursor: pointer; }
 .ofx-quien-lista button.activo { background: var(--c); color: #fff; }
 
-.ofx-registro { list-style: none; margin: 0.2rem 0; padding: 0.5rem 0.7rem; font-size: 0.82rem; display: grid; gap: 0.2rem; background: rgba(255, 255, 255, 0.92); color: #0f172a; border-radius: 14px; }
-.ofx-controles { display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; }
-.ofx-sumas { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.4rem 0; }
+.ofx-registro { list-style: none; margin: 0.2rem 0; padding: 0.5rem 0.7rem; font-size: 0.82rem; display: grid; gap: 0.2rem; background: rgba(255, 255, 255, 0.94); color: #0f172a; border-radius: 14px; }
+.ofx-controles { display: flex; justify-content: center; gap: 0.8rem; flex-wrap: wrap; }
+.ofx-sumas { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.4rem 0; color: #0f172a; }
 .ofx-sumas span { display: inline-flex; align-items: center; gap: 0.35rem; font-weight: 600; }
 .ofx-sumas b { color: #16a34a; }
+.ofx-gate-rebote { text-align: center; }
+.ofx-gate-emoji { font-size: 3rem; }

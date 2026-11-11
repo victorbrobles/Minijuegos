@@ -183,9 +183,20 @@ function Audio({ pista, sonar }) {
   );
 }
 
-function Pista({ pista, n, sonar }) {
+function Pista({ pista, n, sonar, enLista = false }) {
   if (pista.tipo === 'imagen') return <Imagen pista={pista} />;
-  if (pista.tipo === 'frase') return <blockquote className="pzp-frase">{pista.valor}</blockquote>;
+  if (pista.tipo === 'frase' && !enLista) return <blockquote className="pzp-frase">{pista.valor}</blockquote>;
+  // En una lista de pistas, la frase va en su propia tarjeta (si no, queda sobre el fondo oscuro)
+  if (pista.tipo === 'frase') {
+    return (
+      <div className="pzp-pista frase">
+        <div className="pzp-pista-cuerpo">
+          <span className="pzp-pista-etiqueta">{pista.etiqueta}</span>
+          <blockquote className="pzp-frase en-tarjeta">{pista.valor}</blockquote>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className={`pzp-pista ${pista.tipo}`}>
       <span className="pzp-pista-n">{n}</span>
@@ -214,7 +225,7 @@ export function Estimulo({ v, reloj, pistas = v.pistas, todas = false }) {
   const puntos = v.reglas.puntosPista || [];
   return (
     <div className="pzp-pistas">
-      {pistas.map((p, i) => <Pista key={i} pista={p} n={i + 1} sonar={sonar} />)}
+      {pistas.map((p, i) => <Pista key={i} pista={p} n={i + 1} sonar={sonar} enLista />)}
       {!todas && Array.from({ length: total - pistas.length }, (_, k) => {
         const i = pistas.length + k;
         const falta = reloj ? Math.max(0, Math.ceil((seg[i] * 1000 - reloj.transcurrido) / 1000)) : null;
@@ -528,6 +539,35 @@ export function Ayuda({ onCerrar, titulo, descripcion, reglas }) {
           <ul>{reglas.map((r) => <li key={r}>{r}</li>)}</ul>
         </div>
         <button type="button" className="big full qq-btn-principal" onClick={onCerrar}>¡Entendido!</button>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Pantalla intermedia de turno para el modo online: cuando `clave` cambia (y no es null), aparece unos segundos
+ * un aviso a pantalla completa («¡Te toca!», «Turno de Ana»…). Se cierra tocándolo.
+ */
+export function AvisoTurno({ clave, texto, sub, emoji = '🎯', id }) {
+  const [vis, setVis] = useState(null);
+  const previa = useRef(null);
+  useEffect(() => {
+    if (clave != null && clave !== previa.current) setVis({ texto, sub, emoji, id });
+    previa.current = clave;
+  }, [clave]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!vis) return undefined;
+    const t = setTimeout(() => setVis(null), 2600);
+    return () => clearTimeout(t);
+  }, [vis]);
+  if (!vis) return null;
+  return (
+    <div className="pzp-aviso-turno" role="status" onClick={() => setVis(null)}>
+      <div className="pzp-aviso-caja" style={vis.id != null ? { '--c': colorDe(vis.id) } : undefined}>
+        <span className="pzp-aviso-emoji" aria-hidden="true">{vis.emoji}</span>
+        <strong>{vis.texto}</strong>
+        {vis.sub && <p>{vis.sub}</p>}
+        <small>Toca para seguir</small>
       </div>
     </div>
   );

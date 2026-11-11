@@ -23,7 +23,9 @@ const JUEGO = {
     `En tu turno das pasos (3; con el Corazón, uno menos) a salas vecinas sin pared. Entrar en una sala nueva te detiene. Las puertas cerradas (marrones) se abren con una 🔑.`,
     'Hay trampas 🕳️ (−1 vida), tesoros 💰, llaves 🔑, pociones 🧪, mapas 📜 que descubren lo de alrededor, cepos 🪤 y barricadas 🚧. Sin vidas, caes aturdido: sueltas el Corazón y la mitad del oro y vuelves a tu entrada.',
     'Además puedes hacer una acción por turno: robar a quien esté en tu sala (el Corazón o 3 de oro; gana el que tiene más vidas), dejar un cepo escondido, bloquear un pasillo o proponer un pacto (unas rondas sin robos ni trampas entre vosotros).',
+    `Quien roba el Corazón queda protegido 🛡️ durante ${AJUSTES.rondasEscudo} rondas: nadie puede robarle, así que tiene tiempo de huir hacia una salida. Para pararle, córtale el paso con barricadas y cepos o llega antes a su salida.`,
     ...Object.values(PERSONAJES).map((p) => `${p.e} ${p.nombre}: ${p.desc}`),
+    'El Mago no puede teletransportarse a una sala donde haya otro jugador.',
     `Si pasan ${AJUSTES.rondasMax} rondas (configurable) sin que nadie escape, gana quien tenga más oro.`
   ]
 };

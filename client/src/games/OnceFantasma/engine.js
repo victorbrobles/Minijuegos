@@ -1,11 +1,13 @@
 // server/oncefantasma/engine.js
 // «El Once Fantasma»: motor puro (sin red). Se copia al cliente con `npm run sync:oncefantasma`.
-// Cada ronda hay un once histórico oculto. Todos escriben nombres a la vez: quien acierta un hueco se lo queda
-// (más puntos cuantas menos pistas tenía ese hueco) y su acierto destapa una pista de otro compañero.
-// Además, el reloj va destapando pistas solo.
+//
+// Cada partido histórico tiene sus dos onces titulares. Por turnos, a cada jugador le toca reconstruir UN once
+// (los dos onces de un partido van a jugadores seguidos). Durante su turno solo él puede adivinar: cada acierto
+// destapa una pista de otro compañero y el reloj va destapando más. Si se le acaba el tiempo o se planta con
+// huecos sin descubrir, hay REBOTE: los demás pueden adivinar los que faltan (valen menos).
 
-export const AJUSTES = { min: 2, max: 12, puntosNivel: [10, 7, 5, 3], segPista: 25, esperaFallo: 1500, bonusOnce: 5 };
-export const OPCIONES = { rondas: [1, 2, 3, 5], segundos: [180, 240, 300] };
+export const AJUSTES = { min: 2, max: 8, puntosNivel: [10, 7, 5, 3], puntosRebote: [5, 4, 3, 2], segPista: 20, segRebote: 40, esperaFallo: 1500, bonusPleno: 5 };
+export const OPCIONES = { onces: [1, 2, 3], segundos: [120, 180, 240] };
 export const NIVELES = ['Posición y dorsal', 'Club o país', 'Trayectoria', 'Iniciales'];
 export const POSICIONES = { POR: 'Portero', DEF: 'Defensa', MED: 'Centrocampista', DEL: 'Delantero' };
 
@@ -31,31 +33,43 @@ const iniciales = (n) => n.split(/\s+/).map((p) => `${p[0].toUpperCase()}.`).joi
 const jug = (p, id) => p.jugadores.find((j) => j.id === id);
 const activos = (p) => p.jugadores.filter((j) => !j.fuera);
 
-/** onces: lista de alineaciones (ya sorteadas). reglas: { rondas, segundos } */
-export function crearPartida(jugadores, onces, reglas = {}, ahora = Date.now(), rng = Math.random) {
-  const rondas = Math.max(1, Math.min(reglas.rondas || 2, onces.length));
+/** partidos: lista ya barajada de { partido, onces: [2] }. reglas: { onces (por jugador), segundos (por turno) } */
+export function crearPartida(jugadores, partidos, reglas = {}, ahora = Date.now(), rng = Math.random) {
+  const n = jugadores.length;
+  const k = OPCIONES.onces.includes(Number(reglas.onces)) ? Number(reglas.onces) : 1;
+  const total = Math.min(n * k, partidos.length * 2);
+  // Turno t: partido ⌊t/2⌋, once t%2, jugador t%n (los dos onces de un partido, a jugadores seguidos)
+  const turnos = Array.from({ length: total }, (_, t) => {
+    const m = partidos[Math.floor(t / 2)];
+    return { jugador: jugadores[t % n].id, partido: m.partido, ...m.onces[t % 2], lado: t % 2 };
+  });
   const p = {
-    jugadores: jugadores.map((j) => ({ id: j.id, nombre: j.nombre, puntos: 0, aciertos: 0, fuera: false })),
-    onces: onces.slice(0, rondas), rondas, segundos: reglas.segundos || 240,
-    ronda: 0, fase: 'jugando', hasta: null, proximaPista: null, huecos: [], esperas: {}, ultimos: {}, registro: [], sumas: {}, fin: null
+    jugadores: jugadores.map((j) => ({ id: j.id, nombre: j.nombre, puntos: 0, aciertos: 0, rebotes: 0, plenos: 0, fuera: false })),
+    turnos, ronda: 0, rondas: turnos.length, segundos: Number(reglas.segundos) || 180, sinReloj: Boolean(reglas.sinReloj),
+    fase: 'turno', hasta: null, proximaPista: null, huecos: [], esperas: {}, ultimos: {}, pasados: [], registro: [], sumas: {}, motivo: null, fin: null
   };
-  empezarRonda(p, ahora, rng);
+  empezarTurno(p, ahora, rng);
   return p;
 }
+const turnoActual = (p) => p.turnos[p.ronda - 1];
 
-function empezarRonda(p, ahora, rng = Math.random) {
+function empezarTurno(p, ahora, rng = Math.random) {
   p.ronda += 1;
-  const o = p.onces[p.ronda - 1];
-  p.huecos = o.jugadores.map((j) => ({ ...j, nivel: 0, por: null, puntos: 0 }));
+  // Si el jugador de este turno se ha ido, se salta
+  while (p.ronda <= p.rondas && jug(p, turnoActual(p).jugador)?.fuera) p.ronda += 1;
+  if (p.ronda > p.rondas) { terminar(p); return; }
+  p.huecos = turnoActual(p).jugadores.map((j) => ({ ...j, nivel: 0, por: null, puntos: 0, rebote: false }));
   // Dos huecos empiezan con una pista extra para tener por dónde tirar
   [...p.huecos.keys()].sort(() => rng() - 0.5).slice(0, 2).forEach((i) => { p.huecos[i].nivel = 1; });
-  p.fase = 'jugando';
-  p.hasta = ahora + p.segundos * 1000;
+  p.fase = 'turno';
+  p.hasta = p.sinReloj ? null : ahora + p.segundos * 1000;
   p.proximaPista = ahora + AJUSTES.segPista * 1000;
   p.esperas = {};
   p.ultimos = {};
+  p.pasados = [];
   p.registro = [];
   p.sumas = {};
+  p.motivo = null;
 }
 
 /** Sube un nivel de pista en un hueco oculto (el de menos pistas, al azar entre empatados). */
@@ -68,30 +82,51 @@ function destapar(p, rng = Math.random, salvo = -1) {
   h.nivel += 1;
   return i;
 }
+const quedan = (p) => p.huecos.filter((h) => !h.por).length;
+const sumar = (p, j, n) => { j.puntos += n; p.sumas[j.id] = (p.sumas[j.id] || 0) + n; };
 
-function cerrarRonda(p, motivo) {
+/** ¿Puede este jugador adivinar ahora? En su turno solo él; en el rebote, todos menos él. */
+export function puedeAdivinar(p, id) {
+  const j = jug(p, id);
+  if (!j || j.fuera) return false;
+  const delTurno = turnoActual(p)?.jugador === id;
+  if (p.fase === 'turno') return delTurno;
+  if (p.fase === 'rebote') return !delTurno && !p.pasados.includes(id);
+  return false;
+}
+
+/** Fin del turno del jugador: rebote si quedan huecos; si no, resultado (y bonus por once completo). */
+function cerrarTurno(p, ahora, motivo) {
+  const t = turnoActual(p);
+  if (!quedan(p)) {
+    const j = jug(p, t.jugador);
+    if (j && p.huecos.every((h) => h.por === t.jugador)) { sumar(p, j, AJUSTES.bonusPleno); j.plenos += 1; p.motivo = 'pleno'; } else p.motivo = 'completo';
+    p.fase = 'resultado';
+    p.hasta = null;
+    p.proximaPista = null;
+    return;
+  }
+  const rivales = activos(p).filter((j) => j.id !== t.jugador);
+  if (!rivales.length) { p.fase = 'resultado'; p.motivo = motivo; p.hasta = null; p.proximaPista = null; return; }
+  p.fase = 'rebote';
+  p.motivo = motivo;
+  p.pasados = [];
+  p.esperas = {};
+  p.hasta = p.sinReloj ? null : ahora + AJUSTES.segRebote * 1000;
+  p.proximaPista = null;
+}
+function cerrarRebote(p) {
   p.fase = 'resultado';
   p.hasta = null;
   p.proximaPista = null;
-  const completo = p.huecos.every((h) => h.por);
-  p.motivo = completo ? 'completo' : motivo;
-  // Bonus a quien más huecos haya descubierto en un once completo
-  if (completo) {
-    const cuenta = {};
-    p.huecos.forEach((h) => { cuenta[h.por] = (cuenta[h.por] || 0) + 1; });
-    const max = Math.max(...Object.values(cuenta));
-    Object.keys(cuenta).filter((id) => cuenta[id] === max).forEach((id) => {
-      const j = p.jugadores.find((x) => String(x.id) === id);
-      if (j) { j.puntos += AJUSTES.bonusOnce; p.sumas[j.id] = (p.sumas[j.id] || 0) + AJUSTES.bonusOnce; }
-    });
-  }
 }
 
 /** Un jugador escribe un nombre. */
 export function adivinar(p, id, texto, ahora = Date.now(), rng = Math.random) {
   const j = jug(p, id);
   if (!j || j.fuera) return { ok: false, error: 'No estás en la partida.' };
-  if (p.fase !== 'jugando') return { ok: false, error: 'La ronda ya ha terminado.' };
+  if (p.fase !== 'turno' && p.fase !== 'rebote') return { ok: false, error: 'Ahora no se puede adivinar.' };
+  if (!puedeAdivinar(p, id)) return { ok: false, error: p.fase === 'turno' ? `Es el turno de ${jug(p, turnoActual(p).jugador)?.nombre}.` : 'En el rebote juegan los demás.' };
   if ((p.esperas[id] || 0) > ahora) return { ok: false, error: 'Espera un momento antes de volver a probar.' };
   const limpio = String(texto || '').trim().slice(0, 40);
   if (!limpio) return { ok: false, error: 'Escribe un nombre.' };
@@ -104,39 +139,52 @@ export function adivinar(p, id, texto, ahora = Date.now(), rng = Math.random) {
     return { ok: true, acierto: false, mensaje };
   }
   const h = p.huecos[i];
-  const puntos = AJUSTES.puntosNivel[h.nivel];
+  const rebote = p.fase === 'rebote';
+  const puntos = (rebote ? AJUSTES.puntosRebote : AJUSTES.puntosNivel)[h.nivel];
   h.por = id;
   h.puntos = puntos;
-  j.puntos += puntos;
-  j.aciertos += 1;
-  p.sumas[id] = (p.sumas[id] || 0) + puntos;
-  // El acierto destapa una pista de otro compañero
+  h.rebote = rebote;
+  sumar(p, j, puntos);
+  if (rebote) j.rebotes += 1; else j.aciertos += 1;
   const otro = destapar(p, rng, i);
-  p.registro.unshift({ id, hueco: i, puntos, pista: otro });
+  p.registro.unshift({ id, hueco: i, puntos, pista: otro, rebote });
   p.ultimos[id] = { acierto: true, mensaje: `¡${h.nombre}! +${puntos}`, t: ahora };
-  if (p.huecos.every((x) => x.por)) cerrarRonda(p, 'completo');
+  if (!quedan(p)) { if (rebote) cerrarRebote(p); else cerrarTurno(p, ahora, 'completo'); }
   return { ok: true, acierto: true, hueco: i, puntos, nombre: h.nombre, pista: otro };
 }
 
-/** El anfitrión (o el grupo) adelanta una pista. */
+/** El jugador del turno pide otra pista (o el anfitrión, para desatascar). */
 export function pista(p, rng = Math.random, ahora = Date.now()) {
-  if (p.fase !== 'jugando') return { ok: false, error: 'La ronda ya ha terminado.' };
+  if (p.fase !== 'turno' && p.fase !== 'rebote') return { ok: false, error: 'Ahora no hay pistas.' };
   const i = destapar(p, rng);
   if (i === null) return { ok: false, error: 'No quedan más pistas.' };
-  p.proximaPista = ahora + AJUSTES.segPista * 1000;
+  if (p.fase === 'turno') p.proximaPista = ahora + AJUSTES.segPista * 1000;
   return { ok: true, hueco: i };
 }
 
-export function rendirse(p) {
-  if (p.fase !== 'jugando') return { ok: false, error: 'La ronda ya ha terminado.' };
-  cerrarRonda(p, 'rendicion');
+/** El jugador del turno se planta: pasa al rebote. */
+export function plantarse(p, id, ahora = Date.now()) {
+  if (p.fase !== 'turno') return { ok: false, error: 'Ahora no.' };
+  if (id !== null && turnoActual(p).jugador !== id) return { ok: false, error: 'No es tu turno.' };
+  cerrarTurno(p, ahora, 'plantado');
+  return { ok: true };
+}
+
+/** En el rebote: «no sé más». Cuando pasan todos, se cierra. id = null cierra el rebote (anfitrión o grupo). */
+export function pasarRebote(p, id) {
+  if (p.fase !== 'rebote') return { ok: false, error: 'No hay rebote.' };
+  if (id === null) { cerrarRebote(p); return { ok: true }; }
+  if (!puedeAdivinar(p, id)) return { ok: false, error: 'Ya has pasado.' };
+  p.pasados.push(id);
+  const t = turnoActual(p);
+  if (activos(p).filter((j) => j.id !== t.jugador).every((j) => p.pasados.includes(j.id))) cerrarRebote(p);
   return { ok: true };
 }
 
 export function siguiente(p, ahora = Date.now(), rng = Math.random) {
-  if (p.fase !== 'resultado') return { ok: false, error: 'Todavía no ha terminado la ronda.' };
+  if (p.fase !== 'resultado') return { ok: false, error: 'Todavía no ha terminado el turno.' };
   if (p.ronda >= p.rondas) { terminar(p); return { ok: true }; }
-  empezarRonda(p, ahora, rng);
+  empezarTurno(p, ahora, rng);
   return { ok: true };
 }
 
@@ -145,42 +193,50 @@ export function terminar(p) {
   p.fase = 'fin';
   p.hasta = null;
   p.proximaPista = null;
-  const tabla = [...p.jugadores].sort((a, b) => b.puntos - a.puntos || b.aciertos - a.aciertos);
+  const tabla = [...p.jugadores].sort((a, b) => (a.fuera - b.fuera) || b.puntos - a.puntos || b.aciertos - a.aciertos);
   let puesto = 0;
   tabla.forEach((j, k) => { if (k === 0 || j.puntos !== tabla[k - 1].puntos) puesto = k + 1; j.puesto = puesto; });
   const max = Math.max(0, ...activos(p).map((j) => j.puntos));
   p.fin = {
-    tabla: tabla.map((j) => ({ id: j.id, nombre: j.nombre, puntos: j.puntos, aciertos: j.aciertos, puesto: j.puesto, fuera: j.fuera })),
+    tabla: tabla.map((j) => ({ id: j.id, nombre: j.nombre, puntos: j.puntos, aciertos: j.aciertos, rebotes: j.rebotes, plenos: j.plenos, puesto: j.puesto, fuera: j.fuera })),
     ganadores: max > 0 ? activos(p).filter((j) => j.puntos === max).map((j) => j.id) : [], max
   };
   return { ok: true };
 }
 
 export function tick(p, ahora = Date.now(), rng = Math.random) {
-  if (p.fase !== 'jugando') return;
-  if (p.hasta && ahora >= p.hasta) { cerrarRonda(p, 'tiempo'); return; }
-  while (p.proximaPista && ahora >= p.proximaPista && p.fase === 'jugando') {
-    destapar(p, rng);
-    p.proximaPista += AJUSTES.segPista * 1000;
-  }
+  if (p.fase === 'turno') {
+    if (p.hasta && ahora >= p.hasta) { cerrarTurno(p, ahora, 'tiempo'); return; }
+    while (p.proximaPista && ahora >= p.proximaPista && p.fase === 'turno') {
+      destapar(p, rng);
+      p.proximaPista += AJUSTES.segPista * 1000;
+    }
+  } else if (p.fase === 'rebote' && p.hasta && ahora >= p.hasta) cerrarRebote(p);
 }
 
-export function abandonar(p, id) {
+export function abandonar(p, id, ahora = Date.now()) {
   const j = jug(p, id);
   if (!j || j.fuera || p.fase === 'fin') return;
   j.fuera = true;
-  if (activos(p).length < 1) terminar(p);
+  if (activos(p).length < 1) { terminar(p); return; }
+  if (p.fase === 'turno' && turnoActual(p).jugador === id) cerrarTurno(p, ahora, 'abandono');
+  else if (p.fase === 'rebote') {
+    const t = turnoActual(p);
+    if (activos(p).filter((x) => x.id !== t.jugador).every((x) => p.pasados.includes(x.id))) cerrarRebote(p);
+  }
 }
 
 /** Lo que ve cada jugador: los huecos ocultos solo enseñan las pistas destapadas. */
 export function vistaDe(p, id) {
-  const o = p.onces[p.ronda - 1];
-  const abierto = p.fase !== 'jugando';
+  const t = turnoActual(p);
+  const abierto = p.fase === 'resultado' || p.fase === 'fin';
   return {
-    fase: p.fase, ronda: p.ronda, rondas: p.rondas, segundos: p.segundos, hasta: p.hasta, proximaPista: p.proximaPista, motivo: p.motivo || null,
-    jugadores: p.jugadores.map((j) => ({ id: j.id, nombre: j.nombre, puntos: j.puntos, aciertos: j.aciertos, fuera: j.fuera })),
-    yo: jug(p, id) ? { id, espera: p.esperas[id] || 0, ultimo: p.ultimos[id] || null } : null,
-    once: o ? { equipo: o.equipo, partido: o.partido, entrenador: o.entrenador, tipo: o.tipo } : null,
+    fase: p.fase, ronda: p.ronda, rondas: p.rondas, hasta: p.hasta, proximaPista: p.proximaPista, motivo: p.motivo,
+    segundos: p.fase === 'rebote' ? AJUSTES.segRebote : p.segundos,
+    turno: t ? t.jugador : null,
+    jugadores: p.jugadores.map((j) => ({ id: j.id, nombre: j.nombre, puntos: j.puntos, aciertos: j.aciertos, fuera: j.fuera, pasado: p.pasados.includes(j.id) })),
+    yo: jug(p, id) ? { id, puedo: puedeAdivinar(p, id), espera: p.esperas[id] || 0, ultimo: p.ultimos[id] || null } : null,
+    once: t ? { equipo: t.equipo, partido: t.partido, entrenador: t.entrenador, tipo: t.tipo, lado: t.lado } : null,
     huecos: p.huecos.map((h) => {
       const visto = abierto || h.por;
       return {
@@ -188,11 +244,11 @@ export function vistaDe(p, id) {
         dato: visto || h.nivel >= 1 ? h.dato : null,
         pista: visto || h.nivel >= 2 ? h.pista : null,
         iniciales: visto || h.nivel >= 3 ? iniciales(h.nombre) : null,
-        nombre: visto ? h.nombre : null, por: h.por, puntos: h.puntos
+        nombre: visto ? h.nombre : null, por: h.por, puntos: h.puntos, rebote: h.rebote
       };
     }),
     registro: p.registro.slice(0, 6),
-    sumas: p.fase === 'jugando' ? {} : p.sumas,
+    sumas: p.sumas,
     fin: p.fin
   };
 }

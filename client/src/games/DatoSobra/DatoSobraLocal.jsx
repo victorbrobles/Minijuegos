@@ -1,10 +1,10 @@
 // client/src/games/DatoSobra/DatoSobraLocal.jsx
-// Un solo dispositivo: todos ven la pantalla; responde quien tiene el turno y los demás deciden en su fila.
+// Un solo dispositivo: pantalla de turno antes de responder y antes de que cada retador decida (en secreto).
 import React, { useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import * as E from './engine.js';
 import { Partida, Fin, Config } from './Partida.jsx';
-import { ModalSalir } from '../Pulsador/Vistas.jsx';
+import { ModalSalir, TurnoDe } from '../Pulsador/Vistas.jsx';
 import { SelectorJugadores } from '../../components/MenuJuego.jsx';
 
 export default function DatoSobraLocal({ juego, onVolver, onExit, onAbrirAyuda }) {
@@ -14,6 +14,7 @@ export default function DatoSobraLocal({ juego, onVolver, onExit, onAbrirAyuda }
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modal, setModal] = useState(false);
+  const [confirmado, setConfirmado] = useState(null);
   const estRef = useRef(null);
   const [, setVer] = useState(0);
   const refrescar = () => setVer((x) => x + 1);
@@ -69,12 +70,30 @@ export default function DatoSobraLocal({ juego, onVolver, onExit, onAbrirAyuda }
       </Fin>
     );
   }
+  // ¿Quién tiene el móvil? En la respuesta, el del turno; en los desafíos, cada retador por orden
+  let quien = null;
+  if (est.fase === 'responder') quien = est.turno;
+  if (est.fase === 'desafiar') quien = est.jugadores.find((j) => !j.fuera && j.id !== est.turno && est.decisiones[j.id] === undefined)?.id ?? null;
   const enviar = (tipo, d = {}) => {
     if (tipo === 'responder') E.responder(est, est.turno, d.indice);
-    else if (tipo === 'desafiar') E.desafiar(est, d.jugador, d.indice);
+    else if (tipo === 'desafiar') E.desafiar(est, quien, d.indice);
     else if (tipo === 'siguiente') E.siguiente(est);
     else if (tipo === 'terminar') E.terminar(est);
     refrescar();
   };
-  return envoltorio(<Partida v={E.vistaDe(est, est.turno)} enviar={enviar} onSalir={() => setModal(true)} local />);
+  if (quien !== null) {
+    const clave = `${est.ronda}-${est.fase}-${quien}`;
+    const v = E.vistaDe(est, quien);
+    if (confirmado !== clave) {
+      const nombre = v.jugadores.find((j) => j.id === quien).nombre;
+      const turno = v.jugadores.find((j) => j.id === est.turno).nombre;
+      return envoltorio(
+        <TurnoDe v={v} id={quien} puedo onListo={() => setConfirmado(clave)} boton={`Soy ${nombre}`}
+          texto={est.fase === 'responder' ? `Pásale el móvil: tiene que encontrar la mentira sobre ${v.futbolista}.`
+            : `Pásale el móvil: decide en secreto si acepta la respuesta de ${turno} o la desafía.`} />
+      );
+    }
+    return envoltorio(<Partida v={v} enviar={enviar} onSalir={() => setModal(true)} local />);
+  }
+  return envoltorio(<Partida v={E.vistaDe(est, -1)} enviar={enviar} onSalir={() => setModal(true)} local />);
 }
