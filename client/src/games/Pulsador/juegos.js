@@ -87,7 +87,6 @@ export const JUEGOS = {
   },
   pareja: {
     id: 'pareja',
-    pantallaTurno: true,
     api: '/api/pareja',
     emoji: '💞',
     unidad: 'parejas',
