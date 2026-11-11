@@ -52,3 +52,8 @@ export const PARTIDOS = [
   { nombre: 'Alemania 1-0 Argentina', detalle: 'Final del Mundial 2014 · Maracaná', claves: [['alemania', 'argentina']],
     acta: ['Final de un Mundial · 0-0 en los 90 minutos', 'Un gol anulado a Higuaín por fuera de juego', 'Gol en el minuto 113 tras un pase de Schürrle', 'El goleador había salido desde el banquillo', 'Gol de Götze · Río de Janeiro'] }
 ];
+
+// Ampliaciones: se añaden sin repetir partido
+import EXTRA1 from './extra1.js';
+import EXTRA2 from './extra2.js';
+for (const x of [...EXTRA1, ...EXTRA2]) if (!PARTIDOS.some((p) => p.nombre === x.nombre)) PARTIDOS.push(x);
