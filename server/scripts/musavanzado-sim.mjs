@@ -1,90 +1,119 @@
-// Simulación de «Mus Avanzado»: pactos, cambios, anuncios, faroles y desafíos al azar.
+// Simulación de «Mus Avanzado»: jugadas, comparaciones a 8 reyes y partidas enteras con envites, órdagos y abandonos.
 import assert from 'assert';
 import * as E from '../musavanzado/engine.js';
 
-const c = (s) => s.split(' ').map((t, i) => ({ id: 100 + i, r: Number(t.slice(0, -1)), p: { o: 'oros', c: 'copas', e: 'espadas', b: 'bastos' }[t.slice(-1)], esp: null }));
-assert.equal(E.evaluar(c('3o 3c 3e 7b 7o'), 'parejas', {}), 4);
-assert.equal(E.evaluar(c('1o 1c 1e 7b 7o'), 'pequena', {}), 5);
-assert.equal(E.evaluar(c('1o 1c 1e 7b 7o'), 'pequena', { invertidas: true }), 0, 'con invertidas los ases valen 10');
-assert.equal(E.evaluar(c('2o 5o 9o 4o 1o'), 'colores', {}), 4);
-assert.equal(E.evaluar(c('10o 10c 2e 3b 4o'), 'suma', { objetivo: 29 }), 5);
-assert.equal(E.evaluar([...c('5o 5c 2e 9b'), { id: 1, esp: 'bomba' }], 'parejas', {}), 1);
-assert.equal(E.evaluar([...c('5o 2e 9b 1c'), { id: 1, r: 5, p: 'copas', esp: 'doble' }], 'parejas', {}), 3, 'doble cuenta dos veces');
-assert.equal(E.evaluar([...c('5o 2e 9b 1c'), { id: 1, esp: 'espejo' }], 'parejas', {}), 1, 'espejo copia una carta');
+const P = { o: 'oros', c: 'copas', e: 'espadas', b: 'bastos' };
+let uid = 1000;
+const c = (s) => s.split(' ').map((t) => ({ id: ++uid, n: Number(t.slice(0, -1)), p: P[t.slice(-1)], esp: null }));
+const k = (s, cat, ctx) => E.evaluar(c(s), cat, ctx).clave;
+const gana = (a, b, cat, ctx) => { const x = k(a, cat, ctx); const y = k(b, cat, ctx); for (let i = 0; i < Math.max(x.length, y.length); i++) if ((x[i] ?? 0) !== (y[i] ?? 0)) return (x[i] ?? 0) > (y[i] ?? 0); return false; };
+const txt = (s, cat) => E.jugadaTexto(cat, E.evaluar(c(s), cat, {}));
+
+// Treses = reyes, doses = ases
+assert.ok(gana('3o 3c 4e 5b 6o', '12o 11c 7e 5b 6c', 'grande'), 'dos treses son dos reyes');
+assert.ok(gana('2o 1c 4e 5b 6o', '1o 4c 4b 5e 6c', 'chica'), 'el dos es un as');
+assert.equal(txt('3o 12c 3e 12b 5o', 'pares'), 'Póker de reyes');
+assert.equal(txt('3o 12c 3e 1b 2o', 'pares'), 'Full de reyes y ases');
+assert.equal(txt('11o 11c 10e 10b 5o', 'pares'), 'Duples de caballos y sotas');
+assert.ok(gana('5o 5c 5e 1b 4o', '12o 12c 11e 11b 7o', 'pares') === false, 'duples gana a medias');
+// Escalera A-4-5-6-7 vale (los doses son ases)
+assert.equal(k('2o 4c 5e 6b 7o', 'escalera')[0], 5);
+assert.equal(k('7o 10c 11e 3b 1o', 'escalera')[0], 4, '7-S-C-R');
+assert.equal(E.extra('escalera', k('2o 4c 5e 6b 7o', 'escalera')), 5);
+assert.equal(E.extra('color', k('2o 4o 5o 6o 7o', 'color')), 5);
+// Juego: 31 > 32 > 40 > 37; más de 40 se pasa
+assert.ok(gana('12o 11c 10e 1b 0o'.replace(' 0o', ''), '12o 11c 10e 2b', 'juego') === false, 'empate en 31');
+assert.ok(gana('10o 10c 10e 1b 0o'.replace(' 0o', ''), '10o 10c 7e 5b', 'juego'));
+assert.equal(txt('12o 11c 10e 10b 10o', 'juego'), 'Se pasa (50)');
+assert.equal(txt('12o 11c 10e 1b 0o'.replace(' 0o', ''), 'juego'), 'Juego 31');
+// Especiales
+const com = [...c('12o 12c 11e 5b'), { id: 1, p: null, n: 0, esp: 'comodin' }];
+assert.equal(E.evaluar(com, 'pares', {}).clave[0], 3, 'el comodín hace duples');
+const bom = [...c('5o 5c 7e 4b'), { id: 2, p: null, n: 0, esp: 'bomba' }];
+assert.equal(E.evaluar(bom, 'pares', {}).clave[0], 1);
+assert.ok(gana('1o 1c 4e 5b 6o', '12o 11c 7e 5b 6c', 'grande', { invertidas: true }), 'invertidas: los ases son reyes');
 assert.throws(() => E.crearPartida([1, 2, 3, 4, 5].map((id) => ({ id, nombre: `J${id}` })), { modo: 'parejas' }), /4 o 6/);
+assert.throws(() => E.crearPartida([1, 2, 3, 4].map((id) => ({ id, nombre: `J${id}` })), { categorias: ['grande'] }), /3 categorías/);
 
-// Pacto: cualquier cambio borra las aceptaciones
-let p = E.crearPartida([1, 2, 3, 4].map((id) => ({ id, nombre: `J${id}` })), { modo: 'parejas', fichas: 20 }, 0);
-E.aceptar(p, 1, 0); E.aceptar(p, 2, 0);
-E.proponer(p, 3, { modificador: 'comodines' });
-assert.deepEqual(p.pacto.aceptan, []);
-assert.equal(E.proponer(p, 3, { categoria: 'grande' }).ok, true);
-[1, 2, 3, 4].forEach((id) => E.aceptar(p, id, 0));
-assert.equal(p.fase, 'cambio');
-assert.equal(p.rondas, 5);
-assert.equal(p.bandos[0].miembros.join(), '1,3');
-
-// Caso a mano: un farol pillado
-p = E.crearPartida([1, 2, 3, 4].map((id) => ({ id, nombre: `J${id}` })), { fichas: 20 }, 0);
-p.pacto.categorias = ['parejas', 'grande', 'escalera'];
-[1, 2, 3, 4].forEach((id) => E.aceptar(p, id, 0));
-p.orden[0] = 'parejas'; p.ctx.cat = 'parejas';
-p.manos[1] = c('1o 2c 4e 6b 9o'); // sin nada
-[1, 2, 3, 4].forEach((id) => E.cambiar(p, id, [], 0));
+// Caso a mano: envite, subida, no quiero y deje
+let p = E.crearPartida([1, 2, 3, 4].map((id) => ({ id, nombre: `J${id}` })), { objetivo: 40, sinReloj: true }, 0, () => 0.3);
+[1, 2, 3, 4].forEach((id) => E.cambiar(p, id, []));
 assert.equal(p.fase, 'apuestas');
-assert.equal(p.bote, 4);
-assert.equal(E.quienHabla(p), 1);
-assert(E.anunciar(p, 1, 3, 2, 0).ok); // «tengo trío», apuesta 2
-assert.equal(E.anunciar(p, 2, 2, 1, 0).ok, false, 'no se puede anunciar menos');
-E.pasar(p, 2, 0);
-assert(E.desafiar(p, 3).ok);
-assert.equal(p.fase, 'revelacion');
-assert.equal(p.revelacion.verdad, false);
-assert.equal(p.bandos[2].fichas, 20 - 1 - 2 + 8, 'quien pilla el farol se lleva el bote');
+const t1 = E.quienHabla(p);
+E.hablar(p, t1, { tipo: 'envido', cantidad: 3 });
+const t2 = E.quienHabla(p);
+E.hablar(p, t2, { tipo: 'envido', cantidad: 2 }); // sube a 5
+assert.equal(p.L.apuesta.total, 5);
+assert.equal(p.L.pendientes.length, 3, 'tras una subida vuelven a hablar todos los demás');
+while (p.fase === 'apuestas' && p.L.cat === 'grande') E.hablar(p, E.quienHabla(p), { tipo: 'noquiero' });
+assert.equal(p.cerradas[0].tipo, 'rechazado');
+assert.equal(p.bandos.find((b) => b.miembros.includes(t2)).puntos, 3, 'el deje es lo que había antes de subir');
+assert.equal(p.fase, 'cambio');
+// Las cartas que te quedas siguen en la siguiente categoría
+const antes = p.manos[1].map((x) => x.id);
+E.cambiar(p, 1, [antes[0], antes[1]]);
+assert.deepEqual(p.manos[1].slice(0, 3).map((x) => x.id), antes.slice(2));
 
-let partidas = 0; let desafios = 0; let faroles = 0; let sinDesafio = 0;
-for (let n = 0; n < 300; n++) {
-  const modo = n % 3 === 0 ? 'parejas' : 'individual';
-  const nj = modo === 'parejas' ? (n % 2 ? 4 : 6) : 4 + (n % 5);
-  p = E.crearPartida(Array.from({ length: nj }, (_, i) => ({ id: i + 1, nombre: `J${i + 1}` })), { modo, fichas: 20 }, 0);
-  const total0 = p.bandos.reduce((s, b) => s + b.fichas, 0);
-  let t = 0; let pasos = 0; let perdidas = 0;
-  // Pacto al azar
-  for (let k = 0; k < 4; k++) {
-    const r = Math.random();
-    if (r < 0.4) E.proponer(p, 1, { modificador: Object.keys(E.MODIFICADORES)[Math.floor(Math.random() * 6)] });
-    else if (r < 0.6) E.proponer(p, 2, { regla: Object.keys(E.REGLAS_ESPECIALES)[Math.floor(Math.random() * 3)] });
-    else E.proponer(p, 3, { categoria: Object.keys(E.CATEGORIAS)[Math.floor(Math.random() * 8)] });
-  }
-  p.jugadores.forEach((j) => E.aceptar(p, j.id, t));
-  while (p.fase !== 'fin') {
-    assert(pasos++ < 3000, 'bucle');
-    t += 1000;
-    if (p.fase === 'cambio') {
-      p.jugadores.forEach((j) => { if (Math.random() < 0.9) E.cambiar(p, j.id, p.manos[j.id].slice(0, Math.floor(Math.random() * 3)).map((x) => x.id), t); });
-      if (p.fase === 'cambio') E.tick(p, (t += 100000));
-      p.jugadores.forEach((j) => assert.equal(p.manos[j.id].length, 5));
-    } else if (p.fase === 'apuestas') {
-      const id = E.quienHabla(p);
-      const v = E.vistaDe(p, id);
-      assert.equal(v.manos, null, 'manos ajenas ocultas');
-      const r = Math.random();
-      const niveles = E.CATEGORIAS[p.ctx.cat].niveles.length;
-      if (p.apuesta && r < 0.3) { desafios++; const res = E.desafiar(p, id); if (res.ok && !res.verdad) faroles++; if (!res.ok) E.pasar(p, id, t); }
-      else if (r < 0.65 && (!p.apuesta || p.apuesta.nivel < niveles)) {
-        const nv = Math.min(niveles, (p.apuesta?.nivel || 0) + 1 + Math.floor(Math.random() * 2));
-        if (!E.anunciar(p, id, nv, 1 + Math.floor(Math.random() * 3), t).ok) E.pasar(p, id, t);
-      } else if (r < 0.95) E.pasar(p, id, t);
-      else E.tick(p, (t += 100000));
-    } else if (p.fase === 'revelacion') {
-      if (p.revelacion.tipo === 'sinDesafio') sinDesafio++;
-      perdidas += p.revelacion.bombas.reduce((s, b) => s + b.fichas, 0);
-      p.bandos.forEach((b) => assert(b.fichas >= 0));
-      E.siguiente(p, t);
+// Órdago querido: quien gana la categoría gana la partida
+p = E.crearPartida([1, 2, 3, 4].map((id) => ({ id, nombre: `J${id}` })), { modo: 'parejas', sinReloj: true }, 0, () => 0.6);
+[1, 2, 3, 4].forEach((id) => E.cambiar(p, id, []));
+E.hablar(p, E.quienHabla(p), { tipo: 'ordago' });
+E.hablar(p, E.quienHabla(p), { tipo: 'quiero' });
+assert.equal(p.fase, 'conteo');
+assert.ok(p.ganador != null);
+assert.equal(E.vistaDe(p, 1).resumen[0].tipo, 'ordago');
+E.siguiente(p);
+assert.equal(p.fase, 'fin');
+assert.ok(p.fin.ganadores.length === 2, 'por parejas ganan los dos');
+
+// Partidas enteras al azar
+let manos = 0; let partidas = 0;
+for (let r = 0; r < 300; r++) {
+  const n = 4 + (r % 5);
+  const modo = r % 3 === 0 && (n === 4 || n === 6) ? 'parejas' : 'individual';
+  const especiales = r % 4 === 0 ? { comodines: true, bombas: true, espejo: true, dobles: true, mutantes: true, invertidas: true } : {};
+  const cats = r % 5 === 0 ? ['grande', 'pares', 'juego'] : undefined;
+  let rnd = r * 7919 + 1;
+  const rng = () => { rnd = (rnd * 16807) % 2147483647; return rnd / 2147483647; };
+  const J = Array.from({ length: n }, (_, i) => ({ id: i + 1, nombre: `J${i + 1}` }));
+  const q = E.crearPartida(J, { modo, objetivo: E.OPCIONES.objetivo[r % 3], especiales, categorias: cats }, 0, rng);
+  let t = 0; let pasos = 0;
+  while (q.fase !== 'fin' && pasos < 30000) {
+    pasos += 1; t += 1000;
+    if (q.fase === 'cambio') {
+      q.jugadores.filter((j) => !j.fuera && q.cambios[j.id] === undefined).forEach((j) => {
+        const m = q.manos[j.id];
+        E.cambiar(q, j.id, m.filter(() => rng() < 0.35).map((x) => x.id), t);
+      });
+    } else if (q.fase === 'apuestas') {
+      const id = E.quienHabla(q);
+      const x = rng();
+      const a = q.L.apuesta;
+      const acc = !a ? (x < 0.5 ? { tipo: 'paso' } : x < 0.97 ? { tipo: 'envido', cantidad: 2 + Math.floor(rng() * 5) } : { tipo: 'ordago' })
+        : a.ordago ? { tipo: x < 0.3 ? 'quiero' : 'noquiero' }
+          : (x < 0.45 ? { tipo: 'quiero' } : x < 0.85 ? { tipo: 'noquiero' } : x < 0.98 ? { tipo: 'envido', cantidad: 1 + Math.floor(rng() * 4) } : { tipo: 'ordago' });
+      const res = E.hablar(q, id, acc, t);
+      assert.ok(res.ok, res.error);
+      if (rng() < 0.002) E.abandonar(q, q.jugadores[Math.floor(rng() * n)].id, t);
+    } else if (q.fase === 'conteo') {
+      manos += 1;
+      const v = E.vistaDe(q, 1);
+      assert.ok(v.resumen.length >= 1);
+      v.resumen.forEach((l) => assert.ok(l.participantes.length >= 1 && l.ganador != null));
+      E.siguiente(q, t);
     }
+    // Invariantes
+    const ids = Object.values(q.manos).flat().map((x) => x.id);
+    assert.equal(new Set(ids).size, ids.length, 'sin cartas repetidas');
+    q.jugadores.filter((j) => !j.fuera && q.manos[j.id]).forEach((j) => assert.equal(q.manos[j.id].length, 5, 'siempre 5 cartas'));
+    q.bandos.forEach((b) => assert.ok(b.puntos >= 0));
   }
-  const total = p.bandos.reduce((s, b) => s + b.fichas, 0) + p.bote + perdidas;
-  assert(total <= total0 && total >= total0 - p.bandos.length, `fichas: ${total} vs ${total0}`);
-  partidas++;
+  assert.equal(q.fase, 'fin', 'la partida termina');
+  partidas += 1;
+  // Nadie ve las cartas de los demás mientras se juega
 }
-console.log(`Mus Avanzado: ${partidas} partidas, ${desafios} desafíos (${faroles} faroles pillados), ${sinDesafio} botes sin desafío. OK`);
+const s = E.crearPartida([1, 2, 3, 4].map((id) => ({ id, nombre: `J${id}` })), {}, 0);
+const vs = E.vistaDe(s, 1);
+assert.equal(vs.resumen, null);
+assert.ok(vs.yo.mano.length === 5 && !JSON.stringify(vs).includes('"manos"'));
+console.log(`musavanzado-sim OK (${partidas} partidas, ${manos} manos)`);

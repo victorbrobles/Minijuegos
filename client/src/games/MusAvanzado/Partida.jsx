@@ -2,262 +2,302 @@
 // Pantallas de «Mus Avanzado» (online y en un dispositivo) con las piezas comunes de ../Pulsador.
 import React, { useEffect, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
-import { Hero, Cuenta, useRestante, Avatar, Pildoras, PantallaFin, colorDe } from '../Pulsador/Vistas.jsx';
+import { Hero, Cuenta, useRestante, Pildoras, PantallaFin, colorDe } from '../Pulsador/Vistas.jsx';
 import { BloqueConfig } from '../../components/MenuJuego.jsx';
-import { CATEGORIAS, CATEGORIAS_NORMALES, MODIFICADORES, REGLAS_ESPECIALES, OPCIONES } from './engine.js';
+import { CATEGORIAS, ORDEN_CATEGORIAS, ESPECIALES, OPCIONES } from './engine.js';
 import './MusAvanzado.css';
 import CartaEspanola from '../../components/CartaEspanola.jsx';
 
 const HERO = { emoji: '🂡' };
 const nombreDe = (v, id) => v.jugadores.find((j) => j.id === id)?.nombre ?? '¿?';
+const bandoDe = (v, bid) => v.bandos.find((b) => b.id === bid);
 /** Nombre de un bando: el jugador o «Ana y Luis». */
-export const nombreBando = (v, bid) => {
-  const b = v.bandos.find((x) => x.id === bid);
-  return b ? b.miembros.map((m) => nombreDe(v, m)).join(' y ') : '¿?';
-};
-const nivelTexto = (v, n) => (n > 0 ? v.categoria.niveles[n - 1] : 'Nada');
+export const nombreBando = (v, bid) => (bandoDe(v, bid)?.miembros || []).map((m) => nombreDe(v, m)).join(' y ') || '¿?';
+const colorBando = (v, bid) => colorDe(bandoDe(v, bid)?.miembros[0] ?? bid);
 const ESPECIAL = { comodin: { e: '🃏', t: 'Comodín' }, bomba: { e: '💣', t: 'Bomba' }, espejo: { e: '🪞', t: 'Espejo' }, doble: { e: '✌️', t: 'Doble' }, mutante: { e: '🧬', t: 'Mutante' } };
 
 export function Carta({ c, sel, onClick, chica }) {
   const esp = ESPECIAL[c.esp];
   const sinValor = c.esp === 'comodin' || c.esp === 'bomba' || c.esp === 'espejo';
-  // En el motor la sota, el caballo y el rey son 8, 9 y 10; en la carta se ven como 10, 11 y 12
-  const carta = sinValor ? null : { p: c.p, n: c.r <= 7 ? c.r : c.r + 2 };
   return (
-    <CartaEspanola c={carta} sel={sel} chica={chica} onClick={onClick || undefined}
+    <CartaEspanola c={sinValor ? null : { p: c.p, n: c.n }} sel={sel} chica={chica} onClick={onClick || undefined}
       especial={sinValor ? { ...esp, clase: c.esp } : null} marca={!sinValor && esp ? esp : null} />
   );
 }
-
 function Mano({ cartas, sel = [], onToggle, chica }) {
   return <div className={`mav-mano${chica ? ' chica' : ''}`}>{cartas.map((c) => <Carta key={c.id} c={c} chica={chica} sel={sel.includes(c.id)} onClick={onToggle ? () => onToggle(c.id) : null} />)}</div>;
+}
+
+// ---------- Categorías de la mano (tira de arriba)
+const RESULTADO = (c) => (c ? { paso: 'en paso', querido: `${c.total} querido`, rechazado: 'no querido', ordago: 'órdago' }[c.tipo] : '');
+function Tira({ v }) {
+  return (
+    <ol className="mav-tira">
+      {v.categorias.map((k, i) => {
+        const c = v.cerradas[i];
+        const actual = i === v.idx && (v.fase === 'cambio' || v.fase === 'apuestas');
+        return (
+          <li key={k} className={`${actual ? 'actual' : ''}${c ? ' hecha' : ''}`}>
+            <span>{CATEGORIAS[k].e}</span><b>{CATEGORIAS[k].nombre}</b><small>{actual ? 'ahora' : RESULTADO(c)}</small>
+          </li>
+        );
+      })}
+    </ol>
+  );
 }
 
 function Categoria({ v }) {
   const c = v.categoria;
   if (!c) return null;
   return (
-    <div className="pzp-tarjeta mav-categoria">
+    <div className="mav-categoria">
       <span className="mav-cat-e">{c.e}</span>
       <div>
         <strong>{c.nombre}</strong>
         <p>{c.desc}</p>
-        {c.detalle && <p className="mav-cat-detalle">{c.detalle}</p>}
+        <p className="mav-cat-extra">⭐ {c.extras}</p>
       </div>
     </div>
   );
 }
 
-// ---------- Pacto
-function Interruptor({ on, e, nombre, desc, onClick }) {
+/** Lo que llevas ahora en cada categoría que queda (para decidir qué te guardas). */
+function MisJugadas({ v }) {
+  if (!v.yo) return null;
   return (
-    <button type="button" className={`mav-opcion${on ? ' on' : ''}`} onClick={onClick} disabled={!onClick} aria-pressed={on}>
-      <span className="mav-opcion-e">{e}</span>
-      <span className="mav-opcion-txt"><b>{nombre}</b><small>{desc}</small></span>
-      <span className="mav-opcion-check">{on ? '✓' : ''}</span>
-    </button>
-  );
-}
-function Pacto({ v, enviar, local }) {
-  const t = v.pacto;
-  const yoAcepto = v.yo && t.aceptan.includes(v.yo.id);
-  const proponer = (cambio) => enviar('proponer', { cambio });
-  return (
-    <>
-      <div className="pzp-tarjeta mav-pacto">
-        <p className="pzp-etiqueta">🤝 Pacto de la baraja</p>
-        <p className="mav-ayuda-osc">Cualquiera puede cambiar la propuesta, pero solo se juega cuando <b>todos</b> la aceptan. Si alguien la cambia, hay que volver a aceptar.</p>
-        <h3>Cartas especiales</h3>
-        {Object.entries(MODIFICADORES).map(([k, m]) => <Interruptor key={k} {...m} on={Boolean(t.modificadores[k])} onClick={() => proponer({ modificador: k })} />)}
-        <h3>Reglas especiales</h3>
-        {Object.entries(REGLAS_ESPECIALES).map(([k, m]) => <Interruptor key={k} {...m} on={Boolean(t.reglas[k])} onClick={() => proponer({ regla: k })} />)}
-        <h3>Categorías ({t.categorias.length})</h3>
-        {Object.entries(CATEGORIAS).map(([k, c]) => (
-          <Interruptor key={k} e={c.e} nombre={`${c.nombre}${CATEGORIAS_NORMALES.includes(k) ? '' : ' ✨'}`} desc={c.desc} on={t.categorias.includes(k)} onClick={() => proponer({ categoria: k })} />
-        ))}
-      </div>
-      <div className="pzp-tarjeta">
-        <p className="pzp-etiqueta">¿Quién acepta esta baraja?</p>
-        <div className="mav-aceptan">
-          {v.jugadores.filter((j) => !j.fuera).map((j) => {
-            const ok = t.aceptan.includes(j.id);
-            return local ? (
-              <button key={j.id} type="button" className={`mav-acepta${ok ? ' ok' : ''}`} style={{ '--c': colorDe(j.id) }} disabled={ok} onClick={() => enviar('aceptar', { jugador: j.id })}>
-                {ok ? '✓' : '○'} {j.nombre}
-              </button>
-            ) : <span key={j.id} className={`mav-acepta${ok ? ' ok' : ''}`} style={{ '--c': colorDe(j.id) }}>{ok ? '✓' : '…'} {j.nombre}</span>;
-          })}
-        </div>
-        {!local && <button type="button" className="pzp-boton" disabled={yoAcepto} onClick={() => enviar('aceptar')}><Icon name="check" size={20} /> {yoAcepto ? 'Aceptada: esperando a los demás' : 'Acepto esta baraja'}</button>}
-        {local && <p className="pzp-nota">Cada jugador pulsa su nombre cuando esté de acuerdo.</p>}
-      </div>
-    </>
+    <div className="mav-jugadas">
+      <p>Con esta mano llevas…</p>
+      <ul>
+        {v.categorias.map((k, i) => (i < v.idx ? null : (
+          <li key={k} className={i === v.idx ? 'actual' : ''}><span>{CATEGORIAS[k].e} {CATEGORIAS[k].nombre}</span><b>{v.yo.jugadas[k]}</b></li>
+        )))}
+      </ul>
+    </div>
   );
 }
 
-// ---------- Cambio
+// ---------- Cambio de cartas
 function Cambio({ v, enviar }) {
   const [sel, setSel] = useState([]);
   const yo = v.yo;
+  const pendientes = v.jugadores.filter((j) => !j.fuera && j.cambio === null).map((j) => j.nombre);
   if (yo.cambio !== null) {
     return (
       <>
         <Mano cartas={yo.mano} />
-        <p className="mav-nota">Has cambiado {yo.cambio} {yo.cambio === 1 ? 'carta' : 'cartas'}. Esperando a: {v.jugadores.filter((j) => !j.fuera && j.cambio === null).map((j) => j.nombre).join(', ')}</p>
+        <MisJugadas v={v} />
+        <p className="mav-espera">✓ Has cambiado {yo.cambio} {yo.cambio === 1 ? 'carta' : 'cartas'}. Esperando a: {pendientes.join(', ')}</p>
       </>
     );
   }
-  const toggle = (id) => setSel((s) => (s.includes(id) ? s.filter((x) => x !== id) : s.length < yo.maxCambio ? [...s, id] : s));
+  const toggle = (id) => setSel((s) => (s.includes(id) ? s.filter((x) => x !== id) : [...s, id]));
+  const ultima = v.idx === v.categorias.length - 1;
   return (
     <>
       <Mano cartas={yo.mano} sel={sel} onToggle={toggle} />
-      <p className="mav-nota">Toca hasta {yo.maxCambio} cartas para cambiarlas por otras del mazo. Solo tú ves tu mano.</p>
-      <MiNivel v={v} />
-      <button type="button" className="pzp-boton" onClick={() => { enviar('cambiar', { ids: sel }); setSel([]); }}>
-        <Icon name="refresh" size={20} /> {sel.length ? `Cambiar ${sel.length} ${sel.length === 1 ? 'carta' : 'cartas'}` : 'Me quedo con estas'}
+      <p className="mav-nota">Toca las cartas que tiras (de 0 a 5). {ultima ? 'Es la última categoría de la mano.' : 'Las que te quedes seguirán contigo en la siguiente categoría.'}</p>
+      <MisJugadas v={v} />
+      <button type="button" className="pzp-boton grande" onClick={() => { enviar('cambiar', { ids: sel }); setSel([]); }}>
+        <Icon name="refresh" size={20} /> {sel.length ? `Tirar ${sel.length} y robar` : 'Me quedo con estas'}
       </button>
     </>
   );
 }
-function MiNivel({ v }) {
-  if (!v.yo || !v.categoria) return null;
-  return <p className="mav-minivel">Tu mano sola, de verdad: <b>{nivelTexto(v, v.yo.nivelPropio)}</b>{v.modo === 'parejas' ? ` (más lo que tenga ${nombreDe(v, v.yo.companero)})` : ''}</p>;
-}
 
 // ---------- Apuestas
-function Apuesta({ v }) {
-  const a = v.apuesta;
+function Mesa({ v }) {
+  const L = v.lance;
+  const a = L.apuesta;
+  const ultima = (bid) => [...L.voces].reverse().find((x) => x.bando === bid);
   return (
-    <div className="mav-mesa">
-      <span className="mav-bote">💰 Bote: <b>{v.bote}</b></span>
-      {a ? <span className="mav-dice"><b style={{ color: colorDe(a.jugador) }}>{nombreDe(v, a.jugador)}</b> dice: «{nivelTexto(v, a.nivel)}» · {a.fichas} 🪙</span>
-        : <span className="mav-dice">Nadie ha anunciado nada todavía.</span>}
-    </div>
-  );
-}
-function Registro({ v }) {
-  if (!v.registro.length) return null;
-  const t = { anuncia: 'anuncia', sube: 'sube:', paso: 'pasa', desafia: '¡desafía!' };
-  return (
-    <ul className="mav-registro">
-      {v.registro.slice(0, 5).map((r, i) => (
-        <li key={i}><b style={{ color: colorDe(r.id) }}>{nombreDe(v, r.id)}</b> {t[r.tipo]}{r.nivel ? ` «${nivelTexto(v, r.nivel)}» (${r.fichas} 🪙)` : ''}</li>
-      ))}
-    </ul>
-  );
-}
-function Acciones({ v, enviar }) {
-  const minimo = (v.apuesta?.nivel || 0) + 1;
-  const niveles = v.categoria.niveles;
-  const [nivel, setNivel] = useState(Math.min(minimo, niveles.length));
-  const [subida, setSubida] = useState(1);
-  useEffect(() => { setNivel(Math.min(minimo, niveles.length)); setSubida(1); }, [minimo, niveles.length]);
-  const misFichas = v.bandos.find((b) => b.id === v.yo.bando).fichas;
-  const coste = (v.apuesta?.fichas || 0) + subida;
-  const puedeAnunciar = minimo <= niveles.length && misFichas >= coste;
-  const desafio = v.apuesta ? Math.min(misFichas, v.apuesta.fichas) : 0;
-  return (
-    <div className="pzp-tarjeta mav-acciones">
-      <p className="pzp-etiqueta">{v.apuesta ? 'Sube con algo mejor, pasa o desafía' : 'Anuncia lo que tienes (o lo que quieres que crean)'}</p>
-      {minimo <= niveles.length ? (
-        <>
-          <div className="mav-niveles">
-            {niveles.map((t, i) => (i + 1 < minimo ? null : (
-              <button key={t} type="button" className={nivel === i + 1 ? 'on' : ''} onClick={() => setNivel(i + 1)}>{t}</button>
-            )))}
-          </div>
-          <div className="mav-subida">
-            <span>Sube</span>
-            {Array.from({ length: v.subidaMax }, (_, i) => i + 1).map((s) => (
-              <button key={s} type="button" className={subida === s ? 'on' : ''} onClick={() => setSubida(s)}>+{s}</button>
-            ))}
-          </div>
-          <button type="button" className="pzp-boton" disabled={!puedeAnunciar} onClick={() => enviar('anunciar', { nivel, subida })}>
-            📣 «{niveles[nivel - 1]}» · pones {coste} 🪙
-          </button>
-          {misFichas < coste && <p className="pzp-nota">No tienes fichas suficientes ({misFichas}).</p>}
-        </>
-      ) : <p className="pzp-nota">Ya no se puede anunciar nada más alto.</p>}
-      <div className="mav-botones">
-        <button type="button" className="pzp-boton secundario" onClick={() => enviar('pasar')}>🙅 Paso</button>
-        {v.apuesta && <button type="button" className="pzp-boton peligro" disabled={misFichas < 1} onClick={() => enviar('desafiar')}>⚔️ ¡No te creo! ({desafio} 🪙)</button>}
+    <div className="mav-tapete">
+      <div className="mav-envite">
+        {a ? (
+          <span className={`mav-envite-caja${a.ordago ? ' ordago' : ''}`} style={{ '--c': colorBando(v, a.por) }}>
+            <small>{CATEGORIAS[L.cat].e} {CATEGORIAS[L.cat].nombre}</small>
+            <strong>{a.ordago ? '🔥 ¡Órdago!' : `Envite: ${a.total}`}</strong>
+            <em>de {nombreDe(v, a.porJugador)}</em>
+          </span>
+        ) : (
+          <span className="mav-envite-caja vacia"><small>{CATEGORIAS[L.cat].e} {CATEGORIAS[L.cat].nombre}</small><strong>Sin envite</strong><em>se puede pasar o envidar</em></span>
+        )}
       </div>
+      <ul className="mav-asientos">
+        {v.bandos.filter((b) => b.miembros.some((m) => !v.jugadores.find((j) => j.id === m).fuera)).map((b) => {
+          const turno = L.turno === b.id;
+          const voz = ultima(b.id);
+          const fuera = !L.activos.includes(b.id);
+          return (
+            <li key={b.id} className={`${turno ? 'turno' : ''}${fuera ? ' retirado' : ''}${v.yo?.bando === b.id ? ' yo' : ''}`} style={{ '--c': colorBando(v, b.id) }}>
+              <span className="mav-asiento-avatares">{b.miembros.map((m) => <i key={m} style={{ background: colorDe(m) }}>{nombreDe(v, m).charAt(0).toUpperCase()}</i>)}</span>
+              <span className="mav-asiento-nombre">{nombreBando(v, b.id)}{b.miembros.includes(v.mano) && <b className="mav-mano-m" title="Es mano">M</b>}</span>
+              <span className="mav-asiento-puntos">{b.puntos}</span>
+              {turno ? <span className="mav-voz habla">🗣️ Le toca</span> : voz ? <span className={`mav-voz ${voz.clase}`}>{voz.texto}</span> : <span className="mav-voz nada">—</span>}
+            </li>
+          );
+        })}
+      </ul>
+      {L.voces.length > 0 && (
+        <ol className="mav-voces">
+          {L.voces.map((x, i) => <li key={i} className={x.clase}><b style={{ color: colorDe(x.id) }}>{nombreDe(v, x.id)}</b> {x.texto}</li>)}
+        </ol>
+      )}
     </div>
   );
 }
 
-// ---------- Revelación
-function Revelacion({ v, enviar, puedeSeguir }) {
-  const r = v.revelacion;
-  const a = r.apuesta;
-  let titulo;
-  if (r.tipo === 'desafio') titulo = r.verdad ? `✅ ${nombreDe(v, a.jugador)} decía la verdad` : `🤥 ¡${nombreDe(v, a.jugador)} iba de farol!`;
-  else if (r.tipo === 'sinDesafio') titulo = `🎩 Nadie desafió a ${nombreDe(v, a.jugador)}`;
-  else titulo = '🤷 Nadie se atrevió a anunciar';
+function Acciones({ v, enviar }) {
+  const a = v.lance.apuesta;
+  const [n, setN] = useState(2);
+  useEffect(() => { setN(a ? 2 : 2); }, [a?.total, a?.ordago]);
+  const tope = v.objetivo;
+  const nom = CATEGORIAS[v.lance.cat].nombre.toLowerCase();
+  const hablar = (accion, cantidad) => enviar('hablar', { accion, cantidad });
   return (
-    <>
-      <div className="pzp-tarjeta">
-        <p className="pzp-etiqueta">{titulo}</p>
-        {a && <p className="mav-ayuda-osc">Anunció «{nivelTexto(v, a.nivel)}» y tenía <b>{nivelTexto(v, r.niveles[a.bando])}</b>.
-          {r.tipo === 'desafio' ? ` Desafió ${nombreDe(v, r.desafianteJugador)}: el bote es para ${nombreBando(v, r.gana)}.` : r.tipo === 'sinDesafio' ? ` Se lleva el bote sin enseñar nada.` : ''}</p>}
-        {r.tipo === 'nadie' && <p className="mav-ayuda-osc">{v.bote ? `El bote (${v.bote} 🪙) pasa a la siguiente categoría.` : 'El bote se reparte.'}</p>}
-        {r.bombas.map((b) => <p key={b.id} className="mav-ayuda-osc">💣 {nombreDe(v, b.id)} tenía una bomba: −{b.fichas} 🪙</p>)}
-      </div>
-      <div className="mav-manos">
-        {v.bandos.map((b) => (
-          <div key={b.id} className={`pzp-tarjeta mav-bando${r.gana === b.id ? ' gana' : ''}`}>
-            <p className="mav-bando-tit">
-              <span>{nombreBando(v, b.id)}</span>
-              <b>{nivelTexto(v, r.niveles[b.id])}</b>
-              <em className={r.cambios[b.id] < 0 ? 'menos' : ''}>{r.cambios[b.id] ? `${r.cambios[b.id] > 0 ? '+' : ''}${r.cambios[b.id]} 🪙` : ''}</em>
-            </p>
-            {b.miembros.map((m) => <Mano key={m} cartas={v.manos[m] || []} chica />)}
-          </div>
-        ))}
-      </div>
-      <div className="pzp-barra estatica">
-        {puedeSeguir ? (
+    <div className="mav-acciones">
+      <p className="mav-pregunta">
+        {!a ? `¿Envidas a ${nom}?` : a.ordago ? `¡Órdago a ${nom}! ¿Lo quieres?` : `Hay ${a.total} a ${nom}. ¿Lo quieres?`}
+      </p>
+      <div className="mav-dos">
+        {!a ? (
           <>
-            <button type="button" className="pzp-boton grande" onClick={() => enviar('siguiente')}>
-              <Icon name="play" size={20} /> {v.ronda >= v.rondas ? 'Ver resultado final' : 'Siguiente categoría'}
-            </button>
-            {v.ronda < v.rondas && <button type="button" className="pzp-enlace" onClick={() => enviar('terminar')}>Terminar la partida ya</button>}
+            <button type="button" className="pzp-boton secundario" onClick={() => hablar('paso')}>Paso</button>
+            <button type="button" className="pzp-boton" onClick={() => hablar('envido', 2)}>Envido 2</button>
           </>
-        ) : <p className="pzp-esperando">⏳ El anfitrión pasará a la siguiente categoría…</p>}
+        ) : (
+          <>
+            <button type="button" className="pzp-boton" onClick={() => hablar('quiero')}>Quiero</button>
+            <button type="button" className="pzp-boton secundario" onClick={() => hablar('noquiero')}>No quiero</button>
+          </>
+        )}
       </div>
-    </>
+      {!a?.ordago && (
+        <div className="mav-subir">
+          <button type="button" className="mav-paso" onClick={() => setN((x) => Math.max(a ? 1 : 2, x - 1))}>−</button>
+          <button type="button" className="pzp-boton secundario" onClick={() => hablar('envido', n)}>{a ? `${n} más (${a.total + n})` : `Envido ${n}`}</button>
+          <button type="button" className="mav-paso" onClick={() => setN((x) => Math.min(tope, x + 1))}>+</button>
+          <button type="button" className="pzp-boton peligro" onClick={() => hablar('ordago')}>Órdago</button>
+        </div>
+      )}
+      {a && !a.ordago && <p className="mav-nota-osc">Si nadie quiere, {nombreDe(v, a.porJugador)} se lleva {a.previo}. Un órdago querido lo gana quien tenga la mejor jugada… y con él, la partida.</p>}
+    </div>
+  );
+}
+
+// ---------- Conteo
+const ETIQUETA = (l) => ({ paso: 'En paso', querido: `Envite querido de ${l.total}`, rechazado: 'No querido', ordago: '🔥 Órdago querido' }[l.tipo]);
+function Duelo({ v, l }) {
+  const quienes = l.participantes;
+  const g = quienes.find((x) => x.id === l.ganador);
+  const resto = quienes.filter((x) => x.id !== l.ganador);
+  return (
+    <div className="mav-duelo">
+      {[g, ...resto].filter(Boolean).map((x) => (
+        <div key={x.id} className={`mav-duelo-fila${x.id === l.ganador ? ' gana' : ''}${x.id === l.rival ? ' rival' : ''}`} style={{ '--c': colorBando(v, x.bando) }}>
+          <p className="mav-duelo-nombre">{x.id === l.ganador ? '🏆 ' : ''}{nombreDe(v, x.id)}</p>
+          <Mano cartas={x.cartas} chica />
+          <p className="mav-duelo-jugada">{x.jugada}</p>
+        </div>
+      ))}
+    </div>
+  );
+}
+function Puntuaciones({ v, enviar, admin, final = false }) {
+  const res = v.resumen || [];
+  const totales = v.bandos.map((b) => ({ id: b.id, n: res.reduce((a, l) => a + (l.puntos[b.id] || 0), 0) + v.bombas.filter((x) => x.bando === b.id).reduce((a, x) => a + x.puntos, 0) }));
+  return (
+    <div className="mav-conteo">
+      <div className="mav-conteo-cab">
+        <p>Mano {v.numMano}</p>
+        <h2>📊 Así ha ido la mano</h2>
+      </div>
+      {v.ganador != null && <p className="mav-banner">🏆 ¡{nombreBando(v, v.ganador)} {bandoDe(v, v.ganador).miembros.length > 1 ? 'ganan' : 'gana'} la partida!</p>}
+      {res.map((l) => (
+        <article key={l.cat} className={`mav-lance ${l.tipo}`} style={{ '--c': colorBando(v, v.jugadores.find((j) => j.id === l.ganador)?.bando) }}>
+          <header>
+            <span className="mav-lance-e">{CATEGORIAS[l.cat].e}</span>
+            <h3>{CATEGORIAS[l.cat].nombre}</h3>
+            <span className={`mav-lance-tipo ${l.tipo}`}>{ETIQUETA(l)}</span>
+          </header>
+          {l.voces.length > 0 && <ol className="mav-voces">{l.voces.map((x, i) => <li key={i} className={x.clase}><b style={{ color: colorDe(x.id) }}>{nombreDe(v, x.id)}</b> {x.texto}</li>)}</ol>}
+          {l.tipo === 'rechazado' ? <p className="mav-nadie">Nadie quiso: {nombreDe(v, l.porJugador)} gana sin enseñar más que sus extras.</p> : null}
+          <Duelo v={v} l={l} />
+          {l.cobros.length > 0 ? (
+            <ul className="mav-desglose">
+              {l.cobros.map((c, i) => (
+                <li key={i} style={{ '--c': colorBando(v, c.bando) }}>
+                  <b>{c.puntos == null ? '🏆' : `+${c.puntos}`}</b>
+                  <span>{c.texto}{c.jugador != null ? ` · ${nombreDe(v, c.jugador)}` : ''}</span>
+                  <em>{nombreBando(v, c.bando)}</em>
+                </li>
+              ))}
+            </ul>
+          ) : <p className="mav-nadie">{v.ganador != null && l.tipo !== 'ordago' ? 'No se llegó a cobrar: la partida ya estaba ganada.' : 'Sin puntos.'}</p>}
+        </article>
+      ))}
+      {v.bombas.length > 0 && (
+        <article className="mav-lance bomba">
+          <header><span className="mav-lance-e">💣</span><h3>Bombas</h3></header>
+          <ul className="mav-desglose">{v.bombas.map((c, i) => <li key={i} style={{ '--c': '#dc2626' }}><b>{c.puntos}</b><span>bomba en la mano · {nombreDe(v, c.jugador)}</span></li>)}</ul>
+        </article>
+      )}
+      <div className="mav-totales">
+        <p>En esta mano</p>
+        <ul>
+          {totales.map((t) => (
+            <li key={t.id} style={{ '--c': colorBando(v, t.id) }}>
+              <span>{nombreBando(v, t.id)}</span><b>{t.n > 0 ? '+' : ''}{t.n}</b><small>{bandoDe(v, t.id).puntos}/{v.objetivo}</small>
+            </li>
+          ))}
+        </ul>
+      </div>
+      {!final && (
+        <div className="pzp-barra estatica">
+          {admin ? (
+            <>
+              <button type="button" className="pzp-boton grande" onClick={() => enviar('siguiente')}>
+                <Icon name="play" size={20} /> {v.ganador != null ? 'Ver resultado final' : 'Siguiente mano'}
+              </button>
+              {v.ganador == null && <button type="button" className="pzp-enlace" onClick={() => enviar('terminar')}>Terminar la partida ya</button>}
+            </>
+          ) : <p className="pzp-esperando">⏳ El anfitrión repartirá la siguiente mano…</p>}
+        </div>
+      )}
+    </div>
   );
 }
 
 export function Partida({ v, enviar, offset = 0, onSalir, local = false, admin = true }) {
   const restante = useRestante(v.hasta, offset);
   const habla = v.habla;
-  const miTurno = v.fase === 'apuestas' && v.yo && habla === v.yo.id;
-  const chip = v.fase === 'pacto' ? '🂡 Pacto' : `🂡 ${v.ronda}/${v.rondas}`;
+  const puedo = v.fase === 'apuestas' && v.yo && (local ? habla === v.yo.id : v.lance.turno === v.yo.bando);
+  const chip = `🂡 Mano ${v.numMano}`;
+  const cat = v.categoria;
+  const turnoTxt = v.lance ? nombreBando(v, v.lance.turno) : '';
   const titulos = {
-    pacto: 'Pactad la baraja',
-    cambio: v.categoria?.nombre,
-    apuestas: miTurno ? (local ? `Habla ${nombreDe(v, habla)}` : '¡Te toca hablar!') : `Habla ${nombreDe(v, habla)}`,
-    revelacion: 'Se enseñan las cartas'
+    cambio: `${cat?.e} ${cat?.nombre}: cambia cartas`,
+    apuestas: puedo ? '¡Te toca hablar!' : `Habla ${turnoTxt}`,
+    conteo: v.ganador != null ? '¡Partida decidida!' : 'Fin de la mano'
   };
-  const etiqueta = v.fase === 'pacto' ? 'Mus Avanzado' : v.modo === 'parejas' && v.yo ? `Vas con ${nombreDe(v, v.yo.companero)}` : v.fase === 'cambio' ? 'Cambia cartas' : v.categoria?.nombre;
+  const etiqueta = `${v.modo === 'parejas' && v.yo ? `Vas con ${nombreDe(v, v.yo.companero)} · ` : ''}A ${v.objetivo} puntos · categoría ${Math.min(v.idx + 1, v.categorias.length)}/${v.categorias.length}`;
   return (
     <>
       <Hero v={v} juego={HERO} onSalir={onSalir} chip={chip} etiqueta={etiqueta} titulo={titulos[v.fase]} turno={habla ?? undefined} />
       {v.hasta && <Cuenta ms={restante} total={v.segundos * 1000} />}
-      {v.fase === 'pacto' && <Pacto v={v} enviar={enviar} local={local} />}
-      {v.fase !== 'pacto' && v.fase !== 'revelacion' && <Categoria v={v} />}
-      {v.fase === 'cambio' && v.yo && <Cambio key={`${v.ronda}-${v.yo.id}`} v={v} enviar={enviar} />}
+      {v.fase !== 'conteo' && <Tira v={v} />}
+      {v.fase === 'cambio' && <Categoria v={v} />}
+      {v.fase === 'cambio' && v.yo && <Cambio key={`${v.numMano}-${v.idx}-${v.yo.id}`} v={v} enviar={enviar} />}
+      {v.fase === 'cambio' && !v.yo && <p className="mav-espera">⏳ Cada jugador está cambiando cartas…</p>}
       {v.fase === 'apuestas' && (
         <>
-          <Apuesta v={v} />
+          <Mesa v={v} />
           {v.yo && <Mano cartas={v.yo.mano} />}
-          <MiNivel v={v} />
-          {miTurno ? <Acciones key={`${v.ronda}-${v.registro.length}`} v={v} enviar={enviar} /> : <p className="mav-nota">Esperando a {nombreDe(v, habla)}…</p>}
-          <Registro v={v} />
+          {v.yo && <p className="mav-info">{cat.e} Llevas: <b>{v.yo.jugadas[cat.id]}</b></p>}
+          {puedo ? <Acciones key={`${v.idx}-${v.lance.voces.length}`} v={v} enviar={enviar} />
+            : <p className="mav-espera">⏳ {v.modo === 'parejas' && v.yo && v.lance.turno === v.yo.bando ? `Habla tu compañero ${nombreDe(v, v.yo.companero)}…` : `Habla ${turnoTxt}…`}</p>}
         </>
       )}
-      {v.fase === 'revelacion' && <Revelacion v={v} enviar={enviar} puedeSeguir={admin} />}
+      {v.fase === 'conteo' && <Puntuaciones v={v} enviar={enviar} admin={admin} />}
     </>
   );
 }
@@ -267,17 +307,54 @@ export function PartidaOnline({ v, sala, enviar, offset, onSalir }) {
 }
 
 export function Fin({ v, juego, onSalir, children }) {
-  return <PantallaFin v={v} juego={juego} onSalir={onSalir}>{children}</PantallaFin>;
+  return (
+    <PantallaFin v={v} juego={juego} onSalir={onSalir}>
+      {v.resumen?.length > 0 && (
+        <details className="pzp-tarjeta mav-ultima">
+          <summary>🂠 La última mano</summary>
+          <Puntuaciones v={v} enviar={() => {}} final />
+        </details>
+      )}
+      {children}
+    </PantallaFin>
+  );
 }
 
+function Interruptor({ on, e, nombre, desc, onClick }) {
+  return (
+    <button type="button" className={`mav-opcion${on ? ' on' : ''}`} onClick={onClick} disabled={!onClick} aria-pressed={on}>
+      <span className="mav-opcion-e">{e}</span>
+      <span className="mav-opcion-txt"><b>{nombre}</b><small>{desc}</small></span>
+      <span className="mav-opcion-check">{on ? '✓' : ''}</span>
+    </button>
+  );
+}
+
+/** Lo configura el anfitrión (o quien prepara la partida en un móvil): modo, puntos, categorías y cartas especiales. */
 export function Config({ config, onCambiar }) {
+  const cats = config.categorias || ORDEN_CATEGORIAS;
+  const esp = config.especiales || {};
+  const tocarCat = (k) => {
+    const nuevas = cats.includes(k) ? cats.filter((x) => x !== k) : ORDEN_CATEGORIAS.filter((x) => x === k || cats.includes(x));
+    if (nuevas.length >= 3) onCambiar({ categorias: nuevas });
+  };
   return (
     <>
       <BloqueConfig titulo="Modo">
         <Pildoras opciones={[['individual', '👤 Individual (4-8)'], ['parejas', '👥 Parejas (4 o 6)']]} valor={config.modo} onCambiar={onCambiar && ((modo) => onCambiar({ modo }))} />
       </BloqueConfig>
-      <BloqueConfig titulo="Fichas por jugador">
-        <Pildoras opciones={OPCIONES.fichas.map((n) => [n, `${n}`])} valor={config.fichas} onCambiar={onCambiar && ((fichas) => onCambiar({ fichas }))} />
+      <BloqueConfig titulo="Se juega a">
+        <Pildoras opciones={OPCIONES.objetivo.map((n) => [n, `${n} puntos`])} valor={config.objetivo} onCambiar={onCambiar && ((objetivo) => onCambiar({ objetivo }))} />
+      </BloqueConfig>
+      <BloqueConfig titulo={`Categorías (${cats.length}, mínimo 3)`}>
+        <div className="mav-opciones">
+          {ORDEN_CATEGORIAS.map((k) => <Interruptor key={k} e={CATEGORIAS[k].e} nombre={CATEGORIAS[k].nombre} desc={CATEGORIAS[k].extras} on={cats.includes(k)} onClick={onCambiar && (() => tocarCat(k))} />)}
+        </div>
+      </BloqueConfig>
+      <BloqueConfig titulo="Cartas especiales (opcional)">
+        <div className="mav-opciones">
+          {Object.entries(ESPECIALES).map(([k, m]) => <Interruptor key={k} {...m} on={Boolean(esp[k])} onClick={onCambiar && (() => onCambiar({ especiales: { ...esp, [k]: !esp[k] } }))} />)}
+        </div>
       </BloqueConfig>
     </>
   );

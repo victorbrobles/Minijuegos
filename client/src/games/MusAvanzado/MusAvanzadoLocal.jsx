@@ -1,5 +1,5 @@
 // client/src/games/MusAvanzado/MusAvanzadoLocal.jsx
-// Un solo dispositivo: el pacto se hace en común y el móvil pasa de mano en mano para cambiar cartas y apostar.
+// Un solo dispositivo: el móvil pasa de mano en mano para cambiar cartas y hablar; el conteo se ve entre todos.
 import React, { useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import * as E from './engine.js';
@@ -10,7 +10,7 @@ import { SelectorJugadores } from '../../components/MenuJuego.jsx';
 export default function MusAvanzadoLocal({ juego, onVolver, onExit, onAbrirAyuda }) {
   const [paso, setPaso] = useState('config');
   const [nombres, setNombres] = useState(['', '', '', '']);
-  const [config, setConfig] = useState({ modo: 'individual', fichas: 20 });
+  const [config, setConfig] = useState({ modo: 'individual', objetivo: 30, categorias: [...E.ORDEN_CATEGORIAS], especiales: {} });
   const [error, setError] = useState('');
   const [aviso, setAviso] = useState(null);
   const [modal, setModal] = useState(false);
@@ -80,24 +80,20 @@ export default function MusAvanzadoLocal({ juego, onVolver, onExit, onAbrirAyuda
   const enviar = (tipo, d = {}) => {
     const ahora = Date.now();
     let r;
-    if (tipo === 'proponer') r = E.proponer(est, est.jugadores[0].id, d.cambio);
-    else if (tipo === 'aceptar') r = E.aceptar(est, d.jugador, ahora);
-    else if (tipo === 'cambiar') r = E.cambiar(est, quien, d.ids, ahora);
-    else if (tipo === 'anunciar') r = E.anunciar(est, quien, d.nivel, d.subida, ahora);
-    else if (tipo === 'pasar') r = E.pasar(est, quien, ahora);
-    else if (tipo === 'desafiar') r = E.desafiar(est, quien);
+    if (tipo === 'cambiar') r = E.cambiar(est, quien, d.ids, ahora);
+    else if (tipo === 'hablar') r = E.hablar(est, quien, { tipo: d.accion, cantidad: d.cantidad }, ahora);
     else if (tipo === 'siguiente') r = E.siguiente(est, ahora);
     else if (tipo === 'terminar') r = E.terminar(est);
     if (r && !r.ok) mostrar(r.error);
     refrescar();
   };
   if (quien !== null) {
-    const clave = `${est.ronda}-${est.fase}-${quien}-${est.registro.length}`;
+    const clave = `${est.numMano}-${est.idx}-${est.fase}-${quien}-${est.L?.voces.length ?? 0}`;
     const v = E.vistaDe(est, quien);
     if (confirmado !== clave) {
       return envoltorio(
         <TurnoDe v={v} id={quien} puedo onListo={() => setConfirmado(clave)} boton={`Soy ${v.jugadores.find((j) => j.id === quien).nombre}`}
-          texto={est.fase === 'cambio' ? 'Pásale el móvil: va a ver sus cartas y cambiar las que quiera.' : 'Pásale el móvil: le toca hablar. ¡Que nadie mire sus cartas!'} />
+          texto={est.fase === 'cambio' ? `Pásale el móvil: va a ver sus cartas y cambiar las que quiera para ${E.CATEGORIAS[est.categorias[est.idx]].nombre.toLowerCase()}.` : 'Pásale el móvil: le toca hablar. ¡Que nadie mire sus cartas!'} />
       );
     }
     return envoltorio(<Partida v={v} enviar={enviar} onSalir={() => setModal(true)} local />);

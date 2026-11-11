@@ -259,14 +259,14 @@ Las portadas de los juegos nuevos se generan con `node server/scripts/portadas.c
 
 ## Minijuego: Mus Avanzado (`MusAvanzado/`)
 
-Mus de faroles con baraja española, individual (4-8) o por parejas (4 o 6, con fichas compartidas y la mejor combinación de 5 entre las 10 cartas de la pareja).
+El mus con 5 cartas y seis categorías, individual (4-8) o por parejas (4 o 6). Baraja de 40 a 8 reyes (treses = reyes, doses = ases). Gana quien llega antes a 20, 30 o 40 puntos, o quien gana un órdago querido.
 
-1. **Pacto**: cualquiera puede activar cartas especiales (comodines, ases y reyes invertidos, dobles, bombas, mutantes, espejos), reglas especiales (farol caro, cambio de 3 cartas, subidas grandes) y elegir las categorías (6 normales + exactitud y caos). Al cambiar algo se borran las aceptaciones: solo se juega cuando todos aceptan.
-2. Por categoría (en orden aleatorio): 5 cartas nuevas y **cambio** secreto de hasta 2 (o 3).
-3. **Apuestas**: ante de 1 ficha por jugador; por turnos se anuncia un nivel de la categoría (puede ser mentira) poniendo fichas, se sube con un nivel mejor, se pasa o se desafía igualando la apuesta. Si quien anuncia decía la verdad, gana el bote; si iba de farol, lo gana quien desafió. Si nadie desafía, se lo lleva sin enseñar nada.
-4. **Revelación** de todas las manos con su nivel real; las bombas cuestan 2 fichas.
+1. El anfitrión configura modo, puntos, categorías (grande, chica, pares, escalera, color y juego; mínimo 3) y cartas especiales opcionales (comodines, espejos, dobles, bombas, mutantes, ases y reyes invertidos).
+2. Cada **mano** reparte 5 cartas. Antes de cada categoría cada uno tira de 0 a 5 cartas y roba otras tantas; lo que se queda sigue en la siguiente categoría.
+3. Se **habla como en el mus**: paso, envido (cualquier cantidad) u órdago; los demás quieren, suben, no quieren (se retiran de esa categoría) u órdago. Tras una subida vuelven a hablar todos. Si nadie quiere, el que envidó cobra el deje en el acto.
+4. **Conteo** al final de la mano: por categoría se enseñan las cartas (como estaban al cerrarse) de los que siguieron, gana la mejor según el mus (empate: el más cercano a la mano) y se cobra lo querido, 1 en paso (grande y chica) y los extras de cada jugador del bando ganador: pares 1-5, escalera de 4/5 → 2/5, color de 4/5 → 1/5, juego 31 → 3, otro juego → 2, ganar a punto → 1. Un órdago querido se resuelve en el momento y da la partida.
 
-Motor en `server/musavanzado/engine.js` (`evaluar` prueba comodines, espejos y dobles por fuerza bruta), `npm run sync:musavanzado`; simulación en `server/scripts/musavanzado-sim.mjs`; ruta `/api/musavanzado`. En un dispositivo se pasa el móvil en el cambio y en cada turno de apuesta.
+Motor en `server/musavanzado/engine.js` (`evaluar` prueba comodines, espejos y dobles por fuerza bruta; `npm run sync:musavanzado`); simulación en `server/scripts/musavanzado-sim.mjs`; ruta `/api/musavanzado`. En un dispositivo se pasa el móvil para cambiar cartas y en cada turno de habla.
 
 ## Minijuego: El Dato que Sobra (`DatoSobra/`)
 

@@ -1,72 +1,153 @@
-/* Mus Avanzado (prefijo mav-) */
-.pzp-contenedor.musavanzado { --pz0: #d1fae5; --pz1: #6ee7b7; --pz2: #065f46; --pz3: #022c22; }
+/* Mus Avanzado (prefijo mav-). Solo la paleta del contenedor: sin fondo propio, para que no quede un bloque de otro
+   color detrás de las tarjetas. */
+.pzp-contenedor.musavanzado { --pz0: #d1fae5; --pz1: #6ee7b7; --pz2: #047857; --pz3: #022c22; }
 
-.mav-categoria { display: flex; gap: 0.8rem; align-items: center; padding: 0.8rem 1rem; color: #0f172a; }
-.mav-cat-e { font-size: 2.2rem; }
-.mav-categoria strong { font-size: 1.15rem; }
-.mav-categoria p { margin: 0.1rem 0 0; font-size: 0.85rem; opacity: 0.8; }
-.mav-categoria .mav-cat-detalle { opacity: 1; font-weight: 800; color: var(--pz2); }
+/* Tira de categorías de la mano */
+.mav-tira { display: flex; gap: 0.3rem; margin: 0.6rem 0 0; padding: 0 0 0.2rem; list-style: none; overflow-x: auto; scrollbar-width: none; }
+.mav-tira li { display: flex; flex: 1 0 auto; flex-direction: column; align-items: center; min-width: 58px; padding: 0.3rem 0.35rem; border-radius: 12px; background: rgba(255, 255, 255, 0.88); color: #334155; line-height: 1.1; text-align: center; }
+.mav-tira span { font-size: 1rem; }
+.mav-tira b { font-size: 0.7rem; }
+.mav-tira small { min-height: 0.75rem; color: #64748b; font-size: 0.6rem; font-weight: 700; }
+.mav-tira li.actual { background: #fef08a; color: #713f12; box-shadow: 0 0 0 2px #facc15; }
+.mav-tira li.hecha { opacity: 0.7; }
 
-.mav-mano { display: flex; justify-content: center; gap: 0.35rem; margin: 0.7rem 0; flex-wrap: wrap; }
-.mav-mano.chica { justify-content: flex-start; gap: 0.25rem; margin: 0.25rem 0; }
+.mav-categoria { display: flex; gap: 0.75rem; align-items: center; margin: 0.6rem 0 0; padding: 0.8rem 1rem; border-radius: 20px; background: #ffffff; color: #0f172a; box-shadow: 0 5px 0 rgba(0, 0, 0, 0.2); }
+.mav-cat-e { display: grid; place-items: center; flex: none; width: 52px; height: 52px; border-radius: 16px; background: #ecfdf5; font-size: 1.9rem; }
+.mav-categoria strong { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.25rem; }
+.mav-categoria p { margin: 0.1rem 0 0; color: #475569; font-size: 0.82rem; line-height: 1.3; }
+.mav-categoria .mav-cat-extra { color: #047857; font-weight: 800; }
 
-.mav-nota { text-align: center; font-size: 0.85rem; color: rgba(255, 255, 255, 0.88); margin: 0.4rem 0; }
-.mav-minivel { text-align: center; font-size: 0.82rem; color: #fde68a; margin: 0.2rem 0 0.6rem; }
-.mav-ayuda-osc { font-size: 0.86rem; color: #334155; margin: 0.3rem 0; }
-
-.mav-pacto h3 { margin: 0.9rem 0 0.35rem; font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--pz2); }
-.mav-opcion { width: 100%; display: flex; align-items: center; gap: 0.6rem; margin: 0 0 0.35rem; padding: 0.5rem 0.6rem; border-radius: 12px; border: 2px solid #e2e8f0; background: #fff; color: #0f172a; font: inherit; text-align: left; cursor: pointer; }
-.mav-opcion.on { border-color: var(--pz2); background: #ecfdf5; }
-.mav-opcion-e { font-size: 1.3rem; }
-.mav-opcion-txt { flex: 1; display: flex; flex-direction: column; }
-.mav-opcion-txt small { font-size: 0.74rem; opacity: 0.75; }
-.mav-opcion-check { width: 24px; height: 24px; border-radius: 7px; border: 2px solid #cbd5e1; display: grid; place-items: center; font-weight: 900; color: #fff; }
-.mav-opcion.on .mav-opcion-check { background: var(--pz2); border-color: var(--pz2); }
-.mav-aceptan { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.7rem; }
-.mav-acepta { border: 2px solid var(--c); border-radius: 999px; padding: 0.3rem 0.7rem; font: inherit; font-weight: 700; font-size: 0.85rem; background: #fff; color: #0f172a; }
-button.mav-acepta { cursor: pointer; }
-.mav-acepta.ok { background: var(--c); color: #fff; }
-
-.mav-mesa { display: grid; gap: 0.25rem; margin: 0.6rem 0 0; padding: 0.6rem 0.8rem; border-radius: 16px; background: #064e3b; color: #ecfdf5; border: 3px solid #fbbf24; text-align: center; }
-.mav-bote { font-size: 1.05rem; }
-.mav-dice { font-size: 0.9rem; }
-.mav-dice b { filter: brightness(1.6); }
-.mav-acciones { color: #0f172a; }
-.mav-niveles { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0.3rem 0 0.6rem; }
-.mav-niveles button, .mav-subida button { border: 2px solid #e2e8f0; border-radius: 999px; background: #fff; padding: 0.3rem 0.65rem; font: inherit; font-size: 0.82rem; font-weight: 700; color: #0f172a; cursor: pointer; }
-.mav-niveles button.on, .mav-subida button.on { background: var(--pz2); border-color: var(--pz2); color: #fff; }
-.mav-subida { display: flex; align-items: center; gap: 0.35rem; margin-bottom: 0.6rem; font-size: 0.85rem; font-weight: 700; }
-.mav-acciones .pzp-boton { margin-top: 0 !important; }
-.mav-botones { display: grid; grid-template-columns: 1fr 1.4fr; gap: 0.5rem; margin-top: 0.5rem; }
-.mav-botones .pzp-boton { margin: 0 !important; width: 100% !important; }
-.mav-botones .pzp-boton:only-child { grid-column: 1 / -1; }
-.pzp-boton.peligro { background: linear-gradient(180deg, #ef4444, #b91c1c) !important; color: #fff !important; }
-.mav-registro { list-style: none; padding: 0.5rem 0.7rem; margin: 0.6rem 0 0; display: grid; gap: 0.15rem; font-size: 0.82rem; background: rgba(255, 255, 255, 0.92); color: #0f172a; border-radius: 14px; }
-
-.mav-manos { display: grid; gap: 0.5rem; margin: 0.6rem 0; }
-.mav-bando { padding: 0.6rem 0.8rem; color: #0f172a; }
-.mav-bando.gana { box-shadow: 0 0 0 3px #fbbf24; }
-.mav-bando-tit { display: flex; align-items: baseline; gap: 0.4rem; flex-wrap: wrap; margin: 0 0 0.2rem; font-weight: 700; font-size: 0.9rem; }
-.mav-bando-tit b { color: var(--pz2); font-size: 0.82rem; }
-.mav-bando-tit em { margin-left: auto; font-style: normal; font-weight: 900; color: #16a34a; }
-.mav-bando-tit em.menos { color: #dc2626; }
-
-/* Mesa de tapete y mano en abanico */
-.pzp-contenedor.musavanzado {
-  background: radial-gradient(ellipse at 50% 30%, #15803d 0%, #14532d 55%, #052e16 100%) !important;
-}
-.pzp-contenedor.musavanzado::before {
-  content: ''; position: fixed; inset: 0; pointer-events: none; opacity: 0.12;
-  background-image: radial-gradient(rgba(255, 255, 255, 0.6) 0.6px, transparent 0.6px); background-size: 5px 5px;
-}
-.mav-mano { gap: 0; padding: 0.6rem 0 0.3rem; }
-.mav-mano .cesp { width: 66px !important; margin: 0 -4px !important; }
+/* Mano en abanico */
+.mav-mano { display: flex; justify-content: center; gap: 0; margin: 0.4rem 0; padding: 0.7rem 0 0.4rem; flex-wrap: nowrap; }
+.mav-mano .cesp { width: 66px !important; margin: 0 -3px !important; }
 .mav-mano .cesp:nth-child(1) { transform: rotate(-10deg) translateY(8px); }
 .mav-mano .cesp:nth-child(2) { transform: rotate(-5deg) translateY(2px); }
 .mav-mano .cesp:nth-child(4) { transform: rotate(5deg) translateY(2px); }
 .mav-mano .cesp:nth-child(5) { transform: rotate(10deg) translateY(8px); }
-.mav-mano .cesp.sel { transform: translateY(-14px) !important; z-index: 1; }
-.mav-mano.chica { padding: 0.15rem 0; gap: 0.2rem; }
-.mav-mano.chica .cesp { width: 34px !important; margin: 0 !important; transform: none !important; }
-.mav-mesa { background: radial-gradient(ellipse, #166534, #064e3b) !important; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.15), 0 8px 18px rgba(0, 0, 0, 0.35); }
-.mav-bote b { display: inline-block; min-width: 2.2rem; padding: 0 0.4rem; border-radius: 999px; background: #fbbf24; color: #422006; }
+.mav-mano .cesp.sel { transform: translateY(-16px) !important; z-index: 1; }
+.mav-mano.chica { justify-content: flex-start; gap: 2px; margin: 0; padding: 0; }
+.mav-mano.chica .cesp { width: 32px !important; margin: 0 !important; transform: none !important; }
+
+.mav-nota { margin: 0.4rem 0; color: rgba(255, 255, 255, 0.9); font-size: 0.85rem; text-align: center; }
+.mav-nota-osc { margin: 0; color: #64748b; font-size: 0.76rem; text-align: center; }
+.mav-info { width: fit-content; margin: 0 auto 0.5rem; padding: 0.25rem 0.8rem; border-radius: 999px; background: rgba(255, 255, 255, 0.92); color: #064e3b; font-size: 0.85rem; }
+.mav-espera { margin: 0.5rem 0; padding: 0.8rem 1rem; border-radius: 18px; background: rgba(255, 255, 255, 0.95); color: #064e3b; font-weight: 800; text-align: center; }
+
+/* Lo que llevas en cada categoría */
+.mav-jugadas { margin: 0.4rem 0 0.7rem; padding: 0.65rem 0.8rem; border-radius: 18px; background: rgba(255, 255, 255, 0.95); color: #0f172a; box-shadow: 0 4px 0 rgba(0, 0, 0, 0.18); }
+.mav-jugadas p { margin: 0 0 0.35rem; color: #047857; font-size: 0.72rem; font-weight: 900; letter-spacing: 0.04em; text-transform: uppercase; }
+.mav-jugadas ul { display: grid; gap: 0.2rem; margin: 0; padding: 0; list-style: none; }
+.mav-jugadas li { display: flex; justify-content: space-between; gap: 0.5rem; padding: 0.25rem 0.5rem; border-radius: 10px; font-size: 0.84rem; }
+.mav-jugadas li span { color: #475569; }
+.mav-jugadas li.actual { background: #fef9c3; }
+.mav-jugadas li.actual span { color: #713f12; font-weight: 800; }
+
+/* Tapete de las apuestas */
+.mav-tapete {
+  display: flex; flex-direction: column; gap: 0.6rem; margin: 0.6rem 0 0.2rem; padding: 0.8rem 0.7rem; border-radius: 26px;
+  background: radial-gradient(circle at 50% 30%, #16a34a 0%, #15803d 55%, #14532d 100%);
+  box-shadow: inset 0 0 0 6px #713f12, inset 0 0 0 9px #a16207, 0 6px 0 rgba(0, 0, 0, 0.3);
+}
+.mav-envite { display: flex; justify-content: center; padding-top: 0.3rem; }
+.mav-envite-caja { display: flex; flex-direction: column; align-items: center; min-width: 170px; padding: 0.45rem 1rem; border-radius: 18px; background: var(--c, #fff); color: #ffffff; line-height: 1.15; box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3); }
+.mav-envite-caja small { font-size: 0.72rem; font-weight: 800; opacity: 0.9; }
+.mav-envite-caja strong { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.45rem; }
+.mav-envite-caja em { font-size: 0.75rem; font-style: normal; font-weight: 700; opacity: 0.9; }
+.mav-envite-caja.vacia { background: rgba(0, 0, 0, 0.25); }
+.mav-envite-caja.ordago { background: linear-gradient(135deg, #f97316, #dc2626); }
+.mav-asientos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.4rem; margin: 0; padding: 0; list-style: none; }
+.mav-asientos li { display: grid; grid-template-columns: auto 1fr auto; grid-template-areas: 'av nom pts' 'voz voz voz'; align-items: center; gap: 0.25rem 0.35rem; padding: 0.45rem 0.5rem; border-left: 5px solid var(--c); border-radius: 14px; background: rgba(0, 0, 0, 0.22); color: #ffffff; }
+.mav-asientos li.yo { background: rgba(255, 255, 255, 0.16); }
+.mav-asientos li.turno { background: rgba(254, 240, 138, 0.28); box-shadow: 0 0 0 3px #fde047; animation: mavLatido 1.4s ease-in-out infinite; }
+.mav-asientos li.retirado { opacity: 0.5; }
+@keyframes mavLatido { 50% { box-shadow: 0 0 0 3px rgba(253, 224, 71, 0.4); } }
+.mav-asiento-avatares { grid-area: av; display: flex; }
+.mav-asiento-avatares i { display: grid; place-items: center; width: 26px; height: 26px; margin-right: -6px; border: 2px solid rgba(0, 0, 0, 0.25); border-radius: 9px; color: #fff; font-size: 0.78rem; font-style: normal; font-weight: 900; }
+.mav-asiento-avatares i:last-child { margin-right: 0; }
+.mav-asiento-nombre { grid-area: nom; min-width: 0; overflow: hidden; font-size: 0.85rem; font-weight: 800; white-space: nowrap; text-overflow: ellipsis; }
+.mav-mano-m { display: inline-grid; place-items: center; width: 17px; height: 17px; margin-left: 0.25rem; border-radius: 50%; background: #fde047; color: #713f12; font-size: 0.6rem; vertical-align: middle; }
+.mav-asiento-puntos { grid-area: pts; padding: 0.05rem 0.45rem; border-radius: 999px; background: rgba(255, 255, 255, 0.92); color: #064e3b; font-size: 0.78rem; font-weight: 900; }
+.mav-voz { grid-area: voz; justify-self: start; padding: 0.15rem 0.6rem; border-radius: 999px; background: #ffffff; color: #0f172a; font-size: 0.8rem; font-weight: 900; animation: mavPop 0.25s ease-out; }
+@keyframes mavPop { from { transform: scale(0.6); opacity: 0; } to { transform: none; opacity: 1; } }
+.mav-voz.paso { background: #e2e8f0; color: #334155; }
+.mav-voz.envido { background: #fde047; color: #713f12; }
+.mav-voz.quiero { background: #4ade80; color: #052e16; }
+.mav-voz.noquiero { background: #fca5a5; color: #7f1d1d; }
+.mav-voz.ordago { background: linear-gradient(135deg, #f97316, #dc2626); color: #ffffff; }
+.mav-voz.habla { background: #fde047; color: #713f12; }
+.mav-voz.nada { background: transparent; color: rgba(255, 255, 255, 0.5); animation: none; }
+.mav-voces { display: flex; flex-wrap: wrap; gap: 0.25rem; margin: 0; padding: 0; list-style: none; }
+.mav-voces li { padding: 0.12rem 0.5rem; border-radius: 8px; background: #f1f5f9; color: #334155; font-size: 0.74rem; font-weight: 700; }
+.mav-voces li b { filter: brightness(0.8); }
+.mav-voces li.envido { background: #fef9c3; }
+.mav-voces li.quiero { background: #dcfce7; }
+.mav-voces li.noquiero { background: #fee2e2; }
+.mav-voces li.ordago { background: #ffedd5; color: #9a3412; }
+.mav-tapete .mav-voces li { background: rgba(255, 255, 255, 0.9); }
+
+/* Acciones */
+.mav-acciones { display: flex; flex-direction: column; gap: 0.5rem; margin: 0.4rem 0; padding: 0.85rem; border-radius: 22px; background: #ffffff; box-shadow: 0 5px 0 rgba(0, 0, 0, 0.2); }
+.mav-pregunta { margin: 0; color: #0f172a; font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.1rem; font-weight: 800; text-align: center; }
+.mav-dos { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+.mav-dos .pzp-boton, .mav-subir .pzp-boton { width: 100% !important; margin: 0 !important; }
+.mav-subir { display: grid; grid-template-columns: 40px 1fr 40px 1fr; gap: 0.35rem; align-items: center; }
+.mav-subir .pzp-boton { min-height: 44px; padding-left: 0.3rem !important; padding-right: 0.3rem !important; font-size: 0.9rem !important; }
+.mav-paso {
+  display: grid !important; place-items: center; width: 40px !important; height: 44px; min-height: 0 !important; margin: 0 !important; padding: 0 !important;
+  border: 2px solid #e2e8f0 !important; border-radius: 12px !important; background: #f8fafc !important; color: #334155 !important; font-size: 1.3rem !important; font-weight: 900 !important; cursor: pointer;
+}
+.pzp-boton.peligro { background: linear-gradient(180deg, #ef4444, #b91c1c) !important; color: #fff !important; }
+
+/* Conteo */
+.mav-conteo { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 0.6rem; }
+.mav-conteo-cab { padding: 0.75rem 1rem; border-radius: 22px; background: linear-gradient(150deg, #15803d, #14532d); color: #ffffff; box-shadow: 0 5px 0 rgba(0, 0, 0, 0.3); }
+.mav-conteo-cab p { margin: 0; color: #bbf7d0; font-size: 0.72rem; font-weight: 900; letter-spacing: 0.05em; text-transform: uppercase; }
+.mav-conteo-cab h2 { margin: 0.1rem 0 0; color: #ffffff; font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.45rem; }
+.mav-banner { margin: 0; padding: 0.6rem 0.8rem; border-radius: 16px; background: #fef08a; color: #713f12; font-weight: 900; text-align: center; box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2); }
+.mav-lance { display: flex; flex-direction: column; gap: 0.5rem; padding: 0.8rem; border-top: 6px solid var(--c, #94a3b8); border-radius: 22px; background: #ffffff; color: #0f172a; box-shadow: 0 5px 0 rgba(0, 0, 0, 0.2); }
+.mav-lance > header { display: flex; align-items: center; gap: 0.45rem; }
+.mav-lance-e { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 12px; background: #f0fdf4; font-size: 1.25rem; }
+.mav-lance h3 { flex: 1; margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.2rem; }
+.mav-lance-tipo { padding: 0.18rem 0.6rem; border-radius: 999px; background: #f1f5f9; color: #475569; font-size: 0.72rem; font-weight: 900; }
+.mav-lance-tipo.querido { background: #dcfce7; color: #166534; }
+.mav-lance-tipo.rechazado { background: #fee2e2; color: #991b1b; }
+.mav-lance-tipo.ordago { background: #ffedd5; color: #9a3412; }
+.mav-duelo { display: flex; flex-direction: column; gap: 0.3rem; }
+.mav-duelo-fila { display: grid; grid-template-columns: 1fr auto; grid-template-areas: 'nom cartas' 'jug cartas'; align-items: center; gap: 0 0.5rem; padding: 0.4rem 0.55rem; border: 2px solid transparent; border-left: 5px solid var(--c); border-radius: 14px; background: #f8fafc; }
+.mav-duelo-fila.gana { border-color: var(--c); background: #fffbeb; }
+.mav-duelo-fila:not(.gana) { opacity: 0.88; }
+.mav-duelo-nombre { grid-area: nom; margin: 0; min-width: 0; overflow: hidden; font-size: 0.88rem; font-weight: 900; white-space: nowrap; text-overflow: ellipsis; }
+.mav-duelo-jugada { grid-area: jug; margin: 0; color: #475569; font-size: 0.78rem; font-weight: 800; }
+.mav-duelo-fila .mav-mano { grid-area: cartas; }
+.mav-nadie { margin: 0; color: #64748b; font-size: 0.82rem; text-align: center; }
+.mav-desglose { display: flex; flex-direction: column; gap: 0.25rem; margin: 0; padding: 0; list-style: none; }
+.mav-desglose li { display: flex; align-items: center; gap: 0.5rem; padding: 0.3rem 0.5rem; border-radius: 10px; background: #f8fafc; font-size: 0.84rem; }
+.mav-desglose li b { min-width: 2.2rem; padding: 0.1rem 0.35rem; border-radius: 8px; background: var(--c); color: #ffffff; font-size: 0.85rem; text-align: center; }
+.mav-desglose li span { flex: 1; }
+.mav-desglose li span::first-letter { text-transform: uppercase; }
+.mav-desglose li em { color: #64748b; font-size: 0.72rem; font-style: normal; font-weight: 800; }
+.mav-totales { padding: 0.75rem 0.9rem; border-radius: 22px; background: linear-gradient(150deg, #166534, #14532d); color: #ffffff; box-shadow: 0 5px 0 rgba(0, 0, 0, 0.3); }
+.mav-totales p { margin: 0 0 0.4rem; color: #bbf7d0; font-size: 0.72rem; font-weight: 900; letter-spacing: 0.05em; text-transform: uppercase; }
+.mav-totales ul { display: grid; gap: 0.3rem; margin: 0; padding: 0; list-style: none; }
+.mav-totales li { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 0.6rem; padding: 0.3rem 0.6rem; border-left: 5px solid var(--c); border-radius: 12px; background: rgba(0, 0, 0, 0.2); }
+.mav-totales li span { min-width: 0; overflow: hidden; font-weight: 800; white-space: nowrap; text-overflow: ellipsis; }
+.mav-totales li b { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.15rem; }
+.mav-totales li small { padding: 0.05rem 0.45rem; border-radius: 999px; background: rgba(255, 255, 255, 0.9); color: #064e3b; font-size: 0.72rem; font-weight: 900; }
+.mav-ultima summary { color: #334155; font-weight: 800; cursor: pointer; }
+
+/* Configuración */
+.mav-opciones { display: grid; gap: 0.35rem; }
+.mav-opcion { width: 100%; display: flex; align-items: center; gap: 0.6rem; margin: 0; padding: 0.5rem 0.6rem; border-radius: 12px; border: 2px solid #e2e8f0; background: #fff; color: #0f172a; font: inherit; text-align: left; cursor: pointer; }
+.mav-opcion:disabled { cursor: default; }
+.mav-opcion.on { border-color: var(--pz2); background: #ecfdf5; }
+.mav-opcion-e { font-size: 1.3rem; }
+.mav-opcion-txt { flex: 1; display: flex; flex-direction: column; }
+.mav-opcion-txt small { font-size: 0.74rem; opacity: 0.75; }
+.mav-opcion-check { flex: none; width: 24px; height: 24px; border-radius: 7px; border: 2px solid #cbd5e1; display: grid; place-items: center; font-weight: 900; color: #fff; }
+.mav-opcion.on .mav-opcion-check { background: var(--pz2); border-color: var(--pz2); }
+
+@media (max-width: 370px) {
+  .mav-mano .cesp { width: 58px !important; }
+  .mav-mano.chica .cesp { width: 28px !important; }
+}
+@media (prefers-reduced-motion: reduce) { .mav-voz, .mav-asientos li.turno { animation: none !important; } }
