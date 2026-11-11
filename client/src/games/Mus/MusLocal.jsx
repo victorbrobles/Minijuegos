@@ -60,6 +60,7 @@ export default function MusLocal({ juego, onVolver, onExit, onAbrirAyuda }) {
     else if (tipo === 'descartar') r = E.descartar(est, 0, d.ids, t);
     else if (tipo === 'hablar') r = E.hablar(est, 0, { tipo: d.accion, cantidad: d.cantidad }, t);
     else if (tipo === 'seguir' || tipo === 'forzar') r = E.seguir(est, 0, t);
+    else if (tipo === 'verPuntos') r = E.verPuntos(est);
     if (r && !r.ok) { setAviso(r.error); setTimeout(() => setAviso(null), 2500); }
     refrescar();
   };
@@ -74,7 +75,7 @@ export default function MusLocal({ juego, onVolver, onExit, onAbrirAyuda }) {
               <button type="button" className="pzp-boton secundario" onClick={() => onExit?.()}><Icon name="door" size={18} /> Salir a la portada</button>
             </div>
           </Fin>
-        ) : <Mesa v={v} enviar={enviar} onSalir={() => setModal(true)} />}
+        ) : <Mesa v={v} enviar={enviar} onSalir={() => setModal(true)} anfitrion />}
       </section>
       {modal && (
         <ModalSalir titulo="¿Salir de la partida?" texto="Se perderá la partida en curso y volverás a la portada."

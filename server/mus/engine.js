@@ -47,6 +47,7 @@ export function paresDe(mano) {
   return { tipo: 'pareja', valor: [fuerzaRango(grupos[0].r)], bonus: 1 };
 }
 const TIPO_PARES = { pareja: 1, medias: 2, duples: 3 };
+export const NOMBRE_PARES = { pareja: 'pareja', medias: 'medias', duples: 'duples' };
 export const tieneJuego = (mano) => sumaJuego(mano) >= 31;
 
 const lexico = (a, b) => { for (let i = 0; i < Math.max(a.length, b.length); i++) { if ((a[i] ?? 0) !== (b[i] ?? 0)) return (a[i] ?? 0) - (b[i] ?? 0); } return 0; };
@@ -80,7 +81,10 @@ function anotar(p, texto, tipo = 'info') {
   if (p.log.length > 60) p.log.shift();
 }
 /** Lo que ha dicho cada asiento (bocadillos de la mesa). */
-function decir(p, s, texto) { p.dichos[s] = { texto, n: ++p.nlog }; }
+function decir(p, s, texto, clase = 'info') {
+  p.dichos[s] = { texto, n: ++p.nlog, clase };
+  if (p.fase === 'lance' && p.lance) (p.voces[p.lance.nombre] ||= []).push({ s, texto, clase });
+}
 
 /**
  * jugadores: 4 { id, nombre, bot } en orden de asiento (0 y 2 forman pareja contra 1 y 3).
@@ -94,7 +98,7 @@ export function crearPartida(jugadores, config = {}, ahora = Date.now(), rng = M
     puntos: [0, 0], juegos: [0, 0], numMano: 0, mano: Math.floor(rng() * 4),
     mazo: [], descartes: [], cartas: [[], [], [], []],
     fase: 'mus', turno: null, musDichos: [], descartes4: {}, lance: null, resultados: {}, dichos: {},
-    conteo: null, listos: [], hasta: null, log: [], nlog: 0, fin: null
+    conteo: null, listos: [], hasta: null, log: [], nlog: 0, fin: null, voces: {}, cobros: [], revelado: false
   };
   Object.defineProperty(p, 'rng', { value: rng, enumerable: false, writable: true });
   nuevaMano(p, ahora, true);
@@ -125,6 +129,9 @@ function nuevaMano(p, ahora, primera = false) {
   p.resultados = {};
   p.dichos = {};
   p.conteo = null;
+  p.voces = {};
+  p.cobros = [];
+  p.revelado = false;
   p.listos = [];
   p.turno = p.mano;
   anotar(p, `— Mano ${p.numMano}: es mano ${nombre(p, p.mano)} —`);
@@ -255,7 +262,7 @@ export function hablar(p, s, accion, ahora = Date.now()) {
   const otraPareja = (k) => L.participantes.filter((x) => pareja(x) !== k);
   if (!L.propuesta) {
     if (tipo === 'paso') {
-      decir(p, s, 'Paso');
+      decir(p, s, 'Paso', 'paso');
       L.cola.shift();
       if (!L.cola.length) {
         p.resultados[L.nombre] = { tipo: 'paso' };
@@ -266,13 +273,13 @@ export function hablar(p, s, accion, ahora = Date.now()) {
       const ord = tipo === 'ordago';
       L.propuesta = { pareja: pareja(s), total: ord ? null : cant, deje: 1, ordago: ord, por: s };
       L.cola = otraPareja(pareja(s));
-      decir(p, s, ord ? '¡Órdago!' : `Envido ${cant}`);
+      decir(p, s, ord ? '¡Órdago!' : `Envido ${cant}`, ord ? 'ordago' : 'envido');
       anotar(p, ord ? `🔥 ${nombre(p, s)} echa un ÓRDAGO a la ${nom.toLowerCase()}.` : `${nombre(p, s)} envida ${cant} a la ${nom.toLowerCase()}.`, ord ? 'malo' : 'info');
     } else return { ok: false, error: 'Puedes pasar, envidar o echar un órdago.' };
   } else {
     const pr = L.propuesta;
     if (tipo === 'quiero') {
-      decir(p, s, 'Quiero');
+      decir(p, s, 'Quiero', 'quiero');
       if (pr.ordago) {
         anotar(p, `⚔️ ${nombre(p, s)} quiere el órdago.`, 'malo');
         L.querido = { ordago: true };
@@ -286,11 +293,12 @@ export function hablar(p, s, accion, ahora = Date.now()) {
       anotar(p, `${nombre(p, s)} quiere: ${pr.total} a la ${nom.toLowerCase()}.`);
       siguienteLance(p);
     } else if (tipo === 'noquiero') {
-      decir(p, s, 'No quiero');
+      decir(p, s, 'No quiero', 'noquiero');
       L.cola.shift();
       if (!L.cola.length) {
         p.resultados[L.nombre] = { tipo: 'rechazado', pareja: pr.pareja, deje: pr.deje };
         anotar(p, `${nom}: no quieren.`);
+        p.cobros.push({ lance: L.nombre, pareja: pr.pareja, puntos: pr.deje, texto: pr.deje === 1 ? 'envite no querido' : `envite no querido (había ${pr.deje})` });
         if (!sumar(p, pr.pareja, pr.deje, `${nom.toLowerCase()} no querida`)) siguienteLance(p);
       }
     } else if (tipo === 'envido' || tipo === 'ordago') {
@@ -298,7 +306,7 @@ export function hablar(p, s, accion, ahora = Date.now()) {
       const ord = tipo === 'ordago';
       L.propuesta = { pareja: pareja(s), total: ord ? null : pr.total + cant, deje: pr.total, ordago: ord, por: s };
       L.cola = otraPareja(pareja(s));
-      decir(p, s, ord ? '¡Órdago!' : `${cant} más`);
+      decir(p, s, ord ? '¡Órdago!' : `${cant} más`, ord ? 'ordago' : 'envido');
       anotar(p, ord ? `🔥 ${nombre(p, s)} responde con ÓRDAGO a la ${nom.toLowerCase()}.` : `${nombre(p, s)} sube ${cant} más (${pr.total + cant}).`, ord ? 'malo' : 'info');
     } else return { ok: false, error: 'Quiero, no quiero, sube o echa un órdago.' };
   }
@@ -318,6 +326,7 @@ function ganadorLance(p, lance) {
 function ordagoQuerido(p, lance) {
   const g = ganadorLance(p, lance);
   p.conteo = { ordago: { lance, ganador: g }, filas: [] };
+  p.cobros.push({ lance, pareja: pareja(g), puntos: null, texto: 'órdago querido: gana el juego' });
   anotar(p, `🏆 El órdago a la ${NOMBRE_LANCE[lance].toLowerCase()} lo gana ${nombrePareja(p, pareja(g))}.`, 'bueno');
   p.puntos[pareja(g)] = p.objetivo;
   ganarJuego(p, pareja(g), true);
@@ -331,9 +340,10 @@ function contar(p) {
   const filas = [];
   const ganadores = Object.fromEntries(['grande', 'chica', 'pares', 'juego', 'punto'].map((l) => [l, p.resultados[l] ? ganadorLance(p, l) : null]));
   p.conteo = { filas, ganadores };
-  const cobrar = (lanceNombre, k, n, motivo) => {
+  const cobrar = (lanceNombre, k, n, motivo, s = null) => {
     if (!n || p.fase !== 'conteo') return;
     filas.push({ lance: lanceNombre, pareja: k, puntos: n, motivo });
+    p.cobros.push({ lance: lanceNombre, pareja: k, puntos: n, texto: motivo, s });
     sumar(p, k, n, `${NOMBRE_LANCE[lanceNombre].toLowerCase()}: ${motivo}`);
   };
   for (const l of ['grande', 'chica', 'pares', 'juego', 'punto']) {
@@ -346,12 +356,10 @@ function contar(p) {
     if (r.tipo === 'paso') cobrar(l, k, (l === 'pares' || l === 'juego') ? 0 : 1, 'en paso');
     if (r.tipo === 'querido') cobrar(l, k, r.total, `envite querido de ${r.total}`);
     if (l === 'pares') {
-      const bonus = [k, k + 2].reduce((a, s) => a + (paresDe(p.cartas[s])?.bonus || 0), 0);
-      cobrar(l, k, bonus, 'por las parejas');
+      [k, k + 2].forEach((s) => { const pr = paresDe(p.cartas[s]); if (pr) cobrar(l, k, pr.bonus, NOMBRE_PARES[pr.tipo], s); });
     }
     if (l === 'juego') {
-      const bonus = [k, k + 2].reduce((a, s) => a + (tieneJuego(p.cartas[s]) ? (sumaJuego(p.cartas[s]) === 31 ? 3 : 2) : 0), 0);
-      cobrar(l, k, bonus, 'por el juego');
+      [k, k + 2].forEach((s) => { if (tieneJuego(p.cartas[s])) { const t = sumaJuego(p.cartas[s]); cobrar(l, k, t === 31 ? 3 : 2, t === 31 ? 'juego de 31' : `juego de ${t}`, s); } });
     }
   }
   if (p.fase === 'conteo') { p.listos = []; marcarBotsListos(p); }
@@ -376,6 +384,13 @@ function ganarJuego(p, k, porOrdago = false) {
     p.listos = [];
     marcarBotsListos(p);
   }
+}
+
+/** Tras enseñar las cartas, el anfitrión (o quien juega solo) pasa a las puntuaciones de la mano. */
+export function verPuntos(p) {
+  if (p.fase !== 'conteo' && p.fase !== 'finJuego') return { ok: false, error: 'Ahora no.' };
+  p.revelado = true;
+  return { ok: true };
 }
 
 /** Cada jugador pulsa «seguir» tras el conteo (los bots ya están listos). */
@@ -503,6 +518,39 @@ export function terminar(p) {
 
 // ---------------------------------------------------------------- Vista
 const publicas = (c) => ({ id: c.id, p: c.p, n: c.n });
+const NOMBRE_RANGO = { 12: 'reyes', 11: 'caballos', 10: 'sotas', 7: 'sietes', 6: 'seises', 5: 'cincos', 4: 'cuatros', 1: 'ases' };
+/** Cómo se llama lo que lleva una mano en un lance («Duples de reyes y sotas», «Juego 31», «Punto 27»…). */
+export function jugadaDe(lance, mano) {
+  if (lance === 'pares') {
+    const pr = paresDe(mano);
+    if (!pr) return 'Sin pares';
+    const nom = (f) => NOMBRE_RANGO[ORDEN_GRANDE[ORDEN_GRANDE.length - f]];
+    if (pr.tipo === 'duples') return pr.valor[0] === pr.valor[1] ? `Duples de ${nom(pr.valor[0])}` : `Duples de ${nom(pr.valor[0])} y ${nom(pr.valor[1])}`;
+    return `${pr.tipo === 'medias' ? 'Medias' : 'Pareja'} de ${nom(pr.valor[0])}`;
+  }
+  const t = sumaJuego(mano);
+  if (lance === 'juego') return t >= 31 ? `Juego ${t}` : `Sin juego (${t})`;
+  if (lance === 'punto') return `Punto ${t}`;
+  const orden = mano.map(rango).sort((a, b) => (lance === 'grande' ? fuerzaRango(b) - fuerzaRango(a) : fuerzaRango(a) - fuerzaRango(b)));
+  return orden.map((r) => ({ 12: 'R', 11: 'C', 10: 'S', 1: 'A' }[r] || r)).join(' · ');
+}
+/** Resumen de la mano para el conteo: por cada lance, quién se enfrentó, quién ganó y qué se cobró. */
+function resumenMano(p) {
+  const orden = ['grande', 'chica', 'pares', p.resultados.punto ? 'punto' : 'juego'];
+  return orden.map((l) => {
+    const r = p.resultados[l] || null;
+    const parts = l === 'pares' ? desdeMano(p).filter((s) => paresDe(p.cartas[s])) : l === 'juego' ? desdeMano(p).filter((s) => tieneJuego(p.cartas[s])) : desdeMano(p);
+    const g = r && parts.length ? ganadorLance(p, l) : null;
+    let rival = null;
+    if (g != null) parts.forEach((s) => { if (pareja(s) !== pareja(g) && (rival == null || comparar(l, p.cartas[s], p.cartas[rival]) > 0)) rival = s; });
+    const cobros = p.cobros.filter((c) => c.lance === l);
+    return {
+      lance: l, tipo: r?.tipo ?? null, total: r?.total ?? null, ganador: g, rival,
+      jugadaGanador: g != null ? jugadaDe(l, p.cartas[g]) : null, jugadaRival: rival != null ? jugadaDe(l, p.cartas[rival]) : null,
+      voces: p.voces[l] || [], cobros, puntos: [0, 1].map((k) => cobros.filter((c) => c.pareja === k).reduce((a, c) => a + (c.puntos || 0), 0))
+    };
+  });
+}
 export function vistaDe(p, id) {
   const yo = p.jugadores.find((j) => j.id === id) || null;
   const ensenar = p.fase === 'conteo' || p.fase === 'finJuego' || p.fase === 'fin';
@@ -513,7 +561,7 @@ export function vistaDe(p, id) {
     turno: quienActua(p),
     jugadores: p.jugadores.map((j, s) => ({
       id: j.id, nombre: j.nombre, bot: j.bot, fuera: j.fuera, asiento: s, pareja: pareja(s),
-      nCartas: p.cartas[s].length, dicho: p.dichos[s]?.texto ?? null, dichoN: p.dichos[s]?.n ?? 0,
+      nCartas: p.cartas[s].length, dicho: p.dichos[s]?.texto ?? null, dichoN: p.dichos[s]?.n ?? 0, dichoClase: p.dichos[s]?.clase ?? 'info',
       descartado: p.fase === 'descarte' ? Boolean(p.descartes4[s]) : null,
       cartas: ensenar || (yo && yo.asiento === s) ? p.cartas[s].map(publicas) : null,
       listo: p.listos.includes(s)
@@ -523,6 +571,9 @@ export function vistaDe(p, id) {
     declaraciones: p.fase === 'lance' ? p.declaraciones : null,
     resultados: p.resultados,
     conteo: ensenar ? p.conteo : null,
+    resumen: ensenar ? resumenMano(p) : null,
+    revelado: p.revelado,
+    voces: p.voces,
     log: p.log.slice(-14),
     fin: p.fin
   };

@@ -48,10 +48,6 @@
 .msp-mano { display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: #fde047; color: #713f12; font-size: 0.62rem; }
 .msp-mini-cartas { display: flex; gap: 2px; }
 .msp-decl { padding: 0.08rem 0.4rem; border-radius: 999px; background: rgba(255, 255, 255, 0.9); color: #14532d; font-size: 0.62rem; font-weight: 800; white-space: nowrap; }
-.msp-bocadillo {
-  position: absolute; top: -10px; right: -4px; z-index: 3; max-width: 120px; padding: 0.15rem 0.5rem; border-radius: 12px 12px 4px 12px;
-  background: #ffffff; color: #0f172a; font-size: 0.72rem; font-weight: 900; white-space: nowrap; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3); animation: mspBocadillo 0.3s ease-out;
-}
 @keyframes mspBocadillo { from { transform: scale(0.6); opacity: 0; } to { transform: none; opacity: 1; } }
 .msp-centro { grid-area: centro; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem; min-width: 0; color: #dcfce7; text-align: center; }
 .msp-fase { font-family: 'Bricolage Grotesque', sans-serif; color: #ffffff; font-size: 1.05rem; font-weight: 800; }
@@ -108,9 +104,144 @@ button.msp-carta { cursor: pointer; }
   .msp-carta { width: 58px !important; height: 88px; }
   .msp-mesa { grid-template-columns: 1fr 0.9fr 1fr; }
 }
-@media (prefers-reduced-motion: reduce) { .msp-bocadillo { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .msp-voz, .msp-asiento.turno { animation: none !important; } }
 
 /* Cartas dibujadas (componente común CartaEspanola) */
 .msp-cartas .cesp { width: 64px !important; }
 .msp-mini-cartas .cesp.chica { width: 24px !important; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35) !important; }
 @media (min-width: 420px) { .msp-cartas .cesp { width: 70px !important; } }
+
+/* ============ Tapete grande (v2) ============ */
+.msp-mesa { min-height: 400px; grid-template-rows: auto 1fr auto; gap: 0.5rem; padding: 0.85rem 0.55rem; align-items: center; }
+.msp-asiento { gap: 0.35rem; padding: 0.5rem 0.35rem; border-radius: 18px; background: rgba(0, 0, 0, 0.22); transition: box-shadow 0.2s ease, background 0.2s ease; }
+.msp-asiento.arriba, .msp-asiento.abajo { justify-self: center; min-width: 150px; }
+.msp-asiento.abajo { padding: 0.4rem 0.8rem; }
+.msp-asiento.turno { background: rgba(254, 240, 138, 0.28); box-shadow: 0 0 0 3px #fde047, 0 0 18px rgba(253, 224, 71, 0.55); animation: mspLatido 1.4s ease-in-out infinite; }
+@keyframes mspLatido { 50% { box-shadow: 0 0 0 3px #fde047, 0 0 4px rgba(253, 224, 71, 0.2); } }
+.msp-avatar { width: 30px; height: 30px; border-radius: 10px; font-size: 0.95rem; box-shadow: 0 2px 0 rgba(0, 0, 0, 0.3); }
+.msp-asiento-nombre { font-size: 0.92rem; }
+.msp-mano { width: 20px; height: 20px; font-size: 0.68rem; }
+.msp-mini-cartas { gap: 3px; }
+.msp-mini-cartas .cesp.chica { width: 27px !important; }
+.msp-asiento.arriba .msp-mini-cartas .cesp.chica { width: 32px !important; }
+.msp-asiento-pie { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.25rem; min-height: 1.7rem; }
+.msp-voz {
+  position: relative; padding: 0.22rem 0.7rem; border-radius: 999px; background: #ffffff; color: #0f172a;
+  font-size: 0.86rem; font-weight: 900; white-space: nowrap; box-shadow: 0 3px 0 rgba(0, 0, 0, 0.3); animation: mspBocadillo 0.3s ease-out;
+}
+.msp-voz.paso { background: #e2e8f0; color: #334155; }
+.msp-voz.envido { background: #fde047; color: #713f12; }
+.msp-voz.quiero { background: #4ade80; color: #052e16; }
+.msp-voz.noquiero { background: #fca5a5; color: #7f1d1d; }
+.msp-voz.ordago { background: linear-gradient(135deg, #f97316, #dc2626); color: #ffffff; }
+.msp-habla { padding: 0.22rem 0.6rem; border-radius: 999px; background: rgba(253, 224, 71, 0.95); color: #713f12; font-size: 0.74rem; font-weight: 900; }
+.msp-decl { font-size: 0.7rem; padding: 0.12rem 0.45rem; }
+.msp-centro { gap: 0.35rem; padding: 0.4rem 0.2rem; border-radius: 50%; }
+.msp-fase { font-size: 1.35rem; text-shadow: 0 2px 0 rgba(0, 0, 0, 0.25); }
+.msp-centro small { font-size: 0.72rem; }
+.msp-apuesta { display: flex; flex-direction: column; align-items: center; padding: 0.3rem 0.75rem; border-radius: 14px; color: #ffffff; font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.05rem; font-weight: 800; line-height: 1.1; box-shadow: 0 3px 0 rgba(0, 0, 0, 0.3); }
+.msp-apuesta small { font-family: inherit; font-size: 0.66rem; opacity: 0.9; }
+.msp-apuesta.nos { background: #2563eb; }
+.msp-apuesta.ellos { background: #dc2626; }
+.msp-lances strong { font-size: 0.8rem; }
+
+/* Hilo de lo dicho en el lance */
+.msp-hilo { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; padding: 0.55rem 0.7rem; border-radius: 16px; background: rgba(255, 255, 255, 0.95); box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2); }
+.msp-hilo > span { color: #14532d; font-size: 0.8rem; font-weight: 900; }
+.msp-hilo em { color: #64748b; font-size: 0.78rem; }
+.msp-voces { display: flex; flex-wrap: wrap; gap: 0.25rem; margin: 0; padding: 0; list-style: none; }
+.msp-voces li { padding: 0.15rem 0.5rem; border-left: 3px solid; border-radius: 8px; background: #f1f5f9; color: #334155; font-size: 0.74rem; font-weight: 700; }
+.msp-voces li.nos { border-left-color: #2563eb; }
+.msp-voces li.ellos { border-left-color: #dc2626; }
+.msp-voces li b { color: #0f172a; }
+.msp-voces li.envido { background: #fef9c3; }
+.msp-voces li.quiero { background: #dcfce7; }
+.msp-voces li.noquiero { background: #fee2e2; }
+.msp-voces li.ordago { background: #ffedd5; color: #9a3412; }
+
+/* Destape: cartas boca arriba */
+.msp-destape, .msp-puntos { display: flex; flex-direction: column; gap: 0.6rem; }
+.msp-destape-cab { padding: 0.75rem 1rem; border-radius: 22px; background: linear-gradient(150deg, #15803d, #14532d); color: #ffffff; box-shadow: 0 5px 0 rgba(0, 0, 0, 0.3); }
+.msp-destape-cab .pzp-etiqueta { margin: 0; color: #bbf7d0; }
+.msp-destape-cab h2 { margin: 0.1rem 0 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.5rem; color: #ffffff; }
+.msp-banner { margin: 0; padding: 0.6rem 0.8rem; border-radius: 16px; background: #fef08a; color: #713f12; font-weight: 900; text-align: center; box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2); }
+.msp-banner.ordago { background: linear-gradient(135deg, #fed7aa, #fecaca); color: #9a3412; }
+.msp-equipo { display: flex; flex-direction: column; gap: 0.5rem; padding: 0.7rem; border-radius: 22px; background: radial-gradient(circle at 50% 0%, #16a34a, #14532d); box-shadow: inset 0 0 0 4px rgba(0, 0, 0, 0.15), 0 5px 0 rgba(0, 0, 0, 0.3); }
+.msp-equipo h3 { align-self: flex-start; margin: 0; padding: 0.15rem 0.7rem; border-radius: 999px; color: #ffffff; font-size: 0.78rem; letter-spacing: 0.5px; text-transform: uppercase; }
+.msp-equipo.nos h3 { background: #2563eb; }
+.msp-equipo.ellos h3 { background: #dc2626; }
+.msp-destape-fila { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; padding: 0.5rem; border-radius: 16px; background: rgba(0, 0, 0, 0.2); }
+.msp-destape-quien { display: flex; align-items: center; gap: 0.4rem; color: #ffffff; font-size: 1rem; }
+.msp-equipo.nos .msp-avatar { background: #2563eb; }
+.msp-equipo.ellos .msp-avatar { background: #dc2626; }
+.msp-destape-cartas { display: flex; gap: 0.4rem; }
+.msp-destape-cartas .cesp { width: 64px !important; }
+.msp-jugadas { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.3rem; }
+.msp-jugadas span { padding: 0.15rem 0.6rem; border-radius: 999px; background: #fef08a; color: #713f12; font-size: 0.78rem; font-weight: 900; }
+.msp-jugadas span.no { background: rgba(255, 255, 255, 0.85); color: #64748b; font-weight: 700; }
+
+/* Puntuaciones por lance */
+.msp-lance-tarjeta { display: flex; flex-direction: column; gap: 0.55rem; padding: 0.8rem; border-top: 6px solid #94a3b8; border-radius: 22px; background: #ffffff; color: #0f172a; box-shadow: 0 5px 0 rgba(0, 0, 0, 0.2); }
+.msp-lance-tarjeta.nos { border-top-color: #2563eb; }
+.msp-lance-tarjeta.ellos { border-top-color: #dc2626; }
+.msp-lance-tarjeta > header { display: flex; align-items: center; gap: 0.45rem; }
+.msp-lance-icono { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 12px; background: #f0fdf4; font-size: 1.25rem; }
+.msp-lance-tarjeta h3 { flex: 1; margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.25rem; }
+.msp-lance-tipo { padding: 0.18rem 0.6rem; border-radius: 999px; background: #f1f5f9; color: #475569; font-size: 0.72rem; font-weight: 900; text-align: right; }
+.msp-lance-tipo.querido { background: #dcfce7; color: #166534; }
+.msp-lance-tipo.rechazado { background: #fee2e2; color: #991b1b; }
+.msp-lance-tipo.ordago { background: #ffedd5; color: #9a3412; }
+.msp-duelo { display: grid; grid-template-columns: 1fr auto 1fr; align-items: stretch; gap: 0.3rem; }
+.msp-vs { align-self: center; color: #94a3b8; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; }
+.msp-duelo-lado { display: flex; flex-direction: column; align-items: center; gap: 0.3rem; min-width: 0; padding: 0.45rem 0.25rem; border: 2px solid transparent; border-radius: 16px; background: #f8fafc; text-align: center; }
+.msp-duelo-lado.nos { background: #eff6ff; }
+.msp-duelo-lado.ellos { background: #fef2f2; }
+.msp-duelo-lado.gana.nos { border-color: #2563eb; }
+.msp-duelo-lado.gana.ellos { border-color: #dc2626; }
+.msp-duelo-lado:not(.gana) { opacity: 0.85; }
+.msp-duelo-lado.vacio { justify-content: center; color: #64748b; }
+.msp-duelo-lado.vacio p { margin: 0; font-weight: 900; }
+.msp-duelo-nombre { margin: 0; max-width: 100%; overflow: hidden; font-size: 0.9rem; font-weight: 900; white-space: nowrap; text-overflow: ellipsis; }
+.msp-duelo-cartas { display: flex; gap: 2px; }
+.msp-duelo-cartas .cesp.chica { width: 33px !important; }
+.msp-duelo-jugada { margin: 0; color: #334155; font-size: 0.8rem; font-weight: 800; }
+.msp-duelo-lado small { color: #64748b; font-size: 0.66rem; font-weight: 800; text-transform: uppercase; }
+.msp-nadie { margin: 0; color: #64748b; font-size: 0.85rem; text-align: center; }
+.msp-desglose { display: flex; flex-direction: column; gap: 0.25rem; margin: 0; padding: 0; list-style: none; }
+.msp-desglose li { display: flex; align-items: center; gap: 0.5rem; padding: 0.3rem 0.5rem; border-radius: 10px; background: #f8fafc; font-size: 0.85rem; }
+.msp-desglose li b { min-width: 2.2rem; padding: 0.1rem 0.35rem; border-radius: 8px; color: #ffffff; font-size: 0.85rem; text-align: center; }
+.msp-desglose li.nos b { background: #2563eb; }
+.msp-desglose li.ellos b { background: #dc2626; }
+.msp-desglose li span::first-letter { text-transform: uppercase; }
+.msp-lance-tarjeta > footer { display: flex; justify-content: flex-end; gap: 0.4rem; }
+.msp-lance-tarjeta > footer span { padding: 0.2rem 0.7rem; border-radius: 999px; color: #ffffff; font-size: 0.85rem; font-weight: 900; }
+.msp-lance-tarjeta > footer .nos { background: #2563eb; }
+.msp-lance-tarjeta > footer .ellos { background: #dc2626; }
+.msp-total { display: flex; align-items: center; justify-content: center; gap: 0.7rem; padding: 0.7rem; border-radius: 22px; background: linear-gradient(150deg, #166534, #14532d); color: #ffffff; box-shadow: 0 5px 0 rgba(0, 0, 0, 0.3); }
+.msp-total > span:not(.msp-total-txt) { display: flex; flex-direction: column; align-items: center; min-width: 80px; padding: 0.25rem 0.6rem; border-radius: 14px; line-height: 1.05; }
+.msp-total .nos { background: #2563eb; }
+.msp-total .ellos { background: #dc2626; }
+.msp-total small { font-size: 0.62rem; font-weight: 800; text-transform: uppercase; }
+.msp-total strong { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.6rem; }
+.msp-total-txt { color: #bbf7d0; font-size: 0.75rem; font-weight: 800; }
+.msp-puntos .msp-seguir { padding: 0.2rem 0 0.4rem; }
+.msp-ultima summary { color: #334155; font-weight: 800; cursor: pointer; }
+.msp-ultima .msp-puntos { margin-top: 0.6rem; }
+.msp-ultima .msp-total-txt { color: #bbf7d0; }
+
+@media (max-width: 380px) {
+  .msp-destape-cartas .cesp { width: 56px !important; }
+  .msp-duelo-cartas .cesp.chica { width: 29px !important; }
+  .msp-mini-cartas .cesp.chica { width: 24px !important; }
+}
+@media (min-width: 560px) {
+  .msp-destape-cartas .cesp { width: 76px !important; }
+  .msp-duelo-cartas .cesp.chica { width: 42px !important; }
+  .msp-mini-cartas .cesp.chica { width: 32px !important; }
+}
+
+/* Asientos laterales: cartas en 2×2 para que quepa el nombre */
+.msp-asiento.izquierda .msp-mini-cartas, .msp-asiento.derecha .msp-mini-cartas { display: grid; grid-template-columns: repeat(2, auto); gap: 3px; }
+.msp-asiento.izquierda .msp-mini-cartas .cesp.chica, .msp-asiento.derecha .msp-mini-cartas .cesp.chica { width: 30px !important; }
+.msp-asiento.izquierda .msp-asiento-cab, .msp-asiento.derecha .msp-asiento-cab { flex-direction: column; gap: 0.15rem; }
+.msp-asiento.izquierda .msp-asiento-nombre, .msp-asiento.derecha .msp-asiento-nombre { max-width: 100%; }

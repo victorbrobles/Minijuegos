@@ -52,6 +52,7 @@ montarSalas(router, {
       case 'descartar': return M.descartar(p, s, Array.isArray(d.ids) ? d.ids : [], ahora);
       case 'hablar': return M.hablar(p, s, { tipo: d.accion, cantidad: d.cantidad }, ahora);
       case 'seguir': return M.seguir(p, s, ahora);
+      case 'verPuntos': return esAdmin ? M.verPuntos(p) : { ok: false, error: 'Solo el anfitrión.' };
       case 'forzar': return esAdmin ? M.forzarSeguir(p, ahora) : { ok: false, error: 'Solo el anfitrión.' };
       case 'terminar': return esAdmin ? M.terminar(p) : { ok: false, error: 'Solo el anfitrión.' };
       default: return null;
