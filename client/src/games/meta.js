@@ -93,7 +93,7 @@ export const META = {
     colores: ['#38bdf8', '#0c4a6e'],
     etiquetas: 'futbol fichajes mercado presupuesto plantilla manager liga tactica pujas',
     descripcion: 'Dirige un club con presupuesto limitado: puja en secreto por futbolistas reales, monta una plantilla equilibrada, elige táctica y compite en una liga simulada. No basta con fichar a los mejores.',
-    categorias: ['futbol', 'estrategia']
+    categorias: ['futbol', 'favoritos']
   },
   'musavanzado': {
     titulo: 'Mus Avanzado',
@@ -120,7 +120,7 @@ export const META = {
     colores: ['#ec4899', '#500724'],
     etiquetas: 'pareja relacionar actor pelicula inventor invento pais moneda personaje creador cantante grupo pintor cuadro',
     descripcion: 'Sale un actor, un inventor, un país, un personaje, un cantante o un pintor: encuentra su pareja entre cuatro opciones antes que nadie. La dificultad sube y los puntos se multiplican.',
-    categorias: ['prueba']
+    categorias: ['famosos']
   },
   'tablero': {
     titulo: 'El Tablero de Puntos',
@@ -138,7 +138,7 @@ export const META = {
     colores: ['#a8a29e',  '#292524'],
     etiquetas: 'hemeroteca titulares periodico noticias historia huecos pistas actualidad prensa',
     descripcion: 'Titulares históricos de periódico a los que les faltan palabras. Las pistas se destapan poco a poco (época, contexto, iniciales): cuanto antes completes el titular, más puntos.',
-    categorias: ['prueba']
+    categorias: ['famosos']
   },
   'acta': {
     titulo: 'Acta del Partido',
@@ -165,7 +165,7 @@ export const META = {
     colores: ['#f59e0b',  '#78350f'],
     etiquetas: 'piezas tablero silueta figura encajar tetris puzle geometria turnos bloquear objetivo',
     descripcion: 'Un tablero compartido con una figura incompleta. Por turnos, cada jugador coloca una pieza geométrica (girándola o volteándola): cierra filas, cumple tu objetivo secreto, pon la última pieza o deja al siguiente sin sitio.',
-    categorias: ['estrategia']
+    categorias: ['dos_jugadores']
   },
   'laberinto': {
     titulo: 'El Laberinto',
@@ -183,7 +183,7 @@ export const META = {
     colores: ['#16a34a', '#14532d'],
     etiquetas: 'mus cartas baraja española parejas envido ordago grande chica pares juego clasico bar',
     descripcion: 'El clásico juego de cartas español por parejas: mus o no hay mus, envites a grande, chica, pares y juego, faroles y órdagos. Juega online con tus amigos o contra la máquina.',
-    categorias: ['estrategia', 'favoritos']
+    categorias: ['estrategia']
   },
   'reinos': {
     titulo: 'Los Siete Reinos',
@@ -309,7 +309,7 @@ export const META = {
     colores: ['#6366f1', '#312e81'],
     etiquetas: 'siglas acronimos significado palabras cultura general',
     descripcion: 'Adivina el significado real de las siglas y acrónimos más conocidos del mundo. No falles y supera tu propio récord.',
-    categorias: ['dos_jugadores']
+    categorias: ['un_jugador']
   },
   'rankings': {
     titulo: 'Ranking oculto',
