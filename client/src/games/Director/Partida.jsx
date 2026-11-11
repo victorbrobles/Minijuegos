@@ -34,18 +34,68 @@ function Cabecera({ v, onSalir, titulo, etiqueta, chip }) {
   );
 }
 
-export function Futbolista({ f, children, pagado }) {
+/** Cifras de un futbolista: media, potencial y precio (o lo pagado), cada una en su casilla. */
+function Cifras({ f, precio }) {
   const sube = f.temporada != null ? f.temporada - f.media : null;
   return (
-    <div className="dtp-fut">
-      <span className="dtp-pos" style={{ '--c': POS[f.pos].c }}>{f.pos}</span>
+    <div className="dtp-cifras">
+      <span className="med"><small>MED</small><b>{f.media}</b></span>
+      <span className="pot"><small>POT</small><b>{f.potencial}</b>{sube ? <i className={sube > 0 ? 'sube' : 'baja'}>{sube > 0 ? '▲' : '▼'}{Math.abs(sube)}</i> : null}</span>
+      {precio != null && <span className="pre"><small>{precio.etiqueta}</small><b>{m(precio.valor)}</b></span>}
+    </div>
+  );
+}
+
+/** Ficha de un futbolista. onClick: toda la ficha se puede tocar (mercado). puja: lo que has pujado por él. */
+export function Futbolista({ f, children, pagado, precio = null, onClick, puja = null }) {
+  const pr = pagado != null ? { etiqueta: 'PAGADO', valor: pagado } : precio != null ? { etiqueta: 'PRECIO', valor: precio } : null;
+  const Tag = onClick ? 'button' : 'div';
+  return (
+    <Tag type={onClick ? 'button' : undefined} className={`dtp-fut${onClick ? ' tocable' : ''}${puja != null ? ' pujado' : ''}`} style={{ '--c': POS[f.pos].c }} onClick={onClick}>
+      <span className="dtp-pos">{f.pos}</span>
       <div className="dtp-fut-datos">
         <strong>{f.nombre}</strong>
         <small>{f.edad} años · {f.club} · {f.pais}</small>
       </div>
-      <div className="dtp-media"><b>{f.media}</b><small>pot. {f.potencial}{sube ? ` (${sube > 0 ? '+' : ''}${sube})` : ''}</small></div>
-      {pagado != null && <span className="dtp-precio">{m(pagado)}</span>}
+      <Cifras f={f} precio={pr} />
       {children}
+    </Tag>
+  );
+}
+
+/** Ventana para pujar por un futbolista: cantidad clara, atajos y presupuesto restante. */
+function ModalPuja({ f, actual, libre, onGuardar, onQuitar, onCerrar }) {
+  const [x, setX] = useState(actual ?? f.precio);
+  const redondea = (n) => Math.max(f.precio, Math.round(n * 2) / 2);
+  const tras = libre - x;
+  return (
+    <div className="dtp-modal-fondo" role="dialog" aria-modal="true" onClick={onCerrar}>
+      <div className="dtp-modal" onClick={(e) => e.stopPropagation()}>
+        <div className="dtp-modal-cab" style={{ '--c': POS[f.pos].c }}>
+          <span className="dtp-pos">{f.pos}</span>
+          <div><strong>{f.nombre}</strong><small>{f.edad} años · {f.club} · {f.pais}</small></div>
+          <button type="button" className="dtp-cerrar" onClick={onCerrar} aria-label="Cerrar">✕</button>
+        </div>
+        <Cifras f={f} precio={{ etiqueta: 'PRECIO', valor: f.precio }} />
+        <p className="dtp-modal-ayuda">Puja secreta: gana la más alta. El mínimo es su precio.</p>
+        <div className="dtp-cantidad">
+          <button type="button" onClick={() => setX((v) => redondea(v - 1))} disabled={x <= f.precio}>−1</button>
+          <button type="button" onClick={() => setX((v) => redondea(v - 0.5))} disabled={x <= f.precio}>−0,5</button>
+          <strong>{m(x)}</strong>
+          <button type="button" onClick={() => setX((v) => redondea(v + 0.5))}>+0,5</button>
+          <button type="button" onClick={() => setX((v) => redondea(v + 1))}>+1</button>
+        </div>
+        <div className="dtp-atajos">
+          {[['Su precio', f.precio], ['+10 %', f.precio * 1.1], ['+25 %', f.precio * 1.25], ['+50 %', f.precio * 1.5], ['+5 M€', x + 5]].map(([t, n]) => (
+            <button key={t} type="button" onClick={() => setX(redondea(n))}>{t}</button>
+          ))}
+        </div>
+        <p className={`dtp-restante${tras < 0 ? ' mal' : ''}`}>{tras < 0 ? `Te pasas en ${m(-tras)}` : `Te quedarían ${m(tras)} para otras pujas`}</p>
+        <div className="dtp-modal-botones">
+          {actual != null && <button type="button" className="pzp-boton secundario dtp-quitar" onClick={onQuitar}>🗑️ Quitar puja</button>}
+          <button type="button" className="pzp-boton" disabled={tras < 0} onClick={() => onGuardar(x)}><Icon name="check" size={18} /> {actual != null ? 'Guardar' : 'Pujar'}</button>
+        </div>
+      </div>
     </div>
   );
 }
@@ -97,13 +147,14 @@ function Formacion({ v, enviar }) {
 function Mercado({ v, enviar }) {
   const yo = clubDe(v, v.yo.id);
   const [pujas, setPujas] = useState(() => ({ ...(v.yo.pujas || {}) }));
+  const [modal, setModal] = useState(null);
   const total = Object.values(pujas).reduce((a, x) => a + x, 0);
   if (v.yo.listo) {
     return (
       <>
         <div className="pzp-tarjeta">
           <p className="pzp-etiqueta">Tus pujas secretas · {m(total)}</p>
-          {Object.keys(v.yo.pujas || {}).length ? v.oferta.filter((f) => v.yo.pujas[f.id] != null).map((f) => <Futbolista key={f.id} f={f}><span className="dtp-puja">{m(v.yo.pujas[f.id])}</span></Futbolista>)
+          {Object.keys(v.yo.pujas || {}).length ? <div className="dtp-lista">{v.oferta.filter((f) => v.yo.pujas[f.id] != null).map((f) => <div key={f.id} className="dtp-fila pujado"><Futbolista f={f} precio={f.precio} puja={v.yo.pujas[f.id]} /><div className="dtp-fila-acciones"><span>✓ Has pujado <b>{m(v.yo.pujas[f.id])}</b></span></div></div>)}</div>
             : <p className="pzp-nota">En este mercado no pujas por nadie.</p>}
           <button type="button" className="pzp-enlace oscuro" onClick={() => enviar('retirar')}>✏️ Cambiar mis pujas</button>
         </div>
@@ -112,30 +163,33 @@ function Mercado({ v, enviar }) {
     );
   }
   const cambia = (f, x) => setPujas((p) => { const n = { ...p }; if (x == null) delete n[f.id]; else n[f.id] = Math.max(f.precio, Math.round(x * 2) / 2); return n; });
+  const abierto = v.oferta.find((f) => f.id === modal);
   const n = Object.keys(pujas).length;
   const pasa = total > yo.presupuesto || n > AJUSTES.maxPujas || yo.plantilla.length + n > AJUSTES.maxPlantilla;
   return (
     <>
       <Plantilla c={yo} />
       <div className="pzp-tarjeta">
-        <p className="pzp-etiqueta">En el mercado · puja lo que quieras (mínimo su precio): gana la puja más alta</p>
+        <p className="pzp-etiqueta">En el mercado · toca un jugador para pujar</p>
         <div className="dtp-lista">
           {v.oferta.map((f) => (
-            <Futbolista key={f.id} f={f}>
-              {pujas[f.id] == null ? (
-                <button type="button" className="dtp-pujar" onClick={() => cambia(f, f.precio)}>{m(f.precio)}<small>Pujar</small></button>
-              ) : (
-                <div className="dtp-ajuste">
-                  <button type="button" onClick={() => (pujas[f.id] <= f.precio ? cambia(f, null) : cambia(f, pujas[f.id] - 1))}>{pujas[f.id] <= f.precio ? '✕' : '−'}</button>
-                  <strong>{m(pujas[f.id])}</strong>
-                  <button type="button" onClick={() => cambia(f, pujas[f.id] + 1)}>+</button>
-                  <button type="button" onClick={() => cambia(f, pujas[f.id] + 5)}>+5</button>
+            <div key={f.id} className={`dtp-fila${pujas[f.id] != null ? ' pujado' : ''}`}>
+              <Futbolista f={f} precio={f.precio} puja={pujas[f.id] ?? null} onClick={() => setModal(f.id)} />
+              {pujas[f.id] != null && (
+                <div className="dtp-fila-acciones">
+                  <span>✓ Has pujado <b>{m(pujas[f.id])}</b></span>
+                  <button type="button" onClick={() => setModal(f.id)}>✏️ Editar</button>
+                  <button type="button" className="quitar" onClick={() => cambia(f, null)}>🗑️ Quitar</button>
                 </div>
               )}
-            </Futbolista>
+            </div>
           ))}
         </div>
       </div>
+      {abierto && (
+        <ModalPuja f={abierto} actual={pujas[abierto.id] ?? null} libre={yo.presupuesto - total + (pujas[abierto.id] || 0)}
+          onCerrar={() => setModal(null)} onQuitar={() => { cambia(abierto, null); setModal(null); }} onGuardar={(x) => { cambia(abierto, x); setModal(null); }} />
+      )}
       <div className="pzp-barra">
         <p className={`dtp-total${pasa ? ' mal' : ''}`}>{n} {n === 1 ? 'puja' : 'pujas'} · {m(total)} de {m(yo.presupuesto)}{n > AJUSTES.maxPujas ? ` · máximo ${AJUSTES.maxPujas}` : ''}</p>
         <button type="button" className="pzp-boton grande" disabled={pasa} onClick={() => enviar('pujar', { pujas })}>

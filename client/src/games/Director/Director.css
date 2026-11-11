@@ -4,24 +4,10 @@
 
 .pzp-contenedor.director { --pz0: #e0f2fe; --pz1: #38bdf8; --pz2: #0369a1; --pz3: #0c4a6e; }
 
-.dtp-lista { display: flex; flex-direction: column; gap: 0.4rem; }
-.dtp-fut { display: flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.55rem; border-radius: 14px; background: #f8fafc; }
-.dtp-pos { display: grid; place-items: center; flex: none; width: 38px; height: 26px; border-radius: 8px; background: var(--c); color: #ffffff; font-size: 0.72rem; font-weight: 900; }
+.dtp-lista { display: flex; flex-direction: column; gap: 0.3rem; }
 .dtp-fut-datos { flex: 1; min-width: 0; }
 .dtp-fut-datos strong { display: block; overflow: hidden; color: #0f172a; font-size: 0.92rem; white-space: nowrap; text-overflow: ellipsis; }
 .dtp-fut-datos small { display: block; overflow: hidden; color: #64748b; font-size: 0.7rem; font-weight: 600; white-space: nowrap; text-overflow: ellipsis; }
-.dtp-media { display: flex; flex-direction: column; align-items: center; flex: none; min-width: 44px; line-height: 1.05; }
-.dtp-media b { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.25rem; color: #0f172a; }
-.dtp-media small { color: #16a34a; font-size: 0.62rem; font-weight: 800; white-space: nowrap; }
-.dtp-precio, .dtp-puja { flex: none; padding: 0.2rem 0.5rem; border-radius: 999px; background: #e0f2fe; color: #075985; font-size: 0.75rem; font-weight: 900; white-space: nowrap; }
-.dtp-pujar {
-  display: flex !important; flex: none; flex-direction: column; align-items: center; width: auto !important; min-width: 64px; min-height: 0 !important; margin: 0 !important; padding: 0.3rem 0.5rem !important;
-  border: 2px solid var(--pz2) !important; border-radius: 12px !important; background: #ffffff !important; color: var(--pz3) !important; font-size: 0.78rem !important; font-weight: 900 !important; line-height: 1.1; cursor: pointer;
-}
-.dtp-pujar small { color: #64748b; font-size: 0.62rem; }
-.dtp-ajuste { display: flex; flex: none; align-items: center; gap: 0.2rem; }
-.dtp-ajuste button { width: 28px !important; height: 30px; min-height: 0 !important; margin: 0 !important; padding: 0 !important; border: none !important; border-radius: 8px !important; background: var(--pz2) !important; color: #ffffff !important; font-size: 0.8rem !important; font-weight: 900 !important; cursor: pointer; }
-.dtp-ajuste strong { min-width: 54px; color: var(--pz3); font-size: 0.78rem; text-align: center; }
 .dtp-total { margin: 0; padding: 0.35rem 0.8rem; border-radius: 999px; background: rgba(255, 255, 255, 0.95); color: var(--pz3); font-weight: 900; text-align: center; }
 .dtp-total.mal { background: #fee2e2; color: #b91c1c; }
 .dtp-plegar { display: flex !important; flex-wrap: wrap; align-items: center; gap: 0.4rem; width: 100% !important; min-height: 0 !important; margin: 0 !important; padding: 0 !important; border: none !important; background: none !important; box-shadow: none !important; color: #0f172a !important; font-weight: 800 !important; text-align: left; cursor: pointer; }
@@ -78,22 +64,8 @@
 .dtp-fuerzas li { display: flex; justify-content: space-between; gap: 0.5rem; color: #334155; font-size: 0.8rem; }
 
 /* ---- Tema estadio de noche: focos, césped y fichas de jugador ---- */
-.pzp-contenedor.director {
-  background:
-    radial-gradient(ellipse at 15% -5%, rgba(255, 255, 255, 0.28) 0%, transparent 35%),
-    radial-gradient(ellipse at 85% -5%, rgba(255, 255, 255, 0.28) 0%, transparent 35%),
-    linear-gradient(180deg, #0b1d3a 0%, #0c2a4d 55%, #14532d 100%) !important;
-}
 .pzp-contenedor.director .pzp-tarjeta { border-top: 5px solid #0284c7; }
 .pzp-contenedor.director .pzp-hero { background: linear-gradient(135deg, #0369a1, #082f49) !important; }
-.dtp-fut {
-  position: relative; border: 1px solid #e2e8f0; border-left: 5px solid var(--c, #0369a1);
-  background: linear-gradient(90deg, #ffffff, #f8fafc); box-shadow: 0 2px 0 #e2e8f0;
-}
-.dtp-media { padding: 0.15rem 0.35rem; border-radius: 10px; background: linear-gradient(180deg, #fef9c3, #fde68a); }
-.dtp-media b { color: #713f12; }
-.dtp-pujar { box-shadow: 0 3px 0 var(--pz2) !important; }
-.dtp-pujar:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--pz2) !important; }
 .dtp-formacion, .dtp-tactica {
   position: relative; overflow: hidden;
   background: repeating-linear-gradient(180deg, #f0fdf4 0 14px, #ecfccb 14px 28px) !important; border-color: #bbf7d0 !important;
@@ -104,3 +76,74 @@
 .dtp-partidos li b { background: linear-gradient(180deg, #1e293b, #0f172a); color: #fde047; font-variant-numeric: tabular-nums; }
 .dtp-tabla tr:nth-child(even) td { background: #f8fafc; }
 .dtp-tabla tr.mio td { background: #fef9c3; }
+
+/* ---- Fichas de jugador compactas (sin fondo propio en el contenedor) ---- */
+.dtp-fut {
+  position: relative; display: flex !important; align-items: center; gap: 0.45rem; width: 100% !important; min-height: 0 !important; margin: 0 !important;
+  padding: 0.35rem 0.4rem 0.35rem 0.45rem !important; border: 1px solid #e2e8f0 !important; border-left: 5px solid var(--c) !important; border-radius: 12px !important;
+  background: #ffffff !important; color: #0f172a !important; font: inherit !important; text-align: left; box-shadow: 0 2px 0 #e2e8f0 !important;
+}
+button.dtp-fut { cursor: pointer; transition: transform 0.1s, box-shadow 0.1s; }
+button.dtp-fut:hover { box-shadow: 0 0 0 2px var(--pz1), 0 2px 0 #e2e8f0 !important; }
+button.dtp-fut:active { transform: scale(0.99); }
+.dtp-fut.pujado { background: linear-gradient(90deg, #dcfce7, #f0fdf4) !important; }
+.dtp-pos { display: grid; place-items: center; flex: none; width: 34px; height: 24px; border-radius: 7px; background: var(--c); color: #ffffff; font-size: 0.68rem; font-weight: 900; }
+.dtp-fut-datos strong { font-size: 0.88rem; }
+.dtp-fut-datos small { font-size: 0.68rem; }
+.dtp-mi-puja { display: inline-block; margin-top: 0.1rem; padding: 0.05rem 0.45rem; border-radius: 999px; background: #16a34a; color: #ffffff; font-size: 0.68rem; font-style: normal; font-weight: 900; }
+.dtp-cifras { display: flex; flex: none; gap: 0.2rem; }
+.dtp-cifras span { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 38px; padding: 0.15rem 0.25rem; border-radius: 9px; line-height: 1.05; }
+.dtp-cifras small { font-size: 0.52rem; font-weight: 900; letter-spacing: 0.05em; opacity: 0.8; }
+.dtp-cifras b { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.1rem; font-variant-numeric: tabular-nums; }
+.dtp-cifras .med { background: #0f172a; color: #fde047; }
+.dtp-cifras .pot { background: #ecfdf5; color: #166534; box-shadow: inset 0 0 0 1.5px #86efac; }
+.dtp-cifras .pre { min-width: 54px; background: #e0f2fe; color: #075985; box-shadow: inset 0 0 0 1.5px #7dd3fc; }
+.dtp-cifras .pre b { font-size: 0.85rem; white-space: nowrap; }
+.dtp-cifras i { position: absolute; top: -6px; right: -4px; padding: 0 0.2rem; border-radius: 6px; font-size: 0.55rem; font-style: normal; font-weight: 900; }
+.dtp-cifras i.sube { background: #16a34a; color: #ffffff; }
+.dtp-cifras i.baja { background: #dc2626; color: #ffffff; }
+.dtp-fila { display: flex; flex-direction: column; }
+.dtp-fila.pujado { padding: 3px; border-radius: 14px; background: #16a34a; box-shadow: 0 3px 0 #15803d; }
+.dtp-fila.pujado .dtp-fut { border-color: transparent !important; border-left-color: var(--c) !important; box-shadow: none !important; }
+.dtp-fila-acciones { display: flex; align-items: center; gap: 0.3rem; padding: 0.3rem 0.3rem 0.15rem 0.45rem; color: #ffffff; font-size: 0.8rem; font-weight: 700; }
+.dtp-fila-acciones span { flex: 1; }
+.dtp-fila-acciones b { font-family: 'Bricolage Grotesque', sans-serif; font-size: 0.95rem; }
+.dtp-fila-acciones button { min-height: 0 !important; margin: 0 !important; padding: 0.2rem 0.6rem !important; border: 0 !important; border-radius: 999px !important; background: #ffffff !important; color: #166534 !important; font-size: 0.75rem !important; font-weight: 900 !important; cursor: pointer; }
+.dtp-fila-acciones button.quitar { background: #fee2e2 !important; color: #b91c1c !important; }
+@media (max-width: 380px) {
+  .dtp-cifras span { min-width: 32px; }
+  .dtp-cifras .pre { min-width: 48px; }
+  .dtp-cifras b { font-size: 1rem; }
+  .dtp-fut-datos small { display: none; }
+}
+
+/* Ventana de puja */
+.dtp-modal-fondo { position: fixed; inset: 0; z-index: 80; display: grid; place-items: end center; padding: 0.8rem; background: rgba(15, 23, 42, 0.6); animation: dtpFondo 0.2s ease-out; }
+@media (min-width: 520px) { .dtp-modal-fondo { place-items: center; } }
+@keyframes dtpFondo { from { opacity: 0; } to { opacity: 1; } }
+.dtp-modal { display: flex; flex-direction: column; gap: 0.6rem; width: min(100%, 420px); padding: 1rem; border-radius: 22px; background: #ffffff; color: #0f172a; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4); animation: dtpSube 0.25s ease-out; }
+@keyframes dtpSube { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+.dtp-modal-cab { display: flex; align-items: center; gap: 0.55rem; }
+.dtp-modal-cab > div { flex: 1; min-width: 0; }
+.dtp-modal-cab strong { display: block; font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.2rem; }
+.dtp-modal-cab small { color: #64748b; font-size: 0.78rem; font-weight: 600; }
+.dtp-cerrar { width: 34px !important; height: 34px; min-height: 0 !important; margin: 0 !important; padding: 0 !important; border: 0 !important; border-radius: 50% !important; background: #f1f5f9 !important; color: #334155 !important; font-weight: 900 !important; cursor: pointer; }
+.dtp-modal .dtp-cifras { justify-content: center; gap: 0.4rem; }
+.dtp-modal .dtp-cifras span { min-width: 64px; padding: 0.35rem 0.5rem; border-radius: 12px; }
+.dtp-modal .dtp-cifras b { font-size: 1.5rem; }
+.dtp-modal .dtp-cifras .pre b { font-size: 1.05rem; }
+.dtp-modal-ayuda { margin: 0; color: #64748b; font-size: 0.8rem; text-align: center; }
+.dtp-cantidad { display: grid; grid-template-columns: 44px 44px 1fr 44px 44px; align-items: center; gap: 0.3rem; }
+.dtp-cantidad strong { padding: 0.45rem 0.2rem; border-radius: 14px; background: #f0fdf4; color: #166534; font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.45rem; text-align: center; box-shadow: inset 0 0 0 2px #86efac; white-space: nowrap; }
+.dtp-cantidad button, .dtp-atajos button {
+  min-height: 0 !important; margin: 0 !important; padding: 0.5rem 0 !important; border: 0 !important; border-radius: 12px !important; background: var(--pz0) !important;
+  color: var(--pz3) !important; font-size: 0.85rem !important; font-weight: 900 !important; cursor: pointer; box-shadow: inset 0 -3px 0 rgba(3, 105, 161, 0.2) !important;
+}
+.dtp-cantidad button:disabled { opacity: 0.4; cursor: default; }
+.dtp-atajos { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0.3rem; }
+.dtp-atajos button { padding: 0.4rem 0 !important; background: #f8fafc !important; color: #334155 !important; font-size: 0.72rem !important; box-shadow: inset 0 0 0 1.5px #e2e8f0 !important; }
+.dtp-restante { margin: 0; padding: 0.35rem 0.6rem; border-radius: 999px; background: #e0f2fe; color: #075985; font-size: 0.82rem; font-weight: 800; text-align: center; }
+.dtp-restante.mal { background: #fee2e2; color: #b91c1c; }
+.dtp-modal-botones { display: flex; gap: 0.4rem; }
+.dtp-modal-botones .pzp-boton { flex: 1; width: auto !important; margin: 0 !important; }
+.dtp-quitar { color: #b91c1c !important; }
