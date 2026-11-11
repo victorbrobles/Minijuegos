@@ -4,7 +4,7 @@ import React, { useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import * as E from './engine.js';
 import { Partida, Fin, Config } from './Partida.jsx';
-import { ModalSalir } from '../Pulsador/Vistas.jsx';
+import { ModalSalir, TurnoDe } from '../Pulsador/Vistas.jsx';
 import { SelectorJugadores } from '../../components/MenuJuego.jsx';
 
 export default function TableroLocal({ juego, onVolver, onExit, onAbrirAyuda }) {
@@ -14,6 +14,7 @@ export default function TableroLocal({ juego, onVolver, onExit, onAbrirAyuda }) 
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modal, setModal] = useState(false);
+  const [confirmado, setConfirmado] = useState(null);
   const estRef = useRef(null);
   const [, setVer] = useState(0);
   const refrescar = () => setVer((x) => x + 1);
@@ -75,5 +76,16 @@ export default function TableroLocal({ juego, onVolver, onExit, onAbrirAyuda }) 
     else if (tipo === 'terminar') E.terminar(est);
     refrescar();
   };
-  return envoltorio(<Partida v={E.vistaDe(est, est.turno)} enviar={enviar} onSalir={() => setModal(true)} local />);
+  const v = E.vistaDe(est, est.turno);
+  // Pantalla de turno antes de que cada jugador elija casilla
+  if (est.fase === 'elegir' && confirmado !== est.jugadas) {
+    const nombre = v.jugadores.find((j) => j.id === est.turno).nombre;
+    return envoltorio(
+      <TurnoDe v={v} id={est.turno} puedo onListo={() => setConfirmado(est.jugadas)} boton={`Soy ${nombre}`}
+        texto={`Pásale el móvil: elige casilla y responde. Quedan ${v.quedan} casillas.`}>
+        {est.ultimo && <p className="tbx-gate-ultimo">{v.jugadores.find((j) => j.id === est.ultimo.id).nombre} {est.ultimo.bien ? 'acertó' : 'falló'}: {est.ultimo.puntos > 0 ? '+' : ''}{est.ultimo.puntos}</p>}
+      </TurnoDe>
+    );
+  }
+  return envoltorio(<Partida v={v} enviar={enviar} onSalir={() => setModal(true)} local />);
 }

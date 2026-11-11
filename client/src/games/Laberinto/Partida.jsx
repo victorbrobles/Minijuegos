@@ -2,7 +2,7 @@
 // Pantallas de «El Laberinto» (online y en un dispositivo): tablero con niebla, tu personaje y tus acciones.
 import React, { useState } from 'react';
 import Icon from '../../components/Icon.jsx';
-import { Pildoras, useRestante, Cuenta } from '../Pulsador/Vistas.jsx';
+import { Pildoras, useRestante, Cuenta, AvisoTurno } from '../Pulsador/Vistas.jsx';
 import { BloqueConfig } from '../../components/MenuJuego.jsx';
 import { PERSONAJES, CONTENIDO, AJUSTES } from './engine.js';
 import './Laberinto.css';
@@ -174,6 +174,7 @@ export function Partida({ v, enviar, onSalir, offset = 0, local = false, admin =
         <h1 className="pzp-hero-titulo">{v.jugadores.some((j) => j.corazon) ? `💎 ¡${v.jugadores.find((j) => j.corazon).nombre} lleva el Corazón!` : 'Encuentra el Corazón 💎'}</h1>
       </header>
       {!local && v.hasta && <div className="pzp-tarjeta" style={{ padding: '0.5rem 0.8rem' }}><Cuenta ms={restante} total={AJUSTES.segTurno * 1000} /></div>}
+      {!local && v.yo && <AvisoTurno clave={miTurno ? `${v.ronda}-${v.turno.jugadorId}` : null} emoji={PERSONAJES[v.jugadores.find((j) => j.id === v.yo.id)?.personaje]?.e || '🗝️'} texto="¡Te toca!" sub="Muévete por el laberinto y haz tu acción." />}
       <Objetivo v={v} />
       <Estado v={v} />
       <div className="pzp-tarjeta lbr-tablero-tarjeta"><Tablero v={v} marcadas={marcadas} onTocar={miTurno ? tocar : null} /></div>

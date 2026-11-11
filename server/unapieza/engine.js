@@ -94,7 +94,7 @@ export function crearPartida(jugadores, figuras, reglas = {}, ahora = Date.now()
     jugadores: jugadores.map((j) => ({ id: j.id, nombre: j.nombre, puntos: 0, piezas: 0, objetivos: 0, fuera: false, mano: [] })),
     figuras: figuras.slice(0, rondas), rondas, segundos: reglas.segundos || AJUSTES.segTurno,
     ronda: 0, fase: 'jugando', turno: null, hasta: null, tablero: [], lineas: [], cerradas: [], objetivos: {},
-    pasesSeguidos: 0, ultimo: null, registro: [], sumas: {}, fin: null, motivo: null
+    pasesSeguidos: 0, ultimo: null, registro: [], sumas: {}, fin: null, motivo: null, nturno: 0
   };
   p.jugadores.forEach((j) => { for (let i = 0; i < AJUSTES.mano; i++) j.mano.push(robar(rng)); });
   empezarRonda(p, ahora, rng);
@@ -118,9 +118,11 @@ function empezarRonda(p, ahora, rng = Math.random) {
   const a = activos(p);
   p.turno = a[(p.ronda - 1) % a.length].id;
   p.hasta = ahora + p.segundos * 1000;
+  p.nturno = (p.nturno || 0) + 1;
 }
 
 function siguienteTurno(p, ahora) {
+  p.nturno += 1;
   const a = activos(p);
   if (!a.length) return;
   const i = a.findIndex((j) => j.id === p.turno);
@@ -239,7 +241,7 @@ export function vistaDe(p, id) {
   const abierto = p.fase !== 'jugando';
   const fig = p.figuras[p.ronda - 1];
   return {
-    fase: p.fase, ronda: p.ronda, rondas: p.rondas, segundos: p.segundos, hasta: p.hasta, turno: p.turno, motivo: p.motivo,
+    fase: p.fase, ronda: p.ronda, rondas: p.rondas, segundos: p.segundos, hasta: p.hasta, turno: p.turno, motivo: p.motivo, nturno: p.nturno,
     figura: fig ? { id: fig.id, nombre: fig.nombre, e: fig.e } : null,
     tablero: p.tablero, cerradas: p.cerradas, ultimo: p.ultimo,
     huecos: p.tablero.flat().filter((x) => x === 0).length,

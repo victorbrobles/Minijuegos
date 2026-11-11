@@ -100,7 +100,7 @@ export default function ReinosLocal({ juego, onVolver, onExit, onAbrirAyuda }) {
       if (r && !r.ok) mostrar(r.error);
       refrescar();
     };
-    return envoltorio(<Partida key={`${quien.id}-${est.ronda}-${est.fase}`} v={v} enviar={enviar} onSalir={() => setModal(true)} />);
+    return envoltorio(<Partida key={`${quien.id}-${est.ronda}-${est.fase}`} v={v} enviar={enviar} onSalir={() => setModal(true)} local />);
   }
 
   // Crónica (todos juntos)

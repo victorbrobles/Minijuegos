@@ -4,7 +4,7 @@ import React, { useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import * as E from './engine.js';
 import { Partida, Fin, Config } from './Partida.jsx';
-import { ModalSalir } from '../Pulsador/Vistas.jsx';
+import { ModalSalir, TurnoDe } from '../Pulsador/Vistas.jsx';
 import { SelectorJugadores } from '../../components/MenuJuego.jsx';
 
 const barajar = (l) => { const b = [...l]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
@@ -16,6 +16,7 @@ export default function UnaPiezaLocal({ juego, onVolver, onExit, onAbrirAyuda })
   const [error, setError] = useState('');
   const [aviso, setAviso] = useState(null);
   const [modal, setModal] = useState(false);
+  const [confirmado, setConfirmado] = useState(null);
   const estRef = useRef(null);
   const [, setVer] = useState(0);
   const refrescar = () => setVer((x) => x + 1);
@@ -80,5 +81,14 @@ export default function UnaPiezaLocal({ juego, onVolver, onExit, onAbrirAyuda })
     refrescar();
   };
   const v = E.vistaDe(est, est.fase === 'jugando' ? est.turno : -1);
+  // Pantalla de turno: cada uno tiene su mano y su objetivo secreto
+  const clave = est.nturno;
+  if (est.fase === 'jugando' && confirmado !== clave) {
+    const nombre = v.jugadores.find((j) => j.id === est.turno).nombre;
+    return envoltorio(
+      <TurnoDe v={v} id={est.turno} puedo onListo={() => setConfirmado(clave)} boton={`Soy ${nombre}`}
+        texto={`Pásale el móvil: va a ver sus piezas y su objetivo secreto. ${v.figura.e} ${v.figura.nombre}: quedan ${v.huecos} huecos.`} />
+    );
+  }
   return envoltorio(<Partida v={v} enviar={enviar} onSalir={() => setModal(true)} local />);
 }

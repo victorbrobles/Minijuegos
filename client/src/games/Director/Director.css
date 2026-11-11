@@ -76,3 +76,31 @@
 .dtp-tabla tr.lider td:first-child { color: #ca8a04; font-weight: 900; }
 .dtp-premios p { margin: 0 0 0.4rem !important; color: #334155 !important; }
 .dtp-fuerzas li { display: flex; justify-content: space-between; gap: 0.5rem; color: #334155; font-size: 0.8rem; }
+
+/* ---- Tema estadio de noche: focos, césped y fichas de jugador ---- */
+.pzp-contenedor.director {
+  background:
+    radial-gradient(ellipse at 15% -5%, rgba(255, 255, 255, 0.28) 0%, transparent 35%),
+    radial-gradient(ellipse at 85% -5%, rgba(255, 255, 255, 0.28) 0%, transparent 35%),
+    linear-gradient(180deg, #0b1d3a 0%, #0c2a4d 55%, #14532d 100%) !important;
+}
+.pzp-contenedor.director .pzp-tarjeta { border-top: 5px solid #0284c7; }
+.pzp-contenedor.director .pzp-hero { background: linear-gradient(135deg, #0369a1, #082f49) !important; }
+.dtp-fut {
+  position: relative; border: 1px solid #e2e8f0; border-left: 5px solid var(--c, #0369a1);
+  background: linear-gradient(90deg, #ffffff, #f8fafc); box-shadow: 0 2px 0 #e2e8f0;
+}
+.dtp-media { padding: 0.15rem 0.35rem; border-radius: 10px; background: linear-gradient(180deg, #fef9c3, #fde68a); }
+.dtp-media b { color: #713f12; }
+.dtp-pujar { box-shadow: 0 3px 0 var(--pz2) !important; }
+.dtp-pujar:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--pz2) !important; }
+.dtp-formacion, .dtp-tactica {
+  position: relative; overflow: hidden;
+  background: repeating-linear-gradient(180deg, #f0fdf4 0 14px, #ecfccb 14px 28px) !important; border-color: #bbf7d0 !important;
+}
+.dtp-formacion::after { content: ''; position: absolute; left: 0; right: 0; top: 50%; border-top: 1px solid rgba(22, 101, 52, 0.25); pointer-events: none; }
+.dtp-formacion.activa, .dtp-tactica.activa { border-color: #16a34a !important; background: repeating-linear-gradient(180deg, #bbf7d0 0 14px, #a7f3d0 14px 28px) !important; box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.3) !important; }
+.dtp-total { box-shadow: 0 3px 0 rgba(0, 0, 0, 0.25); }
+.dtp-partidos li b { background: linear-gradient(180deg, #1e293b, #0f172a); color: #fde047; font-variant-numeric: tabular-nums; }
+.dtp-tabla tr:nth-child(even) td { background: #f8fafc; }
+.dtp-tabla tr.mio td { background: #fef9c3; }

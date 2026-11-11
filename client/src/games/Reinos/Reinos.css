@@ -83,3 +83,29 @@
 .rnp-final ul { margin: 0; padding: 0; list-style: none; font-size: 0.8rem; }
 .rnp-final ul li { color: #94a3b8; }
 .rnp-final ul li.si { color: #166534; font-weight: 700; }
+
+/* ---- Tema medieval: pergamino, oro y mapa con marco de madera ---- */
+.pzp-contenedor.reinos {
+  background: radial-gradient(ellipse at 50% -10%, #7f1d1d 0%, #3b0a0a 50%, #1a0505 100%) !important;
+}
+.pzp-contenedor.reinos .pzp-tarjeta {
+  background: linear-gradient(180deg, #fdf6e3, #f5e9c8) !important; border: 2px solid #d6b98c; box-shadow: 0 5px 0 rgba(0, 0, 0, 0.35), inset 0 0 24px rgba(146, 64, 14, 0.12) !important;
+}
+.pzp-contenedor.reinos .pzp-etiqueta { color: #7c2d12 !important; font-family: Georgia, 'Times New Roman', serif; letter-spacing: 0.08em; }
+.pzp-contenedor.reinos .pzp-hero { background: linear-gradient(135deg, #991b1b, #450a0a) !important; border-bottom: 3px solid #fbbf24; }
+.pzp-contenedor.reinos .pzp-hero-titulo { font-family: Georgia, 'Times New Roman', serif; }
+.rnp-mapa-tarjeta {
+  padding: 0.6rem !important; border: 6px solid #78350f !important; border-radius: 18px !important;
+  background: radial-gradient(ellipse, #bae6fd 0%, #7dd3fc 70%, #38bdf8 100%) !important;
+  box-shadow: inset 0 0 0 2px #fbbf24, inset 0 0 30px rgba(12, 74, 110, 0.35), 0 8px 18px rgba(0, 0, 0, 0.45) !important;
+}
+.rnp-leyenda { color: #0c4a6e; }
+.rnp-cifras span { background: radial-gradient(circle at 30% 25%, #fffbeb, #fde68a); border: 2px solid #d97706; box-shadow: inset 0 -3px 0 rgba(146, 64, 14, 0.2); }
+.rnp-cifras strong { color: #78350f; }
+.rnp-tipo { border: 2px solid #d97706 !important; background: linear-gradient(180deg, #fffbeb, #fef3c7) !important; box-shadow: 0 3px 0 #b45309 !important; font-family: Georgia, 'Times New Roman', serif; }
+.rnp-tipo:active { transform: translateY(2px); box-shadow: 0 1px 0 #b45309 !important; }
+.rnp-lista-ordenes li { background: #fff7ed; border: 1px solid #fdba74; }
+.rnp-objetivos li { background: #fffbeb; border: 1px dashed #d6b98c; }
+.rnp-objetivos li.si { background: #dcfce7; border-style: solid; border-color: #86efac; }
+.rnp-cronica li { background: #fffdf5; }
+.rnp-escudo { border: 2px solid #fde68a; }

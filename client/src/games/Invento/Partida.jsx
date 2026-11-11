@@ -2,7 +2,7 @@
 // Pantallas de «El Invento del Siglo» (online y en un dispositivo) con las piezas comunes de ../Pulsador.
 import React, { useState } from 'react';
 import Icon from '../../components/Icon.jsx';
-import { Hero, Cuenta, useRestante, Avatar, Pildoras, PantallaFin } from '../Pulsador/Vistas.jsx';
+import { Hero, Cuenta, useRestante, Avatar, Pildoras, PantallaFin, AvisoTurno } from '../Pulsador/Vistas.jsx';
 import { BloqueConfig } from '../../components/MenuJuego.jsx';
 import { CATEGORIAS, AJUSTES, OPCIONES } from './engine.js';
 import './Invento.css';
@@ -160,6 +160,10 @@ export function Partida({ v, enviar, offset = 0, onSalir, local = false, puedeSe
   return (
     <>
       <Hero v={v} juego={HERO} onSalir={onSalir} chip={`💡 Ronda ${v.ronda}/${v.rondas}`} etiqueta={etiqueta} titulo={titulo} />
+      {!local && v.yo && v.fase !== 'resultados' && (
+        <AvisoTurno clave={`${v.fase}-${v.ronda}`} emoji={v.fase === 'votar' ? '🗳️' : '💡'} texto={v.fase === 'votar' ? '¡A votar!' : `Ronda ${v.ronda}: ¡a inventar!`}
+          sub={v.fase === 'votar' ? 'Vota los inventos sin saber de quién son.' : 'Mira tus tres cartas e inventa algo.'} />
+      )}
       {v.fase === 'inventar' && v.yo && <Inventar key={`${v.ronda}-${v.yo.id}`} v={v} enviar={enviar} offset={offset} local={local} />}
       {v.fase === 'votar' && v.yo && <Votar key={`${v.ronda}-${v.yo.id}`} v={v} enviar={enviar} local={local} />}
       {v.fase === 'resultados' && <Resultados v={v} enviar={enviar} puedeSeguir={puedeSeguir} />}

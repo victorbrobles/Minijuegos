@@ -2,7 +2,7 @@
 // Pantallas de «Una Pieza Más» (online y en un dispositivo) con las piezas comunes de ../Pulsador.
 import React, { useEffect, useMemo, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
-import { Hero, Cuenta, useRestante, Avatar, Pildoras, PantallaFin, colorDe } from '../Pulsador/Vistas.jsx';
+import { Hero, Cuenta, useRestante, Avatar, Pildoras, PantallaFin, colorDe, AvisoTurno } from '../Pulsador/Vistas.jsx';
 import { BloqueConfig } from '../../components/MenuJuego.jsx';
 import { AJUSTES, OPCIONES, PIEZAS, celdasDe, colocadas, nombreLinea } from './engine.js';
 import './UnaPieza.css';
@@ -60,15 +60,13 @@ function Mano({ v, sel, setSel, rot, espejo, deshabilitada }) {
   );
 }
 
-function Objetivo({ v, local }) {
-  const [ver, setVer] = useState(!local);
-  useEffect(() => { setVer(!local); }, [v.turno, v.ronda, local]);
+function Objetivo({ v }) {
   const o = v.yo?.objetivo;
   if (!o) return null;
   return (
     <div className={`upz-objetivo${o.hecho ? ' hecho' : ''}`}>
-      🎯 {ver ? <>Objetivo secreto: cierra tú <b>{nombreLinea(o.linea)}</b> (+{AJUSTES.ptsObjetivo}){o.hecho ? ' ✅' : ''}</>
-        : <button type="button" className="pzp-enlace oscuro" onClick={() => setVer(true)}>Ver mi objetivo secreto (que no miren)</button>}
+      🎯 Objetivo secreto: cierra tú <b>{nombreLinea(o.linea)}</b> (+{AJUSTES.ptsObjetivo}){o.hecho ? ' ✅' : ''}
+      <small>Está marcada en naranja en el tablero.</small>
     </div>
   );
 }
@@ -78,8 +76,7 @@ function MiTurno({ v, enviar, local }) {
   const [rot, setRot] = useState(0);
   const [espejo, setEspejo] = useState(false);
   const [ancla, setAncla] = useState(null);
-  const [verObj, setVerObj] = useState(!local);
-  useEffect(() => { setSel(null); setAncla(null); setRot(0); setEspejo(false); setVerObj(!local); }, [v.turno, v.ronda, local]);
+  useEffect(() => { setSel(null); setAncla(null); setRot(0); setEspejo(false); }, [v.turno, v.ronda]);
   const atascado = !v.yo.cabe.some(Boolean);
   const suelta = sel === -1;
   const tipo = suelta ? 'P1' : sel !== null ? v.yo.mano[sel] : null;
@@ -91,7 +88,7 @@ function MiTurno({ v, enviar, local }) {
   };
   return (
     <>
-      <Tablero v={v} fantasma={fantasma} valido={valido} onTocar={tipo ? (f, k) => setAncla([f, k]) : null} objetivo={verObj ? v.yo.objetivo?.linea : null} />
+      <Tablero v={v} fantasma={fantasma} valido={valido} onTocar={tipo ? (f, k) => setAncla([f, k]) : null} objetivo={v.yo.objetivo?.linea} />
       <p className="upz-ayuda">
         {atascado ? 'No te cabe ninguna pieza: rellena una casilla suelta o pasa y cambia una pieza.'
           : tipo ? (ancla ? (valido ? 'Pulsa «Colocar» o toca otra casilla para moverla.' : 'Ahí no cabe: tiene que ir entera dentro de los huecos libres.') : 'Toca una casilla libre: ahí irá la primera celda de la pieza.')
@@ -109,19 +106,8 @@ function MiTurno({ v, enviar, local }) {
           {sel !== null && sel >= 0 ? '🔄 Pasar y cambiar esta pieza' : '⏭️ Pasar'}
         </button>
       </div>
-      {local && <ObjetivoLocal v={v} ver={verObj} onVer={() => setVerObj(true)} />}
+      <Objetivo v={v} />
     </>
-  );
-}
-
-function ObjetivoLocal({ v, ver, onVer }) {
-  const o = v.yo?.objetivo;
-  if (!o) return null;
-  return (
-    <div className={`upz-objetivo${o.hecho ? ' hecho' : ''}`}>
-      🎯 {ver ? <>Objetivo secreto: cierra tú <b>{nombreLinea(o.linea)}</b> (+{AJUSTES.ptsObjetivo}){o.hecho ? ' ✅' : ''}</>
-        : <button type="button" className="pzp-enlace oscuro" onClick={onVer}>Ver mi objetivo secreto (que no miren)</button>}
-    </div>
   );
 }
 
@@ -174,6 +160,7 @@ export function Partida({ v, enviar, offset = 0, onSalir, local = false, admin =
     <>
       <Hero v={v} juego={HERO} onSalir={onSalir} chip={`🧩 Figura ${v.ronda}/${v.rondas}`} etiqueta={`${v.figura.e} ${v.figura.nombre} · ${v.huecos} huecos`} titulo={titulo}
         turno={v.fase === 'jugando' ? v.turno : undefined} />
+      {!local && v.yo && <AvisoTurno clave={miTurno ? v.nturno : null} id={v.yo.id} emoji="🧩" texto="¡Te toca!" sub="Coloca una pieza o pasa y cambia una." />}
       {v.fase === 'jugando' && !local && v.hasta && <Cuenta ms={restante} total={v.segundos * 1000} />}
       {v.fase === 'jugando' && miTurno && <MiTurno key={`${v.ronda}-${v.turno}`} v={v} enviar={enviar} local={local} />}
       {v.fase === 'jugando' && !miTurno && (
@@ -183,7 +170,7 @@ export function Partida({ v, enviar, offset = 0, onSalir, local = false, admin =
             <>
               <p className="upz-ayuda">Tus piezas (puedes ir pensando dónde ponerlas):</p>
               <Mano v={v} sel={null} setSel={() => {}} deshabilitada />
-              <Objetivo v={v} local={local} />
+              <Objetivo v={v} />
             </>
           )}
         </>

@@ -2,7 +2,7 @@
 // Pantallas de «Director Deportivo» (online y en un dispositivo): formación, mercados con pujas secretas, táctica y liga.
 import React, { useState } from 'react';
 import Icon from '../../components/Icon.jsx';
-import { Pildoras } from '../Pulsador/Vistas.jsx';
+import { Pildoras, AvisoTurno } from '../Pulsador/Vistas.jsx';
 import { BloqueConfig } from '../../components/MenuJuego.jsx';
 import { FORMACIONES, TACTICAS, AJUSTES, OPCIONES } from './engine.js';
 import './Director.css';
@@ -254,6 +254,10 @@ export function Partida({ v, enviar, onSalir, local = false, admin = false }) {
   return (
     <>
       <Cabecera v={v} onSalir={onSalir} titulo={titulos[0]} etiqueta={titulos[1]} chip={chip} />
+      {!local && v.yo && ['formacion', 'mercado', 'tactica'].includes(v.fase) && (
+        <AvisoTurno clave={`${v.fase}-${v.mercado}`} emoji={{ formacion: '📋', mercado: '🛒', tactica: '🧠' }[v.fase]} texto={titulos[0]}
+          sub={{ formacion: 'Decide qué posiciones vas a fichar.', mercado: 'Haz tus pujas secretas antes de que cierre.', tactica: 'Elige cómo jugará tu equipo la liga.' }[v.fase]} />
+      )}
       {v.fase === 'formacion' && v.yo && <Formacion v={v} enviar={enviar} />}
       {v.fase === 'mercado' && v.yo && <Mercado key={`${v.mercado}-${v.yo.id}-${v.yo.listo}`} v={v} enviar={enviar} />}
       {v.fase === 'resultadoMercado' && <ResultadoMercado v={v} enviar={enviar} local={local} />}

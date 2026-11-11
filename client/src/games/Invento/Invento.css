@@ -46,3 +46,30 @@
 .ivp-podio-cats strong { color: #0f172a; font-size: 0.9rem; line-height: 1.25; }
 @keyframes ivpEntra { from { transform: translateY(10px) rotate(-1deg); opacity: 0; } to { transform: none; opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .ivp-carta { animation: none; } }
+
+/* ---- Tema taller del inventor: papel de plano y patentes ---- */
+.pzp-contenedor.invento {
+  background-color: #1e3a8a !important;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    radial-gradient(ellipse at 50% 0%, #2563eb 0%, #1e3a8a 60%, #172554 100%) !important;
+  background-size: 48px 48px, 48px 48px, 12px 12px, 12px 12px, 100% 100% !important;
+}
+.pzp-contenedor.invento .pzp-hero { background: linear-gradient(135deg, #7c3aed, #4c1d95) !important; }
+.ivp-carta { border: 3px solid rgba(255, 255, 255, 0.85); }
+.ivp-carta:nth-child(1) { transform: rotate(-0.8deg); }
+.ivp-carta:nth-child(2) { transform: rotate(0.6deg); }
+.ivp-carta:nth-child(3) { transform: rotate(-0.4deg); }
+.ivp-cartas.chicas .ivp-carta { transform: none; border-width: 2px; }
+.ivp-carta strong { text-shadow: 0 2px 0 rgba(0, 0, 0, 0.18); }
+.ivp-ayuda { color: #dbeafe; }
+.ivp-invento { position: relative; overflow: hidden; border: 2px solid #c7d2fe; background: linear-gradient(180deg, #ffffff, #f5f3ff) !important; }
+.ivp-invento::before {
+  content: 'PATENTE'; position: absolute; top: 12px; right: -34px; padding: 0.15rem 2.4rem; transform: rotate(35deg);
+  background: #7c3aed; color: #fff; font-size: 0.6rem; font-weight: 900; letter-spacing: 0.15em; opacity: 0.85;
+}
+.ivp-letra { box-shadow: 0 3px 0 #4c1d95; }
+.ivp-votos b { background: #ede9fe; color: #5b21b6; }

@@ -3,7 +3,7 @@
 import React, { useMemo, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import Mapa from './Mapa.jsx';
-import { Pildoras } from '../Pulsador/Vistas.jsx';
+import { Pildoras, AvisoTurno } from '../Pulsador/Vistas.jsx';
 import { BloqueConfig } from '../../components/MenuJuego.jsx';
 import { ACCIONES, AJUSTES, TIPOS, OPCIONES_RONDAS } from './engine.js';
 import './Reinos.css';
@@ -316,7 +316,7 @@ function Cronica({ v }) {
  * La partida en marcha. `local`: en un dispositivo (las acciones de «seguir» y «forzar» las hace el grupo).
  * `admin`: el anfitrión puede desbloquear la partida.
  */
-export function Partida({ v, enviar, onSalir, admin = false }) {
+export function Partida({ v, enviar, onSalir, admin = false, local = false }) {
   const yo = v.yo;
   if (!yo) return null;
   const r = reinoDe(v, yo.id);
@@ -367,6 +367,7 @@ export function Partida({ v, enviar, onSalir, admin = false }) {
   return (
     <>
       <Cabecera v={v} onSalir={onSalir} etiqueta={r.nombre} titulo={titulo} />
+      {!local && v.fase === 'ordenes' && <AvisoTurno clave={`o${v.ronda}`} emoji="📜" texto={`Ronda ${v.ronda}`} sub="Da tus órdenes secretas a tu reino." />}
       <Recursos v={v} />
       {cuerpo}
       {admin && (
