@@ -1,0 +1,66 @@
+// GeoQuiz · Países y fronteras (ampliación)
+import { R, O, E, P, ORD } from '../_tipos.js';
+
+const cap = (pais, capital, dato) => R('Capitales', `¿Cuál es la capital de ${pais}?`, capital, dato);
+
+export default [
+  cap('Egipto', 'El Cairo|Cairo'), cap('Perú', 'Lima'), cap('Chile', 'Santiago|Santiago de Chile'), cap('Colombia', 'Bogotá'),
+  cap('Venezuela', 'Caracas'), cap('Ecuador', 'Quito'), cap('Uruguay', 'Montevideo'), cap('Paraguay', 'Asunción'),
+  cap('Cuba', 'La Habana|Habana'), cap('Noruega', 'Oslo'), cap('Suecia', 'Estocolmo'), cap('Finlandia', 'Helsinki'),
+  cap('Dinamarca', 'Copenhague'), cap('Irlanda', 'Dublín'), cap('Hungría', 'Budapest'), cap('Austria', 'Viena'),
+  cap('Rumanía', 'Bucarest'), cap('Bulgaria', 'Sofía'), cap('Ucrania', 'Kiev|Kyiv'), cap('Grecia', 'Atenas'),
+  cap('Croacia', 'Zagreb'), cap('Serbia', 'Belgrado'), cap('Irán', 'Teherán'), cap('Irak', 'Bagdad'),
+  cap('Arabia Saudí', 'Riad'), cap('Tailandia', 'Bangkok'), cap('Indonesia', 'Yakarta'), cap('Filipinas', 'Manila'),
+  cap('Corea del Sur', 'Seúl'), cap('Corea del Norte', 'Pionyang|Pyongyang'), cap('Etiopía', 'Adís Abeba|Addis Abeba'), cap('Kenia', 'Nairobi'),
+  cap('Senegal', 'Dakar'), cap('Ghana', 'Acra|Accra'), cap('Argelia', 'Argel'), cap('Túnez', 'Túnez|Tunez'),
+  cap('Sudáfrica (sede del Gobierno)', 'Pretoria'), cap('Bolivia (constitucional)', 'Sucre'), cap('Eslovaquia', 'Bratislava'), cap('Letonia', 'Riga'),
+  cap('Lituania', 'Vilna|Vilnius'), cap('Estonia', 'Tallin|Tallinn'), cap('Bielorrusia', 'Minsk'), cap('Georgia', 'Tiflis|Tbilisi'),
+  cap('Armenia', 'Ereván'), cap('Azerbaiyán', 'Bakú'), cap('Uzbekistán', 'Taskent'), cap('Afganistán', 'Kabul'),
+  cap('Nepal', 'Katmandú'), cap('Bangladés', 'Daca|Dhaka'), cap('Malasia', 'Kuala Lumpur'), cap('Jamaica', 'Kingston'),
+  cap('Honduras', 'Tegucigalpa'), cap('Panamá', 'Panamá|Ciudad de Panamá'), cap('Costa Rica', 'San José'), cap('El Salvador', 'San Salvador'),
+  cap('República Dominicana', 'Santo Domingo'), cap('Angola', 'Luanda'), cap('Mozambique', 'Maputo'), cap('Madagascar', 'Antananarivo'),
+  // Países vecinos
+  E('Países vecinos', '¿Qué países tienen frontera terrestre con España?', ['Portugal', 'Francia', 'Andorra', 'Marruecos', 'Reino Unido|Gibraltar'], 'Marruecos por Ceuta y Melilla; Reino Unido por Gibraltar.'),
+  E('Países vecinos', '¿Qué países tienen frontera terrestre con Portugal?', ['España']),
+  E('Países vecinos', '¿Qué países tienen frontera terrestre con Italia?', ['Francia', 'Suiza', 'Austria', 'Eslovenia', 'San Marino', 'Vaticano|Ciudad del Vaticano']),
+  E('Países vecinos', '¿Qué países tienen frontera terrestre con Argentina?', ['Chile', 'Bolivia', 'Paraguay', 'Brasil', 'Uruguay']),
+  E('Países vecinos', '¿Qué países tienen frontera terrestre con México?', ['Estados Unidos|EEUU', 'Guatemala', 'Belice']),
+  E('Países vecinos', '¿Qué países tienen frontera terrestre con Suiza?', ['Alemania', 'Francia', 'Italia', 'Austria', 'Liechtenstein']),
+  E('Países vecinos', '¿Qué países tienen frontera terrestre con Polonia?', ['Alemania', 'República Checa|Chequia', 'Eslovaquia', 'Ucrania', 'Bielorrusia', 'Lituania', 'Rusia']),
+  E('Países vecinos', '¿Qué países tienen frontera terrestre con Egipto?', ['Libia', 'Sudán', 'Israel', 'Palestina|Franja de Gaza|Gaza']),
+  R('Países vecinos', '¿Qué único país tiene frontera terrestre con Dinamarca?', 'Alemania'),
+  R('Países vecinos', '¿Qué único país tiene frontera terrestre con Irlanda?', 'Reino Unido'),
+  R('Países vecinos', '¿Qué único país tiene frontera terrestre con Haití?', 'República Dominicana'),
+  R('Países vecinos', '¿Qué único país tiene frontera terrestre con Canadá?', 'Estados Unidos|EEUU'),
+  R('Países vecinos', '¿Qué único país tiene frontera terrestre con Corea del Sur?', 'Corea del Norte'),
+  R('Países vecinos', '¿Qué único país rodea por completo a San Marino?', 'Italia'),
+  R('Países vecinos', '¿Qué único país rodea por completo a Lesoto?', 'Sudáfrica'),
+  // Fronteras imposibles
+  R('Fronteras imposibles', '¿Con qué país europeo tiene frontera terrestre Brasil?', 'Francia', 'A través de la Guayana Francesa.'),
+  R('Fronteras imposibles', '¿Con qué país tiene España su frontera más corta, de solo 85 metros?', 'Marruecos', 'El peñón de Vélez de la Gomera.'),
+  R('Fronteras imposibles', '¿Qué país europeo tiene frontera con Rusia a través del enclave de Kaliningrado además de Polonia?', 'Lituania'),
+  // Países sin costa, insulares y por continente
+  E('Países sin costa', '¿Qué países de Europa no tienen costa? (di al menos varios)', ['Suiza', 'Austria', 'Hungría', 'República Checa|Chequia', 'Eslovaquia', 'Luxemburgo', 'Liechtenstein', 'Andorra', 'San Marino', 'Vaticano|Ciudad del Vaticano', 'Serbia', 'Macedonia del Norte', 'Kosovo', 'Bielorrusia', 'Moldavia']),
+  E('Países insulares', '¿Qué países de Europa son islas o archipiélagos?', ['Reino Unido', 'Irlanda', 'Islandia', 'Malta', 'Chipre']),
+  E('Países por continente', '¿Qué países de América del Sur hablan español?', ['Argentina', 'Chile', 'Uruguay', 'Paraguay', 'Bolivia', 'Perú', 'Ecuador', 'Colombia', 'Venezuela']),
+  E('Países por continente', '¿Qué países forman Centroamérica?', ['Guatemala', 'Belice', 'Honduras', 'El Salvador', 'Nicaragua', 'Costa Rica', 'Panamá']),
+  E('Países por letra', 'Países que empiezan por «P»', ['Panamá', 'Paraguay', 'Perú', 'Polonia', 'Portugal', 'Pakistán', 'Palaos', 'Papúa Nueva Guinea', 'Países Bajos|Holanda', 'Palestina']),
+  E('Países por letra', 'Países que empiezan por «C»', ['Canadá', 'Chile', 'China', 'Colombia', 'Cuba', 'Croacia', 'Chipre', 'Costa Rica', 'Camerún', 'Camboya', 'Catar|Qatar', 'Chad', 'Comoras', 'Congo', 'Corea del Sur', 'Corea del Norte', 'Costa de Marfil', 'Cabo Verde']),
+  O('Países por continente', '¿En qué continente está Surinam?', 'América del Sur', ['África', 'Asia', 'Oceanía']),
+  O('Países por continente', '¿En qué continente está Bután?', 'Asia', ['África', 'Europa', 'Oceanía']),
+  O('Países por continente', '¿En qué continente está Malaui?', 'África', ['Asia', 'Oceanía', 'América']),
+  O('Países por continente', '¿En qué continente está Fiyi?', 'Oceanía', ['Asia', 'África', 'América']),
+  O('Países por superficie', '¿Qué país es más grande?', 'Argelia', ['Egipto', 'Nigeria', 'Marruecos'], 'Argelia es el país más grande de África.'),
+  O('Países por superficie', '¿Qué país es más grande?', 'Brasil', ['Australia', 'India', 'Argentina']),
+  O('Países por superficie', '¿Qué país es el más pequeño?', 'Malta', ['Chipre', 'Luxemburgo', 'Eslovenia']),
+  ORD('Países por superficie', 'Ordena de mayor a menor superficie', ['Rusia', 'Canadá', 'China', 'Brasil', 'Argentina'], 'de mayor a menor'),
+  ORD('Países por población', 'Ordena de más a menos habitantes', ['India', 'China', 'Estados Unidos', 'Brasil', 'España'], 'de más a menos'),
+  ORD('Países por superficie', 'Ordena de mayor a menor superficie (Europa)', ['Francia', 'España', 'Suecia', 'Alemania', 'Italia'], 'de mayor a menor'),
+  // País misterioso
+  P('País misterioso', ['Tiene más de 17 000 islas.', 'Es el país con más musulmanes del mundo.', 'Su capital va a trasladarse a Nusantara.', 'Bali es una de sus islas.', 'Su capital actual es Yakarta.'], 'Indonesia'),
+  P('País misterioso', ['Está en los Andes.', 'Tiene dos capitales.', 'No tiene costa.', 'Comparte el lago Titicaca.', 'Su capital administrativa es La Paz.'], 'Bolivia'),
+  P('País misterioso', ['Tiene forma alargada.', 'Es una península en el norte de Europa.', 'Tiene fiordos.', 'Su capital es Oslo.', 'Allí se ve el sol de medianoche.'], 'Noruega'),
+  P('País misterioso', ['Es una isla en el océano Índico.', 'Allí viven los lémures.', 'Fue colonia francesa.', 'Es la cuarta isla más grande del mundo.', 'Su capital es Antananarivo.'], 'Madagascar'),
+  P('País misterioso', ['Está en Oriente Próximo.', 'Tiene costa en el mar Muerto.', 'Petra está aquí.', 'Su capital es Amán.', 'Es un reino.'], 'Jordania'),
+  P('País misterioso', ['Está en el Caribe.', 'Comparte isla con otro país.', 'Su lengua oficial es el francés y el criollo.', 'Fue la primera república negra independiente.', 'Su capital es Puerto Príncipe.'], 'Haití')
+];

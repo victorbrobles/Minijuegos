@@ -1,0 +1,56 @@
+// GeoQuiz · Mapas y territorios (ampliación)
+import { R, O, E, ORD } from '../_tipos.js';
+
+const terr = (t, pais) => R('Territorios', `¿A qué país pertenece ${t}?`, pais);
+const cont = (pais, c, otras) => O('Continente correcto', `¿En qué continente está ${pais}?`, c, otras);
+const donde = (lugar, resp, otras) => O('¿Dónde está?', `¿Dónde está ${lugar}?`, resp, otras);
+
+export default [
+  terr('Groenlandia', 'Dinamarca'), terr('la Guayana Francesa', 'Francia'), terr('Puerto Rico', 'Estados Unidos|EEUU'), terr('Gibraltar', 'Reino Unido'),
+  terr('Hong Kong', 'China'), terr('Macao', 'China'), terr('las islas Malvinas (administración)', 'Reino Unido'), terr('Nueva Caledonia', 'Francia'),
+  terr('la Polinesia Francesa', 'Francia'), terr('Guam', 'Estados Unidos|EEUU'), terr('las Azores', 'Portugal'), terr('Madeira', 'Portugal'),
+  terr('Ceuta', 'España'), terr('Melilla', 'España'), terr('las islas Åland', 'Finlandia'), terr('Svalbard', 'Noruega'),
+  terr('Aruba', 'Países Bajos|Reino de los Países Bajos|Holanda'), terr('Curazao', 'Países Bajos|Reino de los Países Bajos|Holanda'), terr('Martinica', 'Francia'), terr('Guadalupe (en el Caribe)', 'Francia'),
+  terr('la isla de Man', 'Reino Unido (dependencia de la Corona)|Reino Unido'), terr('Tasmania', 'Australia'), terr('Hawái', 'Estados Unidos|EEUU'), terr('Alaska', 'Estados Unidos|EEUU'),
+  terr('Sicilia', 'Italia'), terr('Creta', 'Grecia'), terr('Bornholm', 'Dinamarca'), terr('Zanzíbar', 'Tanzania'),
+  cont('Malí', 'África', ['Asia', 'Europa', 'Oceanía']), cont('Papúa Nueva Guinea', 'Oceanía', ['Asia', 'África', 'América']),
+  cont('Guyana', 'América del Sur', ['África', 'Asia', 'Oceanía']), cont('Laos', 'Asia', ['África', 'Oceanía', 'América']),
+  cont('Lesoto', 'África', ['Asia', 'Europa', 'Oceanía']), cont('Belice', 'América', ['África', 'Asia', 'Oceanía']),
+  cont('Kirguistán', 'Asia', ['Europa', 'África', 'Oceanía']), cont('Moldavia', 'Europa', ['Asia', 'África', 'América']),
+  cont('Vanuatu', 'Oceanía', ['Asia', 'África', 'América']), cont('Eritrea', 'África', ['Asia', 'Europa', 'Oceanía']),
+  E('Países transcontinentales', '¿Qué países tienen territorio en Europa y en Asia?', ['Rusia', 'Turquía', 'Kazajistán', 'Azerbaiyán', 'Georgia']),
+  R('Países transcontinentales', '¿Qué país africano tiene la península del Sinaí en Asia?', 'Egipto'),
+  R('Países transcontinentales', '¿Qué país europeo tiene territorio en África (Ceuta y Melilla)?', 'España'),
+  R('Enclaves', '¿Qué país está completamente rodeado por Italia, además del Vaticano?', 'San Marino'),
+  R('Enclaves', '¿Qué municipio español está dentro de Francia?', 'Llívia|Llivia'),
+  R('Enclaves', '¿Qué enclave ruso está entre Polonia y Lituania?', 'Kaliningrado'),
+  O('Enclaves', '¿Qué país africano está rodeado por Sudáfrica?', 'Lesoto', ['Esuatini', 'Botsuana', 'Namibia']),
+  O('Estrechos y canales', '¿Qué canal une el Mediterráneo con el mar Rojo?', 'El canal de Suez', ['El de Panamá', 'El de Corinto', 'El de Kiel']),
+  O('Estrechos y canales', '¿Qué canal une el Atlántico con el Pacífico en América Central?', 'El canal de Panamá', ['El de Suez', 'El de Nicaragua', 'El de Beagle']),
+  O('Estrechos y canales', '¿Qué estrecho separa Reino Unido de Francia?', 'El paso de Calais', ['El de Gibraltar', 'El de Ormuz', 'El Bósforo']),
+  O('Estrechos y canales', '¿Qué estrecho separa Irán de la península arábiga?', 'El de Ormuz', ['El de Bab el-Mandeb', 'El de Malaca', 'El de Bering']),
+  O('Estrechos y canales', '¿Qué estrecho separa Malasia de la isla de Sumatra?', 'El de Malaca', ['El de Ormuz', 'El de Sonda', 'El de Torres']),
+  O('Estrechos y canales', '¿Qué canal griego corta un istmo para unir dos mares?', 'El de Corinto', ['El de Suez', 'El de Kiel', 'El del Bósforo']),
+  ORD('Orden geográfico', 'Ordena de oeste a este', ['Lisboa', 'Madrid', 'Barcelona', 'Roma', 'Atenas'], 'de oeste a este'),
+  ORD('Orden geográfico', 'Ordena de norte a sur', ['Oslo', 'Copenhague', 'Berlín', 'Viena', 'Roma'], 'de norte a sur'),
+  ORD('Orden geográfico', 'Ordena de norte a sur', ['Santander', 'Burgos', 'Madrid', 'Córdoba', 'Málaga'], 'de norte a sur'),
+  ORD('Orden geográfico', 'Ordena de oeste a este', ['A Coruña', 'Oviedo', 'Santander', 'Bilbao', 'San Sebastián'], 'de oeste a este'),
+  ORD('Orden geográfico', 'Ordena de norte a sur (América)', ['Toronto', 'Nueva York', 'Miami', 'Ciudad de Panamá', 'Lima'], 'de norte a sur'),
+  ORD('Orden geográfico', 'Ordena de oeste a este', ['Los Ángeles', 'Denver', 'Chicago', 'Nueva York', 'Londres'], 'de oeste a este'),
+  donde('el desierto del Kalahari', 'En el sur de África', ['En el norte de África', 'En Asia central', 'En Australia']),
+  donde('la península de Kamchatka', 'En Rusia', ['En Japón', 'En Alaska', 'En China']),
+  donde('la Patagonia', 'En Argentina y Chile', ['En Perú', 'En Brasil', 'En México']),
+  donde('Transilvania', 'En Rumanía', ['En Hungría', 'En Bulgaria', 'En Eslovaquia']),
+  donde('la región de Cachemira', 'Entre India, Pakistán y China', ['En Irán', 'En Turkmenistán', 'En Nepal']),
+  donde('el Tíbet', 'En China', ['En India', 'En Nepal', 'En Mongolia']),
+  donde('la Laponia', 'En el norte de Escandinavia y Finlandia', ['En Islandia', 'En Groenlandia', 'En Alaska']),
+  donde('Tierra del Fuego', 'En el extremo sur de Sudamérica', ['En la Antártida', 'En Islandia', 'En Indonesia']),
+  donde('la Capadocia', 'En Turquía', ['En Grecia', 'En Irán', 'En Egipto']),
+  donde('la Toscana', 'En Italia', ['En Francia', 'En España', 'En Grecia']),
+  donde('la Bretaña francesa', 'En el noroeste de Francia', ['En el sur de Francia', 'En Reino Unido', 'En Bélgica']),
+  donde('el cabo de Buena Esperanza', 'En Sudáfrica', ['En Australia', 'En Chile', 'En Nueva Zelanda']),
+  donde('el cabo de Hornos', 'En Chile', ['En Argentina', 'En Sudáfrica', 'En Australia']),
+  donde('el cabo Norte', 'En Noruega', ['En Finlandia', 'En Islandia', 'En Rusia']),
+  donde('el cabo de Finisterre', 'En Galicia', ['En Asturias', 'En Portugal', 'En Cantabria']),
+  donde('la meseta de Anatolia', 'En Turquía', ['En Irán', 'En Siria', 'En Grecia'])
+];
