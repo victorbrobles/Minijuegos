@@ -5,7 +5,7 @@ export default [
   [100, '¿En qué siglo llegó Colón a América?', 'En el XV', 'En el XIV', 'En el XVI', 'En el XVII'],
   [100, '¿Qué muralla se construyó para proteger a China de los pueblos del norte?', 'La Gran Muralla', 'El Muro de Adriano', 'La muralla de Ávila', 'El Muro de las Lamentaciones'],
   [100, '¿Cómo se llamaba el barco que se hundió en 1912 tras chocar con un iceberg?', 'Titanic', 'Lusitania', 'Britannic', 'Queen Mary'],
-  [100, '¿Qué emperador romano fue asesinado en los idus de marzo?', 'Julio César', 'Nerón', 'Augusto', 'Calígula'],
+  [100, '¿Qué dictador romano fue asesinado en los idus de marzo?', 'Julio César', 'Nerón', 'Augusto', 'Calígula'],
   [100, '¿Qué rey de España abdicó en 2014?', 'Juan Carlos I', 'Felipe VI', 'Alfonso XIII', 'Felipe V'],
   [100, '¿Qué pueblo nórdico navegaba en barcos llamados drakkar?', 'Los vikingos', 'Los celtas', 'Los visigodos', 'Los fenicios'],
   [100, '¿En qué país empezó la Revolución francesa?', 'Francia', 'España', 'Italia', 'Bélgica'],

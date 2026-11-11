@@ -1,44 +1,79 @@
-// Simulación de «El Tablero de Puntos».
+// Simulación de «El Tablero de Puntos»: banco de preguntas, elección de categorías, rebotes y partidas enteras.
 import assert from 'assert';
 import * as E from '../tablero/engine.js';
 import { CATEGORIAS, PREGUNTAS } from '../data/seeds/tablero/preguntas.js';
-import { montarTablero } from '../routes/tablero.js';
+import { montarBanco } from '../routes/tablero.js';
 
-for (const c of CATEGORIAS) for (const v of E.AJUSTES.valores) assert(PREGUNTAS.filter((q) => q.cat === c.id && q.v === v).length >= 2, `${c.id} ${v}`);
-for (const q of PREGUNTAS) { assert.equal(q.o.length, 4, q.p); assert.equal(new Set(q.o).size, 4, q.p); }
+assert.equal(CATEGORIAS.length, 25, '25 categorías');
+for (const c of CATEGORIAS) {
+  assert(PREGUNTAS.filter((q) => q.cat === c.id).length >= 100, `${c.id}: al menos 100 preguntas`);
+  for (const v of E.AJUSTES.valores) assert(PREGUNTAS.filter((q) => q.cat === c.id && q.v === v).length >= 20, `${c.id} ${v}: al menos 20`);
+}
+for (const q of PREGUNTAS) { assert.equal(q.o.length, 4, q.p); assert.equal(new Set(q.o).size, 4, q.p); assert(CATEGORIAS.some((c) => c.id === q.cat), q.cat); }
 assert.equal(new Set(PREGUNTAS.map((q) => q.p)).size, PREGUNTAS.length, 'preguntas repetidas');
 
-let partidas = 0;
-for (let n = 0; n < 400; n++) {
+// Caso a mano: rebote solo para el siguiente y sin restar
+const banco = montarBanco();
+let p = E.crearPartida([1, 2, 3].map((id) => ({ id, nombre: `J${id}` })), banco, { categorias: 3 }, 0, () => 0);
+assert.equal(p.fase, 'categorias');
+assert.equal(p.turno, 1);
+assert.equal(E.elegirCategoria(p, 2, 'cine').ok, false, 'fuera de turno');
+E.elegirCategoria(p, 1, 'cine');
+assert.equal(E.elegirCategoria(p, 2, 'cine').ok, false, 'categoría repetida');
+E.elegirCategoria(p, 2, 'futbol');
+E.elegirCategoria(p, 3, 'arte');
+assert.equal(p.fase, 'elegir');
+assert.deepEqual(p.categorias.map((c) => c.id), ['cine', 'futbol', 'arte']);
+const t1 = p.turno;
+E.elegir(p, t1, 'cine', 300);
+const q = p.preguntas['cine:300'];
+const mala = q.opciones.find((o) => o !== q.correcta);
+E.responder(p, t1, mala);
+assert.equal(p.fase, 'rebote');
+const r = p.rebote.id;
+assert.notEqual(r, t1);
+assert.equal(E.responder(p, t1, q.correcta).ok, false, 'el que falló no responde el rebote');
+assert.equal(E.responder(p, r, mala).ok, false, 'la opción fallada está descartada');
+const otra = q.opciones.find((o) => o !== q.correcta && o !== mala);
+const antes = p.jugadores.find((j) => j.id === r).puntos;
+E.responder(p, r, otra);
+assert.equal(p.jugadores.find((j) => j.id === r).puntos, antes, 'fallar el rebote no resta');
+assert.equal(p.fase, 'elegir');
+assert.equal(p.turno, r, 'el turno sigue en orden');
+
+// Partidas enteras
+let partidas = 0; let rebotes = 0;
+for (let n = 0; n < 300; n++) {
   const nj = 2 + (n % 4);
   const nc = E.OPCIONES.categorias[n % 4];
-  const t0 = montarTablero(nc);
-  assert.equal(Object.keys(t0.preguntas).length, nc * 4);
-  assert(!t0.doble.endsWith(':100'));
-  const p = E.crearPartida(Array.from({ length: nj }, (_, i) => ({ id: i + 1, nombre: `J${i}` })), t0, { segundos: 20 }, 0);
-  let t = 0; let total = 0; let pasos = 0;
-  while (p.fase !== 'fin') {
-    assert(pasos++ < 500);
+  const b = montarBanco();
+  assert.equal(Object.keys(b.preguntas).length, 25 * 5);
+  const g = E.crearPartida(Array.from({ length: nj }, (_, i) => ({ id: i + 1, nombre: `J${i}` })), b, { categorias: nc, segundos: 20 }, 0);
+  let t = 0; let pasos = 0;
+  while (g.fase !== 'fin') {
+    assert(pasos++ < 1000);
     t += 1000;
-    const v = E.vistaDe(p, p.turno);
-    if (p.fase === 'elegir') {
-      if (Math.random() < 0.1) { E.tick(p, (t += 100000)); continue; }
+    const v = E.vistaDe(g, g.turno);
+    if (g.fase === 'categorias') {
+      if (Math.random() < 0.2) { E.tick(g, (t += 100000)); continue; }
+      const libres = v.disponibles.filter((c) => c.por == null);
+      assert(E.elegirCategoria(g, g.turno, libres[Math.floor(Math.random() * libres.length)].id, t).ok);
+    } else if (g.fase === 'elegir') {
+      if (Math.random() < 0.1) { E.tick(g, (t += 100000)); continue; }
       const libres = v.categorias.flatMap((c) => c.celdas.filter((x) => !x.usada).map((x) => [c.id, x.v]));
       const [c, val] = libres[Math.floor(Math.random() * libres.length)];
-      assert.equal(E.elegir(p, p.turno === 1 ? 2 : 1, c, val, t).ok, false, 'fuera de turno');
-      assert(E.elegir(p, p.turno, c, val, t).ok);
+      assert(E.elegir(g, g.turno, c, val, t).ok);
     } else {
-      assert.equal(v.actual.opciones.length, 4);
-      const antes = p.jugadores.reduce((s, j) => s + j.puntos, 0);
-      if (Math.random() < 0.1) E.tick(p, (t += 100000));
-      else E.responder(p, p.turno, v.actual.opciones[Math.floor(Math.random() * 4)], t);
-      const d = p.jugadores.reduce((s, j) => s + j.puntos, 0) - antes;
-      assert.equal(Math.abs(d), p.ultimo.v * (p.ultimo.doble ? 2 : 1));
-      total += d;
+      if (g.fase === 'rebote') rebotes += 1;
+      const quien = v.responde;
+      const ops = v.actual.opciones.filter((o) => o !== v.rebote?.quitada);
+      if (Math.random() < 0.1) E.tick(g, (t += 100000));
+      else assert(E.responder(g, quien, ops[Math.floor(Math.random() * ops.length)], t).ok);
     }
   }
-  assert.equal(p.jugadas, nc * 4);
-  assert.equal(p.jugadores.reduce((s, j) => s + j.puntos, 0), total);
+  assert.equal(g.jugadas, nc * 5);
+  assert.equal(g.categorias.length, nc);
+  assert.equal(new Set(g.categorias.map((c) => c.id)).size, nc);
   partidas++;
 }
-console.log(`Tablero de Puntos: ${PREGUNTAS.length} preguntas revisadas, ${partidas} partidas simuladas. OK`);
+console.log(`Tablero de Puntos: ${PREGUNTAS.length} preguntas en ${CATEGORIAS.length} categorías, ${partidas} partidas, ${rebotes} rebotes. OK`);

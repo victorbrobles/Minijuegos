@@ -1,23 +1,51 @@
 // server/data/seeds/tablero/preguntas.js
-// «El Tablero de Puntos»: preguntas por categoría y valor. En `o`, la primera opción es la correcta (se barajan al jugar).
-
-export const CATEGORIAS = [
-  { id: 'cine', nombre: 'Cine', emoji: '🎬' },
-  { id: 'historia', nombre: 'Historia', emoji: '🏛️' },
-  { id: 'ciencia', nombre: 'Ciencia', emoji: '🔬' },
-  { id: 'musica', nombre: 'Música', emoji: '🎵' },
-  { id: 'deporte', nombre: 'Deporte', emoji: '⚽' },
-  { id: 'geografia', nombre: 'Geografía', emoji: '🌍' }
-];
-export const VALORES = [100, 200, 300, 500];
-
-const Q = (cat, v, p, o) => ({ cat, v, p, o });
+// «El Tablero de Puntos»: 25 categorías con preguntas de 100, 200, 300, 400 y 500 (al menos 20 por nivel).
+// En `o`, la primera opción es la correcta (se barajan al jugar). Las seis clásicas están aquí y en extra/;
+// las demás, en cats/<id>.js.
+import futbol from './cats/futbol.js';
+import literatura from './cats/literatura.js';
+import arte from './cats/arte.js';
+import gastronomia from './cats/gastronomia.js';
+import animales from './cats/animales.js';
+import tecnologia from './cats/tecnologia.js';
+import videojuegos from './cats/videojuegos.js';
+import television from './cats/television.js';
+import mitologia from './cats/mitologia.js';
+import lengua from './cats/lengua.js';
+import espacio from './cats/espacio.js';
+import cuerpo from './cats/cuerpo.js';
+import espana from './cats/espana.js';
+import comics from './cats/comics.js';
+import inventos from './cats/inventos.js';
+import capitales from './cats/capitales.js';
+import matematicas from './cats/matematicas.js';
+import naturaleza from './cats/naturaleza.js';
+import monumentos from './cats/monumentos.js';
+import nivel400 from './extra/nivel400.js';
+import relleno from './extra/relleno.js';
 import cine from './extra/cine.js';
 import historia from './extra/historia.js';
 import ciencia from './extra/ciencia.js';
 import musica from './extra/musica.js';
 import deporte from './extra/deporte.js';
 import geografia from './extra/geografia.js';
+
+const NUEVAS = [futbol, literatura, arte, gastronomia, animales, tecnologia, videojuegos, television, mitologia, lengua, espacio, cuerpo, espana, comics, inventos, capitales, matematicas, naturaleza, monumentos];
+
+export const CATEGORIAS = [
+  { id: 'cine', nombre: 'Cine', emoji: '🎬', color: '#e11d48' },
+  { id: 'historia', nombre: 'Historia', emoji: '🏛️', color: '#b45309' },
+  { id: 'ciencia', nombre: 'Ciencia', emoji: '🔬', color: '#0891b2' },
+  { id: 'musica', nombre: 'Música', emoji: '🎵', color: '#9333ea' },
+  { id: 'deporte', nombre: 'Deporte', emoji: '🏅', color: '#16a34a' },
+  { id: 'geografia', nombre: 'Geografía', emoji: '🌍', color: '#2563eb' },
+  ...NUEVAS.map(({ id, nombre, emoji, color }) => ({ id, nombre, emoji, color }))
+];
+export const VALORES = [100, 200, 300, 400, 500];
+
+
+
+const Q = (cat, v, p, o) => ({ cat, v, p, o });
 
 export const PREGUNTAS = [
   // ---- Cine
@@ -105,3 +133,13 @@ const EXTRA = { cine, historia, ciencia, musica, deporte, geografia };
 for (const [cat, lista] of Object.entries(EXTRA)) {
   for (const [v, p, ...o] of lista) if (!PREGUNTAS.some((q) => q.p === p)) PREGUNTAS.push(Q(cat, v, p, o));
 }
+
+// Nivel 400 de las clásicas y categorías nuevas
+for (const [cat, lista] of Object.entries(nivel400)) {
+  for (const [p, ...o] of lista) if (!PREGUNTAS.some((q) => q.p === p)) PREGUNTAS.push(Q(cat, 400, p, o));
+}
+for (const [cat, v, p, ...o] of relleno) if (!PREGUNTAS.some((q) => q.p === p)) PREGUNTAS.push(Q(cat, v, p, o));
+// Las categorías nuevas mandan: si una clásica repite el mismo enunciado, se queda en la nueva
+const enNuevas = new Set(NUEVAS.flatMap((c) => c.preguntas.map((q) => q[1])));
+for (let i = PREGUNTAS.length - 1; i >= 0; i--) if (enNuevas.has(PREGUNTAS[i].p)) PREGUNTAS.splice(i, 1);
+for (const c of NUEVAS) for (const [v, p, ...o] of c.preguntas) PREGUNTAS.push(Q(c.id, v, p, o));

@@ -410,7 +410,7 @@
   {
     "id": "tablero",
     "name": "El Tablero de Puntos",
-    "description": "Un tablero de preguntas de cultura general con casillas de 100, 200, 300 y 500 puntos. Elige cuánto arriesgas: si aciertas sumas y si fallas restas. Hay una casilla doble escondida.",
+    "description": "Elegid entre 25 categorías y jugad un tablero con casillas de 100 a 500 puntos. Elige cuánto arriesgas: si aciertas sumas, si fallas restas y el siguiente tiene rebote. Hay una casilla doble escondida.",
     "isNew": true
   },
   {

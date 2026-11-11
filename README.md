@@ -252,7 +252,7 @@ Cada juego guarda su contenido en ficheros de datos; las ampliaciones van en fic
 | El Once Fantasma | 17 finales con sus dos onces |
 | El Dato que Sobra | 201 futbolistas (`extra1.js`, `extra2.js`) |
 | La Pareja Perfecta | 323 parejas en 9 categorías |
-| El Tablero de Puntos | 565 preguntas (~95 por categoría) · `server/data/seeds/tablero/extra/` |
+| El Tablero de Puntos | 2559 preguntas en 25 categorías (≥20 por nivel de 100 a 500) · `server/data/seeds/tablero/cats/` y `extra/` |
 | Una Pieza Más | 30 siluetas |
 
 Las portadas de los juegos nuevos se generan con `node server/scripts/portadas.cjs [ids]`.
@@ -278,7 +278,7 @@ Sale un elemento (actor, inventor, país, personaje, cantante o pintor) y cuatro
 
 ## Minijuego: El Tablero de Puntos (`Tablero/`)
 
-Tablero de 3 a 6 categorías (cine, historia, ciencia, música, deporte, geografía) con casillas de 100, 200, 300 y 500. Por turnos se elige casilla y se responde entre cuatro opciones: acertar suma su valor y fallar lo resta. Una casilla oculta (nunca de 100) vale el doble. Preguntas en `server/data/seeds/tablero/preguntas.js`; motor en `server/tablero/engine.js` (`npm run sync:tablero`), simulación en `server/scripts/tablero-sim.mjs`; ruta `/api/tablero`.
+25 categorías (cine, historia, ciencia, música, deporte, geografía, fútbol, literatura, arte, gastronomía, animales, tecnología, videojuegos, series y TV, mitología, lengua, espacio, cuerpo humano, España, cómics, inventos, capitales y banderas, matemáticas, naturaleza y monumentos), cada una con al menos 100 preguntas y 20 por nivel. Al empezar, por turnos (empieza alguien al azar) cada jugador elige una categoría libre hasta completar las del tablero (3 a 6). Casillas de 100, 200, 300, 400 y 500; el primer turno es al azar y luego en orden. Acertar suma su valor y fallar lo resta, y entonces hay rebote solo para el siguiente jugador (sin la opción fallada): si acierta suma, si falla no resta. Una casilla oculta (nunca de 100) vale el doble. Preguntas en `server/data/seeds/tablero/preguntas.js` (clásicas), `cats/<id>.js` (nuevas), `extra/nivel400.js` y `extra/relleno.js`; motor en `server/tablero/engine.js` (`npm run sync:tablero`), simulación en `server/scripts/tablero-sim.mjs`; ruta `/api/tablero`.
 
 ## Minijuego: La Hemeroteca (`Hemeroteca/`)
 

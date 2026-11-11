@@ -1,16 +1,17 @@
-// client/src/games/DatoSobra/TableroLocal.jsx
-// Un solo dispositivo: el móvil pasa al jugador del turno, que elige casilla y responde (sin reloj).
+// client/src/games/Tablero/TableroLocal.jsx
+// Un solo dispositivo: primero se eligen las categorías por turnos; luego el móvil pasa al jugador del turno,
+// que elige casilla y responde (sin reloj). Si falla, el siguiente tiene rebote en la misma pantalla.
 import React, { useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import * as E from './engine.js';
-import { Partida, Fin, Config } from './Partida.jsx';
+import { Partida, Fin, Config, AvisoResultado } from './Partida.jsx';
 import { ModalSalir, TurnoDe } from '../Pulsador/Vistas.jsx';
 import { SelectorJugadores } from '../../components/MenuJuego.jsx';
 
 export default function TableroLocal({ juego, onVolver, onExit, onAbrirAyuda }) {
   const [paso, setPaso] = useState('config');
   const [nombres, setNombres] = useState(['', '']);
-  const [config, setConfig] = useState({ categorias: 5, segundos: 20 });
+  const [config, setConfig] = useState({ categorias: 4, segundos: 20 });
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modal, setModal] = useState(false);
@@ -25,8 +26,8 @@ export default function TableroLocal({ juego, onVolver, onExit, onAbrirAyuda }) 
     if (new Set(limpios.map((n) => n.toLowerCase())).size !== limpios.length) return setError('Hay nombres repetidos.');
     setError(''); setCargando(true);
     try {
-      const d = await (await fetch(`/api/tablero/local?n=${config.categorias}`)).json();
-      estRef.current = E.crearPartida(limpios.map((nombre, i) => ({ id: i + 1, nombre })), d.tablero, { ...config, sinReloj: true }, Date.now());
+      const d = await (await fetch('/api/tablero/local')).json();
+      estRef.current = E.crearPartida(limpios.map((nombre, i) => ({ id: i + 1, nombre })), d.banco, { ...config, sinReloj: true }, Date.now());
       setPaso('juego');
     } catch {
       setError('No se han podido cargar las preguntas.');
@@ -56,6 +57,7 @@ export default function TableroLocal({ juego, onVolver, onExit, onAbrirAyuda }) 
   const salir = modal && <ModalSalir titulo="¿Salir de la partida?" texto="Se perderá la partida en curso y volverás a la portada." onSeguir={() => setModal(false)} onSalir={() => { setModal(false); onExit?.(); }} />;
   const envoltorio = (c) => (
     <div className={`pzp-contenedor ${juego.id} qq-en-partida`}>
+      {est.fase !== 'fin' && <AvisoResultado v={E.vistaDe(est, -1)} />}
       <section className="game pzp-escena">{c}</section>
       {salir}
     </div>
@@ -71,8 +73,9 @@ export default function TableroLocal({ juego, onVolver, onExit, onAbrirAyuda }) 
     );
   }
   const enviar = (tipo, d = {}) => {
-    if (tipo === 'elegir') E.elegir(est, est.turno, d.cat, d.v);
-    else if (tipo === 'responder') E.responder(est, est.turno, d.opcion);
+    if (tipo === 'categoria') E.elegirCategoria(est, est.turno, d.cat);
+    else if (tipo === 'elegir') E.elegir(est, est.turno, d.cat, d.v);
+    else if (tipo === 'responder') E.responder(est, est.fase === 'rebote' ? est.rebote.id : est.turno, d.opcion);
     else if (tipo === 'terminar') E.terminar(est);
     refrescar();
   };
@@ -83,7 +86,7 @@ export default function TableroLocal({ juego, onVolver, onExit, onAbrirAyuda }) 
     return envoltorio(
       <TurnoDe v={v} id={est.turno} puedo onListo={() => setConfirmado(est.jugadas)} boton={`Soy ${nombre}`}
         texto={`Pásale el móvil: elige casilla y responde. Quedan ${v.quedan} casillas.`}>
-        {est.ultimo && <p className="tbx-gate-ultimo">{v.jugadores.find((j) => j.id === est.ultimo.id).nombre} {est.ultimo.bien ? 'acertó' : 'falló'}: {est.ultimo.puntos > 0 ? '+' : ''}{est.ultimo.puntos}</p>}
+        {est.ultimo && <p className="tbx-gate-ultimo">{v.jugadores.find((j) => j.id === est.ultimo.id).nombre} {est.ultimo.bien ? 'acertó' : 'falló'}{est.ultimo.rebote ? ' el rebote' : ''}: {est.ultimo.puntos > 0 ? '+' : ''}{est.ultimo.puntos}</p>}
       </TurnoDe>
     );
   }

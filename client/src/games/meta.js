@@ -128,7 +128,7 @@ export const META = {
     icono: 'target',
     colores: ['#8b5cf6', '#1e1b4b'],
     etiquetas: 'tablero puntos casillas preguntas cultura general cine historia ciencia musica deporte geografia arriesgar',
-    descripcion: 'Un tablero de preguntas de cultura general con casillas de 100, 200, 300 y 500 puntos. Elige cuánto arriesgas: si aciertas sumas y si fallas restas. Hay una casilla doble escondida.',
+    descripcion: 'Elegid entre 25 categorías y jugad un tablero con casillas de 100 a 500 puntos. Elige cuánto arriesgas: si aciertas sumas, si fallas restas y el siguiente tiene rebote. Hay una casilla doble escondida.',
     categorias: ['prueba']
   },
   'hemeroteca': {
