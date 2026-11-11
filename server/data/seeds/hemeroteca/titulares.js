@@ -50,3 +50,9 @@ export const TITULARES = [
   { t: 'Se estrena {Torrente}, el brazo tonto de la ley', cat: 'Cine', anio: 1998, pista: 'Dirigida y protagonizada por Santiago Segura.', claves: [['torrente']] },
   { t: 'Carlos Alcaraz, número uno del mundo con {19 años}', cat: 'Deporte', anio: 2022, pista: 'Tras ganar el US Open.', claves: [['19'], ['diecinueve']] }
 ];
+
+// Ampliación (extra.js): se añaden los que no repiten respuesta y año de uno que ya esté
+import EXTRA from './extra.js';
+const clave = (x) => `${(x.t.match(/\{([^}]*)\}/) || [])[1]?.toLowerCase()}-${x.anio}`;
+const vistas = new Set(TITULARES.map(clave));
+for (const x of EXTRA) if (!vistas.has(clave(x))) { vistas.add(clave(x)); TITULARES.push(x); }
