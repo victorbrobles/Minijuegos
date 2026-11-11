@@ -172,8 +172,25 @@ export const META = {
     imagen: '/covers/laberinto.webp',
     icono: 'key',
     colores: ['#2dd4bf', '#134e4a'],
-    etiquetas: 'laberinto tablero explorar tesoro trampas llaves personajes robar escapar mazmorra',
-    descripcion: 'Un laberinto de salas que se descubren poco a poco, con trampas, tesoros y puertas cerradas. Cada jugador tiene un personaje con habilidades distintas: roba, deja trampas, bloquea pasillos y escapa con el tesoro antes que nadie.',
+    etiquetas: 'laberinto minotauro niebla roles ocultos persecucion construir carrera crono muros hielo portales',
+    descripcion: 'Dos juegos de laberinto en uno. El Minotauro: uno caza en secreto y los demás buscan las llaves y escapan en la niebla. Constructores y corredores: diseña el laberinto más retorcido para tu rival y recorre el suyo antes que nadie.',
+    categorias: ['estrategia']
+  },
+  // Los dos juegos del Laberinto (no salen en la portada: se eligen dentro del Laberinto)
+  'minotauro': {
+    titulo: 'El Minotauro',
+    icono: 'skull',
+    colores: ['#ef4444', '#450a0a'],
+    etiquetas: 'laberinto minotauro niebla roles',
+    descripcion: 'A uno le toca en secreto ser el Minotauro. Los demás exploran el laberinto en la niebla, buscan las 3 llaves y escapan. Todos movéis a la vez: si el Minotauro te pilla, pasas a ser su ayudante.',
+    categorias: ['estrategia']
+  },
+  'constructores': {
+    titulo: 'Constructores y corredores',
+    icono: 'hardhat',
+    colores: ['#38bdf8', '#0c4a6e'],
+    etiquetas: 'laberinto construir carrera',
+    descripcion: 'Cada ronda diseñas en secreto un laberinto para un rival (muros, hielo, flechas y portales) y después todos recorréis a la vez el que os han hecho. El más rápido suma… y también quien hizo el laberinto más difícil.',
     categorias: ['estrategia']
   },
   'mus': {
