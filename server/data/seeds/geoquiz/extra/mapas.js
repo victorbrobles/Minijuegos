@@ -52,5 +52,7 @@ export default [
   donde('el cabo de Hornos', 'En Chile', ['En Argentina', 'En Sudáfrica', 'En Australia']),
   donde('el cabo Norte', 'En Noruega', ['En Finlandia', 'En Islandia', 'En Rusia']),
   donde('el cabo de Finisterre', 'En Galicia', ['En Asturias', 'En Portugal', 'En Cantabria']),
-  donde('la meseta de Anatolia', 'En Turquía', ['En Irán', 'En Siria', 'En Grecia'])
+  donde('la meseta de Anatolia', 'En Turquía', ['En Irán', 'En Siria', 'En Grecia']),
+  terr('las islas Canarias', 'España'), terr('Córcega', 'Francia'), terr('las Islas Vírgenes de EE. UU.', 'Estados Unidos|EEUU'),
+  terr('Bermudas', 'Reino Unido'), terr('Reunión', 'Francia'), terr('las islas Cook (en libre asociación)', 'Nueva Zelanda')
 ];

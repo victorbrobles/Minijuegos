@@ -5,3 +5,7 @@ export { default as ciudades } from './ciudades.js';
 export { default as fisica } from './fisica.js';
 export { default as simbolos } from './simbolos.js';
 export { default as mapas } from './mapas.js';
+export { default as humana } from './humana.js';
+export { default as monumentos } from './monumentos.js';
+export { default as logica } from './logica.js';
+export { default as records } from './records.js';
