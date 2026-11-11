@@ -12,6 +12,12 @@ export const CATEGORIAS = [
 export const VALORES = [100, 200, 300, 500];
 
 const Q = (cat, v, p, o) => ({ cat, v, p, o });
+import cine from './extra/cine.js';
+import historia from './extra/historia.js';
+import ciencia from './extra/ciencia.js';
+import musica from './extra/musica.js';
+import deporte from './extra/deporte.js';
+import geografia from './extra/geografia.js';
 
 export const PREGUNTAS = [
   // ---- Cine
@@ -93,3 +99,9 @@ export const PREGUNTAS = [
   Q('geografia', 500, '¿Cuántas comunidades autónomas tiene España?', ['17', '15', '19', '16']),
   Q('geografia', 500, '¿Qué estrecho separa Asia de América?', ['El estrecho de Bering', 'El estrecho de Magallanes', 'El estrecho de Ormuz', 'El estrecho de Malaca'])
 ];
+
+// Ampliación (una pregunta por línea en extra/<categoría>.js): se añaden sin repetir enunciados
+const EXTRA = { cine, historia, ciencia, musica, deporte, geografia };
+for (const [cat, lista] of Object.entries(EXTRA)) {
+  for (const [v, p, ...o] of lista) if (!PREGUNTAS.some((q) => q.p === p)) PREGUNTAS.push(Q(cat, v, p, o));
+}
