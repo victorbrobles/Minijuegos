@@ -472,6 +472,8 @@
 .pzp-respondiendo strong { color: #0f172a; }
 .pzp-respondiendo .pzp-etiqueta { margin-bottom: 0.15rem !important; }
 .pzp-tecleo { margin: 0.2rem 0 0.4rem !important; color: var(--pz3) !important; font-weight: 800; overflow-wrap: anywhere; }
+.pzp-ultimo.flotante { position: fixed; top: max(12px, env(safe-area-inset-top)); left: 50%; z-index: 60; width: min(92vw, 420px); transform: translateX(-50%); border: 2px solid #fca5a5; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35); cursor: pointer; animation: pzpAvisoBaja 0.3s ease-out; }
+@keyframes pzpAvisoBaja { from { transform: translate(-50%, -20px); opacity: 0; } to { transform: translateX(-50%); opacity: 1; } }
 .pzp-ultimo { margin: 0; padding: 0.55rem 0.9rem; border-radius: 16px; background: #fee2e2; color: #991b1b; font-weight: 800; text-align: center; animation: pzpEntra 0.3s ease-out; }
 
 /* Solución */

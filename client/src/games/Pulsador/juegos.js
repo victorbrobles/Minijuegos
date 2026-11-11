@@ -67,7 +67,6 @@ export const JUEGOS = {
   },
   hemeroteca: {
     id: 'hemeroteca',
-    pantallaTurno: true,
     api: '/api/hemeroteca',
     emoji: '📰',
     unidad: 'titulares',

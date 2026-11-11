@@ -338,10 +338,18 @@ function Respondiendo({ v, reloj }) {
   );
 }
 
+/** Aviso flotante de un fallo (se ve unos segundos aunque la pantalla sea larga). */
 function Ultimo({ v }) {
   const u = v.log[v.log.length - 1];
-  if (!u || u.tipo !== 'fallo') return null;
-  return <p className="pzp-ultimo" key={u.n}>{u.texto}</p>;
+  const n = u && u.tipo === 'fallo' ? u.n : null;
+  const [visto, setVisto] = useState(null);
+  useEffect(() => {
+    if (n == null) return undefined;
+    const t = setTimeout(() => setVisto(n), 3500);
+    return () => clearTimeout(t);
+  }, [n]);
+  if (n == null || visto === n) return null;
+  return <p className="pzp-ultimo flotante" key={n} role="alert" onClick={() => setVisto(n)}>{u.texto}</p>;
 }
 
 /**
