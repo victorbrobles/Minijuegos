@@ -17,7 +17,7 @@ export const FINALES = {
   s: { titulo: 'La enfermedad', texto: 'El barro, el frío y las heridas acaban con la compañía antes que el enemigo.' }
 };
 
-export default [
+const BASE = [
   {
     quien: '🧑‍🍳 El cocinero', texto: 'Las ratas se han metido en el almacén. Podemos salvar parte de la comida si la repartimos hoy mismo.',
     a: { texto: 'Repartirla ya', ef: { c: -1, m: 1 } },
@@ -211,3 +211,8 @@ export const NAVIDAD = {
   a: { texto: 'Salir a su encuentro', ef: {} },
   b: { texto: 'Quedarse a cubierto', ef: {} }
 };
+
+import EXTRA from './cartasExtra.js';
+import EXTRA2 from './cartasExtra2.js';
+
+export default [...BASE, ...EXTRA, ...EXTRA2];
