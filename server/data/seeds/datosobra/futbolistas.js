@@ -73,3 +73,8 @@ export const FUTBOLISTAS = [
   F('Samuel Eto\'o', ['Jugó en el Real Madrid de joven.', 'Ganó el triplete con el Barcelona y con el Inter.', 'Ganó dos Copas de África.'],
     'Jugó en el Bayern de Múnich.', 'Jugó en el Mallorca, el Barcelona, el Inter, el Anzhi o el Chelsea, pero nunca en el Bayern.')
 ];
+
+// Ampliaciones: se añaden sin repetir futbolista
+import EXTRA1 from './extra1.js';
+import EXTRA2 from './extra2.js';
+for (const x of [...EXTRA1, ...EXTRA2]) if (!FUTBOLISTAS.some((f) => f.nombre === x.nombre)) FUTBOLISTAS.push(x);
