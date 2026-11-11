@@ -40,16 +40,17 @@ export default function Mapa({ v, resaltados = {}, onTocar, flechas = [] }) {
               stroke={c || (x.tipo === 'trono' ? '#d97706' : '#cbbfa6')} strokeWidth={x.tipo === 'trono' || x.tipo === 'capital' ? 3 : 1.5} />
             <text x={cx} y={cy - 6} textAnchor="middle" fontSize="14">{TIPOS[x.tipo].e}</text>
             {x.muralla > 0 && <text x={cx} y={cy + 4} textAnchor="middle" fontSize="7" fill="#57534e" fontWeight="800">{'▰'.repeat(x.muralla)}</text>}
-            <g>
-              <circle cx={cx} cy={cy + 13} r="8" fill={c || '#78716c'} stroke="#ffffff" strokeWidth="1.5" />
-              <text x={cx} y={cy + 16.5} textAnchor="middle" fontSize="10" fontWeight="900" fill="#ffffff">{x.soldados}</text>
+            <g aria-label={`${x.soldados} soldados`}>
+              <rect x={cx - 12} y={cy + 5} width="24" height="15" rx="7.5" fill={c || '#78716c'} stroke="#ffffff" strokeWidth="1.5" />
+              <text x={cx - 6} y={cy + 16} textAnchor="middle" fontSize="8">🪖</text>
+              <text x={cx + 5} y={cy + 16.3} textAnchor="middle" fontSize="10" fontWeight="900" fill="#ffffff">{x.soldados}</text>
             </g>
           </g>
         );
       })}
       {flechas.map((f, k) => {
         const a = pos[f.desde]; const b = pos[f.hacia];
-        return <line key={k} x1={a.cx} y1={a.cy} x2={a.cx + (b.cx - a.cx) * 0.78} y2={a.cy + (b.cy - a.cy) * 0.78} stroke="#0f172a" strokeWidth="3" strokeDasharray="4 3" markerEnd="url(#rnp-punta)" />;
+        return <line key={k} x1={a.cx} y1={a.cy} x2={a.cx + (b.cx - a.cx) * 0.78} y2={a.cy + (b.cy - a.cy) * 0.78} stroke="#0f172a" strokeWidth="3" strokeDasharray="4 3" markerEnd="url(#rnp-punta)" pointerEvents="none" />;
       })}
     </svg>
   );

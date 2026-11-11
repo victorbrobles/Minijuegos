@@ -117,9 +117,10 @@ const territoriosDe = (p, id) => p.mapa.filter((x) => x.dueno === id);
 const aliados = (p, a, b) => a != null && b != null && p.alianzas.some((al) => (al[0] === a && al[1] === b) || (al[0] === b && al[1] === a));
 const barajar = (arr, rng) => { const b = [...arr]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(rng() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
 
-function cronica(p, texto, tipo = 'info', implicados = []) {
+/** detalle (opcional): datos para dibujar el hecho (batallas, reclutas, murallas…). */
+function cronica(p, texto, tipo = 'info', implicados = [], detalle = null) {
   p.nlog += 1;
-  const e = { n: p.nlog, ronda: p.ronda, texto, tipo, implicados };
+  const e = { n: p.nlog, ronda: p.ronda, texto, tipo, implicados, detalle };
   p.cronica.push(e);
   p.log.push(e);
   if (p.log.length > 80) p.log.shift();
@@ -302,19 +303,19 @@ function resolver(p) {
     if (!a || !b) return;
     if (x.clase === 'romper') {
       p.alianzas = p.alianzas.filter((al) => !(al.includes(a.id) && al.includes(b.id)));
-      cronica(p, `💔 El ${a.nombre} rompe su alianza con el ${b.nombre}.`, 'malo', [a.id, b.id]);
+      cronica(p, `💔 El ${a.nombre} rompe su alianza con el ${b.nombre}.`, 'malo', [a.id, b.id], { clase: 'romper', a: a.id, b: b.id });
     } else if (x.estado !== 'aceptada') {
       cronica(p, `${b.nombre} rechaza ${x.clase === 'alianza' ? 'la alianza' : 'el intercambio'} del ${a.nombre}.`, 'info', [a.id, b.id]);
     } else if (x.clase === 'alianza') {
       if (!aliados(p, a.id, b.id)) p.alianzas.push([a.id, b.id]);
-      cronica(p, `🤝 Alianza entre el ${a.nombre} y el ${b.nombre}.`, 'bueno', [a.id, b.id]);
+      cronica(p, `🤝 Alianza entre el ${a.nombre} y el ${b.nombre}.`, 'bueno', [a.id, b.id], { clase: 'alianza', a: a.id, b: b.id });
     } else {
       const puede = b.oro >= x.pido.oro && b.alimento >= x.pido.alimento && a.oro >= x.doy.oro && a.alimento >= x.doy.alimento;
       if (!puede) { cronica(p, `El intercambio entre el ${a.nombre} y el ${b.nombre} falla: no tenían los recursos.`, 'malo', [a.id, b.id]); return; }
       a.oro += x.pido.oro - x.doy.oro; a.alimento += x.pido.alimento - x.doy.alimento;
       b.oro += x.doy.oro - x.pido.oro; b.alimento += x.doy.alimento - x.pido.alimento;
       a.historia.intercambios += 1; b.historia.intercambios += 1;
-      cronica(p, `⚖️ Intercambio: el ${a.nombre} da ${textoRec(x.doy)} y recibe ${textoRec(x.pido)} del ${b.nombre}.`, 'bueno', [a.id, b.id]);
+      cronica(p, `⚖️ Intercambio: el ${a.nombre} da ${textoRec(x.doy)} y recibe ${textoRec(x.pido)} del ${b.nombre}.`, 'bueno', [a.id, b.id], { clase: 'intercambio', a: a.id, b: b.id, doy: x.doy, pido: x.pido });
     }
   });
   // 2. Mercado, reclutas y murallas
@@ -324,7 +325,7 @@ function resolver(p) {
       const pagar = o.lotes * AJUSTES.mercado.da;
       if (r[o.da] < pagar) return;
       r[o.da] -= pagar; r[recibe] += o.lotes * AJUSTES.mercado.recibe;
-      cronica(p, `⚖️ El ${r.nombre} comercia en el mercado.`, 'info', [r.id]);
+      cronica(p, `⚖️ El ${r.nombre} comercia en el mercado.`, 'info', [r.id], { clase: 'mercado', reino: r.id });
     }
   }));
   act.forEach((r) => (r.ordenes || []).forEach((o) => {
@@ -333,11 +334,11 @@ function resolver(p) {
       const n = Math.min(o.soldados, Math.floor(r.oro / AJUSTES.coste.soldadoOro), Math.floor(r.alimento / AJUSTES.coste.soldadoAlimento));
       if (n <= 0) return;
       r.oro -= n * AJUSTES.coste.soldadoOro; r.alimento -= n * AJUSTES.coste.soldadoAlimento; x.soldados += n;
-      cronica(p, `🛡️ El ${r.nombre} entrena ${n} soldados.`, 'info', [r.id]);
+      cronica(p, `🛡️ El ${r.nombre} entrena ${n} soldados en ${nombreT(x)}.`, 'info', [r.id], { clase: 'entrenar', reino: r.id, territorio: x.id, n, antes: x.soldados - n, despues: x.soldados });
     }
     if (o.tipo === 'fortificar' && x?.dueno === r.id && x.muralla < AJUSTES.maxMuralla && r.oro >= AJUSTES.coste.muralla) {
       r.oro -= AJUSTES.coste.muralla; x.muralla += 1;
-      cronica(p, `🧱 El ${r.nombre} levanta murallas (nivel ${x.muralla}).`, 'info', [r.id]);
+      cronica(p, `🧱 El ${r.nombre} levanta murallas en ${nombreT(x)} (nivel ${x.muralla}).`, 'info', [r.id], { clase: 'muralla', reino: r.id, territorio: x.id, nivel: x.muralla });
     }
   }));
   // 3. Movimientos: salen todos a la vez
@@ -360,7 +361,7 @@ function resolver(p) {
   Object.entries(llegadas).forEach(([dest, lista]) => { if (lista.length) batalla(p, p.mapa[dest], lista); });
   // 5. Reinos sin territorios: eliminados
   act.forEach((r) => {
-    if (!territoriosDe(p, r.id).length) { r.eliminado = true; cronica(p, `☠️ El ${r.nombre} ha caído: ya no le quedan territorios.`, 'malo', [r.id]); }
+    if (!territoriosDe(p, r.id).length) { r.eliminado = true; cronica(p, `☠️ El ${r.nombre} ha caído: ya no le quedan territorios.`, 'malo', [r.id], { clase: 'caida', reino: r.id }); }
   });
   p.alianzas = p.alianzas.filter((al) => al.every((id) => vivos(p).some((r) => r.id === id)));
   // ¿Fin?
@@ -383,7 +384,7 @@ function batalla(p, x, atacantes) {
       const r = jug(p, a.reino);
       r.historia.traiciones += 1;
       a.traicion = true;
-      cronica(p, `🗡️ ¡TRAICIÓN! El ${r.nombre} ataca a su aliado, el ${nombreR(p, defensor)}.`, 'malo', [a.reino, defensor]);
+      cronica(p, `🗡️ ¡TRAICIÓN! El ${r.nombre} ataca a su aliado, el ${nombreR(p, defensor)}.`, 'malo', [a.reino, defensor], { clase: 'traicion', a: a.reino, b: defensor });
     }
     if (defensor != null) jug(p, a.reino).historia.atacoReino = true;
   });
@@ -400,6 +401,14 @@ function batalla(p, x, atacantes) {
   const titulo = `${defensor == null ? '' : `del ${nombreR(p, defensor)} `}`;
   const quien = (b) => (b.defensor ? `${nombreR(p, defensor)} (defiende con ${x.soldados}${x.muralla ? ` + muralla ${x.muralla}` : ''})` : b.miembros.map((m) => `${nombreR(p, m.reino)} (${m.soldados})`).join(' + '));
   const implicados = [defensor, ...atacantes.map((a) => a.reino)].filter((v) => v != null);
+  const defIni = x.soldados;
+  const murIni = x.muralla;
+  /** Datos de la batalla para dibujarla: cada lado con sus soldados al empezar y los que mueren. */
+  const detalle = (resultado, muertosDef, muertos, vencedor) => ({
+    clase: 'batalla', territorio: x.id, resultado, vencedor, muralla: murIni,
+    defensa: { reino: defensor, inicial: defIni, muertos: Math.min(defIni, muertosDef) },
+    ataques: atacantes.map((a) => ({ reino: a.reino, inicial: a.soldados, muertos: Math.min(a.soldados, muertos(a)) }))
+  });
   const retirada = (b) => b.miembros.forEach((m) => {
     const vuelven = Math.floor(m.soldados / 3);
     const o = p.mapa[m.desde];
@@ -409,7 +418,8 @@ function batalla(p, x, atacantes) {
     // Empate entre atacantes: nadie entra; todos pierden la mitad
     bandos.forEach((b) => b.miembros.forEach((m) => { const o = p.mapa[m.desde]; if (o.dueno === m.reino) o.soldados += Math.floor(m.soldados / 2); }));
     x.soldados = Math.max(0, x.soldados - Math.ceil((segundo.fuerza) / 2));
-    cronica(p, `⚔️ ${nombreT(x)} ${titulo}: choque igualado entre ${bandos.map(quien).join(' y ')}. Nadie entra.`, 'info', implicados);
+    cronica(p, `⚔️ ${nombreT(x)} ${titulo}: choque igualado entre ${bandos.map(quien).join(' y ')}. Nadie entra.`, 'info', implicados,
+      detalle('empate', defIni - x.soldados, (a) => a.soldados - Math.floor(a.soldados / 2), null));
     return;
   }
   const ganaDefensa = primero.defensor || (segundo && segundo.defensor && primero.fuerza === segundo.fuerza);
@@ -417,7 +427,8 @@ function batalla(p, x, atacantes) {
     const rival = todos.find((b) => !b.defensor);
     x.soldados = Math.max(0, x.soldados - Math.ceil((rival?.fuerza || 0) / 2));
     bandos.forEach(retirada);
-    cronica(p, `🛡️ ${nombreT(x)} ${titulo}resiste: ${quien(def)} frena a ${bandos.map(quien).join(' y ')}.`, defensor == null ? 'info' : 'bueno', implicados);
+    cronica(p, `🛡️ ${nombreT(x)} ${titulo}resiste: ${quien(def)} frena a ${bandos.map(quien).join(' y ')}.`, defensor == null ? 'info' : 'bueno', implicados,
+      detalle('resiste', defIni - x.soldados, (a) => a.soldados - Math.floor(a.soldados / 3), defensor));
     return;
   }
   // Gana un bando atacante: entra quien más soldados aporta
@@ -442,7 +453,10 @@ function batalla(p, x, atacantes) {
   const conquistador = jug(p, jefe.reino);
   let extra = '';
   if (x.tipo === 'capital' && antes != null) { conquistador.oro += AJUSTES.botin; extra = ` ¡Saquea la capital: +${AJUSTES.botin} de oro!`; }
-  cronica(p, `🏴 ${nombreT(x)} ${titulo}cae: ${quien(ganador)} vence${segundo ? ` a ${quien(segundo)}` : ''}. Ahora es del ${conquistador.nombre}.${extra}`, 'malo', implicados);
+  // Bajas del bando ganador, repartidas en proporción a lo que aportó cada uno
+  const muertosGanador = ganador.fuerza - dentro;
+  cronica(p, `🏴 ${nombreT(x)} ${titulo}cae: ${quien(ganador)} vence${segundo ? ` a ${quien(segundo)}` : ''}. Ahora es del ${conquistador.nombre}.${extra}`, 'malo', implicados,
+    { ...detalle('cae', defIni, (a) => (ganador.miembros.includes(a) ? Math.round((a.soldados / ganador.fuerza) * muertosGanador) : a.soldados - Math.floor(a.soldados / 3)), jefe.reino), quedan: propios, botin: extra ? AJUSTES.botin : 0 });
 }
 
 // ---------------------------------------------------------------- Puntos y final

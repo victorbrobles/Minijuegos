@@ -3,6 +3,7 @@
 import React, { useMemo, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import Mapa from './Mapa.jsx';
+import CronicaBonita from './Cronica.jsx';
 import { Pildoras, AvisoTurno } from '../Pulsador/Vistas.jsx';
 import { BloqueConfig } from '../../components/MenuJuego.jsx';
 import { ACCIONES, AJUSTES, TIPOS, OPCIONES_RONDAS } from './engine.js';
@@ -50,10 +51,10 @@ function Recursos({ v }) {
     <div className="pzp-tarjeta rnp-recursos">
       <div className="rnp-reino"><Escudo r={r} /><div><strong>{r.nombre}</strong><small>{r.jugador}</small></div></div>
       <div className="rnp-cifras">
-        <span>🪙 <strong>{yo.oro}</strong>{yo.ingresos ? <small>+{yo.ingresos.oro}</small> : null}</span>
-        <span>🌾 <strong>{yo.alimento}</strong>{yo.ingresos ? <small>+{yo.ingresos.alimento} −{yo.ingresos.comen}</small> : null}</span>
-        <span>⚔️ <strong>{r.soldados}</strong></span>
-        <span>👑 <strong>{r.tronos}</strong></span>
+        <span>🪙 <strong>{yo.oro}</strong><small>oro{yo.ingresos ? ` · +${yo.ingresos.oro}` : ''}</small></span>
+        <span>🌾 <strong>{yo.alimento}</strong><small>alimento{yo.ingresos ? ` · +${yo.ingresos.alimento} −${yo.ingresos.comen}` : ''}</small></span>
+        <span>🪖 <strong>{r.soldados}</strong><small>soldados</small></span>
+        <span>👑 <strong>{r.tronos}</strong><small>tronos</small></span>
       </div>
       <button type="button" className="pzp-enlace oscuro" onClick={() => setVerObj((x) => !x)}>🎯 Objetivos secretos {verObj ? '▲' : '▼'}</button>
       {verObj && (
@@ -207,14 +208,24 @@ function Ordenes({ v, enviar }) {
     } else setSel({ en: id });
   };
   const flechas = [...lista.filter((a) => a.tipo === 'conquistar'), ...(sel.desde != null && sel.hacia != null ? [sel] : [])];
+  const mapa = (
+    <div className="pzp-tarjeta rnp-mapa-tarjeta">
+      <Mapa v={v} resaltados={resaltados} onTocar={tipo ? tocar : null} flechas={flechas} />
+      <Leyenda v={v} />
+    </div>
+  );
+  const soldados = v.mapa.filter((x) => x.dueno === yo.id).reduce((s2, x) => s2 + x.soldados, 0);
+  const gasto = { oro: yo.oro - disponibles.oro, alimento: yo.alimento - disponibles.alimento };
   return (
     <>
-      <div className="pzp-tarjeta rnp-mapa-tarjeta">
-        <Mapa v={v} resaltados={resaltados} onTocar={tipo ? tocar : null} flechas={flechas} />
-        <Leyenda v={v} />
+      <div className="rnp-barra-rec" role="status">
+        <span title="Oro disponible">🪙 <b>{disponibles.oro}</b>{gasto.oro > 0 && <small>−{gasto.oro}</small>}</span>
+        <span title="Alimento disponible">🌾 <b>{disponibles.alimento}</b>{gasto.alimento > 0 && <small>−{gasto.alimento}</small>}</span>
+        <span title="Soldados en tus territorios">⚔️ <b>{soldados}</b><small>soldados</small></span>
+        <span title="Órdenes de esta ronda">📜 <b>{lista.length}/{AJUSTES.acciones}</b></span>
       </div>
       <div className="pzp-tarjeta">
-        <p className="pzp-etiqueta">Tus órdenes · {lista.length}/{AJUSTES.acciones} · quedan {disponibles.oro}🪙 {disponibles.alimento}🌾</p>
+        <p className="pzp-etiqueta">Tus órdenes · {lista.length}/{AJUSTES.acciones}</p>
         {lista.length > 0 && (
           <ol className="rnp-lista-ordenes">
             {lista.map((a, k) => (
@@ -235,6 +246,7 @@ function Ordenes({ v, enviar }) {
         <NuevaOrden key={tipo} v={v} tipo={tipo} disponibles={disponibles} sel={sel} setSel={setSel}
           onCancelar={() => setTipo(null)} onAnadir={(o) => { setLista((l) => [...l, o]); setTipo(null); }} />
       )}
+      {mapa}
       {!tipo && (
         <div className="pzp-barra estatica">
           <button type="button" className="pzp-boton grande" onClick={() => enviar('ordenar', { acciones: lista })}>
@@ -278,6 +290,7 @@ function Propuestas({ v, enviar }) {
 function Leyenda({ v }) {
   return (
     <div className="rnp-leyenda">
+      <span className="rnp-leyenda-sold"><b>🪖 5</b> = 5 soldados en ese territorio</span>
       <span>🏰 Capital +3🪙+3🌾</span><span>👑 Trono +1🪙+1🌾</span><span>🌾 Granja +2🌾</span><span>⛏️ Mina +2🪙</span><span>🏘️ Ciudad +1🪙+1🌾</span><span>▰ Muralla +2 def.</span>
       {v.alianzas.length > 0 && <span>🤝 {v.alianzas.map((al) => al.map((id) => reinoDe(v, id)?.e).join('')).join(' · ')}</span>}
     </div>
@@ -297,20 +310,7 @@ function Esperando({ v, texto }) {
   );
 }
 
-function Cronica({ v }) {
-  const yo = v.yo?.id;
-  return (
-    <div className="pzp-tarjeta">
-      <p className="pzp-etiqueta">📜 Crónica de la ronda {v.ronda}</p>
-      <ul className="rnp-cronica">
-        {v.cronica.filter((e) => e.tipo !== 'titulo').map((e) => (
-          <li key={e.n} className={`${e.tipo}${e.implicados?.includes(yo) ? ' mia' : ''}`}>{e.texto}</li>
-        ))}
-        {!v.cronica.some((e) => e.tipo !== 'titulo') && <li>Una ronda tranquila: nadie se ha movido.</li>}
-      </ul>
-    </div>
-  );
-}
+const Cronica = CronicaBonita;
 
 /**
  * La partida en marcha. `local`: en un dispositivo (las acciones de «seguir» y «forzar» las hace el grupo).
