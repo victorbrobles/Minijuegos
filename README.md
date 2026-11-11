@@ -234,6 +234,29 @@ Cada club elige formación y, en varios mercados, puja en secreto por futbolista
 ## Minijuego: El Laberinto (`Laberinto/`)
 Tablero de 7×7 salas generado como laberinto con atajos y puertas cerradas, que se descubre al entrar. En el centro está el Corazón; gana quien lo saque por una esquina (o, si se acaban las rondas, quien más oro tenga). Trampas, tesoros, llaves, pociones, mapas, cepos y barricadas; robos entre jugadores de la misma sala y pactos temporales. Personajes: Guerrera (rompe puertas, +2), Ladrón (roba siempre, ve trampas, salta barricadas), Exploradora (4 pasos, no se detiene) y Mago (teletransporte, ve salas vecinas). Motor en `server/laberinto/engine.js` (`npm run sync:laberinto`), online en `/api/laberinto` (de 2 a 4); en un dispositivo, el móvil pasa cada turno. Simulación: `node scripts/laberinto-sim.mjs`. Quien roba el Corazón queda protegido 🛡️ dos rondas (nadie puede robarle) y el Mago no puede teletransportarse a una sala ocupada: así no hay bucles de robos y alguien acaba escapando.
 
+## Bancos de contenido (ampliados)
+
+Cada juego guarda su contenido en ficheros de datos; las ampliaciones van en ficheros `extra*` que se suman sin repetir:
+
+| Juego | Registros |
+|---|---|
+| GeoQuiz | 1160 preguntas (100+ en cada una de sus 10 categorías) · `server/data/seeds/geoquiz/extra/` |
+| Verdadero o Falso | 222 afirmaciones |
+| ¿Qué sobra en la pecera? | 201 retos (`retosExtra*.js`) |
+| Trinchera 1914 | 201 cartas (`cartasExtra*.js`) |
+| Excusas a domicilio | 46 sujetos × 46 acciones × 46 objetos y 44 preguntas del jefe |
+| El Invento del Siglo | 229 objetos, 204 problemas y 200 rasgos |
+| Director Deportivo | 244 futbolistas |
+| La Hemeroteca | 209 titulares (`extra.js`) |
+| Acta del Partido | 117 partidos (`extra1.js`, `extra2.js`) |
+| El Once Fantasma | 17 finales con sus dos onces |
+| El Dato que Sobra | 201 futbolistas (`extra1.js`, `extra2.js`) |
+| La Pareja Perfecta | 323 parejas en 9 categorías |
+| El Tablero de Puntos | 565 preguntas (~95 por categoría) · `server/data/seeds/tablero/extra/` |
+| Una Pieza Más | 30 siluetas |
+
+Las portadas de los juegos nuevos se generan con `node server/scripts/portadas.cjs [ids]`.
+
 ## Minijuego: Mus Avanzado (`MusAvanzado/`)
 
 Mus de faroles con baraja española, individual (4-8) o por parejas (4 o 6, con fichas compartidas y la mejor combinación de 5 entre las 10 cartas de la pareja).

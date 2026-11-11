@@ -398,5 +398,89 @@ export const PARTIDOS = [
       J('Antoine Griezmann', ['griezmann'], 'MED', 7, 'Atlético', 'Máximo goleador del torneo.'),
       J('Olivier Giroud', ['giroud'], 'DEL', 9, 'Arsenal', 'Delantero centro.')
     ])
+  ] },
+  { id: 'champions2006', partido: 'Final de la Champions 2006 · Barcelona 2-1 Arsenal', onces: [
+    O('Barcelona', 'Frank Rijkaard', 'club', [
+      J('Víctor Valdés', ['valdes'], 'POR', 1, 'España', 'Paró un mano a mano decisivo a Henry.'),
+      J('Giovanni van Bronckhorst', ['van bronckhorst', 'bronckhorst', 'gio'], 'DEF', 12, 'Países Bajos', 'Lateral izquierdo holandés.'),
+      J('Rafael Márquez', ['marquez'], 'DEF', 4, 'México', 'Central mexicano, capitán de su selección.'),
+      J('Carles Puyol', ['puyol'], 'DEF', 5, 'España', 'El capitán.'),
+      J('Oleguer Presas', ['oleguer'], 'DEF', 23, 'España', 'Lateral derecho canterano.'),
+      J('Mark van Bommel', ['van bommel', 'bommel'], 'MED', 17, 'Países Bajos', 'Mediocentro holandés; luego fue al Bayern.'),
+      J('Edmílson', ['edmilson'], 'MED', 15, 'Brasil', 'Mediocentro brasileño; se lesionó y entró Iniesta.'),
+      J('Deco', ['deco'], 'MED', 20, 'Portugal', 'Portugués nacido en Brasil; venía del Oporto.'),
+      J('Ronaldinho', ['ronaldinho'], 'DEL', 10, 'Brasil', 'Balón de Oro de 2005.'),
+      J("Samuel Eto'o", ['etoo', 'eto o'], 'DEL', 9, 'Camerún', 'Marcó el empate en el minuto 76.'),
+      J('Ludovic Giuly', ['giuly'], 'DEL', 8, 'Francia', 'Extremo francés, pequeño y rápido.')
+    ]),
+    O('Arsenal', 'Arsène Wenger', 'club', [
+      J('Jens Lehmann', ['lehmann'], 'POR', 1, 'Alemania', 'Fue expulsado en el minuto 18.'),
+      J('Ashley Cole', ['cole', 'ashley cole'], 'DEF', 3, 'Inglaterra', 'Lateral izquierdo inglés.'),
+      J('Sol Campbell', ['campbell'], 'DEF', 23, 'Inglaterra', 'Marcó de cabeza el 0-1.'),
+      J('Kolo Touré', ['kolo', 'toure'], 'DEF', 28, 'Costa de Marfil', 'Central marfileño; hermano de Yaya.'),
+      J('Emmanuel Eboué', ['eboue'], 'DEF', 27, 'Costa de Marfil', 'Lateral derecho marfileño.'),
+      J('Robert Pirès', ['pires'], 'MED', 7, 'Francia', 'Fue sustituido por el portero suplente tras la expulsión.'),
+      J('Gilberto Silva', ['gilberto'], 'MED', 19, 'Brasil', 'Mediocentro brasileño campeón del mundo.'),
+      J('Cesc Fàbregas', ['cesc', 'fabregas'], 'MED', 15, 'España', 'Español de 19 años formado en La Masía.'),
+      J('Freddie Ljungberg', ['ljungberg'], 'MED', 8, 'Suecia', 'Centrocampista sueco.'),
+      J('Aleksandr Hleb', ['hleb'], 'MED', 13, 'Bielorrusia', 'Bielorruso; dos años después fichó por el Barça.'),
+      J('Thierry Henry', ['henry'], 'DEL', 14, 'Francia', 'Máximo goleador de la historia del club.')
+    ])
+  ] },
+  { id: 'champions2015', partido: 'Final de la Champions 2015 · Barcelona 3-1 Juventus', onces: [
+    O('Barcelona', 'Luis Enrique', 'club', [
+      J('Marc-André ter Stegen', ['ter stegen', 'stegen'], 'POR', 1, 'Alemania', 'Portero alemán que jugaba la Champions y la Copa.'),
+      J('Jordi Alba', ['alba'], 'DEF', 18, 'España', 'Lateral izquierdo que volvió del Valencia.'),
+      J('Javier Mascherano', ['mascherano'], 'DEF', 14, 'Argentina', 'Mediocentro reconvertido a central.'),
+      J('Gerard Piqué', ['pique'], 'DEF', 3, 'España', 'Central canterano.'),
+      J('Dani Alves', ['alves'], 'DEF', 22, 'Brasil', 'Lateral derecho brasileño.'),
+      J('Andrés Iniesta', ['iniesta'], 'MED', 8, 'España', 'Dio el pase del 1-0.'),
+      J('Sergio Busquets', ['busquets'], 'MED', 5, 'España', 'Mediocentro canterano.'),
+      J('Ivan Rakitić', ['rakitic'], 'MED', 4, 'Croacia', 'Marcó el 1-0 en el minuto 4.'),
+      J('Neymar', ['neymar'], 'DEL', 11, 'Brasil', 'Marcó el 3-1 en el descuento.'),
+      J('Luis Suárez', ['suarez'], 'DEL', 9, 'Uruguay', 'Marcó el 2-1 tras un rechace.'),
+      J('Lionel Messi', ['messi', 'leo'], 'DEL', 10, 'Argentina', 'Jugaba en la banda derecha del tridente.')
+    ]),
+    O('Juventus', 'Massimiliano Allegri', 'club', [
+      J('Gianluigi Buffon', ['buffon'], 'POR', 1, 'Italia', 'Capitán veterano.'),
+      J('Patrice Evra', ['evra'], 'DEF', 33, 'Francia', 'Lateral izquierdo francés que había jugado en el United.'),
+      J('Leonardo Bonucci', ['bonucci'], 'DEF', 19, 'Italia', 'Central italiano.'),
+      J('Andrea Barzagli', ['barzagli'], 'DEF', 15, 'Italia', 'Central campeón del mundo en 2006.'),
+      J('Stephan Lichtsteiner', ['lichtsteiner'], 'DEF', 26, 'Suiza', 'Lateral derecho suizo.'),
+      J('Paul Pogba', ['pogba'], 'MED', 6, 'Francia', 'Joven francés que había salido del United.'),
+      J('Andrea Pirlo', ['pirlo'], 'MED', 21, 'Italia', 'Jugó su último gran partido europeo.'),
+      J('Claudio Marchisio', ['marchisio'], 'MED', 8, 'Italia', 'Centrocampista turinés.'),
+      J('Arturo Vidal', ['vidal'], 'MED', 23, 'Chile', 'Chileno; después jugó en el Barça.'),
+      J('Carlos Tevez', ['tevez'], 'DEL', 10, 'Argentina', 'Delantero argentino.'),
+      J('Álvaro Morata', ['morata'], 'DEL', 9, 'España', 'Español; marcó el 1-1.')
+    ])
+  ] },
+  { id: 'champions2019', partido: 'Final de la Champions 2019 · Liverpool 2-0 Tottenham', onces: [
+    O('Liverpool', 'Jürgen Klopp', 'club', [
+      J('Alisson Becker', ['alisson'], 'POR', 13, 'Brasil', 'Portero brasileño fichado de la Roma.'),
+      J('Andrew Robertson', ['robertson'], 'DEF', 26, 'Escocia', 'Lateral izquierdo escocés.'),
+      J('Virgil van Dijk', ['van dijk', 'dijk'], 'DEF', 4, 'Países Bajos', 'Fue elegido mejor jugador de la final.'),
+      J('Joël Matip', ['matip'], 'DEF', 32, 'Camerún', 'Central camerunés nacido en Alemania.'),
+      J('Trent Alexander-Arnold', ['alexander arnold', 'trent', 'arnold'], 'DEF', 66, 'Inglaterra', 'Lateral derecho canterano con el dorsal 66.'),
+      J('Georginio Wijnaldum', ['wijnaldum'], 'MED', 5, 'Países Bajos', 'Marcó dos goles al Barça en semifinales.'),
+      J('Fabinho', ['fabinho'], 'MED', 3, 'Brasil', 'Mediocentro brasileño.'),
+      J('Jordan Henderson', ['henderson'], 'MED', 14, 'Inglaterra', 'El capitán.'),
+      J('Sadio Mané', ['mane'], 'DEL', 10, 'Senegal', 'Extremo senegalés.'),
+      J('Roberto Firmino', ['firmino'], 'DEL', 9, 'Brasil', 'Delantero brasileño; volvía de lesión.'),
+      J('Mohamed Salah', ['salah'], 'DEL', 11, 'Egipto', 'Marcó de penalti en el minuto 2.')
+    ]),
+    O('Tottenham', 'Mauricio Pochettino', 'club', [
+      J('Hugo Lloris', ['lloris'], 'POR', 1, 'Francia', 'Capitán francés.'),
+      J('Danny Rose', ['rose'], 'DEF', 3, 'Inglaterra', 'Lateral izquierdo.'),
+      J('Jan Vertonghen', ['vertonghen'], 'DEF', 5, 'Bélgica', 'Central belga.'),
+      J('Toby Alderweireld', ['alderweireld'], 'DEF', 4, 'Bélgica', 'Central belga que jugó en el Atlético.'),
+      J('Kieran Trippier', ['trippier'], 'DEF', 2, 'Inglaterra', 'Lateral derecho; luego fichó por el Atlético.'),
+      J('Moussa Sissoko', ['sissoko'], 'MED', 17, 'Francia', 'Le pitaron penalti por mano en el primer minuto.'),
+      J('Harry Winks', ['winks'], 'MED', 8, 'Inglaterra', 'Mediocentro canterano.'),
+      J('Son Heung-min', ['son'], 'MED', 7, 'Corea del Sur', 'Surcoreano; luego ganó la Europa League con el club.'),
+      J('Christian Eriksen', ['eriksen'], 'MED', 23, 'Dinamarca', 'Danés; tenía un gran golpeo.'),
+      J('Dele Alli', ['alli', 'dele'], 'MED', 20, 'Inglaterra', 'Mediapunta inglés.'),
+      J('Harry Kane', ['kane'], 'DEL', 10, 'Inglaterra', 'Volvía de una lesión de tobillo.')
+    ])
   ] }
 ];

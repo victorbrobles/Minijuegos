@@ -201,6 +201,53 @@ Antony|DEL|25|80|82|BRA|Betis
 Ante Budimir|DEL|33|80|80|CRO|Osasuna
 Iago Aspas|DEL|38|79|79|ESP|Celta
 Borja Iglesias|DEL|32|77|77|ESP|Celta
+Emiliano Martínez|POR|33|86|86|ARG|Aston Villa
+Bart Verbruggen|POR|23|82|86|NED|Brighton
+Robert Sánchez|POR|27|80|82|ESP|Chelsea
+Jordan Pickford|POR|31|83|83|ENG|Everton
+Nick Pope|POR|33|82|82|ENG|Newcastle
+Wojciech Szczęsny|POR|35|82|82|POL|Barcelona
+Juan Musso|POR|31|78|78|ARG|Atlético
+Sergio Herrera|POR|32|78|78|ESP|Osasuna
+Rui Silva|POR|31|79|79|POR|Sporting
+David de Gea|POR|34|82|82|ESP|Fiorentina
+Raúl Asencio|DEF|22|78|84|ESP|Real Madrid
+Ferland Mendy|DEF|30|81|81|FRA|Real Madrid
+Fran García|DEF|26|78|79|ESP|Real Madrid
+Eric García|DEF|24|79|82|ESP|Barcelona
+Andreas Christensen|DEF|29|80|80|DEN|Barcelona
+Clément Lenglet|DEF|30|78|78|FRA|Atlético
+Nahuel Molina|DEF|27|79|80|ARG|Atlético
+Aitor Paredes|DEF|25|78|81|ESP|Athletic
+Lucas Hernández|DEF|29|82|82|FRA|PSG
+Destiny Udogie|DEF|22|80|85|ITA|Tottenham
+Leny Yoro|DEF|19|78|87|FRA|Man United
+Dani Ceballos|MED|29|79|79|ESP|Real Madrid
+Marc Casadó|MED|22|77|82|ESP|Barcelona
+Javi Guerra|MED|22|79|85|ESP|Valencia
+Pepelu|MED|27|78|79|ESP|Valencia
+Sergi Darder|MED|31|78|78|ESP|Mallorca
+Mikel Jauregizar|MED|22|76|83|ESP|Athletic
+Santi Comesaña|MED|29|77|77|ESP|Villarreal
+Rodrigo De Paul|MED|31|81|81|ARG|Inter Miami
+Nico González|MED|23|79|83|ESP|Man City
+Leon Goretzka|MED|30|81|81|GER|Bayern
+Aleksandar Pavlović|MED|21|81|87|GER|Bayern
+Warren Zaïre-Emery|MED|19|80|88|FRA|PSG
+Brahim Díaz|MED|26|80|81|MAR|Real Madrid
+Franco Mastantuono|MED|18|75|88|ARG|Real Madrid
+Thiago Almada|MED|24|78|82|ARG|Atlético
+Johnny Cardoso|MED|24|78|82|USA|Atlético
+Nico Paz|MED|21|78|85|ARG|Como
+Isi Palazón|MED|30|77|77|ESP|Rayo Vallecano
+Désiré Doué|DEL|20|82|89|FRA|PSG
+Bradley Barcola|DEL|23|81|85|FRA|PSG
+Gonçalo Ramos|DEL|24|79|82|POR|PSG
+Samu Omorodion|DEL|21|78|84|ESP|Oporto
+Giuliano Simeone|DEL|22|78|82|ARG|Atlético
+Jorge de Frutos|DEL|28|77|77|ESP|Rayo Vallecano
+Marcus Rashford|DEL|27|80|80|ENG|Barcelona
+Roony Bardghji|DEL|19|72|84|SWE|Barcelona
 `;
 
 export const FUTBOLISTAS = DATOS.trim().split('\n').map((l, i) => {
