@@ -107,7 +107,6 @@ export const JUEGOS = {
   },
   acta: {
     id: 'acta',
-    pantallaTurno: true,
     api: '/api/acta',
     emoji: '📋',
     unidad: 'partidos',

@@ -2,9 +2,10 @@
 // «Una Pieza Más»: motor puro (sin red). Se copia al cliente con `npm run sync:unapieza`.
 // Tablero compartido con una silueta que hay que rellenar. Por turnos, cada jugador coloca una de sus tres piezas
 // (girándola o dándole la vuelta) dentro de los huecos libres. Puntúan las casillas, las filas y columnas que se
-// cierran, el objetivo secreto, colocar la última pieza y dejar al siguiente sin poder colocar nada.
+// cierran, el objetivo secreto, colocar la última pieza y dejar al siguiente sin poder colocar nada. Quien acaba la
+// figura sin haber cerrado su objetivo pierde unos puntos.
 
-export const AJUSTES = { min: 2, max: 6, mano: 3, segTurno: 60, ptsLinea: 2, ptsObjetivo: 4, ptsUltima: 5, ptsBloqueo: 2, lado: 8 };
+export const AJUSTES = { min: 2, max: 6, mano: 3, segTurno: 60, ptsLinea: 2, ptsObjetivo: 4, ptsObjetivoFallo: 2, ptsUltima: 5, ptsBloqueo: 2, lado: 8 };
 export const OPCIONES = { rondas: [2, 3, 4], segundos: [45, 60, 90] };
 
 export const PIEZAS = {
@@ -135,6 +136,7 @@ function empezarRonda(p, ahora, rng = Math.random) {
   p.ultimo = null;
   p.registro = [];
   p.sumas = {};
+  p.desglose = Object.fromEntries(activos(p).map((j) => [j.id, { piezas: 0, casillas: 0, lineas: 0, nLineas: 0, objetivo: 0, ultima: 0, bloqueos: 0, fallo: 0 }]));
   p.motivo = null;
   const a = activos(p);
   p.turno = a[(p.ronda - 1) % a.length].id;
@@ -151,9 +153,15 @@ function siguienteTurno(p, ahora) {
   p.hasta = ahora + p.segundos * 1000;
 }
 const sumar = (p, j, n) => { j.puntos += n; p.sumas[j.id] = (p.sumas[j.id] || 0) + n; };
+const dsg = (p, id) => (p.desglose[id] ||= { piezas: 0, casillas: 0, lineas: 0, nLineas: 0, objetivo: 0, ultima: 0, bloqueos: 0, fallo: 0 });
 const quedanHuecos = (p) => p.tablero.some((r) => r.includes(0));
 
 function cerrarRonda(p, motivo) {
+  // Quien no ha cerrado su objetivo secreto pierde puntos
+  activos(p).forEach((j) => {
+    const o = p.objetivos[j.id];
+    if (o && !o.hecho) { sumar(p, j, -AJUSTES.ptsObjetivoFallo); dsg(p, j.id).fallo -= AJUSTES.ptsObjetivoFallo; }
+  });
   p.fase = 'resultado';
   p.motivo = motivo;
   p.hasta = null;
@@ -195,6 +203,11 @@ export function colocar(p, id, { pieza, rot = 0, espejo = false, fila, col } = {
     if (!sig.mano.some((t) => cabeEnAlgunSitio(p, t))) { pts += AJUSTES.ptsBloqueo; bloqueo = sig.id; detalle.push(`bloquea a ${sig.nombre}`); }
   }
   sumar(p, j, pts);
+  const d = dsg(p, id);
+  d.piezas += 1; d.casillas += celdas.length; d.lineas += nuevas.length * AJUSTES.ptsLinea; d.nLineas += nuevas.length;
+  if (obj?.hecho && nuevas.includes(obj.linea)) d.objetivo += AJUSTES.ptsObjetivo;
+  if (completa) d.ultima += AJUSTES.ptsUltima;
+  if (bloqueo != null) d.bloqueos += AJUSTES.ptsBloqueo;
   p.ultimo = { id, celdas, tipo };
   p.registro.unshift({ id, tipo, puntos: pts, detalle: detalle.join(' · '), lineas: nuevas, bloqueo });
   if (completa) cerrarRonda(p, 'completa');
@@ -268,12 +281,15 @@ export function vistaDe(p, id) {
     huecos: p.tablero.flat().filter((x) => x === 0).length,
     jugadores: p.jugadores.map((j) => ({ id: j.id, nombre: j.nombre, puntos: j.puntos, piezas: j.piezas, objetivos: j.objetivos, fuera: j.fuera, mano: j.mano.length })),
     yo: yo ? {
-      id, mano: yo.mano, objetivo: p.objetivos[id] || null,
+      id, mano: yo.mano,
+      objetivo: p.objetivos[id] ? { ...p.objetivos[id], cerradaPorOtro: !p.objetivos[id].hecho && p.cerradas.includes(p.objetivos[id].linea) } : null,
       cabe: yo.mano.map((t) => cabeEnAlgunSitio(p, t))
     } : null,
     objetivos: abierto ? p.objetivos : null,
     registro: p.registro.slice(0, 5),
     sumas: p.sumas,
+    desglose: abierto ? p.desglose : null,
+    forma: fig ? fig.forma : null,
     fin: p.fin
   };
 }

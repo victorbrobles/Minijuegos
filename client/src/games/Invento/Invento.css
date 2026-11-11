@@ -48,16 +48,7 @@
 @media (prefers-reduced-motion: reduce) { .ivp-carta { animation: none; } }
 
 /* ---- Tema taller del inventor: papel de plano y patentes ---- */
-.pzp-contenedor.invento {
-  background-color: #1e3a8a !important;
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px),
-    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    radial-gradient(ellipse at 50% 0%, #2563eb 0%, #1e3a8a 60%, #172554 100%) !important;
-  background-size: 48px 48px, 48px 48px, 12px 12px, 12px 12px, 100% 100% !important;
-}
+/* Sin fondo propio en el contenedor: dejaba un bloque de otro color detrás de las tarjetas. */
 .pzp-contenedor.invento .pzp-hero { background: linear-gradient(135deg, #7c3aed, #4c1d95) !important; }
 .ivp-carta { border: 3px solid rgba(255, 255, 255, 0.85); }
 .ivp-carta:nth-child(1) { transform: rotate(-0.8deg); }

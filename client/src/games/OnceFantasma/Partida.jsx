@@ -13,31 +13,65 @@ const LINEAS = ['DEL', 'MED', 'DEF', 'POR'];
 const CAMISETA = ['#dc2626', '#1d4ed8'];
 const apellido = (n) => { const p = n.split(' '); return p.length > 1 && p[p.length - 2].length <= 3 ? p.slice(-2).join(' ') : p[p.length - 1]; };
 
-function Camiseta({ color, oculto, dorsal }) {
+function Camiseta({ color, oculto, dorsal, id }) {
+  const g = `ofx-g-${id}`;
   return (
     <svg className="ofx-camiseta" viewBox="0 0 48 44" aria-hidden="true">
+      <defs>
+        <linearGradient id={g} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor={oculto ? '#0f172a' : color} stopOpacity={oculto ? 0.35 : 1} />
+          <stop offset="1" stopColor={oculto ? '#0f172a' : color} stopOpacity={oculto ? 0.6 : 0.78} />
+        </linearGradient>
+      </defs>
       <path d="M14 3 L4 9 L1 19 L9 22 L10 41 H38 L39 22 L47 19 L44 9 L34 3 Q24 10 14 3 Z"
-        fill={oculto ? 'rgba(15,23,42,0.55)' : color} stroke={oculto ? '#e2e8f0' : '#fff'} strokeWidth="2" strokeDasharray={oculto ? '4 3' : 'none'} strokeLinejoin="round" />
-      <text x="24" y="31" textAnchor="middle" fontSize="15" fontWeight="900" fill="#fff" fontFamily="'Bricolage Grotesque', sans-serif">{dorsal}</text>
+        fill={`url(#${g})`} stroke={oculto ? 'rgba(255,255,255,0.85)' : '#ffffff'} strokeWidth="2" strokeDasharray={oculto ? '3.5 3' : 'none'} strokeLinejoin="round" />
+      {!oculto && <path d="M18 4.5 Q24 9 30 4.5" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="2" />}
+      {!oculto && <path d="M9 22 L10 41 M39 22 L38 41" stroke="rgba(0,0,0,0.18)" strokeWidth="3" />}
+      <text x="24" y="31" textAnchor="middle" fontSize="15" fontWeight="900" fill="#fff" fontFamily="'Bricolage Grotesque', sans-serif" style={{ paintOrder: 'stroke' }} stroke="rgba(0,0,0,0.25)" strokeWidth="1">{dorsal}</text>
     </svg>
   );
 }
 
-/** El campo con los once huecos, por líneas (izquierda a derecha, vistos desde su portería). */
+/** Líneas del campo (medio campo visto desde la propia portería, abajo). */
+function Lineas() {
+  return (
+    <svg className="ofx-lineas" viewBox="0 0 100 150" preserveAspectRatio="none" aria-hidden="true">
+      <g fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="0.6" vectorEffect="non-scaling-stroke">
+        <rect x="2" y="2" width="96" height="146" rx="1" />
+        <line x1="2" y1="75" x2="98" y2="75" />
+        <ellipse cx="50" cy="75" rx="13" ry="9" />
+        <rect x="22" y="2" width="56" height="20" />
+        <rect x="36" y="2" width="28" height="7" />
+        <path d="M40 22 Q50 29 60 22" />
+        <rect x="22" y="128" width="56" height="20" />
+        <rect x="36" y="141" width="28" height="7" />
+        <path d="M40 128 Q50 121 60 128" />
+        <path d="M2 5 Q5 5 5 2 M95 2 Q95 5 98 5 M2 145 Q5 145 5 148 M95 148 Q95 145 98 145" />
+      </g>
+      <g fill="rgba(255,255,255,0.75)"><circle cx="50" cy="75" r="0.9" /><circle cx="50" cy="16" r="0.7" /><circle cx="50" cy="134" r="0.7" /></g>
+      <rect x="42" y="148" width="16" height="2" fill="rgba(255,255,255,0.85)" />
+    </svg>
+  );
+}
+
+/** El campo con los once huecos, por líneas (izquierda a derecha, vistos desde su portería), y el entrenador en la banda. */
 function Campo({ v, marcado, onElegir }) {
   const color = CAMISETA[v.once.lado] || CAMISETA[0];
+  const cazados = v.huecos.filter((h) => h.por || h.nombre).length;
   return (
-    <div className="ofx-campo" role="list" aria-label={`Alineación de ${v.once.equipo}`}>
-      <span className="ofx-area arriba" aria-hidden="true" /><span className="ofx-area abajo" aria-hidden="true" /><span className="ofx-circulo" aria-hidden="true" />
+    <div className="ofx-campo" role="list" aria-label={`Alineación de ${v.once.equipo}`} style={{ '--equipo': color }}>
+      <Lineas />
+      <span className="ofx-marcador-campo">✅ {cazados}/11</span>
       {LINEAS.map((l) => (
-        <div key={l} className="ofx-linea">
+        <div key={l} className={`ofx-linea ${l}`}>
           {v.huecos.map((h, i) => [h, i]).filter(([h]) => h.pos === l).map(([h, i]) => (
             <button key={i} type="button" role="listitem" onClick={() => onElegir?.(i)}
               className={`ofx-hueco${h.nombre ? ' visto' : ''}${h.por ? ' cazado' : ''}${marcado === i ? ' marcado' : ''}`}
               style={h.por ? { '--c': colorDe(h.por) } : undefined}
               aria-label={h.nombre ? `${h.dorsal}, ${h.nombre}` : `Dorsal ${h.dorsal}, ${POSICIONES[h.pos]}, oculto`}>
-              <Camiseta color={color} oculto={!h.nombre} dorsal={h.dorsal} />
-              <span className="ofx-nombre">{h.nombre ? apellido(h.nombre) : h.iniciales || '?'}</span>
+              <span className="ofx-dorsal-chico">{h.dorsal}</span>
+              <Camiseta color={color} oculto={!h.nombre} dorsal={h.dorsal} id={i} />
+              <span className="ofx-nombre">{h.nombre ? apellido(h.nombre) : h.iniciales || POSICIONES[h.pos].slice(0, 3)}</span>
               {h.dato && !h.nombre && <span className="ofx-dato">{h.dato}</span>}
               {!h.nombre && <span className="ofx-nivel" aria-hidden="true">{[0, 1, 2].map((k) => <i key={k} className={h.nivel > k ? 'on' : ''} />)}</span>}
               {h.por && <span className="ofx-quien" title={nombreDe(v, h.por)}>{h.rebote ? '🔁' : ''}{nombreDe(v, h.por).slice(0, 1)}</span>}
@@ -45,6 +79,28 @@ function Campo({ v, marcado, onElegir }) {
           ))}
         </div>
       ))}
+      <div className="ofx-banquillo"><span>🧑‍💼</span><div><small>Entrenador</small><b>{v.once.entrenador}</b></div></div>
+    </div>
+  );
+}
+
+/** El partido como un marcador: competición, resultado y el equipo que hay que adivinar resaltado. */
+function Partido({ v }) {
+  const [comp, resultado] = v.once.partido.split(' · ');
+  const m = /^(.*?) (\d+)-(\d+) (.*)$/.exec(resultado || '');
+  const color = CAMISETA[v.once.lado] || CAMISETA[0];
+  const equipo = (n) => n.trim() === v.once.equipo;
+  return (
+    <div className="ofx-partido" style={{ '--equipo': color }}>
+      <p className="ofx-competicion">🏆 {comp}</p>
+      {m ? (
+        <div className="ofx-resultado">
+          <span className={equipo(m[1]) ? 'adivinar' : ''}>{m[1]}</span>
+          <b>{m[2]}<i>-</i>{m[3]}</b>
+          <span className={equipo(m[4]) ? 'adivinar' : ''}>{m[4]}</span>
+        </div>
+      ) : <p className="ofx-resultado-txt">{resultado}</p>}
+      <p className="ofx-objetivo">🎯 Adivina el once de <b>{v.once.equipo}</b></p>
     </div>
   );
 }
@@ -139,15 +195,12 @@ export function Partida({ v, enviar, offset = 0, onSalir, local = false, admin =
   const rivales = v.jugadores.filter((j) => !j.fuera && j.id !== v.turno);
   return (
     <>
-      <Hero v={v} juego={HERO} onSalir={onSalir} chip={`👻 Once ${v.ronda}/${v.rondas}`} etiqueta={v.once.partido} titulo={v.once.equipo} turno={v.fase === 'turno' ? v.turno : undefined} />
+      <Hero v={v} juego={HERO} onSalir={onSalir} chip={`👻 Once ${v.ronda}/${v.rondas}`} etiqueta={v.fase === 'resultado' ? 'Resultado del once' : v.fase === 'rebote' ? '🔁 Rebote' : `Turno de ${quien}`} titulo={`Once de ${v.once.equipo}`} turno={v.fase === 'turno' ? v.turno : undefined} />
+      <Partido v={v} />
       {!local && <AvisoTurno clave={v.fase === 'turno' && esMio ? `t${v.ronda}` : v.fase === 'rebote' && v.yo?.puedo ? `r${v.ronda}` : null}
         texto={v.fase === 'rebote' ? '¡Rebote!' : '¡Te toca!'} sub={v.fase === 'rebote' ? `A ${quien} le faltan ${11 - cazados}: adivínalos tú.` : `Reconstruye el once de ${v.once.equipo}.`} emoji={v.fase === 'rebote' ? '🔁' : '👻'} id={v.yo?.id} />}
       {v.fase === 'turno' && <p className="ofx-estado"><Avatar id={v.turno} nombre={quien} /> {local || !esMio ? `Turno de ${quien}: solo adivina él.` : 'Tu turno: solo adivinas tú.'} Si deja huecos, habrá rebote.</p>}
       {v.fase === 'rebote' && <p className="ofx-estado rebote">🔁 <span><b>¡Rebote!</b> A {quien} le faltan {11 - cazados}. {local ? 'Los demás pueden decirlos.' : esMio ? 'Ahora pueden adivinarlos los demás.' : 'Adivínalos antes que nadie (valen menos).'}</span></p>}
-      <div className="pzp-tarjeta ofx-cabecera">
-        <span>🧑‍💼 <b>{v.once.entrenador}</b></span>
-        <span className="ofx-contador">{cazados}/11</span>
-      </div>
       {(v.fase === 'turno' || v.fase === 'rebote') && v.hasta && <Cuenta ms={restante} total={v.segundos * 1000} />}
       <Campo v={v} marcado={marcado} onElegir={(i) => setMarcado((m) => (m === i ? null : i))} />
       {marcado !== null ? <Ficha v={v} i={marcado} onCerrar={() => setMarcado(null)} /> : (

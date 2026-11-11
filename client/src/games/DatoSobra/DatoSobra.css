@@ -1,21 +1,29 @@
 /* El Dato que Sobra (prefijo dsx-) */
 .pzp-contenedor.datosobra { --pz0: #ffedd5; --pz1: #fdba74; --pz2: #c2410c; --pz3: #431407; }
 
-.dsx-futbolista { display: flex; align-items: center; gap: 0.6rem; justify-content: center; padding: 0.8rem 1rem; }
-.dsx-futbolista span { font-size: 1.6rem; }
-.dsx-futbolista strong { font-size: 1.35rem; color: #0f172a; }
+.dsx-futbolista {
+  display: flex; align-items: center; gap: 0.8rem; margin: 0.6rem 0 0; padding: 0.75rem 0.95rem; border-radius: 20px;
+  background: linear-gradient(135deg, #fff7ed, #fed7aa); border: 2px solid #fdba74; box-shadow: 0 5px 0 #c2410c; color: #431407;
+}
+.dsx-foto { display: grid; place-items: center; flex: none; width: 56px; height: 56px; border-radius: 16px; background: radial-gradient(circle at 30% 30%, #fb923c, #9a3412); font-size: 1.8rem; box-shadow: inset 0 -4px 0 rgba(0, 0, 0, 0.2); }
+.dsx-futbolista small { display: block; color: #c2410c; font-size: 0.68rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; }
+.dsx-futbolista strong { display: block; font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.45rem; line-height: 1.1; }
+.dsx-futbolista em { color: #9a3412; font-size: 0.78rem; font-style: normal; font-weight: 700; }
 
 .dsx-lista { list-style: none; margin: 0.6rem 0; padding: 0; display: grid; gap: 0.5rem; }
 .dsx-afirmacion {
-  width: 100%; display: flex; align-items: center; gap: 0.7rem; text-align: left; padding: 0.75rem 0.8rem; margin: 0;
-  border: 3px solid #e2e8f0; border-radius: 16px; background: #fff; color: #0f172a; font: inherit; font-size: 0.95rem; font-weight: 600; cursor: pointer;
+  width: 100%; display: flex; align-items: center; gap: 0.7rem; text-align: left; padding: 0.8rem 0.85rem; margin: 0;
+  border: 3px solid #fde7d3; border-radius: 18px; background: #fff; color: #0f172a; font: inherit; font-size: 0.95rem; font-weight: 600; line-height: 1.3; cursor: pointer;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.18); transition: transform 0.1s, box-shadow 0.1s;
 }
+.dsx-afirmacion:not(:disabled):hover { transform: translateY(-2px); }
+.dsx-afirmacion:not(:disabled):active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0, 0, 0, 0.18); }
 .dsx-afirmacion:disabled { cursor: default; opacity: 1; }
 .dsx-afirmacion.marcada { border-color: var(--pz2); background: #fff7ed; box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.25); }
 .dsx-afirmacion.respuesta { border-color: #2563eb; background: #eff6ff; }
 .dsx-afirmacion.falsa { border-color: #dc2626; background: #fef2f2; }
 .dsx-afirmacion.cierta { border-color: #bbf7d0; background: #f0fdf4; opacity: 0.85; }
-.dsx-letra { flex: 0 0 auto; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 10px; background: var(--pz2); color: #fff; font-weight: 900; }
+.dsx-letra { flex: 0 0 auto; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 11px; background: linear-gradient(135deg, #fb923c, #c2410c); color: #fff; font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.1rem; font-weight: 900; box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.2); }
 .dsx-texto { flex: 1; }
 .dsx-sello { flex: 0 0 auto; font-size: 0.75rem; font-weight: 800; white-space: nowrap; }
 
@@ -32,9 +40,35 @@
 .dsx-reto-op { display: flex; gap: 0.3rem; }
 .dsx-reto-op button { width: 38px; height: 38px; border-radius: 10px; border: 2px solid #e2e8f0; background: #fff; font: inherit; font-weight: 900; color: var(--pz2); cursor: pointer; }
 
+/* Pantalla de resultado de la ronda */
+.dsx-veredicto { margin: 0.6rem 0 0; padding: 0.9rem; border-radius: 22px; color: #ffffff; box-shadow: 0 6px 0 rgba(0, 0, 0, 0.3); }
+.dsx-veredicto.bien { background: linear-gradient(150deg, #22c55e, #14532d); }
+.dsx-veredicto.mal { background: linear-gradient(150deg, #ef4444, #7f1d1d); }
+.dsx-veredicto-etq { margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.3rem; font-weight: 800; }
+.dsx-veredicto-sobre { margin: 0.3rem 0 0.4rem; font-size: 0.85rem; opacity: 0.92; }
+.dsx-mentira { display: flex; align-items: center; gap: 0.6rem; padding: 0.7rem; border-radius: 16px; background: #ffffff; color: #7f1d1d; box-shadow: 0 0 0 3px #fca5a5; }
+.dsx-mentira .dsx-letra { background: linear-gradient(135deg, #ef4444, #991b1b); }
+.dsx-mentira strong { font-size: 0.98rem; line-height: 1.3; text-decoration: line-through; text-decoration-color: rgba(220, 38, 38, 0.6); text-decoration-thickness: 2px; }
+.dsx-veredicto .dsx-porque { margin: 0.55rem 0 0; padding: 0.5rem 0.65rem; border-radius: 12px; background: rgba(0, 0, 0, 0.2); color: #ffffff; font-size: 0.86rem; }
+.dsx-todas { margin: 0.5rem 0 0; padding: 0.5rem 0.8rem; border-radius: 16px; background: rgba(255, 255, 255, 0.95); color: #0f172a; }
+.dsx-todas summary { font-weight: 800; cursor: pointer; }
+.dsx-ronda .dsx-detalle li { padding: 0.45rem 0.55rem; border-radius: 14px; background: #fff7ed; flex-wrap: nowrap; }
+.dsx-ronda .dsx-detalle li.turno { background: #ffedd5; box-shadow: inset 0 0 0 2px #fdba74; }
+.dsx-quien { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.dsx-quien small { color: #57534e; font-size: 0.78rem; opacity: 1 !important; }
+.dsx-detalle strong { padding: 0.1rem 0.6rem; border-radius: 999px; background: #e7e5e4; color: #44403c; font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.05rem; }
+.dsx-detalle strong.mas { background: #16a34a; color: #ffffff; }
+.dsx-detalle strong.menos { background: #dc2626; color: #ffffff; }
+.dsx-clasif { margin: 0.5rem 0; padding: 0.75rem 0.9rem; border-radius: 20px; background: linear-gradient(150deg, #9a3412, #431407); color: #ffedd5; box-shadow: 0 5px 0 rgba(0, 0, 0, 0.3); }
+.dsx-clasif p { margin: 0 0 0.4rem; font-size: 0.72rem; font-weight: 900; letter-spacing: 0.05em; text-transform: uppercase; opacity: 0.85; }
+.dsx-clasif ol { display: grid; gap: 0.25rem; margin: 0; padding: 0; list-style: none; }
+.dsx-clasif li { display: flex; align-items: center; gap: 0.45rem; padding: 0.3rem 0.5rem; border-radius: 12px; background: rgba(0, 0, 0, 0.2); }
+.dsx-clasif li b { flex: 1; }
+.dsx-clasif li strong { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.2rem; }
 .dsx-porque { margin: 0.2rem 0 0.6rem; color: #0f172a; font-weight: 600; }
 .dsx-detalle { list-style: none; padding: 0; margin: 0 0 0.6rem; display: grid; gap: 0.4rem; color: #0f172a; }
 .dsx-detalle li { display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; }
 .dsx-detalle small { opacity: 0.7; flex: 1; }
 .dsx-detalle b { color: #16a34a; }
 .dsx-detalle b.menos { color: #dc2626; }
+.dsx-quien b { color: #0f172a !important; }

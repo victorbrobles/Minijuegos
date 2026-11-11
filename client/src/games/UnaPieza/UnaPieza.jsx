@@ -23,7 +23,7 @@ const JUEGO = {
     'En el tablero hay una silueta incompleta (una casa, un cohete, un pez…). Cada jugador tiene tres piezas geométricas en la mano.',
     'En tu turno coloca una pieza entera dentro de los huecos libres: puedes girarla y darle la vuelta. Luego robas otra. También puedes pasar y cambiar una pieza.',
     `Sumas 1 punto por casilla, ${AJUSTES.ptsLinea} por cada fila o columna de la figura que cierres y ${AJUSTES.ptsUltima} si colocas la última pieza.`,
-    `Cada figura tienes un objetivo secreto: cerrar tú una fila o columna concreta (+${AJUSTES.ptsObjetivo}).`,
+    `Cada figura tienes un objetivo secreto (arriba, se despliega al tocarlo): cerrar tú una fila o columna concreta. Si lo consigues, +${AJUSTES.ptsObjetivo}; si la figura acaba sin que lo hayas cerrado, −${AJUSTES.ptsObjetivoFallo}.`,
     `Si con tu pieza dejas al siguiente sin sitio para ninguna de las suyas, ganas ${AJUSTES.ptsBloqueo} puntos por bloquearle. Quien no puede colocar nada rellena una casilla suelta.`,
     'Gana quien más puntos sume al acabar todas las figuras.'
   ]
