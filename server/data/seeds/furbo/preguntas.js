@@ -5,6 +5,7 @@
 import { BASE } from './bancos/base.js';
 import { VESTUARIO, REBOTE, ELECCION, PROHIBIDAS } from './bancos/manual.js';
 import { generar } from './bancos/generador.js';
+import { VESTUARIO_EXTRA, REBOTE_EXTRA, QUINIELA_DIFICIL, PROHIBIDAS_EXTRA, PENALTIS_FACIL_EXTRA, PENALTIS_DIFICIL_EXTRA } from './bancos/extra.js';
 
 const gen = generar();
 
@@ -38,37 +39,48 @@ function unicos(lista, fnClave = (x) => (Array.isArray(x) ? x[0] : x)) {
 export const PREGUNTAS = {
   vestuario: unicos([
     ...BASE.vestuario,
-    ...VESTUARIO
+    ...VESTUARIO,
+    ...VESTUARIO_EXTRA
   ]),
 
   rebote: unicos([
     ...BASE.rebote,
     ...REBOTE,
-    ...gen.rebote
+    ...gen.rebote,
+    ...REBOTE_EXTRA
   ]),
 
   quiniela: unicos([
     ...BASE.quiniela,
     ...quinielaManual,
-    ...gen.quiniela
+    ...gen.quiniela,
+    ...QUINIELA_DIFICIL
   ]),
 
   prohibidas: unicos([
     ...BASE.prohibidas,
-    ...PROHIBIDAS
+    ...PROHIBIDAS,
+    ...PROHIBIDAS_EXTRA
   ]),
 
   penaltisFacil: unicos([
     ...BASE.penaltisFacil,
     ...penaltisFacilManual,
-    ...gen.penaltisMedio
+    ...gen.penaltisMedio,
+    ...PENALTIS_FACIL_EXTRA
   ]),
 
   penaltisDificil: unicos([
     ...BASE.penaltisDificil,
     ...penaltisDificilManual,
-    ...gen.penaltisAlto
+    ...gen.penaltisAlto,
+    ...PENALTIS_DIFICIL_EXTRA
   ])
 };
+
+// Las quinielas difíciles van al final de la lista: el motor saca la mitad de las veces una de ellas
+const claveQ = (x) => String(x[0]).trim().toLowerCase();
+const dificiles = new Set(QUINIELA_DIFICIL.map(claveQ));
+export const QUINIELA_DIFICILES = PREGUNTAS.quiniela.map((x, i) => (dificiles.has(claveQ(x)) ? i : -1)).filter((i) => i >= 0);
 
 export default PREGUNTAS;

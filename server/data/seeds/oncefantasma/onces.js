@@ -6,6 +6,9 @@
 const J = (nombre, alias, pos, dorsal, dato, pista) => ({ nombre, alias, pos, dorsal, dato, pista });
 const O = (equipo, entrenador, tipo, jugadores) => ({ equipo, entrenador, tipo, jugadores });
 
+import ONCES_2 from './onces2.js';
+import ONCES_3 from './onces3.js';
+
 export const PARTIDOS = [
   { id: 'mundial2010', partido: 'Final del Mundial 2010 · España 1-0 Holanda', onces: [
     O('España', 'Vicente del Bosque', 'seleccion', [
@@ -484,3 +487,6 @@ export const PARTIDOS = [
     ])
   ] }
 ];
+
+// Ampliación (onces2.js), sin repetir ids.
+[...ONCES_2, ...ONCES_3].forEach((p) => { if (!PARTIDOS.some((x) => x.id === p.id)) PARTIDOS.push(p); });

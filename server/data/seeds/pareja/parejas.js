@@ -2,7 +2,9 @@
 // «La Pareja Perfecta»: [elemento, pareja, nivel]. Los distractores salen de otras parejas de la misma categoría,
 // así que dentro de una categoría ninguna pareja se repite.
 
-export const CATEGORIAS = [
+import { CATEGORIAS_EXTRA } from './parejas2.js';
+
+const BASE = [
   { id: 'actor', nombre: 'Actor o actriz → su película más famosa', emoji: '🎬', pregunta: '¿Cuál es su película más famosa?', parejas: [
     ['Leonardo DiCaprio', 'Titanic', 1], ['Tom Hanks', 'Forrest Gump', 1], ['Sylvester Stallone', 'Rocky', 1],
     ['Arnold Schwarzenegger', 'Terminator', 1], ['Harrison Ford', 'Indiana Jones', 1], ['Daniel Radcliffe', 'Harry Potter', 1],
@@ -121,3 +123,5 @@ export const CATEGORIAS = [
     ['Bestia', 'Hank McCoy', 3], ['El Castigador', 'Frank Castle', 3], ['Ms. Marvel', 'Kamala Khan', 3], ['Hombre Murciélago (El Chapulín)', 'sin identidad', 0]
   ].filter(([, , n]) => n > 0) }
 ];
+
+export const CATEGORIAS = [...BASE, ...CATEGORIAS_EXTRA];

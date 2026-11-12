@@ -4,6 +4,7 @@
 // cumplen la casilla se descartan (eran errores). Solo se juegan los tableros con respuestas en todas las casillas.
 import GRIDS_VOL_1 from './categorias.js';
 import GRIDS_VOL_2 from './categorias1.js';
+import GRIDS_VOL_3 from './categorias2.js';
 import { calcularCasilla, JUGADORES, predicado, tipo, nuncaEntrenado, ALIAS } from './respuestas.js';
 
 // Categorías imposibles o casi (ninguna o una respuesta real) sustituidas por otras parecidas.
@@ -51,5 +52,5 @@ function completar(g) {
   return { ...g, filas, columnas, respuestas, alias };
 }
 
-export const TODOS_LOS_GRIDS = [...GRIDS_VOL_1, ...GRIDS_VOL_2].map(completar);
+export const TODOS_LOS_GRIDS = [...GRIDS_VOL_1, ...GRIDS_VOL_2, ...GRIDS_VOL_3].map(completar);
 export const GRIDS_JUGABLES = TODOS_LOS_GRIDS.filter((g) => g.respuestas.every((f) => f.every((c) => c.length > 0)));

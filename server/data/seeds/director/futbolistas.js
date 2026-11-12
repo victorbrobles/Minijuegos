@@ -248,6 +248,204 @@ Giuliano Simeone|DEL|22|78|82|ARG|Atlético
 Jorge de Frutos|DEL|28|77|77|ESP|Rayo Vallecano
 Marcus Rashford|DEL|27|80|80|ENG|Barcelona
 Roony Bardghji|DEL|19|72|84|SWE|Barcelona
+Vanja Milinković-Savić|POR|28|81|82|SRB|Nápoles
+Alex Meret|POR|28|80|80|ITA|Nápoles
+Mile Svilar|POR|26|84|86|SRB|Roma
+Michele Di Gregorio|POR|28|81|82|ITA|Juventus
+Josep Martínez|POR|27|78|81|ESP|Inter
+Ivan Provedel|POR|31|80|80|ITA|Lazio
+Filip Jörgensen|POR|23|76|82|DEN|Chelsea
+Matz Sels|POR|33|81|81|BEL|Nottingham Forest
+Dean Henderson|POR|28|81|82|ENG|Crystal Palace
+Bernd Leno|POR|33|81|81|GER|Fulham
+Senne Lammens|POR|23|77|84|BEL|Man United
+Kevin Trapp|POR|35|79|79|GER|Paris FC
+Oliver Baumann|POR|35|80|80|GER|Hoffenheim
+Alexander Nübel|POR|29|81|82|GER|Stuttgart
+Paulo Gazzaniga|POR|33|77|77|ARG|Girona
+Augusto Batalla|POR|29|78|79|ARG|Rayo Vallecano
+Julen Agirrezabala|POR|24|77|83|ESP|Valencia
+Marko Dmitrović|POR|33|77|77|SRB|Espanyol
+Federico Gatti|DEF|27|80|81|ITA|Juventus
+Pierre Kalulu|DEF|25|81|83|FRA|Juventus
+Andrea Cambiaso|DEF|25|82|85|ITA|Juventus
+Alessandro Buongiorno|DEF|26|83|85|ITA|Nápoles
+Giovanni Di Lorenzo|DEF|32|83|83|ITA|Nápoles
+Amir Rrahmani|DEF|31|81|81|KOS|Nápoles
+Francesco Acerbi|DEF|37|80|80|ITA|Inter
+Denzel Dumfries|DEF|29|83|83|NED|Inter
+Yann Bisseck|DEF|24|80|84|GER|Inter
+Fikayo Tomori|DEF|27|81|82|ENG|Milan
+Strahinja Pavlović|DEF|24|79|83|SRB|Milan
+Evan Ndicka|DEF|26|81|83|CIV|Roma
+Gianluca Mancini|DEF|29|81|81|ITA|Roma
+Josip Stanišić|DEF|25|80|83|CRO|Bayern
+Hiroki Ito|DEF|26|79|81|JPN|Bayern
+Waldemar Anton|DEF|29|80|80|GER|Dortmund
+Julian Ryerson|DEF|27|80|81|NOR|Dortmund
+Edmond Tapsoba|DEF|26|82|84|BFA|Leverkusen
+David Raum|DEF|27|81|82|GER|Leipzig
+Castello Lukeba|DEF|23|81|86|FRA|Leipzig
+Maximilian Mittelstädt|DEF|28|80|81|GER|Stuttgart
+Nathaniel Brown|DEF|22|78|84|GER|Eintracht Fráncfort
+Lucas Beraldo|DEF|22|78|84|BRA|PSG
+Illia Zabarnyi|DEF|23|81|85|UKR|PSG
+Ezri Konsa|DEF|28|82|82|ENG|Aston Villa
+Lucas Digne|DEF|32|80|80|FRA|Aston Villa
+Marc Guéhi|DEF|25|83|86|ENG|Crystal Palace
+Daniel Muñoz|DEF|29|82|82|COL|Crystal Palace
+Tyrick Mitchell|DEF|26|79|80|ENG|Crystal Palace
+Murillo|DEF|23|82|86|BRA|Nottingham Forest
+Nikola Milenković|DEF|28|81|81|SRB|Nottingham Forest
+Ola Aina|DEF|29|80|80|NGA|Nottingham Forest
+Tino Livramento|DEF|23|81|85|ENG|Newcastle
+Sven Botman|DEF|25|81|84|NED|Newcastle
+Malick Thiaw|DEF|24|80|84|GER|Newcastle
+Lewis Hall|DEF|21|80|86|ENG|Newcastle
+Diogo Dalot|DEF|26|80|81|POR|Man United
+Luke Shaw|DEF|30|79|79|ENG|Man United
+Antonee Robinson|DEF|28|81|81|USA|Fulham
+Wesley Fofana|DEF|24|80|83|FRA|Chelsea
+Trevoh Chalobah|DEF|26|80|81|ENG|Chelsea
+Malo Gusto|DEF|22|81|85|FRA|Chelsea
+Abdukodir Khusanov|DEF|21|78|85|UZB|Man City
+Rayan Aït-Nouri|DEF|24|82|84|ALG|Man City
+Nathan Aké|DEF|30|81|81|NED|Man City
+Djed Spence|DEF|25|78|80|ENG|Tottenham
+Jon Aramburu|DEF|23|79|83|VEN|Real Sociedad
+Igor Zubeldia|DEF|28|80|80|ESP|Real Sociedad
+Juan Foyth|DEF|27|80|81|ARG|Villarreal
+Sergi Cardona|DEF|26|78|79|ESP|Villarreal
+Renato Veiga|DEF|22|79|84|POR|Villarreal
+Natan|DEF|24|78|81|BRA|Betis
+Diego Llorente|DEF|32|78|78|ESP|Betis
+Héctor Bellerín|DEF|30|77|77|ESP|Betis
+José Gayà|DEF|30|79|79|ESP|Valencia
+César Tárrega|DEF|23|78|83|ESP|Valencia
+Javi Rodríguez|DEF|22|76|82|ESP|Celta
+Kike Salas|DEF|23|77|81|ESP|Sevilla
+Daley Blind|DEF|35|77|77|NED|Girona
+Manuel Locatelli|MED|27|82|82|ITA|Juventus
+Khéphren Thuram|MED|24|81|85|FRA|Juventus
+Weston McKennie|MED|27|79|79|USA|Juventus
+Frank Anguissa|MED|29|82|82|CMR|Nápoles
+Billy Gilmour|MED|24|79|82|SCO|Nápoles
+Henrikh Mkhitaryan|MED|36|80|80|ARM|Inter
+Davide Frattesi|MED|25|81|83|ITA|Inter
+Petar Sučić|MED|22|77|84|CRO|Inter
+Youssouf Fofana|MED|26|80|81|FRA|Milan
+Samuele Ricci|MED|24|79|83|ITA|Milan
+Ruben Loftus-Cheek|MED|29|78|78|ENG|Milan
+Bryan Cristante|MED|30|79|79|ITA|Roma
+Manu Koné|MED|24|81|85|FRA|Roma
+Matías Soulé|MED|22|80|85|ARG|Roma
+Marten de Roon|MED|34|79|79|NED|Atalanta
+Charles De Ketelaere|MED|24|82|85|BEL|Atalanta
+Nicolò Rovella|MED|23|80|84|ITA|Lazio
+Mattéo Guendouzi|MED|26|80|81|FRA|Lazio
+Felix Nmecha|MED|24|80|84|GER|Dortmund
+Julian Brandt|MED|29|81|81|GER|Dortmund
+Marcel Sabitzer|MED|31|79|79|AUT|Dortmund
+Exequiel Palacios|MED|27|81|82|ARG|Leverkusen
+Xavi Simons|MED|22|83|88|NED|Tottenham
+Lucas Paquetá|MED|28|81|81|BRA|West Ham
+Morgan Gibbs-White|MED|25|82|84|ENG|Nottingham Forest
+Elliot Anderson|MED|22|81|86|ENG|Nottingham Forest
+Adam Wharton|MED|21|80|87|ENG|Crystal Palace
+Eberechi Eze|MED|27|84|85|ENG|Arsenal
+Christian Nørgaard|MED|31|79|79|DEN|Arsenal
+Joelinton|MED|29|80|80|BRA|Newcastle
+Youri Tielemans|MED|28|82|82|BEL|Aston Villa
+Boubacar Kamara|MED|25|81|83|FRA|Aston Villa
+John McGinn|MED|30|80|80|SCO|Aston Villa
+Amadou Onana|MED|24|80|84|BEL|Aston Villa
+Carlos Baleba|MED|21|80|86|CMR|Brighton
+Mason Mount|MED|26|79|80|ENG|Man United
+Manuel Ugarte|MED|24|79|82|URU|Man United
+Casemiro|MED|33|80|80|BRA|Man United
+Rodrigo Bentancur|MED|28|80|80|URU|Tottenham
+Pape Matar Sarr|MED|23|79|83|SEN|Tottenham
+João Palhinha|MED|30|81|81|POR|Tottenham
+Andrey Santos|MED|21|77|84|BRA|Chelsea
+Romeo Lavia|MED|21|78|85|BEL|Chelsea
+Rayan Cherki|MED|22|82|87|FRA|Man City
+Iñigo Ruiz de Galarreta|MED|32|79|79|ESP|Athletic
+Beñat Prados|MED|24|77|81|ESP|Athletic
+Luka Sučić|MED|23|78|83|CRO|Real Sociedad
+Pape Gueye|MED|26|79|80|SEN|Villarreal
+Thomas Partey|MED|32|80|80|GHA|Villarreal
+Pablo Fornals|MED|29|80|80|ESP|Betis
+Giovani Lo Celso|MED|29|80|80|ARG|Betis
+Sergi Altimira|MED|24|77|81|ESP|Betis
+Djibril Sow|MED|28|77|77|SUI|Sevilla
+Nemanja Gudelj|MED|33|77|77|SRB|Sevilla
+Pablo Torre|MED|22|76|82|ESP|Mallorca
+Unai López|MED|29|77|77|ESP|Rayo Vallecano
+Óscar Valentín|MED|31|77|77|ESP|Rayo Vallecano
+Paulo Dybala|DEL|31|82|82|ARG|Roma
+Artem Dovbyk|DEL|28|81|81|UKR|Roma
+Evan Ferguson|DEL|20|76|84|IRL|Roma
+Gianluca Scamacca|DEL|26|80|81|ITA|Atalanta
+Jonathan David|DEL|25|82|84|CAN|Juventus
+Francisco Conceição|DEL|23|80|84|POR|Juventus
+Santiago Giménez|DEL|24|80|83|MEX|Milan
+Christopher Nkunku|DEL|27|81|81|FRA|Milan
+Ange-Yoan Bonny|DEL|21|77|84|FRA|Inter
+Moise Kean|DEL|25|82|83|ITA|Fiorentina
+Mattia Zaccagni|DEL|30|80|80|ITA|Lazio
+Taty Castellanos|DEL|26|79|80|ARG|Lazio
+Riccardo Orsolini|DEL|28|80|80|ITA|Bolonia
+Nick Woltemade|DEL|23|80|85|GER|Newcastle
+Ermedin Demirović|DEL|27|80|80|BIH|Stuttgart
+Deniz Undav|DEL|29|80|80|GER|Stuttgart
+Karim Adeyemi|DEL|23|80|84|GER|Dortmund
+Maximilian Beier|DEL|22|79|84|GER|Dortmund
+Jonathan Burkardt|DEL|25|80|82|GER|Eintracht Fráncfort
+Nicolas Jackson|DEL|24|80|83|SEN|Bayern
+Dominic Solanke|DEL|28|80|80|ENG|Tottenham
+Richarlison|DEL|28|79|79|BRA|Tottenham
+Brennan Johnson|DEL|24|80|82|WAL|Tottenham
+Anthony Gordon|DEL|24|82|85|ENG|Newcastle
+Harvey Barnes|DEL|27|79|79|ENG|Newcastle
+Yoane Wissa|DEL|29|81|81|COD|Newcastle
+Chris Wood|DEL|33|80|80|NZL|Nottingham Forest
+Callum Hudson-Odoi|DEL|24|79|81|ENG|Nottingham Forest
+Jean-Philippe Mateta|DEL|28|81|81|FRA|Crystal Palace
+Ismaïla Sarr|DEL|27|80|80|SEN|Crystal Palace
+Yeremy Pino|DEL|22|79|84|ESP|Crystal Palace
+Danny Welbeck|DEL|34|77|77|ENG|Brighton
+Yankuba Minteh|DEL|21|78|84|GAM|Brighton
+Liam Delap|DEL|22|79|85|ENG|Chelsea
+Jamie Gittens|DEL|21|80|86|ENG|Chelsea
+Estêvão|DEL|18|78|89|BRA|Chelsea
+Noni Madueke|DEL|23|81|84|ENG|Arsenal
+Leandro Trossard|DEL|30|82|82|BEL|Arsenal
+Kai Havertz|DEL|26|83|84|GER|Arsenal
+Gabriel Jesus|DEL|28|80|80|BRA|Arsenal
+Federico Chiesa|DEL|27|79|79|ITA|Liverpool
+Savinho|DEL|21|80|86|BRA|Man City
+Joshua Zirkzee|DEL|24|78|81|NED|Man United
+Amad Diallo|DEL|23|81|85|CIV|Man United
+Niclas Füllkrug|DEL|32|78|78|GER|West Ham
+Raúl Jiménez|DEL|34|78|78|MEX|Fulham
+Thierno Barry|DEL|22|78|83|FRA|Everton
+Vedat Muriqi|DEL|31|79|79|KOS|Mallorca
+Kike García|DEL|35|76|76|ESP|Espanyol
+Javi Puado|DEL|27|78|78|ESP|Espanyol
+Álex Berenguer|DEL|30|78|78|ESP|Athletic
+Gorka Guruzeta|DEL|29|78|78|ESP|Athletic
+Ander Barrenetxea|DEL|23|79|82|ESP|Real Sociedad
+Nicolas Pépé|DEL|30|79|79|CIV|Villarreal
+Tajon Buchanan|DEL|26|78|79|CAN|Villarreal
+Cucho Hernández|DEL|26|80|81|COL|Betis
+Abde Ezzalzouli|DEL|23|80|83|MAR|Betis
+Rodrigo Riquelme|DEL|25|79|81|ESP|Betis
+Hugo Duro|DEL|25|78|79|ESP|Valencia
+Diego López|DEL|23|78|82|ESP|Valencia
+Isaac Romero|DEL|25|77|79|ESP|Sevilla
+Cristhian Stuani|DEL|38|76|76|URU|Girona
+Sergio Camello|DEL|24|77|79|ESP|Rayo Vallecano
+Álvaro García|DEL|33|77|77|ESP|Rayo Vallecano
 `;
 
 export const FUTBOLISTAS = DATOS.trim().split('\n').map((l, i) => {

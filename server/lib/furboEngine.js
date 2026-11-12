@@ -7,7 +7,7 @@
 //
 // Estados de la partida:  'intro' -> 'ronda' -> 'resultado' -> ... -> 'fin'
 
-import { PREGUNTAS } from '../data/seeds/furbo/preguntas.js';
+import { PREGUNTAS, QUINIELA_DIFICILES } from '../data/seeds/furbo/preguntas.js';
 
 export const FASES = ['vestuario', 'rebote', 'quiniela', 'prorroga', 'penaltis'];
 
@@ -144,6 +144,11 @@ function elegir(p, clave) {
   if (libres.length === 0) {
     p.usados[clave] = [];
     libres = banco.map((_, i) => i);
+  }
+  // Quiniela: la mitad de las veces, una pregunta del banco difícil
+  if (clave === 'quiniela' && Math.random() < 0.5) {
+    const duras = libres.filter((i) => QUINIELA_DIFICILES.includes(i));
+    if (duras.length) libres = duras;
   }
   const idx = libres[Math.floor(Math.random() * libres.length)];
   p.usados[clave].push(idx);
