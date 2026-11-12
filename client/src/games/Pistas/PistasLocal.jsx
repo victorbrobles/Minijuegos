@@ -28,7 +28,7 @@ export default function PistasLocal({ onVolver, onExit }) {
   const [rondasSel, setRondasSel] = useState(rondasPorDefecto('pistas'));
   const maxRondas = modo === 'estandar' ? totalRondas('pistas', rondasSel) : null;
   const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
-  const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: `Jugador ${i + 1}` })));
+  const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: '' })));
 
   // Marcadores y vidas
   const [puntos, setPuntos] = useState({});
@@ -124,7 +124,7 @@ export default function PistasLocal({ onVolver, onExit }) {
     setNumJugadores(num);
     const nuevos = Array.from({ length: num }, (_, i) => ({
       id: i + 1,
-      nombre: jugadores[i]?.nombre || `Jugador ${i + 1}`
+      nombre: jugadores[i]?.nombre ?? ''
     }));
     setJugadores(nuevos);
   };

@@ -8,6 +8,7 @@ import { centrarActivo } from '../../lib/centrarActivo.js';
 import { limitesLocal } from '../limites.js';
 import { SelectorRondas } from '../../components/MenuJuego.jsx';
 import { rondasPorDefecto, totalRondas } from '../rondas.js';
+import { avisarNombres } from '../../lib/nombres.js';
 
 const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('conoce');
 
@@ -419,7 +420,7 @@ export default function ConoceLocal({ onVolver, onSalir, onExit, onAbrirAyuda })
 
   const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
   const [listaConfig, setListaConfig] = useState(
-    Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: `Jugador ${i + 1}` }))
+    Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: '' }))
   );
   const [rondasSel, setRondasSel] = useState(rondasPorDefecto('conoce'));
   const MAX_RONDAS = totalRondas('conoce', rondasSel, listaConfig.length);
@@ -464,7 +465,7 @@ export default function ConoceLocal({ onVolver, onSalir, onExit, onAbrirAyuda })
     setNumJugadores(k);
     const nuevos = Array.from({ length: k }, (_, i) => ({
       id: i + 1,
-      nombre: listaConfig[i]?.nombre || `Jugador ${i + 1}`
+      nombre: listaConfig[i]?.nombre ?? ''
     }));
     setListaConfig(nuevos);
   };
@@ -476,6 +477,7 @@ export default function ConoceLocal({ onVolver, onSalir, onExit, onAbrirAyuda })
   };
 
   const iniciarPartida = () => {
+    if (avisarNombres(listaConfig)) return;
     const jugs = listaConfig.map((j, i) => ({
       id: i + 1,
       nombre: j.nombre.trim() || `Jugador ${i + 1}`,
@@ -735,7 +737,7 @@ export default function ConoceLocal({ onVolver, onSalir, onExit, onAbrirAyuda })
                     type="text"
                     value={j.nombre}
                     onChange={(e) => handleNombreChange(idx, e.target.value)}
-                    placeholder={`Jugador ${j.id}`}
+                    placeholder={`Nombre del jugador ${j.id}`}
                     maxLength={20}
                   />
                 </div>

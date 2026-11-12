@@ -42,7 +42,7 @@ import SelectorRoles, { selInicial, rolesDeSel } from './SelectorRoles.jsx';
 import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx';
 import { CabeceraLobos, Aldea, PasaDispositivo, ModalSalirLobos, FINAL } from './Escena.jsx';
 
-const nombresPorDefecto = (n) => Array.from({ length: n }, (_, i) => `Jugador ${i + 1}`);
+const nombresPorDefecto = (n) => Array.from({ length: n }, () => '');
 
 function limpiarNombres(nombres) {
   const usados = new Set();

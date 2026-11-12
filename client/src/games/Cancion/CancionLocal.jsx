@@ -16,7 +16,7 @@ const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('cancion');
 export default function CancionLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [fase, setFase] = useState('setup'); // setup | cargando | ronda | resuelta | clasificacion | final
   const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
-  const [nombres, setNombres] = useState(() => Array.from({ length: MAX_JUGADORES }, (_, i) => `Jugador ${i + 1}`));
+  const [nombres, setNombres] = useState(() => Array.from({ length: MAX_JUGADORES }, () => ''));
   const [rondas, setRondas] = useState(15);
   const [error, setError] = useState('');
   const [modalSalir, setModalSalir] = useState(false);

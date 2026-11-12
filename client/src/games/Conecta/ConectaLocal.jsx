@@ -8,6 +8,7 @@ import ConectaPartida, { SelectorCategorias } from './ConectaPartida.jsx';
 import { limitesLocal } from '../limites.js';
 import { SelectorRondas } from '../../components/MenuJuego.jsx';
 import { rondasPorDefecto, totalRondas } from '../rondas.js';
+import { avisarNombres } from '../../lib/nombres.js';
 
 const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('conecta');
 
@@ -43,7 +44,7 @@ export default function ConectaLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [modalSalirPortada, setModalSalirPortada] = useState(false);
 
   const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
-  const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: `Jugador ${i + 1}` })));
+  const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: '' })));
   const [puntos, setPuntos] = useState({});
   const [rondaActual, setRondaActual] = useState(0);
   const [rondasSel, setRondasSel] = useState(rondasPorDefecto('conecta'));
@@ -82,7 +83,7 @@ export default function ConectaLocal({ onVolver, onExit, onAbrirAyuda }) {
     setNumJugadores(num);
     const nuevos = Array.from({ length: num }, (_, i) => ({
       id: i + 1,
-      nombre: jugadores[i]?.nombre || `Jugador ${i + 1}`
+      nombre: jugadores[i]?.nombre ?? ''
     }));
     setJugadores(nuevos);
   };
@@ -94,6 +95,7 @@ export default function ConectaLocal({ onVolver, onExit, onAbrirAyuda }) {
   };
 
   const irACategorias = () => {
+    if (avisarNombres(jugadores)) return;
     const listaActualizada = jugadores.map((j) => ({
       ...j,
       nombre: j.nombre.trim() || `Jugador ${j.id}`
@@ -241,7 +243,7 @@ export default function ConectaLocal({ onVolver, onExit, onAbrirAyuda }) {
                     type="text"
                     value={j.nombre}
                     onChange={(e) => handleNombreChange(idx, e.target.value)}
-                    placeholder={`Jugador ${j.id}`}
+                    placeholder={`Nombre del jugador ${j.id}`}
                     maxLength={30}
                     required
                   />

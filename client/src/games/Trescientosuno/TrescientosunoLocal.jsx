@@ -7,6 +7,7 @@ import { centrarActivo } from '../../lib/centrarActivo.js';
 import { limitesLocal } from '../limites.js';
 import { SelectorRondas } from '../../components/MenuJuego.jsx';
 import { rondasPorDefecto, totalRondas } from '../rondas.js';
+import { avisarNombres } from '../../lib/nombres.js';
 
 const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('trescientosuno');
 const TIEMPO_TURNO = 60;
@@ -325,7 +326,7 @@ export default function TrescientosunoLocal({ onVolver, onExit, onAbrirAyuda }) 
   const sumadaRef = useRef(0);
 
   const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
-  const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: `Jugador ${i + 1}`, puntos: 0, estado: 'vivo', comodines: ['x2', 'x3', 'x5', 'revelar'] })));
+  const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: '', puntos: 0, estado: 'vivo', comodines: ['x2', 'x3', 'x5', 'revelar'] })));
 
   const [equipos, setEquipos] = useState([]);
   const [filtroEquipo, setFiltroEquipo] = useState('');
@@ -403,7 +404,7 @@ export default function TrescientosunoLocal({ onVolver, onExit, onAbrirAyuda }) 
       const nuevaLista = [];
       for (let i = 1; i <= cant; i++) {
         const existente = prev.find((p) => p.id === i);
-        nuevaLista.push(existente || { id: i, nombre: `Jugador ${i}`, puntos: 0, estado: 'vivo', comodines: ['x2', 'x3', 'x5', 'revelar'] });
+        nuevaLista.push(existente || { id: i, nombre: '', puntos: 0, estado: 'vivo', comodines: ['x2', 'x3', 'x5', 'revelar'] });
       }
       jugadoresRef.current = nuevaLista;
       return nuevaLista;
@@ -419,6 +420,7 @@ export default function TrescientosunoLocal({ onVolver, onExit, onAbrirAyuda }) 
   };
 
   const iniciarJuego = () => {
+    if (avisarNombres(jugadoresRef.current)) return;
     const jActualizados = jugadoresRef.current.map((j) => ({
       ...j,
       nombre: j.nombre.trim() || `Jugador ${j.id}`,
@@ -730,7 +732,7 @@ export default function TrescientosunoLocal({ onVolver, onExit, onAbrirAyuda }) 
                     type="text"
                     value={j.nombre}
                     onChange={(e) => handleNombreJugador(j.id, e.target.value)}
-                    placeholder={`Jugador ${j.id}`}
+                    placeholder={`Nombre del jugador ${j.id}`}
                     maxLength={20}
                   />
                 </div>
@@ -742,7 +744,7 @@ export default function TrescientosunoLocal({ onVolver, onExit, onAbrirAyuda }) 
               type="button"
               className="big full qq-btn-principal"
               style={{ marginTop: '1.5rem' }}
-              onClick={() => { setSerie({ partida: 1, puntos: {} }); sumadaRef.current = 0; setFase('equipo'); }}
+              onClick={() => { if (avisarNombres(jugadores)) return; setSerie({ partida: 1, puntos: {} }); sumadaRef.current = 0; setFase('equipo'); }}
             >
               <Icon name="play" size={22} /> Elegir equipo
             </button>

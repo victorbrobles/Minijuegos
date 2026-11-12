@@ -15,7 +15,7 @@ const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('geoquiz');
 export default function GeoQuizLocal({ onVolver, onExit, onAbrirAyuda }) {
   const navigate = useNavigate();
   const [fase, setFase] = useState('setup'); // 'setup' | 'juego'
-  const [nombres, setNombres] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => `Jugador ${i + 1}`));
+  const [nombres, setNombres] = useState(() => Array.from({ length: MIN_JUGADORES }, () => ''));
   const [config, setConfig] = useState(configPorDefecto);
   const [categorias, setCategorias] = useState([]);
   const [error, setError] = useState('');
@@ -56,7 +56,7 @@ export default function GeoQuizLocal({ onVolver, onExit, onAbrirAyuda }) {
 
   const cambiarNum = (n) => {
     setNombres((prev) => (n > prev.length
-      ? [...prev, ...Array.from({ length: n - prev.length }, (_, i) => `Jugador ${prev.length + i + 1}`)]
+      ? [...prev, ...Array.from({ length: n - prev.length }, () => '')]
       : prev.slice(0, n)));
   };
 

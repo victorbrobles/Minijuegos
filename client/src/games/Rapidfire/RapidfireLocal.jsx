@@ -7,6 +7,7 @@ import { centrarActivo } from '../../lib/centrarActivo.js';
 import { limitesLocal } from '../limites.js';
 import { SelectorRondas } from '../../components/MenuJuego.jsx';
 import { rondasPorDefecto, totalRondas } from '../rondas.js';
+import { avisarNombres } from '../../lib/nombres.js';
 
 const TIEMPO_S = 60;
 const PREPARACION_S = 3;
@@ -363,7 +364,7 @@ export default function RapidfireLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [categoriasTodas, setCategoriasTodas] = useState([]);
 
   const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
-  const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: `Jugador ${i + 1}` })));
+  const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: '' })));
   const [puntos, setPuntos] = useState({});
   const [ronda, setRonda] = useState(1);
   const [rondasSel, setRondasSel] = useState(rondasPorDefecto('rapidfire'));
@@ -417,7 +418,7 @@ export default function RapidfireLocal({ onVolver, onExit, onAbrirAyuda }) {
     setJugadores(
       Array.from({ length: num }, (_, i) => ({
         id: i + 1,
-        nombre: jugadores[i]?.nombre ?? `Jugador ${i + 1}`
+        nombre: jugadores[i]?.nombre ?? ''
       }))
     );
   };
@@ -432,6 +433,7 @@ export default function RapidfireLocal({ onVolver, onExit, onAbrirAyuda }) {
   };
 
   const empezar = () => {
+    if (avisarNombres(jugadores)) return;
     const lista = jugadores.map((j) => ({ ...j, nombre: j.nombre.trim() || `Jugador ${j.id}` }));
     setJugadores(lista);
     setPuntos(Object.fromEntries(lista.map((j) => [j.id, 0])));
@@ -631,7 +633,7 @@ export default function RapidfireLocal({ onVolver, onExit, onAbrirAyuda }) {
                     type="text"
                     value={j.nombre}
                     onChange={(e) => handleNombre(idx, e.target.value)}
-                    placeholder={`Jugador ${j.id}`}
+                    placeholder={`Nombre del jugador ${j.id}`}
                     maxLength={20}
                   />
                 </div>

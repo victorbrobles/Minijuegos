@@ -4,14 +4,15 @@ import { BINGOS_CHAMPIONS } from './parte2.js';
 import { BINGOS_LALIGA } from './parte3.js';
 import { BINGOS_GRANDES_LIGAS } from './parte4.js';
 import { BINGOS_LEYENDAS } from './parte5.js';
+import { BINGOS_EXTRA } from './parte6.js';
 
 // Grupos principales con sus 5 sub-bingos correspondientes
 export const GRUPOS_BINGOS = [
-  { id: 'internacional', nombre: 'Fútbol Internacional y Selecciones', bingos: BINGOS_INTERNACIONAL },
-  { id: 'champions', nombre: 'UEFA Champions League', bingos: BINGOS_CHAMPIONS },
-  { id: 'laliga', nombre: 'La Liga Española', bingos: BINGOS_LALIGA },
-  { id: 'grandes_ligas', nombre: 'Grandes Ligas Europeas', bingos: BINGOS_GRANDES_LIGAS },
-  { id: 'leyendas', nombre: 'Leyendas del Fútbol Histórico', bingos: BINGOS_LEYENDAS }
+  { id: 'internacional', nombre: 'Fútbol Internacional y Selecciones', bingos: [...BINGOS_INTERNACIONAL, ...BINGOS_EXTRA.internacional] },
+  { id: 'champions', nombre: 'UEFA Champions League', bingos: [...BINGOS_CHAMPIONS, ...BINGOS_EXTRA.champions] },
+  { id: 'laliga', nombre: 'La Liga Española', bingos: [...BINGOS_LALIGA, ...BINGOS_EXTRA.laliga] },
+  { id: 'grandes_ligas', nombre: 'Grandes Ligas Europeas', bingos: [...BINGOS_GRANDES_LIGAS, ...BINGOS_EXTRA.grandes_ligas] },
+  { id: 'leyendas', nombre: 'Leyendas del Fútbol Histórico', bingos: [...BINGOS_LEYENDAS, ...BINGOS_EXTRA.leyendas] }
 ];
 
 // Mapa indexado con los 25 bingos individuales
@@ -20,7 +21,8 @@ export const BINGOS = {
   ...Object.fromEntries(BINGOS_CHAMPIONS.map(b => [b.id, b])),
   ...Object.fromEntries(BINGOS_LALIGA.map(b => [b.id, b])),
   ...Object.fromEntries(BINGOS_GRANDES_LIGAS.map(b => [b.id, b])),
-  ...Object.fromEntries(BINGOS_LEYENDAS.map(b => [b.id, b]))
+  ...Object.fromEntries(BINGOS_LEYENDAS.map(b => [b.id, b])),
+  ...Object.fromEntries(Object.values(BINGOS_EXTRA).flat().map(b => [b.id, b]))
 };
 
 // Lista plana para selectores o listados de partidas

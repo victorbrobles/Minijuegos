@@ -31,7 +31,7 @@ export default function UbicacionLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [modalSalir, setModalSalir] = useState(false);
 
   const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
-  const [nombres, setNombres] = useState(() => Array.from({ length: MAX_JUGADORES }, (_, i) => `Jugador ${i + 1}`));
+  const [nombres, setNombres] = useState(() => Array.from({ length: MAX_JUGADORES }, () => ''));
   const [rondasElegidas, setRondasElegidas] = useState(7);
 
   const [jugadores, setJugadores] = useState([]);

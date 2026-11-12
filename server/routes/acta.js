@@ -17,7 +17,7 @@ const itemDe = (x) => ({
 const rondasValidas = (n, def = 10) => (OPCIONES_RONDAS.includes(Number(n)) ? Number(n) : def);
 
 router.get('/local', (req, res) => {
-  const items = elegirSinRepetir({ usados: new Set() }, PARTIDOS, rondasValidas(req.query.n), (x) => x.nombre).map(itemDe);
+  const items = elegirSinRepetir({ usados: new Set() }, PARTIDOS, rondasValidas(req.query.n), (x) => `${x.nombre}|${x.detalle}`).map(itemDe);
   res.json({ success: true, reglas: REGLAS.acta, items });
 });
 
@@ -26,7 +26,7 @@ montarSalas(router, {
   config: { rondas: 10 },
   validarConfig: (b, c) => ({ ...c, rondas: rondasValidas(b.rondas, c.rondas) }),
   reglas: () => REGLAS.acta,
-  prepararItems: async (sala) => elegirSinRepetir(sala, PARTIDOS, sala.config.rondas, (x) => x.nombre).map(itemDe)
+  prepararItems: async (sala) => elegirSinRepetir(sala, PARTIDOS, sala.config.rondas, (x) => `${x.nombre}|${x.detalle}`).map(itemDe)
 });
 
 export default router;

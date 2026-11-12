@@ -7,6 +7,7 @@ import { useState } from 'react';
 import Icon from './Icon.jsx';
 import { metaDe } from '../games/meta.js';
 import { LIMITES, limitesLocal, limitesOnline, textoJugadores, rango } from '../games/limites.js';
+import { errorNombres } from '../lib/nombres.js';
 import { opcionesRondas, textoOpcionRondas, rondasPorJugador, unidadRondas } from '../games/rondas.js';
 import './MenuJuego.css';
 
@@ -320,6 +321,7 @@ export function SelectorJugadores({
   onEmpezar, textoBoton = '¡Iniciar juego!', iconoBoton = 'play', puedeEmpezar = true,
   titulo = 'Jugadores', subtitulo, error, children, maxLength = 20, sinNombres = false
 }) {
+  const [errorNom, setErrorNombres] = useState(null);
   const fijo = min === max;
   return (
     <section className="game qq-pantalla">
@@ -389,7 +391,7 @@ export function SelectorJugadores({
                       type="text"
                       value={valor}
                       onChange={(e) => onNombre(idx, e.target.value)}
-                      placeholder={`Jugador ${idx + 1}`}
+                      placeholder={`Nombre del jugador ${idx + 1}`}
                       maxLength={maxLength}
                       aria-label={`Nombre del jugador ${idx + 1}`}
                     />
@@ -402,7 +404,7 @@ export function SelectorJugadores({
 
         {children}
 
-        {error && <p className="error" style={{ marginTop: '1rem' }}>{error}</p>}
+        {(errorNom || error) && <p className="error" style={{ marginTop: '1rem' }}>{errorNom || error}</p>}
 
         {typeof onEmpezar === 'function' && (
           <button
@@ -410,7 +412,12 @@ export function SelectorJugadores({
             className="big full qq-btn-principal"
             style={{ marginTop: '1.5rem' }}
             disabled={!puedeEmpezar}
-            onClick={onEmpezar}
+            onClick={() => {
+              // Todos los jugadores tienen que tener nombre (y sin repetir)
+              const e = !sinNombres && nombres.length ? errorNombres(nombres.slice(0, numJugadores || nombres.length)) : null;
+              setErrorNombres(e);
+              if (!e) onEmpezar();
+            }}
           >
             <Icon name={iconoBoton} size={24} /> {textoBoton}
           </button>

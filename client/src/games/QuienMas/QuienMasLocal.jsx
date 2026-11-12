@@ -8,6 +8,7 @@ import { centrarActivo } from '../../lib/centrarActivo.js';
 import { limitesLocal } from '../limites.js';
 import { SelectorRondas } from '../../components/MenuJuego.jsx';
 import { rondasPorDefecto, totalRondas } from '../rondas.js';
+import { avisarNombres } from '../../lib/nombres.js';
 
 const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('quienmas');
 const TIEMPO_VOTO = 30;
@@ -147,7 +148,7 @@ export default function QuienMasLocal({ onVolver, onExit, onAbrirAyuda }) {
 
   // Configuración
   const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
-  const [listaConfig, setListaConfig] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: `Jugador ${i + 1}` })));
+  const [listaConfig, setListaConfig] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: '' })));
   const [rondasSel, setRondasSel] = useState(rondasPorDefecto('quienmas'));
   const [categoria, setCategoria] = useState('normal');
   const [error, setError] = useState('');
@@ -191,7 +192,7 @@ export default function QuienMasLocal({ onVolver, onExit, onAbrirAyuda }) {
     setNumJugadores(n);
     const nuevos = Array.from({ length: n }, (_, i) => ({
       id: i + 1,
-      nombre: listaConfig[i]?.nombre || `Jugador ${i + 1}`
+      nombre: listaConfig[i]?.nombre ?? ''
     }));
     setListaConfig(nuevos);
   };
@@ -216,6 +217,7 @@ export default function QuienMasLocal({ onVolver, onExit, onAbrirAyuda }) {
   };
 
   const empezarPartida = async () => {
+    if (avisarNombres(listaConfig)) return;
     const limpios = limpiarNombres(listaConfig);
     setListaConfig(limpios);
     const nombresJugs = limpios.map((j) => j.nombre);
@@ -401,7 +403,7 @@ export default function QuienMasLocal({ onVolver, onExit, onAbrirAyuda }) {
                     type="text"
                     value={j.nombre}
                     onChange={(e) => handleNombreChange(idx, e.target.value)}
-                    placeholder={`Jugador ${j.id}`}
+                    placeholder={`Nombre del jugador ${j.id}`}
                     maxLength={20}
                   />
                 </div>

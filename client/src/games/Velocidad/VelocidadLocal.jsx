@@ -22,7 +22,7 @@ export default function VelocidadLocal({ onVolver, onExit }) {
   const [modalSalirPortada, setModalSalirPortada] = useState(false);
 
   const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
-  const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: `Jugador ${i + 1}`, aciertos: 0, jugo: false })));
+  const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: '', aciertos: 0, jugo: false })));
   // Rondas: en cada una juega todo el mundo su minuto; los aciertos se suman
   const [rondasSel, setRondasSel] = useState(rondasPorDefecto('velocidad'));
   const maxRondas = totalRondas('velocidad', rondasSel);
@@ -126,7 +126,7 @@ export default function VelocidadLocal({ onVolver, onExit }) {
     setNumJugadores(num);
     const nuevos = Array.from({ length: num }, (_, i) => ({
       id: i + 1,
-      nombre: jugadores[i]?.nombre || `Jugador ${i + 1}`,
+      nombre: jugadores[i]?.nombre ?? '',
       aciertos: 0,
       jugo: false
     }));
