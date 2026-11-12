@@ -3,7 +3,7 @@ import * as E from '../footballsplit/engine.js';
 import { generarRetos } from '../data/seeds/footballsplit/split.js';
 
 for (let k = 0; k < 300; k++) {
-  const n = 2 + (k % 7);
+  const n = E.AJUSTES.min + (k % (E.AJUSTES.max - E.AJUSTES.min + 1));
   const retos = generarRetos(5);
   let t = 1e6;
   const p = E.crearPartida(Array.from({ length: n }, (_, i) => ({ id: i + 1, nombre: `J${i + 1}` })), retos, t);

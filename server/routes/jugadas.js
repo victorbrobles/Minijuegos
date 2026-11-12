@@ -3,11 +3,14 @@
 import express from 'express';
 import crypto from 'node:crypto';
 import { crearPartida, aplicar, vista, tick, marcarAusente } from '../lib/jugadasEngine.js';
+import { limitesOnline, limitesLocal } from '../../client/src/games/limites.js';
+const LIM = limitesOnline('jugadas');
+const LIM_LOCAL = limitesLocal('jugadas');
 
 const router = express.Router();
 
-const MIN_JUGADORES = 2;
-const MAX_JUGADORES = 12;
+const MIN_JUGADORES = LIM.min;
+const MAX_JUGADORES = LIM.max;
 const ACCIONES_ANFITRION = new Set(['continuar', 'finalizar']);
 const INACTIVIDAD_MAX_MS = 6 * 60 * 60 * 1000;
 
@@ -20,10 +23,10 @@ function limpiarNombre(n, max = 25) {
 // =====================================================================
 router.post('/local/nueva', (req, res) => {
   const nombres = Array.isArray(req.body?.nombres) ? req.body.nombres : [];
-  if (nombres.length < MIN_JUGADORES || nombres.length > MAX_JUGADORES) {
+  if (nombres.length < LIM_LOCAL.min || nombres.length > LIM_LOCAL.max) {
     return res.status(400).json({
       ok: false,
-      error: `Debe haber entre ${MIN_JUGADORES} y ${MAX_JUGADORES} jugadores.`
+      error: `Debe haber entre ${LIM_LOCAL.min} y ${LIM_LOCAL.max} jugadores.`
     });
   }
   const jugadores = nombres.map((n, i) => ({

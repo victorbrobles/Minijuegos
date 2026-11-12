@@ -6,7 +6,7 @@
 // sale el elemento que más tiempo llevaba en la mesa y entra otro; la racha sigue hasta el primer fallo (o hasta que se
 // acaba el tiempo). Gana quien consiga la racha más larga.
 
-export const AJUSTES = { min: 1, max: 15, segEleccion: 30, msRevelar: 1800, msFallo: 2600, margen: 0.03 };
+export const AJUSTES = { min: 1, max: 10, segEleccion: 30, msRevelar: 1800, msFallo: 2600, margen: 0.03 };
 export const OPCIONES_VUELTAS = [1, 2, 3];
 
 const jug = (p, id) => p.jugadores.find((j) => j.id === id);

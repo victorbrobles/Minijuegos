@@ -7,6 +7,7 @@ import ConfigJuego from './Config.jsx';
 import {
   MenuModoOnline, FormCrearSala, FormUnirseSala, CabeceraSala, ListaSala, EsperandoAnfitrion, BloqueConfig
 } from '../../components/MenuJuego.jsx';
+import { textoSala } from '../limites.js';
 
 export const claveSesion = (id) => `${id}_online_session`;
 
@@ -149,7 +150,7 @@ export default function PulsadorOnline({ juego, onVolver, onSalir, onAbrirAyuda 
         {menu === 'crear' && (
           <FormCrearSala onVolver={() => { setMenu('menu'); setErrorMenu(''); }} onAyuda={onAbrirAyuda} nombre={nombre} setNombre={setNombre}
             onCrear={() => entrar('crear', { nombre: nombre.trim() })} cargando={cargando} error={errorMenu}
-            descripcion="Introduce tu nombre para abrir la sala y ser el anfitrión (de 2 a 15 jugadores, cada uno con su móvil y su pulsador)." />
+            descripcion={`Introduce tu nombre para abrir la sala y ser el anfitrión (${textoSala(juego.id)}, cada uno con su móvil y su pulsador).`} />
         )}
         {menu === 'unirse' && (
           <FormUnirseSala onVolver={() => { setMenu('menu'); setErrorMenu(''); }} onAyuda={onAbrirAyuda} codigo={codigo} setCodigo={setCodigo}

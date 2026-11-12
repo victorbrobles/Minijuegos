@@ -6,6 +6,7 @@ import { Router } from 'express';
 import { CANCIONES_MODERNAS, CANCIONES_ANTIGUAS, CANCIONES, PELICULAS } from '../data/seeds/adivina/adivina.js';
 import { montarSalas, elegirSinRepetir } from '../lib/salasJuego.js';
 import { REGLAS, OPCIONES_RONDAS } from '../pulsador/engine.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
 
 const router = Router();
 const cacheAudio = new Map();
@@ -188,6 +189,7 @@ router.get('/audio/:id', (req, res) => redirigirAudio(res, CANCIONES.find((x) =>
 
 // ---------------------------------------------------------------- Salas online
 const { itemDe: itemDeSala } = montarSalas(router, {
+  ...limitesOnline('adivina'),
   config: leerConfig({}),
   validarConfig: leerConfig,
   reglas: () => REGLAS.adivina,

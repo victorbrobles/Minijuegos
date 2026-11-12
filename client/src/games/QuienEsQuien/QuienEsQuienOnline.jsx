@@ -5,6 +5,7 @@ import { useAdmin, adminHeaders } from '../../lib/admin.js';
 import Icon from '../../components/Icon.jsx';
 import './QuienEsQuien.css';
 import { PantallaTablero, EnlaceSecundario, SelectorCategorias, colorJugador } from './TableroPartida.jsx';
+import { ChipJugadores } from '../../components/MenuJuego.jsx';
 
 const CLAVE_SESION_QQ = 'qq_online_session';
 
@@ -308,6 +309,7 @@ export default function QuienEsQuienOnline({
               <Icon name="whois" size={44} strokeWidth={1.7} />
             </div>
             <h1 className="title qq-main-title">{tituloJuego}</h1>
+            <ChipJugadores juegoId="quien-es-quien" />
             <p className="hint qq-main-desc">{descripcionJuego}</p>
 
             {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}

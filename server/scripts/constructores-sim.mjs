@@ -54,7 +54,7 @@ function construir() {
 
 let partidas = 0; let pasosMedios = 0; let encargos = 0;
 for (let k = 0; k < 120; k++) {
-  const n = 2 + (k % 7);
+  const n = E.AJUSTES.min + (k % (E.AJUSTES.max - E.AJUSTES.min + 1));
   const J = Array.from({ length: n }, (_, x) => ({ id: x + 1, nombre: `J${x + 1}` }));
   const p = E.crearPartida(J, { rondas: E.OPCIONES.rondas[k % 3], segConstruir: 90, segCarrera: 90 }, 0);
   let t = 0;

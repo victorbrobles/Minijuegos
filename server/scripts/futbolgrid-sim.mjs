@@ -5,7 +5,7 @@ import { GRIDS_JUGABLES } from '../data/seeds/futbolgrid/index.js';
 let ganadas = 0; let empates = 0;
 for (let k = 0; k < 400; k++) {
   const grid = GRIDS_JUGABLES[k % GRIDS_JUGABLES.length];
-  const n = 2 + (k % 5);
+  const n = E.AJUSTES.min + (k % (E.AJUSTES.max - E.AJUSTES.min + 1));
   let t = 1e6;
   const p = E.crearPartida(Array.from({ length: n }, (_, i) => ({ id: i + 1, nombre: `J${i + 1}` })), grid, k % 2 ? 'O' : 'X');
   let pasos = 0;

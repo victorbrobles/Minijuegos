@@ -14,6 +14,10 @@ import {
   colorJugador,
   indiceColor
 } from './PopularLocal.jsx';
+import { limitesOnline, textoSala } from '../limites.js';
+import { ChipJugadores } from '../../components/MenuJuego.jsx';
+
+const LIM_ON = limitesOnline('popular');
 
 const CLAVE_SESION_POPULAR = 'popular_online_session';
 const TIEMPO_TURNO = 45;
@@ -385,6 +389,7 @@ export default function PopularOnline({
               <Icon name="trophy" size={44} strokeWidth={1.7} />
             </div>
             <h1 className="title qq-main-title">{tituloJuego}</h1>
+            <ChipJugadores juegoId="popular" />
             <p className="hint qq-main-desc">{descripcionJuego}</p>
 
             {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
@@ -670,9 +675,9 @@ export default function PopularOnline({
                 </div>
               ))}
             </div>
-            {sala.jugadores.length < 2 && (
+            {sala.jugadores.length < LIM_ON.min && (
               <p className="hint" style={{ marginTop: '0.8rem' }}>
-                Se necesitan al menos 2 jugadores para empezar la partida.
+                Se necesitan al menos {LIM_ON.min} jugadores para empezar la partida.
               </p>
             )}
           </div>
@@ -684,11 +689,11 @@ export default function PopularOnline({
               type="button"
               className="big full qq-btn-principal"
               style={{ marginTop: '1rem' }}
-              disabled={sala.jugadores.length < 2}
+              disabled={sala.jugadores.length < LIM_ON.min}
               onClick={handleIniciarPartida}
             >
               <Icon name="play" size={22} />
-              {sala.jugadores.length < 2 ? 'Esperando rivales (mínimo 2)...' : '¡Iniciar juego!'}
+              {sala.jugadores.length < LIM_ON.min ? `Esperando rivales (mínimo ${LIM_ON.min})...` : '¡Iniciar juego!'}
             </button>
           ) : (
             <div className="panel center" style={{ padding: '1.8rem 1.4rem', marginTop: '1rem' }}>

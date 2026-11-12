@@ -341,7 +341,7 @@ export function Config({ config, onCambiar }) {
   return (
     <>
       <BloqueConfig titulo="Modo">
-        <Pildoras opciones={[['individual', '👤 Individual (4-8)'], ['parejas', '👥 Parejas (4 o 6)']]} valor={config.modo} onCambiar={onCambiar && ((modo) => onCambiar({ modo }))} />
+        <Pildoras opciones={[['individual', '👤 Individual (3-8)'], ['parejas', '👥 Parejas (4 o 6)']]} valor={config.modo} onCambiar={onCambiar && ((modo) => onCambiar({ modo }))} />
       </BloqueConfig>
       <BloqueConfig titulo="Se juega a">
         <Pildoras opciones={OPCIONES.objetivo.map((n) => [n, `${n} puntos`])} valor={config.objetivo} onCambiar={onCambiar && ((objetivo) => onCambiar({ objetivo }))} />

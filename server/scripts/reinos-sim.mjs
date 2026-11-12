@@ -27,7 +27,7 @@ function ordenesAlAzar(p, r) {
 
 let traiciones = 0; let porTronos = 0; let batallas = 0;
 for (let g = 0; g < 150; g++) {
-  const n = 2 + (g % 6);
+  const n = E.AJUSTES.min + (g % (E.AJUSTES.max - E.AJUSTES.min + 1));
   const J = Array.from({ length: n }, (_, i) => ({ id: i + 1, nombre: `J${i + 1}` }));
   const p = E.crearPartida(J, { rondas: [6, 8, 10, 12][g % 4] });
   assert.equal(p.mapa.length, 37);

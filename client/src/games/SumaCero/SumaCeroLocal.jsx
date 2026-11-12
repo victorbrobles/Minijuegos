@@ -9,6 +9,9 @@ import { PantallaJuego, PantallaResultado, PantallaFin, Avatar } from './Vistas.
 import { ModalSalir, SelectorRondas } from './SumaCeroOnline.jsx';
 import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx';
 import './SumaCero.css';
+import { limitesLocal } from '../limites.js';
+
+const LIM_JUG = limitesLocal('sumacero');
 
 const ACCIONES = {
   robar: (est, id, d) => E.robar(est, id, d.origen),
@@ -19,7 +22,7 @@ const ACCIONES = {
 
 export default function SumaCeroLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [paso, setPaso] = useState('config');
-  const [nombres, setNombres] = useState(['', '', '']);
+  const [nombres, setNombres] = useState(() => Array(LIM_JUG.min).fill(''));
   const [rondas, setRondas] = useState(3);
   const [error, setError] = useState('');
   const [aviso, setAviso] = useState(null);
@@ -46,7 +49,7 @@ export default function SumaCeroLocal({ onVolver, onExit, onAbrirAyuda }) {
     return (
       <div className="szp-contenedor">
         <SelectorJugadores
-          onVolver={onVolver} onAyuda={onAbrirAyuda} min={E.AJUSTES.min} max={E.AJUSTES.max}
+          onVolver={onVolver} onAyuda={onAbrirAyuda} min={LIM_JUG.min} max={LIM_JUG.max}
           numJugadores={nombres.length}
           onCambiarNum={(n) => setNombres((l) => (n > l.length ? [...l, ...Array(n - l.length).fill('')] : l.slice(0, n)))}
           nombres={nombres}

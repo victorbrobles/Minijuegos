@@ -4,10 +4,12 @@
 import express from 'express';
 import CATEGORIAS from '../data/seeds/geoquiz/index.js';
 import * as E from '../geoquiz/engine.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
+const LIM = limitesOnline('geoquiz');
 
 const router = express.Router();
 
-const MAX_JUGADORES = 12;
+const MAX_JUGADORES = LIM.max;
 
 // Banco de preguntas de las categorías pedidas (todas si no se indica ninguna)
 function banco(categoriaId) {
@@ -109,7 +111,7 @@ router.post('/online/unirse', (req, res) => {
   const sala = salas[code];
   if (!sala) return res.status(404).json({ error: 'La sala no existe o el código es incorrecto.' });
   if (sala.estado !== 'lobby') return res.status(400).json({ error: 'La partida ya ha comenzado.' });
-  if (sala.jugadores.length >= MAX_JUGADORES) return res.status(400).json({ error: 'La sala está completa.' });
+  if (sala.jugadores.length >= LIM.max) return res.status(400).json({ error: `La sala está llena (máx. ${LIM.max}).` });
   if (sala.jugadores.some((j) => j.nombre.toLowerCase() === nombre.toLowerCase())) {
     return res.status(400).json({ error: 'Ya hay un jugador con ese nombre en la sala.' });
   }
@@ -140,7 +142,7 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
   const r = obtenerSala(req, res, { admin: true });
   if (!r) return;
   const { sala } = r;
-  if (sala.jugadores.length < 2) return res.status(400).json({ error: 'Hacen falta al menos 2 jugadores.' });
+  if (sala.jugadores.length < LIM.min) return res.status(400).json({ error: `Se necesitan al menos ${LIM.min} jugadores.` });
   const cfg = sala.config;
   sala.partida = E.crearPartida(
     sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre })),

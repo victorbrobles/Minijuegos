@@ -11,6 +11,9 @@ import {
   ListaSala,
   EsperandoAnfitrion
 } from '../../components/MenuJuego.jsx';
+import { limitesOnline, textoSala } from '../limites.js';
+
+const LIM_ON = limitesOnline('velocidad');
 
 const CLAVE_SESION_VEL = 'velocidad_online_session';
 const COLORES_JUGADOR = ['#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316', '#84cc16', '#6366f1'];
@@ -495,8 +498,8 @@ export default function VelocidadOnline({ onLocal }) {
           <ListaSala
             jugadores={sala.jugadores}
             yoId={yoId}
-            min={2}
-            max={15}
+            min={LIM_ON.min}
+            max={LIM_ON.max}
             anfitrionId={sala.anfitrionId}
             renderExtra={(j) => (
               <span className="ptp-sala-extra">
@@ -514,11 +517,11 @@ export default function VelocidadOnline({ onLocal }) {
             <div style={{ marginTop: '1.2rem' }}>
               <button
                 className="big full qq-btn-principal"
-                disabled={sala.jugadores.length < 2}
+                disabled={sala.jugadores.length < LIM_ON.min}
                 onClick={handleIniciarJuego}
               >
                 <Icon name="play" size={22} />
-                {sala.jugadores.length < 2 ? 'Esperando jugadores...' : '¡Empezar Desafío!'}
+                {sala.jugadores.length < LIM_ON.min ? 'Esperando jugadores...' : '¡Empezar Desafío!'}
               </button>
             </div>
           ) : (

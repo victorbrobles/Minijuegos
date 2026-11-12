@@ -5,6 +5,7 @@ import express from 'express';
 import * as E from '../invento/engine.js';
 import { OBJETOS, PROBLEMAS, RASGOS } from '../data/seeds/invento/cartas.js';
 import { montarSalas } from '../lib/salasJuego.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
 
 const router = express.Router();
 export const MAZOS = { objeto: OBJETOS, problema: PROBLEMAS, rasgo: RASGOS };
@@ -19,10 +20,9 @@ router.get('/cartas', (req, res) => res.json({ success: true, mazos: MAZOS }));
 const MOTOR = { ...E, crearPartida: (jugadores, items, reglas, ahora) => E.crearPartida(jugadores, MAZOS, reglas, ahora) };
 
 montarSalas(router, {
+  ...limitesOnline('invento'),
   engine: MOTOR,
   sinItems: true,
-  min: E.AJUSTES.min,
-  max: E.AJUSTES.max,
   config: leerConfig({}),
   validarConfig: leerConfig,
   prepararItems: async (sala) => ({ items: [], reglas: { ...sala.config } }),

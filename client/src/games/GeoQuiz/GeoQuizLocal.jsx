@@ -8,14 +8,14 @@ import * as E from './engine.js';
 import GeoQuizPartida from './GeoQuizPartida.jsx';
 import GeoQuizConfig, { configPorDefecto } from './GeoQuizConfig.jsx';
 import './GeoQuiz.css';
+import { limitesLocal } from '../limites.js';
 
-const MIN_JUGADORES = 2;
-const MAX_JUGADORES = 10;
+const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('geoquiz');
 
 export default function GeoQuizLocal({ onVolver, onExit, onAbrirAyuda }) {
   const navigate = useNavigate();
   const [fase, setFase] = useState('setup'); // 'setup' | 'juego'
-  const [nombres, setNombres] = useState(['Jugador 1', 'Jugador 2', 'Jugador 3']);
+  const [nombres, setNombres] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => `Jugador ${i + 1}`));
   const [config, setConfig] = useState(configPorDefecto);
   const [categorias, setCategorias] = useState([]);
   const [error, setError] = useState('');

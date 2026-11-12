@@ -8,10 +8,12 @@ import { PantallaJuego, PantallaResultado, PantallaFin, ModalSalir, TurnoDe } fr
 import ConfigJuego from './Config.jsx';
 import { urlLocal } from './juegos.js';
 import { SelectorJugadores } from '../../components/MenuJuego.jsx';
+import { limitesLocal } from '../limites.js';
 
 export default function PulsadorLocal({ juego, onVolver, onExit, onAbrirAyuda }) {
   const [paso, setPaso] = useState('config');
-  const [nombres, setNombres] = useState(['', '', '']);
+  const lim = limitesLocal(juego.id);
+  const [nombres, setNombres] = useState(() => Array(lim.min).fill(''));
   const [config, setConfig] = useState(juego.config);
   const [error, setError] = useState('');
   const [aviso, setAviso] = useState(null);
@@ -64,7 +66,7 @@ export default function PulsadorLocal({ juego, onVolver, onExit, onAbrirAyuda })
     return (
       <div className={`pzp-contenedor ${juego.id}`}>
         <SelectorJugadores
-          onVolver={onVolver} onAyuda={onAbrirAyuda} min={2} max={15}
+          onVolver={onVolver} onAyuda={onAbrirAyuda} min={lim.min} max={lim.max}
           numJugadores={nombres.length}
           onCambiarNum={(n) => setNombres((l) => (n > l.length ? [...l, ...Array(n - l.length).fill('')] : l.slice(0, n)))}
           nombres={nombres}
@@ -84,7 +86,11 @@ export default function PulsadorLocal({ juego, onVolver, onExit, onAbrirAyuda })
   const enviar = (tipo, d = {}) => {
     const t = Date.now();
     let r;
-    if (tipo === 'pulsar') r = E.pulsar(est, null, t);
+    if (tipo === 'pulsar') {
+      r = E.pulsar(est, null, t);
+      // Jugando solo no hace falta decir quién ha pulsado
+      if (r?.ok && est.jugadores.length === 1) r = E.identificar(est, est.jugadores[0].id);
+    }
     else if (tipo === 'identificar') r = E.identificar(est, d.id);
     else if (tipo === 'cancelar') r = E.cancelar(est, t);
     else if (tipo === 'responder') r = E.responder(est, null, d.respuesta, t);

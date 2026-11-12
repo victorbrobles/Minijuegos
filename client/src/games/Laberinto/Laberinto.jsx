@@ -13,7 +13,7 @@ import './Laberinto.css';
 
 const JUEGOS = { minotauro: JUEGO_MINOTAURO, constructores: JUEGO_CONSTRUCTORES };
 const OPCIONES = [
-  { id: 'minotauro', e: '🐂', titulo: 'El Minotauro', jugadores: '3 a 8 jugadores', texto: 'Uno caza en secreto. Los demás buscan las llaves y escapan en la niebla. Todos movéis a la vez.' },
+  { id: 'minotauro', e: '🐂', titulo: 'El Minotauro', jugadores: '2 a 8 jugadores', texto: 'Uno caza en secreto. Los demás buscan las llaves y escapan en la niebla. Todos movéis a la vez.' },
   { id: 'constructores', e: '🧱', titulo: 'Constructores y corredores', jugadores: '2 a 8 jugadores', texto: 'Diseña el laberinto más retorcido para tu rival… y recorre el suyo antes que nadie.' }
 ];
 

@@ -4,6 +4,7 @@
 import express from 'express';
 import * as E from '../footballsplit/engine.js';
 import { generarRetos } from '../data/seeds/footballsplit/split.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
 
 const router = express.Router();
 
@@ -13,8 +14,7 @@ router.get('/retos', (req, res) => {
   res.json({ success: true, retos: generarRetos(n) });
 });
 const salas = {};
-const MIN = E.AJUSTES.min;
-const MAX = E.AJUSTES.max;
+const { min: MIN, max: MAX } = limitesOnline('footballsplit');
 const CADUCIDAD_MS = 4 * 60 * 60 * 1000;
 
 const codigoSala = () => {

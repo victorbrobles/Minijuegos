@@ -8,7 +8,7 @@ import { CATEGORIAS, AJUSTES, OPCIONES } from './engine.js';
 import './Invento.css';
 
 const HERO = { emoji: '💡' };
-const nombreDe = (v, id) => v.jugadores.find((j) => j.id === id)?.nombre ?? '¿?';
+const nombreDe = (v, id) => (id === 0 ? 'La casa 🏠' : v.jugadores.find((j) => j.id === id)?.nombre ?? '¿?');
 const CARTA = { objeto: { t: 'El objeto', e: '📦' }, problema: { t: 'Tiene que', e: '🎯' }, rasgo: { t: 'Y además', e: '🤪' } };
 
 export function Cartas({ cartas, onCambiar, chicas = false }) {
@@ -80,7 +80,7 @@ function Invento({ x, children, ganadas = [] }) {
     <div className={`pzp-tarjeta ivp-invento${x.mio ? ' mio' : ''}`}>
       <div className="ivp-invento-cab">
         <span className="ivp-letra">{x.letra}</span>
-        <div><strong>{x.nombre}</strong>{x.mio && <small>Tu invento</small>}</div>
+        <div><strong>{x.nombre}</strong>{x.mio && <small>Tu invento</small>}{x.casa && <small>🏠 Invento de la casa</small>}</div>
         {ganadas.length > 0 && <span className="ivp-medallas">{ganadas.map((c) => CATEGORIAS[c].e).join('')}</span>}
       </div>
       <p className="ivp-desc">{x.desc}</p>
@@ -107,6 +107,7 @@ function Votar({ v, enviar, local }) {
   const completo = Object.keys(CATEGORIAS).every((c) => votos[c]);
   return (
     <>
+      {v.inventos.some((x) => x.casa) && <p className="pzp-nota">Sois dos: entra un invento de la casa para que cada voto sea una elección de verdad. Sus votos no dan puntos a nadie.</p>}
       {v.inventos.map((x) => <Invento key={x.letra} x={x} />)}
       <div className="pzp-tarjeta pzp-form ivp-votacion">
         <p className="pzp-etiqueta">Tus votos (no puedes votarte)</p>

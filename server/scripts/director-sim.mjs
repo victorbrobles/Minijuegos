@@ -8,7 +8,7 @@ assert.ok(E.precio({ media: 91, edad: 26, potencial: 92 }) > E.precio({ media: 8
 assert.ok(E.precio({ media: 85, edad: 20, potencial: 91 }) > E.precio({ media: 85, edad: 34, potencial: 85 }), 'los jóvenes valen más');
 const campeones = {};
 for (let g = 0; g < 80; g++) {
-  const n = 2 + (g % 7);
+  const n = E.AJUSTES.min + (g % (E.AJUSTES.max - E.AJUSTES.min + 1));
   const J = Array.from({ length: n }, (_, i) => ({ id: i + 1, nombre: `J${i + 1}` }));
   let t = 0;
   const p = E.crearPartida(J, FUTBOLISTAS, { presupuesto: [150, 200, 300][g % 3], mercados: [3, 4, 5][g % 3] }, t);

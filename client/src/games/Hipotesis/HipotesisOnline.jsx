@@ -8,6 +8,9 @@ import {
   MenuModoOnline, FormCrearSala, FormUnirseSala, CabeceraSala, ListaSala, EsperandoAnfitrion, BloqueConfig
 } from '../../components/MenuJuego.jsx';
 import './Hipotesis.css';
+import { limitesOnline, textoSala } from '../limites.js';
+
+const LIM_ON = limitesOnline('hipotesis');
 
 export const CLAVE_SESION_HIPOTESIS = 'hipotesis_online_session';
 const API = '/api/hipotesis/online';
@@ -162,7 +165,7 @@ export default function HipotesisOnline({ onVolver, onSalir, onAbrirAyuda }) {
         {menu === 'crear' && (
           <FormCrearSala onVolver={() => { setMenu('menu'); setErrorMenu(''); }} onAyuda={onAbrirAyuda} nombre={nombre} setNombre={setNombre}
             onCrear={() => entrar('crear', { nombre: nombre.trim() })} cargando={cargando} error={errorMenu}
-            descripcion="Introduce tu nombre para abrir la sala y ser el anfitrión (de 3 a 8 jugadores, cada uno con su móvil)." />
+            descripcion={`Introduce tu nombre para abrir la sala y ser el anfitrión (${textoSala('hipotesis')}, cada uno con su móvil).`} />
         )}
         {menu === 'unirse' && (
           <FormUnirseSala onVolver={() => { setMenu('menu'); setErrorMenu(''); }} onAyuda={onAbrirAyuda} codigo={codigo} setCodigo={setCodigo}

@@ -4,12 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import './Pistas.css';
 import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx';
+import { limitesLocal } from '../limites.js';
 
 const MAX_PISTAS = 6;
 const TIEMPO_PISTA_SEGUNDOS = 10;
 const TIEMPO_RESPUESTA_LOCAL = 30;
-const MIN_JUGADORES = 2;
-const MAX_JUGADORES = 15;
+const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('pistas');
 
 const COLORES_JUGADOR = ['#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316', '#84cc16', '#6366f1'];
 const colorJugador = (id) => COLORES_JUGADOR[(Number(id) - 1 + COLORES_JUGADOR.length * 10) % COLORES_JUGADOR.length];
@@ -23,13 +23,8 @@ export default function PistasLocal({ onVolver, onExit }) {
 
   // Setup
   const [modo, setModo] = useState('estandar'); // 'estandar' | 'supervivencia'
-  const [numJugadores, setNumJugadores] = useState(4);
-  const [jugadores, setJugadores] = useState([
-    { id: 1, nombre: 'Jugador 1' },
-    { id: 2, nombre: 'Jugador 2' },
-    { id: 3, nombre: 'Jugador 3' },
-    { id: 4, nombre: 'Jugador 4' }
-  ]);
+  const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
+  const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: `Jugador ${i + 1}` })));
 
   // Marcadores y vidas
   const [puntos, setPuntos] = useState({});

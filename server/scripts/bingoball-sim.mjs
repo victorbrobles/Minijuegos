@@ -6,7 +6,7 @@ const bingos = Object.values(BINGOS);
 let bingosCantados = 0; let futbolistas = 0; let lineas = 0;
 for (let k = 0; k < 200; k++) {
   const bingo = bingos[k % bingos.length];
-  const n = 2 + (k % 6);
+  const n = E.AJUSTES.min + (k % (E.AJUSTES.max - E.AJUSTES.min + 1));
   let t = 1e6;
   const p = E.crearPartida(Array.from({ length: n }, (_, i) => ({ id: i + 1, nombre: `J${i + 1}` })), bingo, t);
   let pasos = 0;

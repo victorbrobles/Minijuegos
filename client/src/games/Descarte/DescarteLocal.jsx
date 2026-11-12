@@ -9,6 +9,9 @@ import { PantallaJuego, PantallaTablero, PantallaFin } from './Vistas.jsx';
 import { ModalSalir, SelectorTableros } from './DescarteOnline.jsx';
 import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx';
 import './Descarte.css';
+import { limitesLocal } from '../limites.js';
+
+const LIM_JUG = limitesLocal('descarte');
 
 const ACCIONES = {
   retar: (est, d) => E.retar(est, est.retadorId, d),
@@ -20,7 +23,7 @@ const ACCIONES = {
 
 export default function DescarteLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [paso, setPaso] = useState('config');
-  const [nombres, setNombres] = useState(['', '', '', '']);
+  const [nombres, setNombres] = useState(() => Array(LIM_JUG.min).fill(''));
   const [tableros, setTableros] = useState(5);
   const [error, setError] = useState('');
   const [aviso, setAviso] = useState(null);
@@ -52,7 +55,7 @@ export default function DescarteLocal({ onVolver, onExit, onAbrirAyuda }) {
     return (
       <div className="dsp-contenedor">
         <SelectorJugadores
-          onVolver={onVolver} onAyuda={onAbrirAyuda} min={E.AJUSTES.min} max={E.AJUSTES.max}
+          onVolver={onVolver} onAyuda={onAbrirAyuda} min={LIM_JUG.min} max={LIM_JUG.max}
           numJugadores={nombres.length}
           onCambiarNum={(n) => setNombres((l) => (n > l.length ? [...l, ...Array(n - l.length).fill('')] : l.slice(0, n)))}
           nombres={nombres}

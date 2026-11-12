@@ -4,6 +4,7 @@
 import express from 'express';
 import * as E from '../bingoball/engine.js';
 import { GRUPOS_BINGOS } from '../data/seeds/bingoball/bingoballData.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
 
 const bingoDeGrupo = (grupoId) => {
   const grupo = GRUPOS_BINGOS.find((g) => g.id === grupoId) || GRUPOS_BINGOS[0];
@@ -12,8 +13,7 @@ const bingoDeGrupo = (grupoId) => {
 
 const router = express.Router();
 const salas = {};
-const MIN = E.AJUSTES.min;
-const MAX = E.AJUSTES.max;
+const { min: MIN, max: MAX } = limitesOnline('bingoball');
 const CADUCIDAD_MS = 4 * 60 * 60 * 1000;
 
 const codigoSala = () => {

@@ -8,7 +8,7 @@
 // la media de cada línea (y si cada uno juega en su posición), la química (compañeros del mismo club o país),
 // la edad (los jóvenes crecen hacia su potencial, los veteranos se cansan), el fondo de armario y la táctica.
 
-export const AJUSTES = { min: 2, max: 8, minClubes: 6, maxPlantilla: 16, maxPujas: 5, canterano: 60, segJornada: 3 };
+export const AJUSTES = { min: 2, max: 10, minClubes: 6, maxPlantilla: 16, maxPujas: 5, canterano: 60, segJornada: 3 };
 export const OPCIONES = { presupuesto: [150, 200, 300], mercados: [3, 4, 5] };
 export const FORMACIONES = {
   '4-3-3': { DEF: 4, MED: 3, DEL: 3 },

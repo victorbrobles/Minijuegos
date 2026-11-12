@@ -7,10 +7,13 @@ import * as E from './engine.js';
 import { PantallaJuego, PantallaResultado, PantallaFin, ModalSalir, SelectorRondas } from './Vistas.jsx';
 import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx';
 import './FootballSplit.css';
+import { limitesLocal } from '../limites.js';
+
+const LIM_JUG = limitesLocal('footballsplit');
 
 export default function FootballSplitLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [paso, setPaso] = useState('config');
-  const [nombres, setNombres] = useState(['', '']);
+  const [nombres, setNombres] = useState(() => Array(LIM_JUG.min).fill(''));
   const [rondas, setRondas] = useState(10);
   const [error, setError] = useState('');
   const [aviso, setAviso] = useState(null);
@@ -51,7 +54,7 @@ export default function FootballSplitLocal({ onVolver, onExit, onAbrirAyuda }) {
     return (
       <div className="ffp-contenedor">
         <SelectorJugadores
-          onVolver={onVolver} onAyuda={onAbrirAyuda} min={E.AJUSTES.min} max={E.AJUSTES.max}
+          onVolver={onVolver} onAyuda={onAbrirAyuda} min={LIM_JUG.min} max={LIM_JUG.max}
           numJugadores={nombres.length}
           onCambiarNum={(n) => setNombres((l) => (n > l.length ? [...l, ...Array(n - l.length).fill('')] : l.slice(0, n)))}
           nombres={nombres}

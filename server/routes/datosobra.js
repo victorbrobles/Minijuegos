@@ -5,6 +5,7 @@ import express from 'express';
 import * as E from '../datosobra/engine.js';
 import { FUTBOLISTAS } from '../data/seeds/datosobra/futbolistas.js';
 import { montarSalas, elegirSinRepetir } from '../lib/salasJuego.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
 
 const router = express.Router();
 const barajar = (l) => { const b = [...l]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
@@ -21,9 +22,8 @@ router.get('/local', (req, res) => {
 });
 
 montarSalas(router, {
+  ...limitesOnline('datosobra'),
   engine: E,
-  min: E.AJUSTES.min,
-  max: E.AJUSTES.max,
   config: leerConfig({}),
   validarConfig: leerConfig,
   prepararItems: async (sala) => ({ items: elegirSinRepetir(sala, FUTBOLISTAS, sala.config.rondas, (x) => x.nombre).map(itemDe), reglas: { ...sala.config } }),

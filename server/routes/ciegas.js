@@ -6,6 +6,8 @@ import deportistas from '../data/seeds/ciegas/deportistas.js';
 import famosos from '../data/seeds/ciegas/famosos.js';
 import culturapop from '../data/seeds/ciegas/culturapop.js';
 import geografia from '../data/seeds/ciegas/geografia.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
+const LIM = limitesOnline('ciegas');
 
 const router = express.Router();
 
@@ -101,7 +103,7 @@ router.post('/online/unirse', (req, res) => {
 
   if (!sala) return res.status(404).json({ error: 'Sala no encontrada.' });
   if (sala.estado !== 'lobby') return res.status(400).json({ error: 'La partida ya comenzó.' });
-  if (sala.jugadores.length >= 10) return res.status(400).json({ error: 'Sala llena (máx 10).' });
+  if (sala.jugadores.length >= LIM.max) return res.status(400).json({ error: `La sala está llena (máx. ${LIM.max}).` });
 
   const token = 'tok_' + Math.random().toString(36).substring(2);
   const nuevoId = sala.jugadores.length + 1;
@@ -159,8 +161,8 @@ router.post('/online/sala/:code/iniciar-ronda', (req, res) => {
   const sala = salasCiegas.get(req.params.code?.toUpperCase());
   if (!sala || sala.adminToken !== req.body?.token) return res.status(403).json({ error: 'No autorizado.' });
 
-  if (sala.jugadores.length < 3) {
-    return res.status(400).json({ error: 'Se necesitan mínimo 3 jugadores.' });
+  if (sala.jugadores.length < LIM.min) {
+    return res.status(400).json({ error: `Se necesitan al menos ${LIM.min} jugadores.` });
   }
 
   // Elegir jugador activo al azar

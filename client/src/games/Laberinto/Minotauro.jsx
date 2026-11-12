@@ -5,6 +5,9 @@ import Icon from '../../components/Icon.jsx';
 import * as E from './minotauro.js';
 import { Cuenta, useRestante, Pildoras, colorDe, ModalSalir, TurnoDe, AvisoTurno } from '../Pulsador/Vistas.jsx';
 import { BloqueConfig, SelectorJugadores } from '../../components/MenuJuego.jsx';
+import { limitesLocal } from '../limites.js';
+
+const LIM_JUG = limitesLocal('minotauro');
 
 const ROL = {
   explorador: { e: '🧭', n: 'Explorador', t: 'Busca las llaves y escapa' },
@@ -224,7 +227,7 @@ export function Config({ config, onCambiar }) {
 /** Un solo dispositivo: el móvil pasa de jugador en jugador cada turno (lo que ve cada uno es secreto). */
 export function Local({ juego, onVolver, onExit, onAbrirAyuda }) {
   const [paso, setPaso] = useState('config');
-  const [nombres, setNombres] = useState(['', '', '']);
+  const [nombres, setNombres] = useState(() => Array(LIM_JUG.min).fill(''));
   const [config, setConfig] = useState({ turnos: 25 });
   const [error, setError] = useState('');
   const [aviso, setAviso] = useState(null);
@@ -247,7 +250,7 @@ export function Local({ juego, onVolver, onExit, onAbrirAyuda }) {
   if (paso === 'config') {
     return (
       <div className={`pzp-contenedor ${juego.id}`}>
-        <SelectorJugadores onVolver={onVolver} onAyuda={onAbrirAyuda} min={E.AJUSTES.min} max={E.AJUSTES.max} numJugadores={nombres.length}
+        <SelectorJugadores onVolver={onVolver} onAyuda={onAbrirAyuda} min={LIM_JUG.min} max={LIM_JUG.max} numJugadores={nombres.length}
           onCambiarNum={(n) => setNombres((l) => (n > l.length ? [...l, ...Array(n - l.length).fill('')] : l.slice(0, n)))}
           nombres={nombres} onNombre={(i, valor) => setNombres((l) => l.map((x, k) => (k === i ? valor : x)))}
           onEmpezar={empezar} textoBoton="¡Entrar en el laberinto!" error={error}>
@@ -315,7 +318,7 @@ export const JUEGO_MINOTAURO = {
   Partida: PartidaOnline,
   Fin,
   Config,
-  notaSala: '🐂 De 3 a 8 jugadores. Al empezar, a uno le tocará en secreto ser el Minotauro.',
+  notaSala: '🐂 De 2 a 8 jugadores. Al empezar, a uno le tocará en secreto ser el Minotauro.',
   ganador: (n) => `¡Ganan ${n.join(' y ')}!`,
   reglas: [
     `Laberinto de ${E.AJUSTES.lado}×${E.AJUSTES.lado} casillas con niebla: cada uno solo ve lo que tiene cerca (a ${E.AJUSTES.vista.explorador} casillas por los pasillos) y recuerda lo que ya ha visto.`,

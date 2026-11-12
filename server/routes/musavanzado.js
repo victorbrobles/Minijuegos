@@ -4,6 +4,7 @@
 import express from 'express';
 import * as E from '../musavanzado/engine.js';
 import { montarSalas } from '../lib/salasJuego.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
 
 const router = express.Router();
 const BASE = { modo: 'individual', objetivo: 30, categorias: [...E.ORDEN_CATEGORIAS], especiales: {} };
@@ -22,10 +23,9 @@ const leerConfig = (b = {}, c = BASE) => {
 const MOTOR = { ...E, crearPartida: (jugadores, items, reglas, ahora) => E.crearPartida(jugadores, reglas, ahora) };
 
 montarSalas(router, {
+  ...limitesOnline('musavanzado'),
   engine: MOTOR,
   sinItems: true,
-  min: E.AJUSTES.min,
-  max: E.AJUSTES.max,
   config: leerConfig({}),
   validarConfig: leerConfig,
   prepararItems: async (sala) => ({ items: [], reglas: { ...sala.config } }),

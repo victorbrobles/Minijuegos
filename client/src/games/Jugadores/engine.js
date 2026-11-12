@@ -6,7 +6,7 @@
 // los dos, aunque fuera en clubes distintos. Quien lo sepa pulsa y escribe el nombre: si está en la lista, acierta;
 // si no está, decide el anfitrión (o el grupo, en un dispositivo), por si es un acierto que nos falta en la lista.
 
-export const AJUSTES = { min: 2, max: 15, segRonda: 120, segRespuesta: 30, puntosAcierto: 3, puntosFallo: 1, verSoluciones: 12 };
+export const AJUSTES = { min: 1, max: 16, segRonda: 120, segRespuesta: 30, puntosAcierto: 3, puntosFallo: 1, verSoluciones: 12 };
 export const OPCIONES_RONDAS = [5, 10, 15];
 
 // ---------------------------------------------------------------- Respuestas

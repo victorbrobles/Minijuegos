@@ -9,13 +9,13 @@ import {
   SEGUNDOS_RESPUESTA, colorJugador, inicial
 } from './Pantallas.jsx';
 import './Cancion.css';
+import { limitesLocal } from '../limites.js';
 
-const MIN_JUGADORES = 2;
-const MAX_JUGADORES = 20;
+const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('cancion');
 
 export default function CancionLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [fase, setFase] = useState('setup'); // setup | cargando | ronda | resuelta | clasificacion | final
-  const [numJugadores, setNumJugadores] = useState(4);
+  const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
   const [nombres, setNombres] = useState(() => Array.from({ length: MAX_JUGADORES }, (_, i) => `Jugador ${i + 1}`));
   const [rondas, setRondas] = useState(10);
   const [error, setError] = useState('');

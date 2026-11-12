@@ -1450,6 +1450,7 @@ button.rebote { background: linear-gradient(135deg, #ff9f43, #ff4d6d); }
   letter-spacing: .04em; text-transform: uppercase; color: #5b21b6; background: #ede9fe; border-radius: 999px;
 }
 .gm-titulo { margin: 0; font-size: 1.45rem; line-height: 1.15; color: var(--ink); }
+.gm-jugadores { display: inline-block; margin-top: .35rem; padding: .2rem .6rem; border-radius: 999px; background: color-mix(in srgb, var(--g1) 14%, white); color: color-mix(in srgb, var(--g1) 70%, #0f172a); font-size: .85rem; font-weight: 800; }
 .gm-texto { margin: 1.1rem 0 1.3rem; font-size: 1.05rem; line-height: 1.6; color: var(--ink-soft); font-weight: 600; }
 .gm-ventana .gm-jugar {
   width: 100%; padding: 1rem; font-size: 1.1rem; font-weight: 800; color: #fff; border-radius: 16px;

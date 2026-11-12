@@ -4,6 +4,8 @@ import { esAdmin } from '../lib/admin.js';
 import preguntasNormalRaw from '../data/seeds/quienmas/preguntas.js';
 import preguntasPicanteRaw from '../data/seeds/quienmas/incomodas.js';
 import { barajar } from '../lib/barajar.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
+const LIM = limitesOnline('quienmas');
 
 const router = express.Router();
 
@@ -130,7 +132,7 @@ router.post('/online/unirse', (req, res) => {
   const sala = salasOnline[code];
   if (!sala) return res.status(404).json({ error: 'La sala no existe o el código es incorrecto.' });
   if (sala.estado !== 'lobby') return res.status(400).json({ error: 'La partida ya ha comenzado.' });
-  if (sala.jugadores.length >= 20) return res.status(400).json({ error: 'La sala está completa.' });
+  if (sala.jugadores.length >= LIM.max) return res.status(400).json({ error: `La sala está llena (máx. ${LIM.max}).` });
   if (sala.jugadores.some((j) => j.nombre.toLowerCase() === nombre.toLowerCase())) {
     return res.status(400).json({ error: 'Ya hay un jugador con ese nombre en la sala.' });
   }
@@ -166,7 +168,7 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
   const sala = salasOnline[code];
   if (!sala) return res.status(404).json({ error: 'La sala no existe.' });
   if (sala.adminToken !== token) return res.status(403).json({ error: 'Solo el anfitrión puede iniciar.' });
-  if (sala.jugadores.length < 3) return res.status(400).json({ error: 'Se necesitan al menos 3 jugadores.' });
+  if (sala.jugadores.length < LIM.min) return res.status(400).json({ error: `Se necesitan al menos ${LIM.min} jugadores.` });
 
   const lista = sala.categoria === 'picante' ? preguntasPicante : preguntasNormal;
   const barajadas = barajar([...lista]);

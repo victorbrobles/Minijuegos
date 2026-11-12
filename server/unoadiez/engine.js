@@ -7,7 +7,7 @@
 // El que adivina dice un número o pide otra pista (otro jugador, otra categoría). Puntuación de golf: menos es mejor.
 //   exacto = nº de pistas usadas · a uno de distancia = pistas + 1 · más lejos = pistas + 10
 
-export const AJUSTES = { min: 2, max: 12, segPista: 90, segAdivinar: 60, maxPistas: 5 };
+export const AJUSTES = { min: 2, max: 16, segPista: 90, segAdivinar: 60, maxPistas: 5 };
 export const OPCIONES_VUELTAS = [1, 2, 3];
 
 const jug = (p, id) => p.jugadores.find((j) => j.id === id);

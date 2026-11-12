@@ -7,10 +7,13 @@ import * as E from './engine.js';
 import { Partida, Fin, Config, AvisoResultado } from './Partida.jsx';
 import { ModalSalir, TurnoDe } from '../Pulsador/Vistas.jsx';
 import { SelectorJugadores } from '../../components/MenuJuego.jsx';
+import { limitesLocal } from '../limites.js';
+
+const LIM_JUG = limitesLocal('tablero');
 
 export default function TableroLocal({ juego, onVolver, onExit, onAbrirAyuda }) {
   const [paso, setPaso] = useState('config');
-  const [nombres, setNombres] = useState(['', '']);
+  const [nombres, setNombres] = useState(() => Array(LIM_JUG.min).fill(''));
   const [config, setConfig] = useState({ categorias: 4, segundos: 20 });
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
@@ -41,7 +44,7 @@ export default function TableroLocal({ juego, onVolver, onExit, onAbrirAyuda }) 
     return (
       <div className={`pzp-contenedor ${juego.id}`}>
         <SelectorJugadores
-          onVolver={onVolver} onAyuda={onAbrirAyuda} min={E.AJUSTES.min} max={E.AJUSTES.max}
+          onVolver={onVolver} onAyuda={onAbrirAyuda} min={LIM_JUG.min} max={LIM_JUG.max}
           numJugadores={nombres.length}
           onCambiarNum={(n) => setNombres((l) => (n > l.length ? [...l, ...Array(n - l.length).fill('')] : l.slice(0, n)))}
           nombres={nombres}

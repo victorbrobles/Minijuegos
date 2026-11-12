@@ -4,13 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import './Rapidfire.css';
 import { centrarActivo } from '../../lib/centrarActivo.js';
+import { limitesLocal } from '../limites.js';
 
 const TIEMPO_S = 60;
 const PREPARACION_S = 3;
 const PUNTOS_POR_ACIERTO = 2;
 const NUM_OPCIONES = 3;
-const MIN_JUGADORES = 2;
-const MAX_JUGADORES = 10;
+const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('rapidfire');
 
 const COLORES = ['#ef4444', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#06b6d4', '#f97316'];
 export const colorJugador = (i) => COLORES[((i % COLORES.length) + COLORES.length) % COLORES.length];
@@ -359,11 +359,8 @@ export default function RapidfireLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [modalSalirPortada, setModalSalirPortada] = useState(false);
   const [categoriasTodas, setCategoriasTodas] = useState([]);
 
-  const [numJugadores, setNumJugadores] = useState(2);
-  const [jugadores, setJugadores] = useState([
-    { id: 1, nombre: 'Jugador 1' },
-    { id: 2, nombre: 'Jugador 2' }
-  ]);
+  const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
+  const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: `Jugador ${i + 1}` })));
   const [puntos, setPuntos] = useState({});
   const [ronda, setRonda] = useState(1);
   const [jugadorInicialRonda, setJugadorInicialRonda] = useState(0);
@@ -598,7 +595,7 @@ export default function RapidfireLocal({ onVolver, onExit, onAbrirAyuda }) {
                 >
                   {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => (
                     <option key={i + MIN_JUGADORES} value={i + MIN_JUGADORES}>
-                      {i + MIN_JUGADORES} jugadores
+                      {i + MIN_JUGADORES} {i + MIN_JUGADORES === 1 ? 'jugador' : 'jugadores'}
                     </option>
                   ))}
                 </select>

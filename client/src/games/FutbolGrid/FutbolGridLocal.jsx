@@ -7,10 +7,13 @@ import * as E from './engine.js';
 import { PantallaJuego, PantallaFin, ModalSalir } from './Vistas.jsx';
 import { SelectorJugadores } from '../../components/MenuJuego.jsx';
 import './FutbolGrid.css';
+import { limitesLocal } from '../limites.js';
+
+const LIM_JUG = limitesLocal('futbolgrid');
 
 export default function FutbolGridLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [paso, setPaso] = useState('config');
-  const [nombres, setNombres] = useState(['', '']);
+  const [nombres, setNombres] = useState(() => Array(LIM_JUG.min).fill(''));
   const [error, setError] = useState('');
   const [errorJuego, setErrorJuego] = useState('');
   const [cargando, setCargando] = useState(false);
@@ -60,7 +63,7 @@ export default function FutbolGridLocal({ onVolver, onExit, onAbrirAyuda }) {
     return (
       <div className="fgp-contenedor">
         <SelectorJugadores
-          onVolver={onVolver} onAyuda={onAbrirAyuda} min={E.AJUSTES.min} max={E.AJUSTES.max}
+          onVolver={onVolver} onAyuda={onAbrirAyuda} min={LIM_JUG.min} max={LIM_JUG.max}
           numJugadores={nombres.length}
           onCambiarNum={(n) => setNombres((l) => (n > l.length ? [...l, ...Array(n - l.length).fill('')] : l.slice(0, n)))}
           nombres={nombres}

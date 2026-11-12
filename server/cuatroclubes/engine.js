@@ -6,7 +6,7 @@
 // clubes en los que jugó (pleno = 4). Si el futbolista está en nuestra base se puntúa solo; si no, decide el juez
 // (el anfitrión online, el grupo en un dispositivo). Un futbolista no se puede repetir en la misma ronda.
 
-export const AJUSTES = { min: 2, max: 10, segTurno: 90, verMejores: 10 };
+export const AJUSTES = { min: 2, max: 12, segTurno: 90, verMejores: 10 };
 export const OPCIONES_RONDAS = [3, 5, 8];
 
 // ---------------------------------------------------------------- Respuestas

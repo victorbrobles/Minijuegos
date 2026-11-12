@@ -1,6 +1,8 @@
 // server/routes/rapidfire.js
 import express from 'express';
 import { CATEGORIAS } from '../data/seeds/rapidfire/rapidfire.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
+const LIM = limitesOnline('rapidfire');
 
 const router = express.Router();
 const TIEMPO_S = 60;
@@ -119,7 +121,7 @@ router.post('/online/unirse', (req, res) => {
 
   if (!sala) return res.status(404).json({ error: 'Sala no encontrada.' });
   if (sala.estado !== 'lobby') return res.status(400).json({ error: 'La partida ya ha comenzado.' });
-  if (sala.jugadores.length >= 10) return res.status(400).json({ error: 'Sala llena (máximo 10 jugadores).' });
+  if (sala.jugadores.length >= LIM.max) return res.status(400).json({ error: `La sala está llena (máx. ${LIM.max}).` });
 
   const token = 'tok_' + Math.random().toString(36).substring(2);
   const nuevoId = sala.jugadores.length + 1;
@@ -212,7 +214,7 @@ router.get('/online/sala/:code', (req, res) => {
 router.post('/online/sala/:code/iniciar', (req, res) => {
   const sala = salasOnline.get(req.params.code?.toUpperCase());
   if (!sala || sala.adminToken !== req.body?.token) return res.status(403).json({ error: 'No autorizado.' });
-  if (sala.jugadores.length < 2) return res.status(400).json({ error: 'Mínimo 2 jugadores para iniciar.' });
+  if (sala.jugadores.length < LIM.min) return res.status(400).json({ error: `Se necesitan al menos ${LIM.min} jugadores.` });
 
   sala.estado = 'categorias';
   sala.rondaNum = 1;

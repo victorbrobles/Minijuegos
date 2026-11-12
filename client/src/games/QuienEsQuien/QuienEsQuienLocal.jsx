@@ -5,9 +5,9 @@ import { useAdmin, adminHeaders } from '../../lib/admin.js';
 import Icon from '../../components/Icon.jsx';
 import './QuienEsQuien.css';
 import { PantallaPasarMovil, PantallaTablero, BotonPrincipal, EnlaceSecundario, SelectorCategorias, colorJugador } from './TableroPartida.jsx';
+import { limitesLocal } from '../limites.js';
 
-const MIN_JUGADORES = 2;
-const MAX_JUGADORES = 15;
+const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('quien-es-quien');
 
 export default function QuienEsQuienLocal({ onVolver, onExit, onAbrirAyuda }) {
   const esAdminGlobal = useAdmin();
@@ -15,13 +15,8 @@ export default function QuienEsQuienLocal({ onVolver, onExit, onAbrirAyuda }) {
 
   // 'config' | 'categorias' | 'interturno' | 'turno'
   const [paso, setPaso] = useState('config');
-  const [numJugadores, setNumJugadores] = useState(4);
-  const [jugadores, setJugadores] = useState([
-    { id: 1, nombre: 'Jugador 1', tarjeta: null },
-    { id: 2, nombre: 'Jugador 2', tarjeta: null },
-    { id: 3, nombre: 'Jugador 3', tarjeta: null },
-    { id: 4, nombre: 'Jugador 4', tarjeta: null }
-  ]);
+  const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
+  const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: `Jugador ${i + 1}`, tarjeta: null })));
 
   const [categorias, setCategorias] = useState([]);
   const [categoriaElegida, setCategoriaElegida] = useState(null);
@@ -247,7 +242,7 @@ export default function QuienEsQuienLocal({ onVolver, onExit, onAbrirAyuda }) {
                 >
                   {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => (
                     <option key={i + MIN_JUGADORES} value={i + MIN_JUGADORES}>
-                      {i + MIN_JUGADORES} jugadores
+                      {i + MIN_JUGADORES} {i + MIN_JUGADORES === 1 ? 'jugador' : 'jugadores'}
                     </option>
                   ))}
                 </select>

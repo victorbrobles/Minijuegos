@@ -44,7 +44,7 @@ assert.equal(p.turno, r, 'el turno sigue en orden');
 // Partidas enteras
 let partidas = 0; let rebotes = 0;
 for (let n = 0; n < 300; n++) {
-  const nj = 2 + (n % 4);
+  const nj = E.AJUSTES.min + (n % (E.AJUSTES.max - E.AJUSTES.min + 1));
   const nc = E.OPCIONES.categorias[n % 4];
   const b = montarBanco();
   assert.equal(Object.keys(b.preguntas).length, 25 * 5);

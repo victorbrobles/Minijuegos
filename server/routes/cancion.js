@@ -15,6 +15,8 @@ import parte3 from '../data/seeds/cancion/parte3.js';
 import parte4 from '../data/seeds/cancion/parte4.js';
 import parte5 from '../data/seeds/cancion/parte5.js';
 import parte6 from '../data/seeds/cancion/parte6.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
+const LIM = limitesOnline('cancion');
 
 const router = express.Router();
 
@@ -24,7 +26,7 @@ const PTS_MAX = 10;
 const PTS_MIN = 3;
 const PTS_FALLO = 3;
 const RONDAS_PERMITIDAS = [5, 10, 15, 20];
-const MAX_JUGADORES = 20;
+const MAX_JUGADORES = LIM.max;
 
 export function normalizar(texto) {
   return String(texto ?? '')
@@ -354,7 +356,7 @@ router.post('/online/unirse', (req, res) => {
   if (!sala) return res.status(404).json({ error: 'Sala no encontrada.' });
   if (!nombre) return res.status(400).json({ error: 'Nombre requerido.' });
   if (sala.estado !== 'lobby') return res.status(400).json({ error: 'La partida ya ha comenzado.' });
-  if (sala.jugadores.length >= MAX_JUGADORES) return res.status(400).json({ error: `La sala está llena (máx. ${MAX_JUGADORES}).` });
+  if (sala.jugadores.length >= LIM.max) return res.status(400).json({ error: `La sala está llena (máx. ${LIM.max}).` });
   if (sala.jugadores.some((j) => normalizar(j.nombre) === normalizar(nombre))) return res.status(400).json({ error: 'Ya hay un jugador con ese nombre.' });
   const token = nuevoToken();
   // Arreglo: el id ya no se repite aunque alguien haya salido de la sala
@@ -381,7 +383,7 @@ const soloAnfitrion = (req, res) => {
 router.post('/online/sala/:code/iniciar', async (req, res) => {
   const sala = soloAnfitrion(req, res);
   if (!sala) return;
-  if (sala.jugadores.length < 2) return res.status(400).json({ error: 'Hacen falta al menos 2 jugadores.' });
+  if (sala.jugadores.length < LIM.min) return res.status(400).json({ error: `Se necesitan al menos ${LIM.min} jugadores.` });
   sala.estado = 'cargando';
   sala.rondaNum = 1;
   sala.usados = [];

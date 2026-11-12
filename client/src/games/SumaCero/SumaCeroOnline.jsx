@@ -9,6 +9,9 @@ import {
   MenuModoOnline, FormCrearSala, FormUnirseSala, CabeceraSala, ListaSala, EsperandoAnfitrion, BloqueConfig
 } from '../../components/MenuJuego.jsx';
 import './SumaCero.css';
+import { limitesOnline, textoSala } from '../limites.js';
+
+const LIM_ON = limitesOnline('sumacero');
 
 export const CLAVE_SESION_SUMACERO = 'sumacero_online_session';
 const API = '/api/sumacero/online';
@@ -163,7 +166,7 @@ export default function SumaCeroOnline({ onVolver, onSalir, onAbrirAyuda }) {
         {menu === 'crear' && (
           <FormCrearSala onVolver={() => { setMenu('menu'); setErrorMenu(''); }} onAyuda={onAbrirAyuda} nombre={nombre} setNombre={setNombre}
             onCrear={() => entrar('crear', { nombre: nombre.trim() })} cargando={cargando} error={errorMenu}
-            descripcion="Introduce tu nombre para abrir la sala y ser el anfitrión (de 2 a 6 jugadores, cada uno con su móvil)." />
+            descripcion={`Introduce tu nombre para abrir la sala y ser el anfitrión (${textoSala('sumacero')}, cada uno con su móvil).`} />
         )}
         {menu === 'unirse' && (
           <FormUnirseSala onVolver={() => { setMenu('menu'); setErrorMenu(''); }} onAyuda={onAbrirAyuda} codigo={codigo} setCodigo={setCodigo}

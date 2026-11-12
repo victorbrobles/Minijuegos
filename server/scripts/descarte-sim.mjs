@@ -4,7 +4,7 @@ import { TODAS_LAS_CATEGORIAS } from '../data/seeds/descarte/descarte.js';
 
 let partidas = 0;
 for (let k = 0; k < 400; k++) {
-  const n = 3 + (k % 10);
+  const n = E.AJUSTES.min + (k % (E.AJUSTES.max - E.AJUSTES.min + 1));
   const p = E.crearPartida(Array.from({ length: n }, (_, i) => ({ id: i + 1, nombre: `J${i + 1}` })), { tableros: [3, 5, 7][k % 3] }, TODAS_LAS_CATEGORIAS);
   let t = 0; let pasos = 0;
   while (p.fase !== 'fin' && pasos++ < 5000) {

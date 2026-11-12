@@ -3,7 +3,7 @@
 // Cada ronda, un jugador (por turnos) señala cuál de las cuatro afirmaciones sobre un futbolista es la falsa.
 // Después, los demás deciden en secreto si aceptan su respuesta o la desafían señalando otra.
 
-export const AJUSTES = { min: 2, max: 10, acierto: 3, aguante: 1, desafioGanado: 4, desafioPerdido: -1, segResponder: 30, segDesafio: 20 };
+export const AJUSTES = { min: 1, max: 12, acierto: 3, aguante: 1, desafioGanado: 4, desafioPerdido: -1, segResponder: 30, segDesafio: 20 };
 export const OPCIONES = { rondas: [4, 6, 8, 10] };
 export const LETRAS = ['A', 'B', 'C', 'D'];
 

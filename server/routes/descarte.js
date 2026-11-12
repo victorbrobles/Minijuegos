@@ -4,11 +4,11 @@
 import express from 'express';
 import * as E from '../descarte/engine.js';
 import { TODAS_LAS_CATEGORIAS } from '../data/seeds/descarte/descarte.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
 
 const router = express.Router();
 const salas = {};
-const MIN = E.AJUSTES.min;
-const MAX = E.AJUSTES.max;
+const { min: MIN, max: MAX } = limitesOnline('descarte');
 const CADUCIDAD_MS = 4 * 60 * 60 * 1000;
 
 const codigoSala = () => {

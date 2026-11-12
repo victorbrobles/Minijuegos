@@ -7,7 +7,7 @@
 // cada uno vota en tres categorías (no a sí mismo): el que compraría, el más absurdo y el que triunfará.
 // Cada voto da 1 punto; ganar una categoría, 2 más.
 
-export const AJUSTES = { min: 3, max: 12, cambiosPorRonda: 1, bonusCategoria: 2, maxNombre: 50, maxDesc: 280 };
+export const AJUSTES = { min: 2, max: 20, cambiosPorRonda: 1, bonusCategoria: 2, maxNombre: 50, maxDesc: 280 };
 export const OPCIONES = { rondas: [2, 3, 4, 5], segundos: [120, 180, 300] };
 export const CATEGORIAS = {
   compraria: { nombre: 'Lo compraría', e: '🛒' },
@@ -81,10 +81,27 @@ export function retirar(p, id) {
   return { ok: true };
 }
 
+// Con solo dos inventos, cada uno solo podría votar al otro y siempre empatarían: entra un invento
+// de «la casa» (con cartas al azar) para que cada voto sea una elección de verdad.
+export const CASA = 0;
+const sinArticulo = (t) => String(t).replace(/^(un|una|unos|unas)\s+/i, '');
+const mayus = (t) => t.charAt(0).toUpperCase() + t.slice(1);
+function inventoDeLaCasa(p) {
+  const c = { objeto: robar(p, 'objeto'), problema: robar(p, 'problema'), rasgo: robar(p, 'rasgo') };
+  const modelo = ['3000', 'Plus', 'Turbo', 'Deluxe', 'Pro Max', 'XXL'][Math.floor(azar(p) * 6)];
+  p.cartas[CASA] = c;
+  p.inventos[CASA] = {
+    nombre: `${mayus(sinArticulo(c.objeto))} ${modelo}`,
+    desc: `${c.objeto} para ${c.problema}. Y lo mejor: ${c.rasgo.replace(/^que /, 'hemos conseguido que ')}.`,
+    casa: true
+  };
+}
+
 function aVotar(p) {
   const autores = Object.keys(p.inventos).map(Number).filter((id) => jug(p, id) && !jug(p, id).fuera);
   p.hasta = null;
   if (autores.length < 2) { cerrarRonda(p); return; }
+  if (autores.length === 2) { inventoDeLaCasa(p); autores.push(CASA); }
   p.orden = barajar(autores, () => azar(p));
   p.fase = 'votar';
 }
@@ -115,9 +132,9 @@ function cerrarRonda(p) {
   Object.keys(CATEGORIAS).forEach((c) => {
     const max = Math.max(0, ...Object.values(recuento).map((r) => r[c]));
     ganadores[c] = max > 0 ? Object.keys(recuento).map(Number).filter((a) => recuento[a][c] === max) : [];
-    ganadores[c].forEach((a) => { recuento[a].puntos += AJUSTES.bonusCategoria; jug(p, a).titulos[c] += 1; });
+    ganadores[c].forEach((a) => { recuento[a].puntos += AJUSTES.bonusCategoria; if (jug(p, a)) jug(p, a).titulos[c] += 1; });
   });
-  Object.entries(recuento).forEach(([a, r]) => { jug(p, Number(a)).puntos += r.puntos; });
+  Object.entries(recuento).forEach(([a, r]) => { if (jug(p, Number(a))) jug(p, Number(a)).puntos += r.puntos; });
   p.resultado = { recuento, ganadores };
   p.historial.push({
     ronda: p.ronda,
@@ -141,7 +158,7 @@ function finalizar(p) {
   let puesto = 0; let previo = null;
   const tabla = orden.map((j, i) => { if (j.puntos !== previo) { puesto = i + 1; previo = j.puntos; } return { id: j.id, nombre: j.nombre, puntos: j.puntos, titulos: { ...j.titulos }, fuera: j.fuera, puesto }; });
   // El mejor invento de la partida (más puntos en una ronda)
-  const todos = p.historial.flatMap((h) => h.inventos);
+  const todos = p.historial.flatMap((h) => h.inventos).filter((x) => x.autor !== CASA);
   const mejor = todos.sort((a, b) => b.puntos - a.puntos)[0] || null;
   p.fin = { tabla, ganadores: max > 0 ? activos(p).filter((j) => j.puntos === max).map((j) => j.id) : [], max, mejor };
 }
@@ -192,7 +209,7 @@ export function vistaDe(p, id) {
     // En la votación, los inventos van sin autor (solo una letra); en los resultados, con autor y votos
     inventos: p.fase === 'votar' || publico ? p.orden.map((a) => ({
       letra: letra(a), ...p.inventos[a], cartas: p.cartas[a], mio: a === id,
-      autor: publico ? a : null, votos: publico && p.resultado ? p.resultado.recuento[a] : null
+      autor: publico ? a : null, casa: a === CASA, votos: publico && p.resultado ? p.resultado.recuento[a] : null
     })) : [],
     // Ganadores de cada categoría, por letra
     ganadores: publico && p.resultado ? Object.fromEntries(Object.entries(p.resultado.ganadores).map(([c, l]) => [c, l.map(letra)])) : null,

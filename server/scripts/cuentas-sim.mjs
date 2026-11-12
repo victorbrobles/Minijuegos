@@ -3,7 +3,7 @@
 import * as E from '../cuentas/engine.js';
 const N = Number(process.argv[2] || 300);
 const stats = {};
-for (let n = 2; n <= 8; n++) {
+for (let n = E.AJUSTES.min; n <= E.AJUSTES.max; n++) {
   let atascos = 0; let turnos = 0; let elim = 0;
   for (let k = 0; k < N; k++) {
     const est = E.crearPartida(Array.from({ length: n }, (_, i) => ({ id: i + 1, nombre: `B${i + 1}` })));

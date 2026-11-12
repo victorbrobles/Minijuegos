@@ -88,7 +88,7 @@ export const AJUSTES = {
   monedasIni: 2, planosIni: 4, cobro: 2, planosRobo: 2,
   bonusPrimero: 3, bonusCompleto: 2, bonusVariedad: 3, monedasPorPunto: 3, puntosMedalla: 2,
   rondasMax: 30,
-  min: 2, max: 9
+  min: 3, max: 9
 };
 
 // ---------------------------------------------------------------- Utilidades

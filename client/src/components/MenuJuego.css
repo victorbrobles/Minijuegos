@@ -195,6 +195,20 @@ body:has(.qq-en-partida) .game-shell > .back {
   color: #64748b !important;
 }
 
+/* Distintivo con el número de jugadores */
+.game-shell .qq-chip-jugadores {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0 auto 0.7rem !important;
+  padding: 0.28rem 0.75rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--g1, #2563eb) 12%, white);
+  color: color-mix(in srgb, var(--g1, #2563eb) 70%, #0f172a) !important;
+  font-size: 0.85rem !important;
+  font-weight: 800;
+}
+
 /* ---------- Opciones del menú ---------- */
 .game-shell .qq-menu-opciones {
   display: flex;

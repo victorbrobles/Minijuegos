@@ -9,7 +9,7 @@
 // menos un tercio de ellos (mínimo uno); si no, gana el Minotauro con sus ayudantes.
 
 export const AJUSTES = {
-  min: 3, max: 8, lado: 11, llaves: 3, segTurno: 45,
+  min: 2, max: 8, lado: 11, llaves: 3, segTurno: 45,
   pasos: { explorador: 2, correr: 3, minotauro: 3, ayudante: 2 },
   vista: { explorador: 2, antorcha: 4, cazador: 2 },
   trampas: 1, turnosAntorcha: 3, antorchas: 2, atajos: 0.14, ayudantesCazan: true, fraccionEscape: 1 / 3

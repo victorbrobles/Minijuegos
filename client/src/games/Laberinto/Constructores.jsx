@@ -6,6 +6,9 @@ import Icon from '../../components/Icon.jsx';
 import * as E from './constructores.js';
 import { Cuenta, useRestante, Pildoras, colorDe, ModalSalir, TurnoDe, AvisoTurno } from '../Pulsador/Vistas.jsx';
 import { BloqueConfig, SelectorJugadores } from '../../components/MenuJuego.jsx';
+import { limitesLocal } from '../limites.js';
+
+const LIM_JUG = limitesLocal('constructores');
 
 const L = E.AJUSTES.lado;
 const nombreDe = (v, id) => v.jugadores.find((j) => j.id === id)?.nombre ?? '¿?';
@@ -341,7 +344,7 @@ export function Config({ config, onCambiar }) {
 /** Un solo dispositivo: se construye por turnos y luego cada uno corre su laberinto con el móvil en la mano. */
 export function Local({ juego, onVolver, onExit, onAbrirAyuda }) {
   const [paso, setPaso] = useState('config');
-  const [nombres, setNombres] = useState(['', '']);
+  const [nombres, setNombres] = useState(() => Array(LIM_JUG.min).fill(''));
   const [config, setConfig] = useState({ rondas: 3, segConstruir: 90, segCarrera: 90, niebla: true });
   const [error, setError] = useState('');
   const [modal, setModal] = useState(false);
@@ -363,7 +366,7 @@ export function Local({ juego, onVolver, onExit, onAbrirAyuda }) {
   if (paso === 'config') {
     return (
       <div className={`pzp-contenedor ${juego.id}`}>
-        <SelectorJugadores onVolver={onVolver} onAyuda={onAbrirAyuda} min={E.AJUSTES.min} max={E.AJUSTES.max} numJugadores={nombres.length}
+        <SelectorJugadores onVolver={onVolver} onAyuda={onAbrirAyuda} min={LIM_JUG.min} max={LIM_JUG.max} numJugadores={nombres.length}
           onCambiarNum={(n) => setNombres((l) => (n > l.length ? [...l, ...Array(n - l.length).fill('')] : l.slice(0, n)))}
           nombres={nombres} onNombre={(i, valor) => setNombres((l) => l.map((x, k) => (k === i ? valor : x)))}
           onEmpezar={empezar} textoBoton="¡A construir!" error={error}>

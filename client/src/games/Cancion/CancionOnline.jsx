@@ -11,6 +11,9 @@ import {
   Hero, Disco, Pulsador, FormRespuesta, Aviso, Solucion, Clasificacion, Podio, ModalSalir, PildorasRondas, Cargando
 } from './Pantallas.jsx';
 import './Cancion.css';
+import { limitesOnline, textoSala } from '../limites.js';
+
+const LIM_ON = limitesOnline('cancion');
 
 export const CLAVE_SESION_CANCION = 'cancion_online_session';
 
@@ -191,7 +194,7 @@ export default function CancionOnline({ onVolver, onSalir, onAbrirAyuda }) {
           onCrear={() => entrar('/crear', { nombre: nombre.trim(), rondas })}
           cargando={cargando}
           error={error}
-          descripcion="Introduce tu nombre para abrir la sala. Como anfitrión pondrás las canciones (de 2 a 20 jugadores)."
+          descripcion={`Introduce tu nombre para abrir la sala. Como anfitrión pondrás las canciones (${textoSala('cancion')}).`}
         >
           <BloqueConfig titulo="Número de canciones" style={{ marginTop: '1rem' }}>
             <PildorasRondas valor={rondas} onCambiar={setRondas} />
@@ -232,13 +235,13 @@ export default function CancionOnline({ onVolver, onSalir, onAbrirAyuda }) {
       <div className="cancion-contenedor">
         <section className="game qq-pantalla">
           <CabeceraSala codigo={sala.code} onVolver={() => setModalLobby(true)} onAyuda={onAbrirAyuda} />
-          <ListaSala jugadores={sala.jugadores} yoId={sala.yoId} max={20} min={2} anfitrionId={sala.anfitrionId}>
+          <ListaSala jugadores={sala.jugadores} yoId={sala.yoId} max={LIM_ON.max} min={LIM_ON.min} anfitrionId={sala.anfitrionId}>
             <p className="hint" style={{ marginTop: '0.8rem' }}>🎵 {sala.totalRondas} canciones · 🔊 subid el volumen del móvil</p>
           </ListaSala>
           {error && <p className="error" style={{ margin: '0.8rem 0' }}>{error}</p>}
           {sala.esAdmin ? (
-            <button type="button" className="big full qq-btn-principal" style={{ marginTop: '1rem' }} disabled={sala.jugadores.length < 2} onClick={() => { desbloquearAudio(); accion('iniciar'); }}>
-              <Icon name="play" size={22} /> {sala.jugadores.length < 2 ? 'Esperando jugadores…' : '¡Empezar partida!'}
+            <button type="button" className="big full qq-btn-principal" style={{ marginTop: '1rem' }} disabled={sala.jugadores.length < LIM_ON.min} onClick={() => { desbloquearAudio(); accion('iniciar'); }}>
+              <Icon name="play" size={22} /> {sala.jugadores.length < LIM_ON.min ? 'Esperando jugadores…' : '¡Empezar partida!'}
             </button>
           ) : (
             <EsperandoAnfitrion>

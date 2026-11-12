@@ -8,10 +8,13 @@ import {
 import GeoQuizPartida from './GeoQuizPartida.jsx';
 import GeoQuizConfig, { resumenConfig } from './GeoQuizConfig.jsx';
 import './GeoQuiz.css';
+import { limitesOnline, textoSala } from '../limites.js';
+
+const LIM_ON = limitesOnline('geoquiz');
 
 const CLAVE_SESION = 'geoquiz_online_session';
 const API = '/api/geoquiz/online';
-const MAX_JUGADORES = 12;
+const MAX_JUGADORES = LIM_ON.max;
 
 const post = async (url, body) => {
   const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
@@ -168,14 +171,14 @@ export default function GeoQuizOnline({ onLocal, onSalir, onAbrirAyuda }) {
       {vista === 'sala' && sala?.estado === 'lobby' && (
         <section className="game qq-pantalla">
           <CabeceraSala codigo={sala.code} onVolver={() => setModalSalir(true)} onAyuda={ayuda} />
-          <ListaSala jugadores={sala.jugadores} yoId={sala.yoId} max={MAX_JUGADORES} min={2} />
+          <ListaSala jugadores={sala.jugadores} yoId={sala.yoId} max={LIM_ON.max} min={LIM_ON.min} />
 
           {sala.esAdmin ? (
             <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
               <h3 className="qq-sala-titulo"><Icon name="settings" size={20} /> Partida</h3>
               <GeoQuizConfig config={sala.config} categorias={categorias} onCambiar={(config) => llamar('config', { config })} />
-              <button type="button" className="big full qq-btn-principal" style={{ marginTop: '1.4rem' }} disabled={sala.jugadores.length < 2} onClick={() => llamar('iniciar')}>
-                <Icon name="play" size={22} /> {sala.jugadores.length < 2 ? 'Esperando jugadores…' : '¡Empezar GeoQuiz!'}
+              <button type="button" className="big full qq-btn-principal" style={{ marginTop: '1.4rem' }} disabled={sala.jugadores.length < LIM_ON.min} onClick={() => llamar('iniciar')}>
+                <Icon name="play" size={22} /> {sala.jugadores.length < LIM_ON.min ? 'Esperando jugadores…' : '¡Empezar GeoQuiz!'}
               </button>
             </div>
           ) : (

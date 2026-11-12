@@ -6,6 +6,7 @@ import express from 'express';
 import { CATEGORIAS } from '../data/seeds/pareja/parejas.js';
 import { montarSalas } from '../lib/salasJuego.js';
 import { REGLAS, OPCIONES_RONDAS } from '../pulsador/engine.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
 
 const router = express.Router();
 const barajar = (a) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
@@ -55,6 +56,7 @@ router.get('/local', (req, res) => {
 });
 
 montarSalas(router, {
+  ...limitesOnline('pareja'),
   config: { rondas: 10 },
   validarConfig: (b, c) => ({ ...c, rondas: rondasValidas(b.rondas, c.rondas) }),
   reglas: () => REGLAS.pareja,

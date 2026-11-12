@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import Icon from './Icon.jsx';
 import { metaDe } from '../games/meta.js';
+import { LIMITES, limitesLocal, limitesOnline, textoJugadores, rango } from '../games/limites.js';
 import './MenuJuego.css';
 
 export function BotonVolver({ onClick, texto = 'Volver' }) {
@@ -58,7 +59,7 @@ export function OpcionMenu({ icono, titulo, texto, onClick, principal = false })
   );
 }
 
-function Cabecera({ icono, titulo, descripcion, h1 = false, tamIcono = 40 }) {
+function Cabecera({ icono, titulo, descripcion, h1 = false, tamIcono = 40, juegoId }) {
   const Titulo = h1 ? 'h1' : 'h2';
   return (
     <>
@@ -66,9 +67,25 @@ function Cabecera({ icono, titulo, descripcion, h1 = false, tamIcono = 40 }) {
         <Icon name={icono} size={tamIcono} strokeWidth={1.7} />
       </div>
       <Titulo className="title qq-main-title">{titulo}</Titulo>
+      {juegoId && <ChipJugadores juegoId={juegoId} />}
       {descripcion && <p className="hint qq-main-desc">{descripcion}</p>}
     </>
   );
+}
+
+// Distintivo con el número de jugadores que admite el juego (sale de limites.js).
+export function ChipJugadores({ juegoId, className = '' }) {
+  if (!LIMITES[juegoId]) return null;
+  return (
+    <p className={`qq-chip-jugadores ${className}`}>
+      <Icon name="users" size={16} /> {textoJugadores(juegoId)}
+    </p>
+  );
+}
+
+// «· 2 a 8 jugadores» para los textos de las opciones del menú.
+function sufijo(l) {
+  return l ? ` · ${rango(l.min, l.max)}` : '';
 }
 
 function Error({ texto }) {
@@ -79,7 +96,7 @@ function Error({ texto }) {
 // Icono, título y descripción del juego (de meta.js) para pantallas iniciales propias.
 export function CabeceraJuego({ juegoId }) {
   const m = metaDe(juegoId);
-  return <Cabecera icono={m.icono} titulo={m.titulo} descripcion={m.descripcion} h1 tamIcono={44} />;
+  return <Cabecera icono={m.icono} titulo={m.titulo} descripcion={m.descripcion} h1 tamIcono={44} juegoId={juegoId} />;
 }
 
 /**
@@ -90,10 +107,13 @@ export function CabeceraJuego({ juegoId }) {
 export function MenuInicioJuego({ juegoId, onOnline, onLocal, onCrear, onUnirse, onAyuda, error, onVolver, textoVolver, local }) {
   const m = metaDe(juegoId);
   const soloOnline = typeof onLocal !== 'function';
+  const conLimites = Boolean(LIMITES[juegoId]);
+  const lOn = conLimites ? limitesOnline(juegoId) : null;
+  const lLo = conLimites ? limitesLocal(juegoId) : null;
   return (
     <section className="game qq-pantalla">
       <PanelMenu onAyuda={onAyuda} onVolver={onVolver} textoVolver={textoVolver}>
-        <Cabecera icono={m.icono} titulo={m.titulo} descripcion={m.descripcion} h1 tamIcono={44} />
+        <Cabecera icono={m.icono} titulo={m.titulo} descripcion={m.descripcion} h1 tamIcono={44} juegoId={juegoId} />
         <Error texto={error} />
         <div className="qq-menu-opciones">
           {soloOnline ? (
@@ -103,8 +123,8 @@ export function MenuInicioJuego({ juegoId, onOnline, onLocal, onCrear, onUnirse,
             </>
           ) : (
             <>
-              <OpcionMenu principal icono="globe" titulo="Jugar online" texto="Cada jugador desde su propio móvil con código de sala" onClick={onOnline} />
-              <OpcionMenu icono={local?.icono || 'users'} titulo={local?.titulo || 'Jugar en un único dispositivo'} texto={local?.texto || 'Pasando el móvil por turnos entre los jugadores'} onClick={onLocal} />
+              <OpcionMenu principal icono="globe" titulo="Jugar online" texto={`Cada jugador desde su propio móvil con código de sala${sufijo(lOn)}`} onClick={onOnline} />
+              <OpcionMenu icono={local?.icono || 'users'} titulo={local?.titulo || 'Jugar en un único dispositivo'} texto={`${local?.texto || (lLo?.max === 1 ? 'Tú solo en este móvil' : 'Pasando el móvil por turnos entre los jugadores')}${sufijo(lLo)}`} onClick={onLocal} />
             </>
           )}
         </div>
@@ -337,7 +357,7 @@ export function SelectorJugadores({
                 onChange={(e) => onCambiarNum(parseInt(e.target.value, 10))}
               >
                 {Array.from({ length: max - min + 1 }, (_, i) => (
-                  <option key={i + min} value={i + min}>{i + min} jugadores</option>
+                  <option key={i + min} value={i + min}>{i + min} {i + min === 1 ? 'jugador' : 'jugadores'}</option>
                 ))}
               </select>
               <button

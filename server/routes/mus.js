@@ -1,9 +1,10 @@
 // server/routes/mus.js
-// Mus clásico online: de 2 a 4 personas; los asientos libres los ocupa la máquina.
+// Mus clásico online: cuatro personas, dos parejas (en un dispositivo se juega contra la máquina).
 // Motor en ../mus/engine.js; salas de ../lib/salasJuego.js.
 import express from 'express';
 import * as E from '../mus/engine.js';
 import { montarSalas } from '../lib/salasJuego.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
 
 const router = express.Router();
 export const NOMBRES_BOT = ['Paco', 'Maite', 'Ramón', 'Pili'];
@@ -37,10 +38,9 @@ const MOTOR = {
 };
 
 montarSalas(router, {
+  ...limitesOnline('mus'),
   engine: MOTOR,
   sinItems: true,
-  min: 2,
-  max: 4,
   config: leerConfig({}),
   validarConfig: leerConfig,
   prepararItems: async (sala) => ({ items: [], reglas: { ...sala.config } }),

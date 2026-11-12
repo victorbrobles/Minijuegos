@@ -4,9 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import './Impostor.css';
 import { centrarActivo } from '../../lib/centrarActivo.js';
+import { limitesLocal } from '../limites.js';
 
-const MIN_JUGADORES = 3;
-const MAX_JUGADORES = 20;
+const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('impostor');
 
 const COLORES = ['#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316'];
 export const colorJugador = (i) => COLORES[((i % COLORES.length) + COLORES.length) % COLORES.length];
@@ -239,13 +239,8 @@ export default function ImpostorLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [fase, setFase] = useState('setup');
   const [modalSalirPortada, setModalSalirPortada] = useState(false);
 
-  const [numJugadores, setNumJugadores] = useState(4);
-  const [jugadores, setJugadores] = useState([
-    { id: 1, nombre: 'Jugador 1' },
-    { id: 2, nombre: 'Jugador 2' },
-    { id: 3, nombre: 'Jugador 3' },
-    { id: 4, nombre: 'Jugador 4' }
-  ]);
+  const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
+  const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: `Jugador ${i + 1}` })));
   const [puntos, setPuntos] = useState({});
 
   const [modoJuego, setModoJuego] = useState('clasico');
@@ -467,7 +462,7 @@ export default function ImpostorLocal({ onVolver, onExit, onAbrirAyuda }) {
                 >
                   {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => (
                     <option key={i + MIN_JUGADORES} value={i + MIN_JUGADORES}>
-                      {i + MIN_JUGADORES} jugadores
+                      {i + MIN_JUGADORES} {i + MIN_JUGADORES === 1 ? 'jugador' : 'jugadores'}
                     </option>
                   ))}
                 </select>

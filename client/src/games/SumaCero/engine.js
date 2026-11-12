@@ -31,7 +31,7 @@ const ATAQUES = new Set(['robar', 'purga', 'cambio', 'congelar', 'avalancha']);
 
 export const OPCIONES_RONDAS = [3, 5, 7];
 export const AJUSTES = {
-  min: 2, max: 6,
+  min: 3, max: 10,
   manoInicial: 5, copiasEspecial: 3, maxValor: 10, copiasNumero: 2,
   bonusCero: 3, penalPlanton: 5, penalEspecial: 2,
   turnosMaxRonda: 80
@@ -64,7 +64,7 @@ export const nombreCarta = (c) => (c.tipo === 'numero' ? (c.valor > 0 ? `+${c.va
 export function crearMazo(numJugadores = 4) {
   const cartas = [];
   let uid = 0;
-  const factor = numJugadores >= 5 ? 2 : 1;
+  const factor = numJugadores >= 9 ? 3 : numJugadores >= 5 ? 2 : 1;
   for (let f = 0; f < factor; f++) {
     for (let v = 1; v <= AJUSTES.maxValor; v++) {
       for (let k = 0; k < AJUSTES.copiasNumero; k++) {

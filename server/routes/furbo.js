@@ -3,11 +3,14 @@
 import express from 'express';
 import crypto from 'node:crypto';
 import { crearPartida, aplicar, vista, tick, marcarAusente, FASES, DURACIONES } from '../lib/furboEngine.js';
+import { limitesOnline, limitesLocal } from '../../client/src/games/limites.js';
+const LIM = limitesOnline('furbo');
+const LIM_LOCAL = limitesLocal('furbo');
 
 const router = express.Router();
 
-const MIN_JUGADORES = 2;
-const MAX_JUGADORES = 20;
+const MIN_JUGADORES = LIM.min;
+const MAX_JUGADORES = LIM.max;
 const ACCIONES_ANFITRION = new Set(['continuar', 'saltar', 'finalizar']);
 const INACTIVIDAD_MAX_MS = 6 * 60 * 60 * 1000; // las salas inactivas se borran a las 6 h
 
@@ -29,8 +32,8 @@ function limpiarNombre(n, max = 25) {
 // =====================================================================
 router.post('/local/nueva', (req, res) => {
   const nombres = Array.isArray(req.body?.nombres) ? req.body.nombres : [];
-  if (nombres.length < MIN_JUGADORES || nombres.length > MAX_JUGADORES) {
-    return res.status(400).json({ ok: false, error: `Debe haber entre ${MIN_JUGADORES} y ${MAX_JUGADORES} jugadores.` });
+  if (nombres.length < LIM_LOCAL.min || nombres.length > LIM_LOCAL.max) {
+    return res.status(400).json({ ok: false, error: `Debe haber entre ${LIM_LOCAL.min} y ${LIM_LOCAL.max} jugadores.` });
   }
   const jugadores = nombres.map((n, i) => ({ id: i + 1, nombre: limpiarNombre(n) || `Jugador ${i + 1}` }));
   const partida = crearPartida(jugadores, limpiarConfig(req.body?.config), { local: true });
@@ -119,7 +122,7 @@ router.post('/online/unirse', (req, res) => {
   if (!nombre) return res.status(400).json({ error: 'Debes indicar un nombre.' });
   if (!sala) return res.status(404).json({ error: 'La sala no existe o el código es incorrecto.' });
   if (sala.estado !== 'lobby') return res.status(400).json({ error: 'La partida ya ha comenzado.' });
-  if (sala.jugadores.length >= MAX_JUGADORES) return res.status(400).json({ error: `La sala está llena (máx. ${MAX_JUGADORES}).` });
+  if (sala.jugadores.length >= LIM.max) return res.status(400).json({ error: `La sala está llena (máx. ${LIM.max}).` });
   if (sala.jugadores.some((j) => j.nombre.toLowerCase() === nombre.toLowerCase())) {
     return res.status(400).json({ error: 'Ya hay un jugador con ese nombre en la sala.' });
   }
@@ -170,7 +173,7 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
   const sala = obtenerSala(req);
   if (!sala) return res.status(404).json({ error: 'La sala no existe.' });
   if (sala.adminToken !== req.body?.token) return res.status(403).json({ error: 'Solo el anfitrión puede iniciar.' });
-  if (sala.jugadores.length < MIN_JUGADORES) return res.status(400).json({ error: 'Se necesitan al menos 2 jugadores.' });
+  if (sala.jugadores.length < LIM.min) return res.status(400).json({ error: `Se necesitan al menos ${LIM.min} jugadores.` });
   // Un doble toque en «Pitido inicial» reiniciaba la partida que acababa de empezar
   if (sala.estado === 'jugando' && sala.partida && sala.partida.estado !== 'fin') {
     return res.status(400).json({ error: 'La partida ya está en marcha.' });

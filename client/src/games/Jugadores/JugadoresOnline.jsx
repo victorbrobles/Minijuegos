@@ -7,6 +7,9 @@ import {
   MenuModoOnline, FormCrearSala, FormUnirseSala, CabeceraSala, ListaSala, EsperandoAnfitrion, BloqueConfig
 } from '../../components/MenuJuego.jsx';
 import './Jugadores.css';
+import { limitesOnline, textoSala } from '../limites.js';
+
+const LIM_ON = limitesOnline('jugadores');
 
 export const CLAVE_SESION_JUGADORES = 'jugadores_online_session';
 const API = '/api/jugadores/online';
@@ -174,7 +177,7 @@ export default function JugadoresOnline({ onVolver, onSalir, onAbrirAyuda }) {
         {menu === 'crear' && (
           <FormCrearSala onVolver={() => { setMenu('menu'); setErrorMenu(''); }} onAyuda={onAbrirAyuda} nombre={nombre} setNombre={setNombre}
             onCrear={() => entrar('crear', { nombre: nombre.trim() })} cargando={cargando} error={errorMenu}
-            descripcion="Introduce tu nombre para abrir la sala y ser el anfitrión (de 2 a 15 jugadores, cada uno con su móvil)." />
+            descripcion={`Introduce tu nombre para abrir la sala y ser el anfitrión (${textoSala('jugadores')}, cada uno con su móvil).`} />
         )}
         {menu === 'unirse' && (
           <FormUnirseSala onVolver={() => { setMenu('menu'); setErrorMenu(''); }} onAyuda={onAbrirAyuda} codigo={codigo} setCodigo={setCodigo}

@@ -34,7 +34,7 @@ assert.equal(p.sumas[1], E.AJUSTES.desafioGanado);
 
 let partidas = 0;
 for (let n = 0; n < 500; n++) {
-  const nj = 2 + (n % 5);
+  const nj = E.AJUSTES.min + (n % (E.AJUSTES.max - E.AJUSTES.min + 1));
   p = E.crearPartida(Array.from({ length: nj }, (_, i) => ({ id: i + 1, nombre: `J${i}` })), FUTBOLISTAS.map(itemDe), { rondas: 6 }, 0);
   let t = 0;
   while (p.fase !== 'fin') {

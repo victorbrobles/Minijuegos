@@ -61,11 +61,12 @@ assert.equal(p.fase, 'fin');
 
 let partidas = 0;
 for (let n = 0; n < 200; n++) {
-  const nj = 2 + (n % 4);
+  const nj = E.AJUSTES.min + (n % (E.AJUSTES.max - E.AJUSTES.min + 1));
   const k = E.OPCIONES.onces[n % 3];
   const ps = [...PARTIDOS].sort(() => Math.random() - 0.5).slice(0, Math.ceil((nj * k) / 2));
   p = E.crearPartida(Array.from({ length: nj }, (_, i) => ({ id: i + 1, nombre: `J${i}` })), ps, { onces: k, segundos: 120 }, 0);
-  assert.equal(p.rondas, nj * k);
+  assert.equal(p.rondas, Math.max(Math.min(nj, ps.length * 2), Math.floor(Math.min(nj * k, ps.length * 2) / nj) * nj));
+  assert.equal(p.rondas % nj === 0 || p.rondas === ps.length * 2, true);
   let t = 0; let pasos = 0;
   while (p.fase !== 'fin') {
     assert(pasos++ < 5000);

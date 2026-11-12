@@ -4,6 +4,7 @@
 import express from 'express';
 import * as E from '../unapieza/engine.js';
 import { montarSalas, elegirSinRepetir } from '../lib/salasJuego.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
 
 const router = express.Router();
 const leerConfig = (b, c = { rondas: 3, segundos: 60 }) => ({
@@ -12,9 +13,8 @@ const leerConfig = (b, c = { rondas: 3, segundos: 60 }) => ({
 });
 
 montarSalas(router, {
+  ...limitesOnline('unapieza'),
   engine: E,
-  min: E.AJUSTES.min,
-  max: E.AJUSTES.max,
   config: leerConfig({}),
   validarConfig: leerConfig,
   prepararItems: async (sala) => ({ items: elegirSinRepetir(sala, E.FIGURAS, sala.config.rondas), reglas: { ...sala.config } }),

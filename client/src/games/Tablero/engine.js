@@ -8,7 +8,7 @@
 //    para el siguiente jugador, que puede responder sin riesgo (si acierta suma; si falla no resta).
 //    Una casilla oculta vale el doble. Se acaba cuando no quedan casillas.
 
-export const AJUSTES = { min: 2, max: 8, segElegir: 30, segCategoria: 30, valores: [100, 200, 300, 400, 500] };
+export const AJUSTES = { min: 2, max: 12, segElegir: 30, segCategoria: 30, valores: [100, 200, 300, 400, 500] };
 export const OPCIONES = { categorias: [3, 4, 5, 6], segundos: [15, 20, 30] };
 
 const jug = (p, id) => p.jugadores.find((j) => j.id === id);

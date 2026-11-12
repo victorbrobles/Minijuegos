@@ -4,6 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import './Conecta.css';
 import ConectaPartida, { SelectorCategorias } from './ConectaPartida.jsx';
+import { limitesOnline, textoSala } from '../limites.js';
+import { ChipJugadores } from '../../components/MenuJuego.jsx';
+
+const LIM_ON = limitesOnline('conecta');
 
 const CLAVE_SESION_CONECTA = 'conecta_online_session';
 
@@ -323,6 +327,7 @@ export default function ConectaOnline({
               <Icon name="connect" size={44} strokeWidth={1.7} />
             </div>
             <h1 className="title qq-main-title">{tituloJuego}</h1>
+            <ChipJugadores juegoId="conecta" />
             <p className="hint qq-main-desc">{descripcionJuego}</p>
 
             {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
@@ -602,9 +607,9 @@ export default function ConectaOnline({
                 </div>
               ))}
             </div>
-            {sala.jugadores.length < 3 && (
+            {sala.jugadores.length < LIM_ON.min && (
               <p className="hint" style={{ marginTop: '0.8rem' }}>
-                Faltan al menos {3 - sala.jugadores.length} jugadores para poder empezar (mínimo 3).
+                {LIM_ON.min - sala.jugadores.length === 1 ? 'Falta al menos 1 jugador' : `Faltan al menos ${LIM_ON.min - sala.jugadores.length} jugadores`} para poder empezar (mínimo {LIM_ON.min}).
               </p>
             )}
           </div>
@@ -614,11 +619,11 @@ export default function ConectaOnline({
               <button
                 type="button"
                 className="big full qq-btn-principal"
-                disabled={sala.jugadores.length < 3}
+                disabled={sala.jugadores.length < LIM_ON.min}
                 onClick={handleIniciarJuego}
               >
                 <Icon name="play" size={22} />
-                {sala.jugadores.length < 3 ? 'Esperando jugadores...' : '¡Elegir Categoría y Empezar!'}
+                {sala.jugadores.length < LIM_ON.min ? 'Esperando jugadores...' : '¡Elegir Categoría y Empezar!'}
               </button>
             </div>
           ) : (

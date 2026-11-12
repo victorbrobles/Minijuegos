@@ -1,7 +1,7 @@
 // server/musavanzado/engine.js
 // «Mus Avanzado»: motor puro (sin red). Se copia al cliente con `npm run sync:musavanzado`.
 //
-// Se juega individual (4-8) o por parejas (4 o 6) con la baraja española de 40 cartas, a 8 reyes: los treses
+// Se juega individual (3-8) o por parejas (4 o 6) con la baraja española de 40 cartas, a 8 reyes: los treses
 // valen como reyes y los doses como ases. Cada «bando» (un jugador o una pareja) suma puntos; gana quien llega
 // antes al objetivo (o quien gana un órdago querido).
 //
@@ -12,7 +12,7 @@
 // suben, no quieren u órdago. Al acabar la mano se enseñan las cartas de cada categoría (tal y como estaban al
 // cerrarse) de los que siguieron en la puja, y se cobra lance a lance con sus extras.
 
-export const AJUSTES = { min: 4, max: 8, cartas: 5, segTurno: 45, segCambio: 40, envidoMin: 2, bomba: 2 };
+export const AJUSTES = { min: 3, max: 8, cartas: 5, segTurno: 45, segCambio: 40, envidoMin: 2, bomba: 2 };
 export const OPCIONES = { modo: ['individual', 'parejas'], objetivo: [20, 30, 40] };
 export const PALOS = ['oros', 'copas', 'espadas', 'bastos'];
 export const NUMEROS = [1, 2, 3, 4, 5, 6, 7, 10, 11, 12];
@@ -368,7 +368,9 @@ function cerrarLance(p, ahora) {
   const pr = L.apuesta;
   let tipo = 'paso';
   if (pr) tipo = L.activos.length <= 1 ? 'rechazado' : pr.ordago ? 'ordago' : 'querido';
-  const participantes = L.activos;
+  // Si el que envidó se ha ido y no queda nadie en el lance, la categoría queda en paso entre los que siguen
+  if (!L.activos.length) tipo = 'paso';
+  const participantes = L.activos.length ? L.activos : ordenBandos(p);
   const cartas = {};
   participantes.forEach((bid) => vivos(p, bando(p, bid)).forEach((m) => { cartas[m] = p.manos[m].map((c) => ({ ...c })); }));
   const cl = { cat: L.cat, tipo, total: pr?.total ?? null, previo: pr?.previo ?? null, por: pr?.por ?? null, porJugador: pr?.porJugador ?? null, participantes: [...participantes], cartas, voces: L.voces, orden: ordenJugadores(p) };
@@ -417,6 +419,7 @@ function contar(p) {
     if (p.ganador != null) break;
     if (cl.tipo === 'ordago') continue;
     const r = resolver(p, cl);
+    if (r.ganador == null) continue; // Nadie siguió en la categoría (p. ej. el que envidó abandonó)
     const g = bandoDe(p, r.ganador).id;
     if (cl.tipo === 'querido') sumar(p, g, cl.total, cl.cat, `envite querido de ${cl.total}`);
     if (cl.tipo === 'paso' && (cl.cat === 'grande' || cl.cat === 'chica')) sumar(p, g, 1, cl.cat, 'en paso');

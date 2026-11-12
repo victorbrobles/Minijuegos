@@ -4,6 +4,7 @@
 import express from 'express';
 import * as E from '../jugadores/engine.js';
 import { DUPLAS } from '../data/seeds/jugadores/index.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
 
 const barajar = (a) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
 /** Elige parejas sin repetir las ya jugadas en la sala mientras queden. */
@@ -24,8 +25,7 @@ router.get('/retos', (req, res) => {
   res.json({ success: true, retos: barajar(DUPLAS).slice(0, n) });
 });
 const salas = {};
-const MIN = E.AJUSTES.min;
-const MAX = E.AJUSTES.max;
+const { min: MIN, max: MAX } = limitesOnline('jugadores');
 const CADUCIDAD_MS = 4 * 60 * 60 * 1000;
 
 const codigoSala = () => {

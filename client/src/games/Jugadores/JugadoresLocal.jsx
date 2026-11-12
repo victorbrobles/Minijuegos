@@ -7,12 +7,15 @@ import * as E from './engine.js';
 import { PantallaRonda, PantallaResultado, PantallaFin, Pulsador, FormRespuesta, Revision, ModalSalir, SelectorRondas, Avatar } from './Vistas.jsx';
 import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx';
 import './Jugadores.css';
+import { limitesLocal } from '../limites.js';
+
+const LIM_JUG = limitesLocal('jugadores');
 
 const barajar = (a) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
 
 export default function JugadoresLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [paso, setPaso] = useState('config');
-  const [nombres, setNombres] = useState(['', '']);
+  const [nombres, setNombres] = useState(() => Array(LIM_JUG.min).fill(''));
   const [rondas, setRondas] = useState(10);
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
@@ -57,7 +60,7 @@ export default function JugadoresLocal({ onVolver, onExit, onAbrirAyuda }) {
     return (
       <div className="cqp-contenedor">
         <SelectorJugadores
-          onVolver={onVolver} onAyuda={onAbrirAyuda} min={E.AJUSTES.min} max={E.AJUSTES.max}
+          onVolver={onVolver} onAyuda={onAbrirAyuda} min={LIM_JUG.min} max={LIM_JUG.max}
           numJugadores={nombres.length}
           onCambiarNum={(n) => setNombres((l) => (n > l.length ? [...l, ...Array(n - l.length).fill('')] : l.slice(0, n)))}
           nombres={nombres}

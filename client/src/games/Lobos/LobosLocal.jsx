@@ -149,12 +149,12 @@ export default function LobosLocal({ onVolver, onSalir, onExit, onAbrirAyuda }) 
   const [modalSalirPortada, setModalSalirPortada] = useState(false);
 
   // Configuración
-  const [numJugadores, setNumJugadores] = useState(10);
-  const [nombres, setNombres] = useState(nombresPorDefecto(10));
+  const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
+  const [nombres, setNombres] = useState(nombresPorDefecto(MIN_JUGADORES));
   const [minutos, setMinutos] = useState(3);
   const [votosPublicos, setVotosPublicos] = useState(true);
   const [mec, setMec] = useState({ ...MEC_NINGUNA });
-  const [sel, setSel] = useState(() => selInicial(10));
+  const [sel, setSel] = useState(() => selInicial(MIN_JUGADORES));
 
   // Partida
   const [e, setE] = useState(null);

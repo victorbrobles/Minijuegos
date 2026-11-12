@@ -5,7 +5,7 @@ import { RETOS_TRAYECTORIAS } from '../data/seeds/trayectoria/trayectorias.seed.
 const azar = (a) => a[Math.floor(Math.random() * a.length)];
 let aciertos = 0; let nadie = 0;
 for (let k = 0; k < 300; k++) {
-  const n = 2 + (k % 8);
+  const n = E.AJUSTES.min + (k % (E.AJUSTES.max - E.AJUSTES.min + 1));
   const retos = [...RETOS_TRAYECTORIAS].sort(() => Math.random() - 0.5).slice(0, 5);
   let t = 1e6;
   const p = E.crearPartida(Array.from({ length: n }, (_, i) => ({ id: i + 1, nombre: `J${i + 1}` })), retos, t);

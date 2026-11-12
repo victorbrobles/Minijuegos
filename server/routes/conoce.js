@@ -2,6 +2,8 @@
 import express from 'express';
 import crypto from 'crypto';
 import { getPreguntaAleatoria } from '../data/seeds/conoce/conoceData.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
+const LIM = limitesOnline('conoce');
 
 const router = express.Router();
 const salas = {};
@@ -42,7 +44,7 @@ router.post('/unirse', (req, res) => {
   const sala = salas[joinCode];
   if (!sala) return res.status(404).json({ error: 'Sala no encontrada' });
   if (sala.estado !== 'lobby') return res.status(400).json({ error: 'Partida ya en curso' });
-  if (sala.jugadores.length >= 16) return res.status(400).json({ error: 'Sala llena (máximo 16 jugadores)' });
+  if (sala.jugadores.length >= LIM.max) return res.status(400).json({ error: `La sala está llena (máx. ${LIM.max}).` });
 
   const token = crypto.randomUUID();
   const newId = sala.jugadores.length > 0 ? Math.max(...sala.jugadores.map(j => j.id)) + 1 : 1;
@@ -216,7 +218,7 @@ router.post('/sala/:code/iniciar', (req, res) => {
   const sala = salas[code];
   const yo = sala?.jugadores.find(j => j.token === token);
   if (!yo || !yo.esAdmin) return res.status(403).json({ error: 'No autorizado' });
-  if (sala.jugadores.length < 4) return res.status(400).json({ error: 'Mínimo 4 jugadores' });
+  if (sala.jugadores.length < LIM.min) return res.status(400).json({ error: `Se necesitan al menos ${LIM.min} jugadores.` });
 
   sala.jugadores.forEach(j => { j.puntos = 0; });
   sala.rondaNum = 1;

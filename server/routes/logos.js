@@ -9,6 +9,7 @@ import * as simpleIcons from 'simple-icons';
 import { TODOS_LOS_LOGOS } from '../data/seeds/logos/logosData.js';
 import * as E from '../logos/engine.js';
 import { montarSalas, elegirSinRepetir } from '../lib/salasJuego.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
 
 const router = express.Router();
 
@@ -80,9 +81,8 @@ router.get('/local', (req, res) => {
 // ---------------------------------------------------------------- Salas online
 // La imagen se pide por sala y ronda, para que la URL no delate qué marca es.
 const { itemDe: itemDeSala } = montarSalas(router, {
+  ...limitesOnline('logos'),
   engine: E,
-  min: 2,
-  max: E.AJUSTES.max,
   config: { rondas: 20 },
   validarConfig: (b, c) => ({ ...c, rondas: rondasValidas(b.rondas, c.rondas) }),
   prepararItems: async (sala) => {

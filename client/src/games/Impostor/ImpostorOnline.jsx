@@ -14,6 +14,10 @@ import {
   colorJugador,
   indiceColor
 } from './ImpostorLocal.jsx';
+import { limitesOnline, textoSala } from '../limites.js';
+import { ChipJugadores } from '../../components/MenuJuego.jsx';
+
+const LIM_ON = limitesOnline('impostor');
 
 const CLAVE_SESION_IMP = 'impostor_online_session';
 
@@ -338,6 +342,7 @@ export default function ImpostorOnline({
               <Icon name="eye" size={44} strokeWidth={1.7} />
             </div>
             <h1 className="title qq-main-title">{tituloJuego}</h1>
+            <ChipJugadores juegoId="impostor" />
             <p className="hint qq-main-desc">{descripcionJuego}</p>
 
             {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
@@ -623,9 +628,9 @@ export default function ImpostorOnline({
                 </div>
               ))}
             </div>
-            {sala.jugadores.length < 3 && (
+            {sala.jugadores.length < LIM_ON.min && (
               <p className="hint" style={{ marginTop: '0.8rem' }}>
-                Faltan al menos {3 - sala.jugadores.length} jugadores para poder empezar (mínimo 3).
+                {LIM_ON.min - sala.jugadores.length === 1 ? 'Falta al menos 1 jugador' : `Faltan al menos ${LIM_ON.min - sala.jugadores.length} jugadores`} para poder empezar (mínimo {LIM_ON.min}).
               </p>
             )}
           </div>
@@ -635,11 +640,11 @@ export default function ImpostorOnline({
               type="button"
               className="big full qq-btn-principal"
               style={{ marginTop: '1rem' }}
-              disabled={sala.jugadores.length < 3}
+              disabled={sala.jugadores.length < LIM_ON.min}
               onClick={() => setEligiendoModo(true)}
             >
               <Icon name="play" size={22} />
-              {sala.jugadores.length < 3 ? 'Esperando jugadores...' : 'Continuar y elegir modo de juego'}
+              {sala.jugadores.length < LIM_ON.min ? 'Esperando jugadores...' : 'Continuar y elegir modo de juego'}
             </button>
           ) : (
             <div className="panel center" style={{ padding: '1.8rem 1.4rem', marginTop: '1rem' }}>

@@ -13,6 +13,10 @@ import {
   colorJugador,
   indiceColor
 } from './AproximacionLocal.jsx';
+import { limitesOnline, textoSala } from '../limites.js';
+import { ChipJugadores } from '../../components/MenuJuego.jsx';
+
+const LIM_ON = limitesOnline('aproximacion');
 
 const CLAVE_SESION_APROX = 'aprox_online_session';
 const TIEMPO_TURNO = 30;
@@ -454,6 +458,7 @@ export default function AproximacionOnline({
               <Icon name="target" size={44} strokeWidth={1.7} />
             </div>
             <h1 className="title qq-main-title">{tituloJuego}</h1>
+            <ChipJugadores juegoId="aproximacion" />
             <p className="hint qq-main-desc">{descripcionJuego}</p>
 
             {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
@@ -540,7 +545,7 @@ export default function AproximacionOnline({
                 </span>
                 <div className="qq-opcion-textos">
                   <strong>Crear partida</strong>
-                  <span>Sé el anfitrión y genera un código para tu grupo (4 a 20 jugadores)</span>
+                  <span>Sé el anfitrión y genera un código para tu grupo ({textoSala('aproximacion')})</span>
                 </div>
               </button>
 
@@ -592,7 +597,7 @@ export default function AproximacionOnline({
             </div>
             <h2 className="title qq-main-title">Crear partida</h2>
             <p className="hint qq-main-desc">
-              Introduce tu nombre para abrir la sala y ser el anfitrión (4 a 20 jugadores).
+              Introduce tu nombre para abrir la sala y ser el anfitrión ({textoSala('aproximacion')}).
             </p>
 
             <div className="lb-form qq-form-estilizado">
@@ -739,9 +744,9 @@ export default function AproximacionOnline({
                 </div>
               ))}
             </div>
-            {sala.jugadores.length < 4 && (
+            {sala.jugadores.length < LIM_ON.min && (
               <p className="hint" style={{ marginTop: '0.8rem' }}>
-                Faltan al menos {4 - sala.jugadores.length} jugadores para poder empezar (mínimo 4).
+                {LIM_ON.min - sala.jugadores.length === 1 ? 'Falta al menos 1 jugador' : `Faltan al menos ${LIM_ON.min - sala.jugadores.length} jugadores`} para poder empezar (mínimo {LIM_ON.min}).
               </p>
             )}
           </div>
@@ -753,18 +758,18 @@ export default function AproximacionOnline({
               type="button"
               className="big full qq-btn-principal"
               style={{ marginTop: '1rem' }}
-              disabled={sala.jugadores.length < 4}
+              disabled={sala.jugadores.length < LIM_ON.min}
               onClick={handleIniciarJuego}
             >
               <Icon name="play" size={22} />
-              {sala.jugadores.length < 4 ? 'Esperando jugadores (mínimo 4)...' : 'Iniciar juego (15 rondas)'}
+              {sala.jugadores.length < LIM_ON.min ? `Esperando jugadores (mínimo ${LIM_ON.min})...` : 'Iniciar juego (15 rondas)'}
             </button>
           ) : (
             <div className="panel center" style={{ padding: '1.8rem 1.4rem', marginTop: '1rem' }}>
               <span className="lb-luna chica"><Icon name="hourglass" size={36} /></span>
               <h3 style={{ margin: '0.4rem 0' }}>Esperando al anfitrión...</h3>
               <p className="hint">
-                El anfitrión iniciará la partida cuando estéis todos listos (mínimo 4 jugadores).
+                El anfitrión iniciará la partida cuando estéis todos listos (mínimo {LIM_ON.min} jugadores).
               </p>
             </div>
           )}

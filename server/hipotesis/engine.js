@@ -157,7 +157,7 @@ const BOLSA_EVENTOS = ['normal', 'doble', 'rumor', 'topo', 'sincera', 'ciegas', 
 export const OPCIONES_RONDAS = [3, 5, 7];
 export const REACCIONES = ['🤔', '😂', '🙄', '😱', '👀'];
 export const AJUSTES = {
-  min: 3, max: 8,
+  min: 3, max: 10,
   formularMs: 75000, juicioMs: 60000, revelacionMs: 40000,
   puntosAcierto: 1, puntosSeguro: 2, penalSeguro: -1,
   autorCierta: 1, autorFarol: 2, autorPillado: -1,

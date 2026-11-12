@@ -5,6 +5,7 @@ import express from 'express';
 import { PARTIDOS } from '../data/seeds/acta/partidos.js';
 import { montarSalas, elegirSinRepetir } from '../lib/salasJuego.js';
 import { REGLAS, OPCIONES_RONDAS } from '../pulsador/engine.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
 
 const router = express.Router();
 const itemDe = (x) => ({
@@ -21,6 +22,7 @@ router.get('/local', (req, res) => {
 });
 
 montarSalas(router, {
+  ...limitesOnline('acta'),
   config: { rondas: 10 },
   validarConfig: (b, c) => ({ ...c, rondas: rondasValidas(b.rondas, c.rondas) }),
   reglas: () => REGLAS.acta,

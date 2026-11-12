@@ -5,6 +5,7 @@ import express from 'express';
 import * as E from '../masmenos/engine.js';
 import { CATEGORIAS } from '../data/seeds/masmenos/index.js';
 import { montarSalas } from '../lib/salasJuego.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
 
 const router = express.Router();
 const barajar = (a) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
@@ -32,9 +33,8 @@ router.get('/local', (req, res) => {
 });
 
 montarSalas(router, {
+  ...limitesOnline('masmenos'),
   engine: E,
-  min: 2,
-  max: E.AJUSTES.max,
   config: leerConfig({}),
   validarConfig: leerConfig,
   prepararItems: async (sala) => preparar(sala.config),

@@ -8,6 +8,9 @@ import {
   MenuInicioJuego, FormCrearSala, FormUnirseSala, CabeceraSala, ListaSala, EsperandoAnfitrion, BloqueConfig
 } from '../../components/MenuJuego.jsx';
 import './Golpe.css';
+import { limitesOnline, textoSala } from '../limites.js';
+
+const LIM_ON = limitesOnline('golpe');
 
 export const CLAVE_SESION_GOLPE = 'golpe_online_session';
 const API = '/api/golpe/online';
@@ -152,7 +155,7 @@ export default function GolpeOnline({ onVolver, onSalir, onAbrirAyuda }) {
         {menu === 'crear' && (
           <FormCrearSala onVolver={() => { setMenu('menu'); setErrorMenu(''); }} onAyuda={onAbrirAyuda} nombre={nombre} setNombre={setNombre}
             onCrear={() => entrar('crear', { nombre: nombre.trim() })} cargando={cargando} error={errorMenu}
-            descripcion="Introduce tu nombre para abrir la sala y ser el anfitrión (de 3 a 8 jugadores, cada uno con su móvil)." />
+            descripcion={`Introduce tu nombre para abrir la sala y ser el anfitrión (${textoSala('golpe')}, cada uno con su móvil).`} />
         )}
         {menu === 'unirse' && (
           <FormUnirseSala onVolver={() => { setMenu('menu'); setErrorMenu(''); }} onAyuda={onAbrirAyuda} codigo={codigo} setCodigo={setCodigo}

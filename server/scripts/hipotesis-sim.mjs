@@ -25,7 +25,7 @@ export function hipotesisAlAzar(est, id, honesto) {
 }
 
 const stats = {};
-for (let n = 3; n <= 8; n++) {
+for (let n = E.AJUSTES.min; n <= E.AJUSTES.max; n++) {
   let atascos = 0; let ciertas = 0; let total = 0; let maxPts = 0;
   for (let k = 0; k < N; k++) {
     const est = E.crearPartida(Array.from({ length: n }, (_, i) => ({ id: i + 1, nombre: `B${i + 1}` })), { rondas: 5 }, { local: true });

@@ -5,9 +5,9 @@ import Icon from '../../components/Icon.jsx';
 import { getPreguntaAleatoria } from '../../../../server/data/seeds/conoce/conoceData.js';
 import './Conoce.css';
 import { centrarActivo } from '../../lib/centrarActivo.js';
+import { limitesLocal } from '../limites.js';
 
-const MIN_JUGADORES = 4;
-const MAX_JUGADORES = 16;
+const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('conoce');
 const MAX_RONDAS = 15;
 
 const COLORES = ['#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316'];
@@ -416,9 +416,9 @@ export default function ConoceLocal({ onVolver, onSalir, onExit, onAbrirAyuda })
   const [paso, setPaso] = useState('setup');
   const [modalSalirPortada, setModalSalirPortada] = useState(false);
 
-  const [numJugadores, setNumJugadores] = useState(4);
+  const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
   const [listaConfig, setListaConfig] = useState(
-    Array.from({ length: 4 }, (_, i) => ({ id: i + 1, nombre: `Jugador ${i + 1}` }))
+    Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: `Jugador ${i + 1}` }))
   );
 
   const [jugadores, setJugadores] = useState([]);
@@ -701,7 +701,7 @@ export default function ConoceLocal({ onVolver, onSalir, onExit, onAbrirAyuda })
                 >
                   {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => (
                     <option key={i + MIN_JUGADORES} value={i + MIN_JUGADORES}>
-                      {i + MIN_JUGADORES} jugadores
+                      {i + MIN_JUGADORES} {i + MIN_JUGADORES === 1 ? 'jugador' : 'jugadores'}
                     </option>
                   ))}
                 </select>

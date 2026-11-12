@@ -1,5 +1,7 @@
 import express from 'express';
 import { equiposData } from '../data/seeds/trescientosuno/index.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
+const LIM = limitesOnline('trescientosuno');
 
 const router = express.Router();
 
@@ -203,7 +205,7 @@ router.post('/online/unirse', (req, res) => {
   const sala = salasOnline.get(String(code || '').toUpperCase());
   if (!sala) return res.status(404).json({ error: 'Sala no encontrada.' });
   if (sala.estado !== 'lobby') return res.status(400).json({ error: 'La partida ya ha comenzado.' });
-  if (sala.jugadores.length >= 12) return res.status(400).json({ error: 'Sala llena (máx 12).' });
+  if (sala.jugadores.length >= LIM.max) return res.status(400).json({ error: `La sala está llena (máx. ${LIM.max}).` });
 
   const token = nuevoToken();
   const nuevoId = Math.max(...sala.jugadores.map((j) => j.id)) + 1;
@@ -257,7 +259,7 @@ router.post('/online/sala/:code/empezar', (req, res) => {
   const { sala, yo } = ctx;
   if (sala.adminToken !== yo.token) return res.status(403).json({ error: 'Solo el anfitrión puede empezar.' });
   if (sala.estado !== 'lobby') return res.status(400).json({ error: 'La partida ya ha empezado.' });
-  if (sala.jugadores.length < 2) return res.status(400).json({ error: 'Hacen falta al menos 2 jugadores.' });
+  if (sala.jugadores.length < LIM.min) return res.status(400).json({ error: `Se necesitan al menos ${LIM.min} jugadores.` });
   sala.estado = 'configuracion';
   res.json({ success: true });
 });

@@ -11,6 +11,8 @@ import cine from '../data/seeds/conecta/cine.js';
 import musica from '../data/seeds/conecta/musica.js';
 import historia from '../data/seeds/conecta/historia.js';
 import * as E from '../conecta/engine.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
+const LIM = limitesOnline('conecta');
 
 const router = express.Router();
 
@@ -87,7 +89,7 @@ router.get('/tablero', (req, res) => {
 // SALAS ONLINE (POR TURNOS, CON EL MOTOR server/conecta/engine.js)
 // ==========================================
 const salasOnline = {};
-const MAX_JUGADORES = 15;
+const MAX_JUGADORES = LIM.max;
 
 function generarCodigoSala() {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -178,7 +180,7 @@ router.post('/online/unirse', (req, res) => {
   const sala = salasOnline[code];
   if (!sala) return res.status(404).json({ error: 'La sala no existe o el código es incorrecto.' });
   if (sala.estado !== 'lobby') return res.status(400).json({ error: 'La partida ya ha comenzado.' });
-  if (sala.jugadores.length >= MAX_JUGADORES) return res.status(400).json({ error: 'La sala está completa.' });
+  if (sala.jugadores.length >= LIM.max) return res.status(400).json({ error: `La sala está llena (máx. ${LIM.max}).` });
   if (sala.jugadores.some((j) => j.nombre.toLowerCase() === nombre.toLowerCase())) {
     return res.status(400).json({ error: 'Ya hay un jugador con ese nombre en la sala.' });
   }
@@ -202,7 +204,7 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
   const r = obtenerSala(req, res, { admin: true });
   if (!r) return;
   const { sala } = r;
-  if (sala.jugadores.length < 2) return res.status(400).json({ error: 'Hacen falta al menos 2 jugadores.' });
+  if (sala.jugadores.length < LIM.min) return res.status(400).json({ error: `Se necesitan al menos ${LIM.min} jugadores.` });
   sala.jugadores.forEach((j) => { j.puntos = 0; });
   sala.rondaActual = 0;
   sala.ronda = null;

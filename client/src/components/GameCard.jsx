@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import Icon from './Icon.jsx';
 import { metaDe } from '../games/meta.js';
+import { LIMITES, textoJugadores } from '../games/limites.js';
 
 export default function GameCard({ game }) {
   const [mostrarDesc, setMostrarDesc] = useState(false);
@@ -141,6 +142,7 @@ export default function GameCard({ game }) {
               <div>
                 <span className="gm-badge">¿De qué trata?</span>
                 <h2 className="gm-titulo">{m.titulo || game.name}</h2>
+                {LIMITES[game.id] && <span className="gm-jugadores">👥 {textoJugadores(game.id)}</span>}
               </div>
             </div>
 

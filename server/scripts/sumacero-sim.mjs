@@ -26,7 +26,7 @@ function juegaBot(est, id) {
 }
 
 const stats = {};
-for (let n = 2; n <= 6; n++) {
+for (let n = E.AJUSTES.min; n <= E.AJUSTES.max; n++) {
   let atascos = 0; let ceros = 0; let filas = 0; let turnos = 0;
   for (let k = 0; k < N; k++) {
     const est = E.crearPartida(Array.from({ length: n }, (_, i) => ({ id: i + 1, nombre: `B${i + 1}` })), { rondas: 3 });

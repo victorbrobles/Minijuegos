@@ -4,6 +4,7 @@
 import express from 'express';
 import * as E from '../futbolgrid/engine.js';
 import { GRIDS_JUGABLES } from '../data/seeds/futbolgrid/index.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
 
 function elegirGrid(sala) {
   let libres = GRIDS_JUGABLES.filter((g) => !sala.usados.has(g.id));
@@ -20,9 +21,8 @@ router.get('/grid', (req, res) => {
   res.json({ success: true, grid: GRIDS_JUGABLES[Math.floor(Math.random() * GRIDS_JUGABLES.length)] });
 });
 const salas = {};
-const MIN = E.AJUSTES.min;
+const { min: MIN, max: MAX } = limitesOnline('futbolgrid');
 const equiposListos = (sala) => ['X', 'O'].every((e) => sala.jugadores.some((j) => j.equipo === e));
-const MAX = E.AJUSTES.max;
 const CADUCIDAD_MS = 4 * 60 * 60 * 1000;
 
 const codigoSala = () => {

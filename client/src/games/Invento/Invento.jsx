@@ -22,7 +22,7 @@ const JUEGO = {
   reglas: [
     'Cada ronda recibes tres cartas: un objeto, un problema que tiene que resolver y una característica absurda. Puedes cambiar una de ellas.',
     'Inventa un producto que combine las tres: ponle nombre y explica cómo funciona (como en la teletienda).',
-    `Después se enseñan todos los inventos sin autor y cada uno vota en tres categorías: ${Object.values(CATEGORIAS).map((c) => `${c.e} ${c.nombre.toLowerCase()}`).join(', ')}. No te puedes votar.`,
+    `Después se enseñan todos los inventos sin autor y cada uno vota en tres categorías: ${Object.values(CATEGORIAS).map((c) => `${c.e} ${c.nombre.toLowerCase()}`).join(', ')}. No te puedes votar. Si sois solo dos, entra también un invento de la casa (sus votos no dan puntos a nadie).`,
     `Cada voto da 1 punto y ganar una categoría, ${AJUSTES.bonusCategoria} más. Gana quien más puntos sume al final.`
   ]
 };

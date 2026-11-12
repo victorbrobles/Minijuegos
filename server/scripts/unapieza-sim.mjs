@@ -27,7 +27,7 @@ function jugadaAleatoria(p, id) {
 const stats = { completas: 0, atascadas: 0, figuras: 0, bloqueos: 0, objetivos: 0, puntos: [] };
 let t = 0;
 for (let n = 0; n < 300; n++) {
-  const nj = 2 + (n % 4);
+  const nj = E.AJUSTES.min + (n % (E.AJUSTES.max - E.AJUSTES.min + 1));
   const figs = [...E.FIGURAS].sort(() => Math.random() - 0.5);
   const p = E.crearPartida(Array.from({ length: nj }, (_, i) => ({ id: i + 1, nombre: `J${i + 1}` })), figs, { rondas: 3, segundos: 60 }, t);
   let pasos = 0;

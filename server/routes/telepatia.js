@@ -1,5 +1,7 @@
 import express from 'express';
 import crypto from 'crypto';
+import { limitesOnline } from '../../client/src/games/limites.js';
+const LIM = limitesOnline('telepatia');
 
 const router = express.Router();
 const salas = {};
@@ -49,7 +51,7 @@ router.post('/unirse', (req, res) => {
   const sala = salas[joinCode];
   if (!sala) return res.status(404).json({ error: 'Sala no encontrada' });
   if (sala.estado !== 'lobby') return res.status(400).json({ error: 'Partida ya empezada' });
-  if (sala.jugadores.length >= 20) return res.status(400).json({ error: 'Sala llena (máximo 20)' });
+  if (sala.jugadores.length >= LIM.max) return res.status(400).json({ error: `La sala está llena (máx. ${LIM.max}).` });
 
   const token = crypto.randomUUID();
   const newId = sala.jugadores.length > 0 ? Math.max(...sala.jugadores.map(j => j.id)) + 1 : 1;
@@ -174,7 +176,7 @@ router.post('/sala/:code/iniciar', (req, res) => {
   const { code, token } = req.body;
   const sala = salas[code];
   if (!sala || !sala.jugadores.find(j => j.token === token)?.esAdmin) return res.status(403).json({ error: 'No autorizado' });
-  if (sala.jugadores.length < 4) return res.status(400).json({ error: 'Mínimo 4 jugadores' });
+  if (sala.jugadores.length < LIM.min) return res.status(400).json({ error: `Se necesitan al menos ${LIM.min} jugadores.` });
 
   sala.jugadores.forEach(j => { j.puntos = 0; j.racha = 0; j.palabra = ''; });
   sala.rondaNum = 1;

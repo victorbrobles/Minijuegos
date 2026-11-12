@@ -69,7 +69,7 @@ assert.ok(p.fin.ganadores.length === 2, 'por parejas ganan los dos');
 // Partidas enteras al azar
 let manos = 0; let partidas = 0;
 for (let r = 0; r < 300; r++) {
-  const n = 4 + (r % 5);
+  const n = E.AJUSTES.min + (r % (E.AJUSTES.max - E.AJUSTES.min + 1));
   const modo = r % 3 === 0 && (n === 4 || n === 6) ? 'parejas' : 'individual';
   const especiales = r % 4 === 0 ? { comodines: true, bombas: true, espejo: true, dobles: true, mutantes: true, invertidas: true } : {};
   const cats = r % 5 === 0 ? ['grande', 'pares', 'juego'] : undefined;

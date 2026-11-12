@@ -12,7 +12,7 @@
 
 export const AJUSTES = {
   min: 2,
-  max: 15,
+  max: 16,
   segPreparacion: 10,
   segFutbolista: 15,
   filas: 4,

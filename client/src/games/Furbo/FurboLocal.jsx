@@ -8,14 +8,14 @@ import { ModalSalir } from './FurboOnline.jsx';
 import { ConfigPartida } from './FurboComun.jsx';
 import { ORDEN_FASES } from './FurboInfo.js';
 import './Furbo.css';
+import { limitesLocal } from '../limites.js';
 
-const MIN = 2;
-const MAX = 20;
+const { min: MIN, max: MAX } = limitesLocal('furbo');
 
 export default function FurboLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [fase, setFase] = useState('setup'); // 'setup' | 'jugando'
   const [modalSalir, setModalSalir] = useState(false);
-  const [nombres, setNombres] = useState(['Jugador 1', 'Jugador 2', 'Jugador 3', 'Jugador 4']);
+  const [nombres, setNombres] = useState(() => Array.from({ length: MIN }, (_, i) => `Jugador ${i + 1}`));
   const [config, setConfig] = useState({ fases: [...ORDEN_FASES], duracion: 'normal' });
   const [vista, setVista] = useState(null);
   const [sostiene, setSostiene] = useState(null);

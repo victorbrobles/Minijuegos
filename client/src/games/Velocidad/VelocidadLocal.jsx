@@ -4,11 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import './Velocidad.css';
 import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx';
+import { limitesLocal } from '../limites.js';
 
 const TIEMPO_TURNO = 60;
 const TIEMPO_PREPARACION = 10;
-const MIN_JUGADORES = 1;
-const MAX_JUGADORES = 15;
+const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('velocidad');
 
 const COLORES_JUGADOR = ['#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316', '#84cc16', '#6366f1'];
 const colorJugador = (id) => COLORES_JUGADOR[(Number(id) - 1 + COLORES_JUGADOR.length * 10) % COLORES_JUGADOR.length];
@@ -20,12 +20,8 @@ export default function VelocidadLocal({ onVolver, onExit }) {
   const [modalAyuda, setModalAyuda] = useState(false);
   const [modalSalirPortada, setModalSalirPortada] = useState(false);
 
-  const [numJugadores, setNumJugadores] = useState(3);
-  const [jugadores, setJugadores] = useState([
-    { id: 1, nombre: 'Jugador 1', aciertos: 0, jugo: false },
-    { id: 2, nombre: 'Jugador 2', aciertos: 0, jugo: false },
-    { id: 3, nombre: 'Jugador 3', aciertos: 0, jugo: false }
-  ]);
+  const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
+  const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: `Jugador ${i + 1}`, aciertos: 0, jugo: false })));
 
   const [record, setRecord] = useState(() => {
     try {

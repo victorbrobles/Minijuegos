@@ -1,5 +1,5 @@
 // client/src/games/Mus/Mus.jsx
-// Mus clásico: online (de 2 a 4 personas; los huecos los ocupa la máquina) o contra la máquina en tu móvil.
+// Mus clásico: online (cuatro personas, dos parejas) o contra la máquina en tu móvil.
 // Usa la sala y las pantallas comunes de ../Pulsador.
 import React from 'react';
 import JuegoPulsador from '../Pulsador/JuegoPulsador.jsx';
@@ -16,7 +16,7 @@ const JUEGO = {
   Partida: PartidaOnline,
   Fin,
   Config,
-  notaSala: '🂡 Dos parejas: el anfitrión y su compañero contra los otros dos. Si faltan jugadores, juega la máquina.',
+  notaSala: '🂡 Dos parejas: el anfitrión y su compañero contra los otros dos. Hacen falta los cuatro jugadores para empezar.',
   ganador: (n) => `¡Gana ${n.join(' y ')}!`,
   reglas: [
     'Se juega por parejas (los de enfrente) con la baraja española de 40 cartas, a 8 reyes: los treses valen como reyes y los doses como ases.',

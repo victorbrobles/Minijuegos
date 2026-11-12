@@ -13,7 +13,7 @@
 // una TRAICIÓN: rompe la alianza, queda a la vista de todos y resta puntos al final.
 
 export const AJUSTES = {
-  min: 2, max: 7, radio: 3, acciones: 2,
+  min: 2, max: 8, radio: 3, acciones: 2,
   inicio: { oro: 6, alimento: 6, soldados: 4 },
   coste: { soldadoOro: 2, soldadoAlimento: 1, muralla: 4 }, maxEntrenar: 5, maxMuralla: 3,
   mercado: { da: 3, recibe: 2, maxLotes: 3 },
@@ -28,7 +28,8 @@ export const REINOS = [
   { nombre: 'Reino del Dragón', e: '🐉', c: '#9333ea' },
   { nombre: 'Reino del Lobo', e: '🐺', c: '#475569' },
   { nombre: 'Reino del Halcón', e: '🦉', c: '#ea580c' },
-  { nombre: 'Reino del Oso', e: '🐻', c: '#a16207' }
+  { nombre: 'Reino del Oso', e: '🐻', c: '#a16207' },
+  { nombre: 'Reino del Toro', e: '🐂', c: '#0891b2' },
 ];
 export const TIPOS = {
   capital: { nombre: 'Capital', e: '🏰', oro: 3, alimento: 3 },

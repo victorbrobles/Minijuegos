@@ -5,6 +5,7 @@ import express from 'express';
 import * as E from '../oncefantasma/engine.js';
 import { PARTIDOS } from '../data/seeds/oncefantasma/onces.js';
 import { montarSalas, elegirSinRepetir } from '../lib/salasJuego.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
 
 const router = express.Router();
 const leerConfig = (b, c = { onces: 1, segundos: 180 }) => ({
@@ -21,9 +22,8 @@ router.get('/local', (req, res) => {
 });
 
 montarSalas(router, {
+  ...limitesOnline('oncefantasma'),
   engine: E,
-  min: E.AJUSTES.min,
-  max: E.AJUSTES.max,
   config: leerConfig({}),
   validarConfig: leerConfig,
   prepararItems: async (sala) => ({

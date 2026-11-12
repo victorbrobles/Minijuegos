@@ -6,7 +6,7 @@
 // una casilla libre y dice un futbolista que cumpla las dos categorías; el turno entero dura AJUSTES.segTurno. Si acierta, la
 // casilla es suya. Acierte o falle, el turno pasa al otro equipo. Un futbolista no se puede repetir en el tablero.
 
-export const AJUSTES = { min: 2, max: 12, segTurno: 120, ejemplos: 8 };
+export const AJUSTES = { min: 2, max: 6, segTurno: 120, ejemplos: 8 };
 export const EQUIPOS = {
   X: { nombre: 'Azul', simbolo: '✕' },
   O: { nombre: 'Rojo', simbolo: '◯' }

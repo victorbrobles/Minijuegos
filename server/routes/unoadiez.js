@@ -5,6 +5,7 @@ import express from 'express';
 import * as E from '../unoadiez/engine.js';
 import { CATEGORIAS_1_AL_10 } from '../data/seeds/unoadiez/unoadiez.js';
 import { montarSalas } from '../lib/salasJuego.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
 
 const router = express.Router();
 const barajar = (a) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
@@ -14,9 +15,8 @@ const leerConfig = (b, c = { vueltas: 1 }) => ({ vueltas: E.OPCIONES_VUELTAS.inc
 router.get('/categorias', (req, res) => res.json({ success: true, categorias: barajar(CATEGORIAS) }));
 
 montarSalas(router, {
+  ...limitesOnline('unoadiez'),
   engine: E,
-  min: E.AJUSTES.min,
-  max: E.AJUSTES.max,
   config: leerConfig({}),
   validarConfig: leerConfig,
   prepararItems: async (sala) => ({ items: barajar(CATEGORIAS), reglas: { vueltas: sala.config.vueltas } }),

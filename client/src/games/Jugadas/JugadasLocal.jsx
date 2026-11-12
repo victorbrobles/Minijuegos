@@ -8,10 +8,13 @@ import { ModalSalir } from './JugadasComun.jsx';
 import { MIN_JUGADORES, MAX_JUGADORES } from './constantes.js';
 import { SelectorJugadores } from '../../components/MenuJuego.jsx';
 import './Jugadas.css';
+import { limitesLocal } from '../limites.js';
+
+const LIM_JUG = limitesLocal('jugadas');
 
 export default function JugadasLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [paso, setPaso] = useState('config');
-  const [nombres, setNombres] = useState(['', '']);
+  const [nombres, setNombres] = useState(() => Array(LIM_JUG.min).fill(''));
   const [vista, setVista] = useState(null);
   const [error, setError] = useState('');
   const [aviso, setAviso] = useState('');
@@ -61,7 +64,7 @@ export default function JugadasLocal({ onVolver, onExit, onAbrirAyuda }) {
     return (
       <div className="jgp-contenedor">
         <SelectorJugadores
-          onVolver={onVolver} onAyuda={onAbrirAyuda} min={MIN_JUGADORES} max={MAX_JUGADORES}
+          onVolver={onVolver} onAyuda={onAbrirAyuda} min={LIM_JUG.min} max={LIM_JUG.max}
           numJugadores={nombres.length}
           onCambiarNum={(n) => setNombres((l) => (n > l.length ? [...l, ...Array(n - l.length).fill('')] : l.slice(0, n)))}
           nombres={nombres}

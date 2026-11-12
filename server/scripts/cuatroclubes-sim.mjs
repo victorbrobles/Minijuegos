@@ -5,7 +5,7 @@ import { RETOS, NOMBRES_BASE } from '../data/seeds/cuatroclubes/index.js';
 const azar = (a) => a[Math.floor(Math.random() * a.length)];
 let plenos = 0; let juez = 0;
 for (let k = 0; k < 200; k++) {
-  const n = 2 + (k % 6);
+  const n = E.AJUSTES.min + (k % (E.AJUSTES.max - E.AJUSTES.min + 1));
   const retos = [...RETOS].sort(() => Math.random() - 0.5).slice(0, 3);
   let t = 1e6;
   const p = E.crearPartida(Array.from({ length: n }, (_, i) => ({ id: i + 1, nombre: `J${i + 1}` })), retos, NOMBRES_BASE, t);

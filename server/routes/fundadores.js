@@ -3,11 +3,11 @@
 // La lógica vive en ../fundadores/engine.js; cada jugador recibe solo SU vista (nadie ve manos ni elecciones ajenas).
 import express from 'express';
 import * as E from '../fundadores/engine.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
 
 const router = express.Router();
 const salas = {};
-const MIN = E.AJUSTES.min;
-const MAX = E.AJUSTES.max;
+const { min: MIN, max: MAX } = limitesOnline('fundadores');
 const CADUCIDAD_MS = 4 * 60 * 60 * 1000;
 
 const codigoSala = () => {

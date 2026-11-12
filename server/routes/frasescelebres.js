@@ -7,6 +7,7 @@ import parte2 from '../data/seeds/frasescelebres/parte2.js';
 import parte3 from '../data/seeds/frasescelebres/parte3.js';
 import { montarSalas, elegirSinRepetir } from '../lib/salasJuego.js';
 import { REGLAS, OPCIONES_RONDAS } from '../pulsador/engine.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
 
 const router = express.Router();
 // Solo frases bien formadas: cuatro autores distintos y el bueno entre ellos.
@@ -28,6 +29,7 @@ router.get('/local', (req, res) => {
 });
 
 montarSalas(router, {
+  ...limitesOnline('frasescelebres'),
   config: { rondas: 10 },
   validarConfig: (b, c) => ({ ...c, rondas: rondasValidas(b.rondas, c.rondas) }),
   reglas: () => REGLAS.frasescelebres,

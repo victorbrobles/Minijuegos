@@ -38,7 +38,7 @@ assert.equal(p.jugadores[1].rol, 'ayudante', 'Ana atrapada');
 let ganaE = 0; let ganaM = 0; let turnos = 0; let capturas = 0; let escapes = 0;
 const N = 300;
 for (let k = 0; k < N; k++) {
-  const n = 3 + (k % 6);
+  const n = E.AJUSTES.min + (k % (E.AJUSTES.max - E.AJUSTES.min + 1));
   const q = E.crearPartida(Array.from({ length: n }, (_, i) => ({ id: i + 1, nombre: `J${i + 1}` })), { turnos: 25, sinReloj: true }, 0);
   let pasos = 0;
   while (q.fase !== 'fin') {

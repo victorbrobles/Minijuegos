@@ -9,9 +9,9 @@ import {
   Hero, BarraTiempo, TarjetaFoto, BotonFoto, ModalFoto, TablaRonda, Clasificacion, Podio, ModalSalir, inicial
 } from './Pantallas.jsx';
 import './Ubicacion.css';
+import { limitesLocal } from '../limites.js';
 
-const MIN_JUGADORES = 2;
-const MAX_JUGADORES = 10;
+const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('ubicacion');
 const SEGUNDOS_IMAGEN = 10;
 const SEGUNDOS_TURNO = 90;
 
@@ -30,7 +30,7 @@ export default function UbicacionLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [errorCarga, setErrorCarga] = useState('');
   const [modalSalir, setModalSalir] = useState(false);
 
-  const [numJugadores, setNumJugadores] = useState(3);
+  const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
   const [nombres, setNombres] = useState(() => Array.from({ length: MAX_JUGADORES }, (_, i) => `Jugador ${i + 1}`));
   const [rondasElegidas, setRondasElegidas] = useState(10);
 

@@ -5,6 +5,7 @@ import express from 'express';
 import * as E from '../director/engine.js';
 import { FUTBOLISTAS } from '../data/seeds/director/futbolistas.js';
 import { montarSalas } from '../lib/salasJuego.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
 
 const router = express.Router();
 const leerConfig = (b, c = { presupuesto: 200, mercados: 4 }) => ({
@@ -26,10 +27,9 @@ const MOTOR = {
 };
 
 montarSalas(router, {
+  ...limitesOnline('director'),
   engine: MOTOR,
   sinItems: true,
-  min: E.AJUSTES.min,
-  max: E.AJUSTES.max,
   config: leerConfig({}),
   validarConfig: leerConfig,
   prepararItems: async (sala) => ({ items: [], reglas: { ...sala.config } }),

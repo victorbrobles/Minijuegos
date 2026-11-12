@@ -4,7 +4,7 @@ import * as E from '../golpe/engine.js';
 const N = Number(process.argv[2] || 300);
 const azar = (a) => a[Math.floor(Math.random() * a.length)];
 const stats = {};
-for (let n = 3; n <= 8; n++) {
+for (let n = E.AJUSTES.min; n <= E.AJUSTES.max; n++) {
   let atascos = 0; let exitos = 0; let misiones = 0; const objetivos = {}; const cumplidos = {};
   for (let k = 0; k < N; k++) {
     const est = E.crearPartida(Array.from({ length: n }, (_, i) => ({ id: i + 1, nombre: `B${i + 1}` })), { misiones: 3 });

@@ -12,6 +12,10 @@ import {
   colorJugador,
   indiceColor
 } from './TelepatiaLocal.jsx';
+import { limitesOnline, textoSala } from '../limites.js';
+import { ChipJugadores } from '../../components/MenuJuego.jsx';
+
+const LIM_ON = limitesOnline('telepatia');
 
 const CLAVE_SESION_TEL = 'telepatia_online_session';
 
@@ -202,7 +206,7 @@ export default function TelepatiaOnline({
 
   const yo = sala?.jugadores?.find((j) => j.esTu);
   const esAdmin = Boolean(yo?.esAdmin);
-  const faltan = sala?.jugadores ? Math.max(0, 4 - sala.jugadores.length) : 4;
+  const faltan = sala?.jugadores ? Math.max(0, LIM_ON.min - sala.jugadores.length) : LIM_ON.min;
 
   const ranking = sala?.jugadores ? [...sala.jugadores].sort((a, b) => b.puntos - a.puntos) : [];
   const maxPuntos = ranking.length > 0 ? ranking[0].puntos : 0;
@@ -232,6 +236,7 @@ export default function TelepatiaOnline({
               <Icon name="zap" size={44} strokeWidth={1.7} />
             </div>
             <h1 className="title qq-main-title">{tituloJuego}</h1>
+            <ChipJugadores juegoId="telepatia" />
             <p className="hint qq-main-desc">{descripcionJuego}</p>
 
             {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
@@ -318,7 +323,7 @@ export default function TelepatiaOnline({
                 </span>
                 <div className="qq-opcion-textos">
                   <strong>Crear partida</strong>
-                  <span>Sé el anfitrión y genera un código para tu grupo (mínimo 4)</span>
+                  <span>Sé el anfitrión y genera un código para tu grupo (mínimo {LIM_ON.min})</span>
                 </div>
               </button>
 
@@ -519,7 +524,7 @@ export default function TelepatiaOnline({
             </div>
             {faltan > 0 && (
               <p className="hint" style={{ marginTop: '0.8rem' }}>
-                Faltan al menos {faltan} jugador{faltan === 1 ? '' : 'es'} para poder empezar (mínimo 4).
+                Faltan al menos {faltan} jugador{faltan === 1 ? '' : 'es'} para poder empezar (mínimo {LIM_ON.min}).
               </p>
             )}
           </div>
@@ -535,14 +540,14 @@ export default function TelepatiaOnline({
               onClick={() => peticionPost(`sala/${sesion.code}/iniciar`)}
             >
               <Icon name="play" size={22} />
-              {faltan > 0 ? 'Esperando jugadores (mínimo 4)...' : '¡Iniciar juego! (15 rondas)'}
+              {faltan > 0 ? `Esperando jugadores (mínimo ${LIM_ON.min})...` : '¡Iniciar juego! (15 rondas)'}
             </button>
           ) : (
             <div className="panel center" style={{ padding: '1.8rem 1.4rem', marginTop: '1rem' }}>
               <span className="lb-luna chica"><Icon name="hourglass" size={36} /></span>
               <h3 style={{ margin: '0.4rem 0' }}>Esperando al anfitrión...</h3>
               <p className="hint">
-                El anfitrión iniciará la partida cuando estéis todos listos (mínimo 4 jugadores).
+                El anfitrión iniciará la partida cuando estéis todos listos (mínimo {LIM_ON.min} jugadores).
               </p>
             </div>
           )}

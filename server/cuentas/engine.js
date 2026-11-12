@@ -25,8 +25,8 @@ export const ACCIONES = {
 const BOLSA = ['chivato', 'chivato', 'radar', 'radar', 'escudo', 'encasquetar', 'quemar', 'espia', 'congelar', 'ruleta', 'carga', 'apagon'];
 
 export const AJUSTES = {
-  min: 2, max: 8, vidas: 2, accionesPorJugador: 3, pasesPenaliza: 2, maxNumero: 100,
-  cartasPor: { 2: 7, 3: 6, 4: 5, 5: 4, 6: 3, 7: 3, 8: 3 },
+  min: 2, max: 10, vidas: 2, accionesPorJugador: 3, pasesPenaliza: 2, maxNumero: 100,
+  cartasPor: { 2: 7, 3: 6, 4: 5, 5: 4, 6: 3, 7: 3, 8: 3, 9: 3, 10: 3 },
   puntos: [3, 2, 1]
 };
 

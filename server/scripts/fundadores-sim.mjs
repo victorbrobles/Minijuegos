@@ -33,7 +33,7 @@ function jugarTurno(est, id) {
 }
 
 const stats = {};
-for (let n = 2; n <= 9; n++) {
+for (let n = E.AJUSTES.min; n <= E.AJUSTES.max; n++) {
   let rondas = 0; let ganPrimero = 0; let totales = 0; let atascos = 0;
   for (let k = 0; k < N; k++) {
     const est = E.crearPartida(Array.from({ length: n }, (_, i) => ({ id: i + 1, nombre: `B${i + 1}` })));

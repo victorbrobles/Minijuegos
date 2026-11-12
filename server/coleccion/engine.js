@@ -42,7 +42,7 @@ export const ACCIONES = {
 };
 
 export const AJUSTES = {
-  min: 2, max: 6,
+  min: 3, max: 8,
   manoInicial: 5, roboTurno: 2, jugadasTurno: 2, maxMano: 7, maxVitrina: 6,
   copiasPalo: 10, comodines: 4
 };

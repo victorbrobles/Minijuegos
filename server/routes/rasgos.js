@@ -7,6 +7,7 @@ import { randomUUID } from 'node:crypto';
 import { famosos, recorte, fotoCompleta } from '../lib/rasgosImagen.js';
 import { montarSalas, elegirSinRepetir } from '../lib/salasJuego.js';
 import { REGLAS, OPCIONES_RONDAS } from '../pulsador/engine.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
 
 const router = express.Router();
 const RASGO = {
@@ -71,6 +72,7 @@ router.get('/foto/:id/:i', (req, res) => { const f = famosoLocal(req, res); if (
 
 // ---------------------------------------------------------------- Salas online
 const { itemDe: itemDeSala } = montarSalas(router, {
+  ...limitesOnline('rasgos'),
   config: { rondas: 10 },
   validarConfig: (b, c) => ({ ...c, rondas: rondasValidas(b.rondas, c.rondas) }),
   reglas: () => REGLAS.rasgos,

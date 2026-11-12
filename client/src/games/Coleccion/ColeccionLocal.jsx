@@ -9,6 +9,9 @@ import { PantallaJuego, PantallaFin, Avatar } from './Vistas.jsx';
 import { ModalSalir } from './ColeccionOnline.jsx';
 import { SelectorJugadores } from '../../components/MenuJuego.jsx';
 import './Coleccion.css';
+import { limitesLocal } from '../limites.js';
+
+const LIM_JUG = limitesLocal('coleccion');
 
 const ACCIONES = {
   colocar: (est, id, d) => E.colocar(est, id, d.uid),
@@ -20,7 +23,7 @@ const ACCIONES = {
 
 export default function ColeccionLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [paso, setPaso] = useState('config');
-  const [nombres, setNombres] = useState(['', '', '']);
+  const [nombres, setNombres] = useState(() => Array(LIM_JUG.min).fill(''));
   const [error, setError] = useState('');
   const [aviso, setAviso] = useState(null);
   const [modal, setModal] = useState(false);
@@ -46,7 +49,7 @@ export default function ColeccionLocal({ onVolver, onExit, onAbrirAyuda }) {
     return (
       <div className="cxp-contenedor">
         <SelectorJugadores
-          onVolver={onVolver} onAyuda={onAbrirAyuda} min={E.AJUSTES.min} max={E.AJUSTES.max}
+          onVolver={onVolver} onAyuda={onAbrirAyuda} min={LIM_JUG.min} max={LIM_JUG.max}
           numJugadores={nombres.length}
           onCambiarNum={(n) => setNombres((l) => (n > l.length ? [...l, ...Array(n - l.length).fill('')] : l.slice(0, n)))}
           nombres={nombres}

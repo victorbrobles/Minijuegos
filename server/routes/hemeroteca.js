@@ -5,6 +5,7 @@ import express from 'express';
 import { TITULARES } from '../data/seeds/hemeroteca/titulares.js';
 import { montarSalas, elegirSinRepetir } from '../lib/salasJuego.js';
 import { REGLAS, OPCIONES_RONDAS } from '../pulsador/engine.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
 
 const router = express.Router();
 const oculto = (t) => t.replace(/\{([^}]+)\}/g, (_, x) => x.replace(/[^\s,.]/g, '_').replace(/_/g, '＿'));
@@ -34,6 +35,7 @@ router.get('/local', (req, res) => {
 });
 
 montarSalas(router, {
+  ...limitesOnline('hemeroteca'),
   config: { rondas: 10 },
   validarConfig: (b, c) => ({ ...c, rondas: rondasValidas(b.rondas, c.rondas) }),
   reglas: () => REGLAS.hemeroteca,

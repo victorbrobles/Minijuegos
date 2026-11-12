@@ -11,6 +11,9 @@ import {
   Hero, BarraTiempo, TarjetaFoto, BotonFoto, ModalFoto, TablaRonda, Clasificacion, Podio, ModalSalir, inicial
 } from './Pantallas.jsx';
 import './Ubicacion.css';
+import { limitesOnline, textoSala } from '../limites.js';
+
+const LIM_ON = limitesOnline('ubicacion');
 
 export const CLAVE_SESION_UBICACION = 'ubicacion_online_session';
 const SEGUNDOS_FOTO = 10;
@@ -188,7 +191,7 @@ export default function UbicacionOnline({ onVolver, onSalir, onAbrirAyuda }) {
           onCrear={handleCrear}
           cargando={cargando}
           error={errorMsg}
-          descripcion="Introduce tu nombre para abrir la sala y ser el anfitrión (de 2 a 10 jugadores)."
+          descripcion={`Introduce tu nombre para abrir la sala y ser el anfitrión (${textoSala('ubicacion')}).`}
         >
           <BloqueConfig titulo="Número de rondas" style={{ marginTop: '1rem' }}>
             <div className="ubp-pildoras">
@@ -242,8 +245,8 @@ export default function UbicacionOnline({ onVolver, onSalir, onAbrirAyuda }) {
           <ListaSala
             jugadores={sala.jugadores}
             yoId={yoId}
-            max={10}
-            min={2}
+            max={LIM_ON.max}
+            min={LIM_ON.min}
             anfitrionId={sala.anfitrionId}
             renderExtra={(j) => <span className="ubp-punto" style={{ background: j.color }} />}
           >
@@ -255,10 +258,10 @@ export default function UbicacionOnline({ onVolver, onSalir, onAbrirAyuda }) {
               type="button"
               className="big full qq-btn-principal"
               style={{ marginTop: '1rem' }}
-              disabled={sala.jugadores.length < 2}
+              disabled={sala.jugadores.length < LIM_ON.min}
               onClick={() => accion('iniciar')}
             >
-              <Icon name="play" size={22} /> {sala.jugadores.length < 2 ? 'Esperando jugadores…' : '¡Empezar el viaje!'}
+              <Icon name="play" size={22} /> {sala.jugadores.length < LIM_ON.min ? 'Esperando jugadores…' : '¡Empezar el viaje!'}
             </button>
           ) : (
             <EsperandoAnfitrion />

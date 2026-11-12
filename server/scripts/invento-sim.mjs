@@ -33,10 +33,33 @@ E.inventar(p, 2, 'Algo', 'Una descripción suficientemente larga', t);
 E.inventar(p, 3, 'Otro', 'Una descripción suficientemente larga', t);
 E.tick(p, t + 121_000);
 assert.equal(p.fase, 'votar');
-assert.equal(p.orden.length, 2);
+assert.equal(p.orden.length, 3); // dos inventos + el de la casa
 E.forzar(p);
 E.siguiente(p, t);
 assert.equal(p.fase, 'fin');
 assert.deepEqual(p.fin.ganadores, [1]);
 assert.ok(p.fin.mejor.nombre === 'Invento 1');
 console.log('invento-sim OK');
+
+// Con dos jugadores entra el invento de la casa; con veinte, todo cuadra
+for (const n of [E.AJUSTES.min, E.AJUSTES.max]) {
+  const JJ = Array.from({ length: n }, (_, i) => ({ id: i + 1, nombre: `J${i + 1}` }));
+  const q = E.crearPartida(JJ, M, { rondas: 2, segundos: 120 }, 0);
+  for (let r = 0; r < 2; r++) {
+    JJ.forEach((j) => assert.ok(E.inventar(q, j.id, `Invento ${j.id}`, 'Una descripción suficientemente larga', 0).ok));
+    assert.equal(q.fase, 'votar');
+    assert.equal(q.orden.length, n === 2 ? 3 : n);
+    const vv = E.vistaDe(q, 1);
+    if (n === 2) assert.ok(vv.inventos.some((x) => x.casa) && vv.inventos.find((x) => x.casa).nombre);
+    JJ.forEach((j) => {
+      const otras = E.vistaDe(q, j.id).inventos.filter((x) => !x.mio).map((x) => x.letra);
+      const el = () => otras[Math.floor(Math.random() * otras.length)];
+      assert.ok(E.votar(q, j.id, { compraria: el(), absurdo: el(), exito: el() }).ok);
+    });
+    assert.equal(q.fase, 'resultados');
+    E.siguiente(q, 0);
+  }
+  assert.equal(q.fase, 'fin');
+  assert.ok(q.fin.mejor === null || q.fin.mejor.autor !== E.CASA);
+}
+console.log('invento-sim OK (2 y 20 jugadores)');

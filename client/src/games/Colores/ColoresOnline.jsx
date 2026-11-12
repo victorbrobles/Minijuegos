@@ -9,6 +9,9 @@ import {
   Hero, BarraTiempo, TarjetaElemento, Paleta, Chips, ResultadoRonda, Clasificacion, Podio, ModalSalir, PildorasRondas
 } from './Pantallas.jsx';
 import './Colores.css';
+import { limitesOnline, textoSala } from '../limites.js';
+
+const LIM_ON = limitesOnline('colores');
 
 export const CLAVE_SESION_COLORES = 'colores_online_session';
 
@@ -157,7 +160,7 @@ export default function ColoresOnline({ onVolver, onSalir, onAbrirAyuda }) {
           onCrear={() => entrar('/crear', { nombre: nombre.trim(), rondas })}
           cargando={cargando}
           error={error}
-          descripcion="Introduce tu nombre para abrir la sala y ser el anfitrión (de 2 a 15 jugadores)."
+          descripcion={`Introduce tu nombre para abrir la sala y ser el anfitrión (${textoSala('colores')}).`}
         >
           <BloqueConfig titulo="Número de rondas" style={{ marginTop: '1rem' }}>
             <PildorasRondas valor={rondas} onCambiar={setRondas} />
@@ -200,13 +203,13 @@ export default function ColoresOnline({ onVolver, onSalir, onAbrirAyuda }) {
       <div className="colores-contenedor">
         <section className="game qq-pantalla">
           <CabeceraSala codigo={sala.code} onVolver={() => setModalLobby(true)} onAyuda={onAbrirAyuda} />
-          <ListaSala jugadores={sala.jugadores} yoId={sala.yoId} max={15} min={2} anfitrionId={sala.anfitrionId}>
+          <ListaSala jugadores={sala.jugadores} yoId={sala.yoId} max={LIM_ON.max} min={LIM_ON.min} anfitrionId={sala.anfitrionId}>
             <p className="hint" style={{ marginTop: '0.8rem' }}>🎨 {sala.totalRondas} rondas</p>
           </ListaSala>
           {error && <p className="error" style={{ margin: '0.8rem 0' }}>{error}</p>}
           {sala.esAdmin ? (
-            <button type="button" className="big full qq-btn-principal" style={{ marginTop: '1rem' }} disabled={sala.jugadores.length < 2} onClick={() => accion('iniciar')}>
-              <Icon name="play" size={22} /> {sala.jugadores.length < 2 ? 'Esperando jugadores…' : '¡Empezar partida!'}
+            <button type="button" className="big full qq-btn-principal" style={{ marginTop: '1rem' }} disabled={sala.jugadores.length < LIM_ON.min} onClick={() => accion('iniciar')}>
+              <Icon name="play" size={22} /> {sala.jugadores.length < LIM_ON.min ? 'Esperando jugadores…' : '¡Empezar partida!'}
             </button>
           ) : (
             <EsperandoAnfitrion />

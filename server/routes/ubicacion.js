@@ -2,6 +2,8 @@
 import { Router } from 'express';
 import { LUGARES } from '../data/seeds/ubicacion/ubicacion.seed.js';
 import { barajar } from '../lib/barajar.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
+const LIM = limitesOnline('ubicacion');
 
 const router = Router();
 const RONDAS = 10;
@@ -136,7 +138,7 @@ router.post('/online/unirse', (req, res) => {
 
   if (!sala) return res.status(404).json({ error: 'Sala no encontrada.' });
   if (sala.estado !== 'lobby') return res.status(400).json({ error: 'La partida ya comenzó.' });
-  if (sala.jugadores.length >= 10) return res.status(400).json({ error: 'Sala llena (máx 10).' });
+  if (sala.jugadores.length >= LIM.max) return res.status(400).json({ error: `La sala está llena (máx. ${LIM.max}).` });
 
   const token = 'tok_' + Math.random().toString(36).substring(2);
   // El id no puede repetirse aunque alguien haya salido de la sala
@@ -242,7 +244,7 @@ router.get('/online/sala/:code', (req, res) => {
 router.post('/online/sala/:code/iniciar', (req, res) => {
   const sala = salasOnline.get(req.params.code?.toUpperCase());
   if (!sala || sala.adminToken !== req.body?.token) return res.status(403).json({ error: 'No autorizado.' });
-  if (sala.jugadores.length < 2) return res.status(400).json({ error: 'Mínimo 2 jugadores para el modo online.' });
+  if (sala.jugadores.length < LIM.min) return res.status(400).json({ error: `Se necesitan al menos ${LIM.min} jugadores.` });
 
   sala.estado = 'jugando';
   sala.rondaNum = 1;

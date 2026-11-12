@@ -16,6 +16,10 @@ import {
   colorJugador,
   indiceColor
 } from './TrescientosunoLocal.jsx';
+import { limitesOnline, textoSala } from '../limites.js';
+import { ChipJugadores } from '../../components/MenuJuego.jsx';
+
+const LIM_ON = limitesOnline('trescientosuno');
 
 const CLAVE_SESION_trescientosuno = 'trescientosuno_online_session';
 const TIEMPO_TURNO = 60;
@@ -406,6 +410,7 @@ export default function TrescientosunoOnline({
               <Icon name="goal301" size={44} strokeWidth={1.7} />
             </div>
             <h1 className="title qq-main-title">{tituloJuego}</h1>
+            <ChipJugadores juegoId="trescientosuno" />
             <p className="hint qq-main-desc">{descripcionJuego}</p>
 
             {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
@@ -689,9 +694,9 @@ export default function TrescientosunoOnline({
                 </div>
               ))}
             </div>
-            {sala.jugadores.length < 2 && (
+            {sala.jugadores.length < LIM_ON.min && (
               <p className="hint" style={{ marginTop: '0.8rem' }}>
-                Falta al menos 1 jugador más para poder empezar.
+                Faltan jugadores para poder empezar (mínimo {LIM_ON.min}).
               </p>
             )}
           </div>
@@ -701,11 +706,11 @@ export default function TrescientosunoOnline({
               type="button"
               className="big full qq-btn-principal"
               style={{ marginTop: '1rem' }}
-              disabled={sala.jugadores.length < 2}
+              disabled={sala.jugadores.length < LIM_ON.min}
               onClick={() => accionAdmin('empezar')}
             >
               <Icon name="play" size={22} />
-              {sala.jugadores.length < 2 ? 'Esperando jugadores...' : 'Iniciar juego'}
+              {sala.jugadores.length < LIM_ON.min ? 'Esperando jugadores...' : 'Iniciar juego'}
             </button>
           ) : (
             <div className="panel center" style={{ padding: '1.8rem 1.4rem', marginTop: '1rem' }}>
@@ -1130,7 +1135,7 @@ export default function TrescientosunoOnline({
               {esAdmin ? (
                 <>
                   <BotonPrincipal
-                    disabled={cargando || sala.jugadores.length < 2}
+                    disabled={cargando || sala.jugadores.length < LIM_ON.min}
                     onClick={() => accionAdmin('revancha')}
                   >
                     <Icon name="refresh" size={20} /> Jugar con otro equipo

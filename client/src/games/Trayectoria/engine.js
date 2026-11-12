@@ -8,8 +8,8 @@
 // aparece una pista); si nadie acierta, se revela la solución.
 
 export const AJUSTES = {
-  min: 2,
-  max: 15,
+  min: 1,
+  max: 10,
   segClub: 6,
   segRespuesta: 20,
   segTrasUltimo: 15,

@@ -4,12 +4,14 @@
 // y cada jugador solo recibe SU vista, así nadie puede leer roles ajenos desde el navegador).
 import express from 'express';
 import * as E from '../traiciones/engine.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
+const LIM = limitesOnline('traiciones');
 
 const router = express.Router();
 const salas = {};
 
-const MIN_JUGADORES = 4;
-const MAX_JUGADORES = 12;
+const MIN_JUGADORES = LIM.min;
+const MAX_JUGADORES = LIM.max;
 const CADUCIDAD_MS = 4 * 60 * 60 * 1000;
 
 function codigoSala() {

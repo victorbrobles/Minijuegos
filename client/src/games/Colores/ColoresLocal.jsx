@@ -8,14 +8,14 @@ import {
   PildorasRondas, SEGUNDOS_RESPUESTA, colorJugador, inicial
 } from './Pantallas.jsx';
 import './Colores.css';
+import { limitesLocal } from '../limites.js';
 
-const MIN_JUGADORES = 2;
-const MAX_JUGADORES = 15;
+const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('colores');
 
 export default function ColoresLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [fase, setFase] = useState('setup'); // setup | cargando | privacidad | turno | resultados | clasificacion | final
   const [modalSalir, setModalSalir] = useState(false);
-  const [numJugadores, setNumJugadores] = useState(4);
+  const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
   const [nombres, setNombres] = useState(() => Array.from({ length: MAX_JUGADORES }, (_, i) => `Jugador ${i + 1}`));
   const [rondas, setRondas] = useState(15);
   const [error, setError] = useState('');

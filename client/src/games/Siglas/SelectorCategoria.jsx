@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { leerRecord } from './records.js';
 import Icon, { ICONO_CATEGORIA } from '../../components/Icon.jsx';
 import './Siglas.css';
+import { ChipJugadores } from '../../components/MenuJuego.jsx';
 
 const COLORES_CATEGORIA = [
   ['#f97316', '#ef4444'],
@@ -47,6 +48,7 @@ export default function SelectorCategoria({
             <Icon name="zap" size={42} strokeWidth={1.7} />
           </div>
           <h2 className="title qq-main-title">{tituloJuego}</h2>
+          <ChipJugadores juegoId="siglas" />
           <p className="error" style={{ margin: '0.8rem 0' }}>
             No se pudo conectar con el servidor. ¿Está arrancado?
           </p>
@@ -127,6 +129,9 @@ export default function SelectorCategoria({
           <div className="qqp-hero-chips">
             <span className="qqp-chip">
               <Icon name="trophy" size={14} /> <span>Récord: {recordGlobal} pts</span>
+            </span>
+            <span className="qqp-chip">
+              <Icon name="users" size={14} /> <span>1 jugador</span>
             </span>
             {onAyuda && (
               <button

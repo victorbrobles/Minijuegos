@@ -4,6 +4,7 @@ import express from 'express';
 import * as E from '../tablero/engine.js';
 import { CATEGORIAS, PREGUNTAS } from '../data/seeds/tablero/preguntas.js';
 import { montarSalas } from '../lib/salasJuego.js';
+import { limitesOnline } from '../../client/src/games/limites.js';
 
 const router = express.Router();
 const barajar = (l) => { const b = [...l]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
@@ -36,10 +37,9 @@ router.get('/local', (req, res) => {
 const MOTOR = { ...E, crearPartida: (jugadores, items, reglas, ahora) => E.crearPartida(jugadores, reglas.banco, reglas, ahora) };
 
 montarSalas(router, {
+  ...limitesOnline('tablero'),
   engine: MOTOR,
   sinItems: true,
-  min: E.AJUSTES.min,
-  max: E.AJUSTES.max,
   config: leerConfig({}),
   validarConfig: leerConfig,
   prepararItems: async (sala) => ({ items: [], reglas: { ...sala.config, banco: montarBanco(sala.usados) } }),

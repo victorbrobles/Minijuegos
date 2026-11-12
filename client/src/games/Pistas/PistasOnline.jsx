@@ -3,6 +3,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
 import './Pistas.css';
 import { MenuInicioJuego, MenuModoOnline, FormCrearSala, FormUnirseSala, CabeceraSala, ListaSala, EsperandoAnfitrion } from '../../components/MenuJuego.jsx';
+import { limitesOnline, textoSala } from '../limites.js';
+
+const LIM_ON = limitesOnline('pistas');
 
 const CLAVE_SESION_PISTAS = 'pistas_online_session';
 const COLORES_JUGADOR = ['#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316', '#84cc16', '#6366f1'];
@@ -383,7 +386,7 @@ export default function PistasOnline({ onLocal, onSalir }) {
           </div>
 
           <ListaSala
-            jugadores={sala.jugadores} yoId={yoId} min={2} max={15} anfitrionId={sala.anfitrionId}
+            jugadores={sala.jugadores} yoId={yoId} min={LIM_ON.min} max={LIM_ON.max} anfitrionId={sala.anfitrionId}
             renderExtra={(j) => (
               <span className="ptp-sala-extra">
                 {!j.conectado && <span className="ptp-sin-conexion" title="Sin conexión">📵</span>}
@@ -398,11 +401,11 @@ export default function PistasOnline({ onLocal, onSalir }) {
             <div style={{ marginTop: '1.2rem' }}>
               <button
                 className="big full qq-btn-principal"
-                disabled={sala.jugadores.length < 2}
+                disabled={sala.jugadores.length < LIM_ON.min}
                 onClick={handleIniciarJuego}
               >
                 <Icon name="play" size={22} />
-                {sala.jugadores.length < 2 ? 'Esperando jugadores...' : '¡Empezar Partida!'}
+                {sala.jugadores.length < LIM_ON.min ? 'Esperando jugadores...' : '¡Empezar Partida!'}
               </button>
             </div>
           ) : (

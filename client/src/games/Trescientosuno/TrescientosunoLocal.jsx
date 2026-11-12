@@ -4,9 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import './Trescientosuno.css';
 import { centrarActivo } from '../../lib/centrarActivo.js';
+import { limitesLocal } from '../limites.js';
 
-const MIN_JUGADORES = 2;
-const MAX_JUGADORES = 12;
+const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('trescientosuno');
 const TIEMPO_TURNO = 60;
 
 const COLORES = ['#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316'];
@@ -317,12 +317,8 @@ export default function TrescientosunoLocal({ onVolver, onExit, onAbrirAyuda }) 
   const [fase, setFase] = useState('setup');
   const [modalSalirPortada, setModalSalirPortada] = useState(false);
 
-  const [numJugadores, setNumJugadores] = useState(3);
-  const [jugadores, setJugadores] = useState([
-    { id: 1, nombre: 'Jugador 1', puntos: 0, estado: 'vivo', comodines: ['x2', 'x3', 'x5', 'revelar'] },
-    { id: 2, nombre: 'Jugador 2', puntos: 0, estado: 'vivo', comodines: ['x2', 'x3', 'x5', 'revelar'] },
-    { id: 3, nombre: 'Jugador 3', puntos: 0, estado: 'vivo', comodines: ['x2', 'x3', 'x5', 'revelar'] }
-  ]);
+  const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
+  const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: `Jugador ${i + 1}`, puntos: 0, estado: 'vivo', comodines: ['x2', 'x3', 'x5', 'revelar'] })));
 
   const [equipos, setEquipos] = useState([]);
   const [filtroEquipo, setFiltroEquipo] = useState('');
@@ -684,7 +680,7 @@ export default function TrescientosunoLocal({ onVolver, onExit, onAbrirAyuda }) 
                 >
                   {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => (
                     <option key={i + MIN_JUGADORES} value={i + MIN_JUGADORES}>
-                      {i + MIN_JUGADORES} jugadores
+                      {i + MIN_JUGADORES} {i + MIN_JUGADORES === 1 ? 'jugador' : 'jugadores'}
                     </option>
                   ))}
                 </select>
@@ -745,7 +741,7 @@ export default function TrescientosunoLocal({ onVolver, onExit, onAbrirAyuda }) 
               <BotonPortada texto="Volver" onClick={() => setFase('setup')} />
               <div className="qqp-hero-chips">
                 <span className="qqp-chip">
-                  <Icon name="users" size={14} /> <span>{jugadores.length} jugadores</span>
+                  <Icon name="users" size={14} /> <span>{jugadores.length} {jugadores.length === 1 ? 'jugador' : 'jugadores'}</span>
                 </span>
               </div>
             </div>

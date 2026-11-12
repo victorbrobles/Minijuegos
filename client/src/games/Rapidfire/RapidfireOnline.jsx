@@ -14,6 +14,10 @@ import {
   colorJugador,
   indiceColor
 } from './RapidfireLocal.jsx';
+import { limitesOnline, textoSala } from '../limites.js';
+import { ChipJugadores } from '../../components/MenuJuego.jsx';
+
+const LIM_ON = limitesOnline('rapidfire');
 
 const CLAVE_SESION_RF = 'rapidfire_online_session';
 const TIEMPO_S = 60;
@@ -346,6 +350,7 @@ export default function RapidfireOnline({
               <Icon name="zap" size={44} strokeWidth={1.7} />
             </div>
             <h1 className="title qq-main-title">{tituloJuego}</h1>
+            <ChipJugadores juegoId="rapidfire" />
             <p className="hint qq-main-desc">{descripcionJuego}</p>
 
             {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
@@ -612,7 +617,7 @@ export default function RapidfireOnline({
               {sala.code}
             </button>
             <p className="hint small">
-              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Comparte este código para que se unan (mínimo 2 jugadores).'}
+              {codigoCopiado ? '¡Copiado al portapapeles!' : 'Comparte este código para que se unan (mínimo {LIM_ON.min} jugadores).'}
             </p>
           </div>
 
@@ -625,9 +630,9 @@ export default function RapidfireOnline({
                 </div>
               ))}
             </div>
-            {sala.jugadores.length < 2 && (
+            {sala.jugadores.length < LIM_ON.min && (
               <p className="hint" style={{ marginTop: '0.8rem' }}>
-                Falta al menos 1 jugador más para poder empezar.
+                Faltan jugadores para poder empezar (mínimo {LIM_ON.min}).
               </p>
             )}
           </div>
@@ -637,11 +642,11 @@ export default function RapidfireOnline({
               type="button"
               className="big full qq-btn-principal"
               style={{ marginTop: '1rem' }}
-              disabled={sala.jugadores.length < 2}
+              disabled={sala.jugadores.length < LIM_ON.min}
               onClick={handleIniciarPartida}
             >
               <Icon name="play" size={22} />
-              {sala.jugadores.length < 2 ? 'Esperando rivales...' : 'Iniciar juego'}
+              {sala.jugadores.length < LIM_ON.min ? 'Esperando rivales...' : 'Iniciar juego'}
             </button>
           ) : (
             <div className="panel center" style={{ padding: '1.8rem 1.4rem', marginTop: '1rem' }}>
