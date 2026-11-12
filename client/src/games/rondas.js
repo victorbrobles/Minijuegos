@@ -52,7 +52,12 @@ export const RONDAS = {
   footballsplit: { opciones: [2, 3, 5], porJugador: true },
   jugadas: { opciones: [5, 10, 15], unidad: 'jugadas' },
   cuatroclubes: { opciones: [10, 15, 20] },
-  geoquiz: { opciones: [2, 3, 5], porJugador: true }
+  geoquiz: { opciones: [2, 3, 5], porJugador: true },
+  escondite: { opciones: [2, 3, 4], porJugador: true },
+  lapiz: { opciones: [3, 5, 7], unidad: 'letras' },
+  fichajes: { opciones: [5, 7, 10] },
+  ponorden: { opciones: [5, 10, 15] },
+  intruso: { opciones: [5, 10, 15] }
 };
 
 function base(id) {

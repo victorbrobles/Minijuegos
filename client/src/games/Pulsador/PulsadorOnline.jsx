@@ -22,7 +22,7 @@ const leerSesion = (clave) => {
 const post = async (url, body) => {
   const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error || 'Algo ha fallado.');
+  if (!res.ok) { const e = new Error(data.error || 'Algo ha fallado.'); e.datos = data; throw e; }
   return data;
 };
 
@@ -114,10 +114,12 @@ export default function PulsadorOnline({ juego, onVolver, onSalir, onAbrirAyuda 
     const s = sesionRef.current;
     if (!s) return;
     try {
-      await post(`${API}/sala/${s.code}/${ruta}`, { token: s.token, ...cuerpo });
+      const datos = await post(`${API}/sala/${s.code}/${ruta}`, { token: s.token, ...cuerpo });
       await consultar();
+      return { ok: true, datos };
     } catch (e) {
       mostrarAviso(e.message);
+      return { ok: false, error: e.message, datos: e.datos };
     }
   };
   const enviar = (tipo, datos = {}) => {

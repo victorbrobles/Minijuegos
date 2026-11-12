@@ -1,0 +1,9 @@
+/* client/src/games/Fichajes/Fichajes.css — «Fichaje exprés» (clases fch-) */
+.fch-carta { text-align: center; }
+.fch-racha { display: inline-block; margin: 0.4rem 0 0.6rem; padding: 0.3rem 0.8rem; border-radius: 999px; background: #fff7ed; color: #9a3412; font-weight: 800; }
+.fch-nombre { margin: 0.2rem 0 0.1rem; font-size: 1.9rem; line-height: 1.1; color: #0f172a; }
+.fch-datos { margin: 0 0 0.8rem; font-weight: 700; color: #64748b !important; }
+.fch-carta .smx-form { text-align: left; }
+.fch-ultimo { padding: 0.65rem 0.85rem; border-radius: 16px; background: #fef2f2; color: #7f1d1d; font-weight: 700; }
+.fch-ultimo.bien { background: #f0fdf4; color: #14532d; }
+.fch-ultimo small { display: block; margin-top: 0.2rem; font-weight: 600; }

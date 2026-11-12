@@ -418,5 +418,47 @@
     "name": "Mus Avanzado",
     "description": "Mus de faroles con baraja pactada: comodines, bombas o espejos si todos aceptan. Cada ronda es una categoría distinta (la grande, parejas, escalera, colores…) y en cada una se anuncia, se sube, se pasa o se desafía. Individual o por parejas.",
     "isNew": true
+  },
+  {
+    "id": "escondite",
+    "name": "El Escondite",
+    "description": "Sale una categoría con pocas respuestas posibles. Por turnos, uno se esconde en una de ellas y el resto intenta adivinar cuál ha elegido. Si nadie te encuentra, sumas.",
+    "isNew": true
+  },
+  {
+    "id": "ponorden",
+    "name": "Ponlo en orden",
+    "description": "Seis inventos, ríos, películas o planetas para ordenar por fecha, tamaño o distancia. Cada posición acertada suma, y el orden perfecto vale mucho más.",
+    "isNew": true
+  },
+  {
+    "id": "intruso",
+    "name": "El Intruso Histórico",
+    "description": "Cinco elementos y uno no encaja: es de otra época o de otra categoría. Tienes diez segundos para encontrarlo.",
+    "isNew": true
+  },
+  {
+    "id": "lapiz",
+    "name": "¡Lápiz fuera!",
+    "description": "Sale una letra y ocho categorías: nombre, animal, país, cosa… Rellénalas antes que nadie y suelta el lápiz. Las respuestas que nadie más ha puesto valen el doble.",
+    "isNew": true
+  },
+  {
+    "id": "fichajes",
+    "name": "Fichaje exprés",
+    "description": "Sale un futbolista y tienes 15 segundos para decir en qué equipo juega ahora. Aguanta la racha: cada acierto suma y los jugadores son cada vez menos conocidos.",
+    "isNew": true
+  },
+  {
+    "id": "eco",
+    "name": "Eco Cromático",
+    "description": "Repite la secuencia de luces… pero cada vez con más botones, más rápido y con trampas: rondas al revés, pasos prohibidos y colores que cambian de sitio.",
+    "isNew": true
+  },
+  {
+    "id": "crimen",
+    "name": "Escena del Crimen",
+    "description": "Han asesinado a Víctor. Coloca a cada sospechoso en el plano de la casa con las pistas (uno por fila y columna) y descubre quién estaba a solas con la víctima.",
+    "isNew": true
   }
 ]

@@ -207,7 +207,7 @@ export function montarSalas(router, opciones) {
     }
     if (r === null) return res.status(400).json({ error: 'Acción desconocida.' });
     revisar(sala);
-    if (!r.ok) return res.status(400).json({ error: r.error });
+    if (!r.ok) return res.status(400).json({ ...r, error: r.error });
     res.json({ success: true, resultado: r });
   });
 

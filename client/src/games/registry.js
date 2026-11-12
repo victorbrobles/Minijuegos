@@ -69,6 +69,13 @@ import Ordenalos from './Ordenalos/Ordenalos.jsx';
 import Excusas from './Excusas/Excusas.jsx';
 import Semaforo from './Semaforo/Semaforo.jsx';
 import UnTrazo from './UnTrazo/UnTrazo.jsx';
+import Escondite from './Escondite/Escondite.jsx';
+import PonOrden from './PonOrden/PonOrden.jsx';
+import Intruso from './Intruso/Intruso.jsx';
+import Lapiz from './Lapiz/Lapiz.jsx';
+import Fichajes from './Fichajes/Fichajes.jsx';
+import Eco from './Eco/Eco.jsx';
+import Crimen from './Crimen/Crimen.jsx';
 
 // id del juego (el mismo que en server/data/games.json) -> componente React
 const registry = {
@@ -141,7 +148,14 @@ const registry = {
   'ordenalos': Ordenalos,
   'excusas': Excusas,
   'semaforo': Semaforo,
-  'untrazo': UnTrazo
+  'untrazo': UnTrazo,
+  'escondite': Escondite,
+  'ponorden': PonOrden,
+  'intruso': Intruso,
+  'lapiz': Lapiz,
+  'fichajes': Fichajes,
+  'eco': Eco,
+  'crimen': Crimen
 };
 
 export default registry;

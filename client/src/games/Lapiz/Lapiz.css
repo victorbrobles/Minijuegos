@@ -1,0 +1,26 @@
+/* client/src/games/Lapiz/Lapiz.css — «¡Lápiz fuera!» (clases lpz-) */
+.lpz-cab { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.7rem; }
+.lpz-cab p { margin: 0; font-weight: 700; color: #475569; font-size: 0.95rem; }
+.lpz-letra { display: grid; place-items: center; flex: 0 0 4.2rem; height: 4.2rem; border-radius: 18px; background: linear-gradient(150deg, var(--pz1), var(--pz2)); color: #ffffff; box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2); }
+.lpz-letra small { font-size: 0.62rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.85; margin-bottom: -0.4rem; }
+.lpz-letra b { font-size: 2.3rem; line-height: 1; }
+.lpz-aviso { display: block; color: #b91c1c; }
+.lpz-campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.5rem; }
+.lpz-campo { display: grid; gap: 0.2rem; }
+.lpz-campo span { font-size: 0.8rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em; color: #64748b; }
+.lpz-campo input { width: 100%; box-sizing: border-box; padding: 0.65rem 0.8rem; border: 3px solid #e2e8f0; border-radius: 14px; background: #ffffff; color: #0f172a; font: inherit; font-weight: 700; outline: none; }
+.lpz-campo input:focus { border-color: var(--pz2); }
+.lpz-campo.ok input { border-color: #22c55e; }
+.lpz-campo.mal input { border-color: #f87171; }
+.lpz-fuera { margin-top: 0.8rem; width: 100%; }
+.lpz-fuera small { opacity: 0.85; }
+.lpz-rev { margin-top: 0.6rem; }
+.lpz-rev-fila { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.25rem; }
+.lpz-resp { position: relative; display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.25rem 0.6rem 0.25rem 0.25rem; border: 2px solid #e2e8f0; border-radius: 999px; background: #ffffff; color: #0f172a; font: inherit; font-weight: 800; font-size: 0.92rem; cursor: pointer; }
+.lpz-resp:disabled { cursor: default; opacity: 0.9; }
+.lpz-resp b { color: #16a34a; }
+.lpz-resp em { font-style: normal; font-size: 0.75rem; color: #b91c1c; }
+.lpz-resp.mio { border-color: #f87171; }
+.lpz-resp.anulada { text-decoration: line-through; background: #fef2f2; color: #991b1b; }
+.lpz-resp.anulada b { color: #991b1b; }
+.lpz-resp.vacia { background: #f1f5f9; color: #94a3b8; cursor: default; }

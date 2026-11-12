@@ -78,7 +78,14 @@ export const LIMITES = {
   ordenalos: { min: 1, max: 1 },
   excusas: { min: 1, max: 1 },
   semaforo: { min: 1, max: 1 },
-  untrazo: { min: 1, max: 1 }
+  untrazo: { min: 1, max: 1 },
+  escondite: { min: 3, max: 12 },
+  lapiz: { min: 2, max: 12 },
+  eco: { min: 1, max: 1 },
+  crimen: { min: 1, max: 1 },
+  fichajes: { min: 1, max: 10 },
+  ponorden: { min: 1, max: 12 },
+  intruso: { min: 1, max: 10 }
 };
 
 function base(id) {

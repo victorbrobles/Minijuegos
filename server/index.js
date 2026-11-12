@@ -71,6 +71,11 @@ import footballsplitRoutes from './routes/footballsplit.js';
 import jugadasRoutes from './routes/jugadas.js';
 import cuatroclubesRoutes from './routes/cuatroclubes.js';
 import geoquizRoutes from './routes/geoquiz.js';
+import fichajesRoutes from './routes/fichajes.js';
+import lapizRoutes from './routes/lapiz.js';
+import intrusoRoutes from './routes/intruso.js';
+import ponordenRoutes from './routes/ponorden.js';
+import esconditeRoutes from './routes/escondite.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -169,6 +174,11 @@ app.use('/api/footballsplit', footballsplitRoutes);
 app.use('/api/jugadas', jugadasRoutes);
 app.use('/api/cuatroclubes', cuatroclubesRoutes);
 app.use('/api/geoquiz', geoquizRoutes);
+app.use('/api/fichajes', fichajesRoutes);
+app.use('/api/lapiz', lapizRoutes);
+app.use('/api/intruso', intrusoRoutes);
+app.use('/api/ponorden', ponordenRoutes);
+app.use('/api/escondite', esconditeRoutes);
 
 // 5. Redirección para React Router (Single Page Application)
 app.get('*', (req, res) => {

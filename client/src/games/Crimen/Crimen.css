@@ -1,0 +1,35 @@
+/* client/src/games/Crimen/Crimen.css — «Escena del Crimen» (clases crm-) */
+.crm-contenedor { width: 100%; }
+.crm-mision { margin: 0.6rem 0 0; padding: 0.6rem 0.8rem; border-radius: 16px; background: #ffffff; color: #0f172a; font-weight: 700; }
+.crm-pistas ul { margin: 0.3rem 0 0; padding-left: 1.1rem; display: grid; gap: 0.3rem; }
+.crm-pistas li { font-weight: 700; color: #1e293b; cursor: pointer; }
+.crm-pistas li.hecha { text-decoration: line-through; color: #94a3b8; }
+.crm-pistas li.regla { list-style: '⚖️ '; color: #64748b; cursor: default; font-weight: 600; }
+.crm-personas { display: flex; flex-wrap: wrap; gap: 0.35rem; justify-content: center; margin: 0.6rem 0; }
+.crm-persona { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.4rem 0.7rem; border: 3px solid transparent; border-radius: 999px; background: #ffffff; color: #0f172a; font: inherit; font-weight: 800; cursor: pointer; box-shadow: 0 3px 0 rgba(0, 0, 0, 0.18); }
+.crm-persona span { font-size: 1.15rem; }
+.crm-persona.sel { border-color: #f59e0b; }
+.crm-persona.puesta { opacity: 0.6; }
+.crm-persona.mal { border-color: #dc2626; }
+.crm-persona.victima { background: #f1f5f9; }
+.crm-persona.tachar { background: #fee2e2; }
+.crm-tablero { display: grid; grid-template-columns: 1.2rem repeat(var(--n), 1fr); gap: 0; width: min(94vw, 470px); margin: 0 auto; }
+.crm-coord { display: grid; place-items: center; font-size: 0.75rem; font-weight: 900; color: rgba(255, 255, 255, 0.85); padding: 0.15rem; }
+.crm-celda { position: relative; aspect-ratio: 1; width: 100% !important; min-width: 0 !important; min-height: 0 !important; height: auto !important; margin: 0 !important; padding: 0 !important; border-radius: 0 !important; border-style: solid !important; border-color: #1e293b !important; box-shadow: none !important; transform: none !important; display: grid; place-items: center; cursor: pointer; font: inherit; color: #0f172a; overflow: hidden; }
+.crm-celda:disabled { cursor: default; }
+.crm-celda.bloqueada { background-image: repeating-linear-gradient(45deg, rgba(0, 0, 0, 0.07) 0 6px, transparent 6px 12px); }
+.crm-celda.tachada { filter: grayscale(0.6) brightness(0.85); }
+.crm-sala { position: absolute; top: 1px; left: 2px; right: 2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-align: left; font-size: 0.52rem; font-weight: 900; text-transform: uppercase; color: rgba(15, 23, 42, 0.6); letter-spacing: 0.02em; pointer-events: none; }
+.crm-mueble { font-style: normal; font-size: clamp(0.9rem, 4.5vw, 1.4rem); opacity: 0.9; }
+.crm-ficha { position: absolute; inset: 8% 8%; display: grid; place-items: center; align-content: center; border-radius: 50%; background: #ffffff; box-shadow: 0 0 0 3px #f59e0b, 0 3px 6px rgba(0, 0, 0, 0.3); font-size: clamp(1rem, 5vw, 1.5rem); line-height: 1; }
+.crm-ficha em { font-style: normal; font-size: 0.45rem; font-weight: 900; margin-top: 1px; }
+.crm-ficha.victima { box-shadow: 0 0 0 3px #475569, 0 3px 6px rgba(0, 0, 0, 0.3); }
+.crm-celda.mal .crm-ficha { box-shadow: 0 0 0 3px #dc2626; }
+.crm-celda.asesino .crm-ficha { box-shadow: 0 0 0 4px #dc2626, 0 0 18px #dc2626; }
+.crm-x { font-size: 1.2rem; color: #b91c1c; font-weight: 900; }
+.crm-acciones { display: grid; gap: 0.5rem; margin-top: 0.8rem; }
+.crm-sospechosos { display: flex; flex-wrap: wrap; gap: 0.4rem; justify-content: center; margin: 0.6rem 0; }
+.uj-fin .crm-tablero { margin-top: 0.8rem; width: 100%; box-sizing: border-box; }
+.uj-fin .crm-coord { color: #64748b; }
+
+.crm-tablero { padding: 0.35rem; border-radius: 14px; background: rgba(255, 255, 255, 0.12); }

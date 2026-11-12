@@ -660,6 +660,62 @@ export const META = {
     etiquetas: 'dibujar trazo figuras lineas puntos logica euler puzle un jugador solitario',
     descripcion: 'Repasa todas las líneas de la figura sin levantar el dedo ni pasar dos veces por la misma. Y si es imposible… ¡demuéstralo!',
     categorias: ['un_jugador']
+  },
+  'escondite': {
+    titulo: 'El Escondite',
+    icono: 'eyeoff',
+    colores: ['#14b8a6', '#042f2e'],
+    etiquetas: 'categorias esconder adivinar farol listas grupo online amigos',
+    descripcion: 'Sale una categoría con pocas respuestas posibles. Por turnos, uno se esconde en una de ellas y el resto intenta adivinar cuál ha elegido. Si nadie te encuentra, sumas.',
+    categorias: ['chill', 'estrategia']
+  },
+  'ponorden': {
+    titulo: 'Ponlo en orden',
+    icono: 'podium',
+    colores: ['#6366f1', '#1e1b4b'],
+    etiquetas: 'ordenar cronologia tamaño distancia historia inventos rios peliculas cultura online',
+    descripcion: 'Seis inventos, ríos, películas o planetas para ordenar por fecha, tamaño o distancia. Cada posición acertada suma, y el orden perfecto vale mucho más.',
+    categorias: ['prueba']
+  },
+  'intruso': {
+    titulo: 'El Intruso Histórico',
+    icono: 'search',
+    colores: ['#ef4444', '#450a0a'],
+    etiquetas: 'intruso historia epoca categoria rapidez cultura obras inventos online',
+    descripcion: 'Cinco elementos y uno no encaja: es de otra época o de otra categoría. Tienes diez segundos para encontrarlo.',
+    categorias: ['prueba']
+  },
+  'lapiz': {
+    titulo: '¡Lápiz fuera!',
+    icono: 'edit',
+    colores: ['#f59e0b', '#431407'],
+    etiquetas: 'letra palabras categorias nombre animal pais cosa escribir rapidez stop basta online',
+    descripcion: 'Sale una letra y ocho categorías: nombre, animal, país, cosa… Rellénalas antes que nadie y suelta el lápiz. Las respuestas que nadie más ha puesto valen el doble.',
+    categorias: ['chill', 'prueba']
+  },
+  'fichajes': {
+    titulo: 'Fichaje exprés',
+    icono: 'soccer',
+    colores: ['#22c55e', '#052e16'],
+    etiquetas: 'futbol futbolistas equipos clubes plantillas racha rapidez 15 segundos online',
+    descripcion: 'Sale un futbolista y tienes 15 segundos para decir en qué equipo juega ahora. Aguanta la racha: cada acierto suma y los jugadores son cada vez menos conocidos.',
+    categorias: ['futbol']
+  },
+  'eco': {
+    titulo: 'Eco Cromático',
+    icono: 'orb',
+    colores: ['#a855f7', '#1e1b4b'],
+    etiquetas: 'memoria secuencias colores sonidos luces reflejos un jugador solitario',
+    descripcion: 'Repite la secuencia de luces… pero cada vez con más botones, más rápido y con trampas: rondas al revés, pasos prohibidos y colores que cambian de sitio.',
+    categorias: ['un_jugador']
+  },
+  'crimen': {
+    titulo: 'Escena del Crimen',
+    icono: 'detective',
+    colores: ['#475569', '#0f172a'],
+    etiquetas: 'asesinato deduccion logica puzle sospechosos pistas detective murdoku un jugador solitario',
+    descripcion: 'Han asesinado a Víctor. Coloca a cada sospechoso en el plano de la casa con las pistas (uno por fila y columna) y descubre quién estaba a solas con la víctima.',
+    categorias: ['un_jugador']
   }
 };
 

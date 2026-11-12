@@ -1,0 +1,40 @@
+/* client/src/games/comun/Simultaneo.css — juegos por rondas simultáneas (clases smx-) y paletas de cada juego */
+.pzp-contenedor.escondite { --pz0: #ccfbf1; --pz1: #5eead4; --pz2: #0f766e; --pz3: #042f2e; }
+.pzp-contenedor.lapiz { --pz0: #fef9c3; --pz1: #fde047; --pz2: #b45309; --pz3: #431407; }
+.pzp-contenedor.fichajes { --pz0: #dcfce7; --pz1: #4ade80; --pz2: #15803d; --pz3: #052e16; }
+.pzp-contenedor.ponorden { --pz0: #e0e7ff; --pz1: #a5b4fc; --pz2: #4338ca; --pz3: #1e1b4b; }
+.pzp-contenedor.intruso { --pz0: #fee2e2; --pz1: #fca5a5; --pz2: #b91c1c; --pz3: #450a0a; }
+
+.smx-espera ul { list-style: none; margin: 0.4rem 0 0; padding: 0; display: grid; gap: 0.4rem; }
+.smx-espera li { display: flex; align-items: center; gap: 0.55rem; padding: 0.45rem 0.6rem; border-radius: 14px; background: #f1f5f9; font-weight: 800; color: #475569; }
+.smx-espera li span { flex: 1; }
+.smx-espera li.ok { background: #dcfce7; color: #166534; }
+
+.smx-sumas { display: flex; flex-wrap: wrap; gap: 0.45rem; justify-content: center; }
+.smx-sumas span { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.35rem 0.7rem 0.35rem 0.35rem; border-radius: 999px; background: #ffffff; font-weight: 800; color: #0f172a; box-shadow: 0 3px 0 rgba(0, 0, 0, 0.15); }
+.smx-sumas span b { color: #16a34a; }
+.smx-sumas span.menos b { color: #dc2626; }
+.smx-nadie { margin: 0; text-align: center; font-weight: 800; color: rgba(255, 255, 255, 0.85); }
+
+.smx-form { display: grid; gap: 0.6rem; }
+.smx-input { width: 100%; box-sizing: border-box; padding: 0.85rem 1rem; border: 3px solid #e2e8f0; border-radius: 16px; background: #ffffff; color: #0f172a; font: inherit; font-size: 1.08rem; font-weight: 700; outline: none; }
+.smx-input:focus { border-color: var(--pz2); }
+.smx-error { padding: 0.7rem 0.8rem; border-radius: 14px; background: #fef2f2; border: 2px solid #fecaca; }
+.smx-error p { margin: 0 0 0.35rem; color: #b91c1c !important; font-weight: 800; }
+
+.smx-cat { display: flex; align-items: center; gap: 0.7rem; }
+.smx-cat-emoji { font-size: 2rem; line-height: 1; }
+.smx-cat h2 { margin: 0; font-size: 1.25rem; line-height: 1.25; color: #0f172a; }
+.smx-cat small { display: block; margin-top: 0.2rem; font-weight: 700; color: #64748b; }
+.smx-rol { margin: 0.8rem 0; padding: 0.65rem 0.8rem; border-radius: 14px; background: var(--pz0); color: var(--pz3) !important; font-weight: 800; }
+
+.smx-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.3rem; }
+.smx-chip { padding: 0.3rem 0.6rem; border-radius: 999px; background: #e2e8f0; color: #0f172a; font-weight: 800; font-size: 0.88rem; }
+.smx-chip.elegida { background: var(--pz2); color: #ffffff; }
+.smx-chip.mal { background: #fee2e2; color: #991b1b; text-decoration: line-through; }
+
+.smx-lista { list-style: none; margin: 0.5rem 0 0; padding: 0; display: grid; gap: 0.35rem; }
+.smx-lista li { display: flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.6rem; border-radius: 12px; background: #f1f5f9; font-weight: 700; color: #0f172a; }
+.smx-lista li.destacada { background: var(--pz0); outline: 2px solid var(--pz2); }
+.smx-lista li .smx-quienes { margin-left: auto; display: flex; gap: 0.2rem; }
+.smx-veredicto { margin: 0 0 0.4rem; font-size: 1.15rem; font-weight: 900; color: #0f172a; }

@@ -1,0 +1,14 @@
+/* client/src/games/Intruso/Intruso.css — «El Intruso Histórico» (clases itr-) */
+.itr-opciones { display: grid; gap: 0.45rem; margin-top: 0.8rem; }
+.itr-opcion { display: flex; align-items: center; gap: 0.65rem; width: 100%; padding: 0.75rem 0.8rem; border: 3px solid #e2e8f0; border-radius: 16px; background: #ffffff; color: #0f172a; font: inherit; font-weight: 800; text-align: left; cursor: pointer; }
+.itr-opcion i { display: inline-grid; place-items: center; flex: 0 0 1.9rem; height: 1.9rem; border-radius: 10px; background: var(--pz0); color: var(--pz2); font-style: normal; }
+.itr-opcion.elegida { border-color: var(--pz2); background: var(--pz0); }
+.itr-opcion:disabled { cursor: default; }
+.itr-opcion.resuelta { cursor: default; }
+.itr-opcion.intruso { border-color: #dc2626; background: #fef2f2; }
+.itr-opcion.intruso i { background: #dc2626; color: #ffffff; }
+.itr-opcion .smx-quienes { margin-left: auto; display: flex; gap: 0.2rem; }
+.itr-explica { margin: 0.8rem 0 0; padding: 0.6rem 0.75rem; border-radius: 12px; background: #fffbeb; color: #78350f !important; font-weight: 700; font-size: 0.92rem; }
+
+.itr-opcion { justify-content: flex-start !important; }
+.itr-opcion > span:not(.smx-quienes) { flex: 1; text-align: left; }

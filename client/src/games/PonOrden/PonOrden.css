@@ -1,0 +1,20 @@
+/* client/src/games/PonOrden/PonOrden.css — «Ponlo en orden» (clases pno-) */
+.pno-ayuda { margin: 0.7rem 0 0.5rem; font-size: 0.92rem; font-weight: 700; color: #64748b !important; }
+.pno-lista { display: grid; gap: 0.45rem; }
+.pno-elemento { display: flex; align-items: center; gap: 0.7rem; width: 100%; padding: 0.7rem 0.8rem; border: 3px solid #e2e8f0; border-radius: 16px; background: #ffffff; color: #0f172a; font: inherit; font-weight: 800; text-align: left; cursor: pointer; transition: transform 0.12s, border-color 0.12s; }
+.pno-elemento b { display: inline-grid; place-items: center; flex: 0 0 2rem; height: 2rem; border-radius: 50%; background: #e2e8f0; color: #475569; font-size: 1rem; }
+.pno-elemento.puesto { border-color: var(--pz2); background: var(--pz0); }
+.pno-elemento.puesto b { background: var(--pz2); color: #ffffff; }
+.pno-elemento:active { transform: scale(0.98); }
+.pno-orden { margin: 0.7rem 0 0; padding-left: 1.4rem; font-weight: 800; color: var(--pz3); }
+.pno-orden li { margin: 0.1rem 0; color: var(--pz3) !important; }
+.pno-botones { display: grid; grid-template-columns: auto 1fr; gap: 0.5rem; margin-top: 0.8rem; }
+@media (max-width: 420px) { .pno-botones { grid-template-columns: 1fr; } }
+.pno-solucion { list-style: none; margin: 0.3rem 0 0; padding: 0; display: grid; gap: 0.35rem; }
+.pno-solucion li { display: flex; align-items: center; gap: 0.55rem; padding: 0.5rem 0.6rem; border-radius: 12px; background: #f1f5f9; font-weight: 800; color: #0f172a; flex-wrap: wrap; }
+.pno-solucion li b { display: inline-grid; place-items: center; width: 1.7rem; height: 1.7rem; border-radius: 50%; background: var(--pz2); color: #ffffff; }
+.pno-solucion li small { color: #64748b; font-weight: 700; }
+.pno-solucion li .smx-quienes { margin-left: auto; display: flex; gap: 0.2rem; }
+
+.pno-elemento { justify-content: flex-start !important; }
+.pno-elemento > span { flex: 1; text-align: left; }
