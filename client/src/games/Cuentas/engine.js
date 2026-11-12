@@ -6,8 +6,8 @@
 //
 // IDEA: cada jugador recibe unos cuantos números del 1 al 100, secretos. Entre todos hay que colocarlos en
 // orden ascendente SIN HABLAR. En tu turno puedes: soltar un número, usar una carta de acción (aleatoria; tienes
-// 3 en toda la partida) o pasar. Si sueltas un número que no tocaba (había otro más bajo en alguna mano) pierdes
-// una vida; con 2 fallos quedas eliminado. Y ojo: si pasas dos turnos seguidos sin soltar carta teniendo tú el
+// 3 en toda la partida; resolverla no gasta tu turno) o pasar. Si sueltas un número que no tocaba (había otro más bajo en alguna mano) pierdes
+// una vida; con 2 fallos quedas eliminado. Y ojo: si pasas dos turnos seguidos teniendo tú el
 // número que había que colocar, también pierdes una vida. Gana quien se queda antes sin cartas.
 
 export const ACCIONES = {
@@ -270,8 +270,8 @@ export function usarAccion(est, id) {
   p.privado.push({ n: est.nlog, texto: `${A.e} ${A.nombre}: ${secreto || A.desc}` });
   avisar(est, id, { e: A.e, titulo: `Tu carta: ${A.nombre}`, texto: secreto || A.desc, gana, pierde, tipo: A.tipo });
   if (p.privado.length > 10) p.privado.shift();
-  // usar una acción no es soltar número: cuenta para la retención
-  finTurnoSinSoltar(est, p, sig);
+  // La carta se resuelve y el turno SIGUE: después puedes soltar un número, usar otra carta o pasar.
+  // (No cuenta como «retener»: solo pasar cuenta.)
   return ok({ accion: tipo, secreto });
 }
 

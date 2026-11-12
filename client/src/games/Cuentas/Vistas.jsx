@@ -97,7 +97,7 @@ export function PantallaJuego({ v, enviar, onSalir, admin = null }) {
                 </button>
                 <button type="button" className="ctp-boton secundario" onClick={() => enviar('pasar')}>⏭️ Pasar</button>
               </div>
-              <p className="ctp-pista">Soltar uno que no toca: −1 vida (vuelve a tu mano). Pasar o usar una acción dos turnos seguidos teniendo tú el número que tocaba: −1 vida.</p>
+              <p className="ctp-pista">Soltar uno que no toca: −1 vida (vuelve a tu mano). La carta de acción no gasta tu turno. Pasar dos turnos seguidos teniendo tú el número que tocaba: −1 vida.</p>
             </div>
           )}
         </div>
@@ -169,11 +169,11 @@ export function Ayuda({ onCerrar, titulo, descripcion }) {
             <li>Cada uno recibe unos números del 1 al {AJUSTES.maxNumero} (secretos). Entre todos hay que colocarlos en <strong>orden ascendente, sin hablar</strong>.</li>
             <li>Gana quien se queda antes sin números. Puntos de la sala: {AJUSTES.puntos.join(', ')} para los tres primeros.</li>
           </ul>
-          <p className="ctp-ayuda-sub">🔁 Tu turno: una de estas tres cosas</p>
+          <p className="ctp-ayuda-sub">🔁 Tu turno</p>
           <ul>
             <li><strong>Soltar un número.</strong> Si no era el que tocaba (había uno más bajo en alguna mano), pierdes una vida y el número vuelve a tu mano.</li>
-            <li><strong>Usar una carta de acción</strong> (tienes {AJUSTES.accionesPorJugador} en toda la partida): sale una al azar.</li>
-            <li><strong>Pasar.</strong> Pero si pasas (o usas una acción) dos turnos seguidos teniendo tú el número que tocaba, pierdes una vida.</li>
+            <li><strong>Usar una carta de acción</strong> (tienes {AJUSTES.accionesPorJugador} en toda la partida): sale una al azar, se resuelve y <strong>sigues en tu turno</strong>.</li>
+            <li><strong>Pasar.</strong> Pero si pasas dos turnos seguidos teniendo tú el número que tocaba, pierdes una vida.</li>
           </ul>
           <p>Tienes {AJUSTES.vidas} vidas: al perderlas quedas eliminado y tus números salen del juego.</p>
           <p className="ctp-ayuda-sub">🃏 Cartas de acción (al azar)</p>

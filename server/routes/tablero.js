@@ -8,8 +8,8 @@ import { limitesOnline } from '../../client/src/games/limites.js';
 
 const router = express.Router();
 const barajar = (l) => { const b = [...l]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
-const leerConfig = (b, c = { categorias: 4, segundos: 20 }) => ({
-  categorias: E.OPCIONES.categorias.includes(Number(b.categorias)) ? Number(b.categorias) : c.categorias,
+const leerConfig = (b, c = { porJugador: 1, segundos: 20 }) => ({
+  porJugador: E.OPCIONES.porJugador.includes(Number(b.porJugador)) ? Number(b.porJugador) : c.porJugador,
   segundos: E.OPCIONES.segundos.includes(Number(b.segundos)) ? Number(b.segundos) : c.segundos
 });
 

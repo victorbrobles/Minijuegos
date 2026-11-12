@@ -607,6 +607,44 @@ export default function ConoceOnline({
       )}
 
       {/* 5. RESPONDIENDO (60s) */}
+      {/* 4B. MEJOR AMIGO (antes de la primera ronda, en secreto) */}
+      {vista === 'sala' && sala && sala.estado === 'mejor_amigo' && (
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            categoria={{ nombre: 'Mejor amigo', icono: 'users' }}
+            etiqueta="Antes de empezar · elección secreta"
+            titulo={sala.miAmigoId ? '¡Elegido!' : '¿Quién es tu mejor amigo?'}
+          >
+            <div className="qqp-identidad">
+              <span className="qqp-identidad-icono"><Icon name="zap" size={16} /></span>
+              <span>Si los dos acertáis la respuesta del otro, tú te llevas el doble de puntos.</span>
+            </div>
+          </Cabecera>
+          {sala.miAmigoId ? (
+            <div className="qqp-tarjeta qqp-pasar">
+              <span className="cnc-emoji-grande" aria-hidden="true">💛</span>
+              <p className="qqp-pasar-para">Tu mejor amigo</p>
+              <h3 className="qqp-pasar-nombre">{sala.jugadores.find((j) => j.id === sala.miAmigoId)?.nombre}</h3>
+              <p className="qqp-texto">
+                Esperando a que elijan los demás ({sala.jugadores.filter((j) => j.haElegidoAmigo).length}/{sala.jugadores.length})…
+              </p>
+            </div>
+          ) : (
+            <div className="cnc-amigos-lista">
+              {rivales.map((r) => (
+                <button key={r.id} type="button" className="cnc-amigo-opcion" disabled={cargando}
+                  onClick={() => peticionPost(`sala/${sesion.code}/mejor-amigo`, { amigoId: r.id })}>
+                  <Avatar nombre={r.nombre} color={colorJugador(indiceColor(r, 0))} />
+                  <span>{r.nombre}</span>
+                  <span aria-hidden="true">💛</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+
       {vista === 'sala' && sala && sala.estado === 'respondiendo' && (
         <section className="game qqp-escena">
           <Cabecera

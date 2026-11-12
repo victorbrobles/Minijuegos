@@ -4,6 +4,7 @@ import crypto from 'crypto';
 import { getPreguntaAleatoria } from '../data/seeds/conoce/conoceData.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
 import { totalRondas } from '../../client/src/games/rondas.js';
+import { sonRespuestasEquivalentes, formatearRespuesta, puntosPareja } from '../../client/src/games/Conoce/respuestas.js';
 const LIM = limitesOnline('conoce');
 
 const router = express.Router();
@@ -25,12 +26,13 @@ router.post('/crear', (req, res) => {
 
   salas[code] = {
     code,
-    estado: 'lobby', // 'lobby' | 'respondiendo' | 'cuenta_atras' | 'adivinando' | 'resultados' | 'fin'
+    estado: 'lobby', // 'lobby' | 'mejor_amigo' | 'respondiendo' | 'cuenta_atras' | 'adivinando' | 'resultados' | 'fin'
     rondaNum: 1,
     preguntaActual: '',
     preguntasUsadas: [],
     segundosRestantes: 60,
-    cuentaAtras10s: 10,
+    cuentaAtras10s: 3,
+    amigos: {}, // { [jugadorId]: idDeSuMejorAmigo }
     timer: null,
     respuestas: {}, // { [jugadorId]: string }
     adivinanzas: {}, // { [adivinadorId]: { [targetId]: respuestaSeleccionada } }
@@ -91,12 +93,14 @@ router.get('/sala/:code', (req, res) => {
     miRespuesta: sala.respuestas[yo.id] || '',
     respuestasOpciones: respuestasDesordenadas,
     misComparaciones: sala.comparaciones[yo.id] || [],
+    miAmigoId: sala.amigos?.[yo.id] ?? null,
     jugadores: sala.jugadores.map(j => ({
       id: j.id,
       nombre: j.nombre,
       puntos: j.puntos,
       haRespondido: Boolean(sala.respuestas[j.id]),
       haAdivinado: Boolean(sala.adivinanzas[j.id] && Object.keys(sala.adivinanzas[j.id]).length >= sala.jugadores.length - 1),
+      haElegidoAmigo: Boolean(sala.amigos?.[j.id]),
       esTu: j.id === yo.id,
       esAdmin: j.esAdmin
     }))
@@ -130,12 +134,12 @@ const pasarACuentaAtras = (sala) => {
   // Asignar respuestas por defecto si alguien no respondió a tiempo
   sala.jugadores.forEach(j => {
     if (!sala.respuestas[j.id]) {
-      sala.respuestas[j.id] = 'Sin respuesta';
+      sala.respuestas[j.id] = 'SIN RESPUESTA';
     }
   });
 
   sala.estado = 'cuenta_atras';
-  sala.cuentaAtras10s = 10;
+  sala.cuentaAtras10s = 3;
 
   sala.timer = setInterval(() => {
     sala.cuentaAtras10s -= 1;
@@ -174,39 +178,30 @@ const calcularResultadosRonda = (sala) => {
       const pA = jugadores[i];
       const pB = jugadores[j];
 
-      const respRealA = sala.respuestas[pA.id]?.trim().toLowerCase();
-      const respRealB = sala.respuestas[pB.id]?.trim().toLowerCase();
-
-      const guessA_sobre_B = sala.adivinanzas[pA.id]?.[pB.id]?.trim().toLowerCase();
-      const guessB_sobre_A = sala.adivinanzas[pB.id]?.[pA.id]?.trim().toLowerCase();
-
-      const aciertaA = Boolean(guessA_sobre_B && guessA_sobre_B === respRealB);
-      const aciertaB = Boolean(guessB_sobre_A && guessB_sobre_A === respRealA);
-
-      if (aciertaA && aciertaB) {
-        // Os conocéis bien: +3 cada uno
-        pA.puntos += 3;
-        pB.puntos += 3;
-        compMap[pA.id].push({ rival: pB.nombre, rivalId: pB.id, estado: 'os_conoceis', etiqueta: '¡Os conocéis bien!', puntos: '+3 pts', respuestaRival: sala.respuestas[pB.id] });
-        compMap[pB.id].push({ rival: pA.nombre, rivalId: pA.id, estado: 'os_conoceis', etiqueta: '¡Os conocéis bien!', puntos: '+3 pts', respuestaRival: sala.respuestas[pA.id] });
-      } else if (aciertaA && !aciertaB) {
-        // A le conoce a B: +2 para A, -1 para B
-        pA.puntos += 2;
-        pB.puntos = pB.puntos - 1;
-        compMap[pA.id].push({ rival: pB.nombre, rivalId: pB.id, estado: 'le_conoces', etiqueta: 'Le conoces', puntos: '+2 pts', respuestaRival: sala.respuestas[pB.id] });
-        compMap[pB.id].push({ rival: pA.nombre, rivalId: pA.id, estado: 'te_conoce', etiqueta: 'Te conoce (tú fallaste)', puntos: '-1 pto', respuestaRival: sala.respuestas[pA.id] });
-      } else if (!aciertaA && aciertaB) {
-        // B le conoce a A: +2 para B, -1 para A
-        pA.puntos = pA.puntos - 1;
-        pB.puntos += 2;
-        compMap[pA.id].push({ rival: pB.nombre, rivalId: pB.id, estado: 'te_conoce', etiqueta: 'Te conoce (tú fallaste)', puntos: '-1 pto', respuestaRival: sala.respuestas[pB.id] });
-        compMap[pB.id].push({ rival: pA.nombre, rivalId: pA.id, estado: 'le_conoces', etiqueta: 'Le conoces', puntos: '+2 pts', respuestaRival: sala.respuestas[pA.id] });
+      const respA = sala.respuestas[pA.id] || '';
+      const respB = sala.respuestas[pB.id] || '';
+      // Respuestas parecidas («FÚTBOL» y «FURBO») cuentan como la misma
+      const aciertaA = sonRespuestasEquivalentes(sala.adivinanzas[pA.id]?.[pB.id] || '', respB);
+      const aciertaB = sonRespuestasEquivalentes(sala.adivinanzas[pB.id]?.[pA.id] || '', respA);
+      const r = puntosPareja(aciertaA, aciertaB, pA.id, pB.id, sala.amigos);
+      pA.puntos += r.a;
+      pB.puntos += r.b;
+      const fila = (rival, estado, etiqueta, pts, doble) => ({
+        rival: rival.nombre, rivalId: rival.id, estado, etiqueta: doble ? `${etiqueta} 💛 ×2` : etiqueta,
+        puntos: `${pts > 0 ? '+' : ''}${pts} ${Math.abs(pts) === 1 ? 'pto' : 'pts'}`, doble, respuestaRival: sala.respuestas[rival.id]
+      });
+      if (r.estado === 'os_conoceis') {
+        compMap[pA.id].push(fila(pB, 'os_conoceis', '¡Os conocéis bien!', r.a, r.dobleA));
+        compMap[pB.id].push(fila(pA, 'os_conoceis', '¡Os conocéis bien!', r.b, r.dobleB));
+      } else if (r.estado === 'a') {
+        compMap[pA.id].push(fila(pB, 'le_conoces', 'Le conoces', r.a));
+        compMap[pB.id].push(fila(pA, 'te_conoce', 'Te conoce (tú fallaste)', r.b));
+      } else if (r.estado === 'b') {
+        compMap[pA.id].push(fila(pB, 'te_conoce', 'Te conoce (tú fallaste)', r.a));
+        compMap[pB.id].push(fila(pA, 'le_conoces', 'Le conoces', r.b));
       } else {
-        // Ninguno acierta: -1 cada uno
-        pA.puntos = pA.puntos - 1;
-        pB.puntos = pB.puntos - 1;
-        compMap[pA.id].push({ rival: pB.nombre, rivalId: pB.id, estado: 'no_os_conoceis', etiqueta: 'No os conocéis', puntos: '-1 pto', respuestaRival: sala.respuestas[pB.id] });
-        compMap[pB.id].push({ rival: pA.nombre, rivalId: pA.id, estado: 'no_os_conoceis', etiqueta: 'No os conocéis', puntos: '-1 pto', respuestaRival: sala.respuestas[pA.id] });
+        compMap[pA.id].push(fila(pB, 'no_os_conoceis', 'No os conocéis', r.a));
+        compMap[pB.id].push(fila(pA, 'no_os_conoceis', 'No os conocéis', r.b));
       }
     }
   }
@@ -226,8 +221,22 @@ router.post('/sala/:code/iniciar', (req, res) => {
   sala.jugadores.forEach(j => { j.puntos = 0; });
   sala.rondaNum = 1;
   sala.preguntasUsadas = [];
+  // Antes de la primera ronda cada uno elige en secreto a su mejor amigo
+  if (sala.timer) clearInterval(sala.timer);
+  sala.amigos = {};
+  sala.estado = 'mejor_amigo';
+  res.json({ success: true });
+});
 
-  iniciarRonda(sala);
+router.post('/sala/:code/mejor-amigo', (req, res) => {
+  const { code, token, amigoId } = req.body;
+  const sala = salas[code];
+  const yo = sala?.jugadores.find(j => j.token === token);
+  if (!yo || sala.estado !== 'mejor_amigo') return res.status(400).json({ error: 'No es momento de elegir mejor amigo' });
+  const amigo = sala.jugadores.find(j => j.id === Number(amigoId));
+  if (!amigo || amigo.id === yo.id) return res.status(400).json({ error: 'Elige a otro jugador' });
+  sala.amigos[yo.id] = amigo.id;
+  if (sala.jugadores.every(j => sala.amigos[j.id])) iniciarRonda(sala);
   res.json({ success: true });
 });
 
@@ -238,7 +247,7 @@ router.post('/sala/:code/responder', (req, res) => {
   if (!yo || sala.estado !== 'respondiendo') return res.status(400).json({ error: 'No es momento de responder' });
   if (!respuesta || !respuesta.trim()) return res.status(400).json({ error: 'Respuesta vacía' });
 
-  sala.respuestas[yo.id] = respuesta.trim();
+  sala.respuestas[yo.id] = formatearRespuesta(respuesta);
 
   // Si todos los jugadores han respondido, avanzar a la cuenta atrás
   const todosRespondieron = sala.jugadores.every(j => sala.respuestas[j.id]);

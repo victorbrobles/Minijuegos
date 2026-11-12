@@ -10,7 +10,7 @@ const JUEGO = {
   id: 'tablero',
   api: '/api/tablero',
   emoji: '🎯',
-  config: { categorias: 4, segundos: 20 },
+  config: { porJugador: 1, segundos: 20 },
   Local: TableroLocal,
   Partida: PartidaOnline,
   Fin,
@@ -19,7 +19,7 @@ const JUEGO = {
   detalleFin: (j) => `${j.aciertos} aciertos · ${j.fallos} fallos`,
   ganador: (n) => (n.length > 1 ? `¡Empate entre ${n.join(' y ')}!` : `¡${n[0]} domina el tablero!`),
   reglas: [
-    'Hay 25 categorías (cine, historia, fútbol, literatura, arte, videojuegos, mitología, espacio…). Al empezar, cada jugador elige por turnos una que no haya elegido nadie hasta completar las del tablero (de 3 a 6).',
+    'Hay 25 categorías (cine, historia, fútbol, literatura, arte, videojuegos, mitología, espacio…). Al empezar, cada jugador elige por turnos una que no haya elegido nadie hasta completar las del tablero: una, dos o tres por jugador (×1, ×2 o ×3).',
     'Cada categoría tiene casillas de 100, 200, 300, 400 y 500 puntos: cuanto más valen, más difíciles son.',
     'El primer turno es al azar y después van en orden. Quien tiene el turno elige casilla y responde entre cuatro opciones: si acierta suma su valor; si falla, lo resta.',
     'Si fallas, hay REBOTE solo para el siguiente jugador: responde la misma pregunta (sin la opción fallada); si acierta suma, y si falla no resta.',

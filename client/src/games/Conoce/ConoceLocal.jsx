@@ -28,74 +28,9 @@ export const PALETA_RESPUESTAS = [
   { bg: '#fef2f2', border: '#f87171', accent: '#dc2626', text: '#7f1d1d', pill: '#fee2e2' }
 ];
 
-/* ==========================================================================
-   NORMALIZACIÓN Y COMPARACIÓN TOLERANTE A FALLOS ORTOGRÁFICOS
-   ========================================================================== */
-
-export function normalizarRespuesta(str = '') {
-  return String(str)
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9\s]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-function distanciaLevenshtein(a = '', b = '') {
-  if (a === b) return 0;
-  if (!a.length) return b.length;
-  if (!b.length) return a.length;
-
-  const matriz = Array.from({ length: a.length + 1 }, (_, i) => [i]);
-  for (let j = 1; j <= b.length; j++) matriz[0][j] = j;
-
-  for (let i = 1; i <= a.length; i++) {
-    for (let j = 1; j <= b.length; j++) {
-      const costo = a[i - 1] === b[j - 1] ? 0 : 1;
-      matriz[i][j] = Math.min(
-        matriz[i - 1][j] + 1,
-        matriz[i][j - 1] + 1,
-        matriz[i - 1][j - 1] + costo
-      );
-    }
-  }
-  return matriz[a.length][b.length];
-}
-
-export function sonRespuestasEquivalentes(r1 = '', r2 = '') {
-  const n1 = normalizarRespuesta(r1);
-  const n2 = normalizarRespuesta(r2);
-  if (!n1 || !n2) return false;
-  if (n1 === n2) return true;
-
-  const sinEsp1 = n1.replace(/\s+/g, '');
-  const sinEsp2 = n2.replace(/\s+/g, '');
-  if (sinEsp1 === sinEsp2) return true;
-
-  const maxLen = Math.max(sinEsp1.length, sinEsp2.length);
-  const diffLen = Math.abs(sinEsp1.length - sinEsp2.length);
-  if (diffLen > 2) return false;
-
-  const dist = distanciaLevenshtein(sinEsp1, sinEsp2);
-  if (maxLen >= 4 && maxLen <= 7 && dist <= 1) return true;
-  if (maxLen >= 8 && dist <= 2) return true;
-
-  return false;
-}
-
-export function agruparRespuestasUnicas(listaTextos = []) {
-  const unicas = [];
-  listaTextos.forEach((txt) => {
-    const limpio = String(txt || '').trim();
-    if (!limpio) return;
-    const yaEsta = unicas.some((existente) => sonRespuestasEquivalentes(existente, limpio));
-    if (!yaEsta) {
-      unicas.push(limpio);
-    }
-  });
-  return unicas.sort((a, b) => a.localeCompare(b));
-}
+// Comparación tolerante (Fútbol ~ Furbo), mayúsculas y puntos: lógica compartida con el servidor.
+import { normalizarRespuesta, sonRespuestasEquivalentes, agruparRespuestasUnicas, formatearRespuesta, puntosPareja } from './respuestas.js';
+export { normalizarRespuesta, sonRespuestasEquivalentes, agruparRespuestasUnicas, formatearRespuesta };
 
 /* ==========================================================================
    COMPONENTES DE TABLERO COMPARTIDOS
@@ -436,6 +371,8 @@ export default function ConoceLocal({ onVolver, onSalir, onExit, onAbrirAyuda })
   const [inputRespuesta, setInputRespuesta] = useState('');
   const [asignacionesActuales, setAsignacionesActuales] = useState({});
   const [desgloseRonda, setDesgloseRonda] = useState({});
+  // Mejor amigo de cada jugador ({ [id]: idAmigo }): si os acertáis mutuamente, quien lo eligió suma el doble.
+  const [amigos, setAmigos] = useState({});
 
   const volverAlMenu = () => {
     if (typeof onVolver === 'function') {
@@ -486,7 +423,20 @@ export default function ConoceLocal({ onVolver, onSalir, onExit, onAbrirAyuda })
     setJugadores(jugs);
     setRondaNum(1);
     setUsadas([]);
-    comenzarNuevaRonda(jugs, 1, []);
+    setAmigos({});
+    setTurnoIdx(0);
+    setPaso('pasar_amigo');
+  };
+
+  const elegirAmigo = (amigoId) => {
+    const nuevos = { ...amigos, [jugadores[turnoIdx].id]: amigoId };
+    setAmigos(nuevos);
+    if (turnoIdx + 1 < jugadores.length) {
+      setTurnoIdx(turnoIdx + 1);
+      setPaso('pasar_amigo');
+    } else {
+      comenzarNuevaRonda(jugadores, 1, []);
+    }
   };
 
   const comenzarNuevaRonda = (jugs, rNum, yaUsadas) => {
@@ -505,7 +455,7 @@ export default function ConoceLocal({ onVolver, onSalir, onExit, onAbrirAyuda })
     if (e) e.preventDefault();
     if (!inputRespuesta.trim()) return;
     const jId = jugadores[turnoIdx].id;
-    const nuevasResp = { ...respuestas, [jId]: inputRespuesta.trim() };
+    const nuevasResp = { ...respuestas, [jId]: formatearRespuesta(inputRespuesta) };
     setRespuestas(nuevasResp);
     setInputRespuesta('');
 
@@ -559,37 +509,31 @@ export default function ConoceLocal({ onVolver, onSalir, onExit, onAbrirAyuda })
         const aciertoA = sonRespuestasEquivalentes(intentoASobreB, respB);
         const aciertoB = sonRespuestasEquivalentes(intentoBSobreA, respA);
 
-        let deltaA = 0;
-        let deltaB = 0;
+        const r = puntosPareja(aciertoA, aciertoB, pA.id, pB.id, amigos);
+        const deltaA = r.a;
+        const deltaB = r.b;
         let estadoA = '';
         let estadoB = '';
         let textoA = '';
         let textoB = '';
+        const x2 = (doble, otro) => (doble ? ` 💛 ${otro} es tu mejor amigo: ¡puntos dobles!` : '');
 
-        if (aciertoA && aciertoB) {
-          deltaA = 3;
-          deltaB = 3;
+        if (r.estado === 'os_conoceis') {
           estadoA = 'os_conoceis';
           estadoB = 'os_conoceis';
-          textoA = `¡Os conocéis! Acertaste la respuesta de ${pB.nombre} y él/ella acertó la tuya.`;
-          textoB = `¡Os conocéis! Acertaste la respuesta de ${pA.nombre} y él/ella acertó la tuya.`;
-        } else if (aciertoA && !aciertoB) {
-          deltaA = 2;
-          deltaB = -1;
+          textoA = `¡Os conocéis! Acertaste la respuesta de ${pB.nombre} y acertó la tuya.${x2(r.dobleA, pB.nombre)}`;
+          textoB = `¡Os conocéis! Acertaste la respuesta de ${pA.nombre} y acertó la tuya.${x2(r.dobleB, pA.nombre)}`;
+        } else if (r.estado === 'a') {
           estadoA = 'le_conoces';
           estadoB = 'te_conoce';
-          textoA = `Acertaste la respuesta de ${pB.nombre}, pero él/ella no acertó la tuya.`;
-          textoB = `${pA.nombre} acertó tu respuesta, pero tú elegiste «${intentoBSobreA || '—'}» en lugar de «${respA}».`;
-        } else if (!aciertoA && aciertoB) {
-          deltaA = -1;
-          deltaB = 2;
+          textoA = `Acertaste la respuesta de ${pB.nombre}, pero no acertó la tuya.`;
+          textoB = `${pA.nombre} acertó tu respuesta, pero elegiste «${intentoBSobreA || '—'}» en lugar de «${respA}».`;
+        } else if (r.estado === 'b') {
           estadoA = 'te_conoce';
           estadoB = 'le_conoces';
-          textoA = `${pB.nombre} acertó tu respuesta, pero tú elegiste «${intentoASobreB || '—'}» en lugar de «${respB}».`;
-          textoB = `Acertaste la respuesta de ${pA.nombre}, pero él/ella no acertó la tuya.`;
+          textoA = `${pB.nombre} acertó tu respuesta, pero elegiste «${intentoASobreB || '—'}» en lugar de «${respB}».`;
+          textoB = `Acertaste la respuesta de ${pA.nombre}, pero no acertó la tuya.`;
         } else {
-          deltaA = -1;
-          deltaB = -1;
           estadoA = 'no_os_conoceis';
           estadoB = 'no_os_conoceis';
           textoA = `Ninguno acertó al otro (elegiste «${intentoASobreB || '—'}» y su respuesta era «${respB}»).`;
@@ -758,6 +702,56 @@ export default function ConoceLocal({ onVolver, onSalir, onExit, onAbrirAyuda })
       )}
 
       {/* 2. PASAR MÓVIL PARA RESPONDER */}
+      {/* 1B. MEJOR AMIGO (antes de la primera ronda, en secreto) */}
+      {paso === 'pasar_amigo' && jugadorTurno && (
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            categoria={{ nombre: 'Mejor amigo', icono: 'lock' }}
+            etiqueta={`Antes de empezar · Turno ${turnoIdx + 1} de ${jugadores.length}`}
+            titulo="Pasad el móvil"
+          >
+            <OrdenTurnos jugadores={jugadores} activoId={jugadorTurno.id} completadosCount={turnoIdx} />
+          </Cabecera>
+          <div className="qqp-tarjeta qqp-pasar">
+            <Avatar nombre={jugadorTurno.nombre} color={colorJugador(indiceColor(jugadorTurno, turnoIdx))} grande />
+            <p className="qqp-pasar-para">Turno de</p>
+            <h3 className="qqp-pasar-nombre">{jugadorTurno.nombre}</h3>
+            <p className="qqp-texto">Elige en secreto a tu mejor amigo de la mesa. Cada vez que os acertéis mutuamente, sumarás el doble.</p>
+          </div>
+          <div className="qqp-barra">
+            <BotonPrincipal onClick={() => setPaso('amigo')}>
+              <Icon name="eye" size={22} /> Soy {jugadorTurno.nombre}, elegir
+            </BotonPrincipal>
+          </div>
+        </section>
+      )}
+
+      {paso === 'amigo' && jugadorTurno && (
+        <section className="game qqp-escena">
+          <Cabecera
+            onSalir={() => setModalSalirPortada(true)}
+            categoria={{ nombre: 'Mejor amigo', icono: 'users' }}
+            etiqueta="Elección secreta"
+            titulo={`${jugadorTurno.nombre}, ¿quién es tu mejor amigo?`}
+          >
+            <div className="qqp-identidad">
+              <span className="qqp-identidad-icono"><Icon name="zap" size={16} /></span>
+              <span>Si los dos acertáis la respuesta del otro, tú te llevas el doble de puntos.</span>
+            </div>
+          </Cabecera>
+          <div className="cnc-amigos-lista">
+            {rivalesActuales.map((r) => (
+              <button key={r.id} type="button" className="cnc-amigo-opcion" onClick={() => elegirAmigo(r.id)}>
+                <Avatar nombre={r.nombre} color={colorJugador(indiceColor(r, 0))} />
+                <span>{r.nombre}</span>
+                <span aria-hidden="true">💛</span>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
       {paso === 'pasar_resp' && jugadorTurno && (
         <section className="game qqp-escena">
           <Cabecera
@@ -1033,7 +1027,7 @@ export default function ConoceLocal({ onVolver, onSalir, onExit, onAbrirAyuda })
           >
             <div className="qqp-identidad">
               <span className="qqp-identidad-icono"><Icon name="zap" size={16} /></span>
-              <span>Acierto mutuo: +3 pts · Solo tú aciertas: +2 pts · Fallo: -1 pt</span>
+              <span>Acierto mutuo: +3 pts (×2 con tu mejor amigo) · Solo tú aciertas: +2 pts · Fallo: -1 pt</span>
             </div>
           </Cabecera>
 

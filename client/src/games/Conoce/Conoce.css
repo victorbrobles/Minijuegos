@@ -1686,3 +1686,36 @@ body:has(.qq-en-partida) .back:not(.qq-btn-volver-sala) {
     background: transparent !important;
   }
 }
+/* Mejor amigo: lista de compañeros para elegir */
+.cnc-amigos-lista {
+  display: grid;
+  gap: 0.6rem;
+  width: 100%;
+  max-width: 520px;
+  margin: 0 auto;
+}
+.cnc-amigo-opcion {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border-radius: 16px;
+  border: 2px solid rgba(236, 72, 153, 0.25);
+  background: rgba(255, 255, 255, 0.92);
+  color: #1f2937;
+  font: inherit;
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+.cnc-amigo-opcion span:nth-child(2) { flex: 1; }
+.cnc-amigo-opcion:hover,
+.cnc-amigo-opcion:focus-visible {
+  transform: translateY(-2px);
+  border-color: #ec4899;
+  box-shadow: 0 8px 20px rgba(236, 72, 153, 0.18);
+}
+.cnc-amigo-opcion.sel { border-color: #ec4899; background: #fdf2f8; }

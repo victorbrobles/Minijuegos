@@ -14,7 +14,7 @@ const LIM_JUG = limitesLocal('tablero');
 export default function TableroLocal({ juego, onVolver, onExit, onAbrirAyuda }) {
   const [paso, setPaso] = useState('config');
   const [nombres, setNombres] = useState(() => Array(LIM_JUG.min).fill(''));
-  const [config, setConfig] = useState({ categorias: 4, segundos: 20 });
+  const [config, setConfig] = useState({ porJugador: 1, segundos: 20 });
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modal, setModal] = useState(false);
@@ -51,7 +51,7 @@ export default function TableroLocal({ juego, onVolver, onExit, onAbrirAyuda }) 
           onNombre={(i, valor) => setNombres((l) => l.map((x, k) => (k === i ? valor : x)))}
           onEmpezar={empezar} textoBoton={cargando ? 'Montando el tablero…' : '¡Al tablero!'} error={error}
         >
-          <Config config={config} onCambiar={(c) => setConfig((x) => ({ ...x, ...c }))} />
+          <Config config={config} nJugadores={nombres.length} onCambiar={(c) => setConfig((x) => ({ ...x, ...c }))} />
         </SelectorJugadores>
       </div>
     );

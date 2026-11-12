@@ -61,10 +61,13 @@ export default function Conoce({ mode, onExit }) {
               <p>{DESCRIPCION_JUEGO}</p>
               <ul>
                 <li>
+                  <strong>Mejor amigo:</strong> Antes de la primera ronda, cada uno elige en secreto a su mejor amigo de la mesa. Cuando los dos acertáis la respuesta del otro, tú te llevas el doble de puntos.
+                </li>
+                <li>
                   <strong>Pregunta sincera:</strong> En cada ronda aparece una pregunta cotidiana. Cada jugador escribe su respuesta en secreto.
                 </li>
                 <li>
-                  <strong>Adivina quién dijo qué:</strong> Se muestran las respuestas desordenadas (si varios coinciden en la misma respuesta, aparece una sola vez y vale para cualquiera de ellos).
+                  <strong>Adivina quién dijo qué:</strong> Se muestran las respuestas desordenadas en mayúsculas. Si varios coinciden o escriben algo muy parecido («Fútbol» y «Furbo»), aparece una sola vez y vale para cualquiera de ellos.
                 </li>
                 <li>
                   <strong>10, 15 o 20 rondas:</strong> Empareja a cada amigo con su respuesta para sumar puntos por parejas.
@@ -74,7 +77,7 @@ export default function Conoce({ mode, onExit }) {
               <div className="cnc-ayuda-puntos">
                 <div className="cnc-ayuda-fila mutuo">
                   <span>💚 ¡Os conocéis bien! (Acierto mutuo)</span>
-                  <strong>+3 pts cada uno</strong>
+                  <strong>+3 pts cada uno (+6 con tu mejor amigo)</strong>
                 </div>
                 <div className="cnc-ayuda-fila uno">
                   <span>💙 Uno acierta al otro</span>

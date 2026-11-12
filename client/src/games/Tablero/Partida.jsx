@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { Hero, Cuenta, useRestante, Pildoras, PantallaFin, colorDe, AvisoTurno } from '../Pulsador/Vistas.jsx';
 import { BloqueConfig } from '../../components/MenuJuego.jsx';
-import { OPCIONES } from './engine.js';
+import { OPCIONES, categoriasPara } from './engine.js';
 import './Tablero.css';
 
 const HERO = { emoji: '🎯' };
@@ -175,12 +175,17 @@ export function Fin({ v, juego, onSalir, children }) {
   return <PantallaFin v={v} juego={juego} onSalir={onSalir}>{children}</PantallaFin>;
 }
 
-export function Config({ config, onCambiar }) {
+export function Config({ config, onCambiar, nJugadores, sala }) {
+  const m = config.porJugador || 1;
+  const n = nJugadores || sala?.jugadores?.length || null;
   return (
     <>
       <BloqueConfig titulo="Categorías en el tablero">
-        <Pildoras opciones={OPCIONES.categorias.map((n) => [n, `${n} (${n * 5} casillas)`])} valor={config.categorias} onCambiar={onCambiar && ((categorias) => onCambiar({ categorias }))} />
-        <p className="pzp-nota" style={{ marginTop: '0.4rem' }}>Al empezar, cada jugador elige por turnos una de las 25 categorías hasta completarlas.</p>
+        <Pildoras opciones={OPCIONES.porJugador.map((k) => [k, `×${k}`])} valor={m} onCambiar={onCambiar && ((porJugador) => onCambiar({ porJugador }))} />
+        <p className="pzp-nota" style={{ marginTop: '0.4rem' }}>
+          Cada jugador elige por turnos {m === 1 ? 'una categoría' : `${m} categorías`} de las 25
+          {n ? `: ${categoriasPara(n, m)} categorías (${categoriasPara(n, m) * 5} casillas) con ${n} jugadores.` : ' (número de jugadores × ' + m + ', máximo 25).'}
+        </p>
       </BloqueConfig>
       <BloqueConfig titulo="Tiempo para responder (online)">
         <Pildoras opciones={OPCIONES.segundos.map((n) => [n, `${n} s`])} valor={config.segundos} onCambiar={onCambiar && ((segundos) => onCambiar({ segundos }))} />

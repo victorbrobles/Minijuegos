@@ -14,7 +14,7 @@ assert.equal(new Set(PREGUNTAS.map((q) => q.p)).size, PREGUNTAS.length, 'pregunt
 
 // Caso a mano: rebote solo para el siguiente y sin restar
 const banco = montarBanco();
-let p = E.crearPartida([1, 2, 3].map((id) => ({ id, nombre: `J${id}` })), banco, { categorias: 3 }, 0, () => 0);
+let p = E.crearPartida([1, 2, 3].map((id) => ({ id, nombre: `J${id}` })), banco, { porJugador: 1 }, 0, () => 0);
 assert.equal(p.fase, 'categorias');
 assert.equal(p.turno, 1);
 assert.equal(E.elegirCategoria(p, 2, 'cine').ok, false, 'fuera de turno');
@@ -45,10 +45,11 @@ assert.equal(p.turno, r, 'el turno sigue en orden');
 let partidas = 0; let rebotes = 0;
 for (let n = 0; n < 300; n++) {
   const nj = E.AJUSTES.min + (n % (E.AJUSTES.max - E.AJUSTES.min + 1));
-  const nc = E.OPCIONES.categorias[n % 4];
+  const m = E.OPCIONES.porJugador[n % 3];
   const b = montarBanco();
   assert.equal(Object.keys(b.preguntas).length, 25 * 5);
-  const g = E.crearPartida(Array.from({ length: nj }, (_, i) => ({ id: i + 1, nombre: `J${i}` })), b, { categorias: nc, segundos: 20 }, 0);
+  const g = E.crearPartida(Array.from({ length: nj }, (_, i) => ({ id: i + 1, nombre: `J${i}` })), b, { porJugador: m, segundos: 20 }, 0);
+  const nc = E.categoriasPara(nj, m, b.categorias.length);
   let t = 0; let pasos = 0;
   while (g.fase !== 'fin') {
     assert(pasos++ < 1000);

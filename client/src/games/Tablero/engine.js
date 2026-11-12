@@ -2,14 +2,17 @@
 // «El Tablero de Puntos»: motor puro (sin red). Se copia al cliente con `npm run sync:tablero`.
 //
 // 1. CATEGORÍAS: por turnos (empieza alguien al azar), cada jugador elige una categoría que no haya elegido nadie
-//    hasta completar las que se juegan.
+//    hasta completar las que se juegan (jugadores × 1, 2 o 3).
 // 2. TABLERO: categorías × valores (100, 200, 300, 400 y 500). El primer turno es al azar y luego van en orden.
 //    Quien tiene el turno elige casilla y responde: si acierta suma su valor; si falla lo resta y hay REBOTE solo
 //    para el siguiente jugador, que puede responder sin riesgo (si acierta suma; si falla no resta).
 //    Una casilla oculta vale el doble. Se acaba cuando no quedan casillas.
 
 export const AJUSTES = { min: 2, max: 12, segElegir: 30, segCategoria: 30, valores: [100, 200, 300, 400, 500] };
-export const OPCIONES = { categorias: [3, 4, 5, 6], segundos: [15, 20, 30] };
+// porJugador: categorías que elige cada jugador (×1, ×2, ×3). El tablero tiene jugadores × porJugador (máx. 25).
+export const OPCIONES = { porJugador: [1, 2, 3], segundos: [15, 20, 30] };
+/** Número de categorías del tablero según jugadores y multiplicador. */
+export const categoriasPara = (nJugadores, porJugador, total = 25) => Math.min(total, nJugadores * porJugador);
 
 const jug = (p, id) => p.jugadores.find((j) => j.id === id);
 const activos = (p) => p.jugadores.filter((j) => !j.fuera);
@@ -28,10 +31,11 @@ function siguienteDe(p, id) {
 
 /**
  * banco: { categorias: [{ id, nombre, emoji, color }], preguntas: { 'cat:v': { p, opciones, correcta } } }
- * (todas las categorías disponibles con una pregunta por valor). reglas: { categorias: n, segundos, sinReloj }
+ * (todas las categorías disponibles con una pregunta por valor). reglas: { porJugador: 1|2|3, segundos, sinReloj }
  */
 export function crearPartida(jugadores, banco, reglas = {}, ahora = Date.now(), rng = Math.random) {
-  const n = OPCIONES.categorias.includes(Number(reglas.categorias)) ? Number(reglas.categorias) : 5;
+  const m = OPCIONES.porJugador.includes(Number(reglas.porJugador)) ? Number(reglas.porJugador) : 1;
+  const n = categoriasPara(jugadores.length, m, banco.categorias.length);
   const p = {
     jugadores: jugadores.map((j) => ({ id: j.id, nombre: j.nombre, puntos: 0, aciertos: 0, fallos: 0, rebotes: 0, fuera: false })),
     disponibles: banco.categorias, preguntas: banco.preguntas, necesarias: Math.min(n, banco.categorias.length),
