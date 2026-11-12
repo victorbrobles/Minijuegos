@@ -9,6 +9,8 @@ import {
 } from '../../components/MenuJuego.jsx';
 import './FutbolGrid.css';
 import { limitesOnline, textoSala } from '../limites.js';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto } from '../rondas.js';
 
 const LIM_ON = limitesOnline('futbolgrid');
 
@@ -31,6 +33,7 @@ const post = async (url, body) => {
 };
 
 export default function FutbolGridOnline({ onVolver, onSalir, onAbrirAyuda }) {
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('futbolgrid'));
   const [sesion, setSesion] = useState(leerSesion);
   const [menu, setMenu] = useState('menu');
   const [nombre, setNombre] = useState('');
@@ -196,9 +199,12 @@ export default function FutbolGridOnline({ onVolver, onSalir, onAbrirAyuda }) {
           <p className="fgp-nota-sala">Toca tu equipo para cambiarte. Cada equipo necesita al menos un jugador.</p>
           {sala.esAdmin && (
             <div style={{ marginTop: '1rem' }}>
-              <button type="button" className="big full qq-btn-principal" disabled={n < sala.min || !equiposListos} onClick={() => llamar('iniciar')}>
+              <>
+              <div className="panel qq-menu-panel" style={{ marginBottom: '0.8rem' }}><SelectorRondas juegoId="futbolgrid" valor={rondasSel} onCambiar={setRondasSel} /></div>
+              <button type="button" className="big full qq-btn-principal" disabled={n < sala.min || !equiposListos} onClick={() => llamar('iniciar', { partidas: rondasSel })}>
                 <Icon name="play" size={22} /> {n < sala.min ? `Esperando jugadores (mínimo ${sala.min})…` : !equiposListos ? 'Falta gente en un equipo' : '¡Empezar partida!'}
               </button>
+              </>
             </div>
           )}
           {!sala.esAdmin && <EsperandoAnfitrion texto="Cuando estéis todos, el anfitrión empezará la partida." />}
@@ -216,9 +222,15 @@ export default function FutbolGridOnline({ onVolver, onSalir, onAbrirAyuda }) {
               <div className="fgp-barra estatica">
                 {sala.esAdmin ? (
                   <>
-                    <button type="button" className="fgp-boton grande" disabled={n < sala.min} onClick={() => llamar('siguiente-partida')}>
-                      <Icon name="refresh" size={20} /> Otra partida (nuevo tablero)
-                    </button>
+                    {sala.numPartida >= sala.maxPartidas ? (
+                      <button type="button" className="fgp-boton grande" onClick={() => llamar('finalizar')}>
+                        <Icon name="trophy" size={20} /> Ver la clasificación final
+                      </button>
+                    ) : (
+                      <button type="button" className="fgp-boton grande" disabled={n < sala.min} onClick={() => llamar('siguiente-partida')}>
+                        <Icon name="refresh" size={20} /> Otra partida (nuevo tablero) · {sala.numPartida + 1} de {sala.maxPartidas}
+                      </button>
+                    )}
                     <button type="button" className="fgp-boton secundario" onClick={() => llamar('finalizar')}>
                       <Icon name="trophy" size={18} /> Terminar y ver la clasificación
                     </button>

@@ -6,7 +6,8 @@ import { OBJETOS, PROBLEMAS, RASGOS } from '../data/seeds/invento/cartas.js';
 const M = { objeto: OBJETOS, problema: PROBLEMAS, rasgo: RASGOS };
 const J = [1, 2, 3, 4].map((id) => ({ id, nombre: `J${id}` }));
 let t = 0;
-const p = E.crearPartida(J, M, { rondas: 2, segundos: 120 }, t);
+const p = E.crearPartida(J, M, { rondas: 4, segundos: 120 }, t);
+p.rondas = 2; // la prueba juega dos rondas
 assert.ok(p.cartas[1].objeto && p.cartas[1].problema && p.cartas[1].rasgo);
 const antes = p.cartas[1].rasgo;
 assert.ok(E.cambiarCarta(p, 1, 'rasgo').ok);
@@ -44,7 +45,8 @@ console.log('invento-sim OK');
 // Con dos jugadores entra el invento de la casa; con veinte, todo cuadra
 for (const n of [E.AJUSTES.min, E.AJUSTES.max]) {
   const JJ = Array.from({ length: n }, (_, i) => ({ id: i + 1, nombre: `J${i + 1}` }));
-  const q = E.crearPartida(JJ, M, { rondas: 2, segundos: 120 }, 0);
+  const q = E.crearPartida(JJ, M, { rondas: 4, segundos: 120 }, 0);
+  q.rondas = 2;
   for (let r = 0; r < 2; r++) {
     JJ.forEach((j) => assert.ok(E.inventar(q, j.id, `Invento ${j.id}`, 'Una descripción suficientemente larga', 0).ok));
     assert.equal(q.fase, 'votar');

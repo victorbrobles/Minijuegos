@@ -18,6 +18,8 @@ import {
 } from './TrescientosunoLocal.jsx';
 import { limitesOnline, textoSala } from '../limites.js';
 import { ChipJugadores } from '../../components/MenuJuego.jsx';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto } from '../rondas.js';
 
 const LIM_ON = limitesOnline('trescientosuno');
 
@@ -67,6 +69,7 @@ export default function TrescientosunoOnline({
   onSalir,
   onAbrirAyuda
 }) {
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('trescientosuno'));
   const navigate = useNavigate();
   const [vista, setVista] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
 
@@ -701,13 +704,18 @@ export default function TrescientosunoOnline({
             )}
           </div>
 
+          {esAdmin && (
+            <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
+              <SelectorRondas juegoId="trescientosuno" valor={rondasSel} onCambiar={setRondasSel} numJugadores={sala.jugadores.length} />
+            </div>
+          )}
           {esAdmin ? (
             <button
               type="button"
               className="big full qq-btn-principal"
               style={{ marginTop: '1rem' }}
               disabled={sala.jugadores.length < LIM_ON.min}
-              onClick={() => accionAdmin('empezar')}
+              onClick={() => accionAdmin('empezar', { rondas: rondasSel })}
             >
               <Icon name="play" size={22} />
               {sala.jugadores.length < LIM_ON.min ? 'Esperando jugadores...' : 'Iniciar juego'}
@@ -1131,6 +1139,23 @@ export default function TrescientosunoOnline({
               </ul>
             </div>
 
+            {sala.serie && (
+              <div className="qqp-tarjeta">
+                <p className="qqp-carta-cara-titulo" style={{ marginBottom: '0.8rem' }}>
+                  <Icon name="trophy" size={16} /> {sala.serie.partida >= sala.serie.max ? 'Clasificación final de la serie' : `Serie · partida ${sala.serie.partida} de ${sala.serie.max}`}
+                </p>
+                <ul className="qqp-rivales">
+                  {[...sala.jugadores].sort((a, b) => (sala.serie.puntos[b.id] || 0) - (sala.serie.puntos[a.id] || 0)).map((j, i) => (
+                    <li key={j.id} className="qqp-rival" style={{ '--c': colorJugador(indiceColor(j, i)) }}>
+                      <span className="qqp-rival-avatar">{i === 0 && (sala.serie.puntos[j.id] || 0) > 0 ? '👑' : i + 1}</span>
+                      <span className="qqp-rival-datos"><strong className="qqp-rival-tarjeta">{j.nombre}{j.id === yoId ? ' (tú)' : ''}</strong></span>
+                      <span className="tcu-ranking-pts">{sala.serie.puntos[j.id] || 0} pts</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             <div className="qqp-barra">
               {esAdmin ? (
                 <>
@@ -1138,7 +1163,7 @@ export default function TrescientosunoOnline({
                     disabled={cargando || sala.jugadores.length < LIM_ON.min}
                     onClick={() => accionAdmin('revancha')}
                   >
-                    <Icon name="refresh" size={20} /> Jugar con otro equipo
+                    <Icon name="refresh" size={20} /> {sala.serie && sala.serie.partida < sala.serie.max ? `Siguiente partida (${sala.serie.partida + 1} de ${sala.serie.max})` : 'Jugar otra serie'}
                   </BotonPrincipal>
                   <EnlaceSecundario onClick={() => setModalSalirPortada(true)}>
                     Salir a la portada principal

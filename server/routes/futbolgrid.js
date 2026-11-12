@@ -5,6 +5,7 @@ import express from 'express';
 import * as E from '../futbolgrid/engine.js';
 import { GRIDS_JUGABLES } from '../data/seeds/futbolgrid/index.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
+import { totalRondas } from '../../client/src/games/rondas.js';
 
 function elegirGrid(sala) {
   let libres = GRIDS_JUGABLES.filter((g) => !sala.usados.has(g.id));
@@ -112,7 +113,7 @@ router.get('/online/sala/:code', (req, res) => {
   const { sala, jugador, esAdmin } = c;
   revisar(sala);
   const base = {
-    success: true, ahora: Date.now(), code: sala.code, estado: sala.estado, esAdmin, yoId: jugador.id, numPartida: sala.numPartida, config: sala.config,
+    success: true, ahora: Date.now(), code: sala.code, estado: sala.estado, esAdmin, yoId: jugador.id, numPartida: sala.numPartida, maxPartidas: sala.maxPartidas || totalRondas('futbolgrid', null), config: sala.config,
     anfitrionId: sala.jugadores.find((j) => j.token === sala.adminToken)?.id ?? null, min: MIN, max: MAX,
     jugadores: sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre, puntos: j.puntos, equipo: j.equipo, conectado: Date.now() - j.visto < 15000 })),
     ultimaPartida: sala.ultimaPartida
@@ -158,6 +159,7 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
   if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión puede iniciar.' });
   if (c.sala.estado === 'jugando') return res.status(400).json({ error: 'La partida ya está en marcha.' });
   if (c.sala.jugadores.length < MIN) return res.status(400).json({ error: `Se necesitan al menos ${MIN} jugadores.` });
+  c.sala.maxPartidas = totalRondas('futbolgrid', req.body?.partidas);
   if (!equiposListos(c.sala)) return res.status(400).json({ error: 'Cada equipo necesita al menos un jugador.' });
   c.sala.jugadores.forEach((j) => { j.puntos = 0; });
   c.sala.ultimaPartida = null; c.sala.numPartida = 0;
@@ -204,6 +206,7 @@ router.post('/online/sala/:code/siguiente-partida', (req, res) => {
   if (!c) return;
   if (!c.esAdmin) return res.status(403).json({ error: 'Solo el anfitrión.' });
   if (!c.sala.partida || c.sala.partida.fase !== 'fin') return res.status(400).json({ error: 'La partida aún no ha terminado.' });
+  if (c.sala.numPartida >= (c.sala.maxPartidas || Infinity)) { c.sala.estado = 'final'; return res.json({ success: true, final: true }); }
   if (c.sala.jugadores.length < MIN) return res.status(400).json({ error: `Se necesitan al menos ${MIN} jugadores.` });
   if (!equiposListos(c.sala)) return res.status(400).json({ error: 'Cada equipo necesita al menos un jugador (volved a la sala de espera).' });
   iniciarPartida(c.sala);

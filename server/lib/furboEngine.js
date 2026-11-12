@@ -12,9 +12,9 @@ import { PREGUNTAS } from '../data/seeds/furbo/preguntas.js';
 export const FASES = ['vestuario', 'rebote', 'quiniela', 'prorroga', 'penaltis'];
 
 export const DURACIONES = {
-  corto: 1,
-  normal: 2,
-  largo: 3
+  corto: 2,
+  normal: 3,
+  largo: 5
 };
 
 // Tiempo límite (ms) de cada tipo de ronda

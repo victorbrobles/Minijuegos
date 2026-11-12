@@ -9,6 +9,8 @@ import {
 } from '../../components/MenuJuego.jsx';
 import './Jugadas.css';
 import { limitesOnline, textoSala } from '../limites.js';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto } from '../rondas.js';
 
 const LIM_ON = limitesOnline('jugadas');
 
@@ -31,6 +33,7 @@ const post = async (url, body) => {
 };
 
 export default function JugadasOnline({ onVolver, onSalir, onAbrirAyuda }) {
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('jugadas'));
   const [sesion, setSesion] = useState(leerSesion);
   const [menu, setMenu] = useState('menu');
   const [nombre, setNombre] = useState('');
@@ -188,8 +191,13 @@ export default function JugadasOnline({ onVolver, onSalir, onAbrirAyuda }) {
             )}
           />
           {sala.esAdmin && (
+            <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
+              <SelectorRondas juegoId="jugadas" valor={rondasSel} onCambiar={setRondasSel} titulo="Jugadas" />
+            </div>
+          )}
+          {sala.esAdmin && (
             <div style={{ marginTop: '1.2rem' }}>
-              <button type="button" className="big full qq-btn-principal" disabled={n < sala.min} onClick={() => llamar('iniciar')}>
+              <button type="button" className="big full qq-btn-principal" disabled={n < sala.min} onClick={() => llamar('iniciar', { rondas: rondasSel })}>
                 <Icon name="play" size={22} /> {n < sala.min ? `Esperando jugadores (mínimo ${sala.min})…` : '¡Empezar partido!'}
               </button>
             </div>

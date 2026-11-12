@@ -9,6 +9,8 @@ import {
 } from '../../components/MenuJuego.jsx';
 import './Cuentas.css';
 import { limitesOnline, textoSala } from '../limites.js';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto } from '../rondas.js';
 
 const LIM_ON = limitesOnline('cuentas');
 
@@ -47,6 +49,7 @@ export function ModalSalir({ titulo, texto, onSeguir, onSalir }) {
 }
 
 export default function CuentasOnline({ onVolver, onSalir, onAbrirAyuda }) {
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('cuentas'));
   const [sesion, setSesion] = useState(leerSesion);
   const [menu, setMenu] = useState('menu');
   const [nombre, setNombre] = useState('');
@@ -211,9 +214,12 @@ export default function CuentasOnline({ onVolver, onSalir, onAbrirAyuda }) {
             <h3 className="qq-sala-titulo"><Icon name="scale" size={20} /> La partida</h3>
             <p className="hint" style={{ textAlign: 'left' }}>Cada uno recibirá sus números en secreto. Colocadlos en orden ascendente sin hablar: gana quien se quede antes sin números.</p>
             {sala.esAdmin && (
-              <button type="button" className="big full qq-btn-principal" disabled={n < sala.min} onClick={() => llamar('iniciar')}>
+              <>
+              <div className="panel qq-menu-panel" style={{ marginBottom: '0.8rem' }}><SelectorRondas juegoId="cuentas" valor={rondasSel} onCambiar={setRondasSel} /></div>
+              <button type="button" className="big full qq-btn-principal" disabled={n < sala.min} onClick={() => llamar('iniciar', { partidas: rondasSel })}>
                 <Icon name="play" size={22} /> {n < sala.min ? `Esperando jugadores (mínimo ${sala.min})…` : '¡Repartir números!'}
               </button>
+              </>
             )}
           </div>
           {!sala.esAdmin && <EsperandoAnfitrion texto="Cuando estéis todos, el anfitrión empezará la partida." />}
@@ -229,9 +235,15 @@ export default function CuentasOnline({ onVolver, onSalir, onAbrirAyuda }) {
               <div className="ctp-barra estatica">
                 {sala.esAdmin ? (
                   <>
-                    <button type="button" className="ctp-boton grande" disabled={n < sala.min} onClick={() => llamar('siguiente-partida')}>
-                      <Icon name="refresh" size={20} /> Otra partida (mismos jugadores)
-                    </button>
+                    {sala.numPartida >= sala.maxPartidas ? (
+                      <button type="button" className="ctp-boton grande" onClick={() => llamar('finalizar')}>
+                        <Icon name="trophy" size={20} /> Ver la clasificación final
+                      </button>
+                    ) : (
+                      <button type="button" className="ctp-boton grande" disabled={n < sala.min} onClick={() => llamar('siguiente-partida')}>
+                        <Icon name="refresh" size={20} /> Otra partida (mismos jugadores) · {sala.numPartida + 1} de {sala.maxPartidas}
+                      </button>
+                    )}
                     <button type="button" className="ctp-boton secundario" onClick={() => llamar('finalizar')}>
                       <Icon name="trophy" size={18} /> Terminar y ver la clasificación
                     </button>

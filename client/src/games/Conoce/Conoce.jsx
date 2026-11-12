@@ -67,7 +67,7 @@ export default function Conoce({ mode, onExit }) {
                   <strong>Adivina quién dijo qué:</strong> Se muestran las respuestas desordenadas (si varios coinciden en la misma respuesta, aparece una sola vez y vale para cualquiera de ellos).
                 </li>
                 <li>
-                  <strong>15 rondas:</strong> Empareja a cada amigo con su respuesta para sumar puntos por parejas.
+                  <strong>10, 15 o 20 rondas:</strong> Empareja a cada amigo con su respuesta para sumar puntos por parejas.
                 </li>
               </ul>
 

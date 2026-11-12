@@ -8,6 +8,8 @@ import { PantallaJuego, PantallaFin, ModalSalir } from './Vistas.jsx';
 import { SelectorJugadores } from '../../components/MenuJuego.jsx';
 import './FutbolGrid.css';
 import { limitesLocal } from '../limites.js';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto, totalRondas } from '../rondas.js';
 
 const LIM_JUG = limitesLocal('futbolgrid');
 
@@ -19,6 +21,9 @@ export default function FutbolGridLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [cargando, setCargando] = useState(false);
   const [modal, setModal] = useState(false);
   const [victorias, setVictorias] = useState({ X: 0, O: 0, empates: 0 });
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('futbolgrid'));
+  const maxPartidas = totalRondas('futbolgrid', rondasSel);
+  const jugadas = victorias.X + victorias.O + victorias.empates;
   const estRef = useRef(null);
   const contado = useRef(false);
   const empieza = useRef('O');
@@ -70,6 +75,7 @@ export default function FutbolGridLocal({ onVolver, onExit, onAbrirAyuda }) {
           onNombre={(i, valor) => setNombres((l) => l.map((x, k) => (k === i ? valor : x)))}
           onEmpezar={empezar} textoBoton={cargando ? 'Cargando…' : '¡Empezar partida!'} error={error}
         >
+          <SelectorRondas juegoId="futbolgrid" valor={rondasSel} onCambiar={setRondasSel} />
           <p className="fgp-nota-sala oscura">Los jugadores se reparten alternos: 1.º, 3.º… al equipo Azul ✕ y 2.º, 4.º… al Rojo ◯.</p>
         </SelectorJugadores>
       </div>
@@ -105,8 +111,18 @@ export default function FutbolGridLocal({ onVolver, onExit, onAbrirAyuda }) {
               <p className="fgp-etiqueta centrada">Marcador de la sesión</p>
               <p className="fgp-marcador-sesion"><span className="eq-X">✕ {victorias.X}</span> <small>empates {victorias.empates}</small> <span className="eq-O">{victorias.O} ◯</span></p>
             </div>
+            {jugadas >= maxPartidas && (
+              <div className="fgp-tarjeta fgp-centro">
+                <p className="fgp-etiqueta centrada">🏆 Fin de la serie ({maxPartidas} {maxPartidas === 1 ? 'partida' : 'partidas'})</p>
+                <h2 style={{ margin: '0.2rem 0 0' }}>{victorias.X === victorias.O ? '¡Empate en la serie!' : `¡Gana la serie el equipo ${E.EQUIPOS[victorias.X > victorias.O ? 'X' : 'O'].nombre}!`}</h2>
+              </div>
+            )}
             <div className="fgp-barra estatica">
-              <button type="button" className="fgp-boton grande" disabled={cargando} onClick={() => nuevaPartida(nombres.map((n) => n.trim()))}><Icon name="refresh" size={20} /> Otra partida (nuevo tablero)</button>
+              {jugadas < maxPartidas ? (
+                <button type="button" className="fgp-boton grande" disabled={cargando} onClick={() => nuevaPartida(nombres.map((n) => n.trim()))}><Icon name="refresh" size={20} /> Siguiente partida ({jugadas + 1} de {maxPartidas})</button>
+              ) : (
+                <button type="button" className="fgp-boton grande" disabled={cargando} onClick={empezar}><Icon name="refresh" size={20} /> Jugar otra serie</button>
+              )}
               <button type="button" className="fgp-boton secundario" onClick={() => setPaso('config')}><Icon name="users" size={18} /> Cambiar jugadores</button>
             </div>
           </PantallaFin>

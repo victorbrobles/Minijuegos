@@ -114,7 +114,8 @@ function segundosRestantes(r, ahora) {
 }
 
 // ----------------------------------------------------------------- creación
-export function crearPartida(jugadores) {
+/** opciones.rondas: jugadas totales de la partida (si no, 3 por jugador). */
+export function crearPartida(jugadores, opciones = {}) {
   const lista = jugadores.map((j) => ({
     id: j.id,
     nombre: j.nombre,
@@ -126,7 +127,8 @@ export function crearPartida(jugadores) {
     jugadores: lista,
     estado: 'ronda', // 'ronda' | 'resultado' | 'fin'
     rondaNum: 0,
-    totalRondas: lista.length * RONDAS_POR_JUGADOR,
+    rondasFijas: Number(opciones.rondas) > 0 ? Number(opciones.rondas) : null,
+    totalRondas: Number(opciones.rondas) > 0 ? Number(opciones.rondas) : lista.length * RONDAS_POR_JUGADOR,
     usados: [],
     ronda: null
   };
@@ -147,7 +149,7 @@ export function marcarAusente(p, id) {
 // ------------------------------------------------------------------- rondas
 function iniciarRonda(p, ahora) {
   const pres = presentes(p);
-  p.totalRondas = pres.length * RONDAS_POR_JUGADOR;
+  p.totalRondas = p.rondasFijas || pres.length * RONDAS_POR_JUGADOR;
   p.rondaNum += 1;
   p.estado = 'ronda';
 
@@ -302,7 +304,7 @@ export function aplicar(p, a, ahora = Date.now()) {
     }
 
     case 'finalizar': {
-      if (p.estado !== 'resultado' || !esFinDeVueltaCompleta(p)) {
+      if (p.estado !== 'resultado' || (!p.rondasFijas && !esFinDeVueltaCompleta(p))) {
         return err('Solo se puede finalizar al terminar una vuelta completa de todos los jugadores.');
       }
       p.estado = 'fin';
@@ -349,8 +351,8 @@ export function vista(p, viewerId = null, ahora = Date.now()) {
     rondaNum: p.rondaNum,
     totalRondas: p.totalRondas,
     vueltaActual,
-    totalVueltas: RONDAS_POR_JUGADOR,
-    puedeFinalizar: p.estado === 'resultado' && esFinDeVueltaCompleta(p) && p.rondaNum < p.totalRondas,
+    totalVueltas: pres.length ? Math.ceil(p.totalRondas / pres.length) : RONDAS_POR_JUGADOR,
+    puedeFinalizar: p.estado === 'resultado' && (p.rondasFijas || esFinDeVueltaCompleta(p)) && p.rondaNum < p.totalRondas,
     jugadores: p.jugadores.map((j) => ({
       id: j.id,
       nombre: j.nombre,

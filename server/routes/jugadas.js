@@ -4,6 +4,7 @@ import express from 'express';
 import crypto from 'node:crypto';
 import { crearPartida, aplicar, vista, tick, marcarAusente } from '../lib/jugadasEngine.js';
 import { limitesOnline, limitesLocal } from '../../client/src/games/limites.js';
+import { totalRondas } from '../../client/src/games/rondas.js';
 const LIM = limitesOnline('jugadas');
 const LIM_LOCAL = limitesLocal('jugadas');
 
@@ -33,7 +34,7 @@ router.post('/local/nueva', (req, res) => {
     id: i + 1,
     nombre: limpiarNombre(n) || `Jugador ${i + 1}`
   }));
-  const partida = crearPartida(jugadores);
+  const partida = crearPartida(jugadores, { rondas: totalRondas('jugadas', req.body?.rondas) });
   res.json({ ok: true, partida, vista: vista(partida, null) });
 });
 
@@ -170,7 +171,7 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
     return res.status(400).json({ error: `Se necesitan al menos ${MIN_JUGADORES} jugadores.` });
   }
 
-  sala.partida = crearPartida(sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre })));
+  sala.partida = crearPartida(sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre })), { rondas: totalRondas('jugadas', req.body?.rondas) });
   sala.estado = 'jugando';
   res.json({ success: true });
 });

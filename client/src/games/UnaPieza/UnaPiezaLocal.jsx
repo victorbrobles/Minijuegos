@@ -15,7 +15,7 @@ const barajar = (l) => { const b = [...l]; for (let i = b.length - 1; i > 0; i--
 export default function UnaPiezaLocal({ juego, onVolver, onExit, onAbrirAyuda }) {
   const [paso, setPaso] = useState('config');
   const [nombres, setNombres] = useState(() => Array(LIM_JUG.min).fill(''));
-  const [config, setConfig] = useState({ rondas: 3, segundos: 60 });
+  const [config, setConfig] = useState({ rondas: 4, segundos: 60 });
   const [error, setError] = useState('');
   const [aviso, setAviso] = useState(null);
   const [modal, setModal] = useState(false);

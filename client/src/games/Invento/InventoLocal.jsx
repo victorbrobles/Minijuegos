@@ -13,7 +13,7 @@ const LIM_JUG = limitesLocal('invento');
 export default function InventoLocal({ juego, onVolver, onExit, onAbrirAyuda }) {
   const [paso, setPaso] = useState('config');
   const [nombres, setNombres] = useState(() => Array(LIM_JUG.min).fill(''));
-  const [config, setConfig] = useState({ rondas: 3, segundos: 180 });
+  const [config, setConfig] = useState({ rondas: 7, segundos: 180 });
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
   const [aviso, setAviso] = useState(null);

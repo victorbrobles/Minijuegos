@@ -5,6 +5,8 @@ import Icon from '../../components/Icon.jsx';
 import './Trescientosuno.css';
 import { centrarActivo } from '../../lib/centrarActivo.js';
 import { limitesLocal } from '../limites.js';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto, totalRondas } from '../rondas.js';
 
 const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('trescientosuno');
 const TIEMPO_TURNO = 60;
@@ -316,6 +318,11 @@ export default function TrescientosunoLocal({ onVolver, onExit, onAbrirAyuda }) 
 
   const [fase, setFase] = useState('setup');
   const [modalSalirPortada, setModalSalirPortada] = useState(false);
+  // Serie de partidas: en cada una, 3 puntos al primero, 2 al segundo y 1 al tercero
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('trescientosuno'));
+  const maxPartidas = totalRondas('trescientosuno', rondasSel);
+  const [serie, setSerie] = useState({ partida: 1, puntos: {} });
+  const sumadaRef = useRef(0);
 
   const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
   const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: `Jugador ${i + 1}`, puntos: 0, estado: 'vivo', comodines: ['x2', 'x3', 'x5', 'revelar'] })));
@@ -617,6 +624,18 @@ export default function TrescientosunoLocal({ onVolver, onExit, onAbrirAyuda }) 
     return [...validos].sort((a, b) => a.puntos - b.puntos);
   };
   const rankingFinal = getGanador();
+
+  useEffect(() => {
+    if (fase !== 'resultados' || sumadaRef.current === serie.partida) return;
+    sumadaRef.current = serie.partida;
+    const orden = getGanador() || [];
+    setSerie((s) => {
+      const puntos = { ...s.puntos };
+      orden.slice(0, 3).forEach((j, i) => { puntos[j.id] = (puntos[j.id] || 0) + (3 - i); });
+      return { ...s, puntos };
+    });
+  }, [fase]); // eslint-disable-line react-hooks/exhaustive-deps
+  const rankingSerie = [...jugadores].sort((a, b) => (serie.puntos[b.id] || 0) - (serie.puntos[a.id] || 0));
   const jActual = jugadores[turnoIndex];
 
   const normalizar = (t) => String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -718,11 +737,12 @@ export default function TrescientosunoLocal({ onVolver, onExit, onAbrirAyuda }) 
               ))}
             </div>
 
+            <SelectorRondas juegoId="trescientosuno" valor={rondasSel} onCambiar={setRondasSel} />
             <button
               type="button"
               className="big full qq-btn-principal"
               style={{ marginTop: '1.5rem' }}
-              onClick={() => setFase('equipo')}
+              onClick={() => { setSerie({ partida: 1, puntos: {} }); sumadaRef.current = 0; setFase('equipo'); }}
             >
               <Icon name="play" size={22} /> Elegir equipo
             </button>
@@ -1059,15 +1079,44 @@ export default function TrescientosunoLocal({ onVolver, onExit, onAbrirAyuda }) 
             </ul>
           </div>
 
+          <div className="qqp-tarjeta">
+            <p className="qqp-carta-cara-titulo" style={{ marginBottom: '0.8rem' }}>
+              <Icon name="trophy" size={16} /> {serie.partida >= maxPartidas ? 'Clasificación final de la serie' : `Serie · partida ${serie.partida} de ${maxPartidas}`}
+            </p>
+            <ul className="qqp-rivales">
+              {rankingSerie.map((j, i) => (
+                <li key={j.id} className="qqp-rival" style={{ '--c': colorJugador(indiceColor(j, i)) }}>
+                  <span className="qqp-rival-avatar">{i === 0 && (serie.puntos[j.id] || 0) > 0 ? '👑' : i + 1}</span>
+                  <span className="qqp-rival-datos"><strong className="qqp-rival-tarjeta">{j.nombre}</strong></span>
+                  <span className="tcu-ranking-pts">{serie.puntos[j.id] || 0} pts</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
           <div className="qqp-barra">
-            <BotonPrincipal
-              onClick={() => {
-                setUltimoAcierto(null);
-                setFase('equipo');
-              }}
-            >
-              <Icon name="refresh" size={20} /> Jugar con otro equipo
-            </BotonPrincipal>
+            {serie.partida < maxPartidas ? (
+              <BotonPrincipal
+                onClick={() => {
+                  setUltimoAcierto(null);
+                  setSerie((s) => ({ ...s, partida: s.partida + 1 }));
+                  setFase('equipo');
+                }}
+              >
+                <Icon name="play" size={20} /> Siguiente partida ({serie.partida + 1} de {maxPartidas})
+              </BotonPrincipal>
+            ) : (
+              <BotonPrincipal
+                onClick={() => {
+                  setUltimoAcierto(null);
+                  setSerie({ partida: 1, puntos: {} });
+                  sumadaRef.current = 0;
+                  setFase('equipo');
+                }}
+              >
+                <Icon name="refresh" size={20} /> Jugar otra serie
+              </BotonPrincipal>
+            )}
             <EnlaceSecundario onClick={() => setModalSalirPortada(true)}>
               Salir a la portada principal
             </EnlaceSecundario>

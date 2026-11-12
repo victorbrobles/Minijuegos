@@ -19,7 +19,7 @@ export function Ayuda({ onCerrar, titulo, descripcion }) {
             <li>Por turnos, cada jugador tiene <strong>{SEGUNDOS_JUGADA} segundos</strong> para escribir qué jugada es (por ejemplo, «Iniesta a Holanda» o «Maradona a Inglaterra»).</li>
             <li>Si aciertas, sumas <strong>tantos puntos como segundos queden</strong> en el reloj.</li>
             <li>Si fallas, pasas o se acaba el tiempo, hay <strong>un único rebote</strong> para el siguiente jugador.</li>
-            <li>Se juegan {RONDAS_POR_JUGADOR} vueltas; al acabar cada vuelta, el anfitrión puede terminar el partido.</li>
+            <li>Se juegan 5, 10 o 15 jugadas (lo elige el anfitrión), por turnos; tras cada jugada se puede terminar el partido antes.</li>
           </ul>
         </div>
         <button type="button" className="big full qq-btn-principal" onClick={onCerrar}>¡Entendido!</button>

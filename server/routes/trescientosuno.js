@@ -1,6 +1,7 @@
 import express from 'express';
 import { equiposData } from '../data/seeds/trescientosuno/index.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
+import { totalRondas } from '../../client/src/games/rondas.js';
 const LIM = limitesOnline('trescientosuno');
 
 const router = express.Router();
@@ -108,6 +109,16 @@ function generarCodigo() {
 const nuevoToken = () => 'tok_' + Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2);
 
 const turnoActual = (sala) => sala.jugadores[sala.turnoActualIndex];
+
+// Serie de partidas: en cada una, 3 puntos al primero, 2 al segundo y 1 al tercero (quedarse más cerca de 0)
+function sumarSerie(sala) {
+  if (!sala.serie || sala.estado !== 'resultados' || sala.serie.sumada === sala.serie.partida) return;
+  sala.serie.sumada = sala.serie.partida;
+  sala.jugadores.filter((j) => j.estado !== 'eliminado' && j.puntuacionActual >= 0)
+    .sort((a, b) => a.puntuacionActual - b.puntuacionActual)
+    .slice(0, 3)
+    .forEach((j, i) => { sala.serie.puntos[j.id] = (sala.serie.puntos[j.id] || 0) + (3 - i); });
+}
 
 function empezarTurno(sala) {
   sala.turnoFin = Date.now() + TIEMPO_TURNO * 1000;
@@ -229,10 +240,12 @@ router.get('/online/sala/:code', (req, res) => {
     ? Math.max(0, Math.ceil((sala.turnoFin - Date.now()) / 1000))
     : 0;
 
+  sumarSerie(sala);
   res.json({
     success: true,
     code: sala.code,
     estado: sala.estado,
+    serie: sala.serie ? { partida: sala.serie.partida, max: sala.serie.max, puntos: sala.serie.puntos } : null,
     esAdmin: sala.adminToken === yo.token,
     yoId: yo.id,
     equipoSeleccionado: sala.equipoSeleccionado,
@@ -261,6 +274,7 @@ router.post('/online/sala/:code/empezar', (req, res) => {
   if (sala.estado !== 'lobby') return res.status(400).json({ error: 'La partida ya ha empezado.' });
   if (sala.jugadores.length < LIM.min) return res.status(400).json({ error: `Se necesitan al menos ${LIM.min} jugadores.` });
   sala.estado = 'configuracion';
+  sala.serie = { partida: 1, max: totalRondas('trescientosuno', req.body?.rondas), puntos: {}, sumada: 0 };
   res.json({ success: true });
 });
 
@@ -398,6 +412,10 @@ router.post('/online/sala/:code/revancha', (req, res) => {
   if (sala.adminToken !== yo.token) return res.status(403).json({ error: 'Solo el anfitrión puede repetir.' });
   if (sala.estado !== 'resultados') return res.status(400).json({ error: 'La partida aún no ha terminado.' });
   if (sala.jugadores.length < 2) return res.status(400).json({ error: 'Hacen falta al menos 2 jugadores.' });
+  sumarSerie(sala);
+  if (!sala.serie) sala.serie = { partida: 0, max: totalRondas('trescientosuno', null), puntos: {}, sumada: 0 };
+  if (sala.serie.partida >= sala.serie.max) sala.serie = { partida: 1, max: sala.serie.max, puntos: {}, sumada: 0 };
+  else sala.serie.partida += 1;
   sala.estado = 'configuracion';
   res.json({ success: true });
 });

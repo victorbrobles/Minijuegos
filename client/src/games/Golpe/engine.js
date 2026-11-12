@@ -72,7 +72,7 @@ export const OBJETIVOS = {
   infiltrado: { nombre: 'El infiltrado', e: '🕶️', desc: 'Que gane un plan que incluya una condición peligrosa… y que aun así salga bien.' }
 };
 
-export const OPCIONES_MISIONES = [3, 5];
+export const OPCIONES_MISIONES = [3, 5, 7];
 export const PUNTOS = { viable: 3, votado: 2, objetivo: 3, acusar: 2, traidorOculto: 2 };
 export const AJUSTES = { min: 3, max: 8, briefingMs: 60000, planMs: 90000, debateMs: 150000, votoMs: 60000, resolucionMs: 60000, chatMax: 160 };
 

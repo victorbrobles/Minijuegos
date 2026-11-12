@@ -58,7 +58,7 @@ export function ConfigPartida({ config, onChange, numJugadores = null }) {
     onChange({ ...config, fases });
   };
 
-  const porJugador = { corto: 1, normal: 2, largo: 3 }[config.duracion] || 2;
+  const porJugador = { corto: 2, normal: 3, largo: 5 }[config.duracion] || 3;
   const rondas = numJugadores ? numJugadores * porJugador * config.fases.length : null;
 
   return (
@@ -88,7 +88,7 @@ export function ConfigPartida({ config, onChange, numJugadores = null }) {
         })}
       </div>
 
-      <span className="qq-label-destacado" style={{ marginTop: '1rem' }}>Duración</span>
+      <span className="qq-label-destacado" style={{ marginTop: '1rem' }}>Rondas por jugador en cada fase</span>
       <div className="fbp-pildoras">
         {Object.entries(DURACIONES_INFO).map(([id, d]) => (
           <button

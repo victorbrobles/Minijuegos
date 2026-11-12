@@ -10,7 +10,7 @@
 export const RONDAS = {
   bingoball: { opciones: [1, 3, 5], unidad: 'partidas' },
   trayectoria: { opciones: [10, 15, 20] },
-  golpe: { opciones: [3, 5, 7], unidad: 'golpes' },
+  golpe: { opciones: [3, 5, 7], unidad: 'misiones' },
   sumacero: { opciones: [3, 5, 7] },
   invento: { opciones: [4, 7, 10] },
   datosobra: { opciones: [2, 3, 4], porJugador: true },
@@ -50,7 +50,7 @@ export const RONDAS = {
   furbo: { opciones: [2, 3, 5], porJugador: true },
   futbolgrid: { opciones: [3, 5, 7], unidad: 'partidas' },
   footballsplit: { opciones: [2, 3, 5], porJugador: true },
-  jugadas: { opciones: [5, 10, 15] },
+  jugadas: { opciones: [5, 10, 15], unidad: 'jugadas' },
   cuatroclubes: { opciones: [10, 15, 20] },
   geoquiz: { opciones: [2, 3, 5], porJugador: true }
 };

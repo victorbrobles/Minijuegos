@@ -67,7 +67,7 @@ export default function Telepatia({ mode, onExit }) {
                   <strong>Conexión mental:</strong> Si <strong>2 o más jugadores</strong> dicen o escriben exactamente la misma palabra, ¡conectan mentes y suman puntos!
                 </li>
                 <li>
-                  <strong>Evolución de la partida:</strong> La palabra coincidente pasa a ser la palabra base de la siguiente ronda hasta completar las <strong>15 rondas</strong>.
+                  <strong>Evolución de la partida:</strong> La palabra coincidente pasa a ser la palabra base de la siguiente ronda hasta completar las rondas elegidas (<strong>10, 15 o 20</strong>).
                 </li>
               </ul>
 

@@ -22,7 +22,9 @@ const esp = PARTIDOS[0].onces[0].jugadores.filter((j) => j.pos === 'DEF').map((j
 assert.deepEqual(esp, ['Joan Capdevila', 'Carles Puyol', 'Gerard Piqué', 'Sergio Ramos']);
 
 // Turnos: los dos onces de un partido, a jugadores seguidos
-let p = E.crearPartida([{ id: 1, nombre: 'A' }, { id: 2, nombre: 'B' }, { id: 3, nombre: 'C' }], PARTIDOS, { onces: 1, segundos: 120 }, 0);
+let p = E.crearPartida([{ id: 1, nombre: 'A' }, { id: 2, nombre: 'B' }, { id: 3, nombre: 'C' }], PARTIDOS, { onces: 2, segundos: 120 }, 0);
+// (las pruebas de abajo juegan una vuelta: un once por jugador)
+p.rondas = 3; p.turnos = p.turnos.slice(0, 3);
 assert.equal(p.rondas, 3);
 assert.deepEqual(p.turnos.map((t) => t.jugador), [1, 2, 3]);
 assert.equal(p.turnos[0].partido, p.turnos[1].partido);
@@ -62,7 +64,7 @@ assert.equal(p.fase, 'fin');
 let partidas = 0;
 for (let n = 0; n < 200; n++) {
   const nj = E.AJUSTES.min + (n % (E.AJUSTES.max - E.AJUSTES.min + 1));
-  const k = E.OPCIONES.onces[n % 3];
+  const k = E.OPCIONES.onces[n % E.OPCIONES.onces.length];
   const ps = [...PARTIDOS].sort(() => Math.random() - 0.5).slice(0, Math.ceil((nj * k) / 2));
   p = E.crearPartida(Array.from({ length: nj }, (_, i) => ({ id: i + 1, nombre: `J${i}` })), ps, { onces: k, segundos: 120 }, 0);
   assert.equal(p.rondas, Math.max(Math.min(nj, ps.length * 2), Math.floor(Math.min(nj * k, ps.length * 2) / nj) * nj));

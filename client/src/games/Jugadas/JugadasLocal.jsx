@@ -9,12 +9,15 @@ import { MIN_JUGADORES, MAX_JUGADORES } from './constantes.js';
 import { SelectorJugadores } from '../../components/MenuJuego.jsx';
 import './Jugadas.css';
 import { limitesLocal } from '../limites.js';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto, totalRondas } from '../rondas.js';
 
 const LIM_JUG = limitesLocal('jugadas');
 
 export default function JugadasLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [paso, setPaso] = useState('config');
   const [nombres, setNombres] = useState(() => Array(LIM_JUG.min).fill(''));
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('jugadas'));
   const [vista, setVista] = useState(null);
   const [error, setError] = useState('');
   const [aviso, setAviso] = useState('');
@@ -29,7 +32,7 @@ export default function JugadasLocal({ onVolver, onExit, onAbrirAyuda }) {
     if (new Set(limpios.map((n) => n.toLowerCase())).size !== limpios.length) return setError('Hay nombres repetidos.');
     setError(''); setCargando(true);
     try {
-      const res = await fetch('/api/jugadas/local/nueva', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nombres: limpios }) });
+      const res = await fetch('/api/jugadas/local/nueva', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ nombres: limpios, rondas: rondasSel }) });
       const data = await res.json();
       if (!res.ok || !data.ok) throw new Error(data.error || 'No se ha podido crear la partida.');
       partidaRef.current = data.partida;
@@ -70,7 +73,9 @@ export default function JugadasLocal({ onVolver, onExit, onAbrirAyuda }) {
           nombres={nombres}
           onNombre={(i, valor) => setNombres((l) => l.map((x, k) => (k === i ? valor : x)))}
           onEmpezar={empezar} textoBoton={cargando ? 'Cargando…' : '¡Empezar partido!'} error={error}
-        />
+        >
+          <SelectorRondas juegoId="jugadas" valor={rondasSel} onCambiar={setRondasSel} titulo="Jugadas" />
+        </SelectorJugadores>
       </div>
     );
   }

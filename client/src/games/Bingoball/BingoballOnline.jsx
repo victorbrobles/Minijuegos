@@ -8,6 +8,8 @@ import {
 } from '../../components/MenuJuego.jsx';
 import './Bingoball.css';
 import { limitesOnline, textoSala } from '../limites.js';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto } from '../rondas.js';
 
 const LIM_ON = limitesOnline('bingoball');
 
@@ -30,6 +32,7 @@ const post = async (url, body) => {
 };
 
 export default function BingoballOnline({ onSalir, onAbrirAyuda }) {
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('bingoball'));
   const [sesion, setSesion] = useState(leerSesion);
   const [menu, setMenu] = useState('menu');
   const [nombre, setNombre] = useState('');
@@ -189,9 +192,12 @@ export default function BingoballOnline({ onSalir, onAbrirAyuda }) {
           />
           {sala.esAdmin && (
             <div style={{ marginTop: '1.2rem' }}>
-              <button type="button" className="big full qq-btn-principal" disabled={n < sala.min} onClick={() => llamar('elegir')}>
+              <>
+              <div className="panel qq-menu-panel" style={{ marginBottom: '0.8rem' }}><SelectorRondas juegoId="bingoball" valor={rondasSel} onCambiar={setRondasSel} /></div>
+              <button type="button" className="big full qq-btn-principal" disabled={n < sala.min} onClick={() => llamar('elegir', { partidas: rondasSel })}>
                 <Icon name="play" size={22} /> {n < sala.min ? `Esperando jugadores (mínimo ${sala.min})…` : '¡Jugar!'}
               </button>
+              </>
             </div>
           )}
           {!sala.esAdmin && <EsperandoAnfitrion texto="Cuando estéis todos, el anfitrión empezará la partida." />}
@@ -217,9 +223,15 @@ export default function BingoballOnline({ onSalir, onAbrirAyuda }) {
               <div className="bbp-barra estatica">
                 {sala.esAdmin ? (
                   <>
-                    <button type="button" className="bbp-boton grande" disabled={n < sala.min} onClick={() => llamar('elegir')}>
-                      <Icon name="refresh" size={20} /> Otro bingo (mismos jugadores)
-                    </button>
+                    {sala.numPartida >= sala.maxPartidas ? (
+                      <button type="button" className="bbp-boton grande" onClick={() => llamar('finalizar')}>
+                        <Icon name="trophy" size={20} /> Ver la clasificación final
+                      </button>
+                    ) : (
+                      <button type="button" className="bbp-boton grande" disabled={n < sala.min} onClick={() => llamar('elegir')}>
+                        <Icon name="refresh" size={20} /> Otro bingo (mismos jugadores) · {sala.numPartida + 1} de {sala.maxPartidas}
+                      </button>
+                    )}
                     <button type="button" className="bbp-boton secundario" onClick={() => llamar('finalizar')}>
                       <Icon name="trophy" size={18} /> Terminar y ver la clasificación
                     </button>
