@@ -17,19 +17,19 @@ function preparar(config) {
   const c = CATEGORIAS[id];
   return {
     items: barajar(c.data),
-    reglas: { categoria: { id, nombre: c.nombre, pregunta: c.pregunta, emoji: c.emoji }, vueltas: config.vueltas }
+    reglas: { categoria: { id, nombre: c.nombre, pregunta: c.pregunta, emoji: c.emoji }, turnos: config.turnos }
   };
 }
-const leerConfig = (b, c = { categoria: 'azar', vueltas: 1 }) => ({
+const leerConfig = (b, c = { categoria: 'azar', turnos: 10 }) => ({
   categoria: b.categoria === 'azar' || CATEGORIAS[b.categoria] ? b.categoria : c.categoria,
-  vueltas: E.OPCIONES_VUELTAS.includes(Number(b.vueltas)) ? Number(b.vueltas) : c.vueltas
+  turnos: E.OPCIONES_TURNOS.includes(Number(b.turnos)) ? Number(b.turnos) : c.turnos
 });
 
 router.get('/categorias', (req, res) => res.json({ success: true, categorias: LISTA }));
 
 // Un solo dispositivo: el cliente juega con el motor copiado.
 router.get('/local', (req, res) => {
-  res.json({ success: true, ...preparar(leerConfig({ categoria: req.query.categoria, vueltas: req.query.vueltas })) });
+  res.json({ success: true, ...preparar(leerConfig({ categoria: req.query.categoria, turnos: req.query.turnos })) });
 });
 
 montarSalas(router, {

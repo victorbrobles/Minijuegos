@@ -30,7 +30,7 @@ export default function CancionOnline({ onVolver, onSalir, onAbrirAyuda }) {
   const [vista, setVista] = useState(() => (sesion ? 'sala' : 'online_menu'));
   const [nombre, setNombre] = useState('');
   const [codigo, setCodigo] = useState('');
-  const [rondas, setRondas] = useState(10);
+  const [rondas, setRondas] = useState(15);
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modalLobby, setModalLobby] = useState(false);

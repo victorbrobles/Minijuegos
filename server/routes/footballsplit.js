@@ -10,8 +10,9 @@ const router = express.Router();
 
 // Modo «un solo dispositivo»: el cliente pide las caras y juega con el motor copiado.
 router.get('/retos', (req, res) => {
-  const n = E.OPCIONES_RONDAS.includes(Number(req.query.n)) ? Number(req.query.n) : 10;
-  res.json({ success: true, retos: generarRetos(n) });
+  const k = E.OPCIONES_RONDAS.includes(Number(req.query.n)) ? Number(req.query.n) : 3;
+  const j = Math.max(1, Math.min(20, Number(req.query.j) || 1));
+  res.json({ success: true, retos: generarRetos(k * j) });
 });
 const salas = {};
 const { min: MIN, max: MAX } = limitesOnline('footballsplit');
@@ -57,7 +58,7 @@ const revisar = (sala) => {
 
 function iniciarPartida(sala) {
   sala.numPartida += 1; sala.puntosAplicados = false;
-  sala.partida = E.crearPartida(sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre })), generarRetos(sala.config.rondas), Date.now());
+  sala.partida = E.crearPartida(sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre })), generarRetos(sala.config.rondas * sala.jugadores.length), Date.now());
   sala.estado = 'jugando';
 }
 
@@ -70,7 +71,7 @@ router.post('/online/crear', (req, res) => {
   const token = nuevoToken();
   salas[code] = {
     code, adminToken: token, estado: 'lobby', contadorIds: 1, numPartida: 0, puntosAplicados: false,
-    partida: null, ultimaPartida: null, ultimaActividad: Date.now(), config: { rondas: 10 },
+    partida: null, ultimaPartida: null, ultimaActividad: Date.now(), config: { rondas: 3 },
     jugadores: [{ id: 1, token, nombre, puntos: 0, visto: Date.now() }]
   };
   res.json({ success: true, code, token, jugadorId: 1 });

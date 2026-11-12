@@ -5,6 +5,8 @@ import Icon from '../../components/Icon.jsx';
 import './Rapidfire.css';
 import { centrarActivo } from '../../lib/centrarActivo.js';
 import { limitesLocal } from '../limites.js';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto, totalRondas } from '../rondas.js';
 
 const TIEMPO_S = 60;
 const PREPARACION_S = 3;
@@ -212,6 +214,7 @@ function BotonVolver({ onClick, texto = 'Volver' }) {
    ========================================================================== */
 
 function Turno({
+  maxRondas,
   jugador,
   jugadores,
   puntos,
@@ -270,7 +273,7 @@ function Turno({
       <Cabecera
         onSalir={onSalirPortada}
         categoria={categoria}
-        etiqueta={esRebote ? `Ronda ${ronda} · Turno de rebote` : `Ronda ${ronda} · Turno en juego`}
+        etiqueta={esRebote ? `Ronda ${ronda} de ${maxRondas} · Turno de rebote` : `Ronda ${ronda} de ${maxRondas} · Turno en juego`}
         titulo={jugador.nombre}
         avatar={<Avatar nombre={jugador.nombre} color={colorJugador(indiceColor(jugador, 0))} />}
         chips={
@@ -363,6 +366,8 @@ export default function RapidfireLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: `Jugador ${i + 1}` })));
   const [puntos, setPuntos] = useState({});
   const [ronda, setRonda] = useState(1);
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('rapidfire'));
+  const maxRondas = totalRondas('rapidfire', rondasSel, jugadores.length);
   const [jugadorInicialRonda, setJugadorInicialRonda] = useState(0);
   const [proximoInicialRonda, setProximoInicialRonda] = useState(0);
   const [turno, setTurno] = useState(0);
@@ -633,6 +638,7 @@ export default function RapidfireLocal({ onVolver, onExit, onAbrirAyuda }) {
               ))}
             </div>
 
+            <SelectorRondas juegoId="rapidfire" valor={rondasSel} onCambiar={setRondasSel} numJugadores={jugadores.length} />
             <button
               type="button"
               className="big full qq-btn-principal"
@@ -652,7 +658,7 @@ export default function RapidfireLocal({ onVolver, onExit, onAbrirAyuda }) {
             onSalir={() => (ronda === 1 ? setPaso('config') : setModalSalirPortada(true))}
             textoSalir={ronda === 1 ? 'Volver' : 'Portada'}
             onAyuda={onAbrirAyuda}
-            etiqueta={`Ronda ${ronda} · ${ronda === 1 ? 'Empieza al azar' : 'Abre la ronda'}`}
+            etiqueta={`Ronda ${ronda} de ${maxRondas} · ${ronda === 1 ? 'Empieza al azar' : 'Abre la ronda'}`}
             titulo={`${jugadorActual.nombre}, elige temática`}
             avatar={<Avatar nombre={jugadorActual.nombre} color={colorJugador(indiceColor(jugadorActual, turno))} />}
           >
@@ -679,6 +685,7 @@ export default function RapidfireLocal({ onVolver, onExit, onAbrirAyuda }) {
           puntos={puntos}
           intentadosIds={intentadosIds}
           ronda={ronda}
+          maxRondas={maxRondas}
           esRebote={intento > 0}
           motivo={motivo}
           categoria={categoria}
@@ -697,7 +704,7 @@ export default function RapidfireLocal({ onVolver, onExit, onAbrirAyuda }) {
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
             categoria={categoria}
-            etiqueta={`Ronda ${ronda} completada`}
+            etiqueta={`Ronda ${ronda} de ${maxRondas} completada`}
             titulo="Puntuaciones"
           >
             {ultimo && (
@@ -739,12 +746,20 @@ export default function RapidfireLocal({ onVolver, onExit, onAbrirAyuda }) {
           </div>
 
           <div className="qqp-barra">
-            <BotonPrincipal onClick={continuar}>
-              <Icon name="play" size={20} /> Continuar: Ronda {ronda + 1}
-            </BotonPrincipal>
-            <EnlaceSecundario onClick={() => setPaso('final')}>
-              Finalizar partida y ver podio
-            </EnlaceSecundario>
+            {ronda >= maxRondas ? (
+              <BotonPrincipal onClick={() => setPaso('final')}>
+                <Icon name="trophy" size={20} /> Ver el podio final
+              </BotonPrincipal>
+            ) : (
+              <>
+                <BotonPrincipal onClick={continuar}>
+                  <Icon name="play" size={20} /> Continuar: Ronda {ronda + 1} de {maxRondas}
+                </BotonPrincipal>
+                <EnlaceSecundario onClick={() => setPaso('final')}>
+                  Finalizar partida y ver podio
+                </EnlaceSecundario>
+              </>
+            )}
           </div>
         </section>
       )}

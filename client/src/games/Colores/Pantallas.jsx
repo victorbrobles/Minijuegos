@@ -20,7 +20,7 @@ export const PALETA = [
 ];
 export const colorDe = (id) => PALETA.find((c) => c.id === id) || PALETA[0];
 
-export const OPCIONES_RONDAS = [10, 15, 25];
+export const OPCIONES_RONDAS = [10, 15, 20];
 export const SEGUNDOS_RESPUESTA = 45;
 
 const COLORES_JUGADOR = ['#ef4444', '#2563eb', '#16a34a', '#f59e0b', '#9333ea', '#ec4899', '#0d9488', '#ea580c', '#475569', '#65a30d', '#6366f1', '#0ea5e9', '#e11d48', '#84cc16', '#a855f7'];

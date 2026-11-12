@@ -28,7 +28,7 @@ const post = (url, body) => fetch(url, {
 export default function UbicacionOnline({ onVolver, onSalir, onAbrirAyuda }) {
   const [nombre, setNombre] = useState('');
   const [codigoInput, setCodigoInput] = useState('');
-  const [rondas, setRondas] = useState(10);
+  const [rondas, setRondas] = useState(7);
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modalSalirLobby, setModalSalirLobby] = useState(false);

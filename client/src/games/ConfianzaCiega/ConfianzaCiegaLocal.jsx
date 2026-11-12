@@ -5,6 +5,8 @@ import Icon from '../../components/Icon.jsx';
 import './ConfianzaCiega.css';
 import { centrarActivo } from '../../lib/centrarActivo.js';
 import { limitesLocal } from '../limites.js';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto, totalRondas } from '../rondas.js';
 
 const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('confianzaciega');
 const TIEMPO_MAXIMO_S = 60;
@@ -146,6 +148,8 @@ export default function ConfianzaCiegaLocal({ onVolver, onExit, onAbrirAyuda }) 
   const [puntos, setPuntos] = useState({});
 
   const [rondaActual, setRondaActual] = useState(1);
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('confianzaciega'));
+  const maxRondas = totalRondas('confianzaciega', rondasSel, jugadores.length);
   const [ordenTurnos, setOrdenTurnos] = useState([]);
   const [indiceTurno, setIndiceTurno] = useState(0);
 
@@ -511,6 +515,7 @@ export default function ConfianzaCiegaLocal({ onVolver, onExit, onAbrirAyuda }) 
 
             {errorCarga && <p className="error" style={{ marginTop: '0.8rem' }}>{errorCarga}</p>}
 
+            <SelectorRondas juegoId="confianzaciega" valor={rondasSel} onCambiar={setRondasSel} numJugadores={jugadores.length} />
             <button
               type="button"
               className="big full qq-btn-principal"
@@ -529,7 +534,7 @@ export default function ConfianzaCiegaLocal({ onVolver, onExit, onAbrirAyuda }) 
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
             categoria={{ nombre: 'Protagonista', icono: 'eye' }}
-            etiqueta={`Ronda ${rondaActual} · Paso de turno`}
+            etiqueta={`Ronda ${rondaActual} de ${maxRondas} · Paso de turno`}
             titulo="Pasad el móvil"
           >
             <OrdenTurnos
@@ -562,7 +567,7 @@ export default function ConfianzaCiegaLocal({ onVolver, onExit, onAbrirAyuda }) 
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
             categoria={{ nombre: 'Elección secreta', icono: 'eye' }}
-            etiqueta={`Ronda ${rondaActual} · Protagonista`}
+            etiqueta={`Ronda ${rondaActual} de ${maxRondas} · Protagonista`}
             titulo={jugadorActivo.nombre}
             avatar={<Avatar nombre={jugadorActivo.nombre} color={colorJugador(indiceColor(jugadorActivo, 0))} />}
           >
@@ -603,7 +608,7 @@ export default function ConfianzaCiegaLocal({ onVolver, onExit, onAbrirAyuda }) 
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
             categoria={{ nombre: 'Apuesta secreta', icono: 'lock' }}
-            etiqueta={`Ronda ${rondaActual} · Apostador ${indiceApostador + 1} de ${apostadoresRestantes.length}`}
+            etiqueta={`Ronda ${rondaActual} de ${maxRondas} · Apostador ${indiceApostador + 1} de ${apostadoresRestantes.length}`}
             titulo="Pasad el móvil"
           >
             <OrdenTurnos
@@ -637,7 +642,7 @@ export default function ConfianzaCiegaLocal({ onVolver, onExit, onAbrirAyuda }) 
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
             categoria={{ nombre: `Apuesta ${indiceApostador + 1}/${apostadoresRestantes.length}`, icono: 'target' }}
-            etiqueta={`Ronda ${rondaActual} · Apostando sobre ${jugadorActivo.nombre}`}
+            etiqueta={`Ronda ${rondaActual} de ${maxRondas} · Apostando sobre ${jugadorActivo.nombre}`}
             titulo={apostadorActual.nombre}
             avatar={<Avatar nombre={apostadorActual.nombre} color={colorJugador(indiceColor(apostadorActual, 0))} />}
           >
@@ -714,7 +719,7 @@ export default function ConfianzaCiegaLocal({ onVolver, onExit, onAbrirAyuda }) 
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
             categoria={{ nombre: '¡A responder!', icono: 'zap' }}
-            etiqueta={`Ronda ${rondaActual} · Todas las apuestas listas`}
+            etiqueta={`Ronda ${rondaActual} de ${maxRondas} · Todas las apuestas listas`}
             titulo="Pasad el móvil"
           >
             <OrdenTurnos
@@ -751,7 +756,7 @@ export default function ConfianzaCiegaLocal({ onVolver, onExit, onAbrirAyuda }) 
               nombre: '¡En marcha!',
               icono: 'clock'
             }}
-            etiqueta={`Ronda ${rondaActual} · Turno de acción`}
+            etiqueta={`Ronda ${rondaActual} de ${maxRondas} · Turno de acción`}
             titulo={jugadorActivo.nombre}
             avatar={<Avatar nombre={jugadorActivo.nombre} color={colorJugador(indiceColor(jugadorActivo, 0))} />}
           >
@@ -821,7 +826,7 @@ export default function ConfianzaCiegaLocal({ onVolver, onExit, onAbrirAyuda }) 
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
             categoria={{ nombre: 'Recuento final', icono: 'check' }}
-            etiqueta={`Ronda ${rondaActual} · Tiempo finalizado`}
+            etiqueta={`Ronda ${rondaActual} de ${maxRondas} · Tiempo finalizado`}
             titulo={`Recuento de ${jugadorActivo.nombre}`}
             avatar={<Avatar nombre={jugadorActivo.nombre} color={colorJugador(indiceColor(jugadorActivo, 0))} />}
           >
@@ -871,7 +876,7 @@ export default function ConfianzaCiegaLocal({ onVolver, onExit, onAbrirAyuda }) 
         <section className="game qqp-escena">
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
-            etiqueta={`Ronda ${rondaActual} completada`}
+            etiqueta={`Ronda ${rondaActual} de ${maxRondas} completada`}
             titulo={`Aciertos: ${resultadoRonda.aciertosFinales}`}
           >
             <div className="qqp-identidad">
@@ -943,12 +948,20 @@ export default function ConfianzaCiegaLocal({ onVolver, onExit, onAbrirAyuda }) 
           </div>
 
           <div className="qqp-barra">
-            <BotonPrincipal onClick={avanzarSiguienteRonda}>
-              <Icon name="play" size={20} /> Siguiente ronda (Ronda {rondaActual + 1})
-            </BotonPrincipal>
-            <EnlaceSecundario onClick={() => setFase('final')}>
-              Finalizar partida y ver podio
-            </EnlaceSecundario>
+            {rondaActual >= maxRondas ? (
+              <BotonPrincipal onClick={() => setFase('final')}>
+                <Icon name="trophy" size={20} /> Ver el podio final
+              </BotonPrincipal>
+            ) : (
+              <>
+                <BotonPrincipal onClick={avanzarSiguienteRonda}>
+                  <Icon name="play" size={20} /> Siguiente ronda ({rondaActual + 1} de {maxRondas})
+                </BotonPrincipal>
+                <EnlaceSecundario onClick={() => setFase('final')}>
+                  Finalizar partida y ver podio
+                </EnlaceSecundario>
+              </>
+            )}
           </div>
         </section>
       )}

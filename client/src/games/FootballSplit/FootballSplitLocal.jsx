@@ -14,7 +14,7 @@ const LIM_JUG = limitesLocal('footballsplit');
 export default function FootballSplitLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [paso, setPaso] = useState('config');
   const [nombres, setNombres] = useState(() => Array(LIM_JUG.min).fill(''));
-  const [rondas, setRondas] = useState(10);
+  const [rondas, setRondas] = useState(3);
   const [error, setError] = useState('');
   const [aviso, setAviso] = useState(null);
   const [cargando, setCargando] = useState(false);
@@ -37,7 +37,7 @@ export default function FootballSplitLocal({ onVolver, onExit, onAbrirAyuda }) {
     if (new Set(limpios.map((n) => n.toLowerCase())).size !== limpios.length) return setError('Hay nombres repetidos.');
     setError(''); setCargando(true);
     try {
-      const r = await fetch(`/api/footballsplit/retos?n=${rondas}`);
+      const r = await fetch(`/api/footballsplit/retos?n=${rondas}&j=${limpios.length}`);
       const d = await r.json();
       if (!d.success) throw new Error();
       estRef.current = E.crearPartida(limpios.map((nombre, i) => ({ id: i + 1, nombre })), d.retos, Date.now());
@@ -61,8 +61,8 @@ export default function FootballSplitLocal({ onVolver, onExit, onAbrirAyuda }) {
           onNombre={(i, valor) => setNombres((l) => l.map((x, k) => (k === i ? valor : x)))}
           onEmpezar={empezar} textoBoton={cargando ? 'Cargando…' : '¡Empezar partida!'} error={error}
         >
-          <BloqueConfig titulo="Número de caras">
-            <SelectorRondas valor={rondas} onCambiar={setRondas} />
+          <BloqueConfig titulo="Caras por jugador">
+            <SelectorRondas valor={rondas} onCambiar={setRondas} numJugadores={nombres.length} />
           </BloqueConfig>
         </SelectorJugadores>
       </div>

@@ -1,6 +1,7 @@
 import express from 'express';
 import crypto from 'crypto';
 import { limitesOnline } from '../../client/src/games/limites.js';
+import { totalRondas } from '../../client/src/games/rondas.js';
 const LIM = limitesOnline('telepatia');
 
 const router = express.Router();
@@ -74,6 +75,7 @@ router.get('/sala/:code', (req, res) => {
     code: sala.code,
     estado: sala.estado,
     rondaNum: sala.rondaNum,
+    maxRondas: sala.maxRondas || totalRondas('telepatia', null),
     palabraActual: sala.palabraActual,
     segundosRestantes: sala.segundosRestantes,
     logRonda: sala.logRonda,
@@ -177,6 +179,7 @@ router.post('/sala/:code/iniciar', (req, res) => {
   const sala = salas[code];
   if (!sala || !sala.jugadores.find(j => j.token === token)?.esAdmin) return res.status(403).json({ error: 'No autorizado' });
   if (sala.jugadores.length < LIM.min) return res.status(400).json({ error: `Se necesitan al menos ${LIM.min} jugadores.` });
+  sala.maxRondas = totalRondas('telepatia', req.body?.rondas, sala.jugadores.length);
 
   sala.jugadores.forEach(j => { j.puntos = 0; j.racha = 0; j.palabra = ''; });
   sala.rondaNum = 1;
@@ -209,7 +212,7 @@ router.post('/sala/:code/siguiente', (req, res) => {
   const yo = sala?.jugadores.find(j => j.token === token);
   if (!yo || !yo.esAdmin) return res.status(403).json({ error: 'No autorizado' });
 
-  if (sala.rondaNum >= 15) {
+  if (sala.rondaNum >= (sala.maxRondas || 15)) {
     sala.estado = 'fin';
     return res.json({ success: true });
   }

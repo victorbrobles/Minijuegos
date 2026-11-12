@@ -2,6 +2,7 @@
 import express from 'express';
 import { CATEGORIAS } from '../data/seeds/rapidfire/rapidfire.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
+import { totalRondas } from '../../client/src/games/rondas.js';
 const LIM = limitesOnline('rapidfire');
 
 const router = express.Router();
@@ -205,6 +206,7 @@ router.get('/online/sala/:code', (req, res) => {
     esAdmin: sala.adminToken === token,
     yoId: jugador.id,
     rondaNum: sala.rondaNum,
+    maxRondas: sala.maxRondas || totalRondas('rapidfire', null, sala.jugadores.length),
     jugadores: sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre, puntos: j.puntos })),
     ronda: infoRonda
   });
@@ -218,6 +220,7 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
 
   sala.estado = 'categorias';
   sala.rondaNum = 1;
+  sala.maxRondas = totalRondas('rapidfire', req.body?.rondas, sala.jugadores.length);
   sala.usados = [];
 
   const ids = sala.jugadores.map((j) => j.id);
@@ -341,6 +344,10 @@ router.post('/online/sala/:code/continuar-ronda', (req, res) => {
   const sala = salasOnline.get(req.params.code?.toUpperCase());
   if (!sala || sala.adminToken !== req.body?.token) return res.status(403).json({ error: 'No autorizado.' });
 
+  if (sala.rondaNum >= (sala.maxRondas || Infinity)) {
+    sala.estado = 'final';
+    return res.json({ success: true, final: true });
+  }
   sala.rondaNum += 1;
   const siguienteTurno = sala.proximoInicialId;
 

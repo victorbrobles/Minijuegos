@@ -52,7 +52,7 @@ export default function Colores({ onExit }) {
                 <li>Elige esos colores entre los 11 de la paleta: {PALETA.map((c) => c.nombre.toLowerCase()).join(', ')}.</li>
                 <li>Tienes <strong>{SEGUNDOS_RESPUESTA} segundos</strong>. Si se acaba el tiempo, cuenta lo que lleves elegido.</li>
                 <li>En el modo online todos responden a la vez; en un dispositivo, os pasáis el móvil en secreto.</li>
-                <li>Partidas de 10, 15 o 25 rondas, de 2 a 16 jugadores.</li>
+                <li>Partidas de 10, 15 o 20 rondas, de 2 a 16 jugadores.</li>
               </ul>
               <p style={{ marginTop: '0.8rem', fontWeight: 800, color: '#0f172a' }}>Puntuación</p>
               <ul>

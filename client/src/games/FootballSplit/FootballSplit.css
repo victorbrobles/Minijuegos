@@ -175,7 +175,7 @@
 .ffp-dos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; width: 100%; }
 /* ---------- Pasa el móvil ---------- */
 .ffp-gate { display: flex; flex-direction: column; align-items: center; padding: 1.6rem 1.2rem 1.3rem; text-align: center; }
-.ffp-gate h2 { margin: 0; color: #0f172a; font-size: 1.5rem; }
+.ffp-gate h2 { margin: 0.1rem 0 0.2rem; color: #0f172a; font-size: 2rem; font-weight: 900; letter-spacing: -0.5px; line-height: 1.1; }
 .ffp-gate .ffp-avatar.grande { width: 84px; height: 84px; margin-bottom: 0.6rem; border-radius: 28px; font-size: 2.4rem; animation: ffpFlotar 2.6s ease-in-out infinite; }
 
 /* ---------- Final ---------- */
@@ -440,6 +440,6 @@
 .ffp-indicacion { margin: 0 !important; padding: 0.45rem 0.9rem; border-radius: 999px; background: rgba(255, 255, 255, 0.15); color: #ffffff !important; font-size: 0.9rem; font-weight: 800; text-align: center; animation: ffpLatir 1.6s ease-in-out infinite; }
 @keyframes ffpLatir { 50% { opacity: 0.7; } }
 .ffp-gate { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; padding: 1.6rem 1.2rem 1.3rem; text-align: center; }
-.ffp-gate h2 { margin: 0; color: #0f172a; font-size: 1.5rem; }
+.ffp-gate h2 { margin: 0.1rem 0 0.2rem; color: #0f172a; font-size: 2rem; font-weight: 900; letter-spacing: -0.5px; line-height: 1.1; }
 .ffp-gate .ffp-boton { margin-top: 0.6rem; }
 .ffp-avatar.grande { width: 84px; height: 84px; margin-bottom: 0.4rem; border-radius: 28px; font-size: 2.4rem; animation: ffpFlotar 2.6s ease-in-out infinite; }

@@ -100,7 +100,7 @@ function robarDelMazo(est, n) {
 
 // ---------------------------------------------------------------- Crear partida y rondas
 export function crearPartida(jugadores, config = {}, { rng = Math.random } = {}) {
-  const rondas = OPCIONES_RONDAS.includes(Number(config.rondas)) ? Number(config.rondas) : 3;
+  const rondas = OPCIONES_RONDAS.includes(Number(config.rondas)) ? Number(config.rondas) : 5;
   const est = {
     rng, cfg: { rondas }, ronda: 0, fase: 'juego', log: [], nlog: 0,
     jugadores: jugadores.map((j) => ({ id: j.id, nombre: j.nombre, mano: [], total: 0, congelado: false, fuera: false, listo: false })),

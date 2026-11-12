@@ -33,7 +33,7 @@ export default function MasMenosLocal({ juego, onVolver, onExit, onAbrirAyuda })
     if (new Set(limpios.map((n) => n.toLowerCase())).size !== limpios.length) return setError('Hay nombres repetidos.');
     setError(''); setCargando(true);
     try {
-      const r = await fetch(`/api/masmenos/local?categoria=${config.categoria}&vueltas=${config.vueltas}`);
+      const r = await fetch(`/api/masmenos/local?categoria=${config.categoria}&turnos=${config.turnos}`);
       const d = await r.json();
       if (!d.success) throw new Error();
       estRef.current = E.crearPartida(limpios.map((nombre, i) => ({ id: i + 1, nombre })), d.items, d.reglas, Date.now());

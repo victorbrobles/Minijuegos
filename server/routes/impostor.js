@@ -5,6 +5,7 @@ import parte2 from '../data/seeds/impostor/parte2.js';
 import parte3 from '../data/seeds/impostor/parte3.js';
 import parte4 from '../data/seeds/impostor/parte4.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
+import { totalRondas } from '../../client/src/games/rondas.js';
 const LIM = limitesOnline('impostor');
 
 const router = express.Router();
@@ -121,8 +122,16 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
   if (sala.jugadores.length < LIM.min) return res.status(400).json({ error: `Se necesitan al menos ${LIM.min} jugadores.` });
 
   if (modo) sala.modoJuego = modo;
-  sala.jugadores.forEach((j) => { j.puntos = 0; });
-  sala.rondaActual = 1;
+  // A mitad de partida solo se cambia el modo de la siguiente ronda (sin perder los puntos)
+  const enCurso = sala.estado !== 'lobby' && sala.estado !== 'final';
+  if (enCurso) {
+    if (sala.rondaActual >= (sala.maxRondas || Infinity)) { sala.estado = 'final'; return res.json({ success: true, final: true }); }
+    sala.rondaActual += 1;
+  } else {
+    sala.maxRondas = totalRondas('impostor', req.body?.rondas);
+    sala.jugadores.forEach((j) => { j.puntos = 0; });
+    sala.rondaActual = 1;
+  }
   prepararPartidaOnline(sala);
 
   res.json({ success: true });
@@ -168,6 +177,7 @@ router.get('/online/sala/:code', (req, res) => {
     estado: sala.estado,
     modoJuego: sala.modoJuego,
     rondaActual: sala.rondaActual,
+    maxRondas: sala.maxRondas || totalRondas('impostor', null),
     esAdmin,
     yoId: jugadorActual.id,
     esImpostor,
@@ -236,6 +246,10 @@ router.post('/online/sala/:code/siguiente-partida', (req, res) => {
   const sala = salasOnline[code];
   if (!sala || sala.adminToken !== token) return res.status(403).json({ error: 'No autorizado.' });
 
+  if (sala.rondaActual >= (sala.maxRondas || Infinity)) {
+    sala.estado = 'final';
+    return res.json({ success: true, final: true });
+  }
   sala.rondaActual += 1;
   prepararPartidaOnline(sala);
   res.json({ success: true });

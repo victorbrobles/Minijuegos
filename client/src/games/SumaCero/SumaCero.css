@@ -464,3 +464,7 @@ button.szp-carta:active { transform: translateY(3px); }
 .szp-texto { display: flex; align-items: center; justify-content: center; gap: 0.35rem; }
 
 @media (prefers-reduced-motion: reduce) { .szp-chip.alerta, .szp-ultimo, .szp-carta.nueva { animation: none !important; } }
+
+/* Pantalla de «pasa el móvil»: cabecera arriba, tarjeta y botón aparte */
+.szp-gate h2 { margin: 0.1rem 0 0.2rem !important; font-size: 2rem !important; font-weight: 900; letter-spacing: -0.5px; line-height: 1.1; color: #0f172a; }
+.szp-turno-sub { display: inline-block; margin-top: 0.7rem !important; padding: 0.3rem 0.8rem; border-radius: 999px; background: #f1f5f9; color: #475569; font-size: 0.82rem; font-weight: 700; }

@@ -64,7 +64,7 @@ router.post('/online/crear', (req, res) => {
   const token = nuevoToken();
   salas[code] = {
     code, adminToken: token, estado: 'lobby', contadorIds: 1, numPartida: 0, puntosAplicados: false,
-    partida: null, ultimaPartida: null, ultimaActividad: Date.now(), config: { tableros: 5 },
+    partida: null, ultimaPartida: null, ultimaActividad: Date.now(), config: { tableros: 3 },
     jugadores: [{ id: 1, token, nombre, puntos: 0, visto: Date.now() }]
   };
   res.json({ success: true, code, token, jugadorId: 1 });

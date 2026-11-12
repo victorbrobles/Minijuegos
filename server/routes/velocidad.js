@@ -3,6 +3,7 @@ import { Router } from 'express';
 import { PREGUNTAS_NORMALES, PREGUNTAS_ESPECIALES } from '../data/seeds/velocidad/index.js';
 import { barajar } from '../lib/barajar.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
+import { totalRondas } from '../../client/src/games/rondas.js';
 const LIM = limitesOnline('velocidad');
 
 const router = Router();
@@ -159,6 +160,8 @@ router.get('/online/sala/:code', (req, res) => {
     yoId: jugadorActual.id,
     jugadorActualId: sala.jugadorActualId,
     jugadorActualNombre: jugadorEnTurno ? jugadorEnTurno.nombre : null,
+    ronda: sala.ronda || 1,
+    maxRondas: sala.maxRondas || totalRondas('velocidad', null),
     cuentaAtrasSegundos,
     progresoEnVivo: sala.progresoEnVivo,
     jugadores: sala.jugadores.map((j) => ({
@@ -213,6 +216,8 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
     j.aciertos = 0;
     j.jugo = false;
   });
+  sala.maxRondas = totalRondas('velocidad', req.body?.rondas);
+  sala.ronda = 1;
 
   const elegido = sala.jugadores[Math.floor(Math.random() * sala.jugadores.length)];
   sala.jugadorActualId = elegido.id;
@@ -328,7 +333,7 @@ router.post('/online/sala/:code/finalizar-turno', (req, res) => {
   const jugador = sala.jugadores.find((j) => j.token === token);
   if (!jugador || jugador.id !== sala.jugadorActualId) return res.status(403).json({ error: 'No es tu turno.' });
 
-  jugador.aciertos = Number(aciertos || 0);
+  jugador.aciertos = (jugador.aciertos || 0) + Number(aciertos || 0);
   jugador.jugo = true;
   sala.estado = 'resumen_turno';
   sala.progresoEnVivo = null;
@@ -347,11 +352,17 @@ router.post('/online/sala/:code/siguiente-jugador', (req, res) => {
   if (!sala) return res.status(404).json({ error: 'La sala no existe.' });
   if (sala.adminToken !== token) return res.status(403).json({ error: 'Solo el anfitrión puede avanzar.' });
 
-  const pendientes = sala.jugadores.filter((j) => !j.jugo);
+  let pendientes = sala.jugadores.filter((j) => !j.jugo);
 
   if (pendientes.length === 0) {
-    sala.estado = 'final';
-    return res.json({ success: true, final: true });
+    if ((sala.ronda || 1) >= (sala.maxRondas || 1)) {
+      sala.estado = 'final';
+      return res.json({ success: true, final: true });
+    }
+    // Nueva ronda: todos vuelven a jugar su minuto (los aciertos se suman)
+    sala.ronda = (sala.ronda || 1) + 1;
+    sala.jugadores.forEach((j) => { j.jugo = false; });
+    pendientes = sala.jugadores;
   }
 
   const elegido = pendientes[Math.floor(Math.random() * pendientes.length)];

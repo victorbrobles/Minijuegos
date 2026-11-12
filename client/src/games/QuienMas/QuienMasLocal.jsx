@@ -6,6 +6,8 @@ import { useAdmin, adminHeaders } from '../../lib/admin.js';
 import Icon from '../../components/Icon.jsx';
 import { centrarActivo } from '../../lib/centrarActivo.js';
 import { limitesLocal } from '../limites.js';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto, totalRondas } from '../rondas.js';
 
 const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('quienmas');
 const TIEMPO_VOTO = 30;
@@ -146,6 +148,7 @@ export default function QuienMasLocal({ onVolver, onExit, onAbrirAyuda }) {
   // Configuración
   const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
   const [listaConfig, setListaConfig] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: `Jugador ${i + 1}` })));
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('quienmas'));
   const [categoria, setCategoria] = useState('normal');
   const [error, setError] = useState('');
 
@@ -225,7 +228,7 @@ export default function QuienMasLocal({ onVolver, onExit, onAbrirAyuda }) {
       const res = await fetch(`/api/quienmas/preguntas?categoria=${categoriaActiva}`, { headers: adminHeaders() });
       if (!res.ok) throw new Error('No se pudieron cargar las preguntas.');
       const data = await res.json();
-      const lista = [...(data.preguntas || [])].sort(() => Math.random() - 0.5);
+      const lista = [...(data.preguntas || [])].sort(() => Math.random() - 0.5).slice(0, totalRondas('quienmas', rondasSel));
       if (lista.length === 0) throw new Error('La lista de preguntas está vacía.');
       setRonda(1);
       nuevaRonda(lista, nombresJugs);
@@ -431,6 +434,7 @@ export default function QuienMasLocal({ onVolver, onExit, onAbrirAyuda }) {
 
             {error && <p className="error" style={{ marginTop: '0.8rem' }}>{error}</p>}
 
+            <SelectorRondas juegoId="quienmas" valor={rondasSel} onCambiar={setRondasSel} />
             <button
               type="button"
               className="big full qq-btn-principal"
@@ -459,7 +463,7 @@ export default function QuienMasLocal({ onVolver, onExit, onAbrirAyuda }) {
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
             categoria={{ nombre: 'Voto secreto', icono: 'lock' }}
-            etiqueta={`Ronda ${ronda} · ${totalVotaron} de ${jugadores.length} han votado`}
+            etiqueta={`Ronda ${ronda} de ${totalRondas('quienmas', rondasSel)} · ${totalVotaron} de ${jugadores.length} han votado`}
             titulo="Pasad el móvil"
           >
             <OrdenTurnos
@@ -493,7 +497,7 @@ export default function QuienMasLocal({ onVolver, onExit, onAbrirAyuda }) {
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
             categoria={{ nombre: 'Voto secreto', icono: 'lock' }}
-            etiqueta={`Ronda ${ronda} · Turno de votación`}
+            etiqueta={`Ronda ${ronda} de ${totalRondas('quienmas', rondasSel)} · Turno de votación`}
             titulo={jugadorTurno}
             avatar={<Avatar nombre={jugadorTurno} color={colorJugador(turno)} />}
           >
@@ -560,7 +564,7 @@ export default function QuienMasLocal({ onVolver, onExit, onAbrirAyuda }) {
         <section className="game qqp-escena">
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
-            etiqueta={`Ronda ${ronda} completada`}
+            etiqueta={`Ronda ${ronda} de ${totalRondas('quienmas', rondasSel)} completada`}
             titulo={
               resultado.empate
                 ? '¡Empate en la votación!'

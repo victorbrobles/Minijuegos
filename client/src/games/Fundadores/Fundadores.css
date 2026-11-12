@@ -508,3 +508,7 @@ button.fdp-plano:disabled { opacity: 0.75; cursor: default; }
 @media (prefers-reduced-motion: reduce) {
   .fdp-carga, .fdp-gate .fdp-avatar.grande { animation: none !important; }
 }
+
+/* Pantalla de «pasa el móvil»: cabecera arriba, tarjeta y botón aparte */
+.fdp-gate h2 { margin: 0.1rem 0 0.2rem !important; font-size: 2rem !important; font-weight: 900; letter-spacing: -0.5px; line-height: 1.1; color: #0f172a; }
+.fdp-turno-sub { display: inline-block; margin-top: 0.7rem !important; padding: 0.3rem 0.8rem; border-radius: 999px; background: #f1f5f9; color: #475569; font-size: 0.82rem; font-weight: 700; }

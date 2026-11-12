@@ -4,7 +4,7 @@
 import React, { useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import * as E from './engine.js';
-import { PantallaJuego, PantallaFin, Avatar } from './Vistas.jsx';
+import { PantallaJuego, PantallaFin, Avatar, Hero } from './Vistas.jsx';
 import { ModalSalir, SelectorRondas } from './HipotesisOnline.jsx';
 import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx';
 import './Hipotesis.css';
@@ -15,7 +15,7 @@ const LIM_JUG = limitesLocal('hipotesis');
 export default function HipotesisLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [paso, setPaso] = useState('config');
   const [nombres, setNombres] = useState(() => Array(LIM_JUG.min).fill(''));
-  const [rondas, setRondas] = useState(5);
+  const [rondas, setRondas] = useState(10);
   const [error, setError] = useState('');
   const [aviso, setAviso] = useState('');
   const [modal, setModal] = useState(false);
@@ -107,13 +107,16 @@ export default function HipotesisLocal({ onVolver, onExit, onAbrirAyuda }) {
     return (
       <div className="hpp-contenedor qq-en-partida">
         <section className="game hpp-escena">
+          <Hero v={E.vistaDe(est, -1)} onSalir={() => setModal(true)} />
           <div className="hpp-tarjeta hpp-gate">
             <Avatar id={quien.id} nombre={quien.nombre} grande />
-            <p className="hpp-etiqueta centrada">Pasa el móvil · ronda {est.ronda} · {est.fase === 'formular' ? 'formular' : 'juicio'}</p>
-            <h2>Le toca a {quien.nombre}</h2>
+            <p className="hpp-etiqueta centrada">Pasa el móvil a</p>
+            <h2>{quien.nombre}</h2>
             <p className="hpp-texto">{texto}</p>
+            <p className="hpp-turno-sub">{est.fase === 'formular' ? 'Fase: formular' : 'Fase: juicio'}</p>
+          </div>
+          <div className="hpp-barra estatica">
             <button type="button" className="hpp-boton grande" onClick={() => setConfirmado(clave)}><Icon name="eye" size={20} /> Soy {quien.nombre}</button>
-            <button type="button" className="hpp-enlace oscuro" style={{ marginTop: '0.6rem' }} onClick={() => setModal(true)}>Salir de la partida</button>
           </div>
         </section>
         {salir}

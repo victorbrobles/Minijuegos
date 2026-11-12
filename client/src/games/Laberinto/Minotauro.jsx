@@ -296,7 +296,7 @@ export function Local({ juego, onVolver, onExit, onAbrirAyuda }) {
   const v = E.vistaDe(est, quien.id);
   if (confirmado !== clave) {
     return envoltorio(
-      <TurnoDe v={v} id={quien.id} puedo onListo={() => setConfirmado(clave)} boton={`Soy ${quien.nombre}`}
+      <TurnoDe juego={juego} onSalir={() => setModal(true)} v={v} id={quien.id} puedo onListo={() => setConfirmado(clave)} boton={`Soy ${quien.nombre}`}
         texto={est.turno === 1 ? 'Pásale el móvil: va a descubrir en secreto si es explorador… o el Minotauro.' : 'Pásale el móvil: lo que ve en el laberinto es secreto.'} />
     );
   }

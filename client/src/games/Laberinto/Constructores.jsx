@@ -409,7 +409,7 @@ export function Local({ juego, onVolver, onExit, onAbrirAyuda }) {
     const v = E.vistaDe(est, e.constructor);
     const clave = `b${est.ronda}-${e.constructor}`;
     if (confirmado !== clave) {
-      return envoltorio(<TurnoDe v={v} id={e.constructor} puedo onListo={() => setConfirmado(clave)} boton={`Soy ${nombreDe(v, e.constructor)}`}
+      return envoltorio(<TurnoDe juego={juego} onSalir={() => setModal(true)} v={v} id={e.constructor} puedo onListo={() => setConfirmado(clave)} boton={`Soy ${nombreDe(v, e.constructor)}`}
         texto={`Pásale el móvil: va a construir en secreto un laberinto para ${nombreDe(v, e.corredor)}. ¡Que no mire!`} />);
     }
     return envoltorio(
@@ -424,7 +424,7 @@ export function Local({ juego, onVolver, onExit, onAbrirAyuda }) {
   const v = E.vistaDe(est, e.corredor);
   const clave = `c${est.ronda}-${e.corredor}`;
   if (confirmado !== clave) {
-    return envoltorio(<TurnoDe v={v} id={e.corredor} puedo onListo={() => { setConfirmado(clave); setSalida(Date.now() + E.AJUSTES.segCuenta * 1000); }} boton={`Soy ${nombreDe(v, e.corredor)}: ¡a correr!`}
+    return envoltorio(<TurnoDe juego={juego} onSalir={() => setModal(true)} v={v} id={e.corredor} puedo onListo={() => { setConfirmado(clave); setSalida(Date.now() + E.AJUSTES.segCuenta * 1000); }} boton={`Soy ${nombreDe(v, e.corredor)}: ¡a correr!`}
       texto={`Pásale el móvil: va a recorrer el laberinto que le ha hecho ${nombreDe(v, e.constructor)}. Tiene ${est.segCarrera} s.`} />);
   }
   return envoltorio(

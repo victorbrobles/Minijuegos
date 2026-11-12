@@ -92,7 +92,7 @@ export default function InventoLocal({ juego, onVolver, onExit, onAbrirAyuda }) 
     const v = E.vistaDe(est, quien.id);
     if (confirmado !== clave) {
       return envoltorio(
-        <TurnoDe v={v} id={quien.id} puedo onListo={() => setConfirmado(clave)} boton={`Soy ${quien.nombre}`}
+        <TurnoDe juego={juego} onSalir={() => setModal(true)} v={v} id={quien.id} puedo onListo={() => setConfirmado(clave)} boton={`Soy ${quien.nombre}`}
           texto={est.fase === 'inventar' ? 'Pásale el móvil: va a recibir sus tres cartas y a inventar en secreto.' : 'Pásale el móvil: va a votar en secreto.'} />
       );
     }

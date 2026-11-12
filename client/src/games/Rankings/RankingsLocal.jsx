@@ -5,10 +5,11 @@ import Icon from '../../components/Icon.jsx';
 import './Rankings.css';
 import { centrarActivo } from '../../lib/centrarActivo.js';
 import { limitesLocal } from '../limites.js';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto, totalRondas } from '../rondas.js';
 
 const TIEMPO_TURNO = 90;
 const PREPARACION_S = 3;
-const MAX_RONDAS = 15;
 const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('rankings');
 
 const COLORES = ['#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316'];
@@ -230,6 +231,7 @@ export function EnlaceSecundario({ children, onClick, disabled }) {
    ========================================================================== */
 
 function TurnoRanking({
+  maxRondas: MAX_RONDAS,
   jugador,
   jugadores,
   puntos,
@@ -454,6 +456,8 @@ export default function RankingsLocal({ onVolver, onExit, onAbrirAyuda }) {
 
   const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
   const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: `Jugador ${i + 1}` })));
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('rankings'));
+  const MAX_RONDAS = totalRondas('rankings', rondasSel, jugadores.length);
 
   const [puntos, setPuntos] = useState({});
   const [rondaActual, setRondaActual] = useState(1);
@@ -819,6 +823,7 @@ export default function RankingsLocal({ onVolver, onExit, onAbrirAyuda }) {
               ))}
             </div>
 
+            <SelectorRondas juegoId="rankings" valor={rondasSel} onCambiar={setRondasSel} numJugadores={jugadores.length} />
             <button
               type="button"
               className="big full qq-btn-principal"
@@ -848,6 +853,7 @@ export default function RankingsLocal({ onVolver, onExit, onAbrirAyuda }) {
       {/* 3. JUGANDO */}
       {paso === 'jugando' && rankingData && (
         <TurnoRanking
+          maxRondas={MAX_RONDAS}
           key={`${rondaActual}-${jugadores[jugadorTurno]?.id}-${intento}`}
           jugador={jugadores[jugadorTurno]}
           jugadores={jugadores}

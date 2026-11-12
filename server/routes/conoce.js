@@ -3,12 +3,14 @@ import express from 'express';
 import crypto from 'crypto';
 import { getPreguntaAleatoria } from '../data/seeds/conoce/conoceData.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
+import { totalRondas } from '../../client/src/games/rondas.js';
 const LIM = limitesOnline('conoce');
 
 const router = express.Router();
 const salas = {};
 
-const MAX_RONDAS = 15;
+// Rondas: las elige el anfitrión al empezar (games/rondas.js)
+const maxRondasDe = (sala) => sala.maxRondas || totalRondas('conoce', null, sala.jugadores.length);
 const generarCodigo = () => Math.random().toString(36).substring(2, 6).toUpperCase();
 
 // Baraja un array
@@ -78,7 +80,7 @@ router.get('/sala/:code', (req, res) => {
     code: sala.code,
     estado: sala.estado,
     rondaNum: sala.rondaNum,
-    maxRondas: MAX_RONDAS,
+    maxRondas: maxRondasDe(sala),
     preguntaActual: sala.preguntaActual,
     segundosRestantes: sala.segundosRestantes,
     cuentaAtras10s: sala.cuentaAtras10s,
@@ -219,6 +221,7 @@ router.post('/sala/:code/iniciar', (req, res) => {
   const yo = sala?.jugadores.find(j => j.token === token);
   if (!yo || !yo.esAdmin) return res.status(403).json({ error: 'No autorizado' });
   if (sala.jugadores.length < LIM.min) return res.status(400).json({ error: `Se necesitan al menos ${LIM.min} jugadores.` });
+  sala.maxRondas = totalRondas('conoce', req.body?.rondas, sala.jugadores.length);
 
   sala.jugadores.forEach(j => { j.puntos = 0; });
   sala.rondaNum = 1;
@@ -269,7 +272,7 @@ router.post('/sala/:code/siguiente-ronda', (req, res) => {
   const yo = sala?.jugadores.find(j => j.token === token);
   if (!yo || !yo.esAdmin) return res.status(403).json({ error: 'No autorizado' });
 
-  if (sala.rondaNum >= MAX_RONDAS) {
+  if (sala.rondaNum >= maxRondasDe(sala)) {
     sala.estado = 'fin';
     return res.json({ success: true, fin: true });
   }

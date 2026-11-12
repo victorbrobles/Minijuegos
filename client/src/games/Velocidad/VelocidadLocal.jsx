@@ -3,8 +3,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import './Velocidad.css';
-import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx';
+import { SelectorJugadores, BloqueConfig, SelectorRondas } from '../../components/MenuJuego.jsx';
 import { limitesLocal } from '../limites.js';
+import { rondasPorDefecto, totalRondas } from '../rondas.js';
 
 const TIEMPO_TURNO = 60;
 const TIEMPO_PREPARACION = 10;
@@ -22,6 +23,10 @@ export default function VelocidadLocal({ onVolver, onExit }) {
 
   const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
   const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: `Jugador ${i + 1}`, aciertos: 0, jugo: false })));
+  // Rondas: en cada una juega todo el mundo su minuto; los aciertos se suman
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('velocidad'));
+  const maxRondas = totalRondas('velocidad', rondasSel);
+  const [ronda, setRonda] = useState(1);
 
   const [record, setRecord] = useState(() => {
     try {
@@ -135,10 +140,17 @@ export default function VelocidadLocal({ onVolver, onExit }) {
   };
 
   const elegirSiguienteJugador = () => {
-    const pendientes = jugadores.filter((j) => !j.jugo);
+    let pendientes = jugadores.filter((j) => !j.jugo);
     if (pendientes.length === 0) {
-      setFase('final');
-      return;
+      if (ronda >= maxRondas) {
+        setFase('final');
+        return;
+      }
+      // Nueva ronda: todos vuelven a jugar
+      const reiniciados = jugadores.map((j) => ({ ...j, jugo: false }));
+      setJugadores(reiniciados);
+      setRonda((x) => x + 1);
+      pendientes = reiniciados;
     }
 
     const elegido = pendientes[Math.floor(Math.random() * pendientes.length)];
@@ -155,6 +167,7 @@ export default function VelocidadLocal({ onVolver, onExit }) {
       jugo: false
     }));
     setJugadores(actualizados);
+    setRonda(1);
 
     const elegido = actualizados[Math.floor(Math.random() * actualizados.length)];
     setJugadorActual(elegido);
@@ -253,7 +266,7 @@ export default function VelocidadLocal({ onVolver, onExit }) {
     if (jugAct) {
       setJugadores((prev) =>
         prev.map((j) =>
-          j.id === jugAct.id ? { ...j, aciertos: puntosFinales, jugo: true } : j
+          j.id === jugAct.id ? { ...j, aciertos: (j.aciertos || 0) + puntosFinales, jugo: true } : j
         )
       );
 
@@ -320,6 +333,7 @@ export default function VelocidadLocal({ onVolver, onExit }) {
           textoBoton="¡Comenzar Desafío!"
           iconoBoton="play"
         >
+          <SelectorRondas juegoId="velocidad" valor={rondasSel} onCambiar={setRondasSel} />
           <BloqueConfig>
             <div className="vel-record-box">
               <Icon name="trophy" size={20} />
@@ -551,7 +565,7 @@ export default function VelocidadLocal({ onVolver, onExit }) {
                 </svg>
                 <span>Portada</span>
               </button>
-              <span className="ptp-chip"><Icon name="flagFinish" size={14} /> ¡Tiempo agotado!</span>
+              <span className="ptp-chip"><Icon name="flagFinish" size={14} /> Ronda {ronda}/{maxRondas} · ¡Tiempo agotado!</span>
             </div>
             <p className="ptp-etiqueta" style={{ color: 'rgba(255,255,255,0.85)' }}>
               Resultado de {jugadorActual.nombre}
@@ -571,7 +585,7 @@ export default function VelocidadLocal({ onVolver, onExit }) {
                     <span className="ptp-ranking-pos">{j.jugo ? '✅' : i + 1}</span>
                     <span className="ptp-jugador-avatar">{inicial(j.nombre)}</span>
                     <span className="ptp-ranking-nombre">{j.nombre}</span>
-                    <strong>{j.jugo ? `${j.aciertos} pts` : 'Pendiente'}</strong>
+                    <strong>{j.jugo ? `${j.aciertos} pts` : ronda > 1 ? `${j.aciertos} pts · pendiente` : 'Pendiente'}</strong>
                   </li>
                 );
               })}
@@ -579,9 +593,9 @@ export default function VelocidadLocal({ onVolver, onExit }) {
           </div>
 
           <div className="ptp-barra estatica">
-            {jugadores.some((j) => !j.jugo) ? (
+            {jugadores.some((j) => !j.jugo) || ronda < maxRondas ? (
               <button type="button" className="ptp-boton grande" onClick={elegirSiguienteJugador}>
-                <Icon name="dice" size={20} /> Sortear siguiente jugador
+                <Icon name="dice" size={20} /> {jugadores.some((j) => !j.jugo) ? 'Sortear siguiente jugador' : `Empezar la ronda ${ronda + 1} de ${maxRondas}`}
               </button>
             ) : (
               <button type="button" className="ptp-boton grande" onClick={() => setFase('final')}>

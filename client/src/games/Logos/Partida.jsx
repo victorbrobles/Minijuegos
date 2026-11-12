@@ -97,7 +97,7 @@ export function Partida({ v, enviar, offset = 0, onSalir, local = false, puedeSe
       return (
         <>
           {hero('¿Qué marca es?', `Turno de ${nombreDe(v, v.turno)}`)}
-          <TurnoDe v={v} id={v.turno} puedo onListo={() => enviar('listo')} texto={`Pásale el móvil. Tendrá ${v.reglas.segRonda} segundos y no verá lo que han dicho los demás.`} />
+          <TurnoDe local v={v} id={v.turno} puedo onListo={() => enviar('listo')} texto={`Pásale el móvil. Tendrá ${v.reglas.segRonda} segundos y no verá lo que han dicho los demás.`} />
         </>
       );
     }

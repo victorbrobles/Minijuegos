@@ -16,6 +16,8 @@ import {
 } from './BuscaminasLocal.jsx';
 import { limitesOnline, textoSala } from '../limites.js';
 import { ChipJugadores } from '../../components/MenuJuego.jsx';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto } from '../rondas.js';
 
 const LIM_ON = limitesOnline('buscaminas');
 
@@ -42,6 +44,7 @@ export default function BuscaminasOnline({
   onSalir,
   onAbrirAyuda
 }) {
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('buscaminas'));
   const navigate = useNavigate();
   const [vista, setVista] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
 
@@ -263,7 +266,7 @@ export default function BuscaminasOnline({
       const res = await fetch(`/api/buscaminas/online/sala/${sesion.code}/iniciar-partida`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion.token })
+        body: JSON.stringify({ token: sesion.token, rondas: rondasSel })
       });
       const d = await res.json();
       if (!res.ok) throw new Error(d.error);
@@ -722,6 +725,11 @@ export default function BuscaminasOnline({
             )}
           </div>
 
+          {esAdmin && (
+            <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
+              <SelectorRondas juegoId="buscaminas" valor={rondasSel} onCambiar={setRondasSel} numJugadores={sala.jugadores.length} />
+            </div>
+          )}
           {esAdmin ? (
             <button
               type="button"

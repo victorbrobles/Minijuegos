@@ -6,9 +6,10 @@ import { getPreguntaAleatoria } from '../../../../server/data/seeds/conoce/conoc
 import './Conoce.css';
 import { centrarActivo } from '../../lib/centrarActivo.js';
 import { limitesLocal } from '../limites.js';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto, totalRondas } from '../rondas.js';
 
 const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('conoce');
-const MAX_RONDAS = 15;
 
 const COLORES = ['#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316'];
 export const colorJugador = (i) => COLORES[((i % COLORES.length) + COLORES.length) % COLORES.length];
@@ -420,6 +421,8 @@ export default function ConoceLocal({ onVolver, onSalir, onExit, onAbrirAyuda })
   const [listaConfig, setListaConfig] = useState(
     Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: `Jugador ${i + 1}` }))
   );
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('conoce'));
+  const MAX_RONDAS = totalRondas('conoce', rondasSel, listaConfig.length);
 
   const [jugadores, setJugadores] = useState([]);
   const [rondaNum, setRondaNum] = useState(1);
@@ -739,6 +742,7 @@ export default function ConoceLocal({ onVolver, onSalir, onExit, onAbrirAyuda })
               ))}
             </div>
 
+            <SelectorRondas juegoId="conoce" valor={rondasSel} onCambiar={setRondasSel} numJugadores={listaConfig.length} />
             <button
               type="button"
               className="big full qq-btn-principal"

@@ -132,13 +132,15 @@ function Reloj({ v, offset }) {
 /** Pantalla de «turno de…» antes de que empiece a correr el reloj del jugador. */
 function TurnoDe({ v, quien, local, puedo, onListo }) {
   return (
+    <>
     <div className="ffp-tarjeta ffp-gate">
       <Avatar id={quien?.id} nombre={quien?.nombre} grande />
-      <p className="ffp-etiqueta centrada">{local ? 'Pasad el móvil' : puedo ? 'Te toca' : 'Siguiente turno'}</p>
-      <h2>Turno de {quien?.nombre}</h2>
+      <p className="ffp-etiqueta centrada">{local ? 'Pasa el móvil a' : puedo ? 'Te toca' : 'Turno de'}</p>
+      <h2>{quien?.nombre}</h2>
       <p className="ffp-texto">{puedo ? `Tendrás ${AJUSTES.segTurno} segundos: toca un trozo de la cara y di de quién es.` : `Esperando a que ${quien?.nombre} esté listo…`}</p>
-      {puedo && <button type="button" className="ffp-boton grande" onClick={onListo}><Icon name="check" size={20} /> ¡Listo!</button>}
     </div>
+    {puedo && <div className="ffp-barra estatica"><button type="button" className="ffp-boton grande" onClick={onListo}><Icon name="check" size={20} /> ¡Listo!</button></div>}
+    </>
   );
 }
 
@@ -291,11 +293,11 @@ export function ModalSalir({ titulo, texto, onSeguir, onSalir }) {
   );
 }
 
-export function SelectorRondas({ valor, onCambiar }) {
+export function SelectorRondas({ valor, onCambiar, numJugadores }) {
   return (
     <div className="ffp-pildoras">
       {OPCIONES_RONDAS.map((n) => (
-        <button key={n} type="button" className={`ffp-pildora${valor === n ? ' activo' : ''}`} disabled={!onCambiar} onClick={() => onCambiar?.(n)}>{n} caras</button>
+        <button key={n} type="button" className={`ffp-pildora${valor === n ? ' activo' : ''}`} disabled={!onCambiar} onClick={() => onCambiar?.(n)}>×{n}{numJugadores ? ` · ${n * numJugadores} caras` : ' por jugador'}</button>
       ))}
     </div>
   );

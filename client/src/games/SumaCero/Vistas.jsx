@@ -61,7 +61,7 @@ function Termometro({ suma }) {
 }
 
 // ---------------------------------------------------------------- Cabecera
-function Hero({ v, onSalir, etiqueta, titulo, clase = '' }) {
+export function Hero({ v, onSalir, etiqueta, titulo, clase = '' }) {
   const t = v.turno;
   const plantado = v.jugadores.find((j) => j.id === v.plantado);
   return (
@@ -75,8 +75,8 @@ function Hero({ v, onSalir, etiqueta, titulo, clase = '' }) {
           {plantado && v.fase === 'juego' && <span className="szp-chip alerta">✋ {plantado.nombre} se ha plantado</span>}
         </div>
       </div>
-      <p className="szp-hero-etiqueta">{etiqueta}</p>
-      <h1 className="szp-hero-titulo">{titulo}</h1>
+      {etiqueta && <p className="szp-hero-etiqueta">{etiqueta}</p>}
+      {titulo && <h1 className="szp-hero-titulo">{titulo}</h1>}
       <div className="szp-marcador">
         {[...v.jugadores].sort((a, b) => a.total - b.total).map((j) => (
           <span key={j.id} className={`szp-marca${t?.jugadorId === j.id ? ' turno' : ''}${j.id === v.yo?.id ? ' yo' : ''}${j.fuera ? ' fuera' : ''}`}>

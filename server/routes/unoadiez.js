@@ -10,7 +10,7 @@ import { limitesOnline } from '../../client/src/games/limites.js';
 const router = express.Router();
 const barajar = (a) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
 const CATEGORIAS = [...new Set(CATEGORIAS_1_AL_10)];
-const leerConfig = (b, c = { vueltas: 1 }) => ({ vueltas: E.OPCIONES_VUELTAS.includes(Number(b.vueltas)) ? Number(b.vueltas) : c.vueltas });
+const leerConfig = (b, c = { vueltas: 3 }) => ({ vueltas: E.OPCIONES_VUELTAS.includes(Number(b.vueltas)) ? Number(b.vueltas) : c.vueltas });
 
 router.get('/categorias', (req, res) => res.json({ success: true, categorias: barajar(CATEGORIAS) }));
 

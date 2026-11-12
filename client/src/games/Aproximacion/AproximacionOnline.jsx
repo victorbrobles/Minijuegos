@@ -15,6 +15,8 @@ import {
 } from './AproximacionLocal.jsx';
 import { limitesOnline, textoSala } from '../limites.js';
 import { ChipJugadores } from '../../components/MenuJuego.jsx';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto } from '../rondas.js';
 
 const LIM_ON = limitesOnline('aproximacion');
 
@@ -39,6 +41,7 @@ export default function AproximacionOnline({
   onSalir,
   onAbrirAyuda
 }) {
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('aproximacion'));
   const navigate = useNavigate();
   const [vista, setVista] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
 
@@ -319,7 +322,7 @@ export default function AproximacionOnline({
       const res = await fetch(`/api/aproximacion/online/sala/${sesion.code}/iniciar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion.token })
+        body: JSON.stringify({ token: sesion.token, rondas: rondasSel })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
@@ -753,6 +756,11 @@ export default function AproximacionOnline({
 
           {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
 
+          {esAdmin && (
+            <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
+              <SelectorRondas juegoId="aproximacion" valor={rondasSel} onCambiar={setRondasSel} numJugadores={sala.jugadores.length} />
+            </div>
+          )}
           {esAdmin ? (
             <button
               type="button"
@@ -762,7 +770,7 @@ export default function AproximacionOnline({
               onClick={handleIniciarJuego}
             >
               <Icon name="play" size={22} />
-              {sala.jugadores.length < LIM_ON.min ? `Esperando jugadores (mínimo ${LIM_ON.min})...` : 'Iniciar juego (15 rondas)'}
+              {sala.jugadores.length < LIM_ON.min ? `Esperando jugadores (mínimo ${LIM_ON.min})...` : 'Iniciar juego'}
             </button>
           ) : (
             <div className="panel center" style={{ padding: '1.8rem 1.4rem', marginTop: '1rem' }}>

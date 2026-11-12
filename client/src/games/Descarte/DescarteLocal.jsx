@@ -24,7 +24,7 @@ const ACCIONES = {
 export default function DescarteLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [paso, setPaso] = useState('config');
   const [nombres, setNombres] = useState(() => Array(LIM_JUG.min).fill(''));
-  const [tableros, setTableros] = useState(5);
+  const [tableros, setTableros] = useState(3);
   const [error, setError] = useState('');
   const [aviso, setAviso] = useState(null);
   const [modal, setModal] = useState(false);

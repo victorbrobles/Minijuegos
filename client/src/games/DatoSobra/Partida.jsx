@@ -179,8 +179,8 @@ export function Fin({ v, juego, onSalir, children }) {
 
 export function Config({ config, onCambiar }) {
   return (
-    <BloqueConfig titulo="Futbolistas">
-      <Pildoras opciones={OPCIONES.rondas.map((n) => [n, `${n}`])} valor={config.rondas} onCambiar={onCambiar && ((rondas) => onCambiar({ rondas }))} />
+    <BloqueConfig titulo="Futbolistas por jugador">
+      <Pildoras opciones={OPCIONES.rondas.map((n) => [n, `×${n}`])} valor={config.rondas} onCambiar={onCambiar && ((rondas) => onCambiar({ rondas }))} />
     </BloqueConfig>
   );
 }

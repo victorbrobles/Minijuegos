@@ -6,6 +6,8 @@ import './Conecta.css';
 import * as E from './engine.js';
 import ConectaPartida, { SelectorCategorias } from './ConectaPartida.jsx';
 import { limitesLocal } from '../limites.js';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto, totalRondas } from '../rondas.js';
 
 const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('conecta');
 
@@ -44,6 +46,8 @@ export default function ConectaLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: `Jugador ${i + 1}` })));
   const [puntos, setPuntos] = useState({});
   const [rondaActual, setRondaActual] = useState(0);
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('conecta'));
+  const maxRondas = totalRondas('conecta', rondasSel);
   const [errorCarga, setErrorCarga] = useState('');
 
   // Estado de la ronda (motor de reglas compartido con el servidor)
@@ -245,6 +249,7 @@ export default function ConectaLocal({ onVolver, onExit, onAbrirAyuda }) {
               ))}
             </div>
 
+            <SelectorRondas juegoId="conecta" valor={rondasSel} onCambiar={setRondasSel} />
             <button
               type="button"
               className="big full qq-btn-principal"
@@ -278,12 +283,20 @@ export default function ConectaLocal({ onVolver, onExit, onAbrirAyuda }) {
           onSalir={() => setModalSalirPortada(true)}
           finRonda={(
             <>
-              <button type="button" className="cnp-boton grande" onClick={() => { guardarPuntos(); setFase('categoria'); }}>
-                <Icon name="play" size={20} /> Nueva ronda
-              </button>
-              <button type="button" className="cnp-enlace" onClick={() => { guardarPuntos(); setFase('final'); }}>
-                <Icon name="trophy" size={16} /> Finalizar partida
-              </button>
+              {rondaActual >= maxRondas ? (
+                <button type="button" className="cnp-boton grande" onClick={() => { guardarPuntos(); setFase('final'); }}>
+                  <Icon name="trophy" size={20} /> Ver el podio final
+                </button>
+              ) : (
+                <>
+                  <button type="button" className="cnp-boton grande" onClick={() => { guardarPuntos(); setFase('categoria'); }}>
+                    <Icon name="play" size={20} /> Nueva ronda ({rondaActual + 1} de {maxRondas})
+                  </button>
+                  <button type="button" className="cnp-enlace" onClick={() => { guardarPuntos(); setFase('final'); }}>
+                    <Icon name="trophy" size={16} /> Finalizar partida
+                  </button>
+                </>
+              )}
             </>
           )}
         />

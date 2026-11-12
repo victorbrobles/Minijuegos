@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import './Telepatia.css';
 import { limitesLocal } from '../limites.js';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto, totalRondas } from '../rondas.js';
 
 const PALABRAS_BASE = [
   'PLAYA', 'FÚTBOL', 'PIZZA', 'VERANO', 'VIAJE', 'NOCHE', 'CINE', 'MÚSICA',
@@ -12,7 +14,6 @@ const PALABRAS_BASE = [
 ];
 
 const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('telepatia');
-const MAX_RONDAS = 15;
 
 const COLORES = ['#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316'];
 export const colorJugador = (i) => COLORES[((i % COLORES.length) + COLORES.length) % COLORES.length];
@@ -129,6 +130,8 @@ export default function TelepatiaLocal({ onVolver, onSalir, onExit, onAbrirAyuda
   const [listaConfig, setListaConfig] = useState(
     Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: `Jugador ${i + 1}` }))
   );
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('telepatia'));
+  const MAX_RONDAS = totalRondas('telepatia', rondasSel, listaConfig.length);
 
   const [jugadores, setJugadores] = useState([]);
   const [rondaNum, setRondaNum] = useState(1);
@@ -359,6 +362,7 @@ export default function TelepatiaLocal({ onVolver, onSalir, onExit, onAbrirAyuda
               ))}
             </div>
 
+            <SelectorRondas juegoId="telepatia" valor={rondasSel} onCambiar={setRondasSel} numJugadores={listaConfig.length} />
             <button
               type="button"
               className="big full qq-btn-principal"

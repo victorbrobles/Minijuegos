@@ -15,6 +15,8 @@ import {
 } from './ConfianzaCiegaLocal.jsx';
 import { limitesOnline, textoSala } from '../limites.js';
 import { ChipJugadores } from '../../components/MenuJuego.jsx';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto } from '../rondas.js';
 
 const LIM_ON = limitesOnline('confianzaciega');
 
@@ -39,6 +41,7 @@ export default function ConfianzaCiegaOnline({
   onSalir,
   onAbrirAyuda
 }) {
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('confianzaciega'));
   const navigate = useNavigate();
   const esAdminGlobal = useAdmin();
 
@@ -286,7 +289,7 @@ export default function ConfianzaCiegaOnline({
       await fetch(`/api/confianzaciega/online/sala/${sesion.code}/iniciar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...adminHeaders() },
-        body: JSON.stringify({ token: sesion.token })
+        body: JSON.stringify({ token: sesion.token, rondas: rondasSel })
       });
     } catch (err) {
       setErrorMsg(err.message);
@@ -780,6 +783,11 @@ export default function ConfianzaCiegaOnline({
             )}
           </div>
 
+          {esAdmin && (
+            <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
+              <SelectorRondas juegoId="confianzaciega" valor={rondasSel} onCambiar={setRondasSel} numJugadores={sala.jugadores.length} />
+            </div>
+          )}
           {esAdmin ? (
             <button
               type="button"
@@ -809,7 +817,7 @@ export default function ConfianzaCiegaOnline({
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
             categoria={{ nombre: 'Elección secreta', icono: 'eye' }}
-            etiqueta={`Ronda ${sala.rondaActual} · Protagonista`}
+            etiqueta={`Ronda ${sala.rondaActual} de ${sala.maxRondas} · Protagonista`}
             titulo={esActivo ? '¡Es tu turno!' : `Turno de ${sala.jugadorActivoNombre}`}
             avatar={
               <Avatar
@@ -894,7 +902,7 @@ export default function ConfianzaCiegaOnline({
               nombre: `${sala.totalApostaron}/${sala.totalApostadores} apuestas`,
               icono: 'target'
             }}
-            etiqueta={`Ronda ${sala.rondaActual} · Apostando sobre ${sala.jugadorActivoNombre}`}
+            etiqueta={`Ronda ${sala.rondaActual} de ${sala.maxRondas} · Apostando sobre ${sala.jugadorActivoNombre}`}
             titulo={
               esActivo
                 ? '¡Están apostando sobre ti!'
@@ -1018,7 +1026,7 @@ export default function ConfianzaCiegaOnline({
             <Cabecera
               onSalir={() => setModalSalirPortada(true)}
               categoria={{ nombre: '¡A responder!', icono: 'zap' }}
-              etiqueta={`Ronda ${sala.rondaActual} · Todas las apuestas listas`}
+              etiqueta={`Ronda ${sala.rondaActual} de ${sala.maxRondas} · Todas las apuestas listas`}
               titulo={esActivo ? '¡Es tu turno!' : `Turno de ${sala.jugadorActivoNombre}`}
             >
               <OrdenTurnos
@@ -1069,7 +1077,7 @@ export default function ConfianzaCiegaOnline({
                 nombre: '¡En marcha!',
                 icono: 'clock'
               }}
-              etiqueta={`Ronda ${sala.rondaActual} · Turno de acción`}
+              etiqueta={`Ronda ${sala.rondaActual} de ${sala.maxRondas} · Turno de acción`}
               titulo={sala.jugadorActivoNombre}
               avatar={
                 <Avatar
@@ -1156,7 +1164,7 @@ export default function ConfianzaCiegaOnline({
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
             categoria={{ nombre: 'Recuento final', icono: 'check' }}
-            etiqueta={`Ronda ${sala.rondaActual} · Tiempo finalizado`}
+            etiqueta={`Ronda ${sala.rondaActual} de ${sala.maxRondas} · Tiempo finalizado`}
             titulo={`Recuento de ${sala.jugadorActivoNombre}`}
             avatar={
               <Avatar
@@ -1224,7 +1232,7 @@ export default function ConfianzaCiegaOnline({
         <section className="game qqp-escena">
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
-            etiqueta={`Ronda ${sala.rondaActual} completada`}
+            etiqueta={`Ronda ${sala.rondaActual} de ${sala.maxRondas} completada`}
             titulo={`Aciertos: ${resultadoRonda.aciertosFinales}`}
           >
             <div className="qqp-identidad">
@@ -1302,9 +1310,11 @@ export default function ConfianzaCiegaOnline({
           <div className="qqp-barra">
             {esAdmin ? (
               <>
-                <BotonPrincipal onClick={handleSiguienteRonda}>
-                  <Icon name="play" size={20} /> Siguiente ronda (Ronda {sala.rondaActual + 1})
-                </BotonPrincipal>
+                {sala.rondaActual < sala.maxRondas && (
+                  <BotonPrincipal onClick={handleSiguienteRonda}>
+                    <Icon name="play" size={20} /> Siguiente ronda ({sala.rondaActual + 1} de {sala.maxRondas})
+                  </BotonPrincipal>
+                )}
                 <EnlaceSecundario onClick={handleFinalizarPartida}>
                   Finalizar partida y ver podio 🏆
                 </EnlaceSecundario>

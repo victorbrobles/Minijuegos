@@ -27,7 +27,7 @@ function useAhora(activo) {
 }
 
 // ---------------------------------------------------------------- Cabecera
-function Hero({ v, offset = 0, onSalir, etiqueta, titulo, clase = '' }) {
+export function Hero({ v, offset = 0, onSalir, etiqueta, titulo, clase = '' }) {
   const ahora = useAhora(Boolean(v.limite)) + offset;
   const resto = v.limite ? Math.max(0, v.limite - ahora) : null;
   const ev = EVENTOS[v.evento];
@@ -42,8 +42,8 @@ function Hero({ v, offset = 0, onSalir, etiqueta, titulo, clase = '' }) {
           {resto != null && <span className={`hpp-chip${resto <= 10000 ? ' urgente' : ''}`}><Icon name="clock" size={13} /> {Math.ceil(resto / 1000)} s</span>}
         </div>
       </div>
-      <p className="hpp-hero-etiqueta">{etiqueta}</p>
-      <h1 className="hpp-hero-titulo">{titulo}</h1>
+      {etiqueta && <p className="hpp-hero-etiqueta">{etiqueta}</p>}
+      {titulo && <h1 className="hpp-hero-titulo">{titulo}</h1>}
       <div className="hpp-marcador">
         {[...v.jugadores].sort((a, b) => b.puntos - a.puntos).map((j) => (
           <span key={j.id} className={`hpp-marca${j.id === v.yo?.id ? ' yo' : ''}${j.fuera ? ' fuera' : ''}`}>

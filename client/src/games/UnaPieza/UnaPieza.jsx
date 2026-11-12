@@ -11,7 +11,7 @@ const JUEGO = {
   id: 'unapieza',
   api: '/api/unapieza',
   emoji: '🧩',
-  config: { rondas: 3, segundos: 60 },
+  config: { rondas: 4, segundos: 60 },
   Local: UnaPiezaLocal,
   Partida: PartidaOnline,
   Fin,

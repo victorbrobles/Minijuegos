@@ -5,6 +5,8 @@ import Icon from '../../components/Icon.jsx';
 import './Ciegas.css';
 import { centrarActivo } from '../../lib/centrarActivo.js';
 import { limitesLocal } from '../limites.js';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto, totalRondas } from '../rondas.js';
 
 const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('ciegas');
 
@@ -419,6 +421,8 @@ export default function CiegasLocal({ onVolver, onExit, onAbrirAyuda }) {
 
   const [categoriaObj, setCategoriaObj] = useState(CATEGORIAS_CIEGAS[0]);
   const [rondaNum, setRondaNum] = useState(1);
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('ciegas'));
+  const maxRondas = totalRondas('ciegas', rondasSel, jugadores.length);
   const [usados, setUsados] = useState([]);
 
   const [jugadorActivoIdx, setJugadorActivoIdx] = useState(0);
@@ -662,6 +666,7 @@ export default function CiegasLocal({ onVolver, onExit, onAbrirAyuda }) {
               ))}
             </div>
 
+            <SelectorRondas juegoId="ciegas" valor={rondasSel} onCambiar={setRondasSel} numJugadores={jugadores.length} />
             <button
               type="button"
               className="big full qq-btn-principal"
@@ -693,7 +698,7 @@ export default function CiegasLocal({ onVolver, onExit, onAbrirAyuda }) {
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
             categoria={categoriaObj}
-            etiqueta={`Ronda ${rondaNum} · Protagonista`}
+            etiqueta={`Ronda ${rondaNum} de ${maxRondas} · Protagonista`}
             titulo="Pasad el móvil"
           >
             <CajaTemaRanking categoriaNombre={categoriaObj?.nombre} tema={rankingData.tema} />
@@ -731,7 +736,7 @@ export default function CiegasLocal({ onVolver, onExit, onAbrirAyuda }) {
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
             categoria={categoriaObj}
-            etiqueta={`Ronda ${rondaNum} · Elemento ${indiceSecuencia + 1} de 5`}
+            etiqueta={`Ronda ${rondaNum} de ${maxRondas} · Elemento ${indiceSecuencia + 1} de 5`}
             titulo={jugadorActivo.nombre}
             avatar={
               <Avatar
@@ -763,7 +768,7 @@ export default function CiegasLocal({ onVolver, onExit, onAbrirAyuda }) {
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
             categoria={categoriaObj}
-            etiqueta={`Ronda ${rondaNum} · Votación secreta`}
+            etiqueta={`Ronda ${rondaNum} de ${maxRondas} · Votación secreta`}
             titulo="Pasad el móvil"
           >
             <CajaTemaRanking categoriaNombre={categoriaObj?.nombre} tema={rankingData?.tema} />
@@ -802,7 +807,7 @@ export default function CiegasLocal({ onVolver, onExit, onAbrirAyuda }) {
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
             categoria={categoriaObj}
-            etiqueta={`Ronda ${rondaNum} · Votando sobre ${jugadorActivo?.nombre}`}
+            etiqueta={`Ronda ${rondaNum} de ${maxRondas} · Votando sobre ${jugadorActivo?.nombre}`}
             titulo={votanteActual.nombre}
             avatar={
               <Avatar
@@ -853,7 +858,7 @@ export default function CiegasLocal({ onVolver, onExit, onAbrirAyuda }) {
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
             categoria={categoriaObj}
-            etiqueta={`Ronda ${rondaNum} completada`}
+            etiqueta={`Ronda ${rondaNum} de ${maxRondas} completada`}
             titulo={`${jugadorActivo?.nombre} suma +${sumaRondaActual} pts`}
             avatar={
               jugadorActivo ? (
@@ -915,23 +920,31 @@ export default function CiegasLocal({ onVolver, onExit, onAbrirAyuda }) {
           </div>
 
           <div className="qqp-barra">
-            <BotonPrincipal onClick={siguienteRonda}>
-              <Icon name="play" size={20} /> Siguiente ronda (Ronda {rondaNum + 1})
-            </BotonPrincipal>
-            <EnlaceSecundario
-              onClick={() => {
-                const sigRonda = rondaNum + 1;
-                const sigActivo = (jugadorActivoIdx + 1) % jugadores.length;
-                setRondaNum(sigRonda);
-                setJugadorActivoIdx(sigActivo);
-                setFase('categoria');
-              }}
-            >
-              Cambiar temática para la siguiente ronda
-            </EnlaceSecundario>
-            <EnlaceSecundario onClick={() => setFase('final')}>
-              Finalizar partida y ver podio
-            </EnlaceSecundario>
+            {rondaNum >= maxRondas ? (
+              <BotonPrincipal onClick={() => setFase('final')}>
+                <Icon name="trophy" size={20} /> Ver el podio final
+              </BotonPrincipal>
+            ) : (
+              <>
+                <BotonPrincipal onClick={siguienteRonda}>
+                  <Icon name="play" size={20} /> Siguiente ronda ({rondaNum + 1} de {maxRondas})
+                </BotonPrincipal>
+                <EnlaceSecundario
+                  onClick={() => {
+                    const sigRonda = rondaNum + 1;
+                    const sigActivo = (jugadorActivoIdx + 1) % jugadores.length;
+                    setRondaNum(sigRonda);
+                    setJugadorActivoIdx(sigActivo);
+                    setFase('categoria');
+                  }}
+                >
+                  Cambiar temática para la siguiente ronda
+                </EnlaceSecundario>
+                <EnlaceSecundario onClick={() => setFase('final')}>
+                  Finalizar partida y ver podio
+                </EnlaceSecundario>
+              </>
+            )}
           </div>
         </section>
       )}

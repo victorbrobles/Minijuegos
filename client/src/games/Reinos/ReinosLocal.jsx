@@ -4,7 +4,7 @@
 import React, { useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import * as E from './engine.js';
-import { Partida, Fin, Config, CronicaComun } from './Partida.jsx';
+import { Partida, Fin, Config, CronicaComun, Cabecera } from './Partida.jsx';
 import { ModalSalir } from '../Pulsador/Vistas.jsx';
 import { SelectorJugadores } from '../../components/MenuJuego.jsx';
 import { limitesLocal } from '../limites.js';
@@ -84,14 +84,19 @@ export default function ReinosLocal({ juego, onVolver, onExit, onAbrirAyuda }) {
     const claveTurno = `${est.ronda}-${est.fase}-${quien.id}`;
     if (confirmado !== claveTurno) {
       return envoltorio(
-        <div className="pzp-tarjeta pzp-gate">
-          <p className="pzp-etiqueta centrada">Ronda {est.ronda} · {est.fase === 'ordenes' ? 'órdenes secretas' : 'diplomacia'}</p>
-          <span className="rnp-escudo" style={{ '--c': quien.c, width: 76, height: 84, fontSize: '2.4rem', borderRadius: '18px 18px 36px 36px' }}>{quien.e}</span>
-          <h2 style={{ marginTop: '0.6rem' }}>{quien.nombre}</h2>
-          <p className="pzp-texto">Pásale el móvil a <strong>{quien.jugador}</strong>. Que nadie más mire.</p>
-          <button type="button" className="pzp-boton grande" onClick={() => setConfirmado(claveTurno)}><Icon name="eye" size={20} /> Soy {quien.jugador}</button>
-          <button type="button" className="pzp-enlace oscuro" style={{ marginTop: '0.6rem' }} onClick={() => setModal(true)}>Salir de la partida</button>
-        </div>
+        <>
+          <Cabecera v={E.vistaDe(est, -1)} onSalir={() => setModal(true)} />
+          <div className="pzp-tarjeta pzp-gate">
+            <span className="rnp-escudo" style={{ '--c': quien.c, width: 76, height: 84, fontSize: '2.4rem', borderRadius: '18px 18px 36px 36px' }}>{quien.e}</span>
+            <p className="pzp-etiqueta centrada">Pasa el móvil a</p>
+            <h2>{quien.jugador}</h2>
+            <p className="pzp-texto">{quien.nombre}. Que nadie más mire.</p>
+            <p className="pzp-turno-sub">{est.fase === 'ordenes' ? 'Órdenes secretas' : 'Diplomacia'}</p>
+          </div>
+          <div className="pzp-barra estatica">
+            <button type="button" className="pzp-boton grande" onClick={() => setConfirmado(claveTurno)}><Icon name="eye" size={20} /> Soy {quien.jugador}</button>
+          </div>
+        </>
       );
     }
     const v = E.vistaDe(est, quien.id);

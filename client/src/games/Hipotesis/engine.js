@@ -154,7 +154,7 @@ export const EVENTOS = {
 };
 const BOLSA_EVENTOS = ['normal', 'doble', 'rumor', 'topo', 'sincera', 'ciegas', 'chismorreo', 'relampago'];
 
-export const OPCIONES_RONDAS = [3, 5, 7];
+export const OPCIONES_RONDAS = [5, 10, 15];
 export const REACCIONES = ['🤔', '😂', '🙄', '😱', '👀'];
 export const AJUSTES = {
   min: 3, max: 10,
@@ -174,7 +174,7 @@ export const numCasillas = (n) => Math.min(9, Math.max(6, n + 3));
 
 // ---------------------------------------------------------------- Crear partida
 export function crearPartida(jugadores, config = {}, { rng = Math.random, local = false, ahora = null } = {}) {
-  const rondas = OPCIONES_RONDAS.includes(Number(config.rondas)) ? Number(config.rondas) : 5;
+  const rondas = OPCIONES_RONDAS.includes(Number(config.rondas)) ? Number(config.rondas) : 10;
   const est = {
     rng, local, cfg: { rondas }, ronda: 0, fase: 'formular', limite: null, listos: {},
     jugadores: jugadores.map((j) => ({ id: j.id, nombre: j.nombre, puntos: 0, engaños: 0, aciertos: 0, fuera: false })),

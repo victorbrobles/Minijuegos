@@ -19,7 +19,7 @@ export const AJUSTES = {
   puntosPista: 1,
   puntosFallo: 1
 };
-export const OPCIONES_RONDAS = [5, 10, 15];
+export const OPCIONES_RONDAS = [10, 15, 20];
 export const DIFICULTADES = [
   { id: 'mixta', nombre: 'Mixta' },
   { id: 'baja', nombre: 'Fácil' },

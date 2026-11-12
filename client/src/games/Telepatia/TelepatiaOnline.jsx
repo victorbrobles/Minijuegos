@@ -14,6 +14,8 @@ import {
 } from './TelepatiaLocal.jsx';
 import { limitesOnline, textoSala } from '../limites.js';
 import { ChipJugadores } from '../../components/MenuJuego.jsx';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto } from '../rondas.js';
 
 const LIM_ON = limitesOnline('telepatia');
 
@@ -37,6 +39,7 @@ export default function TelepatiaOnline({
   onSalir,
   onAbrirAyuda
 }) {
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('telepatia'));
   const navigate = useNavigate();
   const [vista, setVista] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
   const [nombre, setNombre] = useState('');
@@ -531,16 +534,21 @@ export default function TelepatiaOnline({
 
           {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
 
+          {esAdmin && (
+            <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
+              <SelectorRondas juegoId="telepatia" valor={rondasSel} onCambiar={setRondasSel} numJugadores={sala.jugadores.length} />
+            </div>
+          )}
           {esAdmin ? (
             <button
               type="button"
               className="big full qq-btn-principal"
               style={{ marginTop: '1rem' }}
               disabled={faltan > 0}
-              onClick={() => peticionPost(`sala/${sesion.code}/iniciar`)}
+              onClick={() => peticionPost(`sala/${sesion.code}/iniciar`, { rondas: rondasSel })}
             >
               <Icon name="play" size={22} />
-              {faltan > 0 ? `Esperando jugadores (mínimo ${LIM_ON.min})...` : '¡Iniciar juego! (15 rondas)'}
+              {faltan > 0 ? `Esperando jugadores (mínimo ${LIM_ON.min})...` : '¡Iniciar juego!'}
             </button>
           ) : (
             <div className="panel center" style={{ padding: '1.8rem 1.4rem', marginTop: '1rem' }}>
@@ -560,7 +568,7 @@ export default function TelepatiaOnline({
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
             categoria={{ nombre: '¡5 segundos!', icono: 'clock' }}
-            etiqueta={`Ronda ${sala.rondaNum} de 15 · Palabra de origen`}
+            etiqueta={`Ronda ${sala.rondaNum} de ${sala.maxRondas} · Palabra de origen`}
             titulo={sala.palabraActual}
             avatar={
               yo ? <Avatar nombre={yo.nombre} color={colorJugador(indiceColor(yo, 0))} /> : undefined
@@ -627,7 +635,7 @@ export default function TelepatiaOnline({
         <section className="game qqp-escena">
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
-            etiqueta={`Ronda ${sala.rondaNum} de 15 completada`}
+            etiqueta={`Ronda ${sala.rondaNum} de ${sala.maxRondas} completada`}
             titulo="Resultados de la ronda"
           >
             <div className="qqp-identidad">
@@ -692,7 +700,7 @@ export default function TelepatiaOnline({
               <>
                 <BotonPrincipal onClick={() => peticionPost(`sala/${sesion.code}/siguiente`)}>
                   <Icon name="play" size={20} />
-                  {sala.rondaNum >= 15 ? 'Ver podio final' : `Ir a Ronda ${sala.rondaNum + 1} de 15`}
+                  {sala.rondaNum >= sala.maxRondas ? 'Ver podio final' : `Ir a Ronda ${sala.rondaNum + 1} de ${sala.maxRondas}`}
                 </BotonPrincipal>
                 <EnlaceSecundario onClick={() => peticionPost(`sala/${sesion.code}/terminar-ya`)}>
                   Finalizar partida anticipadamente
@@ -753,7 +761,7 @@ export default function TelepatiaOnline({
 
           <div className="qqp-barra">
             {esAdmin && (
-              <BotonPrincipal onClick={() => peticionPost(`sala/${sesion.code}/iniciar`)}>
+              <BotonPrincipal onClick={() => peticionPost(`sala/${sesion.code}/iniciar`, { rondas: rondasSel })}>
                 <Icon name="refresh" size={20} /> Jugar otra vez (mismos jugadores)
               </BotonPrincipal>
             )}

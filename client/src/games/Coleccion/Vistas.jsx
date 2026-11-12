@@ -62,7 +62,7 @@ export function Encargo({ encargo, vitrina, progreso, compacto = false }) {
 }
 
 // ---------------------------------------------------------------- Cabecera
-function Hero({ v, onSalir, etiqueta, titulo, clase = '' }) {
+export function Hero({ v, onSalir, etiqueta, titulo, clase = '' }) {
   const t = v.turno;
   const miTurno = Boolean(t && v.yo) && t.jugadorId === v.yo.id;
   return (
@@ -76,8 +76,8 @@ function Hero({ v, onSalir, etiqueta, titulo, clase = '' }) {
           {miTurno && <span className="cxp-chip vivo">⚡ {t.jugadas} {t.jugadas === 1 ? 'jugada' : 'jugadas'}</span>}
         </div>
       </div>
-      <p className="cxp-hero-etiqueta">{etiqueta}</p>
-      <h1 className="cxp-hero-titulo">{titulo}</h1>
+      {etiqueta && <p className="cxp-hero-etiqueta">{etiqueta}</p>}
+      {titulo && <h1 className="cxp-hero-titulo">{titulo}</h1>}
       <div className="cxp-marcador">
         {v.jugadores.map((j) => (
           <span key={j.id} className={`cxp-marca${t?.jugadorId === j.id ? ' turno' : ''}${j.id === v.yo?.id ? ' yo' : ''}${j.fuera ? ' fuera' : ''}`}>

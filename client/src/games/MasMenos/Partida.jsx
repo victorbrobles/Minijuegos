@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { Hero, TurnoDe, Cuenta, useRestante, Pildoras } from '../Pulsador/Vistas.jsx';
 import { BloqueConfig } from '../../components/MenuJuego.jsx';
-import { AJUSTES, OPCIONES_VUELTAS } from './engine.js';
+import { AJUSTES, OPCIONES_TURNOS } from './engine.js';
 
 const nombreDe = (v, id) => v.jugadores.find((j) => j.id === id)?.nombre ?? '¿?';
 export function cifra(valor, unidad) {
@@ -38,7 +38,7 @@ export function Partida({ v, enviar, offset = 0, onSalir, local = false }) {
     return (
       <>
         <Hero v={v} juego={{ emoji: cat.emoji }} onSalir={onSalir} chip={chip} etiqueta={`Turno ${v.turnoN} de ${v.turnos}`} titulo={cat.pregunta} turno={v.turno} />
-        <TurnoDe v={v} id={v.turno} puedo={miTurno} onListo={() => enviar('listo')}
+        <TurnoDe local={local} v={v} id={v.turno} puedo={miTurno} onListo={() => enviar('listo')}
           texto={miTurno ? 'Saldrán dos con la cifra oculta: elige el que tiene más. Cada acierto suma 1 a tu racha; al primer fallo, se acaba.' : null}>
           {u && <p className="pzp-resumen">{nombreDe(v, u.jugadorId)} hizo una racha de {u.racha}{u.motivo === 'tiempo' ? ' (se le acabó el tiempo)' : ''}</p>}
         </TurnoDe>
@@ -84,8 +84,8 @@ export function Config({ config, onCambiar }) {
           ))}
         </div>
       </BloqueConfig>
-      <BloqueConfig titulo="Turnos por jugador">
-        <Pildoras opciones={OPCIONES_VUELTAS.map((n) => [n, n === 1 ? '1 turno' : `${n} turnos`])} valor={config.vueltas} onCambiar={onCambiar && ((vueltas) => onCambiar({ vueltas }))} />
+      <BloqueConfig titulo="Turnos de la partida">
+        <Pildoras opciones={OPCIONES_TURNOS.map((n) => [n, `${n} turnos`])} valor={config.turnos} onCambiar={onCambiar && ((turnos) => onCambiar({ turnos }))} />
       </BloqueConfig>
     </>
   );

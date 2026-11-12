@@ -16,6 +16,8 @@ import {
 } from './RapidfireLocal.jsx';
 import { limitesOnline, textoSala } from '../limites.js';
 import { ChipJugadores } from '../../components/MenuJuego.jsx';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto } from '../rondas.js';
 
 const LIM_ON = limitesOnline('rapidfire');
 
@@ -42,6 +44,7 @@ export default function RapidfireOnline({
   onSalir,
   onAbrirAyuda
 }) {
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('rapidfire'));
   const navigate = useNavigate();
   // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
   const [vista, setVista] = useState('menu');
@@ -246,7 +249,7 @@ export default function RapidfireOnline({
       const res = await fetch(`/api/rapidfire/online/sala/${sesion.code}/iniciar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion.token })
+        body: JSON.stringify({ token: sesion.token, rondas: rondasSel })
       });
       const d = await res.json();
       if (!res.ok) throw new Error(d.error);
@@ -637,6 +640,11 @@ export default function RapidfireOnline({
             )}
           </div>
 
+          {esAdmin && (
+            <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
+              <SelectorRondas juegoId="rapidfire" valor={rondasSel} onCambiar={setRondasSel} numJugadores={sala.jugadores.length} />
+            </div>
+          )}
           {esAdmin ? (
             <button
               type="button"
@@ -664,7 +672,7 @@ export default function RapidfireOnline({
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
             onAyuda={onAbrirAyuda}
-            etiqueta={`Ronda ${sala.rondaNum} · ${esMiTurno ? '¡Te toca elegir!' : `Abre la ronda ${ronda.jugadorTurnoNombre}`}`}
+            etiqueta={`Ronda ${sala.rondaNum} de ${sala.maxRondas} · ${esMiTurno ? '¡Te toca elegir!' : `Abre la ronda ${ronda.jugadorTurnoNombre}`}`}
             titulo={esMiTurno ? 'Elige una temática' : `${ronda.jugadorTurnoNombre} elige temática…`}
             avatar={
               <Avatar
@@ -704,8 +712,8 @@ export default function RapidfireOnline({
               categoria={ronda.categoria}
               etiqueta={
                 ronda.intento > 0
-                  ? `Ronda ${sala.rondaNum} · Turno de rebote`
-                  : `Ronda ${sala.rondaNum} · Turno en juego`
+                  ? `Ronda ${sala.rondaNum} de ${sala.maxRondas} · Turno de rebote`
+                  : `Ronda ${sala.rondaNum} de ${sala.maxRondas} · Turno en juego`
               }
               titulo={esMiTurno ? '¡Es tu turno de hablar!' : `Turno de ${ronda.jugadorTurnoNombre}`}
               avatar={
@@ -811,7 +819,7 @@ export default function RapidfireOnline({
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
             categoria={ronda?.categoria}
-            etiqueta={`Ronda ${sala.rondaNum} completada`}
+            etiqueta={`Ronda ${sala.rondaNum} de ${sala.maxRondas} completada`}
             titulo="Puntuaciones"
           >
             {ronda?.ultimo && (
@@ -854,12 +862,20 @@ export default function RapidfireOnline({
           <div className="qqp-barra">
             {esAdmin ? (
               <>
-                <BotonPrincipal onClick={handleContinuarRonda}>
-                  <Icon name="play" size={20} /> Siguiente ronda (Ronda {sala.rondaNum + 1})
-                </BotonPrincipal>
-                <EnlaceSecundario onClick={handleFinalizar}>
-                  Finalizar partida anticipadamente
-                </EnlaceSecundario>
+                {sala.rondaNum >= sala.maxRondas ? (
+                  <BotonPrincipal onClick={handleFinalizar}>
+                    <Icon name="trophy" size={20} /> Ver el podio final
+                  </BotonPrincipal>
+                ) : (
+                  <>
+                    <BotonPrincipal onClick={handleContinuarRonda}>
+                      <Icon name="play" size={20} /> Siguiente ronda ({sala.rondaNum + 1} de {sala.maxRondas})
+                    </BotonPrincipal>
+                    <EnlaceSecundario onClick={handleFinalizar}>
+                      Finalizar partida anticipadamente
+                    </EnlaceSecundario>
+                  </>
+                )}
               </>
             ) : (
               <p className="qqp-estado">

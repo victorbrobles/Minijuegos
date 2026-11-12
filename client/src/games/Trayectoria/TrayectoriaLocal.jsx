@@ -16,7 +16,7 @@ const barajar = (a) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--
 export default function TrayectoriaLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [paso, setPaso] = useState('config');
   const [nombres, setNombres] = useState(() => Array(LIM_JUG.min).fill(''));
-  const [rondas, setRondas] = useState(10);
+  const [rondas, setRondas] = useState(15);
   const [dificultad, setDificultad] = useState('mixta');
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);

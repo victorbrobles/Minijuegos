@@ -7,6 +7,7 @@ import { useState } from 'react';
 import Icon from './Icon.jsx';
 import { metaDe } from '../games/meta.js';
 import { LIMITES, limitesLocal, limitesOnline, textoJugadores, rango } from '../games/limites.js';
+import { opcionesRondas, textoOpcionRondas, rondasPorJugador, unidadRondas } from '../games/rondas.js';
 import './MenuJuego.css';
 
 export function BotonVolver({ onClick, texto = 'Volver' }) {
@@ -426,5 +427,26 @@ export function BloqueConfig({ titulo, children, style }) {
       {titulo && <span className="qq-label-destacado">{titulo}</span>}
       {children}
     </div>
+  );
+}
+
+/**
+ * Selector del número de rondas (sale de games/rondas.js). `onCambiar` null = solo lectura (invitados online).
+ * En los juegos «por jugador» se ve también el total con los jugadores actuales.
+ */
+export function SelectorRondas({ juegoId, valor, onCambiar, numJugadores, titulo }) {
+  const u = unidadRondas(juegoId);
+  const t = titulo || (rondasPorJugador(juegoId) ? `${u.charAt(0).toUpperCase() + u.slice(1)} por jugador` : u.charAt(0).toUpperCase() + u.slice(1));
+  return (
+    <BloqueConfig titulo={t}>
+      <div className="qq-chips">
+        {opcionesRondas(juegoId).map((n) => (
+          <button key={n} type="button" className={`qq-chip${Number(valor) === n ? ' activo' : ''}`}
+            disabled={!onCambiar} onClick={() => onCambiar?.(n)}>
+            {textoOpcionRondas(juegoId, n, numJugadores)}
+          </button>
+        ))}
+      </div>
+    </BloqueConfig>
   );
 }

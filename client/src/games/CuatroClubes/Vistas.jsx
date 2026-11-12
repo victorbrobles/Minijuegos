@@ -99,13 +99,15 @@ function RespuestasRonda({ v }) {
 
 function TurnoDe({ v, quien, local, puedo, onListo }) {
   return (
+    <>
     <div className="c4p-tarjeta c4p-gate">
       <Avatar id={quien?.id} nombre={quien?.nombre} grande />
-      <p className="c4p-etiqueta centrada">{local ? 'Pasad el móvil' : puedo ? 'Te toca' : 'Siguiente turno'}</p>
-      <h2>Turno de {quien?.nombre}</h2>
+      <p className="c4p-etiqueta centrada">{local ? 'Pasa el móvil a' : puedo ? 'Te toca' : 'Turno de'}</p>
+      <h2>{quien?.nombre}</h2>
       <p className="c4p-texto">{puedo ? `Tendrás ${AJUSTES.segTurno} segundos para decir un futbolista que haya jugado en el mayor número de estos cuatro clubes.` : `Esperando a que ${quien?.nombre} esté listo…`}</p>
-      {puedo && <button type="button" className="c4p-boton grande" onClick={onListo}><Icon name="check" size={20} /> ¡Listo!</button>}
     </div>
+    {puedo && <div className="c4p-barra estatica"><button type="button" className="c4p-boton grande" onClick={onListo}><Icon name="check" size={20} /> ¡Listo!</button></div>}
+    </>
   );
 }
 

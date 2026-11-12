@@ -25,7 +25,7 @@ export const RESPUESTA_MS = 20000;
 const PTS_MAX = 10;
 const PTS_MIN = 3;
 const PTS_FALLO = 3;
-const RONDAS_PERMITIDAS = [5, 10, 15, 20];
+const RONDAS_PERMITIDAS = [10, 15, 20];
 const MAX_JUGADORES = LIM.max;
 
 export function normalizar(texto) {
@@ -341,7 +341,7 @@ router.post('/online/crear', (req, res) => {
     estado: 'lobby',
     adminToken: token,
     rondaNum: 1,
-    totalRondas: RONDAS_PERMITIDAS.includes(Number(req.body?.rondas)) ? Number(req.body.rondas) : 10,
+    totalRondas: RONDAS_PERMITIDAS.includes(Number(req.body?.rondas)) ? Number(req.body.rondas) : 15,
     usados: [],
     jugadores: [{ id: 1, nombre, token, puntos: 0, bloqueado: false }],
     ronda: null,

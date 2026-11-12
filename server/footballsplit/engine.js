@@ -7,7 +7,7 @@
 // La ronda acaba cuando se descubren los tres trozos o cuando todos han tenido su turno.
 
 export const AJUSTES = { min: 2, max: 12, segTurno: 60, puntos: 5, puntosPista: 2 };
-export const OPCIONES_RONDAS = [5, 10, 15];
+export const OPCIONES_RONDAS = [2, 3, 5]; // caras por jugador
 export const PARTES = [
   { id: 'top', nombre: 'Pelo' },
   { id: 'middle', nombre: 'Ojos' },

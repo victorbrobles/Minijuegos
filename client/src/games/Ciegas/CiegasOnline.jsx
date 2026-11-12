@@ -19,6 +19,8 @@ import {
 } from './CiegasLocal.jsx';
 import { limitesOnline, textoSala } from '../limites.js';
 import { ChipJugadores } from '../../components/MenuJuego.jsx';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto } from '../rondas.js';
 
 const LIM_ON = limitesOnline('ciegas');
 
@@ -42,6 +44,7 @@ export default function CiegasOnline({
   onSalir,
   onAbrirAyuda
 }) {
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('ciegas'));
   const navigate = useNavigate();
   const [vista, setVista] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
   const [nombre, setNombre] = useState('');
@@ -198,7 +201,7 @@ export default function CiegasOnline({
       const res = await fetch(`/api/ciegas/online/sala/${sesion.code}/iniciar-ronda`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion.token })
+        body: JSON.stringify({ token: sesion.token, rondas: rondasSel })
       });
       const d = await res.json();
       if (!res.ok) throw new Error(d.error);
@@ -214,7 +217,7 @@ export default function CiegasOnline({
       const res = await fetch(`/api/ciegas/online/sala/${sesion.code}/iniciar-ronda`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion.token })
+        body: JSON.stringify({ token: sesion.token, rondas: rondasSel })
       });
       const d = await res.json();
       if (!res.ok) throw new Error(d.error);
@@ -586,6 +589,11 @@ export default function CiegasOnline({
 
           {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
 
+          {esAdmin && (
+            <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
+              <SelectorRondas juegoId="ciegas" valor={rondasSel} onCambiar={setRondasSel} numJugadores={sala.jugadores.length} />
+            </div>
+          )}
           {esAdmin ? (
             <button
               type="button"
@@ -757,7 +765,7 @@ export default function CiegasOnline({
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
             categoria={categoriaInfo}
-            etiqueta="Ronda completada"
+            etiqueta={`Ronda ${sala.rondaNum} de ${sala.maxRondas} completada`}
             titulo={`${jugadorActivo?.nombre} suma +${ronda.totalPuntosGanados || 0} pts`}
             avatar={
               jugadorActivo ? (
@@ -822,10 +830,17 @@ export default function CiegasOnline({
           </div>
 
           <div className="qqp-barra">
-            {esAdmin ? (
+            {sala.rondaNum >= sala.maxRondas ? (
+              <>
+                <p className="qqp-estado">🏆 ¡Partida terminada! {ranking[0] ? `Gana ${ranking.filter((j) => j.puntos === maximoPuntos).map((j) => j.nombre).join(' y ')}.` : ''}</p>
+                <EnlaceSecundario onClick={() => setModalSalirPortada(true)}>
+                  Salir a la portada
+                </EnlaceSecundario>
+              </>
+            ) : esAdmin ? (
               <>
                 <BotonPrincipal onClick={handleIniciarRonda}>
-                  <Icon name="play" size={20} /> Siguiente ronda ({categoriaInfo.nombre})
+                  <Icon name="play" size={20} /> Siguiente ronda ({sala.rondaNum + 1} de {sala.maxRondas} · {categoriaInfo.nombre})
                 </BotonPrincipal>
                 <EnlaceSecundario onClick={() => setEligiendoCategoria(true)}>
                   Cambiar temática para la siguiente ronda

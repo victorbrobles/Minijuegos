@@ -11,7 +11,7 @@ const JUEGO = {
   id: 'invento',
   api: '/api/invento',
   emoji: '💡',
-  config: { rondas: 3, segundos: 180 },
+  config: { rondas: 7, segundos: 180 },
   Local: InventoLocal,
   Partida: PartidaOnline,
   Fin,

@@ -16,6 +16,8 @@ import {
 } from './QuienMasLocal.jsx';
 import { limitesOnline, textoSala } from '../limites.js';
 import { ChipJugadores } from '../../components/MenuJuego.jsx';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto } from '../rondas.js';
 
 const LIM_ON = limitesOnline('quienmas');
 
@@ -40,6 +42,7 @@ export default function QuienMasOnline({
   onSalir,
   onAbrirAyuda
 }) {
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('quienmas'));
   const navigate = useNavigate();
   const esAdminGlobal = useAdmin();
 
@@ -232,7 +235,7 @@ export default function QuienMasOnline({
       await fetch(`/api/quienmas/online/sala/${sesion.code}/iniciar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...adminHeaders() },
-        body: JSON.stringify({ token: sesion.token })
+        body: JSON.stringify({ token: sesion.token, rondas: rondasSel })
       });
     } catch (err) {
       setErrorMsg(err.message);
@@ -696,6 +699,11 @@ export default function QuienMasOnline({
             )}
           </div>
 
+          {esAdmin && (
+            <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
+              <SelectorRondas juegoId="quienmas" valor={rondasSel} onCambiar={setRondasSel} numJugadores={sala.jugadores.length} />
+            </div>
+          )}
           {esAdmin ? (
             <button
               type="button"
@@ -725,7 +733,7 @@ export default function QuienMasOnline({
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
             categoria={{ nombre: 'Voto secreto', icono: 'lock' }}
-            etiqueta={`Ronda ${sala.rondaNum} · ${sala.totalVotaron} de ${sala.totalJugadores} han votado`}
+            etiqueta={`Ronda ${sala.rondaNum} de ${sala.maxRondas} · ${sala.totalVotaron} de ${sala.totalJugadores} han votado`}
             titulo={sala.yaVoto ? '¡Voto enviado!' : '¡Te toca votar!'}
             avatar={
               miJugador ? (
@@ -817,7 +825,7 @@ export default function QuienMasOnline({
         <section className="game qqp-escena">
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
-            etiqueta={`Ronda ${sala.rondaNum} completada`}
+            etiqueta={`Ronda ${sala.rondaNum} de ${sala.maxRondas} completada`}
             titulo={
               resultado.empate
                 ? '¡Empate en la votación!'

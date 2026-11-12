@@ -8,7 +8,7 @@
 // Cada voto da 1 punto; ganar una categoría, 2 más.
 
 export const AJUSTES = { min: 2, max: 20, cambiosPorRonda: 1, bonusCategoria: 2, maxNombre: 50, maxDesc: 280 };
-export const OPCIONES = { rondas: [2, 3, 4, 5], segundos: [120, 180, 300] };
+export const OPCIONES = { rondas: [4, 7, 10], segundos: [120, 180, 300] };
 export const CATEGORIAS = {
   compraria: { nombre: 'Lo compraría', e: '🛒' },
   absurdo: { nombre: 'El más absurdo', e: '🤪' },
@@ -26,7 +26,7 @@ export function crearPartida(jugadores, mazos, reglas = {}, ahora = Date.now(), 
     jugadores: jugadores.map((j) => ({ id: j.id, nombre: j.nombre, puntos: 0, titulos: { compraria: 0, absurdo: 0, exito: 0 }, fuera: false })),
     mazos: { objeto: barajar(mazos.objeto, rng), problema: barajar(mazos.problema, rng), rasgo: barajar(mazos.rasgo, rng) },
     cursor: { objeto: 0, problema: 0, rasgo: 0 },
-    rondas: OPCIONES.rondas.includes(Number(reglas.rondas)) ? Number(reglas.rondas) : 3,
+    rondas: OPCIONES.rondas.includes(Number(reglas.rondas)) ? Number(reglas.rondas) : 7,
     segundos: OPCIONES.segundos.includes(Number(reglas.segundos)) ? Number(reglas.segundos) : 180,
     ronda: 0, fase: 'inventar', hasta: null, cartas: {}, cambios: {}, inventos: {}, orden: [], votos: {}, resultado: null, historial: [], fin: null
   };

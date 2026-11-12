@@ -5,6 +5,7 @@ import preguntasNormalRaw from '../data/seeds/quienmas/preguntas.js';
 import preguntasPicanteRaw from '../data/seeds/quienmas/incomodas.js';
 import { barajar } from '../lib/barajar.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
+import { totalRondas } from '../../client/src/games/rondas.js';
 const LIM = limitesOnline('quienmas');
 
 const router = express.Router();
@@ -178,7 +179,8 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
   sala.jugadores.forEach((j) => { j.puntos = 0; });
   sala.rondaNum = 1;
   sala.preguntaActual = barajadas[0];
-  sala.reservaPreguntas = barajadas.slice(1);
+  sala.maxRondas = totalRondas('quienmas', req.body?.rondas);
+  sala.reservaPreguntas = barajadas.slice(1, sala.maxRondas);
   sala.votos = {};
   sala.resultado = null;
   sala.estado = 'votando';
@@ -214,6 +216,7 @@ router.get('/online/sala/:code', (req, res) => {
     totalJugadores: sala.jugadores.length,
     quienesVotaron: Object.keys(sala.votos),
     rondaNum: sala.rondaNum,
+    maxRondas: sala.maxRondas || totalRondas('quienmas', null),
     preguntaActual: sala.preguntaActual,
     jugadores: sala.jugadores.map((j) => ({
       id: j.id,

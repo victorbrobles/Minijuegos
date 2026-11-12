@@ -89,7 +89,7 @@ export default function UnaPiezaLocal({ juego, onVolver, onExit, onAbrirAyuda })
   if (est.fase === 'jugando' && confirmado !== clave) {
     const nombre = v.jugadores.find((j) => j.id === est.turno).nombre;
     return envoltorio(
-      <TurnoDe v={v} id={est.turno} puedo onListo={() => setConfirmado(clave)} boton={`Soy ${nombre}`}
+      <TurnoDe juego={juego} onSalir={() => setModal(true)} v={v} id={est.turno} puedo onListo={() => setConfirmado(clave)} boton={`Soy ${nombre}`}
         texto={`Pásale el móvil: va a ver sus piezas y su objetivo secreto. ${v.figura.e} ${v.figura.nombre}: quedan ${v.huecos} huecos.`} />
     );
   }

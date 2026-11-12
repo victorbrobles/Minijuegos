@@ -7,7 +7,7 @@
 // si no está, decide el anfitrión (o el grupo, en un dispositivo), por si es un acierto que nos falta en la lista.
 
 export const AJUSTES = { min: 1, max: 16, segRonda: 120, segRespuesta: 30, puntosAcierto: 3, puntosFallo: 1, verSoluciones: 12 };
-export const OPCIONES_RONDAS = [5, 10, 15];
+export const OPCIONES_RONDAS = [10, 15, 20];
 
 // ---------------------------------------------------------------- Respuestas
 const RELLENO = new Set(['de', 'del', 'la', 'el', 'da', 'do', 'dos', 'van', 'von', 'der', 'ter', 'jr', 'junior']);

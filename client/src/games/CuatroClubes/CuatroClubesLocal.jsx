@@ -14,7 +14,7 @@ const LIM_JUG = limitesLocal('cuatroclubes');
 export default function CuatroClubesLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [paso, setPaso] = useState('config');
   const [nombres, setNombres] = useState(() => Array(LIM_JUG.min).fill(''));
-  const [rondas, setRondas] = useState(5);
+  const [rondas, setRondas] = useState(15);
   const [error, setError] = useState('');
   const [aviso, setAviso] = useState(null);
   const [cargando, setCargando] = useState(false);

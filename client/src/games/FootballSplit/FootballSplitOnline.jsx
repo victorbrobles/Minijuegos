@@ -189,8 +189,8 @@ export default function FootballSplitOnline({ onVolver, onSalir, onAbrirAyuda })
           />
           <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
             <h3 className="qq-sala-titulo"><Icon name="dice" size={20} /> La partida</h3>
-            <BloqueConfig titulo="Número de caras">
-              <SelectorRondas valor={sala.config.rondas} onCambiar={sala.esAdmin ? (n) => llamar('config', { rondas: n }) : null} />
+            <BloqueConfig titulo="Caras por jugador">
+              <SelectorRondas numJugadores={sala.jugadores.length} valor={sala.config.rondas} onCambiar={sala.esAdmin ? (n) => llamar('config', { rondas: n }) : null} />
             </BloqueConfig>
             {sala.esAdmin && (
               <button type="button" className="big full qq-btn-principal" disabled={n < sala.min} onClick={() => llamar('iniciar')}>

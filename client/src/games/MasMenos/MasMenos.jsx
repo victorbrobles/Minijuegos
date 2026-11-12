@@ -11,7 +11,7 @@ const JUEGO = {
   id: 'masmenos',
   api: '/api/masmenos',
   emoji: '🌊',
-  config: { categoria: 'azar', vueltas: 1 },
+  config: { categoria: 'azar', turnos: 10 },
   Local: MasMenosLocal,
   Partida: PartidaOnline,
   Config,

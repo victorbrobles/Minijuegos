@@ -12,7 +12,7 @@ const LIM = limitesOnline('colores');
 const router = express.Router();
 const TODOS_LOS_CASOS = [...parte1, ...parte2, ...parte3, ...parte4, ...parte5, ...parte6];
 const PALETA = ['rojo', 'azul', 'amarillo', 'verde', 'naranja', 'morado', 'marron', 'blanco', 'negro', 'gris', 'rosa'];
-const RONDAS_PERMITIDAS = [10, 15, 25];
+const RONDAS_PERMITIDAS = [10, 15, 20];
 const SEGUNDOS_RESPUESTA = 45;
 const MAX_JUGADORES = LIM.max;
 
@@ -39,7 +39,7 @@ function barajarArray(arr) {
 // ==========================================
 router.get('/preguntas', (req, res) => {
   try {
-    const n = RONDAS_PERMITIDAS.includes(Number(req.query.n)) ? Number(req.query.n) : 25;
+    const n = RONDAS_PERMITIDAS.includes(Number(req.query.n)) ? Number(req.query.n) : 15;
     const seleccionados = barajarArray(TODOS_LOS_CASOS).slice(0, n).map(prepararCaso);
 
     res.json({
@@ -125,7 +125,7 @@ function calcularResultadosOnline(sala) {
 router.post('/online/crear', (req, res) => {
   const nombre = (req.body?.nombre || '').trim().slice(0, 20);
   if (!nombre) return res.status(400).json({ error: 'Debes indicar un nombre.' });
-  const totalRondas = RONDAS_PERMITIDAS.includes(Number(req.body?.rondas)) ? Number(req.body.rondas) : 25;
+  const totalRondas = RONDAS_PERMITIDAS.includes(Number(req.body?.rondas)) ? Number(req.body.rondas) : 15;
 
   let code = generarCodigoSala();
   while (salasOnline[code]) code = generarCodigoSala();

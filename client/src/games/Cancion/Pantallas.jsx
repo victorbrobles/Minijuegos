@@ -6,7 +6,7 @@ import Icon from '../../components/Icon.jsx';
 import { DURACION_S, volumenEn } from './audioPlayerCancion.js';
 import { centrarActivo } from '../../lib/centrarActivo.js';
 
-export const OPCIONES_RONDAS = [5, 10, 15, 20];
+export const OPCIONES_RONDAS = [10, 15, 20];
 export const SEGUNDOS_RESPUESTA = 20;
 export const PUNTOS_MAX = 10;
 export const PUNTOS_MIN = 3;

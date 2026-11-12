@@ -426,3 +426,7 @@ button.cxp-carta:disabled .cxp-carta-accion { background: #e2e8f0; color: #64748
 
 @media (prefers-reduced-motion: reduce) { .cxp-ultimo { animation: none !important; } }
 .cxp-util { position: absolute; top: -8px; right: -6px; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: #facc15; color: #713f12; font-size: 0.8rem; font-weight: 900; box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2); }
+
+/* Pantalla de «pasa el móvil»: cabecera arriba, tarjeta y botón aparte */
+.cxp-gate h2 { margin: 0.1rem 0 0.2rem !important; font-size: 2rem !important; font-weight: 900; letter-spacing: -0.5px; line-height: 1.1; color: #0f172a; }
+.cxp-turno-sub { display: inline-block; margin-top: 0.7rem !important; padding: 0.3rem 0.8rem; border-radius: 999px; background: #f1f5f9; color: #475569; font-size: 0.82rem; font-weight: 700; }

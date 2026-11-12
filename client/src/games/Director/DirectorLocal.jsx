@@ -94,7 +94,7 @@ export default function DirectorLocal({ juego, onVolver, onExit, onAbrirAyuda })
     const v = E.vistaDe(est, quien.id);
     if (confirmado !== clave) {
       const vt = { ...v, jugadores: est.clubes.map((c) => ({ id: c.id, nombre: c.dueno })) };
-      return envoltorio(<TurnoDe v={vt} id={quien.id} puedo onListo={() => setConfirmado(clave)} boton={`Soy ${quien.dueno}`} texto={`Pásale el móvil: ${est.fase === 'mercado' ? 'sus pujas son secretas' : est.fase === 'tactica' ? 'va a elegir táctica' : 'va a elegir formación'}.`} />);
+      return envoltorio(<TurnoDe juego={juego} onSalir={() => setModal(true)} v={vt} id={quien.id} puedo onListo={() => setConfirmado(clave)} boton={`Soy ${quien.dueno}`} texto={`Pásale el móvil: ${est.fase === 'mercado' ? 'sus pujas son secretas' : est.fase === 'tactica' ? 'va a elegir táctica' : 'va a elegir formación'}.`} />);
     }
     const enviar = (tipo, d = {}) => {
       let r;

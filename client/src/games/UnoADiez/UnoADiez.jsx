@@ -11,7 +11,7 @@ const JUEGO = {
   id: 'unoadiez',
   api: '/api/unoadiez',
   emoji: '🔢',
-  config: { vueltas: 1 },
+  config: { vueltas: 3 },
   Local: UnoADiezLocal,
   Partida: PartidaOnline,
   Config,

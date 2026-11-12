@@ -8,7 +8,7 @@
 //   exacto = nº de pistas usadas · a uno de distancia = pistas + 1 · más lejos = pistas + 10
 
 export const AJUSTES = { min: 2, max: 16, segPista: 90, segAdivinar: 60, maxPistas: 5 };
-export const OPCIONES_VUELTAS = [1, 2, 3];
+export const OPCIONES_VUELTAS = [2, 3, 5];
 
 const jug = (p, id) => p.jugadores.find((j) => j.id === id);
 const activos = (p) => p.jugadores.filter((j) => !j.fuera);

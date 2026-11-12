@@ -69,7 +69,7 @@ function enviarLogo(res, logo) {
 
 const POR_ID = new Map(TODOS_LOS_LOGOS.map((l) => [l.id, l]));
 const itemDe = (l, imagen) => ({ id: l.id, imagen, nombre: l.nombre, validas: [l.nombre, ...(l.sinonimos || [])] });
-const rondasValidas = (n, def = 20) => (E.OPCIONES_RONDAS.includes(Number(n)) ? Number(n) : def);
+const rondasValidas = (n, def = 15) => (E.OPCIONES_RONDAS.includes(Number(n)) ? Number(n) : def);
 
 // ---------------------------------------------------------------- Un solo dispositivo
 router.get('/imagen/:id', (req, res) => enviarLogo(res, POR_ID.get(Number(req.params.id))));
@@ -83,7 +83,7 @@ router.get('/local', (req, res) => {
 const { itemDe: itemDeSala } = montarSalas(router, {
   ...limitesOnline('logos'),
   engine: E,
-  config: { rondas: 20 },
+  config: { rondas: 15 },
   validarConfig: (b, c) => ({ ...c, rondas: rondasValidas(b.rondas, c.rondas) }),
   prepararItems: async (sala) => {
     const p = sala.numPartida + 1;

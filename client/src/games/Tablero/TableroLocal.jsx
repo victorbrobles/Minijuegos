@@ -87,7 +87,7 @@ export default function TableroLocal({ juego, onVolver, onExit, onAbrirAyuda }) 
   if (est.fase === 'elegir' && confirmado !== est.jugadas) {
     const nombre = v.jugadores.find((j) => j.id === est.turno).nombre;
     return envoltorio(
-      <TurnoDe v={v} id={est.turno} puedo onListo={() => setConfirmado(est.jugadas)} boton={`Soy ${nombre}`}
+      <TurnoDe juego={juego} onSalir={() => setModal(true)} v={v} id={est.turno} puedo onListo={() => setConfirmado(est.jugadas)} boton={`Soy ${nombre}`}
         texto={`Pásale el móvil: elige casilla y responde. Quedan ${v.quedan} casillas.`}>
         {est.ultimo && <p className="tbx-gate-ultimo">{v.jugadores.find((j) => j.id === est.ultimo.id).nombre} {est.ultimo.bien ? 'acertó' : 'falló'}{est.ultimo.rebote ? ' el rebote' : ''}: {est.ultimo.puntos > 0 ? '+' : ''}{est.ultimo.puntos}</p>}
       </TurnoDe>

@@ -12,6 +12,8 @@ import {
   EsperandoAnfitrion
 } from '../../components/MenuJuego.jsx';
 import { limitesOnline, textoSala } from '../limites.js';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto } from '../rondas.js';
 
 const LIM_ON = limitesOnline('velocidad');
 
@@ -21,6 +23,7 @@ const colorJugador = (id) => COLORES_JUGADOR[(Number(id) - 1 + COLORES_JUGADOR.l
 const inicial = (n = '?') => n.trim().charAt(0).toUpperCase() || '?';
 
 export default function VelocidadOnline({ onLocal }) {
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('velocidad'));
   const [vista, setVista] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
   const [nombre, setNombre] = useState('');
   const [codigoInput, setCodigoInput] = useState('');
@@ -283,7 +286,7 @@ export default function VelocidadOnline({ onLocal }) {
       await fetch(`/api/velocidad/online/sala/${sesion.code}/iniciar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion.token })
+        body: JSON.stringify({ token: sesion.token, rondas: rondasSel })
       });
     } catch (err) {
       setErrorMsg(err.message);
@@ -513,6 +516,11 @@ export default function VelocidadOnline({ onLocal }) {
             )}
           />
 
+          {esAdmin && (
+            <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
+              <SelectorRondas juegoId="velocidad" valor={rondasSel} onCambiar={setRondasSel} />
+            </div>
+          )}
           {esAdmin ? (
             <div style={{ marginTop: '1.2rem' }}>
               <button
@@ -817,9 +825,9 @@ export default function VelocidadOnline({ onLocal }) {
 
           <div className="ptp-barra estatica">
             {esAdmin ? (
-              sala.jugadores.some((j) => !j.jugo) ? (
+              sala.jugadores.some((j) => !j.jugo) || sala.ronda < sala.maxRondas ? (
                 <button type="button" className="ptp-boton grande" onClick={handleSiguienteJugador}>
-                  <Icon name="dice" size={20} /> Sortear siguiente jugador
+                  <Icon name="dice" size={20} /> {sala.jugadores.some((j) => !j.jugo) ? 'Sortear siguiente jugador' : `Empezar la ronda ${sala.ronda + 1} de ${sala.maxRondas}`}
                 </button>
               ) : (
                 <button type="button" className="ptp-boton grande" onClick={handleSiguienteJugador}>

@@ -8,6 +8,8 @@
 
 export const AJUSTES = { min: 1, max: 10, segEleccion: 30, msRevelar: 1800, msFallo: 2600, margen: 0.03 };
 export const OPCIONES_VUELTAS = [1, 2, 3];
+/** Turnos de la partida (en total, repartidos por orden entre los jugadores). */
+export const OPCIONES_TURNOS = [5, 10, 15];
 
 const jug = (p, id) => p.jugadores.find((j) => j.id === id);
 const activos = (p) => p.jugadores.filter((j) => !j.fuera);
@@ -35,14 +37,15 @@ function anotar(p, texto, tipo = 'info') {
 
 /**
  * pool: [{ nombre, detalle, valor, unidad }] ya barajado.
- * reglas: { categoria: { nombre, pregunta, emoji }, vueltas }
+ * reglas: { categoria: { nombre, pregunta, emoji }, turnos } (o `vueltas` por jugador)
  */
 export function crearPartida(jugadores, pool, reglas, ahora = Date.now()) {
   const ids = jugadores.map((j) => j.id);
   const vueltas = Math.max(1, reglas.vueltas || 1);
+  const total = OPCIONES_TURNOS.includes(Number(reglas.turnos)) ? Number(reglas.turnos) : vueltas * ids.length;
   const p = {
     jugadores: jugadores.map((j) => ({ id: j.id, nombre: j.nombre, puntos: 0, mejor: 0, rachas: [], fuera: false })),
-    pool, cursor: 0, reglas, orden: Array.from({ length: vueltas }, () => ids).flat(), turnoIdx: 0,
+    pool, cursor: 0, reglas, orden: Array.from({ length: total }, (_, i) => ids[i % ids.length]), turnoIdx: 0,
     fase: 'turno', cartas: null, racha: 0, eleccion: null, hasta: null, ultimoTurno: null, log: [], nlog: 0, fin: null
   };
   void ahora;

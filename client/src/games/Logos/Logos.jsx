@@ -13,7 +13,7 @@ const JUEGO = {
   emoji: '🏷️',
   unidad: 'logos',
   opcionesRondas: OPCIONES_RONDAS,
-  config: { rondas: 20 },
+  config: { rondas: 15 },
   Local: LogosLocal,
   Partida: PartidaOnline,
   notaSala: '🏷️ Todos ven el mismo logo a la vez y cada uno responde desde su móvil.',

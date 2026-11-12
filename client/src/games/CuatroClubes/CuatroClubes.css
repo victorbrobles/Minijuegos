@@ -175,7 +175,7 @@
 .c4p-dos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.6rem; width: 100%; }
 /* ---------- Pasa el móvil ---------- */
 .c4p-gate { display: flex; flex-direction: column; align-items: center; padding: 1.6rem 1.2rem 1.3rem; text-align: center; }
-.c4p-gate h2 { margin: 0; color: #0f172a; font-size: 1.5rem; }
+.c4p-gate h2 { margin: 0.1rem 0 0.2rem; color: #0f172a; font-size: 2rem; font-weight: 900; letter-spacing: -0.5px; line-height: 1.1; }
 .c4p-gate .c4p-avatar.grande { width: 84px; height: 84px; margin-bottom: 0.6rem; border-radius: 28px; font-size: 2.4rem; animation: c4pFlotar 2.6s ease-in-out infinite; }
 
 /* ---------- Final ---------- */
@@ -372,7 +372,7 @@
 .c4p-club.no .c4p-club-marca { color: #94a3b8; }
 
 .c4p-gate { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; padding: 1.4rem 1.2rem 1.2rem; text-align: center; }
-.c4p-gate h2 { margin: 0; color: #0f172a; font-size: 1.45rem; }
+.c4p-gate h2 { margin: 0.1rem 0 0.2rem; color: #0f172a; font-size: 2rem; font-weight: 900; letter-spacing: -0.5px; line-height: 1.1; }
 .c4p-gate .c4p-boton { margin-top: 0.6rem; }
 .c4p-avatar.grande { width: 76px; height: 76px; margin-bottom: 0.4rem; border-radius: 26px; font-size: 2.2rem; }
 .c4p-form { display: flex; flex-direction: column; gap: 0.55rem; border: 3px solid #d946ef; }

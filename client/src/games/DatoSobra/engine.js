@@ -4,7 +4,7 @@
 // Después, los demás deciden en secreto si aceptan su respuesta o la desafían señalando otra.
 
 export const AJUSTES = { min: 1, max: 12, acierto: 3, aguante: 1, desafioGanado: 4, desafioPerdido: -1, segResponder: 30, segDesafio: 20 };
-export const OPCIONES = { rondas: [4, 6, 8, 10] };
+export const OPCIONES = { rondas: [2, 3, 4] }; // futbolistas por jugador
 export const LETRAS = ['A', 'B', 'C', 'D'];
 
 const jug = (p, id) => p.jugadores.find((j) => j.id === id);
@@ -13,7 +13,9 @@ const sumar = (p, id, n) => { const j = jug(p, id); if (!j || !n) return; j.punt
 
 /** items: [{ nombre, afirmaciones: [4], falsa: índice, porque }] (ya barajados). reglas: { rondas } */
 export function crearPartida(jugadores, items, reglas = {}, ahora = Date.now()) {
-  const rondas = Math.max(1, Math.min(reglas.rondas || 6, items.length));
+  // reglas.rondas: futbolistas por jugador (×2, ×3, ×4)
+  const porJugador = OPCIONES.rondas.includes(Number(reglas.rondas)) ? Number(reglas.rondas) : 3;
+  const rondas = Math.max(1, Math.min(porJugador * jugadores.length, items.length));
   const p = {
     jugadores: jugadores.map((j) => ({ id: j.id, nombre: j.nombre, puntos: 0, aciertos: 0, desafios: 0, fuera: false })),
     items: items.slice(0, rondas), rondas, ronda: 0, fase: 'responder', turno: null, hasta: null,

@@ -7,6 +7,7 @@ import famosos from '../data/seeds/ciegas/famosos.js';
 import culturapop from '../data/seeds/ciegas/culturapop.js';
 import geografia from '../data/seeds/ciegas/geografia.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
+import { totalRondas } from '../../client/src/games/rondas.js';
 const LIM = limitesOnline('ciegas');
 
 const router = express.Router();
@@ -140,7 +141,9 @@ router.get('/online/sala/:code', (req, res) => {
       nombre: j.nombre,
       puntos: j.puntos
     })),
-    ronda: sala.ronda
+    ronda: sala.ronda,
+    rondaNum: sala.rondaNum || 1,
+    maxRondas: sala.maxRondas || totalRondas('ciegas', null, sala.jugadores.length)
   });
 });
 
@@ -163,6 +166,15 @@ router.post('/online/sala/:code/iniciar-ronda', (req, res) => {
 
   if (sala.jugadores.length < LIM.min) {
     return res.status(400).json({ error: `Se necesitan al menos ${LIM.min} jugadores.` });
+  }
+
+  // Rondas: las fija el anfitrión al empezar desde la sala
+  if (sala.estado === 'lobby') {
+    sala.maxRondas = totalRondas('ciegas', req.body?.rondas, sala.jugadores.length);
+    sala.rondaNum = 1;
+  } else {
+    if ((sala.rondaNum || 1) >= (sala.maxRondas || Infinity)) return res.status(400).json({ error: 'La partida ya ha terminado.' });
+    sala.rondaNum = (sala.rondaNum || 1) + 1;
   }
 
   // Elegir jugador activo al azar

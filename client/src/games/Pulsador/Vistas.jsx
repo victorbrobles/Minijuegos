@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { OPCIONES_RONDAS } from './engine.js';
 import './Pulsador.css';
+import { metaDe } from '../meta.js';
 
 export const COLORES = ['#ef4444', '#2563eb', '#16a34a', '#f59e0b', '#9333ea', '#ec4899', '#0d9488', '#ea580c', '#475569', '#65a30d', '#6366f1', '#0ea5e9', '#e11d48', '#84cc16', '#a855f7'];
 export const colorDe = (id) => COLORES[((Number(id) || 1) - 1) % COLORES.length];
@@ -22,18 +23,29 @@ export function useRestante(hasta, offset = 0) {
 }
 
 /** Pantalla «Turno de…» con el botón ¡Listo! (o la espera, si no es tu turno). */
-export function TurnoDe({ v, id, puedo, onListo, texto, children, boton = '¡Listo!' }) {
+export function TurnoDe({ v, id, puedo, onListo, texto, children, boton = '¡Listo!', juego, onSalir, chip, local }) {
   const j = v.jugadores.find((x) => x.id === id);
+  // En un solo dispositivo (o si se pasa la cabecera) se dice «Pasa el móvil a…»
+  const pasar = local ?? Boolean(juego);
+  const etiqueta = pasar ? 'Pasa el móvil a' : puedo ? 'Te toca' : 'Turno de';
+  const chipHero = chip ?? (v.ronda && v.rondas ? undefined : `${juego?.emoji ?? ''} ${(juego?.id && metaDe(juego.id)?.titulo) || ''}`.trim());
   return (
-    <div className="pzp-tarjeta pzp-gate">
-      <p className="pzp-etiqueta centrada">{puedo ? 'Te toca' : 'Turno de'}</p>
-      <Avatar id={id} nombre={j?.nombre} grande />
-      <h2>{j?.nombre ?? '¿?'}{v.yo?.id === id ? ' (tú)' : ''}</h2>
-      {texto && <p className="pzp-texto">{texto}</p>}
-      {children}
-      {puedo ? <button type="button" className="pzp-boton grande" onClick={onListo}><Icon name="play" size={20} /> {boton}</button>
-        : <p className="pzp-esperando-txt">⏳ Esperando a {j?.nombre}…</p>}
-    </div>
+    <>
+      {juego && <Hero v={v} juego={juego} onSalir={onSalir} chip={chipHero} turno={id} />}
+      <div className="pzp-tarjeta pzp-gate">
+        <Avatar id={id} nombre={j?.nombre} grande />
+        <p className="pzp-etiqueta centrada">{etiqueta}</p>
+        <h2>{j?.nombre ?? '¿?'}{!pasar && v.yo?.id === id ? ' (tú)' : ''}</h2>
+        {texto && <p className="pzp-texto">{texto}</p>}
+        {children}
+        {!puedo && <p className="pzp-esperando-txt">⏳ Esperando a {j?.nombre}…</p>}
+      </div>
+      {puedo && (
+        <div className="pzp-barra estatica">
+          <button type="button" className="pzp-boton grande" onClick={onListo}><Icon name="play" size={20} /> {boton}</button>
+        </div>
+      )}
+    </>
   );
 }
 
@@ -77,7 +89,7 @@ export function Hero({ v, juego, onSalir, etiqueta, titulo, clase = '', chip, tu
         <span className="pzp-chip">{chip ?? `${juego.emoji} Ronda ${Math.min(v.ronda, v.rondas)}/${v.rondas}`}</span>
       </div>
       {etiqueta && <p className="pzp-hero-etiqueta">{etiqueta}</p>}
-      <h1 className="pzp-hero-titulo">{titulo}</h1>
+      {titulo && <h1 className="pzp-hero-titulo">{titulo}</h1>}
       <div className="pzp-marcador">
         {lista.map((j) => {
           const pulsa = v.pulsado?.jugadorId === j.id || turno === j.id;

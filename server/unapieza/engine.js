@@ -6,7 +6,7 @@
 // figura sin haber cerrado su objetivo pierde unos puntos.
 
 export const AJUSTES = { min: 2, max: 6, mano: 3, segTurno: 60, ptsLinea: 2, ptsObjetivo: 4, ptsObjetivoFallo: 2, ptsUltima: 5, ptsBloqueo: 2, lado: 8 };
-export const OPCIONES = { rondas: [2, 3, 4], segundos: [45, 60, 90] };
+export const OPCIONES = { rondas: [3, 4, 5], segundos: [45, 60, 90] };
 
 export const PIEZAS = {
   P1: { nombre: 'Comodín', celdas: [[0, 0]], peso: 1 },

@@ -5,6 +5,8 @@ import Icon from '../../components/Icon.jsx';
 import './Impostor.css';
 import { centrarActivo } from '../../lib/centrarActivo.js';
 import { limitesLocal } from '../limites.js';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto, totalRondas } from '../rondas.js';
 
 const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('impostor');
 
@@ -160,7 +162,7 @@ export function SelectorModosImpostor({
           {onSalir ? <BotonPortada onClick={onSalir} texto={textoSalir} /> : <span />}
           <div className="qqp-hero-chips">
             <span className="qqp-chip">
-              <Icon name="flagFinish" size={14} /> <span>Partida {rondaActual}</span>
+              <Icon name="flagFinish" size={14} /> <span>Ronda {rondaActual}</span>
             </span>
             {onAyuda && (
               <button type="button" className="qqp-ayuda" onClick={onAyuda} title="Cómo jugar" aria-label="Cómo jugar">
@@ -272,6 +274,9 @@ export default function ImpostorLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [rondasSobrevividas, setRondasSobrevividas] = useState(1);
   const [puntosRonda, setPuntosRonda] = useState({});
   const [rondaActual, setRondaActual] = useState(1);
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('impostor'));
+  const maxRondas = totalRondas('impostor', rondasSel);
+  const ultimaRonda = rondaActual >= maxRondas;
 
   const handleSalirAPortada = () => {
     setModalSalirPortada(false);
@@ -500,6 +505,7 @@ export default function ImpostorLocal({ onVolver, onExit, onAbrirAyuda }) {
               ))}
             </div>
 
+            <SelectorRondas juegoId="impostor" valor={rondasSel} onCambiar={setRondasSel} />
             <button
               type="button"
               className="big full qq-btn-principal"
@@ -530,7 +536,7 @@ export default function ImpostorLocal({ onVolver, onExit, onAbrirAyuda }) {
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
             categoria={{ nombre: infoModoActual.nombre, icono: infoModoActual.icono }}
-            etiqueta={`Ronda ${rondaActual} · Turno secreto ${indiceReparto + 1} de ${jugadores.length}`}
+            etiqueta={`Ronda ${rondaActual} de ${maxRondas} · Turno secreto ${indiceReparto + 1} de ${jugadores.length}`}
             titulo={jugadorEnTurnoReparto.nombre}
             avatar={
               <Avatar
@@ -629,7 +635,7 @@ export default function ImpostorLocal({ onVolver, onExit, onAbrirAyuda }) {
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
             categoria={{ nombre: infoModoActual.nombre, icono: infoModoActual.icono }}
-            etiqueta={`Ronda ${rondaActual} · Debate en curso`}
+            etiqueta={`Ronda ${rondaActual} de ${maxRondas} · Debate en curso`}
             titulo="¡Descubrid al impostor!"
           >
             {jugadorInicialObj && (
@@ -674,7 +680,7 @@ export default function ImpostorLocal({ onVolver, onExit, onAbrirAyuda }) {
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
             categoria={{ nombre: infoModoActual.nombre, icono: infoModoActual.icono }}
-            etiqueta={`Ronda ${rondaActual} · Identidad revelada`}
+            etiqueta={`Ronda ${rondaActual} de ${maxRondas} · Identidad revelada`}
             titulo={`Impostor: ${impostorObj?.nombre || ''}`}
             avatar={
               impostorObj ? (
@@ -751,7 +757,7 @@ export default function ImpostorLocal({ onVolver, onExit, onAbrirAyuda }) {
         <section className="game qqp-escena">
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
-            etiqueta={`Ronda ${rondaActual} completada`}
+            etiqueta={`Ronda ${rondaActual} de ${maxRondas} completada`}
             titulo={ganador === 'impostor' ? '¡Victoria del Impostor!' : '¡Victoria del Pueblo!'}
             avatar={
               <span className="qqp-avatar" style={{ '--c': ganador === 'impostor' ? '#ef4444' : '#10b981' }}>
@@ -814,25 +820,33 @@ export default function ImpostorLocal({ onVolver, onExit, onAbrirAyuda }) {
           </div>
 
           <div className="qqp-barra">
-            <BotonPrincipal
-              onClick={() => {
-                setRondaActual((r) => r + 1);
-                prepararRonda(modoJuego);
-              }}
-            >
-              <Icon name="play" size={20} /> Siguiente partida ({infoModoActual.nombre})
-            </BotonPrincipal>
-            <EnlaceSecundario
-              onClick={() => {
-                setRondaActual((r) => r + 1);
-                setFase('modo');
-              }}
-            >
-              Cambiar modo de juego para la siguiente
-            </EnlaceSecundario>
-            <EnlaceSecundario onClick={() => setFase('final')}>
-              Finalizar partida y ver podio
-            </EnlaceSecundario>
+            {ultimaRonda ? (
+              <BotonPrincipal onClick={() => setFase('final')}>
+                <Icon name="trophy" size={20} /> Ver el podio final
+              </BotonPrincipal>
+            ) : (
+              <>
+                <BotonPrincipal
+                  onClick={() => {
+                    setRondaActual((r) => r + 1);
+                    prepararRonda(modoJuego);
+                  }}
+                >
+                  <Icon name="play" size={20} /> Siguiente ronda ({rondaActual + 1} de {maxRondas})
+                </BotonPrincipal>
+                <EnlaceSecundario
+                  onClick={() => {
+                    setRondaActual((r) => r + 1);
+                    setFase('modo');
+                  }}
+                >
+                  Cambiar modo de juego para la siguiente
+                </EnlaceSecundario>
+                <EnlaceSecundario onClick={() => setFase('final')}>
+                  Finalizar partida y ver podio
+                </EnlaceSecundario>
+              </>
+            )}
           </div>
         </section>
       )}

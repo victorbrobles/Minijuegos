@@ -14,9 +14,9 @@
 //   supervivencia  3 vidas; cada fallo quita una. Gana el último que sigue vivo
 
 export const MODOS = {
-  geomix: { nombre: 'GeoMix', rondas: [3, 5, 8], rondasPorDefecto: 5 },
-  especialista: { nombre: 'Especialista', rondas: [3, 5, 8], rondasPorDefecto: 5 },
-  contrarreloj: { nombre: 'Contrarreloj', rondas: [1, 2, 3], rondasPorDefecto: 2 },
+  geomix: { nombre: 'GeoMix', rondas: [2, 3, 5], rondasPorDefecto: 3 },
+  especialista: { nombre: 'Especialista', rondas: [2, 3, 5], rondasPorDefecto: 3 },
+  contrarreloj: { nombre: 'Contrarreloj', rondas: [2, 3, 5], rondasPorDefecto: 2 },
   supervivencia: { nombre: 'Supervivencia', rondas: null, rondasPorDefecto: null }
 };
 

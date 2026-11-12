@@ -5,7 +5,7 @@ import React, { useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import AvisoEfecto from '../../components/AvisoEfecto.jsx';
 import * as E from './engine.js';
-import { PantallaJuego, PantallaResultado, PantallaFin, Avatar } from './Vistas.jsx';
+import { PantallaJuego, PantallaResultado, PantallaFin, Avatar, Hero } from './Vistas.jsx';
 import { ModalSalir, SelectorRondas } from './SumaCeroOnline.jsx';
 import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx';
 import './SumaCero.css';
@@ -23,7 +23,7 @@ const ACCIONES = {
 export default function SumaCeroLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [paso, setPaso] = useState('config');
   const [nombres, setNombres] = useState(() => Array(LIM_JUG.min).fill(''));
-  const [rondas, setRondas] = useState(3);
+  const [rondas, setRondas] = useState(5);
   const [error, setError] = useState('');
   const [aviso, setAviso] = useState(null);
   const [modal, setModal] = useState(false);
@@ -110,13 +110,16 @@ export default function SumaCeroLocal({ onVolver, onExit, onAbrirAyuda }) {
     const v = E.vistaDe(est, -1);
     return envoltorio(
       <>
+        <Hero v={v} onSalir={() => setModal(true)} />
         <div className="szp-tarjeta szp-gate">
           <Avatar id={quien.id} nombre={quien.nombre} grande />
-          <p className="szp-etiqueta centrada">Pasa el móvil · ronda {est.ronda}{est.plantado != null ? ' · ¡último turno!' : ''}</p>
-          <h2>Le toca a {quien.nombre}</h2>
+          <p className="szp-etiqueta centrada">Pasa el móvil a</p>
+          <h2>{quien.nombre}</h2>
           <p className="szp-texto">Su mano es secreta: que nadie más mire.</p>
+          {est.plantado != null && <p className="szp-turno-sub">✋ ¡Último turno!</p>}
+        </div>
+        <div className="szp-barra estatica">
           <button type="button" className="szp-boton grande" onClick={() => setConfirmado(claveTurno)}><Icon name="eye" size={20} /> Soy {quien.nombre}</button>
-          <button type="button" className="szp-enlace oscuro" style={{ marginTop: '0.6rem' }} onClick={() => setModal(true)}>Salir de la partida</button>
         </div>
         {v.log.length > 0 && (
           <div className="szp-tarjeta">

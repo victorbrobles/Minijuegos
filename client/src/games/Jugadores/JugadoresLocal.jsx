@@ -16,7 +16,7 @@ const barajar = (a) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--
 export default function JugadoresLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [paso, setPaso] = useState('config');
   const [nombres, setNombres] = useState(() => Array(LIM_JUG.min).fill(''));
-  const [rondas, setRondas] = useState(10);
+  const [rondas, setRondas] = useState(15);
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
   const [aviso, setAviso] = useState(null);

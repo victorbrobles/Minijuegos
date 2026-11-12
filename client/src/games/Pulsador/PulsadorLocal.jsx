@@ -126,7 +126,7 @@ export default function PulsadorLocal({ juego, onVolver, onExit, onAbrirAyuda })
     const id = est.pulsado.jugadorId;
     const nombre = v.jugadores.find((j) => j.id === id)?.nombre;
     contenido = (
-      <TurnoDe v={v} id={id} puedo boton={`Soy ${nombre}: ¡a responder!`}
+      <TurnoDe juego={juego} onSalir={() => setModal(true)} v={v} id={id} puedo boton={`Soy ${nombre}: ¡a responder!`}
         onListo={() => { est.pulsado.hasta = Date.now() + est.reglas.segRespuesta * 1000; setListo(claveTurno(est)); }}
         texto={`Ha pulsado ${nombre}. Pásale el móvil para que responda: el reloj no corre hasta que pulse el botón.`} />
     );

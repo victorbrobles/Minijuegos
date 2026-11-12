@@ -7,7 +7,7 @@
 // huecos sin descubrir, hay REBOTE: los demás pueden adivinar los que faltan (valen menos).
 
 export const AJUSTES = { min: 1, max: 12, puntosNivel: [10, 7, 5, 3], puntosRebote: [5, 4, 3, 2], segPista: 20, segRebote: 40, esperaFallo: 1500, bonusPleno: 5 };
-export const OPCIONES = { onces: [1, 2, 3], segundos: [120, 180, 240] };
+export const OPCIONES = { onces: [2, 3, 4], segundos: [120, 180, 240] };
 export const NIVELES = ['Posición y dorsal', 'Club o país', 'Trayectoria', 'Iniciales'];
 export const POSICIONES = { POR: 'Portero', DEF: 'Defensa', MED: 'Centrocampista', DEL: 'Delantero' };
 
@@ -36,7 +36,7 @@ const activos = (p) => p.jugadores.filter((j) => !j.fuera);
 /** partidos: lista ya barajada de { partido, onces: [2] }. reglas: { onces (por jugador), segundos (por turno) } */
 export function crearPartida(jugadores, partidos, reglas = {}, ahora = Date.now(), rng = Math.random) {
   const n = jugadores.length;
-  const k = OPCIONES.onces.includes(Number(reglas.onces)) ? Number(reglas.onces) : 1;
+  const k = OPCIONES.onces.includes(Number(reglas.onces)) ? Number(reglas.onces) : 3;
   // Todos juegan el mismo número de onces: si no hay partidos para todos, se recorta por igual
   const total = Math.max(Math.min(n, partidos.length * 2), Math.floor(Math.min(n * k, partidos.length * 2) / n) * n);
   // Turno t: partido ⌊t/2⌋, once t%2, jugador t%n (los dos onces de un partido, a jugadores seguidos)

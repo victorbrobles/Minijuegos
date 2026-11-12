@@ -11,7 +11,7 @@ const JUEGO = {
   id: 'datosobra',
   api: '/api/datosobra',
   emoji: '🕵️',
-  config: { rondas: 6 },
+  config: { rondas: 3 },
   Local: DatoSobraLocal,
   Partida: PartidaOnline,
   Fin,

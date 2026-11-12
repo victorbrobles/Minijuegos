@@ -5,9 +5,10 @@ import Icon from '../../components/Icon.jsx';
 import './Popular.css';
 import { centrarActivo } from '../../lib/centrarActivo.js';
 import { limitesLocal } from '../limites.js';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto, totalRondas } from '../rondas.js';
 
 const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('popular');
-const MAX_RONDAS = 15;
 const TIEMPO_TURNO = 45;
 
 export const PUNTOS_POR_PUESTO = {
@@ -161,6 +162,8 @@ export default function PopularLocal({ onVolver, onExit, onAbrirAyuda }) {
 
   const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
   const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: `Jugador ${i + 1}` })));
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('popular'));
+  const MAX_RONDAS = totalRondas('popular', rondasSel, jugadores.length);
   const [puntos, setPuntos] = useState({});
 
   const [rondaNum, setRondaNum] = useState(1);
@@ -545,6 +548,7 @@ export default function PopularLocal({ onVolver, onExit, onAbrirAyuda }) {
               ))}
             </div>
 
+            <SelectorRondas juegoId="popular" valor={rondasSel} onCambiar={setRondasSel} numJugadores={jugadores.length} />
             <button
               type="button"
               className="big full qq-btn-principal"

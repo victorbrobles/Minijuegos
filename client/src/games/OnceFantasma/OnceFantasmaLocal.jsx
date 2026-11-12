@@ -5,7 +5,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import * as E from './engine.js';
 import { Partida, Fin, Config } from './Partida.jsx';
-import { ModalSalir, TurnoDe } from '../Pulsador/Vistas.jsx';
+import { ModalSalir, TurnoDe, Hero } from '../Pulsador/Vistas.jsx';
 import { SelectorJugadores } from '../../components/MenuJuego.jsx';
 import { limitesLocal } from '../limites.js';
 
@@ -93,7 +93,7 @@ export default function OnceFantasmaLocal({ juego, onVolver, onExit, onAbrirAyud
   if (est.fase === 'turno' && confirmado !== `t${est.ronda}`) {
     const t = est.turnos[est.ronda - 1];
     return envoltorio(
-      <TurnoDe v={v} id={t.jugador} puedo boton={`Soy ${v.jugadores.find((j) => j.id === t.jugador).nombre}`}
+      <TurnoDe juego={juego} onSalir={() => setModal(true)} v={v} id={t.jugador} puedo boton={`Soy ${v.jugadores.find((j) => j.id === t.jugador).nombre}`}
         onListo={() => { est.proximaPista = Date.now() + E.AJUSTES.segPista * 1000; setConfirmado(`t${est.ronda}`); }}
         texto={`Pásale el móvil: va a reconstruir el once de ${t.equipo} (${t.partido}).`} />
     );
@@ -102,13 +102,18 @@ export default function OnceFantasmaLocal({ juego, onVolver, onExit, onAbrirAyud
     const t = est.turnos[est.ronda - 1];
     const faltan = est.huecos.filter((h) => !h.por).length;
     return envoltorio(
+      <>
+      <Hero v={v} juego={juego} onSalir={() => setModal(true)} />
       <div className="pzp-tarjeta pzp-gate ofx-gate-rebote">
         <p className="pzp-etiqueta centrada">Rebote</p>
         <span className="ofx-gate-emoji">🔁</span>
         <h2>¡A {v.jugadores.find((j) => j.id === t.jugador).nombre} le faltan {faltan}!</h2>
         <p className="pzp-texto">Poned el móvil en el centro: los demás podéis decir los futbolistas que faltan (valen menos puntos). Quien escribe elige a quién se le apunta.</p>
+      </div>
+      <div className="pzp-barra estatica">
         <button type="button" className="pzp-boton grande" onClick={() => { setQuien(est.jugadores.find((j) => !j.fuera && j.id !== t.jugador)?.id ?? null); setConfirmado(`r${est.ronda}`); }}><Icon name="play" size={20} /> ¡Al rebote!</button>
       </div>
+      </>
     );
   }
   const enviar = (tipo, d = {}) => {

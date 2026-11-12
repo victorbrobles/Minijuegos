@@ -9,7 +9,7 @@ import { limitesOnline } from '../../client/src/games/limites.js';
 
 const router = express.Router();
 export const MAZOS = { objeto: OBJETOS, problema: PROBLEMAS, rasgo: RASGOS };
-const leerConfig = (b, c = { rondas: 3, segundos: 180 }) => ({
+const leerConfig = (b, c = { rondas: 7, segundos: 180 }) => ({
   rondas: E.OPCIONES.rondas.includes(Number(b.rondas)) ? Number(b.rondas) : c.rondas,
   segundos: E.OPCIONES.segundos.includes(Number(b.segundos)) ? Number(b.segundos) : c.segundos
 });

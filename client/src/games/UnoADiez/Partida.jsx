@@ -123,7 +123,7 @@ export function Partida({ v, enviar, offset = 0, onSalir, local = false, puedeSe
   } else if (v.fase === 'pista') {
     if (local) {
       cuerpo = !listoLocal ? (
-        <TurnoDe v={v} id={v.pistador} puedo onListo={() => setPasado(clave)} boton={`Soy ${nombreDe(v, v.pistador)}: ver el número`}
+        <TurnoDe local v={v} id={v.pistador} puedo onListo={() => setPasado(clave)} boton={`Soy ${nombreDe(v, v.pistador)}: ver el número`}
           texto={`Pásale el móvil a ${nombreDe(v, v.pistador)}. ¡Que ${nombreDe(v, v.adivinador)} no mire!`} />
       ) : (
         <Secreto v={v}>
@@ -148,7 +148,7 @@ export function Partida({ v, enviar, offset = 0, onSalir, local = false, puedeSe
     cuerpo = <>{cuerpo}<Pistas v={v} /></>;
   } else {
     if (local && !listoLocal) {
-      cuerpo = <TurnoDe v={v} id={v.adivinador} puedo onListo={() => setPasado(clave)} boton="Ver las pistas y adivinar" texto={`Pásale el móvil a ${nombreDe(v, v.adivinador)}.`} />;
+      cuerpo = <TurnoDe local v={v} id={v.adivinador} puedo onListo={() => setPasado(clave)} boton="Ver las pistas y adivinar" texto={`Pásale el móvil a ${nombreDe(v, v.adivinador)}.`} />;
     } else if (local || v.adivinador === yo) {
       cuerpo = <><Pistas v={v} /><Adivinar key={v.pistas.length} v={v} enviar={enviar} restante={restante} local={local} /></>;
     } else {

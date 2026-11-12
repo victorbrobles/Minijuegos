@@ -7,7 +7,7 @@
 // (el anfitrión online, el grupo en un dispositivo). Un futbolista no se puede repetir en la misma ronda.
 
 export const AJUSTES = { min: 2, max: 12, segTurno: 90, verMejores: 10 };
-export const OPCIONES_RONDAS = [3, 5, 8];
+export const OPCIONES_RONDAS = [10, 15, 20];
 
 // ---------------------------------------------------------------- Respuestas
 const RELLENO = new Set(['de', 'del', 'la', 'el', 'da', 'do', 'dos', 'van', 'von', 'der', 'ter', 'jr', 'junior']);

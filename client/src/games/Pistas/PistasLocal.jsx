@@ -5,6 +5,8 @@ import Icon from '../../components/Icon.jsx';
 import './Pistas.css';
 import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx';
 import { limitesLocal } from '../limites.js';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto, totalRondas } from '../rondas.js';
 
 const MAX_PISTAS = 6;
 const TIEMPO_PISTA_SEGUNDOS = 10;
@@ -23,6 +25,8 @@ export default function PistasLocal({ onVolver, onExit }) {
 
   // Setup
   const [modo, setModo] = useState('estandar'); // 'estandar' | 'supervivencia'
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('pistas'));
+  const maxRondas = modo === 'estandar' ? totalRondas('pistas', rondasSel) : null;
   const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
   const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: `Jugador ${i + 1}` })));
 
@@ -411,6 +415,7 @@ export default function PistasLocal({ onVolver, onExit }) {
         return;
       }
     }
+    if (maxRondas && rondaNum >= maxRondas) { setFase('final'); return; }
     const sig = rondaNum + 1;
     setRondaNum(sig);
     cargarNuevaRonda(sig, usados);
@@ -482,6 +487,7 @@ export default function PistasLocal({ onVolver, onExit }) {
               </button>
             </div>
           </BloqueConfig>
+          {modo === 'estandar' && <SelectorRondas juegoId="pistas" valor={rondasSel} onCambiar={setRondasSel} />}
         </SelectorJugadores>
       )}
 
@@ -508,7 +514,7 @@ export default function PistasLocal({ onVolver, onExit }) {
                 <span>Portada</span>
               </button>
               <div className="ptp-hero-chips">
-                <span className="ptp-chip"><Icon name="flagFinish" size={14} /> Ronda {rondaNum}</span>
+                <span className="ptp-chip"><Icon name="flagFinish" size={14} /> Ronda {rondaNum}{maxRondas ? `/${maxRondas}` : ''}</span>
                 <span className="ptp-chip">
                   {modo === 'estandar'
                     ? `Pista ${pistasReveladas}/${MAX_PISTAS} · +${MAX_PISTAS - pistasReveladas + 1} pts`
@@ -740,7 +746,7 @@ export default function PistasLocal({ onVolver, onExit }) {
 
           <div className="ptp-barra estatica">
             <button type="button" className="ptp-boton grande" onClick={siguienteRonda}>
-              <Icon name="play" size={20} /> Siguiente ronda ({rondaNum + 1})
+              <Icon name="play" size={20} /> {maxRondas && rondaNum >= maxRondas ? 'Ver resultado final' : `Siguiente ronda (${rondaNum + 1})`}
             </button>
             <button type="button" className="ptp-enlace" onClick={() => setFase('final')}>
               <Icon name="trophy" size={16} /> Finalizar partida

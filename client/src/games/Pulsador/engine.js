@@ -18,7 +18,7 @@
 // item = { pistas: [{ tipo, etiqueta, valor }], opciones?: [..], correcta?: '..', respuestas?: [..], solucion: {...} }
 
 export const CUENTA_ATRAS_MS = 3000;
-export const OPCIONES_RONDAS = [5, 10, 15];
+export const OPCIONES_RONDAS = [10, 15, 20];
 
 /** Reglas de cada juego (las mismas online y en un dispositivo). */
 export const REGLAS = {

@@ -6,7 +6,7 @@ import { limitesOnline } from '../../client/src/games/limites.js';
 const LIM = limitesOnline('ubicacion');
 
 const router = Router();
-const RONDAS = 10;
+const RONDAS = 7;
 const TIEMPO_MAPA_S = 90;
 
 const RADIO_TIERRA_KM = 6371;
@@ -24,7 +24,7 @@ function distanciaKm(a, b) {
 // Puntuación: cada jugador suma tantos puntos como kilómetros le separan del lugar.
 // Gana quien MENOS puntos tiene al final. Quien no coloca su marcador suma la penalización.
 export const PENALIZACION_SIN_MARCA = 20000;
-const RONDAS_PERMITIDAS = [5, 10, 15];
+const RONDAS_PERMITIDAS = [5, 7, 10];
 
 function puntosPorDistancia(km) {
   return Math.round(km);

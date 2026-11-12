@@ -13,7 +13,7 @@ const LIM_JUG = limitesLocal('datosobra');
 export default function DatoSobraLocal({ juego, onVolver, onExit, onAbrirAyuda }) {
   const [paso, setPaso] = useState('config');
   const [nombres, setNombres] = useState(() => Array(LIM_JUG.min).fill(''));
-  const [config, setConfig] = useState({ rondas: 6 });
+  const [config, setConfig] = useState({ rondas: 3 });
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modal, setModal] = useState(false);
@@ -28,7 +28,7 @@ export default function DatoSobraLocal({ juego, onVolver, onExit, onAbrirAyuda }
     if (new Set(limpios.map((n) => n.toLowerCase())).size !== limpios.length) return setError('Hay nombres repetidos.');
     setError(''); setCargando(true);
     try {
-      const d = await (await fetch(`/api/datosobra/local?n=${config.rondas}`)).json();
+      const d = await (await fetch(`/api/datosobra/local?n=${config.rondas}&j=${nombres.length}`)).json();
       estRef.current = E.crearPartida(limpios.map((nombre, i) => ({ id: i + 1, nombre })), d.items, { ...config, sinReloj: true }, Date.now());
       setPaso('juego');
     } catch {
@@ -91,7 +91,7 @@ export default function DatoSobraLocal({ juego, onVolver, onExit, onAbrirAyuda }
       const nombre = v.jugadores.find((j) => j.id === quien).nombre;
       const turno = v.jugadores.find((j) => j.id === est.turno).nombre;
       return envoltorio(
-        <TurnoDe v={v} id={quien} puedo onListo={() => setConfirmado(clave)} boton={`Soy ${nombre}`}
+        <TurnoDe juego={juego} onSalir={() => setModal(true)} v={v} id={quien} puedo onListo={() => setConfirmado(clave)} boton={`Soy ${nombre}`}
           texto={est.fase === 'responder' ? `Pásale el móvil: tiene que encontrar la mentira sobre ${v.futbolista}.`
             : `Pásale el móvil: decide en secreto si acepta la respuesta de ${turno} o la desafía.`} />
       );

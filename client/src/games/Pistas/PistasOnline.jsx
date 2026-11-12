@@ -4,6 +4,8 @@ import Icon from '../../components/Icon.jsx';
 import './Pistas.css';
 import { MenuInicioJuego, MenuModoOnline, FormCrearSala, FormUnirseSala, CabeceraSala, ListaSala, EsperandoAnfitrion } from '../../components/MenuJuego.jsx';
 import { limitesOnline, textoSala } from '../limites.js';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto } from '../rondas.js';
 
 const LIM_ON = limitesOnline('pistas');
 
@@ -13,6 +15,7 @@ const colorJugador = (id) => COLORES_JUGADOR[(Number(id) - 1 + COLORES_JUGADOR.l
 const inicial = (n = '?') => n.trim().charAt(0).toUpperCase() || '?';
 
 export default function PistasOnline({ onLocal, onSalir }) {
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('pistas'));
   const [vista, setVista] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
   const [nombre, setNombre] = useState('');
   const [codigoInput, setCodigoInput] = useState('');
@@ -186,7 +189,7 @@ export default function PistasOnline({ onLocal, onSalir }) {
       await fetch(`/api/pistas/online/sala/${sesion.code}/iniciar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion.token })
+        body: JSON.stringify({ token: sesion.token, rondas: rondasSel })
       });
     } catch (err) {
       setErrorMsg(err.message);
@@ -397,6 +400,11 @@ export default function PistasOnline({ onLocal, onSalir }) {
             )}
           />
 
+          {esAdmin && sala.modo !== 'supervivencia' && (
+            <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
+              <SelectorRondas juegoId="pistas" valor={rondasSel} onCambiar={setRondasSel} />
+            </div>
+          )}
           {esAdmin ? (
             <div style={{ marginTop: '1.2rem' }}>
               <button
@@ -465,7 +473,7 @@ export default function PistasOnline({ onLocal, onSalir }) {
                 <span>Portada</span>
               </button>
               <div className="ptp-hero-chips">
-                <span className="ptp-chip"><Icon name="flagFinish" size={14} /> Ronda {sala.rondaNum}</span>
+                <span className="ptp-chip"><Icon name="flagFinish" size={14} /> Ronda {sala.rondaNum}{sala.maxRondas ? `/${sala.maxRondas}` : ''}</span>
                 <span className="ptp-chip">
                   {sala.modo === 'estandar'
                     ? `Pista ${ronda.pistasReveladas}/6 · +${6 - ronda.pistasReveladas + 1} pts`
@@ -659,7 +667,7 @@ export default function PistasOnline({ onLocal, onSalir }) {
             {esAdmin ? (
               <>
                 <button type="button" className="ptp-boton grande" onClick={handleSiguienteRonda}>
-                  <Icon name="play" size={20} /> Siguiente ronda ({sala.rondaNum + 1})
+                  <Icon name="play" size={20} /> {sala.maxRondas && sala.rondaNum >= sala.maxRondas ? 'Ver resultado final' : `Siguiente ronda (${sala.rondaNum + 1})`}
                 </button>
                 <button type="button" className="ptp-enlace" onClick={handleFinalizarPartida}>
                   <Icon name="trophy" size={16} /> Finalizar partida

@@ -7,7 +7,7 @@
 // con su reloj, sin ver lo que han dicho los demás).
 
 export const AJUSTES = { min: 1, max: 12, segRonda: 45 };
-export const OPCIONES_RONDAS = [10, 20, 30];
+export const OPCIONES_RONDAS = [10, 15, 20];
 
 // ---------------------------------------------------------------- Respuestas
 const normalizar = (t) => String(t ?? '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]/g, '');

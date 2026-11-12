@@ -16,6 +16,8 @@ import {
 } from './ImpostorLocal.jsx';
 import { limitesOnline, textoSala } from '../limites.js';
 import { ChipJugadores } from '../../components/MenuJuego.jsx';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto } from '../rondas.js';
 
 const LIM_ON = limitesOnline('impostor');
 
@@ -39,6 +41,7 @@ export default function ImpostorOnline({
   onSalir,
   onAbrirAyuda
 }) {
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('impostor'));
   const navigate = useNavigate();
   const [vista, setVista] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
   const [nombre, setNombre] = useState('');
@@ -220,7 +223,7 @@ export default function ImpostorOnline({
       await fetch(`/api/impostor/online/sala/${sesion.code}/iniciar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token: sesion.token, modo: modoElegido })
+        body: JSON.stringify({ token: sesion.token, modo: modoElegido, ...(sala?.estado === 'lobby' ? { rondas: rondasSel } : {}) })
       });
     } catch (err) {
       setErrorMsg(err.message);
@@ -635,6 +638,11 @@ export default function ImpostorOnline({
             )}
           </div>
 
+          {esAdmin && (
+            <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
+              <SelectorRondas juegoId="impostor" valor={rondasSel} onCambiar={setRondasSel} numJugadores={sala.jugadores.length} />
+            </div>
+          )}
           {esAdmin ? (
             <button
               type="button"
@@ -676,7 +684,7 @@ export default function ImpostorOnline({
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
             categoria={{ nombre: infoModoActual.nombre, icono: infoModoActual.icono }}
-            etiqueta={`Ronda ${sala.rondaActual} · ${esImpostor ? '🎭 Eres el Impostor' : '👤 Eres del Pueblo'}`}
+            etiqueta={`Ronda ${sala.rondaActual} de ${sala.maxRondas} · ${esImpostor ? '🎭 Eres el Impostor' : '👤 Eres del Pueblo'}`}
             titulo={`Empieza: ${sala.nombreInicial}`}
             avatar={
               miJugador ? (
@@ -786,7 +794,7 @@ export default function ImpostorOnline({
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
             categoria={{ nombre: infoModoActual.nombre, icono: infoModoActual.icono }}
-            etiqueta={`Ronda ${sala.rondaActual} · Resolución`}
+            etiqueta={`Ronda ${sala.rondaActual} de ${sala.maxRondas} · Resolución`}
             titulo={esAdmin ? '¿Quién ha ganado?' : 'Resolviendo partida…'}
           />
 
@@ -868,7 +876,7 @@ export default function ImpostorOnline({
         <section className="game qqp-escena">
           <Cabecera
             onSalir={() => setModalSalirPortada(true)}
-            etiqueta={`Ronda ${sala.rondaActual} completada`}
+            etiqueta={`Ronda ${sala.rondaActual} de ${sala.maxRondas} completada`}
             titulo={sala.ganador === 'impostor' ? '¡Victoria del Impostor!' : '¡Victoria del Pueblo!'}
             avatar={
               <span className="qqp-avatar" style={{ '--c': sala.ganador === 'impostor' ? '#ef4444' : '#10b981' }}>
@@ -936,12 +944,20 @@ export default function ImpostorOnline({
           <div className="qqp-barra">
             {esAdmin ? (
               <>
-                <BotonPrincipal onClick={handleSiguientePartida}>
-                  <Icon name="play" size={20} /> Siguiente partida ({infoModoActual.nombre})
-                </BotonPrincipal>
-                <EnlaceSecundario onClick={() => setEligiendoModo(true)}>
-                  Cambiar modo de juego para la siguiente
-                </EnlaceSecundario>
+                {sala.rondaActual >= sala.maxRondas ? (
+                  <BotonPrincipal onClick={handleFinalizarPartida}>
+                    <Icon name="trophy" size={20} /> Ver el podio final
+                  </BotonPrincipal>
+                ) : (
+                  <>
+                    <BotonPrincipal onClick={handleSiguientePartida}>
+                      <Icon name="play" size={20} /> Siguiente ronda ({sala.rondaActual + 1} de {sala.maxRondas})
+                    </BotonPrincipal>
+                    <EnlaceSecundario onClick={() => setEligiendoModo(true)}>
+                      Cambiar modo de juego para la siguiente
+                    </EnlaceSecundario>
+                  </>
+                )}
                 <EnlaceSecundario onClick={handleFinalizarPartida}>
                   Finalizar partida y ver podio 🏆
                 </EnlaceSecundario>

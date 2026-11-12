@@ -3,6 +3,7 @@ import { Router } from 'express';
 import { PISTAS_SEED } from '../data/seeds/pistas/pistas.seed.js';
 import { barajar } from '../lib/barajar.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
+import { totalRondas } from '../../client/src/games/rondas.js';
 const LIM = limitesOnline('pistas');
 
 const router = Router();
@@ -271,6 +272,7 @@ router.get('/online/sala/:code', (req, res) => {
     anfitrionId: anfitrion ? anfitrion.id : null,
     yoId: jugadorActual.id,
     rondaNum: sala.rondaNum,
+    maxRondas: sala.maxRondas || null,
     jugadores: sala.jugadores.map((j) => {
       const bloqueadoReal = sala.ronda ? sala.ronda.bloqueados.includes(j.id) : false;
       const acertoReal = sala.ronda ? sala.ronda.acertados.some((a) => a.jugadorId === j.id) : false;
@@ -316,6 +318,7 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
 
   sala.estado = 'jugando';
   sala.rondaNum = 1;
+  sala.maxRondas = sala.modo === 'supervivencia' ? null : totalRondas('pistas', req.body?.rondas);
   sala.usados = [];
   sala.jugadores.forEach((j) => {
     j.puntos = 0;
@@ -410,6 +413,10 @@ router.post('/online/sala/:code/siguiente-ronda', (req, res) => {
     }
   }
 
+  if (sala.maxRondas && sala.rondaNum >= sala.maxRondas) {
+    sala.estado = 'final';
+    return res.json({ success: true, final: true });
+  }
   sala.rondaNum += 1;
   iniciarNuevaRondaOnline(sala);
   res.json({ success: true });

@@ -8,7 +8,7 @@ import { montarSalas, elegirSinRepetir } from '../lib/salasJuego.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
 
 const router = express.Router();
-const leerConfig = (b, c = { onces: 1, segundos: 180 }) => ({
+const leerConfig = (b, c = { onces: 3, segundos: 180 }) => ({
   onces: E.OPCIONES.onces.includes(Number(b.onces)) ? Number(b.onces) : c.onces,
   segundos: E.OPCIONES.segundos.includes(Number(b.segundos)) ? Number(b.segundos) : c.segundos
 });

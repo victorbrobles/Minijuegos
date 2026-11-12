@@ -95,7 +95,7 @@ export default function MusAvanzadoLocal({ juego, onVolver, onExit, onAbrirAyuda
     const v = E.vistaDe(est, quien);
     if (confirmado !== clave) {
       return envoltorio(
-        <TurnoDe v={v} id={quien} puedo onListo={() => setConfirmado(clave)} boton={`Soy ${v.jugadores.find((j) => j.id === quien).nombre}`}
+        <TurnoDe juego={juego} onSalir={() => setModal(true)} v={v} id={quien} puedo onListo={() => setConfirmado(clave)} boton={`Soy ${v.jugadores.find((j) => j.id === quien).nombre}`}
           texto={est.fase === 'cambio' ? `Pásale el móvil: va a ver sus cartas y cambiar las que quiera para ${E.CATEGORIAS[est.categorias[est.idx]].nombre.toLowerCase()}.` : 'Pásale el móvil: le toca hablar. ¡Que nadie mire sus cartas!'} />
       );
     }

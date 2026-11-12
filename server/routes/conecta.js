@@ -12,6 +12,7 @@ import musica from '../data/seeds/conecta/musica.js';
 import historia from '../data/seeds/conecta/historia.js';
 import * as E from '../conecta/engine.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
+import { totalRondas } from '../../client/src/games/rondas.js';
 const LIM = limitesOnline('conecta');
 
 const router = express.Router();
@@ -144,6 +145,7 @@ function estadoPara(sala, jugador) {
     esAdmin: sala.adminToken === jugador.token,
     yoId: jugador.id,
     rondaActual: sala.rondaActual,
+    maxRondas: sala.maxRondas || totalRondas('conecta', null),
     partida: sala.ronda ? E.vista(sala.ronda, ahora) : null,
     jugadores: sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre, puntos: j.puntos }))
   };
@@ -207,6 +209,7 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
   if (sala.jugadores.length < LIM.min) return res.status(400).json({ error: `Se necesitan al menos ${LIM.min} jugadores.` });
   sala.jugadores.forEach((j) => { j.puntos = 0; });
   sala.rondaActual = 0;
+  sala.maxRondas = totalRondas('conecta', req.body?.rondas);
   sala.ronda = null;
   sala.estado = 'categoria';
   res.json({ success: true });
@@ -268,7 +271,7 @@ router.post('/online/sala/:code/siguiente-ronda', (req, res) => {
   if (!r) return;
   sincronizarPuntos(r.sala);
   r.sala.ronda = null;
-  r.sala.estado = 'categoria';
+  r.sala.estado = r.sala.rondaActual >= (r.sala.maxRondas || Infinity) ? 'final' : 'categoria';
   res.json({ success: true });
 });
 

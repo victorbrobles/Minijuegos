@@ -14,10 +14,10 @@ export function itemDe(f) {
   const afirmaciones = barajar([...f.ciertas, f.falsa]);
   return { nombre: f.nombre, afirmaciones, falsa: afirmaciones.indexOf(f.falsa), porque: f.porque };
 }
-const leerConfig = (b, c = { rondas: 6 }) => ({ rondas: E.OPCIONES.rondas.includes(Number(b.rondas)) ? Number(b.rondas) : c.rondas });
+const leerConfig = (b, c = { rondas: 3 }) => ({ rondas: E.OPCIONES.rondas.includes(Number(b.rondas)) ? Number(b.rondas) : c.rondas });
 
 router.get('/local', (req, res) => {
-  const n = leerConfig({ rondas: req.query.n }).rondas;
+  const n = leerConfig({ rondas: req.query.n }).rondas * Math.max(1, Math.min(20, Number(req.query.j) || 1));
   res.json({ success: true, items: barajar(FUTBOLISTAS).slice(0, n).map(itemDe) });
 });
 
@@ -26,7 +26,7 @@ montarSalas(router, {
   engine: E,
   config: leerConfig({}),
   validarConfig: leerConfig,
-  prepararItems: async (sala) => ({ items: elegirSinRepetir(sala, FUTBOLISTAS, sala.config.rondas, (x) => x.nombre).map(itemDe), reglas: { ...sala.config } }),
+  prepararItems: async (sala) => ({ items: elegirSinRepetir(sala, FUTBOLISTAS, sala.config.rondas * sala.jugadores.length, (x) => x.nombre).map(itemDe), reglas: { ...sala.config } }),
   accion: (M, p, d, { id, esAdmin, ahora }) => {
     const soloAdmin = { ok: false, error: 'Solo el anfitrión.' };
     switch (d.tipo) {

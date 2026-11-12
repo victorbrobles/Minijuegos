@@ -17,7 +17,7 @@ function Escudo({ r, chico = false }) {
   return <span className={`rnp-escudo${chico ? ' chico' : ''}`} style={{ '--c': r.c }}>{r.e}</span>;
 }
 
-function Cabecera({ v, onSalir, titulo, etiqueta }) {
+export function Cabecera({ v, onSalir, titulo, etiqueta }) {
   const yo = v.yo ? reinoDe(v, v.yo.id) : null;
   return (
     <header className="pzp-hero">
@@ -26,8 +26,8 @@ function Cabecera({ v, onSalir, titulo, etiqueta }) {
         <button type="button" className="pzp-salir" onClick={onSalir}><Icon name="door" size={15} /> Salir</button>
         <span className="pzp-chip">👑 Ronda {v.ronda}/{v.rondas}</span>
       </div>
-      <p className="pzp-hero-etiqueta">{etiqueta}</p>
-      <h1 className="pzp-hero-titulo">{titulo}</h1>
+      {etiqueta && <p className="pzp-hero-etiqueta">{etiqueta}</p>}
+      {titulo && <h1 className="pzp-hero-titulo">{titulo}</h1>}
       <div className="pzp-marcador">
         {v.reinos.map((r) => (
           <span key={r.id} className={`pzp-marca${r.id === v.yo?.id ? ' yo' : ''}${r.eliminado || r.fuera ? ' fuera' : ''}`}>

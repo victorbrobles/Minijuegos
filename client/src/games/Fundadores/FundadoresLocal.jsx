@@ -4,7 +4,7 @@
 import React, { useRef, useState } from 'react';
 import Icon from './IconoF.jsx';
 import * as E from './engine.js';
-import { PantallaJuego, PantallaFin, Avatar, Registro } from './Vistas.jsx';
+import { PantallaJuego, PantallaFin, Avatar, Registro, Hero } from './Vistas.jsx';
 import { ModalSalir, SelectorDuracion } from './FundadoresOnline.jsx';
 import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx';
 import './Fundadores.css';
@@ -98,13 +98,15 @@ export default function FundadoresLocal({ onVolver, onExit, onAbrirAyuda }) {
     return (
       <div className="fdp-contenedor qq-en-partida">
         <section className="game fdp-escena">
+          <Hero v={v} onSalir={() => setModal(true)} />
           <div className="fdp-tarjeta fdp-gate">
             <Avatar id={quien.id} nombre={quien.nombre} grande />
-            <p className="fdp-etiqueta centrada">Pasa el móvil · ronda {est.ronda}</p>
-            <h2>Le toca a {quien.nombre}</h2>
+            <p className="fdp-etiqueta centrada">Pasa el móvil a</p>
+            <h2>{quien.nombre}</h2>
             <p className="fdp-texto">{texto}</p>
+          </div>
+          <div className="fdp-barra estatica">
             <button type="button" className="fdp-boton grande" onClick={() => setConfirmado(clave)}><Icon name="eye" size={20} /> Soy {quien.nombre}</button>
-            <button type="button" className="fdp-enlace oscuro" style={{ marginTop: '0.6rem' }} onClick={() => setModal(true)}>Salir de la partida</button>
           </div>
           <Registro v={v} />
         </section>

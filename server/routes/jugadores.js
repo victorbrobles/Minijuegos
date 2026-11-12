@@ -21,7 +21,7 @@ const router = express.Router();
 
 // Modo «un solo dispositivo»: el cliente pide las parejas (con sus respuestas) y juega con el motor copiado.
 router.get('/retos', (req, res) => {
-  const n = E.OPCIONES_RONDAS.includes(Number(req.query.n)) ? Number(req.query.n) : 10;
+  const n = E.OPCIONES_RONDAS.includes(Number(req.query.n)) ? Number(req.query.n) : 15;
   res.json({ success: true, retos: barajar(DUPLAS).slice(0, n) });
 });
 const salas = {};
@@ -81,7 +81,7 @@ router.post('/online/crear', (req, res) => {
   const token = nuevoToken();
   salas[code] = {
     code, adminToken: token, estado: 'lobby', contadorIds: 1, numPartida: 0, puntosAplicados: false,
-    partida: null, ultimaPartida: null, ultimaActividad: Date.now(), config: { rondas: 10 }, usados: new Set(),
+    partida: null, ultimaPartida: null, ultimaActividad: Date.now(), config: { rondas: 15 }, usados: new Set(),
     jugadores: [{ id: 1, token, nombre, puntos: 0, visto: Date.now() }]
   };
   res.json({ success: true, code, token, jugadorId: 1 });

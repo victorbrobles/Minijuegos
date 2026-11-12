@@ -11,7 +11,7 @@ const JUEGO = {
   id: 'oncefantasma',
   api: '/api/oncefantasma',
   emoji: '👻',
-  config: { onces: 1, segundos: 180 },
+  config: { onces: 3, segundos: 180 },
   Local: OnceFantasmaLocal,
   Partida: PartidaOnline,
   Fin,

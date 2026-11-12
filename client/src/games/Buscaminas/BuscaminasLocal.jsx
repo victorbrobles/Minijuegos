@@ -5,9 +5,10 @@ import Icon from '../../components/Icon.jsx';
 import './Buscaminas.css';
 import { centrarActivo } from '../../lib/centrarActivo.js';
 import { limitesLocal } from '../limites.js';
+import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { rondasPorDefecto, totalRondas } from '../rondas.js';
 
 const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('buscaminas');
-const MAX_RONDAS = 10;
 const TOTAL_CORRECTOS = 10;
 const TOTAL_MINAS = 5;
 const TIEMPO_TURNO = 30;
@@ -234,6 +235,8 @@ export default function BuscaminasLocal({ onVolver, onExit, onAbrirAyuda }) {
 
   const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
   const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: `Jugador ${i + 1}` })));
+  const [rondasSel, setRondasSel] = useState(rondasPorDefecto('buscaminas'));
+  const MAX_RONDAS = totalRondas('buscaminas', rondasSel, jugadores.length);
   const [puntos, setPuntos] = useState({});
 
   const [categorias, setCategorias] = useState([]);
@@ -570,6 +573,7 @@ export default function BuscaminasLocal({ onVolver, onExit, onAbrirAyuda }) {
               ))}
             </div>
 
+            <SelectorRondas juegoId="buscaminas" valor={rondasSel} onCambiar={setRondasSel} numJugadores={jugadores.length} />
             <button
               type="button"
               className="big full qq-btn-principal"

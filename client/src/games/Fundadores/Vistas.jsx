@@ -61,7 +61,7 @@ function CartaRol({ rol, onClick, sel = false, estado = '', pie = null }) {
 }
 
 // ---------------------------------------------------------------- Cabecera
-function Hero({ v, onSalir, etiqueta, titulo, clase = '' }) {
+export function Hero({ v, onSalir, etiqueta, titulo, clase = '' }) {
   return (
     <header className={`fdp-hero ${clase}`}>
       <span className="fdp-tejados" aria-hidden="true" />
@@ -73,8 +73,8 @@ function Hero({ v, onSalir, etiqueta, titulo, clase = '' }) {
           <span className="fdp-chip" title="Planos en el mazo"><Icon name="scroll" size={13} /> {v.mazo}</span>
         </div>
       </div>
-      <p className="fdp-hero-etiqueta">{etiqueta}</p>
-      <h1 className="fdp-hero-titulo">{titulo}</h1>
+      {etiqueta && <p className="fdp-hero-etiqueta">{etiqueta}</p>}
+      {titulo && <h1 className="fdp-hero-titulo">{titulo}</h1>}
       <div className="fdp-marcador">
         {v.jugadores.map((j) => {
           const activo = v.turno?.jugadorId === j.id || v.eleccion?.turnoDe === j.id;

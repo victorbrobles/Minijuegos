@@ -5,7 +5,7 @@ import React, { useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import AvisoEfecto from '../../components/AvisoEfecto.jsx';
 import * as E from './engine.js';
-import { PantallaJuego, PantallaFin, Avatar } from './Vistas.jsx';
+import { PantallaJuego, PantallaFin, Avatar, Hero } from './Vistas.jsx';
 import { ModalSalir } from './ColeccionOnline.jsx';
 import { SelectorJugadores } from '../../components/MenuJuego.jsx';
 import './Coleccion.css';
@@ -97,13 +97,15 @@ export default function ColeccionLocal({ onVolver, onExit, onAbrirAyuda }) {
             onVisto={(n) => { E.visto(est, previo, n); setVer((x) => x + 1); }} />
         )}
         <section className="game cxp-escena">
+          <Hero v={v} onSalir={() => setModal(true)} />
           <div className="cxp-tarjeta cxp-gate">
             <Avatar id={quien.id} nombre={quien.nombre} grande />
-            <p className="cxp-etiqueta centrada">Pasa el móvil · ronda {est.ronda}</p>
-            <h2>Le toca a {quien.nombre}</h2>
+            <p className="cxp-etiqueta centrada">Pasa el móvil a</p>
+            <h2>{quien.nombre}</h2>
             <p className="cxp-texto">Su mano y su encargo son secretos: que nadie más mire.</p>
+          </div>
+          <div className="cxp-barra estatica">
             <button type="button" className="cxp-boton grande" onClick={() => setConfirmado(claveTurno)}><Icon name="eye" size={20} /> Soy {quien.nombre}</button>
-            <button type="button" className="cxp-enlace oscuro" style={{ marginTop: '0.6rem' }} onClick={() => setModal(true)}>Salir de la partida</button>
           </div>
           {v.log.length > 0 && (
             <div className="cxp-tarjeta">

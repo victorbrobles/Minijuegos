@@ -23,7 +23,7 @@ export const PUNTOS = Object.fromEntries(LETRAS.map((x) => [x.l, x.pts]));
 const ABECEDARIO = LETRAS.map((x) => x.l);
 
 export const AJUSTES = { min: 3, max: 12, segundosRespuesta: 30 };
-export const OPCIONES_TABLEROS = [3, 5, 7];
+export const OPCIONES_TABLEROS = [1, 3, 5];
 
 const barajar = (arr) => {
   const a = [...arr];
@@ -81,7 +81,7 @@ export function crearPartida(jugadores, config = {}, categorias = []) {
   const lista = jugadores.map((j) => ({ id: j.id, nombre: j.nombre, puntos: 0, aciertos: 0, fuera: false }));
   const p = {
     jugadores: lista,
-    tableros: OPCIONES_TABLEROS.includes(Number(config.tableros)) ? Number(config.tableros) : 5,
+    tableros: OPCIONES_TABLEROS.includes(Number(config.tableros)) ? Number(config.tableros) : 3,
     tablero: 1,
     letras: [...ABECEDARIO],
     fallos: 0,

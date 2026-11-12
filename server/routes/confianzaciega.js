@@ -3,6 +3,7 @@ import express from 'express';
 import CATEGORIAS_NORMALES from '../data/seeds/confianzaciega/categorias.js';
 import CATEGORIAS_PICANTES from '../data/seeds/confianzaciega/personalizadas.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
+import { totalRondas } from '../../client/src/games/rondas.js';
 const LIM = limitesOnline('confianzaciega');
 
 const router = express.Router();
@@ -254,6 +255,7 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
   sala.ordenTurnos = orden;
   sala.indiceTurno = 0;
   sala.rondaActual = 1;
+  sala.maxRondas = totalRondas('confianzaciega', req.body?.rondas, sala.jugadores.length);
 
   prepararTurnoOnline(sala);
   res.json({ success: true });
@@ -305,6 +307,7 @@ router.get('/online/sala/:code', (req, res) => {
     code: sala.code,
     estado: sala.estado,
     rondaActual: sala.rondaActual,
+    maxRondas: sala.maxRondas || totalRondas('confianzaciega', null, sala.jugadores.length),
     usarPicantes: sala.usarPicantes,
     esAdmin,
     yoId: jugadorActual.id,
@@ -426,6 +429,10 @@ router.post('/online/sala/:code/siguiente-ronda', (req, res) => {
   if (!sala) return res.status(404).json({ error: 'La sala no existe.' });
   if (sala.adminToken !== token) return res.status(403).json({ error: 'Solo el anfitrión puede avanzar.' });
 
+  if (sala.rondaActual >= (sala.maxRondas || Infinity)) {
+    sala.estado = 'final';
+    return res.json({ success: true, final: true });
+  }
   sala.indiceTurno = (sala.indiceTurno + 1) % sala.ordenTurnos.length;
   sala.rondaActual += 1;
   prepararTurnoOnline(sala);

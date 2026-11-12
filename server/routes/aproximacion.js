@@ -3,10 +3,12 @@ import { Router } from 'express';
 import { PREGUNTAS } from '../data/seeds/aproximacion/aproximacion.seed.js';
 import { barajar } from '../lib/barajar.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
+import { totalRondas } from '../../client/src/games/rondas.js';
 const LIM = limitesOnline('aproximacion');
 
 const router = Router();
-const MAX_RONDAS = 15;
+// Rondas: las elige el anfitrión al empezar (games/rondas.js)
+const maxRondasDe = (sala) => sala.maxRondas || totalRondas('aproximacion', null, sala.jugadores.length);
 
 // GET /api/aproximacion/preguntas
 router.get('/preguntas', (req, res) => {
@@ -215,7 +217,7 @@ router.get('/online/sala/:code', (req, res) => {
     esAdmin: sala.adminToken === token,
     yoId: jugador.id,
     rondaNum: sala.rondaNum,
-    maxRondas: MAX_RONDAS,
+    maxRondas: maxRondasDe(sala),
     jugadores: sala.jugadores.map((j) => ({ id: j.id, nombre: j.nombre, puntos: j.puntos })),
     ronda: sala.ronda
       ? {
@@ -236,6 +238,7 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
   const sala = salasOnline.get(req.params.code?.toUpperCase());
   if (!sala || sala.adminToken !== req.body?.token) return res.status(403).json({ error: 'No autorizado.' });
   if (sala.jugadores.length < LIM.min) return res.status(400).json({ error: `Se necesitan al menos ${LIM.min} jugadores.` });
+  sala.maxRondas = totalRondas('aproximacion', req.body?.rondas, sala.jugadores.length);
 
   sala.estado = 'jugando';
   sala.rondaNum = 1;
@@ -361,7 +364,7 @@ router.post('/online/sala/:code/siguiente-ronda', (req, res) => {
   const sala = salasOnline.get(req.params.code?.toUpperCase());
   if (!sala || sala.adminToken !== req.body?.token) return res.status(403).json({ error: 'No autorizado.' });
 
-  if (sala.rondaNum >= MAX_RONDAS) {
+  if (sala.rondaNum >= maxRondasDe(sala)) {
     sala.estado = 'final';
   } else {
     sala.rondaNum += 1;

@@ -3,7 +3,7 @@
 // Puntuación: cada jugador suma tantos puntos como kilómetros le separan del lugar.
 // Gana quien MENOS puntos tenga. Si no colocas tu marcador, sumas la penalización.
 export const PENALIZACION_SIN_MARCA = 20000;
-export const OPCIONES_RONDAS = [5, 10, 15];
+export const OPCIONES_RONDAS = [5, 7, 10];
 
 const RADIO_TIERRA_KM = 6371;
 const aRad = (grados) => (grados * Math.PI) / 180;
