@@ -1,5 +1,6 @@
 // client/src/games/CuatroClubes/Vistas.jsx
 // Pantallas de «El club de los cuatro» (online y un solo dispositivo) con el estilo de los juegos renovados.
+import { useRegistrarPartida, resultadoDesdeFin } from '../../lib/registros.js';
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { AJUSTES, OPCIONES_RONDAS } from './engine.js';
@@ -209,6 +210,7 @@ export function PantallaResultado({ v, onSalir, children }) {
 }
 
 export function PantallaFin({ v, onSalir, children }) {
+  useRegistrarPartida('cuatroclubes', resultadoDesdeFin(v));
   const f = v.fin;
   const nombres = f.ganadores.map((id) => v.jugadores.find((j) => j.id === id)?.nombre).filter(Boolean);
   return (

@@ -1,4 +1,7 @@
 // client/src/games/Telepatia/TelepatiaOnline.jsx
+import SalonFama from '../../components/SalonFama.jsx';
+import { useRegistrarPartida, ganadoresPorPuntos } from '../../lib/registros.js';
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
@@ -42,7 +45,7 @@ export default function TelepatiaOnline({
   const [rondasSel, setRondasSel] = useState(rondasPorDefecto('telepatia'));
   const navigate = useNavigate();
   const [vista, setVista] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
-  const [nombre, setNombre] = useState('');
+  const [nombre, setNombre] = useState(nombreIdentidad);
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
@@ -217,6 +220,8 @@ export default function TelepatiaOnline({
 
   const enPartidaActiva = vista === 'sala' && sala && sala.estado !== 'lobby';
 
+  // Salón de la fama: se guarda la partida al llegar a la pantalla final
+  useRegistrarPartida('telepatia', sala?.estado === 'fin' ? ganadoresPorPuntos((sala?.jugadores || []).filter((j) => !j.fuera && !j.abandonado).map((j) => ({ nombre: j.nombre, puntos: j.puntos ?? null }))) : null);
   return (
     <div className={`tel-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
       {/* 1. MENÚ PRINCIPAL */}
@@ -241,6 +246,7 @@ export default function TelepatiaOnline({
             <h1 className="title qq-main-title">{tituloJuego}</h1>
             <ChipJugadores juegoId="telepatia" />
             <p className="hint qq-main-desc">{descripcionJuego}</p>
+            <SalonFama juegoId="telepatia" />
 
             {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
 
@@ -390,7 +396,7 @@ export default function TelepatiaOnline({
                 placeholder="Ej. Alex"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
-                maxLength={15}
+                maxLength={20}
                 autoFocus
               />
               {errorMsg && <p className="error">{errorMsg}</p>}
@@ -461,7 +467,7 @@ export default function TelepatiaOnline({
                 placeholder="Tu nombre"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
-                maxLength={15}
+                maxLength={20}
               />
               {errorMsg && <p className="error">{errorMsg}</p>}
 

@@ -1,5 +1,6 @@
 // client/src/games/Pulsador/PulsadorOnline.jsx
 // Menú online, sala de espera, partida y clasificación de los juegos de pulsador: cada uno con su móvil y su pulsador.
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { PantallaJuego, PantallaResultado, PantallaFin, Avatar, ModalSalir } from './Vistas.jsx';
@@ -31,7 +32,7 @@ export default function PulsadorOnline({ juego, onVolver, onSalir, onAbrirAyuda 
   const API = `${juego.api}/online`;
   const [sesion, setSesion] = useState(() => leerSesion(CLAVE));
   const [menu, setMenu] = useState('menu');
-  const [nombre, setNombre] = useState('');
+  const [nombre, setNombre] = useState(nombreIdentidad);
   const [codigo, setCodigo] = useState('');
   const [errorMenu, setErrorMenu] = useState('');
   const [cargando, setCargando] = useState(false);

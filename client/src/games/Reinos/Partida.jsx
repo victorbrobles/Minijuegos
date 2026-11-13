@@ -1,5 +1,6 @@
 // client/src/games/Reinos/Partida.jsx
 // Pantallas de «Los Siete Reinos» (online y en un dispositivo): órdenes secretas, diplomacia, crónica y final.
+import { useRegistrarPartida, resultadoDesdeFin } from '../../lib/registros.js';
 import React, { useMemo, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import Mapa from './Mapa.jsx';
@@ -399,6 +400,7 @@ export function PartidaOnline({ v, sala, enviar, onSalir }) {
 }
 
 export function Fin({ v, onSalir, children }) {
+  useRegistrarPartida('reinos', (v.fin.tabla || []).filter((t) => !t.fuera).map((t) => ({ nombre: t.jugador || t.nombre, puntos: t.total ?? null, gana: v.fin.ganadores.includes(t.id) })));
   const f = v.fin;
   const g = f.ganadores.map((id) => reinoDe(v, id));
   return (

@@ -1,4 +1,6 @@
 // client/src/games/Lobos/LobosOnline.jsx
+import { useRegistrarPartida } from '../../lib/registros.js';
+import { nombreIdentidad } from '../../lib/identidad.js';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Lobos.css';
@@ -219,7 +221,7 @@ function Espera({ texto, faltan, v, offset, children }) {
 }
 
 function Entrada({ vistaMenu, setVistaMenu, onEntrar, onVolver, onAbrirAyuda, mensajeExterno, limpiarMensajeExterno }) {
-  const [nombre, setNombre] = useState('');
+  const [nombre, setNombre] = useState(nombreIdentidad);
   const [codigo, setCodigo] = useState('');
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
@@ -604,6 +606,8 @@ function InfoNoche({ info }) {
 
 export function VistaJuego({ v, enviar, offset, onAbrirModalSalir }) {
   const e = useMemo(() => vistaAE(v), [v]);
+  // Salón de la fama: se guarda la partida al llegar a la pantalla final
+  useRegistrarPartida('lobos', v.fase === 'fin' && v.fin?.ganador ? (v.jugadores || []).map((j) => ({ nombre: j.nombre, puntos: null, gana: (v.fin.ganador.ids || []).includes(j.id) })) : null);
   const [verRol, setVerRol] = useState(false);
   const [textoEco, setTextoEco] = useState('');
   const m = v.mi;

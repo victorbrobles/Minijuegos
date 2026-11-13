@@ -1,4 +1,7 @@
 // client/src/games/ConfianzaCiega/ConfianzaCiegaOnline.jsx
+import SalonFama from '../../components/SalonFama.jsx';
+import { useRegistrarPartida, ganadoresPorPuntos } from '../../lib/registros.js';
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin, adminHeaders } from '../../lib/admin.js';
@@ -46,7 +49,7 @@ export default function ConfianzaCiegaOnline({
   const esAdminGlobal = useAdmin();
 
   const [vista, setVista] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
-  const [nombre, setNombre] = useState('');
+  const [nombre, setNombre] = useState(nombreIdentidad);
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
@@ -444,6 +447,8 @@ export default function ConfianzaCiegaOnline({
 
   const enPartidaActiva = vista === 'sala' && sala && sala.estado !== 'lobby';
 
+  // Salón de la fama: se guarda la partida al llegar a la pantalla final
+  useRegistrarPartida('confianzaciega', sala?.estado === 'final' ? ganadoresPorPuntos((sala?.jugadores || []).filter((j) => !j.fuera && !j.abandonado).map((j) => ({ nombre: j.nombre, puntos: j.puntos ?? null }))) : null);
   return (
     <div className={`cc-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
       {/* 1. MENÚ PRINCIPAL */}
@@ -468,6 +473,7 @@ export default function ConfianzaCiegaOnline({
             <h1 className="title qq-main-title">{tituloJuego}</h1>
             <ChipJugadores juegoId="confianzaciega" />
             <p className="hint qq-main-desc">{descripcionJuego}</p>
+            <SalonFama juegoId="confianzaciega" />
 
             {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
 

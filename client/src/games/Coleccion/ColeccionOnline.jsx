@@ -1,5 +1,6 @@
 // client/src/games/Coleccion/ColeccionOnline.jsx
 // Menú online, sala de espera, partida y clasificación (el servidor guarda el estado; cada móvil ve solo lo suyo).
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import AvisoEfecto from '../../components/AvisoEfecto.jsx';
@@ -61,7 +62,7 @@ export function ModalSalir({ titulo, texto, onSeguir, onSalir }) {
 export default function ColeccionOnline({ onVolver, onSalir, onAbrirAyuda }) {
   const [sesion, setSesion] = useState(leerSesion);
   const [menu, setMenu] = useState('menu');
-  const [nombre, setNombre] = useState('');
+  const [nombre, setNombre] = useState(nombreIdentidad);
   const [codigo, setCodigo] = useState('');
   const [errorMenu, setErrorMenu] = useState('');
   const [cargando, setCargando] = useState(false);

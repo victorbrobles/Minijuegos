@@ -1,6 +1,7 @@
 // client/src/games/Coleccion/Vistas.jsx
 // Pantallas de «Colecciona con cabeza» (modo online y un solo dispositivo) con el estilo de los juegos renovados.
 // Reciben `v` (vista de un jugador que genera engine.vistaDe) y `enviar(tipo, datos)`.
+import { useRegistrarPartida, resultadoDesdeFin } from '../../lib/registros.js';
 import React, { useEffect, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import InfoCarta from '../../components/InfoCarta.jsx';
@@ -295,6 +296,7 @@ export function PantallaJuego({ v, enviar, onSalir, admin = null }) {
 }
 
 export function PantallaFin({ v, onSalir, children }) {
+  useRegistrarPartida('coleccion', resultadoDesdeFin(v));
   const g = v.jugadores.find((j) => j.id === v.fin.ganadorId);
   return (
     <>

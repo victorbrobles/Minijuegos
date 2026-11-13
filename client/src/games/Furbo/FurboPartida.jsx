@@ -2,6 +2,7 @@
 // Pantalla de partida compartida por el modo local y el online, con el estilo de los juegos renovados:
 // cabecera con degradado (fase, ronda, reloj y marcador), tarjetas blancas, botones en relieve y barra abajo.
 // Recibe la «vista» que prepara el motor del servidor y envía acciones con onAccion.
+import { useRegistrarPartida, ganadoresPorPuntos } from '../../lib/registros.js';
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { FASES_INFO } from './FurboInfo.js';
@@ -644,6 +645,8 @@ export default function FurboPartida({
   const finalizar = () => onAccion({ tipo: 'finalizar' });
 
   const fin = vista.estado === 'fin';
+  // Salón de la fama: se guarda la partida al llegar a la pantalla final
+  useRegistrarPartida('furbo', fin ? ganadoresPorPuntos((jugadores || []).filter((j) => !j.fuera && !j.abandonado).map((j) => ({ nombre: j.nombre, puntos: j.puntos ?? null }))) : null);
   const maximo = Math.max(0, ...jugadores.map((j) => j.puntos));
 
   /* ---------------------------------------------------------- cabecera --- */

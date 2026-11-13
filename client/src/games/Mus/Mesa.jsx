@@ -1,5 +1,6 @@
 // client/src/games/Mus/Mesa.jsx
 // Mesa del Mus (online y contra la máquina): tus cartas abajo, tu pareja arriba y los rivales a los lados.
+import { useRegistrarPartida, resultadoDesdeFin } from '../../lib/registros.js';
 import React, { useEffect, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { Pildoras } from '../Pulsador/Vistas.jsx';
@@ -378,6 +379,7 @@ export function PartidaOnline({ v, sala, enviar, onSalir }) {
 }
 
 export function Fin({ v, onSalir, children }) {
+  useRegistrarPartida('mus', v.jugadores.filter((j) => !j.bot && !j.fuera).map((j) => ({ nombre: j.nombre, puntos: null, gana: (v.fin.ganadores || []).includes(j.id) })));
   const nos = v.yo?.pareja ?? 0;
   const gana = v.fin.ganadora === nos;
   const pareja = (k) => v.jugadores.filter((j) => j.pareja === k).map((j) => j.nombre).join(' y ');

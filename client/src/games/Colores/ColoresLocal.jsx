@@ -1,5 +1,6 @@
 // client/src/games/Colores/ColoresLocal.jsx
 // Modo «un único dispositivo»: cada jugador elige sus colores en secreto y se pasa el móvil.
+import { useRegistrarPartida, ganadoresPorPuntos } from '../../lib/registros.js';
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx';
@@ -127,6 +128,8 @@ export default function ColoresLocal({ onVolver, onExit, onAbrirAyuda }) {
     />
   );
 
+  // Salón de la fama: se guarda la partida al llegar a la pantalla final
+  useRegistrarPartida('colores', fase === 'final' ? ganadoresPorPuntos((conPuntos || []).filter((j) => !j.fuera && !j.abandonado).map((j) => ({ nombre: j.nombre, puntos: j.puntos ?? null }))) : null);
   if (fase === 'setup') {
     return (
       <div className="colores-contenedor">

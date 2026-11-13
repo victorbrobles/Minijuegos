@@ -1,6 +1,7 @@
 // client/src/games/Cuentas/Vistas.jsx
 // Pantallas de «Lleva la cuenta» con el estilo de los juegos renovados.
 // Reciben `v` (vista de un jugador que genera engine.vistaDe) y `enviar(tipo, datos)`.
+import { useRegistrarPartida, resultadoDesdeFin } from '../../lib/registros.js';
 import React, { useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { ACCIONES, AJUSTES } from './engine.js';
@@ -125,6 +126,7 @@ export function PantallaJuego({ v, enviar, onSalir, admin = null }) {
 }
 
 export function PantallaFin({ v, onSalir, children }) {
+  useRegistrarPartida('cuentas', resultadoDesdeFin(v));
   const f = v.fin;
   const g = v.jugadores.find((j) => j.id === f.ganadorId);
   return (

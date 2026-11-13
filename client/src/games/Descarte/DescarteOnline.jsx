@@ -1,5 +1,6 @@
 // client/src/games/Descarte/DescarteOnline.jsx
 // Menú online, sala de espera, partida y clasificación (el servidor guarda el estado y el reloj de cada reto).
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { OPCIONES_TABLEROS } from './engine.js';
@@ -59,7 +60,7 @@ export function SelectorTableros({ valor, onCambiar }) {
 export default function DescarteOnline({ onVolver, onSalir, onAbrirAyuda }) {
   const [sesion, setSesion] = useState(leerSesion);
   const [menu, setMenu] = useState('menu');
-  const [nombre, setNombre] = useState('');
+  const [nombre, setNombre] = useState(nombreIdentidad);
   const [codigo, setCodigo] = useState('');
   const [errorMenu, setErrorMenu] = useState('');
   const [cargando, setCargando] = useState(false);

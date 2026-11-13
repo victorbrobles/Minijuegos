@@ -1,4 +1,7 @@
 // client/src/games/Popular/PopularLocal.jsx
+import { useRegistrarPartida, ganadoresPorPuntos } from '../../lib/registros.js';
+import { RecientesJugadores, ponerReciente } from '../../components/Recientes.jsx';
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
@@ -162,7 +165,7 @@ export default function PopularLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [modalSalirPortada, setModalSalirPortada] = useState(false);
 
   const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
-  const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: '' })));
+  const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: i === 0 ? nombreIdentidad() : '' })));
   const [rondasSel, setRondasSel] = useState(rondasPorDefecto('popular'));
   const MAX_RONDAS = totalRondas('popular', rondasSel, jugadores.length);
   const [puntos, setPuntos] = useState({});
@@ -453,6 +456,8 @@ export default function PopularLocal({ onVolver, onExit, onAbrirAyuda }) {
   const totalDescubiertos = Object.keys(acertados).length;
   const enPartidaActiva = fase !== 'setup';
 
+  // Salón de la fama: se guarda la partida al llegar a la pantalla final
+  useRegistrarPartida('popular', fase === 'final' ? ganadoresPorPuntos((jugadores || []).filter((j) => !j.fuera && !j.abandonado).map((j) => ({ nombre: j.nombre, puntos: j.puntos ?? null }))) : null);
   return (
     <div className={`pop-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
       <Aviso evento={eventoAviso} />
@@ -549,6 +554,7 @@ export default function PopularLocal({ onVolver, onExit, onAbrirAyuda }) {
                 </div>
               ))}
             </div>
+            <RecientesJugadores usados={jugadores.map((j) => j.nombre)} onPoner={(n) => setJugadores((l) => ponerReciente(l, n))} />
 
             <SelectorRondas juegoId="popular" valor={rondasSel} onCambiar={setRondasSel} numJugadores={jugadores.length} />
             <button

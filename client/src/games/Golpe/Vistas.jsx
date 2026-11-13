@@ -1,6 +1,7 @@
 // client/src/games/Golpe/Vistas.jsx
 // Pantallas de «El Golpe» con el estilo de los juegos renovados.
 // Reciben `v` (vista de un jugador que genera engine.vistaDe) y `enviar(tipo, datos)`.
+import { useRegistrarPartida, resultadoDesdeFin } from '../../lib/registros.js';
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { ESCENARIOS, ESTADOS, OBJETIVOS, PUNTOS, AJUSTES } from './engine.js';
@@ -371,6 +372,7 @@ export function PantallaJuego({ v, enviar, onSalir, offset = 0, admin = null }) 
 }
 
 export function PantallaFin({ v, onSalir, children }) {
+  useRegistrarPartida('golpe', resultadoDesdeFin(v));
   const f = v.fin;
   const nombre = (id) => v.jugadores.find((j) => j.id === id)?.nombre ?? '?';
   const top = f.tabla.filter((x) => !x.fuera).slice(0, 3);

@@ -1,5 +1,6 @@
 // client/src/games/Director/Partida.jsx
 // Pantallas de «Director Deportivo» (online y en un dispositivo): formación, mercados con pujas secretas, táctica y liga.
+import { useRegistrarPartida, resultadoDesdeFin } from '../../lib/registros.js';
 import React, { useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { Pildoras, AvisoTurno } from '../Pulsador/Vistas.jsx';
@@ -329,6 +330,7 @@ export function PartidaOnline({ v, sala, enviar, onSalir }) {
 }
 
 export function Fin({ v, onSalir, children }) {
+  useRegistrarPartida('director', resultadoDesdeFin(v));
   const f = v.fin;
   const campeon = clubDe(v, f.campeon);
   return (

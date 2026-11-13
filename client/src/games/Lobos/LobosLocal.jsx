@@ -1,4 +1,5 @@
 // client/src/games/Lobos/LobosLocal.jsx
+import { useRegistrarPartida } from '../../lib/registros.js';
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Lobos.css';
@@ -395,6 +396,8 @@ export default function LobosLocal({ onVolver, onSalir, onExit, onAbrirAyuda }) 
   );
 
   /* 1. SETUP DE JUGADORES */
+  // Salón de la fama: se guarda la partida al llegar a la pantalla final
+  useRegistrarPartida('lobos', fase === 'fin' && e?.ganador ? e.jugadores.map((j) => ({ nombre: j.nombre, puntos: null, gana: (e.ganador.ids || []).includes(j.id) })) : null);
   if (fase === 'setup') {
     return (
       <div className="lb-contenedor">

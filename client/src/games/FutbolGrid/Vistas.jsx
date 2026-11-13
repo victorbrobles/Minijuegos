@@ -1,5 +1,6 @@
 // client/src/games/FutbolGrid/Vistas.jsx
 // Pantallas de «Fútbol en raya» (online y un solo dispositivo) con el estilo de los juegos renovados.
+import { useRegistrarPartida, resultadoDesdeFin } from '../../lib/registros.js';
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { AJUSTES, EQUIPOS } from './engine.js';
@@ -200,6 +201,7 @@ function EsperaRival({ v, fila, col }) {
 }
 
 export function PantallaFin({ v, onSalir, children }) {
+  useRegistrarPartida('futbolgrid', resultadoDesdeFin(v, { gana: (j, vv) => Boolean(vv.fin.ganador) && vv.jugadores.find((x) => x.id === j.id)?.equipo === vv.fin.ganador }));
   const g = v.fin.ganador;
   return (
     <>

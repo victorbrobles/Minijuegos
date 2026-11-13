@@ -1,6 +1,7 @@
 // client/src/games/Descarte/Vistas.jsx
 // Pantallas de «¡Descarta y Elimina!» (online y un solo dispositivo) con el estilo de los juegos renovados.
 // Reciben `v` (vista que genera engine.vistaDe) y `enviar(tipo, datos)`.
+import { useRegistrarPartida, resultadoDesdeFin } from '../../lib/registros.js';
 import React, { useEffect, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { LETRAS, PUNTOS, AJUSTES } from './engine.js';
@@ -368,6 +369,7 @@ export function PantallaTablero({ v, onSalir, children }) {
 }
 
 export function PantallaFin({ v, onSalir, children }) {
+  useRegistrarPartida('descarte', resultadoDesdeFin(v));
   const f = v.fin;
   const nombres = f.ganadores.map((id) => v.jugadores.find((j) => j.id === id)?.nombre).filter(Boolean);
   const top = f.tabla.filter((x) => !x.fuera).slice(0, 3);

@@ -1,4 +1,7 @@
 // client/src/games/QuienMas/QuienMasOnline.jsx
+import SalonFama from '../../components/SalonFama.jsx';
+import { useRegistrarPartida, ganadoresPorPuntos } from '../../lib/registros.js';
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin, adminHeaders } from '../../lib/admin.js';
@@ -47,7 +50,7 @@ export default function QuienMasOnline({
   const esAdminGlobal = useAdmin();
 
   const [vista, setVista] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
-  const [nombre, setNombre] = useState('');
+  const [nombre, setNombre] = useState(nombreIdentidad);
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
@@ -360,6 +363,8 @@ export default function QuienMasOnline({
 
   const enPartidaActiva = vista === 'sala' && sala && sala.estado !== 'lobby';
 
+  // Salón de la fama: se guarda la partida al llegar a la pantalla final
+  useRegistrarPartida('quienmas', sala?.estado === 'ranking' && sala?.quedan === 0 ? ganadoresPorPuntos((sala?.jugadores || []).filter((j) => !j.fuera && !j.abandonado).map((j) => ({ nombre: j.nombre, puntos: j.puntos ?? null }))) : null);
   return (
     <div className={`qm-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
       {/* 1. MENÚ PRINCIPAL */}
@@ -384,6 +389,7 @@ export default function QuienMasOnline({
             <h1 className="title qq-main-title">{tituloJuego}</h1>
             <ChipJugadores juegoId="quienmas" />
             <p className="hint qq-main-desc">{descripcionJuego}</p>
+            <SalonFama juegoId="quienmas" />
 
             {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
 

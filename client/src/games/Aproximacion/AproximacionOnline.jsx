@@ -1,4 +1,7 @@
 // client/src/games/Aproximacion/AproximacionOnline.jsx
+import SalonFama from '../../components/SalonFama.jsx';
+import { useRegistrarPartida, ganadoresPorPuntos } from '../../lib/registros.js';
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
@@ -45,7 +48,7 @@ export default function AproximacionOnline({
   const navigate = useNavigate();
   const [vista, setVista] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
 
-  const [nombre, setNombre] = useState('');
+  const [nombre, setNombre] = useState(nombreIdentidad);
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
@@ -437,6 +440,8 @@ export default function AproximacionOnline({
 
   const enPartidaActiva = vista === 'sala' && sala && sala.estado !== 'lobby';
 
+  // Salón de la fama: se guarda la partida al llegar a la pantalla final
+  useRegistrarPartida('aproximacion', sala?.estado === 'final' ? ganadoresPorPuntos((sala?.jugadores || []).filter((j) => !j.fuera && !j.abandonado).map((j) => ({ nombre: j.nombre, puntos: j.puntos ?? null }))) : null);
   return (
     <div className={`aprox-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
       <Aviso evento={eventoAviso} />
@@ -463,6 +468,7 @@ export default function AproximacionOnline({
             <h1 className="title qq-main-title">{tituloJuego}</h1>
             <ChipJugadores juegoId="aproximacion" />
             <p className="hint qq-main-desc">{descripcionJuego}</p>
+            <SalonFama juegoId="aproximacion" />
 
             {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
 

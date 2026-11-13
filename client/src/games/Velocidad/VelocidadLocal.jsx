@@ -1,4 +1,5 @@
 // client/src/games/Velocidad/VelocidadLocal.jsx
+import { useRegistrarPartida, ganadoresPorPuntos } from '../../lib/registros.js';
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
@@ -291,6 +292,8 @@ export default function VelocidadLocal({ onVolver, onExit }) {
   const ganadores = maximoAciertos > 0 ? ranking.filter((j) => j.aciertos === maximoAciertos) : [];
   const enPartidaActiva = fase === 'cuenta_atras' || fase === 'jugando' || fase === 'resumen_turno';
 
+  // Salón de la fama: se guarda la partida al llegar a la pantalla final
+  useRegistrarPartida('velocidad', fase === 'final' ? ganadoresPorPuntos((jugadores || []).filter((j) => !j.fuera && !j.abandonado).map((j) => ({ nombre: j.nombre, puntos: j.puntos ?? null }))) : null);
   return (
     <div className={`vel-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
       {/* MODAL DE AYUDA */}

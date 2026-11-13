@@ -1,4 +1,6 @@
 // client/src/games/Pistas/PistasOnline.jsx
+import { useRegistrarPartida, ganadoresPorPuntos } from '../../lib/registros.js';
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
 import './Pistas.css';
@@ -17,7 +19,7 @@ const inicial = (n = '?') => n.trim().charAt(0).toUpperCase() || '?';
 export default function PistasOnline({ onLocal, onSalir }) {
   const [rondasSel, setRondasSel] = useState(rondasPorDefecto('pistas'));
   const [vista, setVista] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
-  const [nombre, setNombre] = useState('');
+  const [nombre, setNombre] = useState(nombreIdentidad);
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
@@ -279,6 +281,8 @@ export default function PistasOnline({ onLocal, onSalir }) {
   const maximoPuntos = ranking.length ? (ranking[0].puntos ?? 0) : 0;
   const enPartidaActiva = vista === 'sala' && sala && sala.estado !== 'lobby';
 
+  // Salón de la fama: se guarda la partida al llegar a la pantalla final
+  useRegistrarPartida('pistas', sala?.estado === 'final' ? ganadoresPorPuntos((sala?.jugadores || []).filter((j) => !j.fuera && !j.abandonado).map((j) => ({ nombre: j.nombre, puntos: j.puntos ?? null }))) : null);
   return (
     <div className={`pts-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
       {sinRed && <div className="ptp-sin-red">📶 Reconectando con la sala…</div>}

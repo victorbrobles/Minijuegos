@@ -1,5 +1,6 @@
 // client/src/games/Hipotesis/HipotesisOnline.jsx
 // Menú online, sala de espera, partida y clasificación (el servidor guarda el estado; cada móvil ve solo lo suyo).
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { OPCIONES_RONDAS } from './engine.js';
@@ -59,7 +60,7 @@ export function SelectorRondas({ valor, onCambiar }) {
 export default function HipotesisOnline({ onVolver, onSalir, onAbrirAyuda }) {
   const [sesion, setSesion] = useState(leerSesion);
   const [menu, setMenu] = useState('menu');
-  const [nombre, setNombre] = useState('');
+  const [nombre, setNombre] = useState(nombreIdentidad);
   const [codigo, setCodigo] = useState('');
   const [errorMenu, setErrorMenu] = useState('');
   const [cargando, setCargando] = useState(false);

@@ -1,5 +1,6 @@
 // client/src/games/Ubicacion/UbicacionLocal.jsx
 // Modo «un único dispositivo»: turnos con marcador real y dos señuelos.
+import { useRegistrarPartida, ganadoresPorPuntos } from '../../lib/registros.js';
 import { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx';
@@ -225,6 +226,8 @@ export default function UbicacionLocal({ onVolver, onExit, onAbrirAyuda }) {
   );
 
   // ---------- Configuración ----------
+  // Salón de la fama: se guarda la partida al llegar a la pantalla final
+  useRegistrarPartida('ubicacion', fase === 'final' ? ganadoresPorPuntos((jugadores || []).filter((j) => !j.fuera && !j.abandonado).map((j) => ({ nombre: j.nombre, puntos: j.puntos ?? null }))) : null);
   if (fase === 'setup') {
     return (
       <div className="ub-contenedor">

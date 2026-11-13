@@ -1,5 +1,6 @@
 // client/src/games/Fundadores/FundadoresOnline.jsx
 // Menú online, sala de espera, partida y clasificación (el servidor guarda el estado; cada móvil ve solo lo suyo).
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from './IconoF.jsx';
 import { DURACIONES } from './engine.js';
@@ -62,7 +63,7 @@ export function SelectorDuracion({ valor, onCambiar }) {
 export default function FundadoresOnline({ onVolver, onSalir, onAbrirAyuda }) {
   const [sesion, setSesion] = useState(leerSesion);
   const [menu, setMenu] = useState('menu');
-  const [nombre, setNombre] = useState('');
+  const [nombre, setNombre] = useState(nombreIdentidad);
   const [codigo, setCodigo] = useState('');
   const [errorMenu, setErrorMenu] = useState('');
   const [cargando, setCargando] = useState(false);

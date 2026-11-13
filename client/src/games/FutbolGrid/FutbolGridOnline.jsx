@@ -1,5 +1,6 @@
 // client/src/games/FutbolGrid/FutbolGridOnline.jsx
 // Menú online, sala de espera (con equipos), partida y clasificación. El servidor valida las respuestas.
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { EQUIPOS } from './engine.js';
@@ -36,7 +37,7 @@ export default function FutbolGridOnline({ onVolver, onSalir, onAbrirAyuda }) {
   const [rondasSel, setRondasSel] = useState(rondasPorDefecto('futbolgrid'));
   const [sesion, setSesion] = useState(leerSesion);
   const [menu, setMenu] = useState('menu');
-  const [nombre, setNombre] = useState('');
+  const [nombre, setNombre] = useState(nombreIdentidad);
   const [codigo, setCodigo] = useState('');
   const [errorMenu, setErrorMenu] = useState('');
   const [cargando, setCargando] = useState(false);

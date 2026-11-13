@@ -1,5 +1,6 @@
 // client/src/games/Jugadas/JugadasOnline.jsx
 // Menú online, sala de espera y partida (el servidor lleva el motor de server/lib/jugadasEngine.js).
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import JugadasPartida from './JugadasPartida.jsx';
@@ -36,7 +37,7 @@ export default function JugadasOnline({ onVolver, onSalir, onAbrirAyuda }) {
   const [rondasSel, setRondasSel] = useState(rondasPorDefecto('jugadas'));
   const [sesion, setSesion] = useState(leerSesion);
   const [menu, setMenu] = useState('menu');
-  const [nombre, setNombre] = useState('');
+  const [nombre, setNombre] = useState(nombreIdentidad);
   const [codigo, setCodigo] = useState('');
   const [errorMenu, setErrorMenu] = useState('');
   const [cargando, setCargando] = useState(false);

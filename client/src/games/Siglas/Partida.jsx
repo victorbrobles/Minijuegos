@@ -2,6 +2,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { leerRecord, guardarRecord } from './records.js';
+import { registrarUnJugador } from '../../components/UnJugador.jsx';
 import Icon, { ICONO_CATEGORIA } from '../../components/Icon.jsx';
 import './Siglas.css';
 
@@ -91,6 +92,7 @@ export default function Partida({
     (puntosFinales, datos) => {
       setFinal(datos);
       setFase('fin');
+      registrarUnJugador('siglas', puntosFinales);
       setRecord((r) => {
         if (puntosFinales <= r) {
           setNuevoRecord(false);

@@ -1,6 +1,7 @@
 // client/src/games/Laberinto/Constructores.jsx
 // «El Laberinto · Constructores y corredores»: editor, carrera con niebla y resultados (online y en un dispositivo).
 // Motor en ./constructores.js (copia del servidor).
+import { useRegistrarPartida, resultadoDesdeFin } from '../../lib/registros.js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import * as E from './constructores.js';
@@ -292,6 +293,7 @@ export function PartidaOnline({ v, sala, enviar, offset = 0, onSalir }) {
 }
 
 export function Fin({ v, onSalir, children }) {
+  useRegistrarPartida('laberinto', resultadoDesdeFin(v));
   const f = v.fin;
   const g = f.ganadores.map((id) => nombreDe(v, id));
   return (

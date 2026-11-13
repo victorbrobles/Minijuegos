@@ -1,5 +1,6 @@
 // client/src/games/Trayectoria/TrayectoriaOnline.jsx
 // Menú online, sala de espera, partida y clasificación (el servidor lleva el reloj de cada futbolista).
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { PantallaRonda, PantallaResultado, PantallaFin, Avatar, Pulsador, FormRespuesta, ModalSalir, SelectorRondas, SelectorDificultad } from './Vistas.jsx';
@@ -72,7 +73,7 @@ function RondaOnline({ v, sala, offset, enviar, onSalir, onForzar }) {
 export default function TrayectoriaOnline({ onVolver, onSalir, onAbrirAyuda }) {
   const [sesion, setSesion] = useState(leerSesion);
   const [menu, setMenu] = useState('menu');
-  const [nombre, setNombre] = useState('');
+  const [nombre, setNombre] = useState(nombreIdentidad);
   const [codigo, setCodigo] = useState('');
   const [errorMenu, setErrorMenu] = useState('');
   const [cargando, setCargando] = useState(false);

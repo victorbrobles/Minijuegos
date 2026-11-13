@@ -1,4 +1,7 @@
 // client/src/games/Ciegas/CiegasLocal.jsx
+import { useRegistrarPartida, ganadoresPorPuntos } from '../../lib/registros.js';
+import { RecientesJugadores, ponerReciente } from '../../components/Recientes.jsx';
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
@@ -417,7 +420,7 @@ export default function CiegasLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [modalSalirPortada, setModalSalirPortada] = useState(false);
 
   const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
-  const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: '' })));
+  const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: i === 0 ? nombreIdentidad() : '' })));
   const [puntos, setPuntos] = useState({});
 
   const [categoriaObj, setCategoriaObj] = useState(CATEGORIAS_CIEGAS[0]);
@@ -573,6 +576,8 @@ export default function CiegasLocal({ onVolver, onExit, onAbrirAyuda }) {
   const sumaRondaActual = Object.values(votos).reduce((acc, v) => acc + (Number(v) || 0), 0);
   const enPartidaActiva = fase !== 'setup';
 
+  // Salón de la fama: se guarda la partida al llegar a la pantalla final
+  useRegistrarPartida('ciegas', fase === 'final' ? ganadoresPorPuntos((jugadores || []).filter((j) => !j.fuera && !j.abandonado).map((j) => ({ nombre: j.nombre, puntos: j.puntos ?? null }))) : null);
   return (
     <div className={`ciegas-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
       {/* 1. CONFIGURACIÓN DE JUGADORES */}
@@ -667,6 +672,7 @@ export default function CiegasLocal({ onVolver, onExit, onAbrirAyuda }) {
                 </div>
               ))}
             </div>
+            <RecientesJugadores usados={jugadores.map((j) => j.nombre)} onPoner={(n) => setJugadores((l) => ponerReciente(l, n))} />
 
             <SelectorRondas juegoId="ciegas" valor={rondasSel} onCambiar={setRondasSel} numJugadores={jugadores.length} />
             <button

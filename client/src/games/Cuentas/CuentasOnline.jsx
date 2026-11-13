@@ -1,5 +1,6 @@
 // client/src/games/Cuentas/CuentasOnline.jsx
 // Menú online, sala de espera, partida y clasificación (el servidor guarda el estado; cada móvil ve solo lo suyo).
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import AvisoEfecto from '../../components/AvisoEfecto.jsx';
@@ -52,7 +53,7 @@ export default function CuentasOnline({ onVolver, onSalir, onAbrirAyuda }) {
   const [rondasSel, setRondasSel] = useState(rondasPorDefecto('cuentas'));
   const [sesion, setSesion] = useState(leerSesion);
   const [menu, setMenu] = useState('menu');
-  const [nombre, setNombre] = useState('');
+  const [nombre, setNombre] = useState(nombreIdentidad);
   const [codigo, setCodigo] = useState('');
   const [errorMenu, setErrorMenu] = useState('');
   const [cargando, setCargando] = useState(false);

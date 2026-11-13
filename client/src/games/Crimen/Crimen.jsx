@@ -5,7 +5,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import { PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, leerRecord, guardarRecord, Aviso } from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, leerRecord, guardarRecord, registrarUnJugador, Aviso } from '../../components/UnJugador.jsx';
 import { generarCaso, MUEBLES, NIVELES, COLUMNAS } from './generador.js';
 import './Crimen.css';
 
@@ -20,7 +20,7 @@ export default function Crimen() {
   const [salir, setSalir] = useState(false);
   // Récord (menor tiempo) por nivel
   const record = leerRecord(`${ID}-${nivel}`);
-  const registrar = (valor, extra, op) => guardarRecord(`${ID}-${nivel}`, valor, extra, op);
+  const registrar = (valor, extra, op) => { registrarUnJugador(ID, valor, op); return guardarRecord(`${ID}-${nivel}`, valor, extra, op); };
   const [caso, setCaso] = useState(null);
   const [coloc, setColoc] = useState({}); // persona → celda
   const [tachadas, setTachadas] = useState({}); // celda → true

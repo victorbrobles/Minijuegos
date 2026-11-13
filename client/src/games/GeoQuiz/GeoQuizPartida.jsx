@@ -1,6 +1,7 @@
 // client/src/games/GeoQuiz/GeoQuizPartida.jsx
 // Pantallas de una partida de GeoQuiz (modo local y online). Recibe la «vista» del motor
 // (engine.js) y llama a onAccion(tipo, datos) -> Promise<resultado | { error }>.
+import { useRegistrarPartida, ganadoresPorPuntos } from '../../lib/registros.js';
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { centrarActivo } from '../../lib/centrarActivo.js';
@@ -442,6 +443,8 @@ export default function GeoQuizPartida({ partida, yoId = null, esAdmin, onAccion
   );
 
   // ---------- FIN DE PARTIDA ----------
+  // Salón de la fama: se guarda la partida al llegar a la pantalla final
+  useRegistrarPartida('geoquiz', partida.fase === 'fin' ? ganadoresPorPuntos((partida.jugadores || []).filter((j) => !j.fuera && !j.abandonado).map((j) => ({ nombre: j.nombre, puntos: j.puntos ?? null }))) : null);
   if (partida.fase === 'fin') {
     const ranking = [...partida.jugadores].sort((a, b) => b.puntos - a.puntos || (b.vidas - a.vidas));
     const ganador = supervivencia ? partida.jugadores.find((j) => !j.eliminado) : null;

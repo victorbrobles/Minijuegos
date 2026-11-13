@@ -1,4 +1,5 @@
 // client/src/games/Pistas/PistasLocal.jsx
+import { useRegistrarPartida, ganadoresPorPuntos } from '../../lib/registros.js';
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
@@ -426,6 +427,8 @@ export default function PistasLocal({ onVolver, onExit }) {
   const ganadores = maximo > 0 ? ranking.filter((j) => (puntos[j.id] ?? 0) === maximo) : [];
   const enPartidaActiva = fase === 'jugando' || fase === 'resolucion';
 
+  // Salón de la fama: se guarda la partida al llegar a la pantalla final
+  useRegistrarPartida('pistas', fase === 'final' ? ganadoresPorPuntos((jugadores || []).filter((j) => !j.fuera && !j.abandonado).map((j) => ({ nombre: j.nombre, puntos: j.puntos ?? null }))) : null);
   return (
     <div className={`pts-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
       {/* MODAL DE AYUDA */}

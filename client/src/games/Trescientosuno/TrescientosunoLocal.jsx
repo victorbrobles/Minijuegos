@@ -1,4 +1,7 @@
 // client/src/games/Trescientosuno/TrescientosunoLocal.jsx
+import { useRegistrarPartida } from '../../lib/registros.js';
+import { RecientesJugadores, ponerReciente } from '../../components/Recientes.jsx';
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
@@ -326,7 +329,7 @@ export default function TrescientosunoLocal({ onVolver, onExit, onAbrirAyuda }) 
   const sumadaRef = useRef(0);
 
   const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
-  const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: '', puntos: 0, estado: 'vivo', comodines: ['x2', 'x3', 'x5', 'revelar'] })));
+  const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: i === 0 ? nombreIdentidad() : '', puntos: 0, estado: 'vivo', comodines: ['x2', 'x3', 'x5', 'revelar'] })));
 
   const [equipos, setEquipos] = useState([]);
   const [filtroEquipo, setFiltroEquipo] = useState('');
@@ -647,6 +650,8 @@ export default function TrescientosunoLocal({ onVolver, onExit, onAbrirAyuda }) 
 
   const enPartidaActiva = fase !== 'setup';
 
+  // Salón de la fama: se guarda la partida al llegar a la pantalla final
+  useRegistrarPartida('trescientosuno', fase === 'resultados' ? (jugadores || []).filter((j) => j.nombre).map((j) => ({ nombre: j.nombre, puntos: null, gana: j.estado === 'ganador' })) : null);
   return (
     <div className={`tcu-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
       <Aviso evento={eventoAviso} />
@@ -738,6 +743,7 @@ export default function TrescientosunoLocal({ onVolver, onExit, onAbrirAyuda }) 
                 </div>
               ))}
             </div>
+            <RecientesJugadores usados={jugadores.map((j) => j.nombre)} onPoner={(n) => setJugadores((l) => ponerReciente(l, n))} />
 
             <SelectorRondas juegoId="trescientosuno" valor={rondasSel} onCambiar={setRondasSel} />
             <button

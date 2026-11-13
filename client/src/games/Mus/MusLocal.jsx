@@ -1,5 +1,6 @@
 // client/src/games/Mus/MusLocal.jsx
 // Contra la máquina: tú y tu pareja 🤖 contra dos 🤖. El motor corre en el navegador.
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import * as E from './engine.js';
@@ -9,7 +10,7 @@ import { BloqueConfig } from '../../components/MenuJuego.jsx';
 
 export default function MusLocal({ juego, onVolver, onExit, onAbrirAyuda }) {
   const [paso, setPaso] = useState('config');
-  const [nombre, setNombre] = useState('');
+  const [nombre, setNombre] = useState(nombreIdentidad);
   const [config, setConfig] = useState({ objetivo: 40, vacas: 1 });
   const [modal, setModal] = useState(false);
   const [aviso, setAviso] = useState(null);

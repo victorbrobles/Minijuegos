@@ -1,0 +1,28 @@
+/* client/src/components/Identidad.css — identidad Nombre#1234 (clases idn-) */
+.idn-nt { display: inline-flex; align-items: baseline; gap: 0.05em; min-width: 0; }
+.idn-nt-nombre { font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.idn-nt-tag { font-weight: 600; font-size: 0.78em; opacity: 0.55; }
+
+.idn-fondo { min-height: 100vh; display: grid; place-items: center; padding: 1rem; box-sizing: border-box; }
+.idn-caja { width: 100%; max-width: 420px; padding: 1.6rem 1.3rem; border-radius: 28px; background: #ffffff; color: #0f172a; text-align: center; box-shadow: 0 8px 0 rgba(15, 23, 42, 0.25), 0 24px 40px -16px rgba(15, 23, 42, 0.5); }
+.idn-logo { display: inline-grid; place-items: center; width: 72px; height: 72px; border-radius: 22px; background: linear-gradient(145deg, #8b5cf6, #6366f1); color: #ffffff; }
+.idn-caja h1 { margin: 0.7rem 0 0.3rem; font-size: 1.7rem; color: #0f172a; }
+.idn-caja > p { margin: 0 0 1rem; color: #475569; font-weight: 600; }
+.idn-seguir { display: flex; align-items: center; justify-content: center; gap: 0.4rem; width: 100%; margin: 0 0 1rem; padding: 0.8rem; border: 3px solid #c7d2fe; border-radius: 16px; background: #eef2ff; color: #3730a3; font: inherit; font-weight: 700; font-size: 1.05rem; cursor: pointer; }
+.idn-campos { display: flex; align-items: flex-end; gap: 0.4rem; }
+.idn-campo { display: grid; gap: 0.2rem; text-align: left; }
+.idn-campo.nombre { flex: 1; min-width: 0; }
+.idn-campo.tag { flex: 0 0 5.2rem; }
+.idn-campo span { font-size: 0.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; }
+.idn-campo input { width: 100%; box-sizing: border-box; padding: 0.75rem 0.8rem; border: 3px solid #e2e8f0; border-radius: 14px; background: #ffffff; color: #0f172a; font: inherit; font-size: 1.1rem; font-weight: 800; outline: none; }
+.idn-campo input:focus { border-color: #8b5cf6; }
+.idn-campo.tag input { text-align: center; letter-spacing: 0.08em; }
+.idn-almohadilla { padding-bottom: 0.8rem; font-size: 1.4rem; font-weight: 900; color: #94a3b8; }
+.idn-dado { flex: none; display: grid; place-items: center; width: 2.9rem; height: 2.9rem; margin-bottom: 0.1rem; border: none; border-radius: 14px; background: #f1f5f9; color: #475569; cursor: pointer; }
+.idn-vista { margin: 0.8rem 0 0; color: #475569; font-weight: 600; }
+.idn-error { margin: 0.6rem 0 0; color: #dc2626; font-weight: 800; }
+.idn-caja .qq-btn-principal { margin-top: 1rem; }
+
+.idn-chip { display: inline-flex; align-items: center; gap: 0.45rem; max-width: 100%; padding: 0.35rem 0.4rem 0.35rem 0.75rem; border-radius: 999px; background: rgba(255, 255, 255, 0.18); color: #ffffff; font-size: 0.95rem; }
+.idn-chip button { padding: 0.25rem 0.6rem; border: none; border-radius: 999px; background: rgba(255, 255, 255, 0.25); color: #ffffff; font: inherit; font-size: 0.78rem; font-weight: 800; cursor: pointer; }
+.hub-yo { position: relative; margin: 0.2rem 0 0.7rem; }

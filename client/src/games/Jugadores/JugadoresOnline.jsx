@@ -1,5 +1,6 @@
 // client/src/games/Jugadores/JugadoresOnline.jsx
 // Menú online, sala de espera, partida y clasificación. El anfitrión hace de juez cuando una respuesta no está en la lista.
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { PantallaRonda, PantallaResultado, PantallaFin, Avatar, Pulsador, FormRespuesta, Revision, ModalSalir, SelectorRondas } from './Vistas.jsx';
@@ -71,7 +72,7 @@ function RondaOnline({ v, sala, offset, enviar, onSalir, onForzar }) {
 export default function JugadoresOnline({ onVolver, onSalir, onAbrirAyuda }) {
   const [sesion, setSesion] = useState(leerSesion);
   const [menu, setMenu] = useState('menu');
-  const [nombre, setNombre] = useState('');
+  const [nombre, setNombre] = useState(nombreIdentidad);
   const [codigo, setCodigo] = useState('');
   const [errorMenu, setErrorMenu] = useState('');
   const [cargando, setCargando] = useState(false);

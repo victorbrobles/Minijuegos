@@ -1,4 +1,6 @@
 // client/src/games/Velocidad/VelocidadOnline.jsx
+import { useRegistrarPartida, ganadoresPorPuntos } from '../../lib/registros.js';
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Icon from '../../components/Icon.jsx';
 import './Velocidad.css';
@@ -25,7 +27,7 @@ const inicial = (n = '?') => n.trim().charAt(0).toUpperCase() || '?';
 export default function VelocidadOnline({ onLocal }) {
   const [rondasSel, setRondasSel] = useState(rondasPorDefecto('velocidad'));
   const [vista, setVista] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
-  const [nombre, setNombre] = useState('');
+  const [nombre, setNombre] = useState(nombreIdentidad);
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
@@ -411,6 +413,8 @@ export default function VelocidadOnline({ onLocal }) {
   const aciertosMostrados = esMiTurno ? aciertosActuales : (sala?.progresoEnVivo?.aciertos ?? 0);
   const enEspecialActual = esMiTurno ? mostrandoEspecial : Boolean(sala?.progresoEnVivo?.mostrandoEspecial);
 
+  // Salón de la fama: se guarda la partida al llegar a la pantalla final
+  useRegistrarPartida('velocidad', sala?.estado === 'final' ? ganadoresPorPuntos((sala?.jugadores || []).filter((j) => !j.fuera && !j.abandonado).map((j) => ({ nombre: j.nombre, puntos: j.puntos ?? null }))) : null);
   return (
     <div className={`vel-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
       {sinRed && <div className="ptp-sin-red">📶 Reconectando con la sala…</div>}

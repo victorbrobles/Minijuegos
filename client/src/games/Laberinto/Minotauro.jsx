@@ -1,5 +1,6 @@
 // client/src/games/Laberinto/Minotauro.jsx
 // «El Laberinto · El Minotauro»: pantallas online y en un dispositivo. Motor en ./minotauro.js (copia del servidor).
+import { useRegistrarPartida, resultadoDesdeFin } from '../../lib/registros.js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import * as E from './minotauro.js';
@@ -184,6 +185,7 @@ export function PartidaOnline({ v, sala, enviar, offset, onSalir }) {
 }
 
 export function Fin({ v, onSalir, children }) {
+  useRegistrarPartida('laberinto', resultadoDesdeFin(v));
   const f = v.fin;
   const mino = v.jugadores.find((j) => j.id === f.minotauro);
   return (

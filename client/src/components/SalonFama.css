@@ -1,0 +1,25 @@
+/* client/src/components/SalonFama.css — salón de la fama de cada juego (clases slf-) */
+.slf { width: 100%; margin: 0.9rem 0 0.2rem; padding: 0.7rem 0.75rem 0.8rem; border-radius: 20px; background: linear-gradient(160deg, #fffbeb 0%, #fef3c7 100%); border: 2px solid #fde68a; text-align: left; box-sizing: border-box; }
+.slf-cab { display: flex; align-items: center; gap: 0.4rem; width: 100%; padding: 0; border: none; background: none; color: #92400e; font: inherit; font-weight: 900; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.04em; cursor: pointer; }
+.slf-flecha { margin-left: auto; font-size: 0.7rem; opacity: 0.7; }
+.slf-bloque { margin-top: 0.65rem; }
+.slf-titulo { display: flex; align-items: center; gap: 0.3rem; margin: 0 0 0.35rem; font-size: 0.78rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em; color: #b45309; }
+.slf-top { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.3rem; }
+.slf-top li { display: flex; align-items: center; gap: 0.45rem; padding: 0.4rem 0.6rem; border-radius: 12px; background: #ffffff; color: #0f172a; min-width: 0; }
+.slf-top li .slf-nombre { flex: 1; min-width: 0; }
+.slf-top li b { font-size: 1.05rem; color: #92400e; }
+.slf-top li small { color: #94a3b8; font-weight: 700; font-size: 0.72rem; }
+.slf-medalla { font-size: 1.1rem; line-height: 1; }
+.slf-dos { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+@media (max-width: 460px) { .slf-dos { grid-template-columns: 1fr; } }
+.slf-podio { display: grid; grid-template-columns: repeat(3, 1fr); align-items: end; gap: 0.3rem; }
+.slf-col { display: flex; flex-direction: column; align-items: center; gap: 0.15rem; min-width: 0; text-align: center; color: #0f172a; }
+.slf-col .slf-nombre { max-width: 100%; font-size: 0.82rem; }
+.slf-col small { font-size: 0.7rem; font-weight: 700; color: #78716c; }
+.slf-base { display: grid; place-items: center; width: 100%; border-radius: 10px 10px 4px 4px; background: #fcd34d; color: #78350f; font-weight: 900; }
+.slf-col.p1 .slf-base { height: 2.4rem; background: #fbbf24; }
+.slf-col.p2 .slf-base { height: 1.7rem; background: #e2e8f0; color: #475569; }
+.slf-col.p3 .slf-base { height: 1.2rem; background: #fdba74; color: #7c2d12; }
+.slf-col.vacia .slf-base { opacity: 0.4; }
+.slf-vacio { margin: 0; font-size: 0.82rem; font-weight: 600; color: #a8a29e; }
+.slf-estreno { display: inline-flex; align-items: center; gap: 0.35rem; margin: 0.7rem 0 0; padding: 0.35rem 0.75rem; border-radius: 999px; background: #fef3c7; color: #92400e; font-size: 0.85rem; font-weight: 700; }

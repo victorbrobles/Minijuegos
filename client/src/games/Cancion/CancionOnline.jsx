@@ -1,6 +1,8 @@
 // client/src/games/Cancion/CancionOnline.jsx
 // Modo online: todos escuchan la misma canción a la vez. El servidor lleva el reloj de la canción
 // y cada móvil se sincroniza con él (posición y volumen).
+import { useRegistrarPartida, ganadoresPorPuntos } from '../../lib/registros.js';
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import {
@@ -28,7 +30,7 @@ export default function CancionOnline({ onVolver, onSalir, onAbrirAyuda }) {
     try { return JSON.parse(sessionStorage.getItem(CLAVE_SESION_CANCION)); } catch { return null; }
   });
   const [vista, setVista] = useState(() => (sesion ? 'sala' : 'online_menu'));
-  const [nombre, setNombre] = useState('');
+  const [nombre, setNombre] = useState(nombreIdentidad);
   const [codigo, setCodigo] = useState('');
   const [rondas, setRondas] = useState(15);
   const [error, setError] = useState('');
@@ -176,6 +178,8 @@ export default function CancionOnline({ onVolver, onSalir, onAbrirAyuda }) {
   };
 
   // ---------- Menús ----------
+  // Salón de la fama: se guarda la partida al llegar a la pantalla final
+  useRegistrarPartida('cancion', sala?.estado === 'final' ? ganadoresPorPuntos((sala?.jugadores || []).filter((j) => !j.fuera && !j.abandonado).map((j) => ({ nombre: j.nombre, puntos: j.puntos ?? null }))) : null);
   if (vista === 'online_menu') {
     return (
       <div className="cancion-contenedor">

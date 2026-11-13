@@ -1,5 +1,6 @@
 // client/src/games/Bingoball/Vistas.jsx
 // Pantallas de «Bingoball» con el estilo de los juegos renovados. Reciben `v` (vista de engine.vistaDe).
+import { useRegistrarPartida, resultadoDesdeFin } from '../../lib/registros.js';
 import React, { useEffect, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { AJUSTES } from './engine.js';
@@ -224,6 +225,7 @@ export function PantallaJuego({ v, enviar, onSalir, offset = 0, admin = null }) 
 }
 
 export function PantallaFin({ v, onSalir, children }) {
+  useRegistrarPartida('bingoball', resultadoDesdeFin(v));
   const f = v.fin;
   const quien = v.jugadores.find((j) => j.id === f.bingoId);
   const top = f.tabla.filter((x) => !x.fuera).slice(0, 3);

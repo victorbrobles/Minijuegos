@@ -1,4 +1,6 @@
 // client/src/games/QuienEsQuien/QuienEsQuienLocal.jsx
+import { RecientesJugadores, ponerReciente } from '../../components/Recientes.jsx';
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin, adminHeaders } from '../../lib/admin.js';
@@ -17,7 +19,7 @@ export default function QuienEsQuienLocal({ onVolver, onExit, onAbrirAyuda }) {
   // 'config' | 'categorias' | 'interturno' | 'turno'
   const [paso, setPaso] = useState('config');
   const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
-  const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: '', tarjeta: null })));
+  const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: i === 0 ? nombreIdentidad() : '', tarjeta: null })));
 
   const [categorias, setCategorias] = useState([]);
   const [categoriaElegida, setCategoriaElegida] = useState(null);
@@ -276,6 +278,7 @@ export default function QuienEsQuienLocal({ onVolver, onExit, onAbrirAyuda }) {
                 </div>
               ))}
             </div>
+            <RecientesJugadores usados={jugadores.map((j) => j.nombre)} onPoner={(n) => setJugadores((l) => ponerReciente(l, n))} />
 
             <button
               type="button"

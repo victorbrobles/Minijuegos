@@ -1,4 +1,5 @@
 // client/src/pages/Home.jsx
+import { ChipIdentidad } from '../components/Identidad.jsx';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GameCard from '../components/GameCard.jsx';
@@ -290,6 +291,7 @@ export default function Home() {
             <p className="hub-sub">¡Elige un minijuego y a jugar!</p>
           </div>
         </div>
+        <div className="hub-yo"><ChipIdentidad /></div>
 
         <div className="hub-search" role="search">
           <Icon name="search" size={22} className="hub-search-icon" />

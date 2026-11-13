@@ -1,6 +1,7 @@
 // client/src/games/Jugadas/JugadasPartida.jsx
 // Pantallas de «¡Qué jugadón!» (online y un solo dispositivo) con el estilo de los juegos renovados.
 // Recibe la vista del motor (server/lib/jugadasEngine.js) y manda acciones con onAccion({ tipo, ... }).
+import { useRegistrarPartida, ganadoresPorPuntos } from '../../lib/registros.js';
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
 import './Jugadas.css';
@@ -272,6 +273,8 @@ export default function JugadasPartida({ vista, viewerId = null, local = false, 
   }, [local, restante, claveTurno, onTiempo]);
 
   const jugadores = vista.jugadores;
+  // Salón de la fama: se guarda la partida al llegar a la pantalla final
+  useRegistrarPartida('jugadas', vista.estado === 'fin' ? ganadoresPorPuntos((jugadores || []).filter((j) => !j.fuera && !j.abandonado).map((j) => ({ nombre: j.nombre, puntos: j.puntos ?? null }))) : null);
   const nombre = (id) => jugadores.find((j) => j.id === id)?.nombre ?? '—';
   const turnoId = vista.estado === 'ronda' && ronda ? (ronda.etapa === 'j1' ? ronda.activoId : ronda.etapa === 'rebote' ? ronda.reboteId : null) : null;
   const actorId = local ? turnoId : viewerId;

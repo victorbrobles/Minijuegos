@@ -1,4 +1,7 @@
 // client/src/games/Conoce/ConoceOnline.jsx
+import SalonFama from '../../components/SalonFama.jsx';
+import { useRegistrarPartida, ganadoresPorPuntos } from '../../lib/registros.js';
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
@@ -47,7 +50,7 @@ export default function ConoceOnline({
   const [rondasSel, setRondasSel] = useState(rondasPorDefecto('conoce'));
   const navigate = useNavigate();
   const [vista, setVista] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
-  const [nombre, setNombre] = useState('');
+  const [nombre, setNombre] = useState(nombreIdentidad);
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
@@ -243,6 +246,8 @@ export default function ConoceOnline({
 
   // Reconstrucción de las respuestas reales de todos para la Pantalla 1 de resultados
   const listaRespuestasReales = [];
+  // Salón de la fama: se guarda la partida al llegar a la pantalla final
+  useRegistrarPartida('conoce', sala?.estado === 'fin' ? ganadoresPorPuntos((sala?.jugadores || []).filter((j) => !j.fuera && !j.abandonado).map((j) => ({ nombre: j.nombre, puntos: j.puntos ?? null }))) : null);
   if (yo && sala?.miRespuesta) {
     listaRespuestasReales.push({
       id: yo.id,
@@ -285,6 +290,7 @@ export default function ConoceOnline({
             <h1 className="title qq-main-title">{tituloJuego}</h1>
             <ChipJugadores juegoId="conoce" />
             <p className="hint qq-main-desc">{descripcionJuego}</p>
+            <SalonFama juegoId="conoce" />
 
             {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
 
@@ -434,7 +440,7 @@ export default function ConoceOnline({
                 placeholder="Ej. Alex"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
-                maxLength={15}
+                maxLength={20}
                 autoFocus
               />
               {errorMsg && <p className="error">{errorMsg}</p>}
@@ -505,7 +511,7 @@ export default function ConoceOnline({
                 placeholder="Tu nombre"
                 value={nombre}
                 onChange={(e) => setNombre(e.target.value)}
-                maxLength={15}
+                maxLength={20}
               />
               {errorMsg && <p className="error">{errorMsg}</p>}
 

@@ -2,6 +2,7 @@
 // Pantallas de «La Hipótesis Ganadora» (las comparten el modo online y el de un solo dispositivo), con el estilo
 // de los juegos renovados: cabecera con degradado, tarjetas blancas, botones en relieve y barra abajo.
 // Reciben `v` (vista de un jugador que genera engine.vistaDe) y `enviar(tipo, datos)`.
+import { useRegistrarPartida, resultadoDesdeFin } from '../../lib/registros.js';
 import React, { useEffect, useMemo, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { VARIANTES, PLANTILLAS, EVENTOS, REACCIONES, AJUSTES, rangoN, evaluar, textoHipotesis } from './engine.js';
@@ -364,6 +365,7 @@ export function PantallaJuego({ v, enviar, onSalir, offset = 0, local = false, a
 }
 
 export function PantallaFin({ v, onSalir, children }) {
+  useRegistrarPartida('hipotesis', resultadoDesdeFin(v));
   const f = v.fin;
   const nombre = (id) => v.jugadores.find((j) => j.id === id)?.nombre ?? '?';
   const top = f.tabla.filter((x) => !x.fuera).slice(0, 3);

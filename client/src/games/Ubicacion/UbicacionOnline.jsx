@@ -1,5 +1,7 @@
 // client/src/games/Ubicacion/UbicacionOnline.jsx
 // Modo online: todos sitúan su marcador a la vez desde su propio móvil.
+import { useRegistrarPartida, ganadoresPorPuntos } from '../../lib/registros.js';
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import {
@@ -26,7 +28,7 @@ const post = (url, body) => fetch(url, {
 });
 
 export default function UbicacionOnline({ onVolver, onSalir, onAbrirAyuda }) {
-  const [nombre, setNombre] = useState('');
+  const [nombre, setNombre] = useState(nombreIdentidad);
   const [codigoInput, setCodigoInput] = useState('');
   const [rondas, setRondas] = useState(7);
   const [errorMsg, setErrorMsg] = useState('');
@@ -166,6 +168,8 @@ export default function UbicacionOnline({ onVolver, onSalir, onAbrirAyuda }) {
   const volverMenu = () => { setErrorMsg(''); setVista('online_menu'); };
 
   // ---------- Menús ----------
+  // Salón de la fama: se guarda la partida al llegar a la pantalla final
+  useRegistrarPartida('ubicacion', sala?.estado === 'final' ? ganadoresPorPuntos((sala?.jugadores || []).filter((j) => !j.fuera && !j.abandonado).map((j) => ({ nombre: j.nombre, puntos: j.puntos ?? null }))) : null);
   if (vista === 'online_menu') {
     return (
       <div className="ub-contenedor">

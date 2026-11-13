@@ -1,4 +1,6 @@
 // client/src/games/QuienEsQuien/QuienEsQuienOnline.jsx
+import SalonFama from '../../components/SalonFama.jsx';
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdmin, adminHeaders } from '../../lib/admin.js';
@@ -23,7 +25,7 @@ export default function QuienEsQuienOnline({
   const [vista, setVista] = useState('menu');
   const [eligiendoCategoria, setEligiendoCategoria] = useState(false);
 
-  const [nombre, setNombre] = useState('');
+  const [nombre, setNombre] = useState(nombreIdentidad);
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
@@ -311,6 +313,7 @@ export default function QuienEsQuienOnline({
             <h1 className="title qq-main-title">{tituloJuego}</h1>
             <ChipJugadores juegoId="quien-es-quien" />
             <p className="hint qq-main-desc">{descripcionJuego}</p>
+            <SalonFama juegoId="quien-es-quien" />
 
             {errorMsg && <p className="error" style={{ margin: '0.8rem 0' }}>{errorMsg}</p>}
 

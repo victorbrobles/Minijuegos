@@ -4,6 +4,8 @@
 // Usan los colores del juego (--g1 / --g2, desde meta.js) y el estilo del resto de la web.
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Icon from './Icon.jsx';
+import { registrarPartida } from '../lib/registros.js';
+import { nombreIdentidad } from '../lib/identidad.js';
 import { PanelMenu, CabeceraJuego } from './MenuJuego.jsx';
 import './UnJugador.css';
 
@@ -35,10 +37,21 @@ export function guardarRecord(juegoId, valor, extra = {}, { menorEsMejor = false
   return mejora;
 }
 
+/**
+ * Salón de la fama de los juegos de un jugador: cada partida terminada se guarda con la identidad de la sesión.
+ * `juegoId` puede llevar un sufijo de nivel («crimen-normal»): se registra en el juego («crimen»).
+ */
+export function registrarUnJugador(juegoId, valor, { menorEsMejor = false } = {}) {
+  const yo = nombreIdentidad();
+  if (!yo || !Number.isFinite(Number(valor))) return;
+  registrarPartida(String(juegoId).split('-')[0], [{ nombre: yo, puntos: Number(valor), gana: true }], { orden: menorEsMejor ? 'asc' : 'desc' });
+}
+
 export function useRecord(juegoId) {
   const [record, setRecord] = useState(() => leerRecord(juegoId));
   const registrar = useCallback((valor, extra, opciones) => {
     const nuevo = guardarRecord(juegoId, valor, extra, opciones);
+    registrarUnJugador(juegoId, valor, opciones);
     setRecord(leerRecord(juegoId));
     return nuevo;
   }, [juegoId]);

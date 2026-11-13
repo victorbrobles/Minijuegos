@@ -3,6 +3,7 @@
 // cabecera con degradado, tarjetas blancas, botones en relieve y barra de acciones abajo.
 // Reciben `v` (la vista del jugador que genera engine.vistaDe), `enviar(tipo, datos)` y
 // `offset` (= hora del servidor − hora del navegador, para que los temporizadores sean exactos).
+import { useRegistrarPartida, resultadoDesdeFin } from '../../lib/registros.js';
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from './IconoT.jsx';
 import { SALAS, SALA, ALAS, ROLES, AJUSTES } from './engine.js';
@@ -634,6 +635,7 @@ const TEXTO_FIN = {
 const CAUSA = { asesinado: 'eliminado', expulsado: 'expulsado', abandono: 'abandonó' };
 
 export function PantallaFin({ v, puntosTotales, offset, onSalir, children }) {
+  useRegistrarPartida('traiciones', resultadoDesdeFin(v, { gana: (j, vv) => (vv.fin.puntos?.[j.id] || 0) > 0 }));
   const f = v.fin;
   const [titulo, sub] = TEXTO_FIN[f.motivo] || ['Fin de la partida', ''];
   const clase = f.ganador === 'leales' ? 'leales' : f.ganador === 'traidores' ? 'traidores' : 'bufon';

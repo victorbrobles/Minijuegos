@@ -1,4 +1,7 @@
 // client/src/games/QuienMas/QuienMasLocal.jsx
+import { useRegistrarPartida, ganadoresPorPuntos } from '../../lib/registros.js';
+import { RecientesJugadores, ponerReciente } from '../../components/Recientes.jsx';
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './QuienMas.css';
@@ -148,7 +151,7 @@ export default function QuienMasLocal({ onVolver, onExit, onAbrirAyuda }) {
 
   // Configuración
   const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
-  const [listaConfig, setListaConfig] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: '' })));
+  const [listaConfig, setListaConfig] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: i === 0 ? nombreIdentidad() : '' })));
   const [rondasSel, setRondasSel] = useState(rondasPorDefecto('quienmas'));
   const [categoria, setCategoria] = useState('normal');
   const [error, setError] = useState('');
@@ -315,6 +318,8 @@ export default function QuienMasLocal({ onVolver, onExit, onAbrirAyuda }) {
   const totalVotaron = Object.keys(votos).length;
   const enPartidaActiva = fase !== 'setup';
 
+  // Salón de la fama: se guarda la partida al llegar a la pantalla final
+  useRegistrarPartida('quienmas', fase === 'ranking' && reserva.length === 0 ? ganadoresPorPuntos((jugadores || []).filter((j) => !j.fuera && !j.abandonado).map((j) => ({ nombre: j.nombre, puntos: j.puntos ?? null }))) : null);
   return (
     <div className={`qm-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
       {/* 1. CONFIGURACIÓN DE JUGADORES */}
@@ -409,6 +414,7 @@ export default function QuienMasLocal({ onVolver, onExit, onAbrirAyuda }) {
                 </div>
               ))}
             </div>
+            <RecientesJugadores usados={listaConfig.map((j) => j.nombre)} onPoner={(n) => setListaConfig((l) => ponerReciente(l, n))} />
 
             {esAdmin && (
               <div className="qq-selector-cantidad-box" style={{ marginTop: '1.2rem' }}>

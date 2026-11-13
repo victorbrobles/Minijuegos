@@ -1,5 +1,6 @@
 // client/src/games/FootballSplit/Vistas.jsx
 // Pantallas de «FrankensFootball» (online y un solo dispositivo) con el estilo de los juegos renovados.
+import { useRegistrarPartida, resultadoDesdeFin } from '../../lib/registros.js';
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { AJUSTES, PARTES, OPCIONES_RONDAS } from './engine.js';
@@ -254,6 +255,7 @@ export function PantallaResultado({ v, onSalir, children }) {
 }
 
 export function PantallaFin({ v, onSalir, children }) {
+  useRegistrarPartida('footballsplit', resultadoDesdeFin(v));
   const f = v.fin;
   const nombres = f.ganadores.map((id) => v.jugadores.find((j) => j.id === id)?.nombre).filter(Boolean);
   return (

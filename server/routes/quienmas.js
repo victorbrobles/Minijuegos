@@ -206,6 +206,7 @@ router.get('/online/sala/:code', (req, res) => {
     success: true,
     code: sala.code,
     estado: sala.estado,
+    quedan: sala.reservaPreguntas?.length ?? 0,
     categoria: sala.categoria,
     esAdmin: esAdminSala,
     yoId: jugadorActual.id,

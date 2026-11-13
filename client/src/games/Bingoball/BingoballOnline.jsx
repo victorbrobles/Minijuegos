@@ -1,5 +1,6 @@
 // client/src/games/Bingoball/BingoballOnline.jsx
 // Menú, sala de espera, partida y clasificación (el servidor lleva el reloj; cada móvil ve solo su cartón).
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { PantallaJuego, PantallaPreparacion, PantallaFin, PantallaTipos, Avatar, ModalSalir } from './Vistas.jsx';
@@ -35,7 +36,7 @@ export default function BingoballOnline({ onSalir, onAbrirAyuda }) {
   const [rondasSel, setRondasSel] = useState(rondasPorDefecto('bingoball'));
   const [sesion, setSesion] = useState(leerSesion);
   const [menu, setMenu] = useState('menu');
-  const [nombre, setNombre] = useState('');
+  const [nombre, setNombre] = useState(nombreIdentidad);
   const [codigo, setCodigo] = useState('');
   const [errorMenu, setErrorMenu] = useState('');
   const [cargando, setCargando] = useState(false);

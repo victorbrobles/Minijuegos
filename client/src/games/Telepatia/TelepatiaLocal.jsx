@@ -1,4 +1,7 @@
 // client/src/games/Telepatia/TelepatiaLocal.jsx
+import { useRegistrarPartida, ganadoresPorPuntos } from '../../lib/registros.js';
+import { RecientesJugadores, ponerReciente } from '../../components/Recientes.jsx';
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
@@ -129,7 +132,7 @@ export default function TelepatiaLocal({ onVolver, onSalir, onExit, onAbrirAyuda
 
   const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
   const [listaConfig, setListaConfig] = useState(
-    Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: '' }))
+    Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: i === 0 ? nombreIdentidad() : '' }))
   );
   const [rondasSel, setRondasSel] = useState(rondasPorDefecto('telepatia'));
   const MAX_RONDAS = totalRondas('telepatia', rondasSel, listaConfig.length);
@@ -269,6 +272,8 @@ export default function TelepatiaLocal({ onVolver, onSalir, onExit, onAbrirAyuda
 
   const enPartidaActiva = paso !== 'setup';
 
+  // Salón de la fama: se guarda la partida al llegar a la pantalla final
+  useRegistrarPartida('telepatia', paso === 'fin' ? ganadoresPorPuntos((jugadores || []).filter((j) => !j.fuera && !j.abandonado).map((j) => ({ nombre: j.nombre, puntos: j.puntos ?? null }))) : null);
   return (
     <div className={`tel-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
       {/* 1. CONFIGURACIÓN DE JUGADORES */}
@@ -363,6 +368,7 @@ export default function TelepatiaLocal({ onVolver, onSalir, onExit, onAbrirAyuda
                 </div>
               ))}
             </div>
+            <RecientesJugadores usados={listaConfig.map((j) => j.nombre)} onPoner={(n) => setListaConfig((l) => ponerReciente(l, n))} />
 
             <SelectorRondas juegoId="telepatia" valor={rondasSel} onCambiar={setRondasSel} numJugadores={listaConfig.length} />
             <button

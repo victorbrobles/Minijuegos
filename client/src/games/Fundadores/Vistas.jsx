@@ -2,6 +2,7 @@
 // Pantallas de «Fundadores» (las comparten el modo online y el de un solo dispositivo), con el estilo de los
 // juegos renovados: cabecera con degradado, tarjetas blancas, botones en relieve y barra de acciones abajo.
 // Reciben `v` (la vista de un jugador que genera engine.vistaDe) y `enviar(tipo, datos)`.
+import { useRegistrarPartida, resultadoDesdeFin } from '../../lib/registros.js';
 import React, { useEffect, useState } from 'react';
 import Icon from './IconoF.jsx';
 import { ROLES, ROL, TIPOS, ORDEN_TIPOS, SINGULARES, AJUSTES, DURACIONES } from './engine.js';
@@ -432,6 +433,7 @@ export function PantallaJuego({ v, enviar, onSalir, admin = null }) {
 
 // ---------------------------------------------------------------- Final
 export function PantallaFin({ v, onSalir, yoId = v.yo?.id, children }) {
+  useRegistrarPartida('fundadores', resultadoDesdeFin(v));
   const f = v.fin;
   const nombre = (id) => v.jugadores.find((j) => j.id === id)?.nombre ?? '?';
   const ganadores = f.ganadores.map(nombre);

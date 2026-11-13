@@ -1,4 +1,7 @@
 // client/src/games/Conecta/ConectaLocal.jsx
+import { useRegistrarPartida, ganadoresPorPuntos } from '../../lib/registros.js';
+import { RecientesJugadores, ponerReciente } from '../../components/Recientes.jsx';
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
@@ -44,7 +47,7 @@ export default function ConectaLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [modalSalirPortada, setModalSalirPortada] = useState(false);
 
   const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
-  const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: '' })));
+  const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: i === 0 ? nombreIdentidad() : '' })));
   const [puntos, setPuntos] = useState({});
   const [rondaActual, setRondaActual] = useState(0);
   const [rondasSel, setRondasSel] = useState(rondasPorDefecto('conecta'));
@@ -159,6 +162,8 @@ export default function ConectaLocal({ onVolver, onExit, onAbrirAyuda }) {
   const ganadores = maximo > 0 ? ranking.filter((j) => (puntos[j.id] ?? 0) === maximo) : [];
   const enPartidaActiva = fase === 'juego';
 
+  // Salón de la fama: se guarda la partida al llegar a la pantalla final
+  useRegistrarPartida('conecta', fase === 'final' ? ganadoresPorPuntos((jugadores || []).filter((j) => !j.fuera && !j.abandonado).map((j) => ({ nombre: j.nombre, puntos: j.puntos ?? null }))) : null);
   return (
     <div className={`cc-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
 
@@ -250,6 +255,7 @@ export default function ConectaLocal({ onVolver, onExit, onAbrirAyuda }) {
                 </div>
               ))}
             </div>
+            <RecientesJugadores usados={jugadores.map((j) => j.nombre)} onPoner={(n) => setJugadores((l) => ponerReciente(l, n))} />
 
             <SelectorRondas juegoId="conecta" valor={rondasSel} onCambiar={setRondasSel} />
             <button

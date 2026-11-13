@@ -1,4 +1,7 @@
 // client/src/games/Rankings/RankingsLocal.jsx
+import { useRegistrarPartida, ganadoresPorPuntos } from '../../lib/registros.js';
+import { RecientesJugadores, ponerReciente } from '../../components/Recientes.jsx';
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
@@ -456,7 +459,7 @@ export default function RankingsLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [errorCarga, setErrorCarga] = useState(false);
 
   const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
-  const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: '' })));
+  const [jugadores, setJugadores] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: i === 0 ? nombreIdentidad() : '' })));
   const [rondasSel, setRondasSel] = useState(rondasPorDefecto('rankings'));
   const MAX_RONDAS = totalRondas('rankings', rondasSel, jugadores.length);
 
@@ -712,6 +715,8 @@ export default function RankingsLocal({ onVolver, onExit, onAbrirAyuda }) {
 
   const enPartidaActiva = paso !== 'setup';
 
+  // Salón de la fama: se guarda la partida al llegar a la pantalla final
+  useRegistrarPartida('rankings', paso === 'fin_partida' ? ganadoresPorPuntos((jugadores || []).filter((j) => !j.fuera && !j.abandonado).map((j) => ({ nombre: j.nombre, puntos: j.puntos ?? null }))) : null);
   if (errorCarga) {
     return (
       <div className="rk-contenedor">
@@ -824,6 +829,7 @@ export default function RankingsLocal({ onVolver, onExit, onAbrirAyuda }) {
                 </div>
               ))}
             </div>
+            <RecientesJugadores usados={jugadores.map((j) => j.nombre)} onPoner={(n) => setJugadores((l) => ponerReciente(l, n))} />
 
             <SelectorRondas juegoId="rankings" valor={rondasSel} onCambiar={setRondasSel} numJugadores={jugadores.length} />
             <button

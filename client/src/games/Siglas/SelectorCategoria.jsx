@@ -1,4 +1,5 @@
 // client/src/games/Siglas/SelectorCategoria.jsx
+import SalonFama from '../../components/SalonFama.jsx';
 import React, { useEffect, useState } from 'react';
 import { leerRecord } from './records.js';
 import Icon, { ICONO_CATEGORIA } from '../../components/Icon.jsx';
@@ -162,6 +163,7 @@ export default function SelectorCategoria({
           />
         </label>
       </header>
+      <SalonFama juegoId="siglas" />
 
       {visibles.length ? (
         <ul className="qqp-categorias">

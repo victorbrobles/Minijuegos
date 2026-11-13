@@ -1,5 +1,6 @@
 // client/src/games/Cancion/CancionLocal.jsx
 // Modo «un único dispositivo»: suena la canción en el móvil, quien la sepa pulsa y elige su nombre.
+import { useRegistrarPartida, ganadoresPorPuntos } from '../../lib/registros.js';
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx';
@@ -210,6 +211,8 @@ export default function CancionLocal({ onVolver, onExit, onAbrirAyuda }) {
     />
   );
 
+  // Salón de la fama: se guarda la partida al llegar a la pantalla final
+  useRegistrarPartida('cancion', fase === 'final' ? ganadoresPorPuntos((jugadores || []).filter((j) => !j.fuera && !j.abandonado).map((j) => ({ nombre: j.nombre, puntos: j.puntos ?? null }))) : null);
   if (fase === 'setup') {
     return (
       <div className="cancion-contenedor">

@@ -724,3 +724,12 @@ body:has(.qq-en-partida) .game-shell > .back {
   background: #ffffff !important;
   box-shadow: 0 0 0 4px var(--qq-anillo) !important;
 }
+
+/* Jugadores recientes (components/Recientes.jsx) */
+.qq-recientes { margin-top: 1rem; text-align: left; }
+.qq-recientes .qq-label-destacado { display: inline-flex; align-items: center; gap: 0.35rem; }
+.qq-recientes-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.45rem; }
+.qq-reciente { padding: 0.4rem 0.75rem; border: 2px solid #e2e8f0; border-radius: 999px; background: #ffffff; color: #0f172a; font: inherit; font-size: 0.92rem; cursor: pointer; transition: border-color 0.15s, transform 0.15s; }
+.qq-reciente:hover:not(:disabled) { border-color: var(--g1, #8b5cf6); transform: translateY(-1px); }
+.qq-reciente:disabled { opacity: 0.45; cursor: default; }
+.qq-recientes-nota { display: block; margin-top: 0.35rem; color: #64748b; font-weight: 600; }

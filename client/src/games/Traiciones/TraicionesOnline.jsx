@@ -1,5 +1,6 @@
 // client/src/games/Traiciones/TraicionesOnline.jsx
 // Menús, sala de espera y partida online de Traiciones (el servidor es la única fuente de verdad).
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from './IconoT.jsx';
 import { OPCIONES_DEBATE, numTraidores } from './engine.js';
@@ -159,7 +160,7 @@ function Podio({ sala, llamar, onSalir }) {
 export default function TraicionesOnline({ onSalir, onAbrirAyuda }) {
   const [sesion, setSesion] = useState(leerSesion);
   const [menu, setMenu] = useState('menu'); // 'menu' | 'crear' | 'unirse'
-  const [nombre, setNombre] = useState('');
+  const [nombre, setNombre] = useState(nombreIdentidad);
   const [codigo, setCodigo] = useState('');
   const [errorMenu, setErrorMenu] = useState('');
   const [cargando, setCargando] = useState(false);

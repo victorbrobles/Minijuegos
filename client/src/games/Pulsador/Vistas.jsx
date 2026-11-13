@@ -1,6 +1,7 @@
 // client/src/games/Pulsador/Vistas.jsx
 // Pantallas comunes de los juegos de pulsador (El paparazzi, Luces, Cámara... ¡Música! y Frases Célebres), online y en
 // un solo dispositivo, con el lenguaje de los juegos renovados. Cada juego cambia colores y textos (ver juegos.js).
+import { useRegistrarPartida, desdeTabla } from '../../lib/registros.js';
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { OPCIONES_RONDAS } from './engine.js';
@@ -474,6 +475,8 @@ function Foto({ src, alt }) {
 
 export function PantallaFin({ v, juego, onSalir, children }) {
   const f = v.fin;
+  // Salón de la fama: se guarda la partida (en las salas online, todos los móviles mandan lo mismo y cuenta una vez)
+  useRegistrarPartida(juego.registro || juego.id, desdeTabla(f.tabla, f.ganadores), { orden: juego.menosEsMejor ? 'asc' : 'desc' });
   const detalle = juego.detalleFin || ((j) => `${j.aciertos} ${j.aciertos === 1 ? 'acierto' : 'aciertos'}`);
   const unidad = juego.unidadPuntos || 'pts';
   const nombres = f.ganadores.map((id) => nombreDe(v, id));

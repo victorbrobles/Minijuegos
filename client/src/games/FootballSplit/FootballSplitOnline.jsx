@@ -1,5 +1,6 @@
 // client/src/games/FootballSplit/FootballSplitOnline.jsx
 // Menú online, sala de espera, partida y clasificación (el servidor guarda el estado y los nombres).
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { PantallaJuego, PantallaResultado, PantallaFin, Avatar, ModalSalir, SelectorRondas } from './Vistas.jsx';
@@ -32,7 +33,7 @@ const post = async (url, body) => {
 export default function FootballSplitOnline({ onVolver, onSalir, onAbrirAyuda }) {
   const [sesion, setSesion] = useState(leerSesion);
   const [menu, setMenu] = useState('menu');
-  const [nombre, setNombre] = useState('');
+  const [nombre, setNombre] = useState(nombreIdentidad);
   const [codigo, setCodigo] = useState('');
   const [errorMenu, setErrorMenu] = useState('');
   const [cargando, setCargando] = useState(false);

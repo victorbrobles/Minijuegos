@@ -1,5 +1,6 @@
 // client/src/games/GeoQuiz/GeoQuizOnline.jsx
 // Modo online: cada jugador desde su móvil. Menús comunes + sala de espera con la configuración.
+import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import {
@@ -25,7 +26,7 @@ const post = async (url, body) => {
 
 export default function GeoQuizOnline({ onLocal, onSalir, onAbrirAyuda }) {
   const [vista, setVista] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
-  const [nombre, setNombre] = useState('');
+  const [nombre, setNombre] = useState(nombreIdentidad);
   const [codigoInput, setCodigoInput] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);

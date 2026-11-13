@@ -3,7 +3,10 @@
 // menú principal (online / un dispositivo), submenú online, crear partida,
 // unirse con código, sala de espera y selector de jugadores del modo local.
 // El título, la descripción, el icono y los colores salen siempre de meta.js.
-import { useState } from 'react';
+import { RecientesJugadores } from './Recientes.jsx';
+import SalonFama from './SalonFama.jsx';
+import { nombreIdentidad } from '../lib/identidad.js';
+import { useEffect, useState } from 'react';
 import Icon from './Icon.jsx';
 import { metaDe } from '../games/meta.js';
 import { LIMITES, limitesLocal, limitesOnline, textoJugadores, rango } from '../games/limites.js';
@@ -71,6 +74,7 @@ function Cabecera({ icono, titulo, descripcion, h1 = false, tamIcono = 40, juego
       <Titulo className="title qq-main-title">{titulo}</Titulo>
       {juegoId && <ChipJugadores juegoId={juegoId} />}
       {descripcion && <p className="hint qq-main-desc">{descripcion}</p>}
+      {juegoId && h1 && <SalonFama juegoId={juegoId} />}
     </>
   );
 }
@@ -160,6 +164,8 @@ export function FormCrearSala({ onVolver, onAyuda, nombre, setNombre, onCrear, c
     e.preventDefault();
     if (!cargando && nombre.trim()) onCrear();
   };
+  // Por defecto, la identidad de la sesión
+  useEffect(() => { if (!nombre && setNombre) setNombre(nombreIdentidad()); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <section className="game qq-pantalla">
       <PanelMenu onVolver={onVolver} onAyuda={onAyuda}>
@@ -200,6 +206,8 @@ export function FormUnirseSala({
     e.preventDefault();
     if (valido) onUnirse();
   };
+  // Por defecto, la identidad de la sesión
+  useEffect(() => { if (!nombre && setNombre) setNombre(nombreIdentidad()); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <section className="game qq-pantalla">
       <PanelMenu onVolver={onVolver} onAyuda={onAyuda}>
@@ -323,6 +331,13 @@ export function SelectorJugadores({
 }) {
   const [errorNom, setErrorNombres] = useState(null);
   const fijo = min === max;
+  // El primer jugador es, por defecto, la identidad de la sesión (Nombre#1234)
+  useEffect(() => {
+    const primero = nombres[0];
+    const vacio = !String(typeof primero === 'object' && primero ? primero.nombre ?? '' : primero ?? '').trim();
+    const yo = nombreIdentidad();
+    if (!sinNombres && nombres.length && vacio && yo && typeof onNombre === 'function') onNombre(0, yo);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <section className="game qq-pantalla">
       <PanelMenu onVolver={onVolver} onAyuda={onAyuda} centrado={false}>
@@ -399,6 +414,10 @@ export function SelectorJugadores({
                 );
               })}
             </div>
+            {typeof onNombre === 'function' && (
+              <RecientesJugadores usados={nombres.slice(0, numJugadores || nombres.length)}
+                onPoner={(n) => { const i = nombres.findIndex((x) => !String(typeof x === 'object' && x ? x.nombre ?? '' : x ?? '').trim()); if (i >= 0) onNombre(i, n); }} />
+            )}
           </>
         )}
 
