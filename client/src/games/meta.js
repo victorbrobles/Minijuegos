@@ -663,14 +663,16 @@ export const META = {
   },
   'escondite': {
     titulo: 'El Escondite',
+    imagen: '/covers/escondite.webp',
     icono: 'eyeoff',
     colores: ['#14b8a6', '#042f2e'],
     etiquetas: 'categorias esconder adivinar farol listas grupo online amigos',
     descripcion: 'Sale una categoría con pocas respuestas posibles. Por turnos, uno se esconde en una de ellas y el resto intenta adivinar cuál ha elegido. Si nadie te encuentra, sumas.',
-    categorias: ['chill', 'estrategia']
+    categorias: ['chill']
   },
   'ponorden': {
     titulo: 'Ponlo en orden',
+    imagen: '/covers/orden.webp',
     icono: 'podium',
     colores: ['#6366f1', '#1e1b4b'],
     etiquetas: 'ordenar cronologia tamaño distancia historia inventos rios peliculas cultura online',
@@ -679,6 +681,7 @@ export const META = {
   },
   'intruso': {
     titulo: 'El Intruso Histórico',
+    imagen: '/covers/intruso.webp',
     icono: 'search',
     colores: ['#ef4444', '#450a0a'],
     etiquetas: 'intruso historia epoca categoria rapidez cultura obras inventos online',
@@ -687,14 +690,16 @@ export const META = {
   },
   'lapiz': {
     titulo: '¡Lápiz fuera!',
+    imagen: '/covers/lapiz.webp',
     icono: 'edit',
     colores: ['#f59e0b', '#431407'],
     etiquetas: 'letra palabras categorias nombre animal pais cosa escribir rapidez stop basta online',
     descripcion: 'Sale una letra y ocho categorías: nombre, animal, país, cosa… Rellénalas antes que nadie y suelta el lápiz. Las respuestas que nadie más ha puesto valen el doble.',
-    categorias: ['chill', 'prueba']
+    categorias: ['chill']
   },
   'fichajes': {
     titulo: 'Fichaje exprés',
+    imagen: '/covers/fichaje.webp',
     icono: 'soccer',
     colores: ['#22c55e', '#052e16'],
     etiquetas: 'futbol futbolistas equipos clubes plantillas racha rapidez 15 segundos online',
@@ -703,6 +708,7 @@ export const META = {
   },
   'eco': {
     titulo: 'Eco Cromático',
+    imagen: '/covers/cromatico.webp',
     icono: 'orb',
     colores: ['#a855f7', '#1e1b4b'],
     etiquetas: 'memoria secuencias colores sonidos luces reflejos un jugador solitario',
@@ -711,6 +717,7 @@ export const META = {
   },
   'crimen': {
     titulo: 'Escena del Crimen',
+    imagen: '/covers/crimen.webp',
     icono: 'detective',
     colores: ['#475569', '#0f172a'],
     etiquetas: 'asesinato deduccion logica puzle sospechosos pistas detective murdoku un jugador solitario',
