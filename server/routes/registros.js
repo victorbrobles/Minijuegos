@@ -38,6 +38,7 @@ const limpiarNombre = (n) => String(n ?? '').replace(/\s+/g, ' ').trim().slice(0
 
 const buscarDuplicada = db.prepare('SELECT id FROM registros_partidas WHERE clave = ? AND fecha > ? LIMIT 1');
 const insertarPartida = db.prepare('INSERT INTO registros_partidas (juego, clave, orden, fecha) VALUES (?, ?, ?, ?)');
+const completarEtiqueta = db.prepare('UPDATE registros_resultados SET jugador = ? WHERE partida = ? AND jugador = ?');
 const insertarResultado = db.prepare('INSERT INTO registros_resultados (partida, juego, jugador, puntos, gana, fecha) VALUES (?, ?, ?, ?, ?, ?)');
 
 /** Guarda una partida (si no estaba ya). Devuelve { guardada: bool }. Exportada para las pruebas. */
@@ -48,8 +49,16 @@ export function guardarPartida({ juego, orden, jugadores }, ahora = Date.now()) 
     .filter((j) => j.nombre)
     .slice(0, 30);
   if (!lista.length) return { error: 'Sin jugadores.' };
-  const clave = `${juego}|${[...lista].sort((a, b) => a.nombre.localeCompare(b.nombre)).map((j) => `${j.nombre}:${j.puntos}:${j.gana}`).join(',')}`;
-  if (buscarDuplicada.get(clave, ahora - VENTANA_DUPLICADO)) return { guardada: false };
+  // La clave usa los nombres SIN etiqueta: en una sala online cada móvil solo conoce la suya y manda
+  // «Ana#1234» y «Luis»; el de Luis manda «Ana» y «Luis#5678». Es la misma partida: se guarda una vez y
+  // se completan las etiquetas que falten.
+  const plano = (n) => n.replace(/#\d{4}$/, '');
+  const clave = `${juego}|${[...lista].sort((a, b) => plano(a.nombre).localeCompare(plano(b.nombre))).map((j) => `${plano(j.nombre).toLowerCase()}:${j.puntos}:${j.gana}`).join(',')}`;
+  const previa = buscarDuplicada.get(clave, ahora - VENTANA_DUPLICADO);
+  if (previa) {
+    lista.filter((j) => /#\d{4}$/.test(j.nombre)).forEach((j) => completarEtiqueta.run(j.nombre, previa.id, plano(j.nombre)));
+    return { guardada: false };
+  }
   db.transaction(() => {
     const { lastInsertRowid: id } = insertarPartida.run(juego, clave, orden === 'asc' ? 'asc' : 'desc', ahora);
     lista.forEach((j) => insertarResultado.run(id, juego, j.nombre, j.puntos, j.gana, ahora));

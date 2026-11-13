@@ -4,6 +4,7 @@ import React from 'react';
 import Icon from './Icon.jsx';
 import { useRecientes } from '../lib/registros.js';
 import { NombreTag } from './Identidad.jsx';
+import { partirNombre, recordarEtiqueta } from '../lib/identidad.js';
 
 const texto = (x) => String(x && typeof x === 'object' ? x.nombre ?? '' : x ?? '').trim();
 
@@ -18,7 +19,9 @@ export function ponerReciente(lista, nombre) {
 export function RecientesJugadores({ usados = [], onPoner }) {
   const recientes = useRecientes();
   const ya = new Set(usados.map((x) => texto(x).toLowerCase()));
-  const lista = recientes.filter((n) => !ya.has(n.toLowerCase()));
+  // En la partida se pone solo el nombre; la etiqueta se recuerda para guardar los resultados
+  const lista = recientes.filter((n) => !ya.has(partirNombre(n).nombre.toLowerCase()));
+  const poner = (n) => { recordarEtiqueta(n); onPoner(partirNombre(n).nombre); };
   const hayHueco = usados.some((x) => !texto(x));
   if (!lista.length) return null;
   return (
@@ -26,7 +29,7 @@ export function RecientesJugadores({ usados = [], onPoner }) {
       <span className="qq-label-destacado"><Icon name="clock" size={14} /> Jugadores recientes</span>
       <div className="qq-recientes-chips">
         {lista.map((n) => (
-          <button key={n} type="button" className="qq-reciente" disabled={!hayHueco} onClick={() => onPoner(n)} title={hayHueco ? `Añadir a ${n}` : 'No quedan huecos: añade un jugador más'}>
+          <button key={n} type="button" className="qq-reciente" disabled={!hayHueco} onClick={() => poner(n)} title={hayHueco ? `Añadir a ${n}` : 'No quedan huecos: añade un jugador más'}>
             <NombreTag texto={n} />
           </button>
         ))}

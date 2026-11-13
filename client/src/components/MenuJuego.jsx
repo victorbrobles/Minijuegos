@@ -6,7 +6,7 @@
 import { RecientesJugadores } from './Recientes.jsx';
 import SalonFama from './SalonFama.jsx';
 import { nombreIdentidad } from '../lib/identidad.js';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Icon from './Icon.jsx';
 import { metaDe } from '../games/meta.js';
 import { LIMITES, limitesLocal, limitesOnline, textoJugadores, rango } from '../games/limites.js';
@@ -160,32 +160,49 @@ export function MenuModoOnline({ onVolver, onCrear, onUnirse, onAyuda, error, lo
 }
 
 export function FormCrearSala({ onVolver, onAyuda, nombre, setNombre, onCrear, cargando, error, descripcion, children, maxLength = 20 }) {
+  // Se juega con el nombre elegido al entrar: sin opciones extra, la sala se crea directamente
+  const yo = nombreIdentidad();
+  const directo = Boolean(yo) && !children;
+  const lanzado = useRef(false);
+  useEffect(() => { if (!nombre && setNombre) setNombre(yo); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (directo && !lanzado.current && nombre?.trim()) { lanzado.current = true; onCrear(); }
+  }, [nombre]); // eslint-disable-line react-hooks/exhaustive-deps
   const enviar = (e) => {
     e.preventDefault();
     if (!cargando && nombre.trim()) onCrear();
   };
-  // Por defecto, la identidad de la sesión
-  useEffect(() => { if (!nombre && setNombre) setNombre(nombreIdentidad()); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  if (directo) {
+    return (
+      <section className="game qq-pantalla">
+        <PanelMenu onVolver={onVolver} onAyuda={onAyuda}>
+          <Cabecera icono="crown" titulo="Crear partida" descripcion={error ? 'No se ha podido crear la sala.' : `Abriendo la sala como ${nombre || yo}…`} />
+          {error && <p className="error">{error}</p>}
+          {error && (
+            <button type="button" className="big full qq-btn-principal" disabled={cargando} onClick={() => onCrear()}>
+              <Icon name="refresh" size={22} strokeWidth={2.5} /> Reintentar
+            </button>
+          )}
+        </PanelMenu>
+      </section>
+    );
+  }
   return (
     <section className="game qq-pantalla">
       <PanelMenu onVolver={onVolver} onAyuda={onAyuda}>
         <Cabecera
           icono="crown"
           titulo="Crear partida"
-          descripcion={descripcion || 'Introduce tu nombre para abrir la sala y ser el anfitrión.'}
+          descripcion={yo ? 'Elige las opciones y abre la sala: serás el anfitrión.' : (descripcion || 'Introduce tu nombre para abrir la sala y ser el anfitrión.')}
         />
         <form className="lb-form qq-form-estilizado" onSubmit={enviar}>
-          <label className="field-label" htmlFor="qq-host-nombre">Tu nombre</label>
-          <input
-            id="qq-host-nombre"
-            className="qq-input-moderno"
-            type="text"
-            placeholder="Ej. Alex"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            maxLength={maxLength}
-            autoFocus
-          />
+          {yo ? <p className="qq-jugaras">Jugarás como <b>{nombre || yo}</b></p> : (
+            <>
+              <label className="field-label" htmlFor="qq-host-nombre">Tu nombre</label>
+              <input id="qq-host-nombre" className="qq-input-moderno" type="text" placeholder="Ej. Alex" value={nombre}
+                onChange={(e) => setNombre(e.target.value)} maxLength={maxLength} autoFocus />
+            </>
+          )}
           {children}
           {error && <p className="error">{error}</p>}
           <button type="submit" className="big full qq-btn-principal" disabled={cargando || !nombre.trim()}>
@@ -214,7 +231,7 @@ export function FormUnirseSala({
         <Cabecera
           icono="users"
           titulo="Unirse a partida"
-          descripcion={descripcion || 'Introduce el código que te ha compartido el anfitrión y tu nombre.'}
+          descripcion={nombreIdentidad() ? 'Introduce el código que te ha compartido el anfitrión.' : (descripcion || 'Introduce el código que te ha compartido el anfitrión y tu nombre.')}
         />
         <form className="lb-form qq-form-estilizado" onSubmit={enviar}>
           <label className="field-label" htmlFor="qq-code-input">Código de la partida</label>
@@ -228,16 +245,13 @@ export function FormUnirseSala({
             maxLength={longitudCodigo}
             autoFocus
           />
-          <label className="field-label" htmlFor="qq-guest-nombre" style={{ marginTop: '1rem' }}>Tu nombre</label>
-          <input
-            id="qq-guest-nombre"
-            className="qq-input-moderno"
-            type="text"
-            placeholder="Tu nombre"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            maxLength={maxLength}
-          />
+          {nombreIdentidad() ? <p className="qq-jugaras">Entrarás como <b>{nombre || nombreIdentidad()}</b></p> : (
+            <>
+              <label className="field-label" htmlFor="qq-guest-nombre" style={{ marginTop: '1rem' }}>Tu nombre</label>
+              <input id="qq-guest-nombre" className="qq-input-moderno" type="text" placeholder="Tu nombre" value={nombre}
+                onChange={(e) => setNombre(e.target.value)} maxLength={maxLength} />
+            </>
+          )}
           {error && <p className="error">{error}</p>}
           <button type="submit" className="big full qq-btn-principal" disabled={!valido}>
             <Icon name="check" size={22} strokeWidth={2.5} /> Entrar en la partida

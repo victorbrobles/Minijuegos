@@ -1,80 +1,107 @@
 // client/src/components/SalonFama.jsx
-// Salón de la fama de un juego (debajo de la cabecera del menú): las 3 mejores puntuaciones de siempre y dos podios
-// de los últimos 30 días, el de quién más ha jugado y el de quién más ha ganado.
+// Salón de la fama de un juego: un botón bajo la cabecera del menú que abre una ventana con las 3 mejores
+// puntuaciones de siempre y los podios de los últimos 30 días (más partidas y, si el juego tiene un ganador claro
+// en partidas online, más victorias).
 import React, { useState } from 'react';
 import Icon from './Icon.jsx';
 import { useSalon } from '../lib/registros.js';
 import { NombreTag } from './Identidad.jsx';
+import { LIMITES } from '../games/limites.js';
+import { metaDe } from '../games/meta.js';
 import './SalonFama.css';
+
+// Juegos sin un ganador claro (por equipos, roles o sin final): sin podio de victorias
+const SIN_GANADOR = new Set(['lobos', 'quien-es-quien', 'traiciones', 'impostor', 'golpe', 'futbolgrid', 'mus', 'laberinto']);
+/** ¿Tiene sentido el podio de victorias? Solo en juegos con competición online y un ganador claro. */
+export function conVictorias(juegoId) {
+  const l = LIMITES[juegoId];
+  const online = l && (l.online ? l.online.max > 1 : l.max > 1);
+  return Boolean(online) && !SIN_GANADOR.has(juegoId);
+}
 
 const MEDALLAS = ['🥇', '🥈', '🥉'];
 const numero = (x) => (Number.isInteger(x) ? x : Math.round(x * 10) / 10).toLocaleString('es-ES');
+const fecha = (t) => new Date(t).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
 
-function Podio({ titulo, icono, filas, unidad }) {
-  // Orden visual: 2.º, 1.º, 3.º
-  const col = [filas[1], filas[0], filas[2]];
+function Podio({ titulo, sub, icono, filas, unidad }) {
+  const col = [filas[1], filas[0], filas[2]]; // 2.º, 1.º, 3.º
   return (
-    <div className="slf-bloque">
-      <p className="slf-titulo"><Icon name={icono} size={14} /> {titulo}</p>
+    <section className="slf-seccion">
+      <h4><span className="slf-ico"><Icon name={icono} size={16} /></span>{titulo}<small>{sub}</small></h4>
       {filas.length ? (
         <div className="slf-podio">
           {col.map((f, k) => {
             const puesto = [1, 0, 2][k];
             return (
               <div key={k} className={`slf-col p${puesto + 1}${f ? '' : ' vacia'}`}>
-                {f ? (
-                  <>
+                {f && (
+                  <div className="slf-quien">
                     <span className="slf-medalla">{MEDALLAS[puesto]}</span>
                     <NombreTag texto={f.jugador} className="slf-nombre" />
                     <small>{numero(f.n)} {f.n === 1 ? unidad[0] : unidad[1]}</small>
-                  </>
-                ) : <span className="slf-medalla">·</span>}
-                <span className="slf-base">{puesto + 1}</span>
+                  </div>
+                )}
+                <span className="slf-peana">{puesto + 1}</span>
               </div>
             );
           })}
         </div>
-      ) : <p className="slf-vacio">Todavía nadie en los últimos 30 días.</p>}
+      ) : <p className="slf-vacio">Nadie todavía en los últimos 30 días.</p>}
+    </section>
+  );
+}
+
+function Ventana({ juegoId, salon, onCerrar }) {
+  const victorias = conVictorias(juegoId);
+  const m = metaDe(juegoId);
+  return (
+    <div className="rg-modal-fondo slf-fondo" onClick={onCerrar}>
+      <div className="rg-modal slf-modal" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Salón de la fama">
+        <header className="slf-modal-cab">
+          <span className="slf-trofeo">🏆</span>
+          <div>
+            <p>Salón de la fama</p>
+            <h3>{m.titulo}</h3>
+          </div>
+          <button type="button" className="slf-cerrar" onClick={onCerrar} aria-label="Cerrar"><Icon name="x" size={18} strokeWidth={2.6} /></button>
+        </header>
+        <div className="slf-modal-cuerpo">
+          {!salon ? <p className="slf-vacio">Cargando…</p> : (
+            <>
+              <section className="slf-seccion">
+                <h4><span className="slf-ico"><Icon name="star" size={16} /></span>Mejores puntuaciones<small>de siempre</small></h4>
+                {salon.top.length ? (
+                  <ol className="slf-top">
+                    {salon.top.map((t, i) => (
+                      <li key={i} className={`t${i + 1}`}>
+                        <span className="slf-medalla">{MEDALLAS[i]}</span>
+                        <span className="slf-top-quien"><NombreTag texto={t.jugador} className="slf-nombre" /><small>{fecha(t.fecha)}</small></span>
+                        <b>{numero(t.puntos)}</b>
+                      </li>
+                    ))}
+                  </ol>
+                ) : <p className="slf-vacio">Aún no hay puntuaciones.</p>}
+              </section>
+              <Podio titulo="Más partidas jugadas" sub="últimos 30 días" icono="gamepad" filas={salon.partidas} unidad={['partida', 'partidas']} />
+              {victorias && <Podio titulo="Más victorias" sub="últimos 30 días" icono="crown" filas={salon.victorias} unidad={['victoria', 'victorias']} />}
+            </>
+          )}
+        </div>
+        <button type="button" className="big full qq-btn-principal slf-ok" onClick={onCerrar}>Cerrar</button>
+      </div>
     </div>
   );
 }
 
 export default function SalonFama({ juegoId }) {
-  const salon = useSalon(juegoId);
-  const [abierto, setAbierto] = useState(true);
-  if (!salon) return null;
-  const hayAlgo = salon.top.length || salon.partidas.length;
-  if (!hayAlgo) {
-    return <p className="slf-estreno"><Icon name="trophy" size={15} /> Aún no hay récords en este juego: ¡sé el primero!</p>;
-  }
+  const [abierto, setAbierto] = useState(false);
+  const salon = useSalon(abierto ? juegoId : null);
   return (
-    <section className="slf">
-      <button type="button" className="slf-cab" onClick={() => setAbierto((x) => !x)} aria-expanded={abierto}>
-        <Icon name="trophy" size={16} /> Salón de la fama <span className="slf-flecha">{abierto ? '▲' : '▼'}</span>
+    <>
+      <button type="button" className="slf-boton" onClick={() => setAbierto(true)}>
+        <span>🏆</span> Salón de la fama
       </button>
-      {abierto && (
-        <>
-          {salon.top.length > 0 && (
-            <div className="slf-bloque">
-              <p className="slf-titulo"><Icon name="star" size={14} /> Mejores puntuaciones de siempre</p>
-              <ol className="slf-top">
-                {salon.top.map((t, i) => (
-                  <li key={i}>
-                    <span className="slf-medalla">{MEDALLAS[i]}</span>
-                    <NombreTag texto={t.jugador} className="slf-nombre" />
-                    <b>{numero(t.puntos)}</b>
-                    <small>{new Date(t.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: '2-digit' })}</small>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          )}
-          <div className="slf-dos">
-            <Podio titulo="Más partidas · 30 días" icono="gamepad" filas={salon.partidas} unidad={['partida', 'partidas']} />
-            <Podio titulo="Más victorias · 30 días" icono="crown" filas={salon.victorias} unidad={['victoria', 'victorias']} />
-          </div>
-        </>
-      )}
-    </section>
+      {abierto && <Ventana juegoId={juegoId} salon={salon} onCerrar={() => setAbierto(false)} />}
+    </>
   );
 }

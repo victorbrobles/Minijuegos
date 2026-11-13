@@ -437,7 +437,7 @@ export default function RapidfireOnline({
                 type="button"
                 className="qq-opcion-card principal"
                 onClick={() => {
-                  setVista('crear');
+                  handleCrear(); // se crea la sala con el nombre elegido al entrar
                   setErrorMsg('');
                 }}
               >
@@ -502,17 +502,7 @@ export default function RapidfireOnline({
             </p>
 
             <div className="lb-form qq-form-estilizado">
-              <label className="field-label" htmlFor="rf-host-nombre">Tu nombre</label>
-              <input
-                id="rf-host-nombre"
-                className="qq-input-moderno"
-                type="text"
-                placeholder="Ej. Alex"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                maxLength={20}
-                autoFocus
-              />
+              <p className="qq-jugaras">Jugarás como <b>{nombre}</b></p>
               {errorMsg && <p className="error">{errorMsg}</p>}
 
               <button
@@ -571,18 +561,7 @@ export default function RapidfireOnline({
                 autoFocus
               />
 
-              <label className="field-label" htmlFor="rf-guest-nombre" style={{ marginTop: '1rem' }}>
-                Tu nombre
-              </label>
-              <input
-                id="rf-guest-nombre"
-                className="qq-input-moderno"
-                type="text"
-                placeholder="Tu nombre"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                maxLength={20}
-              />
+              <p className="qq-jugaras">Jugarás como <b>{nombre}</b></p>
               {errorMsg && <p className="error">{errorMsg}</p>}
 
               <button

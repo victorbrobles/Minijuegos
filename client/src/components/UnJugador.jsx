@@ -5,7 +5,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Icon from './Icon.jsx';
 import { registrarPartida } from '../lib/registros.js';
-import { nombreIdentidad } from '../lib/identidad.js';
+import { nombreCompleto } from '../lib/identidad.js';
 import { PanelMenu, CabeceraJuego } from './MenuJuego.jsx';
 import './UnJugador.css';
 
@@ -42,7 +42,7 @@ export function guardarRecord(juegoId, valor, extra = {}, { menorEsMejor = false
  * `juegoId` puede llevar un sufijo de nivel («crimen-normal»): se registra en el juego («crimen»).
  */
 export function registrarUnJugador(juegoId, valor, { menorEsMejor = false } = {}) {
-  const yo = nombreIdentidad();
+  const yo = nombreCompleto();
   if (!yo || !Number.isFinite(Number(valor))) return;
   registrarPartida(String(juegoId).split('-')[0], [{ nombre: yo, puntos: Number(valor), gana: true }], { orden: menorEsMejor ? 'asc' : 'desc' });
 }

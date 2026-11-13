@@ -22,8 +22,28 @@ const leer = (store, clave) => {
 export const leerIdentidad = () => (typeof sessionStorage === 'undefined' ? null : leer(sessionStorage, SESION));
 export const ultimaIdentidad = () => (typeof localStorage === 'undefined' ? null : leer(localStorage, ULTIMA));
 export const textoIdentidad = (i) => (i ? `${i.nombre}#${i.tag}` : '');
-/** «Ana#1234» de la sesión, o '' si no hay. */
-export const nombreIdentidad = () => textoIdentidad(leerIdentidad());
+/** Nombre visible de la sesión («Ana»), o '' si no hay. Es el que se usa en las partidas. */
+export const nombreIdentidad = () => leerIdentidad()?.nombre || '';
+/** Nombre completo con etiqueta («Ana#1234»): solo para guardar los resultados. */
+export const nombreCompleto = () => textoIdentidad(leerIdentidad());
+
+// Etiquetas conocidas en esta sesión (jugadores elegidos de «recientes»): «pablo» → «Pablo#5678»
+const ETIQUETAS = 'minijuegos_etiquetas';
+const leerEtiquetas = () => { try { return JSON.parse(sessionStorage.getItem(ETIQUETAS)) || {}; } catch { return {}; } };
+/** Recuerda que el nombre visible de `completo` («Pablo#5678») es «Pablo». */
+export function recordarEtiqueta(completo) {
+  const { nombre, tag } = partirNombre(completo);
+  if (!tag) return;
+  try { sessionStorage.setItem(ETIQUETAS, JSON.stringify({ ...leerEtiquetas(), [nombre.toLowerCase()]: completo })); } catch { /* nada */ }
+}
+/** Nombre con el que se guarda un jugador: tu identidad o un reciente conocido llevan su etiqueta. */
+export function etiquetar(nombre) {
+  const n = String(nombre || '').trim();
+  if (!n || partirNombre(n).tag) return n;
+  const yo = leerIdentidad();
+  if (yo && yo.nombre.toLowerCase() === n.toLowerCase()) return textoIdentidad(yo);
+  return leerEtiquetas()[n.toLowerCase()] || n;
+}
 
 export function limpiarNombre(n) {
   return String(n || '').replace(/[#|]/g, '').replace(/\s+/g, ' ').trim().slice(0, MAX_NOMBRE);
