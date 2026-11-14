@@ -12,22 +12,23 @@ import './Crimen.css';
 const ID = 'crimen';
 const mmss = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 
-export default function Crimen() {
+/** `reto` (reto diario): { nivel, semilla, onFin(gana, segundos) } → se juega directamente ese caso. */
+export default function Crimen({ reto } = {}) {
   const navigate = useNavigate();
-  const [fase, setFase] = useState('portada'); // portada | juego | fin
-  const [nivel, setNivel] = useState('normal');
+  const [fase, setFase] = useState(reto ? 'juego' : 'portada'); // portada | juego | fin
+  const [nivel, setNivel] = useState(reto?.nivel || 'normal');
   const [ayuda, setAyuda] = useState(false);
   const [salir, setSalir] = useState(false);
   // Récord (menor tiempo) por nivel
   const record = leerRecord(`${ID}-${nivel}`);
   const registrar = (valor, extra, op) => { registrarUnJugador(ID, valor, op); return guardarRecord(`${ID}-${nivel}`, valor, extra, op); };
-  const [caso, setCaso] = useState(null);
+  const [caso, setCaso] = useState(() => (reto ? generarCaso(reto.nivel, reto.semilla) : null));
   const [coloc, setColoc] = useState({}); // persona → celda
   const [tachadas, setTachadas] = useState({}); // celda → true
   const [modo, setModo] = useState('colocar'); // colocar | tachar
   const [sel, setSel] = useState(1);
   const [pistasHechas, setPistasHechas] = useState({});
-  const [inicio, setInicio] = useState(0);
+  const [inicio, setInicio] = useState(() => Date.now());
   const [, setReloj] = useState(0);
   const [resultado, setResultado] = useState(null); // { gana, segundos, acusado }
   const [aviso, setAviso] = useState({ t: '', k: 0, tipo: 'info' });
@@ -103,6 +104,7 @@ export default function Crimen() {
   const acusarA = (p) => {
     const segundos = Math.round((Date.now() - inicio) / 1000);
     const gana = p === caso.asesino;
+    if (reto) { setAcusar(false); reto.onFin(gana, segundos); return; }
     if (gana) setNuevoRecord(registrar(segundos, {}, { menorEsMejor: true }));
     setResultado({ gana, segundos, acusado: p }); setAcusar(false); setFase('fin');
   };
@@ -158,7 +160,7 @@ export default function Crimen() {
       )}
       <Aviso texto={aviso.t} clave={aviso.k} tipo={aviso.tipo} />
       {ayuda && <AyudaCrimen onCerrar={() => setAyuda(false)} />}
-      {salir && <ConfirmarSalida onSeguir={() => setSalir(false)} onSalir={() => navigate('/')} />}
+      {salir && <ConfirmarSalida onSeguir={() => setSalir(false)} onSalir={() => navigate('/')} texto={reto ? 'Si sales, el reto de hoy contará como fallado.' : undefined} />}
     </div>
   );
 }

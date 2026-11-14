@@ -1,5 +1,6 @@
 // client/src/pages/Home.jsx
 import { ChipIdentidad } from '../components/Identidad.jsx';
+import { BannerReto } from '../reto/Banner.jsx';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GameCard from '../components/GameCard.jsx';
@@ -321,6 +322,8 @@ export default function Home() {
           <p className="hub-count" aria-live="polite">{resultados.length} de {games.length} juegos</p>
         )}
       </header>
+
+      {!hayBusqueda && <BannerReto />}
 
       {error && <p className="error">{error}</p>}
       {cargando && !error && <p className="loading">Cargando juegos…</p>}

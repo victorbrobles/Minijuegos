@@ -9,16 +9,16 @@ export const MUEBLES = {
   mesa: { e: '🍽️', nombre: 'una mesa', bloquea: true },
   planta: { e: '🪴', nombre: 'una planta', bloquea: true },
   estanteria: { e: '📚', nombre: 'una estantería', bloquea: true },
-  silla: { e: '🪑', nombre: 'una silla', sobre: 'sentado en una silla' },
-  alfombra: { e: '🧶', nombre: 'una alfombra', sobre: 'de pie sobre una alfombra' },
-  cama: { e: '🛏️', nombre: 'una cama', sobre: 'tumbado en una cama' }
+  silla: { e: '🪑', nombre: 'una silla', sobre: ['sentado en una silla', 'sentada en una silla'] },
+  alfombra: { e: '🧶', nombre: 'una alfombra', sobre: ['de pie sobre una alfombra', 'de pie sobre una alfombra'] },
+  cama: { e: '🛏️', nombre: 'una cama', sobre: ['tumbado en una cama', 'tumbada en una cama'] }
 };
 const SALAS = ['Cocina', 'Salón', 'Biblioteca', 'Dormitorio', 'Baño', 'Jardín', 'Despacho', 'Comedor'];
 const COLORES_SALA = ['#fde68a', '#bfdbfe', '#bbf7d0', '#fbcfe8', '#ddd6fe', '#fed7aa', '#a5f3fc', '#e5e7eb'];
 export const PERSONAS = [
   { nombre: 'Víctor', e: '💀', victima: true },
-  { nombre: 'Ana', e: '👩‍🦰' }, { nombre: 'Bruno', e: '🧔' }, { nombre: 'Carla', e: '👩‍🦱' },
-  { nombre: 'Darío', e: '👨‍🦳' }, { nombre: 'Elsa', e: '👱‍♀️' }, { nombre: 'Fede', e: '🧑‍🦲' }
+  { nombre: 'Ana', e: '👩‍🦰', f: true }, { nombre: 'Bruno', e: '🧔' }, { nombre: 'Carla', e: '👩‍🦱', f: true },
+  { nombre: 'Darío', e: '👨‍🦳' }, { nombre: 'Elsa', e: '👱‍♀️', f: true }, { nombre: 'Fede', e: '🧑‍🦲' }
 ];
 export const NIVELES = {
   facil: { n: 5, nombre: 'Fácil', directas: true },
@@ -75,12 +75,14 @@ function pistasVerdaderas(caso, directas) {
     const s = sala[c];
     U(p, `${nom} estaba en ${art(caso.salas[s])}.`, (x) => sala[x] === s, 3);
     caso.salas.forEach((nombreSala, k) => { if (k !== s) U(p, `${nom} no estaba en ${art(nombreSala)}.`, (x) => sala[x] !== k, 1); });
-    if (mueble[c] && MUEBLES[mueble[c]].sobre) U(p, `${nom} estaba ${MUEBLES[mueble[c]].sobre}.`, (x) => mueble[x] === mueble[c], 3);
+    const g = per.f ? 1 : 0; // concordancia: sentado / sentada
+    if (mueble[c] && MUEBLES[mueble[c]].sobre) U(p, `${nom} estaba ${MUEBLES[mueble[c]].sobre[g]}.`, (x) => mueble[x] === mueble[c], 3);
     if (!mueble[c]) U(p, `${nom} estaba en el suelo, sin ningún mueble debajo.`, (x) => !mueble[x], 1);
     ['mesa', 'planta', 'estanteria', 'silla', 'cama'].forEach((t) => {
       if (junto(c, t)) U(p, `${nom} estaba junto a ${MUEBLES[t].nombre}.`, (x) => junto(x, t), 2);
     });
-    U(p, borde(c) ? `${nom} estaba pegado a una pared exterior.` : `${nom} no estaba pegado a ninguna pared exterior.`, (x) => borde(x) === borde(c), 1);
+    const pegado = per.f ? 'pegada' : 'pegado';
+    U(p, borde(c) ? `${nom} estaba ${pegado} a una pared exterior.` : `${nom} no estaba ${pegado} a ninguna pared exterior.`, (x) => borde(x) === borde(c), 1);
     if (directas) {
       U(p, `${nom} estaba en la fila ${fila(c) + 1}.`, (x) => fila(x) === fila(c), 1);
       U(p, `${nom} estaba en la columna ${COLUMNAS[col(c)]}.`, (x) => col(x) === col(c), 1);

@@ -77,6 +77,7 @@ import intrusoRoutes from './routes/intruso.js';
 import ponordenRoutes from './routes/ponorden.js';
 import esconditeRoutes from './routes/escondite.js';
 import registrosRoutes from './routes/registros.js';
+import retoRoutes from './routes/reto.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -118,6 +119,7 @@ app.use(express.static(path.join(__dirname, '../client/dist')));
 app.use('/api/admin', adminRouter);
 app.use('/api/games', gamesRouter);
 app.use('/api/registros', registrosRoutes);
+app.use('/api/reto', retoRoutes);
 app.use('/api/siglas', siglasRouter);
 app.use('/api/quienesquien', quienEsQuienRouter);
 app.use('/api/trayectoria', trayectoriaRoutes);
