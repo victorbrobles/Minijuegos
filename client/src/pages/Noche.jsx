@@ -5,7 +5,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import Icon from '../components/Icon.jsx';
 import { META, metaDe } from '../games/meta.js';
 import { LIMITES } from '../games/limites.js';
-import { nombreIdentidad } from '../lib/identidad.js';
+import { nombreIdentidad, nombreCompleto } from '../lib/identidad.js';
+import { useJson } from './Estadisticas.jsx';
 import { useRecientes } from '../lib/registros.js';
 import { useNoche, crearNoche, terminarNoche, avanzarNoche, saltarJuego, apuntarAMano, marcador } from '../lib/noche.js';
 import './Estadisticas.css';
@@ -97,6 +98,25 @@ function AMano({ n }) {
   );
 }
 
+/** Al acabar: guardar la noche en el historial de uno de tus grupos. */
+function GuardarEnGrupo({ n, tabla }) {
+  const yo = nombreCompleto();
+  const d = useJson(yo ? `/api/social/grupos?jugador=${encodeURIComponent(yo)}` : null);
+  const [hecho, setHecho] = useState(null);
+  if (!d?.grupos?.length) return <p className="nch-nota">Crea un <Link to="/grupos">grupo de amigos</Link> para guardar el historial de vuestras noches.</p>;
+  const guardar = (g) => fetch(`/api/social/grupos/${g.codigo}/noches`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ noche: { marcador: tabla, juegos: n.juegos.filter((_, i) => !n.resultados[i]?.saltado) } })
+  }).then((r) => r.ok && setHecho(g.nombre)).catch(() => {});
+  if (hecho) return <p className="nch-nota">✅ Guardada en «{hecho}».</p>;
+  return (
+    <div className="nch-grupos">
+      <p className="nch-nota">Guardar esta noche en el historial de un grupo:</p>
+      <div className="nch-fila">{d.grupos.map((g) => <button key={g.codigo} type="button" className="nch-secundario" onClick={() => guardar(g)}>👥 {g.nombre}</button>)}</div>
+    </div>
+  );
+}
+
 function EnJuego({ n }) {
   const navigate = useNavigate();
   const [manoEn, setManoEn] = useState(-1);
@@ -117,6 +137,7 @@ function EnJuego({ n }) {
         <section className="est-tarjeta nch-final">
           <span className="nch-trofeo">🏆</span>
           <h2>¡{tabla.filter((t) => t.puntos === tabla[0].puntos).map((t) => t.nombre).join(' y ')} {tabla.filter((t) => t.puntos === tabla[0].puntos).length > 1 ? 'son los campeones' : 'es el campeón'} de la noche!</h2>
+          <GuardarEnGrupo n={n} tabla={tabla} />
           <button type="button" className="nch-empezar" onClick={terminarNoche}>🎉 Terminar y preparar otra noche</button>
         </section>
       ) : (

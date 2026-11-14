@@ -7,6 +7,8 @@ import { marcarJugado } from '../lib/favoritos.js';
 import { useNoche } from '../lib/noche.js';
 import { capturarInvitacion, leerInvitacion } from '../lib/invitacion.js';
 import '../pages/Noche.css';
+import BotonSonido from '../components/Sonido.jsx';
+import Reacciones from '../components/Reacciones.jsx';
 import '../components/MenuJuego.css';
 
 export default function GamePage() {
@@ -54,10 +56,12 @@ export default function GamePage() {
         <Icon name="arrowLeft" size={20} strokeWidth={2.500} />
         <span>Portada</span>
       </Link>
+      <BotonSonido clase="en-juego" />
       {invitacion && (
         <div className="qq-invitacion">📲 Te han invitado a la sala <b>{invitacion}</b>: entra en <b>Online</b> → <b>Unirse con código</b> y ya lo tendrás puesto.</div>
       )}
       <Game />
+      <Reacciones juego={gameId} />
       {enNoche && (
         <Link to="/noche" className={`nch-banner${noche.resultados[noche.actual] ? ' hecho' : ''}`}>
           🎉 {noche.resultados[noche.actual] ? '¡Resultado apuntado! Ver marcador' : `Noche de juegos · ${noche.actual + 1}/${noche.juegos.length}`}

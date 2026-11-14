@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { prepararLogros } from '../lib/logros.js';
+import { sonar } from '../lib/sonido.js';
 
 export default function AvisoLogros() {
   const [cola, setCola] = useState([]);
@@ -15,6 +16,7 @@ export default function AvisoLogros() {
   }, []);
   useEffect(() => {
     if (!cola.length) return undefined;
+    sonar('logro', { minimo: 1000 });
     const t = setTimeout(() => setCola((c) => c.slice(1)), 4500);
     return () => clearTimeout(t);
   }, [cola]);

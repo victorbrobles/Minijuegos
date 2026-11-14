@@ -1,7 +1,9 @@
 // client/src/lib/registros.js
 // Envío de resultados al servidor (salón de la fama) y lectura del salón y de los jugadores recientes.
 import { useEffect, useRef, useState } from 'react';
-import { etiquetar } from './identidad.js';
+import { etiquetar, leerIdentidad, partirNombre } from './identidad.js';
+import { sonar } from './sonido.js';
+import { silenciarFeedback } from './efectos.js';
 import { comprobarLogros } from './logros.js';
 import { registrarEnNoche } from './noche.js';
 
@@ -12,6 +14,7 @@ import { registrarEnNoche } from './noche.js';
 export function registrarPartida(juego, jugadores, { orden = 'desc' } = {}) {
   if (!juego || !Array.isArray(jugadores) || !jugadores.length) return;
   try { registrarEnNoche(juego, jugadores, orden); } catch { /* la noche es un extra */ }
+  try { sonidoFinal(jugadores); } catch { /* el sonido es un extra */ }
   try {
     fetch('/api/registros', {
       method: 'POST',
@@ -21,6 +24,15 @@ export function registrarPartida(juego, jugadores, { orden = 'desc' } = {}) {
       keepalive: true
     }).then(() => setTimeout(comprobarLogros, 300)).catch(() => {});
   } catch { /* sin red */ }
+}
+
+/** Fanfarria si has ganado (o, si no juegas tú, si alguien gana) y un cierre suave si no. */
+function sonidoFinal(jugadores) {
+  const yo = (leerIdentidad()?.nombre || '').toLowerCase();
+  const mio = jugadores.find((j) => partirNombre(String(j.nombre || '')).nombre.trim().toLowerCase() === yo);
+  const gana = mio ? Boolean(mio.gana) : jugadores.some((j) => j.gana);
+  silenciarFeedback(2000);
+  sonar(gana ? 'victoria' : 'fin', { minimo: 3000 });
 }
 
 /** Registra una sola vez mientras el componente esté montado (pantallas finales). `clave` cambia por partida. */

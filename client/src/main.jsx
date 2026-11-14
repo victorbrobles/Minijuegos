@@ -3,6 +3,11 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App.jsx';
 import './styles.css';
+import { instalarEfectos } from './lib/efectos.js';
+import { instalarSalaViva } from './lib/salaViva.js';
+
+instalarEfectos();
+instalarSalaViva();
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

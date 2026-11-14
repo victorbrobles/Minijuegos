@@ -1,0 +1,27 @@
+/* client/src/components/Sonido.css */
+.snd { position: relative; display: inline-block; z-index: 60; }
+.snd-btn { display: grid; place-items: center; width: 2.6rem; height: 2.6rem; padding: 0; border: none; border-radius: 50%; background: rgba(255, 255, 255, 0.92); font-size: 1.25rem; cursor: pointer; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25); }
+.snd-panel { position: absolute; top: calc(100% + 0.5rem); right: 0; width: min(17.5rem, 86vw); display: grid; gap: 0.45rem; padding: 0.9rem; border-radius: 18px; background: #ffffff; color: #0f172a; box-shadow: 0 16px 40px rgba(15, 23, 42, 0.35); animation: sndEntra 0.15s ease-out; text-align: left; }
+.snd-panel > b { font-size: 0.95rem; }
+.snd-panel small { color: #64748b; font-size: 0.72rem; font-weight: 600; }
+@keyframes sndEntra { from { opacity: 0; transform: translateY(-6px); } }
+.snd-int { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; width: 100%; padding: 0.5rem 0.6rem; border: none; border-radius: 12px; background: #f1f5f9; color: #0f172a; font: inherit; font-size: 0.85rem; font-weight: 800; text-align: left; cursor: pointer; }
+.snd-int i { position: relative; flex: none; width: 2.3rem; height: 1.3rem; border-radius: 999px; background: #cbd5e1; transition: background 0.15s; }
+.snd-int i::after { content: ''; position: absolute; top: 2px; left: 2px; width: calc(1.3rem - 4px); height: calc(1.3rem - 4px); border-radius: 50%; background: #ffffff; transition: transform 0.15s; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25); }
+.snd-int.on i { background: #7c3aed; }
+.snd-int.on i::after { transform: translateX(1rem); }
+.snd-vol { display: grid; gap: 0.2rem; padding: 0 0.3rem; font-size: 0.78rem; font-weight: 800; color: #475569; }
+.snd-vol.off { opacity: 0.45; }
+.snd-vol input { width: 100%; accent-color: #7c3aed; }
+.snd-probar { display: flex; gap: 0.35rem; justify-content: space-between; }
+.snd-probar button { flex: 1; padding: 0.4rem; border: 2px solid #e2e8f0; border-radius: 12px; background: #ffffff; font-size: 1.05rem; cursor: pointer; }
+/* Dentro de los juegos: a la derecha del botón «Portada» */
+.snd.en-juego { position: absolute; top: 0.25rem; right: 0.3rem; }
+.game-shell { position: relative; }
+.hub-yo { display: flex; align-items: center; gap: 0.5rem; }
+.snd.en-portada .snd-btn { width: 2.3rem; height: 2.3rem; font-size: 1.05rem; background: rgba(255, 255, 255, 0.22); box-shadow: none; }
+.snd.en-portada .snd-panel { left: 0; right: auto; }
+.hub-grupos { display: inline-flex; align-items: center; height: 2.3rem; padding: 0 0.85rem; border-radius: 999px; background: rgba(255, 255, 255, 0.22); color: #ffffff; font-size: 0.85rem; font-weight: 800; text-decoration: none; white-space: nowrap; }
+.hub-yo { flex-wrap: wrap; }
+.snd.en-portada .snd-panel { position: fixed; top: 5rem; left: 50%; right: auto; transform: translateX(-50%); animation: none; z-index: 90; }
+@media (max-width: 440px) { .hub-grupos { padding: 0 0.7rem; font-size: 0.8rem; } }

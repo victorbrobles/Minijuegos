@@ -1,0 +1,36 @@
+/* client/src/pages/Tele.css — pensado para pantallas grandes (también se ve bien en un portátil) */
+.tv { position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column; gap: 2vh; padding: 3vh 3vw; overflow: hidden; color: #ffffff;
+  background: radial-gradient(circle at 15% 10%, color-mix(in srgb, var(--g1) 70%, transparent), transparent 55%), radial-gradient(circle at 90% 90%, color-mix(in srgb, var(--g2) 70%, transparent), transparent 55%), #0b1020; font-size: clamp(14px, 1.6vw, 30px); }
+.tv-cab { display: flex; align-items: center; gap: 1.2vw; }
+.tv-cab img { width: 9vh; height: 9vh; border-radius: 1.6vh; object-fit: cover; box-shadow: 0 1vh 3vh rgba(0, 0, 0, 0.45); }
+.tv-cab div { flex: 1; }
+.tv-cab p { margin: 0; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.85; font-size: 0.8em; }
+.tv-cab h1 { margin: 0; font-size: 2.6em; line-height: 1; text-shadow: 0 0.4vh 1.5vh rgba(0, 0, 0, 0.4); }
+.tv-pc { padding: 0.5em 1em; border: 2px solid rgba(255, 255, 255, 0.35); border-radius: 999px; background: rgba(255, 255, 255, 0.12); color: #ffffff; font: inherit; font-size: 0.7em; font-weight: 800; cursor: pointer; }
+.tv-cuerpo { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr); gap: 3vw; }
+.tv-unete { display: grid; align-content: center; justify-items: center; gap: 1.5vh; padding: 3vh; border-radius: 4vh; background: rgba(255, 255, 255, 0.08); border: 2px solid rgba(255, 255, 255, 0.14); text-align: center; }
+.tv-unete p { margin: 0; font-weight: 800; font-size: 1.1em; }
+.tv-unete img, .tv-qr-vacio { width: min(100%, 46vh); aspect-ratio: 1; border-radius: 2vh; background: #ffffff; border: 1vh solid #ffffff; }
+.tv-codigo { font-size: 3.4em; letter-spacing: 0.18em; line-height: 1; }
+.tv-unete small { opacity: 0.7; font-weight: 700; }
+.tv-jugando .tv-cuerpo { grid-template-columns: minmax(0, 0.5fr) minmax(0, 1.6fr); }
+.tv-jugando .tv-codigo { font-size: 2.2em; }
+.tv-marcador { display: flex; flex-direction: column; min-height: 0; }
+.tv-marcador h2 { margin: 0 0 2vh; font-size: 1.8em; }
+.tv-marcador ol { flex: 1; min-height: 0; margin: 0; padding: 0; list-style: none; display: grid; align-content: start; gap: 1.2vh; overflow: hidden; }
+.tv-marcador li { display: flex; align-items: center; gap: 1.2vw; padding: 1.4vh 1.6vw; border-radius: 2.4vh; background: rgba(255, 255, 255, 0.1); animation: tvEntra 0.4s both; }
+.tv-marcador li b { flex: 1; font-size: 1.5em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tv-marcador li em { font-style: normal; font-weight: 900; font-size: 1.9em; font-variant-numeric: tabular-nums; }
+.tv-marcador li.lider { background: linear-gradient(135deg, #f59e0b, #f97316); box-shadow: 0 1vh 3vh rgba(245, 158, 11, 0.45); }
+.tv-marcador li.desconectado { opacity: 0.55; }
+.tv-pos { width: 2.2em; text-align: center; font-size: 1.4em; font-weight: 900; }
+.tv-ini { display: grid; place-items: center; width: 2.2em; height: 2.2em; border-radius: 50%; background: linear-gradient(135deg, var(--g1), var(--g2)); font-weight: 900; font-size: 1.1em; }
+.tv-espera { margin: auto 0; text-align: center; font-size: 1.4em; font-weight: 800; opacity: 0.9; }
+.tv-espera small { font-size: 0.65em; opacity: 0.8; }
+.tv-pista { margin: 1.5vh 0 0; opacity: 0.6; font-size: 0.75em; font-weight: 700; }
+@keyframes tvEntra { from { opacity: 0; transform: translateX(3vw); } }
+@media (max-width: 800px), (orientation: portrait) {
+  .tv { position: static; min-height: 100vh; overflow: auto; font-size: 16px; }
+  .tv-cuerpo, .tv-jugando .tv-cuerpo { grid-template-columns: 1fr; }
+  .tv-unete img { width: min(70vw, 300px); }
+}

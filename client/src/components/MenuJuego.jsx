@@ -313,6 +313,7 @@ export function QRSala({ codigo }) {
       <div className="qq-qr-botones">
         <button type="button" onClick={() => setAbierto(!abierto)}>📱 {abierto ? 'Ocultar QR' : 'Mostrar QR'}</button>
         <button type="button" onClick={compartir}>🔗 {hecho ? '¡Enlace copiado!' : 'Compartir enlace'}</button>
+        <a className="qq-qr-tele" href={`/tele/${window.location.pathname.split('/')[2]}/${codigo}`} target="_blank" rel="noreferrer">📺 Modo tele</a>
       </div>
       {abierto && (img ? <img src={img} alt={`QR para unirse a la sala ${codigo}`} /> : <p className="hint small">Generando QR…</p>)}
       {abierto && <p className="hint small">Escanéalo con la cámara del móvil para entrar directamente.</p>}

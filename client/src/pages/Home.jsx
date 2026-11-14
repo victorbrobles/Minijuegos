@@ -4,6 +4,7 @@ import { BannerReto } from '../reto/Banner.jsx';
 import { Link } from 'react-router-dom';
 import Recomendador from '../components/Recomendador.jsx';
 import Instalar from '../components/Instalar.jsx';
+import BotonSonido from '../components/Sonido.jsx';
 import { useFavoritos, useJugados } from '../lib/favoritos.js';
 import './Estadisticas.css';
 import './Noche.css';
@@ -303,7 +304,7 @@ export default function Home() {
             <p className="hub-sub">¡Elige un minijuego y a jugar!</p>
           </div>
         </div>
-        <div className="hub-yo"><ChipIdentidad /></div>
+        <div className="hub-yo"><ChipIdentidad /><Link to="/grupos" className="hub-grupos">👥 Grupos</Link><BotonSonido clase="en-portada" /></div>
 
         <div className="hub-search" role="search">
           <Icon name="search" size={22} className="hub-search-icon" />
