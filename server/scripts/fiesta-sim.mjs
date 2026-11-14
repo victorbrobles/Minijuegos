@@ -5,7 +5,6 @@ import * as Su from '../../client/src/games/Subasta/engine.js';
 import * as Pa from '../../client/src/games/Patata/engine.js';
 import * as Pi from '../../client/src/games/Piramides/engine.js';
 import * as Tr from '../../client/src/games/Transmision/engine.js';
-import { misterioso } from '../lib/solo.js';
 
 const azar = (l) => l[Math.floor(Math.random() * l.length)];
 const jugadores = (n) => Array.from({ length: n }, (_, i) => ({ id: i + 1, nombre: `J${i + 1}` }));
@@ -71,29 +70,42 @@ for (let k = 0; k < 200; k++) {
 }
 console.log(`Patata OK · ${explosiones} explosiones`);
 
-// ---------------- Pirámides
-const futbolistas = misterioso().futbolistas;
-for (const r of Pi.REGLAS) { const c = futbolistas.filter(r.fn).length; assert.ok(c > 0, `regla sin futbolistas: ${r.id}`); }
-for (let k = 0; k < 200; k++) {
-  const n = 2 + (k % 7); const p = Pi.crearPartida(jugadores(n), futbolistas, { vueltas: azar([3, 4, 5]) });
-  assert.equal(new Set(p.jugadores.map((j) => j.regla)).size, n, 'reglas distintas');
+// ---------------- Pirámides (los jugadores verifican; categorías de un banco)
+let eliminados = 0;
+for (let k = 0; k < 300; k++) {
+  const n = 2 + (k % 7); const p = Pi.crearPartida(jugadores(n), [], { vueltas: azar([5, 8, 12]) });
+  assert.equal(new Set(p.jugadores.map((j) => j.categoria)).size, n, 'categorías distintas');
   Pi.accion(p, null, { tipo: 'visto' });
   let pasos = 0;
-  while (p.fase !== 'fin' && pasos++ < 3000) {
+  while (p.fase !== 'fin' && pasos++ < 5000) {
     const v = Pi.vistaDe(p, -1);
-    const otros = v.jugadores.filter((j) => j.id !== v.turno && !j.descubierta && !j.fuera);
-    const o = azar(otros);
-    const r = Pi.accion(p, null, { tipo: 'preguntar', objetivo: o.id, futbolista: azar(futbolistas).nombre });
-    if (!r.ok) { assert.match(r.error, /Ya se le pregunt/); continue; }
-    if (Math.random() < 0.3) Pi.accion(p, null, { tipo: 'adivinar', objetivo: o.id, regla: azar(o.opciones).id });
-    else Pi.accion(p, null, { tipo: 'pasar' });
-    // Nadie ve reglas ajenas sin descubrir
+    const act = v.jugadores.find((j) => j.id === v.turno);
+    assert.ok(act && !act.eliminado, 'el turno es de alguien vivo');
+    if (v.paso === 'adivinar') {
+      const rivales = v.jugadores.filter((j) => j.id !== act.id && !j.eliminado && !j.fuera && !act.intentos[j.id]);
+      if (rivales.length && Math.random() < 0.5) {
+        const o = azar(rivales); const real = p.jugadores.find((j) => j.id === o.id).categoria;
+        const cat = Math.random() < 0.35 ? real : 'c' + (1 + Math.floor(Math.random() * 200));
+        const r = Pi.accion(p, null, { tipo: 'adivinar', objetivo: o.id, categoria: cat });
+        assert.ok(r.ok, r.error);
+        if (r.acierta) eliminados++;
+        assert.equal(Pi.accion(p, null, { tipo: 'adivinar', objetivo: o.id, categoria: cat }).ok, false, 'solo un intento por turno y rival');
+      } else assert.ok(Pi.accion(p, null, { tipo: 'noAdivinar' }).ok);
+    } else {
+      const pend = v.jugadores.filter((j) => j.id !== act.id && !j.eliminado && !j.fuera && !v.dichos.includes(j.id));
+      const r = Pi.accion(p, null, { tipo: 'apuntar', por: pend[0].id, futbolista: `F${pasos}`, encaja: Math.random() < 0.5 });
+      assert.ok(r.ok, r.error);
+    }
+    if (k % 40 === 0 && pasos === 5) Pi.abandonar(p, 2);
+    // Nadie ve categorías ajenas sin descubrir
     const vy = Pi.vistaDe(p, 1);
-    vy.jugadores.forEach((j) => assert.ok(j.regla === null || j.descubierta || p.fase === 'fin'));
+    vy.jugadores.forEach((j) => assert.ok(j.categoria === null || j.eliminado || p.fase === 'fin'));
   }
   cerrada(p);
+  const N = n; const vivos = p.jugadores.filter((j) => !j.eliminado && !j.fuera);
+  vivos.forEach((j) => assert.equal(p.fin.tabla.find((t) => t.id === j.id).supervivencia, 2 * N));
 }
-console.log('Pirámides OK');
+console.log(`Pirámides OK · ${eliminados} eliminaciones`);
 
 // ---------------- Última Transmisión (con reloj simulado)
 let exitos = 0; let reparadas = 0;
