@@ -1,14 +1,31 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import registry from '../games/registry.js';
 import Icon from '../components/Icon.jsx';
 import { metaDe } from '../games/meta.js';
+import { marcarJugado } from '../lib/favoritos.js';
+import { useNoche } from '../lib/noche.js';
+import { capturarInvitacion, leerInvitacion } from '../lib/invitacion.js';
+import '../pages/Noche.css';
 import '../components/MenuJuego.css';
 
 export default function GamePage() {
   const { gameId } = useParams();
   const Game = registry[gameId];
   const m = metaDe(gameId);
+  const noche = useNoche();
+  const enNoche = noche && noche.juegos[noche.actual] === gameId;
+
+  // Invitación a una sala por enlace/QR (?sala=CODIGO)
+  const [invitacion, setInvitacion] = useState(() => capturarInvitacion(gameId));
+  useEffect(() => {
+    const f = () => setInvitacion(leerInvitacion(gameId));
+    const t = setInterval(f, 1000);
+    return () => clearInterval(t);
+  }, [gameId]);
+
+  // «Seguir jugando» en la portada
+  useEffect(() => { if (Game) marcarJugado(gameId); }, [gameId, Game]);
 
   // Copia los colores del juego en <body> para que el fondo de la página
   // use exactamente los colores asignados al juego en meta.js.
@@ -37,7 +54,15 @@ export default function GamePage() {
         <Icon name="arrowLeft" size={20} strokeWidth={2.500} />
         <span>Portada</span>
       </Link>
+      {invitacion && (
+        <div className="qq-invitacion">📲 Te han invitado a la sala <b>{invitacion}</b>: entra en <b>Online</b> → <b>Unirse con código</b> y ya lo tendrás puesto.</div>
+      )}
       <Game />
+      {enNoche && (
+        <Link to="/noche" className={`nch-banner${noche.resultados[noche.actual] ? ' hecho' : ''}`}>
+          🎉 {noche.resultados[noche.actual] ? '¡Resultado apuntado! Ver marcador' : `Noche de juegos · ${noche.actual + 1}/${noche.juegos.length}`}
+        </Link>
+      )}
     </div>
   );
 }

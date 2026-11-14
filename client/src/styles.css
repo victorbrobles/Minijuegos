@@ -1726,3 +1726,28 @@ body:has(.home-view) {
 .icx-icono { font-size: 2.6rem; line-height: 1.1; }
 .icx-texto { margin: 0 0 0.6rem; color: #334155; font-size: 1rem; font-weight: 600; line-height: 1.45; }
 .icx-nota { margin: 0 0 1rem; color: #64748b; font-size: 0.85rem; }
+
+/* Corazón de favoritos en las tarjetas */
+.gc-fav-btn { position: absolute; top: 7px; left: 7px; z-index: 4; display: grid; place-items: center; width: 30px; height: 30px; padding: 0; border: none; border-radius: 50%;
+  background: rgba(15, 23, 42, 0.45); font-size: 0.95rem; line-height: 1; cursor: pointer; transition: transform 0.15s; backdrop-filter: blur(2px); }
+.gc-fav-btn:hover { transform: scale(1.12); }
+.gc-fav-btn.activo { background: rgba(255, 255, 255, 0.92); animation: gcLatido 0.35s ease-out; }
+@keyframes gcLatido { 50% { transform: scale(1.3); } }
+
+/* Logros */
+.lg-lista { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.45rem; }
+.lg-lista li { display: grid; justify-items: center; gap: 0.15rem; padding: 0.65rem 0.5rem; border-radius: 16px; background: #f1f5f9; text-align: center; filter: grayscale(1); opacity: 0.75; }
+.lg-lista li.si { background: linear-gradient(160deg, #fef3c7, #fde68a); filter: none; opacity: 1; box-shadow: 0 3px 0 rgba(180, 83, 9, 0.25); }
+.lg-emoji { font-size: 1.9rem; line-height: 1.1; }
+.lg-lista b { color: #0f172a; font-size: 0.86rem; }
+.lg-lista small { color: #64748b; font-size: 0.7rem; font-weight: 600; line-height: 1.25; }
+.lg-barra { position: relative; display: block; width: 100%; height: 0.95rem; margin-top: 0.2rem; border-radius: 999px; background: #e2e8f0; overflow: hidden; }
+.lg-barra i { display: block; height: 100%; background: #94a3b8; }
+.lg-barra em { position: absolute; inset: 0; display: grid; place-items: center; font-style: normal; font-size: 0.62rem; font-weight: 900; color: #0f172a; }
+.lg-aviso { position: fixed; left: 50%; bottom: 1.2rem; z-index: 90; display: flex; align-items: center; gap: 0.7rem; width: min(92vw, 380px); padding: 0.75rem 1rem; transform: translateX(-50%);
+  border-radius: 20px; background: linear-gradient(135deg, #f59e0b, #b45309); color: #ffffff; text-decoration: none; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35); animation: lgEntra 0.5s cubic-bezier(.2,1.4,.4,1); }
+.lg-aviso-emoji { display: grid; place-items: center; flex: none; width: 3rem; height: 3rem; border-radius: 14px; background: rgba(255, 255, 255, 0.25); font-size: 1.8rem; }
+.lg-aviso small { display: block; font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.06em; opacity: 0.9; }
+.lg-aviso b { display: block; font-size: 1.05rem; }
+.lg-aviso em { display: block; font-style: normal; font-size: 0.78rem; opacity: 0.9; }
+@keyframes lgEntra { from { opacity: 0; transform: translate(-50%, 30px) scale(0.9); } to { opacity: 1; transform: translate(-50%, 0); } }

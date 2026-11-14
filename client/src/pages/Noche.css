@@ -1,0 +1,59 @@
+/* client/src/pages/Noche.css */
+.nch-cab { background: linear-gradient(135deg, #f43f5e 0%, #c026d3 50%, #7c3aed 100%) !important; }
+.nch-sub { margin-left: auto; font-size: 0.8rem; color: #94a3b8; -webkit-text-fill-color: #94a3b8 !important; }
+.nch-jugadores { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 0.6rem; }
+.nch-chip { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.4rem 0.75rem; border: 2px solid transparent; border-radius: 999px; background: #ede9fe; color: #4c1d95; font: inherit; font-weight: 800; }
+.nch-chip button { padding: 0; border: none; background: none; color: inherit; font-weight: 900; cursor: pointer; }
+.nch-chip.boton { cursor: pointer; background: #f1f5f9; color: #0f172a; }
+.nch-chip.boton.sel { background: #fef3c7; border-color: #f59e0b; }
+.nch-anadir, .nch-fila { display: flex; gap: 0.4rem; }
+.nch-anadir input, .nch-busca { flex: 1; min-width: 0; padding: 0.6rem 0.8rem; border: 2px solid #e2e8f0; border-radius: 12px; font: inherit; font-weight: 700; color: #0f172a; }
+.nch-anadir button, .nch-azar { padding: 0.6rem 0.9rem; border: none; border-radius: 12px; background: #7c3aed; color: #ffffff; font: inherit; font-weight: 900; cursor: pointer; }
+.nch-anadir button:disabled { opacity: 0.4; }
+.nch-recientes { display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; margin-top: 0.5rem; }
+.nch-recientes small { color: #64748b; font-weight: 800; }
+.nch-recientes button { padding: 0.3rem 0.6rem; border: 1.5px dashed #c4b5fd; border-radius: 999px; background: #ffffff; color: #6d28d9; font: inherit; font-size: 0.82rem; font-weight: 800; cursor: pointer; }
+.nch-nota { margin: 0.4rem 0; color: #64748b; font-size: 0.8rem; font-weight: 600; }
+.nch-catalogo { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 0.4rem; max-height: 46vh; overflow-y: auto; padding: 0.2rem; }
+.nch-catalogo button { position: relative; display: grid; justify-items: center; gap: 0.2rem; padding: 0.35rem; border: 3px solid transparent; border-radius: 14px; background: #f8fafc; color: #0f172a; font: inherit; font-size: 0.7rem; font-weight: 800; line-height: 1.15; cursor: pointer; }
+.nch-catalogo img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; }
+.nch-catalogo button.sel { border-color: #7c3aed; background: #ede9fe; }
+.nch-catalogo i { position: absolute; top: 4px; right: 4px; display: grid; place-items: center; width: 1.4rem; height: 1.4rem; border-radius: 50%; background: #7c3aed; color: #ffffff; font-style: normal; font-weight: 900; }
+.nch-orden { list-style: none; margin: 0 0 0.6rem; padding: 0; display: grid; gap: 0.25rem; }
+.nch-orden li { display: flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.7rem; border-radius: 12px; background: #f8fafc; color: #0f172a; }
+.nch-orden li b { flex: 1; }
+.nch-orden li button { padding: 0 0.3rem; border: none; background: none; color: #94a3b8; font-weight: 900; cursor: pointer; }
+.nch-orden li.hecho { opacity: 0.55; } .nch-orden li.actual { background: #ede9fe; box-shadow: 0 0 0 2px #7c3aed; }
+.nch-orden li small { color: #94a3b8; font-weight: 700; }
+.nch-empezar { width: 100%; padding: 1rem; border: none; border-radius: 18px; background: linear-gradient(135deg, #f43f5e, #7c3aed); color: #ffffff; font: inherit; font-size: 1.05rem; font-weight: 900; cursor: pointer; box-shadow: 0 5px 0 rgba(76, 29, 149, 0.45); }
+.nch-empezar:disabled { opacity: 0.5; cursor: default; }
+.nch-secundario { flex: 1; margin-top: 0.4rem; padding: 0.65rem; border: 2px solid #e2e8f0; border-radius: 14px; background: #ffffff; color: #475569; font: inherit; font-weight: 800; cursor: pointer; }
+.nch-marcador { list-style: none; margin: 0 0 0.6rem; padding: 0; display: grid; gap: 0.3rem; }
+.nch-marcador li { display: flex; align-items: center; gap: 0.6rem; padding: 0.55rem 0.75rem; border-radius: 14px; background: #f8fafc; color: #0f172a; }
+.nch-marcador li b { flex: 1; }
+.nch-marcador li em { font-style: normal; font-weight: 900; font-size: 1.15rem; color: #7c3aed; }
+.nch-marcador li.lider { background: #fef3c7; box-shadow: 0 0 0 2px #f59e0b; }
+.nch-actual { text-align: center; border-top: 6px solid var(--g1); }
+.nch-actual h2 { justify-content: center; font-size: 1.5rem !important; }
+.nch-res { list-style: none; margin: 0 0 0.7rem; padding: 0; display: grid; gap: 0.25rem; text-align: left; }
+.nch-res li { display: flex; gap: 0.5rem; padding: 0.4rem 0.7rem; border-radius: 10px; background: #f0fdf4; }
+.nch-res li b { flex: 1; } .nch-res li em { font-style: normal; font-weight: 900; color: #15803d; }
+.nch-amano p { color: #334155; font-weight: 700; }
+.nch-final { text-align: center; }
+.nch-trofeo { display: block; font-size: 4rem; animation: nchSalta 1s ease-in-out infinite alternate; }
+@keyframes nchSalta { to { transform: translateY(-8px) rotate(-6deg); } }
+/* Aviso flotante dentro de los juegos */
+.nch-banner { position: fixed; top: 0.6rem; right: 0.6rem; z-index: 70; display: flex; align-items: center; gap: 0.4rem; padding: 0.45rem 0.8rem; border-radius: 999px;
+  background: linear-gradient(135deg, #f43f5e, #7c3aed); color: #ffffff; font-size: 0.78rem; font-weight: 900; text-decoration: none; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3); }
+.nch-banner.hecho { background: linear-gradient(135deg, #16a34a, #0f766e); animation: nchLatido 1.2s ease-in-out infinite; }
+@keyframes nchLatido { 50% { transform: scale(1.05); } }
+/* Botón de la portada */
+.est-boton.noche { background: linear-gradient(135deg, #f43f5e 0%, #c026d3 100%); box-shadow: 0 6px 0 rgba(112, 26, 117, 0.55); }
+@media (max-width: 420px) { .home-accesos { gap: 0.45rem; } .home-accesos .est-boton { min-width: 4.4rem; padding: 0.5rem 0.4rem; font-size: 0.7rem; text-align: center; } .home-accesos .est-boton span { font-size: 1.35rem; } }
+/* Aviso de instalar como app */
+.inst-aviso { display: flex; align-items: center; gap: 0.6rem; margin: 0 0 1rem; padding: 0.65rem 0.8rem; border-radius: 18px; background: rgba(255, 255, 255, 0.95); color: #0f172a; box-shadow: 0 6px 18px rgba(15, 23, 42, 0.18); }
+.inst-aviso > div { flex: 1; min-width: 0; display: grid; }
+.inst-aviso small { color: #64748b; font-weight: 600; font-size: 0.78rem; }
+.inst-ico { font-size: 1.7rem; }
+.inst-si { padding: 0.5rem 0.9rem; border: none; border-radius: 12px; background: #7c3aed; color: #ffffff; font: inherit; font-weight: 900; cursor: pointer; }
+.inst-no { padding: 0.3rem; border: none; background: none; color: #94a3b8; font-weight: 900; cursor: pointer; }

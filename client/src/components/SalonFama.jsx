@@ -6,6 +6,7 @@ import React, { useState } from 'react';
 import Icon from './Icon.jsx';
 import { useSalon } from '../lib/registros.js';
 import { NombreTag } from './Identidad.jsx';
+import { EnlacePerfil } from './Perfil.jsx';
 import { conVictorias } from '../games/limites.js';
 import { metaDe } from '../games/meta.js';
 import './SalonFama.css';
@@ -30,7 +31,7 @@ export function Podio({ titulo, sub, icono, filas, unidad, vacio = 'Nadie todav√
                 {f && (
                   <div className="slf-quien">
                     <span className="slf-medalla">{MEDALLAS[puesto]}</span>
-                    <NombreTag texto={f.jugador} className="slf-nombre" />
+                    <EnlacePerfil nombre={f.jugador}><NombreTag texto={f.jugador} className="slf-nombre" /></EnlacePerfil>
                     <small>{numero(f.n)} {f.n === 1 ? unidad[0] : unidad[1]}</small>
                   </div>
                 )}
@@ -68,7 +69,7 @@ function Ventana({ juegoId, salon, onCerrar }) {
                     {salon.top.map((t, i) => (
                       <li key={i} className={`t${i + 1}`}>
                         <span className="slf-medalla">{MEDALLAS[i]}</span>
-                        <span className="slf-top-quien"><NombreTag texto={t.jugador} className="slf-nombre" /><small>{fecha(t.fecha)}</small></span>
+                        <span className="slf-top-quien"><EnlacePerfil nombre={t.jugador}><NombreTag texto={t.jugador} className="slf-nombre" /></EnlacePerfil><small>{fecha(t.fecha)}</small></span>
                         <b>{numero(t.puntos)}</b>
                       </li>
                     ))}

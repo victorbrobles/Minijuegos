@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import { PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, useRecord, Aviso } from '../../components/UnJugador.jsx';
-import { cargarSolo, Cargando, Buscador, norm } from './comun.jsx';
+import { cargarSolo, Cargando, Buscador, norm, RetoAmigo } from './comun.jsx';
 import './Solo.css';
 
 const ID = 'misterioso';
@@ -76,7 +76,9 @@ export default function Misterioso() {
     return (
       <FinUnJugador icono="search" etiqueta="Fin de los 3 misterios" titulo={puntos >= 15 ? '¡Ojeador de élite!' : puntos >= 8 ? '¡Muy bien!' : 'Fin de la partida'}
         puntos={puntos} unidad="puntos" nuevoRecord={nuevoRecord} record={record} textoRecord={(r) => `${r.valor} puntos`}
-        exito={puntos > 0} onRepetir={empezar} onMenu={() => setFase('portada')} />
+        exito={puntos > 0} onRepetir={empezar} onMenu={() => setFase('portada')}>
+          <RetoAmigo juego={ID} puntos={puntos} formato={(x) => `${x} puntos`} />
+        </FinUnJugador>
     );
   }
 

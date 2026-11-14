@@ -18,7 +18,8 @@ import {
   indiceColor
 } from './RankingsLocal.jsx';
 import { limitesOnline, textoSala } from '../limites.js';
-import { ChipJugadores } from '../../components/MenuJuego.jsx';
+import { ChipJugadores, QRSala } from '../../components/MenuJuego.jsx';
+import { codigoInvitado } from '../../lib/invitacion.js';
 import { SelectorRondas } from '../../components/MenuJuego.jsx';
 import { rondasPorDefecto } from '../rondas.js';
 
@@ -50,7 +51,7 @@ export default function RankingsOnline({
   const [vista, setVista] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
 
   const [nombre, setNombre] = useState(nombreIdentidad);
-  const [codigoInput, setCodigoInput] = useState('');
+  const [codigoInput, setCodigoInput] = useState(codigoInvitado);
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
 
@@ -671,6 +672,7 @@ export default function RankingsOnline({
                 ? '¡Copiado al portapapeles!'
                 : 'Pulsa el código para copiarlo y compártelo con los demás.'}
             </p>
+            <QRSala codigo={sala.code} />
           </div>
 
           <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>

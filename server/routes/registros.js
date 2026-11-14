@@ -11,6 +11,7 @@ import express from 'express';
 import { readFileSync } from 'node:fs';
 import db from '../db.js';
 import { conVictorias } from '../../client/src/games/limites.js';
+import { calcularLogros } from '../lib/logros.js';
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS registros_partidas (
@@ -133,6 +134,8 @@ const misResultados = db.prepare(`SELECT r.partida, r.juego, r.puntos, r.gana, r
 const companeros = db.prepare(`SELECT o.jugador, COUNT(*) AS n FROM registros_resultados r
   JOIN registros_resultados o ON o.partida = r.partida AND o.jugador <> r.jugador
   WHERE r.jugador = ? GROUP BY o.jugador ORDER BY n DESC LIMIT 3`);
+const numCompaneros = db.prepare(`SELECT COUNT(DISTINCT o.jugador) AS n FROM registros_resultados r
+  JOIN registros_resultados o ON o.partida = r.partida AND o.jugador <> r.jugador WHERE r.jugador = ?`);
 const clavesDia = (t) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Madrid' }).format(new Date(t));
 const diaSiguiente = (f) => new Date(Date.parse(`${f}T12:00:00Z`) + DIA).toISOString().slice(0, 10);
 
@@ -171,14 +174,17 @@ export function personales(jugador, ahora = Date.now()) {
     reto = { intentos: r.filter((x) => x.estado !== 'jugando' || x.fecha !== hoy).length, superados: sup.length, racha: rachas(sup.map((x) => x.fecha), hoy) };
   } catch { /* sin tabla de retos */ }
   const desdeMes = inicioMes(ahora);
+  const racha = rachas(dias, hoy);
+  const logros = calcularLogros(filas, { dias: dias.length, rachaDias: racha.mejor, reto, records, companeros: numCompaneros.get(jugador).n });
   return {
     jugador,
+    logros,
     juegos: [...porJuego.values()],
     partidas: filas.length,
     partidasMes: filas.filter((f) => f.fecha >= desdeMes).length,
     primera: filas[0]?.fecha || null,
     dias: dias.length,
-    racha: rachas(dias, hoy),
+    racha,
     semana,
     companeros: companeros.all(jugador),
     records,
@@ -207,6 +213,12 @@ router.get('/jugador', (req, res) => {
   const j = String(req.query.nombre || '');
   if (!/^.{1,15}#\d{4}$/.test(j)) return res.status(400).json({ error: 'Jugador no válido.' });
   res.json({ success: true, ...personales(j) });
+});
+
+router.get('/logros', (req, res) => {
+  const j = String(req.query.nombre || '');
+  if (!/^.{1,15}#\d{4}$/.test(j)) return res.status(400).json({ error: 'Jugador no válido.' });
+  res.json({ success: true, logros: personales(j).logros });
 });
 
 router.get('/recientes', (req, res) => {

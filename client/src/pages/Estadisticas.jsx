@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import Icon from '../components/Icon.jsx';
 import { Podio } from '../components/SalonFama.jsx';
 import { NombreTag } from '../components/Identidad.jsx';
+import { EnlacePerfil } from '../components/Perfil.jsx';
 import { nombreCompleto } from '../lib/identidad.js';
 import { metaDe, CATEGORIAS_PORTADA } from '../games/meta.js';
 import { conVictorias, LIMITES } from '../games/limites.js';
@@ -20,7 +21,7 @@ const titulo = (id) => metaDe(id)?.titulo || id;
 const fechaCorta = (t) => new Date(t).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
 const unJugador = (id) => (LIMITES[id]?.min ?? 2) === 1;
 
-function useJson(url) {
+export function useJson(url) {
   const [d, setD] = useState(null);
   useEffect(() => {
     let vivo = true;
@@ -79,11 +80,11 @@ function Generales({ d, mes }) {
   );
 }
 
-function Personales({ d, yo }) {
+export function Personales({ d, yo }) {
   if (!yo) return <p className="slf-vacio">Entra con tu nombre para ver tus estadísticas.</p>;
   if (!d) return <p className="slf-vacio">Cargando…</p>;
   if (d.error) return <p className="slf-vacio">No se han podido cargar tus estadísticas.</p>;
-  if (!d.partidas) return <p className="slf-vacio">Todavía no tienes partidas registradas. ¡Juega alguna y vuelve por aquí!</p>;
+  if (!d.partidas) return <p className="slf-vacio">Todavía no tienes partidas registradas. ¡Juega alguna y vuelve por aquí! Hay {d.logros?.length || 23} logros esperándote.</p>;
 
   const competidos = d.juegos.filter((j) => conVictorias(j.juego) && j.multi > 0);
   const multi = competidos.reduce((a, j) => a + j.multi, 0);
@@ -162,10 +163,23 @@ function Personales({ d, yo }) {
         ) : <p className="slf-vacio">Aún no estás en el top 3 de ningún juego. ¡A por ello!</p>}
       </Bloque>
 
+      <Bloque icono="trophy" titulo="Logros" sub={`${d.logros.filter((l) => l.conseguido).length} de ${d.logros.length}`}>
+        <ul className="lg-lista">
+          {[...d.logros].sort((a, b) => b.conseguido - a.conseguido || b.actual / b.objetivo - a.actual / a.objetivo).map((l) => (
+            <li key={l.id} className={l.conseguido ? 'si' : ''} title={l.desc}>
+              <span className="lg-emoji">{l.emoji}</span>
+              <b>{l.nombre}</b>
+              <small>{l.desc}</small>
+              {!l.conseguido && <span className="lg-barra"><i style={{ width: `${(l.actual / l.objetivo) * 100}%` }} /><em>{l.actual}/{l.objetivo}</em></span>}
+            </li>
+          ))}
+        </ul>
+      </Bloque>
+
       {d.companeros.length > 0 && (
         <Bloque icono="users" titulo="Con quién más juegas">
           <ul className="est-companeros">
-            {d.companeros.map((c, i) => <li key={c.jugador}><span>{MEDALLAS[i]}</span><NombreTag texto={c.jugador} /><small>{plural(c.n, 'partida', 'partidas')}</small></li>)}
+            {d.companeros.map((c, i) => <li key={c.jugador}><span>{MEDALLAS[i]}</span><EnlacePerfil nombre={c.jugador}><NombreTag texto={c.jugador} /></EnlacePerfil><small>{plural(c.n, 'partida', 'partidas')}</small></li>)}
           </ul>
         </Bloque>
       )}
@@ -199,7 +213,7 @@ export default function Estadisticas() {
         <Generales d={generales} mes={mes} />
       </section>
       <section className="est-tarjeta">
-        <h2>👤 Tus estadísticas {yo && <NombreTag texto={yo} className="est-yo" />}</h2>
+        <h2>👤 Tus estadísticas {yo && <EnlacePerfil nombre={yo}><NombreTag texto={yo} className="est-yo" /></EnlacePerfil>}</h2>
         <Personales d={mias} yo={yo} />
       </section>
     </div>

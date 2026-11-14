@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import { PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, useRecord, Aviso } from '../../components/UnJugador.jsx';
-import { cargarSolo, Cargando } from './comun.jsx';
+import { cargarSolo, Cargando, RetoAmigo } from './comun.jsx';
 import './Solo.css';
 
 const ID = 'manager';
@@ -110,7 +110,8 @@ export default function Manager() {
           {plantilla.map((j) => <li key={j.nombre}><span>{j.pos}</span><b>{j.nombre}</b><em>{j.m}</em></li>)}
         </ul>
         {mejor && <p className="uj-mini">⭐ Tu mejor jugador: {mejor.nombre} ({mejor.m}){ganga && ganga !== mejor ? ` · 💰 Mejor fichaje: ${ganga.nombre} (${ganga.m} por ${fmt(ganga.precio)})` : ''}</p>}
-      </FinUnJugador>
+        <RetoAmigo juego={ID} puntos={yo.pts} formato={(x) => `${x} puntos en liga`} />
+        </FinUnJugador>
     );
   }
 

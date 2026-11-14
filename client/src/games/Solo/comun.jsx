@@ -2,6 +2,8 @@
 // Utilidades de los juegos de un jugador de trivia y fútbol: carga de datos, comparación de respuestas escritas,
 // cuenta atrás y buscador con sugerencias.
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { nombreCompleto, partirNombre } from '../../lib/identidad.js';
+import { AvatarJugador } from '../../components/Perfil.jsx';
 
 export const norm = (t) => String(t ?? '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9ñ ]/g, ' ').replace(/\s+/g, ' ').trim();
 
@@ -22,11 +24,97 @@ export function coincide(texto, nombre, alias = []) {
   return formas.some((f) => f === t || (f.length >= 6 && distancia(f, t) <= 1));
 }
 
-/** Pide al servidor una partida nueva de /api/solo/:juego. */
+// ---------------------------------------------------------------- Retos entre amigos
+// Si se entra con /juego/<id>?reto=CÓDIGO, la primera partida es la del reto (los mismos datos que jugó quien retó).
+const ultimos = {}; // juego → datos de la última partida (para poder retar con ella)
+let retoActivo = null; // { codigo, juego }
+export const recordarPartida = (juego, datos) => { ultimos[juego] = datos; };
+export const retoDe = (juego) => (retoActivo?.juego === juego ? retoActivo : null);
+/** Si la URL trae un reto de este juego, devuelve sus datos (una sola vez) y lo deja activo. */
+export async function datosDeReto(juego) {
+  const codigo = new URLSearchParams(window.location.search).get('reto');
+  if (!codigo) { if (retoActivo?.juego === juego) retoActivo = null; return null; }
+  window.history.replaceState(null, '', window.location.pathname); // «Jugar otra vez» ya será una partida nueva
+  try {
+    const r = await fetch(`/api/solo/retos/${encodeURIComponent(codigo)}`);
+    if (!r.ok) return null;
+    const d = await r.json();
+    if (d.juego !== juego) return null;
+    retoActivo = { codigo: codigo.toUpperCase(), juego };
+    ultimos[juego] = d.datos;
+    return d.datos;
+  } catch { return null; }
+}
+
+/** Pide al servidor una partida nueva de /api/solo/:juego (o la del reto, si se ha entrado con un enlace de reto). */
 export async function cargarSolo(juego) {
+  const deReto = await datosDeReto(juego);
+  if (deReto) return deReto;
+  if (retoActivo?.juego === juego) retoActivo = null;
   const r = await fetch(`/api/solo/${juego}`);
   if (!r.ok) throw new Error('No se pudo cargar la partida.');
-  return r.json();
+  const d = await r.json();
+  ultimos[juego] = d;
+  return d;
+}
+
+/** Al final de una partida: retar a un amigo con la misma partida o, si era un reto, ver cómo has quedado. */
+export function RetoAmigo({ juego, puntos, orden = 'desc', formato = (x) => x }) {
+  const [estado, setEstado] = useState({ fase: 'inicio' });
+  const reto = retoDe(juego);
+  const yo = nombreCompleto();
+  useEffect(() => {
+    if (!reto || !yo) return;
+    fetch(`/api/solo/retos/${reto.codigo}/resultado`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ jugador: yo, puntos }) })
+      .then((r) => r.json()).then((d) => setEstado({ fase: 'resultado', resultados: d.resultados || [] })).catch(() => {});
+    retoActivo = null;
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  if (!yo || puntos == null) return null;
+  if (estado.fase === 'resultado') {
+    const pos = estado.resultados.findIndex((x) => x.jugador === yo);
+    return (
+      <div className="sl-reto">
+        <p className="sl-reto-titulo">⚔️ Reto entre amigos · {pos === 0 ? '¡vas primero!' : `vas ${pos + 1}.º`}</p>
+        <ol className="sl-reto-lista">
+          {estado.resultados.map((x, i) => (
+            <li key={x.jugador} className={x.jugador === yo ? 'yo' : ''}>
+              <span>{i + 1}.</span><AvatarJugador nombre={x.jugador} tam={22} /><b>{partirNombre(x.jugador).nombre}{x.retador ? ' (retador)' : ''}</b><em>{formato(x.puntos)}</em>
+            </li>
+          ))}
+        </ol>
+      </div>
+    );
+  }
+  if (reto) return <p className="sl-nota">Guardando tu resultado del reto…</p>;
+  const crear = async () => {
+    setEstado({ fase: 'creando' });
+    try {
+      const r = await fetch('/api/solo/retos', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ juego, datos: ultimos[juego], jugador: yo, puntos, orden }) });
+      const d = await r.json();
+      if (!r.ok) throw new Error(d.error);
+      setEstado({ fase: 'creado', url: `${window.location.origin}/juego/${juego}?reto=${d.codigo}` });
+    } catch (e) { setEstado({ fase: 'error', error: e.message || 'No se pudo crear el reto.' }); }
+  };
+  if (estado.fase === 'creado') {
+    const texto = `⚔️ Te reto a superar mis ${formato(puntos)} en este juego de Minigames Hub:`;
+    return (
+      <div className="sl-reto">
+        <p className="sl-reto-titulo">⚔️ ¡Reto creado! Mándale este enlace:</p>
+        <input className="sl-input sl-reto-url" readOnly value={estado.url} onFocus={(e) => e.target.select()} />
+        <div className="sl-fila">
+          <button type="button" className="uj-boton secundario" onClick={() => { navigator.clipboard?.writeText(`${texto} ${estado.url}`); setEstado({ ...estado, copiado: true }); }}>{estado.copiado ? '✓ Copiado' : '📋 Copiar'}</button>
+          {navigator.share && <button type="button" className="uj-boton secundario" onClick={() => navigator.share({ title: 'Minigames Hub', text: texto, url: estado.url }).catch(() => {})}>📤 Compartir</button>}
+        </div>
+        <p className="sl-nota">Jugará exactamente la misma partida. Cuando termine, verá quién ha ganado.</p>
+      </div>
+    );
+  }
+  return (
+    <div className="sl-reto">
+      <button type="button" className="uj-boton" onClick={crear} disabled={estado.fase === 'creando'}>⚔️ {estado.fase === 'creando' ? 'Creando reto…' : 'Retar a un amigo con esta misma partida'}</button>
+      {estado.error && <p className="sl-nota">{estado.error}</p>}
+    </div>
+  );
 }
 
 /** Cuenta atrás con un instante de fin que se puede mover (bonus o penalización). */

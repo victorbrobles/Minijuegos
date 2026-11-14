@@ -2,6 +2,7 @@
 // Identidad del jugador (Nombre#1234): pantalla de entrada, nombre con etiqueta y chip para cambiarla.
 import React, { useState } from 'react';
 import Icon from './Icon.jsx';
+import { AvatarJugador, EditarPerfil } from './Perfil.jsx';
 import {
   useIdentidad, ultimaIdentidad, guardarIdentidad, olvidarIdentidad, tagAlAzar, limpiarNombre, partirNombre, textoIdentidad, MAX_NOMBRE
 } from '../lib/identidad.js';
@@ -73,10 +74,12 @@ export function PuertaIdentidad({ children }) {
 /** Chip con la identidad y opción de cambiarla (portada). */
 export function ChipIdentidad() {
   const yo = useIdentidad();
+  const [editar, setEditar] = useState(false);
   if (!yo) return null;
   return (
     <div className="idn-chip">
-      <Icon name="users" size={15} />
+      <button type="button" className="pf-boton-avatar" onClick={() => setEditar(true)} title="Cambiar tu avatar"><AvatarJugador nombre={textoIdentidad(yo)} tam={24} /></button>
+      {editar && <EditarPerfil jugador={textoIdentidad(yo)} onCerrar={() => setEditar(false)} />}
       <NombreTag texto={textoIdentidad(yo)} />
       <button type="button" onClick={olvidarIdentidad} title="Cambiar de jugador">Cambiar</button>
     </div>

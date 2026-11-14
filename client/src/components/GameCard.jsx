@@ -5,12 +5,14 @@ import { useNavigate } from 'react-router-dom';
 import Icon from './Icon.jsx';
 import { metaDe } from '../games/meta.js';
 import { LIMITES, textoJugadores } from '../games/limites.js';
+import { useFavoritos, alternarFavorito } from '../lib/favoritos.js';
 
 export default function GameCard({ game }) {
   const [mostrarDesc, setMostrarDesc] = useState(false);
   const [imgFallida, setImgFallida] = useState(false);
   const m = metaDe(game.id);
   const navigate = useNavigate();
+  const favorito = useFavoritos().includes(game.id);
 
   const descripcion = m?.descripcion || game?.description || 'Sin descripción disponible.';
   const tienePortada = Boolean(m?.imagen) && !imgFallida;
@@ -69,6 +71,20 @@ export default function GameCard({ game }) {
         }
       }}
     >
+      {/* Corazón: marcar como favorito */}
+      <button
+        type="button"
+        className={`gc-fav-btn${favorito ? ' activo' : ''}`}
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); alternarFavorito(game.id); }}
+        onMouseDown={detenerInteraccion}
+        onTouchStart={detenerInteraccion}
+        aria-label={favorito ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+        aria-pressed={favorito}
+        title={favorito ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+      >
+        {favorito ? '❤️' : '🤍'}
+      </button>
+
       {/* Botón 'i' para abrir la descripción */}
       <button
         type="button"

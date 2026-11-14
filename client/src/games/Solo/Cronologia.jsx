@@ -6,7 +6,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import { PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, useRecord, Aviso } from '../../components/UnJugador.jsx';
-import { cargarSolo, Cargando } from './comun.jsx';
+import { cargarSolo, Cargando, RetoAmigo } from './comun.jsx';
 import './Solo.css';
 
 const ID = 'cronologia';
@@ -73,7 +73,8 @@ export default function Cronologia() {
         puntos={aciertos} unidad={aciertos === 1 ? 'carta bien colocada' : 'cartas bien colocadas'} nuevoRecord={nuevoRecord} record={record}
         textoRecord={(r) => `${r.valor} cartas`} exito={aciertos > 0} onRepetir={empezar} onMenu={() => setFase('portada')}>
         <ol className="cro-linea mini">{linea.map((c) => <li key={c.texto} className={c.ok ? '' : 'mal'}><b>{anioTexto(c.anio)}</b><span>{c.emoji} {c.texto}</span></li>)}</ol>
-      </FinUnJugador>
+        <RetoAmigo juego={ID} puntos={aciertos} formato={(x) => `${x} cartas`} />
+        </FinUnJugador>
     );
   }
 

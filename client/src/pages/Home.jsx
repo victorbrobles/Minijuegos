@@ -3,7 +3,10 @@ import { ChipIdentidad } from '../components/Identidad.jsx';
 import { BannerReto } from '../reto/Banner.jsx';
 import { Link } from 'react-router-dom';
 import Recomendador from '../components/Recomendador.jsx';
+import Instalar from '../components/Instalar.jsx';
+import { useFavoritos, useJugados } from '../lib/favoritos.js';
 import './Estadisticas.css';
+import './Noche.css';
 import './Creditos.css';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -194,6 +197,8 @@ export default function Home() {
   const [busqueda, setBusqueda] = useState('');
   const inputRef = useRef(null);
   const navigate = useNavigate();
+  const favoritos = useFavoritos();
+  const jugados = useJugados();
 
   useEffect(() => {
     fetch('/api/games')
@@ -331,9 +336,11 @@ export default function Home() {
       {!hayBusqueda && (
         <div className="home-accesos">
           <BannerReto />
+          <Link to="/noche" className="est-boton noche" aria-label="Noche de juegos"><span>🎉</span>Noche de juegos</Link>
           <Link to="/estadisticas" className="est-boton" aria-label="Estadísticas"><span>📊</span>Estadísticas</Link>
         </div>
       )}
+      {!hayBusqueda && <Instalar />}
 
       {error && <p className="error">{error}</p>}
       {cargando && !error && <p className="loading">Cargando juegos…</p>}
@@ -350,6 +357,16 @@ export default function Home() {
       {/* Vista principal con carruseles horizontales por categoría */}
       {!cargando && !error && !hayBusqueda && (
         <div className="home-categorias-contenedor">
+          {(() => {
+            const deIds = (ids) => ids.map((id) => games.find((g) => g.id === id)).filter(Boolean);
+            const favs = deIds(favoritos); const recientes = deIds(jugados);
+            return (
+              <>
+                {recientes.length > 0 && <FilaCarrusel cat={{ id: 'seguir', titulo: '🕹️ Seguir jugando' }} juegos={recientes} />}
+                {favs.length > 0 && <FilaCarrusel cat={{ id: 'favs', titulo: '❤️ Tus favoritos' }} juegos={favs} />}
+              </>
+            );
+          })()}
           {CATEGORIAS_PORTADA.map((cat) => {
             const juegosCat = juegosPorCategoria[cat.id] || [];
             if (juegosCat.length === 0) return null;

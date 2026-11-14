@@ -7,7 +7,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import { PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, useRecord, Aviso } from '../../components/UnJugador.jsx';
-import { cargarSolo, Cargando, Buscador } from './comun.jsx';
+import { cargarSolo, Cargando, Buscador, RetoAmigo } from './comun.jsx';
 import './Solo.css';
 
 const ID = 'conexion';
@@ -90,7 +90,8 @@ export default function Conexion() {
         puntos={total} unidad="puntos" nuevoRecord={nuevoRecord} record={record} textoRecord={(r) => `${r.valor} puntos`}
         exito={total > 0} onRepetir={empezar} onMenu={() => setFase('portada')}>
         <p className="uj-mini">{puntosReto.map((p, i) => `Reto ${i + 1}: ${p}`).join(' · ')}</p>
-      </FinUnJugador>
+        <RetoAmigo juego={ID} puntos={total} formato={(x) => `${x} puntos`} />
+        </FinUnJugador>
     );
   }
 

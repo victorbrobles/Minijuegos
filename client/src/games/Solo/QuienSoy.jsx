@@ -6,7 +6,7 @@ import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import { PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, useRecord, Barra, Aviso } from '../../components/UnJugador.jsx';
-import { cargarSolo, useCuenta, Cargando } from './comun.jsx';
+import { cargarSolo, useCuenta, Cargando, RetoAmigo } from './comun.jsx';
 import '../../reto/Reto.css';
 import './Solo.css';
 
@@ -81,7 +81,8 @@ export default function QuienSoy() {
         textoRecord={(r) => `${r.valor} famosos`} exito={aciertos.length > 0} onRepetir={empezar} onMenu={() => setFase('portada')}>
         {aciertos.length > 0 && <div className="sl-chips" style={{ justifyContent: 'center' }}>{aciertos.map((a) => <span key={a} className="sl-chip bien">{a}</span>)}</div>}
         <p className="uj-mini">El último era {datos.candidatos[objetivo].nombre}.</p>
-      </FinUnJugador>
+        <RetoAmigo juego={ID} puntos={aciertos.length} formato={(x) => `${x} famosos`} />
+        </FinUnJugador>
     );
   }
 

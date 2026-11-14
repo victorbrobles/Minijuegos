@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import { PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, useRecord, Barra, Aviso } from '../../components/UnJugador.jsx';
-import { cargarSolo, useCuenta, Cargando, coincide } from './comun.jsx';
+import { cargarSolo, useCuenta, Cargando, coincide, RetoAmigo } from './comun.jsx';
 import './Solo.css';
 
 const ID = 'cadena';
@@ -85,7 +85,8 @@ export default function Cadena() {
         textoRecord={(r) => `${r.valor} respuestas`} exito={puntos > 0} onRepetir={empezar} onMenu={() => setFase('portada')}>
         <p className="uj-mini">{superadas} {superadas === 1 ? 'categoría superada' : 'categorías superadas'}.</p>
         {cat && <p className="uj-mini">En «{cat.titulo}» te faltaron: {cat.opciones.filter((o) => !hallados.includes(o.nombre)).map((o) => o.nombre).join(', ') || 'ninguna'}.</p>}
-      </FinUnJugador>
+        <RetoAmigo juego={ID} puntos={puntos} formato={(x) => `${x} respuestas`} />
+        </FinUnJugador>
     );
   }
 

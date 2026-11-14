@@ -7,7 +7,8 @@ import { useAdmin, adminHeaders } from '../../lib/admin.js';
 import Icon from '../../components/Icon.jsx';
 import './QuienEsQuien.css';
 import { PantallaTablero, EnlaceSecundario, SelectorCategorias, colorJugador } from './TableroPartida.jsx';
-import { ChipJugadores } from '../../components/MenuJuego.jsx';
+import { ChipJugadores, QRSala } from '../../components/MenuJuego.jsx';
+import { codigoInvitado } from '../../lib/invitacion.js';
 
 const CLAVE_SESION_QQ = 'qq_online_session';
 
@@ -26,7 +27,7 @@ export default function QuienEsQuienOnline({
   const [eligiendoCategoria, setEligiendoCategoria] = useState(false);
 
   const [nombre, setNombre] = useState(nombreIdentidad);
-  const [codigoInput, setCodigoInput] = useState('');
+  const [codigoInput, setCodigoInput] = useState(codigoInvitado);
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
 
@@ -588,6 +589,7 @@ export default function QuienEsQuienOnline({
                 ? '¡Copiado al portapapeles!'
                 : 'Pulsa el código para copiarlo y compártelo con los demás.'}
             </p>
+            <QRSala codigo={sala.code} />
           </div>
 
           <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>

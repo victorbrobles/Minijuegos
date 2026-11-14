@@ -6,6 +6,8 @@
 import { RecientesJugadores } from './Recientes.jsx';
 import SalonFama from './SalonFama.jsx';
 import { nombreIdentidad } from '../lib/identidad.js';
+import QRCode from 'qrcode';
+import { enlaceSala, usarInvitacion } from '../lib/invitacion.js';
 import { useEffect, useRef, useState } from 'react';
 import Icon from './Icon.jsx';
 import { metaDe } from '../games/meta.js';
@@ -225,6 +227,8 @@ export function FormUnirseSala({
   };
   // Por defecto, la identidad de la sesión
   useEffect(() => { if (!nombre && setNombre) setNombre(nombreIdentidad()); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  // Invitación por enlace o QR (?sala=CODIGO): el código ya viene puesto
+  useEffect(() => { const c = usarInvitacion(); if (c && !codigo && setCodigo) setCodigo(c.slice(0, longitudCodigo)); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   return (
     <section className="game qq-pantalla">
       <PanelMenu onVolver={onVolver} onAyuda={onAyuda}>
@@ -281,7 +285,38 @@ export function CabeceraSala({ codigo, onVolver, onAyuda, texto }) {
       <p className="hint small">
         {copiado ? '¡Copiado al portapapeles!' : (texto || 'Pulsa el código para copiarlo y compártelo con los demás.')}
       </p>
+      {codigo && <QRSala codigo={codigo} />}
     </PanelMenu>
+  );
+}
+
+// QR (y enlace) para entrar en la sala desde otro móvil sin teclear el código.
+export function QRSala({ codigo }) {
+  const [abierto, setAbierto] = useState(false);
+  const [img, setImg] = useState('');
+  const [hecho, setHecho] = useState(false);
+  const enlace = enlaceSala(codigo);
+  useEffect(() => {
+    if (!abierto) return undefined;
+    let vivo = true;
+    QRCode.toDataURL(enlace, { margin: 1, width: 360, color: { dark: '#0f172a', light: '#ffffff' } }).then((u) => { if (vivo) setImg(u); }).catch(() => {});
+    return () => { vivo = false; };
+  }, [abierto, enlace]);
+  const compartir = async () => {
+    try {
+      if (navigator.share) await navigator.share({ title: 'Únete a mi sala', text: `Entra en mi sala ${codigo}`, url: enlace });
+      else { await navigator.clipboard?.writeText(enlace); setHecho(true); setTimeout(() => setHecho(false), 2000); }
+    } catch { /* cancelado */ }
+  };
+  return (
+    <div className="qq-qr">
+      <div className="qq-qr-botones">
+        <button type="button" onClick={() => setAbierto(!abierto)}>📱 {abierto ? 'Ocultar QR' : 'Mostrar QR'}</button>
+        <button type="button" onClick={compartir}>🔗 {hecho ? '¡Enlace copiado!' : 'Compartir enlace'}</button>
+      </div>
+      {abierto && (img ? <img src={img} alt={`QR para unirse a la sala ${codigo}`} /> : <p className="hint small">Generando QR…</p>)}
+      {abierto && <p className="hint small">Escanéalo con la cámara del móvil para entrar directamente.</p>}
+    </div>
   );
 }
 

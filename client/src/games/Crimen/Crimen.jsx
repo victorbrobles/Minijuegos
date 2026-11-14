@@ -6,6 +6,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import { PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, leerRecord, guardarRecord, registrarUnJugador, Aviso } from '../../components/UnJugador.jsx';
+import { RetoAmigo, datosDeReto, recordarPartida } from '../Solo/comun.jsx';
+import '../Solo/Solo.css';
 import { generarCaso, MUEBLES, NIVELES, COLUMNAS } from './generador.js';
 import './Crimen.css';
 
@@ -41,11 +43,17 @@ export default function Crimen({ reto } = {}) {
     return () => clearInterval(t);
   }, [fase]);
 
-  const empezar = () => {
+  const empezar = async () => {
     // El 8×8 puede tardar un poco en generarse: primero se pinta «Preparando el caso…»
     setFase('preparando');
+    // ¿Se ha entrado con el enlace de un reto entre amigos? Entonces se juega exactamente ese caso
+    const deReto = await datosDeReto('crimen');
+    const nv = deReto?.nivel && NIVELES[deReto.nivel] ? deReto.nivel : nivel;
+    const semilla = deReto?.semilla ?? Date.now();
+    if (nv !== nivel) setNivel(nv);
+    recordarPartida('crimen', { nivel: nv, semilla });
     setTimeout(() => {
-      setCaso(generarCaso(nivel, Date.now()));
+      setCaso(generarCaso(nv, semilla));
       setColoc({}); setTachadas({}); setPistasHechas({}); setModo('colocar'); setSel(1); setResultado(null); setNuevoRecord(false);
       setInicio(Date.now()); setFase('juego');
     }, 60);
@@ -84,6 +92,7 @@ export default function Crimen({ reto } = {}) {
           puntos={resultado.gana ? mmss(resultado.segundos) : null} unidad="minutos" nuevoRecord={nuevoRecord} record={record}
           textoRecord={(r) => mmss(r.valor)} exito={resultado.gana} onRepetir={empezar} onMenu={() => setFase('portada')}>
           <Tablero caso={caso} coloc={Object.fromEntries(caso.pos.map((c, p) => [p, c]))} enCelda={Object.fromEntries(caso.pos.map((c, p) => [c, p]))} tachadas={{}} resuelto />
+          {!reto && resultado.gana && <RetoAmigo juego="crimen" puntos={resultado.segundos} orden="asc" formato={(x) => `${mmss(x)} (${NIVELES[nivel].nombre})`} />}
         </FinUnJugador>
       </div>
     );

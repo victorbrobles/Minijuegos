@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import { PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, useRecord, Barra } from '../../components/UnJugador.jsx';
-import { cargarSolo, useCuenta, Cargando } from './comun.jsx';
+import { cargarSolo, useCuenta, Cargando, RetoAmigo } from './comun.jsx';
 import '../../reto/Reto.css';
 import './Solo.css';
 
@@ -97,7 +97,8 @@ export default function Escalera() {
         puntos={fmt(final.puntos)} unidad="puntos" nuevoRecord={nuevoRecord} record={record} textoRecord={(r) => `${fmt(r.valor)} puntos`}
         exito={final.puntos > 0} onRepetir={empezar} onMenu={() => setFase('portada')}>
         <p className="uj-mini">Llegaste a la pregunta {k + 1} de 15.</p>
-      </FinUnJugador>
+        <RetoAmigo juego={ID} puntos={final.puntos} formato={(x) => `${fmt(x)} puntos`} />
+        </FinUnJugador>
     );
   }
 

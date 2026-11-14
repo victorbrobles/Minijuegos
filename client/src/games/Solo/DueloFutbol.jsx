@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import { PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, useRecord, Barra } from '../../components/UnJugador.jsx';
-import { cargarSolo, useCuenta, Cargando } from './comun.jsx';
+import { cargarSolo, useCuenta, Cargando, RetoAmigo } from './comun.jsx';
 import './Solo.css';
 
 const ID = 'duelofutbol';
@@ -62,7 +62,9 @@ export default function DueloFutbol() {
     return (
       <FinUnJugador icono="flame" etiqueta={elegido === '' ? 'Se acabó el tiempo' : 'Fallaste'} titulo={racha >= 15 ? '¡Enciclopedia del fútbol!' : racha >= 7 ? '¡Gran racha!' : 'Fin de la racha'}
         puntos={racha} unidad={racha === 1 ? 'acierto seguido' : 'aciertos seguidos'} nuevoRecord={nuevoRecord} record={record}
-        textoRecord={(r) => `racha de ${r.valor}`} exito={racha > 0} onRepetir={empezar} onMenu={() => setFase('portada')} />
+        textoRecord={(r) => `racha de ${r.valor}`} exito={racha > 0} onRepetir={empezar} onMenu={() => setFase('portada')}>
+          <RetoAmigo juego={ID} puntos={racha} formato={(x) => `racha de ${x}`} />
+        </FinUnJugador>
     );
   }
 

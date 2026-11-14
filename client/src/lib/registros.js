@@ -2,6 +2,8 @@
 // Envío de resultados al servidor (salón de la fama) y lectura del salón y de los jugadores recientes.
 import { useEffect, useRef, useState } from 'react';
 import { etiquetar } from './identidad.js';
+import { comprobarLogros } from './logros.js';
+import { registrarEnNoche } from './noche.js';
 
 /**
  * Guarda una partida terminada. jugadores: [{ nombre, puntos (o null), gana }]. orden: 'desc' (más es mejor) o 'asc'.
@@ -9,6 +11,7 @@ import { etiquetar } from './identidad.js';
  */
 export function registrarPartida(juego, jugadores, { orden = 'desc' } = {}) {
   if (!juego || !Array.isArray(jugadores) || !jugadores.length) return;
+  try { registrarEnNoche(juego, jugadores, orden); } catch { /* la noche es un extra */ }
   try {
     fetch('/api/registros', {
       method: 'POST',
@@ -16,7 +19,7 @@ export function registrarPartida(juego, jugadores, { orden = 'desc' } = {}) {
       // Los nombres se ven sin etiqueta; al guardar se añade la tuya (y la de los recientes elegidos)
       body: JSON.stringify({ juego, orden, jugadores: jugadores.map((j) => ({ nombre: etiquetar(j.nombre), puntos: j.puntos ?? null, gana: Boolean(j.gana) })) }),
       keepalive: true
-    }).catch(() => {});
+    }).then(() => setTimeout(comprobarLogros, 300)).catch(() => {});
   } catch { /* sin red */ }
 }
 

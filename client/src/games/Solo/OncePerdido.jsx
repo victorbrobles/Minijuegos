@@ -6,7 +6,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
 import { PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, useRecord, Barra, Aviso } from '../../components/UnJugador.jsx';
-import { cargarSolo, useCuenta, Cargando, coincide } from './comun.jsx';
+import { cargarSolo, useCuenta, Cargando, coincide, RetoAmigo } from './comun.jsx';
 import './Solo.css';
 
 const ID = 'onceperdido';
@@ -77,7 +77,8 @@ export default function OncePerdido() {
         puntos={puntos} unidad="puntos" nuevoRecord={nuevoRecord} record={record} textoRecord={(r) => `${r.valor} puntos`}
         exito={puntos > 0} onRepetir={empezar} onMenu={() => setFase('portada')}>
         <p className="uj-mini">Máximo posible: 60 puntos.</p>
-      </FinUnJugador>
+        <RetoAmigo juego={ID} puntos={puntos} formato={(x) => `${x} puntos`} />
+        </FinUnJugador>
     );
   }
 

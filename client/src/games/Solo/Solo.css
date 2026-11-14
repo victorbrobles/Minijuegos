@@ -133,3 +133,13 @@
 .ms-casillas span.si { background: #22c55e; color: #ffffff; }
 .ms-casillas span.casi { background: #facc15; }
 .ms-casillas span i { font-style: normal; font-size: 0.9rem; }
+
+/* ---------- Retos entre amigos ---------- */
+.sl-reto { display: grid; gap: 0.5rem; margin-top: 0.8rem; padding-top: 0.8rem; border-top: 1px dashed #e2e8f0; text-align: left; }
+.sl-reto-titulo { margin: 0; font-weight: 900; color: #0f172a; }
+.sl-reto-url { font-size: 0.8rem; }
+.sl-reto-lista { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.3rem; }
+.sl-reto-lista li { display: flex; align-items: center; gap: 0.45rem; padding: 0.4rem 0.6rem; border-radius: 12px; background: #f8fafc; }
+.sl-reto-lista li.yo { background: #fef3c7; box-shadow: 0 0 0 2px #f59e0b; }
+.sl-reto-lista li b { flex: 1; color: #0f172a; }
+.sl-reto-lista li em { font-style: normal; font-weight: 900; color: #7c3aed; }

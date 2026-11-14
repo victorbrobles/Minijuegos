@@ -1,0 +1,21 @@
+{
+  "name": "Minigames Hub",
+  "short_name": "Minijuegos",
+  "description": "Minijuegos para jugar solo, en grupo en un móvil o online con amigos.",
+  "lang": "es",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1e1b4b",
+  "theme_color": "#7c3aed",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Reto diario", "url": "/reto", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Noche de juegos", "url": "/noche", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] }
+  ]
+}
