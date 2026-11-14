@@ -732,7 +732,7 @@ export const META = {
     colores: ['#f59e0b', '#7c2d12'],
     etiquetas: 'trivia preguntas cultura general escalera millonario comodines plantarse dificultad un jugador solitario',
     descripcion: "Quince preguntas cada vez más difíciles y una escalera de puntos hasta 10.000. Usa tus tres comodines, plántate a tiempo… o arriésgalo todo.",
-    categorias: ['un_jugador', 'prueba']
+    categorias: ['un_jugador']
   },
   'cronologia': {
     titulo: 'Línea del Tiempo',
@@ -741,7 +741,7 @@ export const META = {
     colores: ['#0ea5e9', '#1e3a8a'],
     etiquetas: 'historia fechas años cronologia inventos peliculas libros ordenar linea del tiempo un jugador solitario',
     descripcion: "Coloca inventos, películas, libros y hechos históricos en su sitio de la línea del tiempo. Cada acierto la alarga… y cada hueco es más fino.",
-    categorias: ['un_jugador', 'prueba']
+    categorias: ['un_jugador']
   },
   'cadena': {
     titulo: 'Categorías Encadenadas',
@@ -750,7 +750,7 @@ export const META = {
     colores: ['#10b981', '#064e3b'],
     etiquetas: 'categorias listas escribir contrarreloj cultura geografia futbol onces rapido un jugador solitario',
     descripcion: "Noventa segundos y una categoría tras otra: escribe todas las respuestas que sepas. Supera el mínimo para ganar tiempo y encadenar la siguiente.",
-    categorias: ['un_jugador', 'prueba']
+    categorias: ['un_jugador']
   },
   'quiensoy': {
     titulo: '¿Quién Soy? Contrarreloj',
@@ -759,7 +759,7 @@ export const META = {
     colores: ['#ec4899', '#581c87'],
     etiquetas: 'famosos adivinar preguntas si no deduccion contrarreloj celebridades un jugador solitario',
     descripcion: "Tres minutos para adivinar cuantos famosos puedas a base de preguntas de sí o no. Cada pregunta cuesta segundos: ¡pregunta con cabeza!",
-    categorias: ['un_jugador', 'famosos', 'prueba']
+    categorias: ['un_jugador']
   },
   'onceperdido': {
     titulo: 'El Once Perdido',
@@ -768,7 +768,7 @@ export const META = {
     colores: ['#22c55e', '#052e16'],
     etiquetas: 'futbol alineaciones onces titulares historicos champions mundial memoria un jugador solitario',
     descripcion: "Alineaciones de partidos históricos con cuatro titulares borrados. ¿Recuerdas quién jugaba con el 6 en la final del Mundial? Escríbelo antes de que se acabe el tiempo.",
-    categorias: ['un_jugador', 'futbol']
+    categorias: ['un_jugador']
   },
   'conexion': {
     titulo: 'Conexión',
@@ -777,7 +777,7 @@ export const META = {
     colores: ['#6366f1', '#1e1b4b'],
     etiquetas: 'futbol futbolistas companeros cadena conectar clubes jugadores grafo un jugador solitario',
     descripcion: "Une a dos futbolistas a través de compañeros de equipo. ¿Cómo llegas de Casillas a Haaland en el menor número de pasos?",
-    categorias: ['un_jugador', 'futbol']
+    categorias: ['un_jugador']
   },
   'duelofutbol': {
     titulo: 'Más o Menos Fútbol',
@@ -786,7 +786,7 @@ export const META = {
     colores: ['#ef4444', '#450a0a'],
     etiquetas: 'futbol futbolistas comparar mas menos racha clubes edad valor mercado un jugador solitario',
     descripcion: "¿Quién ha jugado en más clubes? ¿Quién es mayor? ¿Quién vale más? Dos futbolistas, una pregunta y diez segundos. El primer fallo acaba tu racha.",
-    categorias: ['un_jugador', 'futbol']
+    categorias: ['un_jugador']
   },
   'escudo': {
     titulo: 'Escudo Borroso',
@@ -795,7 +795,7 @@ export const META = {
     colores: ['#64748b', '#0f172a'],
     etiquetas: 'futbol escudos clubes logos borroso adivinar equipos un jugador solitario',
     descripcion: "Los escudos de los grandes clubes aparecen borrosos y en gris y se van aclarando. Cuanto antes reconozcas el equipo, más puntos.",
-    categorias: ['un_jugador', 'futbol']
+    categorias: ['un_jugador']
   },
   'manager': {
     titulo: 'Manager por un Día',
@@ -804,7 +804,7 @@ export const META = {
     colores: ['#0d9488', '#134e4a'],
     etiquetas: 'futbol fichajes mercado presupuesto plantilla liga simulacion estrategia manager un jugador solitario',
     descripcion: "Con 220 millones ficha tu once en tres mercados… sin ver la media de nadie. Después, 38 jornadas de liga dirán si tienes ojo de ojeador.",
-    categorias: ['un_jugador', 'futbol', 'estrategia']
+    categorias: ['un_jugador']
   },
   'misterioso': {
     titulo: 'Futbolista Misterioso',
@@ -813,7 +813,7 @@ export const META = {
     colores: ['#eab308', '#713f12'],
     etiquetas: 'futbol futbolista adivinar pistas pais liga club edad media deduccion un jugador solitario',
     descripcion: "Adivina al futbolista misterioso en 8 intentos. Cada nombre que pruebes te dice si aciertas su país, liga, club, puesto, edad y media.",
-    categorias: ['un_jugador', 'futbol']
+    categorias: ['un_jugador']
   },
   'patata': {
     titulo: 'La Patata Caliente',
@@ -822,7 +822,7 @@ export const META = {
     colores: ['#f97316', '#7c2d12'],
     etiquetas: 'bomba patata caliente cartas condicion pasar vidas eliminacion reflejos online',
     descripcion: "Una bomba con mecha secreta pasa de mano en mano. Juega cartas que superen la cifra o el color pedido para quitártela de encima… sin dejárselo fácil al siguiente.",
-    categorias: ['cartas', 'chill']
+    categorias: ['cartas']
   },
   'subasta': {
     titulo: 'Subasta a Ciegas',
@@ -831,7 +831,7 @@ export const META = {
     colores: ['#d97706', '#422006'],
     etiquetas: 'subasta pujas secretas lotes tesoros farol dinero estrategia online',
     descripcion: "Lotes misteriosos, pujas secretas y a la vez. Puede ser un tesoro, un trasto o una maldición: arruínate o hazte de oro.",
-    categorias: ['estrategia', 'chill']
+    categorias: ['chill']
   },
   'dragon': {
     titulo: 'El Dragón',
@@ -840,7 +840,7 @@ export const META = {
     colores: ['#dc2626', '#1c1917'],
     etiquetas: 'dragon mazmorra tesoros riesgo seguir volver valor tension online',
     descripcion: "Explorad juntos una mazmorra llena de tesoros. Tras cada sala, ¿sigues o vuelves con tu botín? Cada paso aumenta el riesgo de despertar al dragón.",
-    categorias: ['estrategia', 'chill']
+    categorias: ['estrategia']
   },
   'piramides': {
     titulo: 'Pirámides Futbolísticas',
@@ -849,7 +849,7 @@ export const META = {
     colores: ['#16a34a', '#1e3a8a'],
     etiquetas: 'futbol futbolistas regla secreta deduccion adivinar preguntar online',
     descripcion: "Cada uno tiene una regla secreta sobre futbolistas. Ve diciendo nombres, mira qué encaja y qué no, y descubre las reglas de los demás antes que nadie.",
-    categorias: ['futbol', 'estrategia']
+    categorias: ['futbol']
   },
   'transmision': {
     titulo: 'Última Transmisión',
@@ -858,7 +858,7 @@ export const META = {
     colores: ['#0ea5e9', '#0c0a3e'],
     etiquetas: 'cooperativo nave espacio averias comunicacion tiempo real equipo online',
     descripcion: "Vuestra nave se cae a pedazos. Cada uno controla una sección, pero el manual de cada avería lo tiene otro. Hablad, coordinaos y aguantad hasta enviar la última transmisión.",
-    categorias: ['chill', 'estrategia']
+    categorias: ['estrategia']
   }
 };
 
