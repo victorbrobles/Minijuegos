@@ -736,7 +736,7 @@ export const META = {
   },
   'cronologia': {
     titulo: 'Línea del Tiempo',
-    imagen: '/covers/cronologia.webp',
+    imagen: '/covers/lineatiempo.webp',
     icono: 'hourglass',
     colores: ['#0ea5e9', '#1e3a8a'],
     etiquetas: 'historia fechas años cronologia inventos peliculas libros ordenar linea del tiempo un jugador solitario',
@@ -745,7 +745,7 @@ export const META = {
   },
   'cadena': {
     titulo: 'Categorías Encadenadas',
-    imagen: '/covers/cadena.webp',
+    imagen: '/covers/categorias.webp',
     icono: 'letters',
     colores: ['#10b981', '#064e3b'],
     etiquetas: 'categorias listas escribir contrarreloj cultura geografia futbol onces rapido un jugador solitario',
@@ -781,7 +781,7 @@ export const META = {
   },
   'duelofutbol': {
     titulo: 'Más o Menos Fútbol',
-    imagen: '/covers/duelofutbol.webp',
+    imagen: '/covers/masomenos.webp',
     icono: 'scale',
     colores: ['#ef4444', '#450a0a'],
     etiquetas: 'futbol futbolistas comparar mas menos racha clubes edad valor mercado un jugador solitario',
@@ -808,7 +808,7 @@ export const META = {
   },
   'misterioso': {
     titulo: 'Futbolista Misterioso',
-    imagen: '/covers/misterioso.webp',
+    imagen: '/covers/futbolistamisterioso.webp',
     icono: 'sleuth',
     colores: ['#eab308', '#713f12'],
     etiquetas: 'futbol futbolista adivinar pistas pais liga club edad media deduccion un jugador solitario',
