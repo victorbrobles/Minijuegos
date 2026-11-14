@@ -225,12 +225,12 @@ export function duelofutbol() {
 // ------------------------------------------------------------------ Escudo borroso
 const miniatura = (url) => {
   const m = /^https:\/\/upload\.wikimedia\.org\/wikipedia\/(commons|en)\/([0-9a-f])\/([0-9a-f]{2})\/([^/]+\.svg)$/i.exec(url || '');
-  return m ? `https://upload.wikimedia.org/wikipedia/${m[1]}/thumb/${m[2]}/${m[3]}/${m[4]}/240px-${m[4]}.png` : url;
+  return m ? `https://upload.wikimedia.org/wikipedia/${m[1]}/thumb/${m[2]}/${m[3]}/${m[4]}/250px-${m[4]}.png` : url;
 };
 const NOMBRE_CLUB = { 'Inter de Milán': 'Inter de Milán', 'Paris Saint-Germain': 'PSG (Paris Saint-Germain)' };
 export function escudo() {
   const clubes = new Map();
-  for (const t of RETOS_TRAYECTORIAS) for (const c of t.clubes) if (c.logo && !clubes.has(c.nombre)) clubes.set(c.nombre, { nombre: NOMBRE_CLUB[c.nombre] || c.nombre, logo: c.logo.replace('/120px-', '/240px-'), color: c.colores?.[0] });
+  for (const t of RETOS_TRAYECTORIAS) for (const c of t.clubes) if (c.logo && !clubes.has(c.nombre)) clubes.set(c.nombre, { nombre: NOMBRE_CLUB[c.nombre] || c.nombre, logo: c.logo.replace('/120px-', '/250px-'), color: c.colores?.[0] });
   for (const c of Object.values(CLUBES_INFO)) {
     const ya = [...clubes.keys()].some((k) => norm(k).includes(norm(c.nombre)) || norm(c.nombre).includes(norm(k)));
     if (c.escudo && !ya) clubes.set(c.nombre, { nombre: c.nombre, logo: miniatura(c.escudo), color: c.colores?.[0] });

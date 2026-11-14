@@ -42,13 +42,24 @@ export default function Crimen({ reto } = {}) {
   }, [fase]);
 
   const empezar = () => {
-    setCaso(generarCaso(nivel, Date.now()));
-    setColoc({}); setTachadas({}); setPistasHechas({}); setModo('colocar'); setSel(1); setResultado(null); setNuevoRecord(false);
-    setInicio(Date.now()); setFase('juego');
+    // El 8×8 puede tardar un poco en generarse: primero se pinta «Preparando el caso…»
+    setFase('preparando');
+    setTimeout(() => {
+      setCaso(generarCaso(nivel, Date.now()));
+      setColoc({}); setTachadas({}); setPistasHechas({}); setModo('colocar'); setSel(1); setResultado(null); setNuevoRecord(false);
+      setInicio(Date.now()); setFase('juego');
+    }, 60);
   };
 
   const enCelda = useMemo(() => Object.fromEntries(Object.entries(coloc).map(([p, c]) => [c, Number(p)])), [coloc]);
 
+  if (fase === 'preparando') {
+    return (
+      <div className="crm-contenedor">
+        <section className="game uj-escena"><div className="uj-tarjeta crm-preparando"><span>🔎</span><p>Preparando el caso…</p><small>{NIVELES[nivel].nombre} · {NIVELES[nivel].n}×{NIVELES[nivel].n}</small></div></section>
+      </div>
+    );
+  }
   if (fase === 'portada') {
     return (
       <div className="crm-contenedor">

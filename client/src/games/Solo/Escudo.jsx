@@ -28,6 +28,7 @@ export default function Escudo() {
   const [ganados, setGanados] = useState(0);
   const [aciertos, setAciertos] = useState(0);
   const [cargada, setCargada] = useState(false);
+  const [reserva, setReserva] = useState(false); // si la miniatura grande falla, se prueba la de 120 px
   const cuenta = useCuenta(fase === 'jugando' && elegida === null && cargada, () => responder(''));
 
   const empezar = async () => {
@@ -75,7 +76,8 @@ export default function Escudo() {
         <CabeceraPartida onSalir={() => setSalir(true)} chips={[<><Icon name="star" size={14} /> {puntos}</>, <>🛡️ {k + 1}/10</>]} />
         <div className="rto-juego">
           <div className="esd-marco">
-            <img key={r.logo} src={r.logo} alt="Escudo" referrerPolicy="no-referrer" onLoad={alCargar} onError={() => { setCargada(true); setElegida('—'); }}
+            <img key={r.logo + reserva} src={reserva ? r.logo.replace('/250px-', '/120px-') : r.logo} alt="Escudo" referrerPolicy="no-referrer" onLoad={alCargar}
+              onError={() => { if (!reserva && r.logo.includes('/250px-')) setReserva(true); else { setCargada(true); setElegida('—'); } }}
               style={{ filter: `blur(${(t * 22).toFixed(1)}px) grayscale(${Math.min(1, t * 1.6).toFixed(2)})`, transform: `scale(${1 + t * 0.25})` }} />
             {elegida === null && cargada && <span className="esd-tiempo">{Math.ceil(cuenta.restante)} s · {Math.max(10, Math.round(t * 100))} pts</span>}
             {!cargada && <span className="esd-tiempo">Cargando escudo…</span>}

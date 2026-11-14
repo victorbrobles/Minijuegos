@@ -18,14 +18,16 @@ const COLORES_SALA = ['#fde68a', '#bfdbfe', '#bbf7d0', '#fbcfe8', '#ddd6fe', '#f
 export const PERSONAS = [
   { nombre: 'Víctor', e: '💀', victima: true },
   { nombre: 'Ana', e: '👩‍🦰', f: true }, { nombre: 'Bruno', e: '🧔' }, { nombre: 'Carla', e: '👩‍🦱', f: true },
-  { nombre: 'Darío', e: '👨‍🦳' }, { nombre: 'Elsa', e: '👱‍♀️', f: true }, { nombre: 'Fede', e: '🧑‍🦲' }
+  { nombre: 'Darío', e: '👨‍🦳' }, { nombre: 'Elsa', e: '👱‍♀️', f: true }, { nombre: 'Fede', e: '🧑‍🦲' },
+  { nombre: 'Gloria', e: '👩‍🦳', f: true }
 ];
 export const NIVELES = {
   facil: { n: 5, nombre: 'Fácil', directas: true },
   normal: { n: 6, nombre: 'Normal', directas: true },
-  dificil: { n: 6, nombre: 'Difícil', directas: false }
+  // 8×8 sin pistas de fila/columna y con las pistas más débiles primero: hay que encadenar muchas deducciones
+  experto: { n: 8, nombre: 'Experto', directas: false, debiles: true }
 };
-export const COLUMNAS = 'ABCDEF';
+export const COLUMNAS = 'ABCDEFGH';
 
 function rngDe(semilla) {
   let s = semilla >>> 0 || 1;
@@ -106,29 +108,33 @@ export function contarSoluciones(caso, pistas, tope = 2) {
   const { n, mueble, personas } = caso;
   const libres = [...Array(n * n).keys()].filter((c) => !mueble[c] || !MUEBLES[mueble[c]].bloquea);
   const cand = personas.map((_, p) => libres.filter((c) => pistas.every((q) => q.tipo !== 'u' || q.p !== p || q.f(c))));
-  const orden = personas.map((_, p) => p).sort((a, b) => cand[a].length - cand[b].length);
+  if (cand.some((l) => !l.length)) return 0;
   const binarias = pistas.filter((q) => q.tipo === 'b');
+  const porPersona = personas.map((_, p) => binarias.filter((q) => q.a === p || q.b === p));
   const pos = Array(personas.length).fill(-1);
-  const filas = new Set(); const cols = new Set();
+  const filas = Array(n).fill(false); const cols = Array(n).fill(false);
   let total = 0;
-  const salaDe = (c) => caso.sala[c];
+  const sala = caso.sala;
   // Regla del asesino: en la habitación de la víctima hay exactamente un sospechoso más
   const victima = personas.findIndex((x) => x.victima);
-  function vale() {
-    const s = salaDe(pos[victima]);
-    return pos.filter((c, p) => p !== victima && salaDe(c) === s).length === 1;
-  }
-  function rec(k) {
+  const vale = () => pos.filter((c, p) => p !== victima && sala[c] === sala[pos[victima]]).length === 1;
+  const encaja = (p, c) => !filas[Math.floor(c / n)] && !cols[c % n]
+    && porPersona[p].every((q) => { const x = q.a === p ? c : pos[q.a]; const y = q.b === p ? c : pos[q.b]; return x < 0 || y < 0 || q.f(x, y); });
+  function rec(colocados) {
     if (total >= tope) return;
-    if (k === orden.length) { if (vale()) total += 1; return; }
-    const p = orden[k];
-    for (const c of cand[p]) {
-      const f = Math.floor(c / n); const col = c % n;
-      if (filas.has(f) || cols.has(col)) continue;
-      pos[p] = c;
-      const ok = binarias.every((q) => (q.a !== p && q.b !== p) || pos[q.a] < 0 || pos[q.b] < 0 || q.f(pos[q.a], pos[q.b]));
-      if (ok) { filas.add(f); cols.add(col); rec(k + 1); filas.delete(f); cols.delete(col); }
-      pos[p] = -1;
+    if (colocados === personas.length) { if (vale()) total += 1; return; }
+    // Se coloca primero a quien menos opciones le quedan (y si alguien no tiene ninguna, se corta aquí)
+    let mejor = -1; let opciones = null;
+    for (let p = 0; p < personas.length; p++) {
+      if (pos[p] >= 0) continue;
+      const o = cand[p].filter((c) => encaja(p, c));
+      if (!o.length) return;
+      if (!opciones || o.length < opciones.length) { mejor = p; opciones = o; if (o.length === 1) break; }
+    }
+    for (const c of opciones) {
+      pos[mejor] = c; filas[Math.floor(c / n)] = true; cols[c % n] = true;
+      rec(colocados + 1);
+      pos[mejor] = -1; filas[Math.floor(c / n)] = false; cols[c % n] = false;
       if (total >= tope) return;
     }
   }
@@ -157,17 +163,28 @@ export function generarCaso(nivel = 'normal', semilla = Date.now()) {
     const conVictima = pos.slice(1).map((c, i) => [c, i + 1]).filter(([c]) => sala[c] === sv);
     if (conVictima.length !== 1) continue;
     const caso = { n, sala, salas, colores: COLORES_SALA, mueble, personas, pos, asesino: conVictima[0][1], semilla };
-    const todas = barajar(pistasVerdaderas(caso, cfg.directas), r).sort((a, b) => b.peso - a.peso + (r() - 0.5) * 2.2);
-    // Añadir pistas hasta que haya una sola solución
+    const todas = barajar(pistasVerdaderas(caso, cfg.directas), r)
+      .sort((a, b) => (cfg.debiles ? a.peso - b.peso : b.peso - a.peso) + (r() - 0.5) * 2.2);
+    // Si ni con todas las pistas hay una sola solución, se descarta este plano
+    const tIntento = Date.now();
+    if (contarSoluciones(caso, todas) !== 1) continue;
+    // Añadir pistas hasta que haya una sola solución (comprobando cada pocas pistas)
     const elegidas = [];
+    const paso = cfg.debiles ? 3 : 1;
     let unica = false;
+    let lento = false;
     for (const q of todas) {
       elegidas.push(q);
-      if (elegidas.length >= n && contarSoluciones(caso, elegidas) === 1) { unica = true; break; }
+      if (elegidas.length >= n && elegidas.length % paso === 0 && contarSoluciones(caso, elegidas) === 1) { unica = true; break; }
+      // Un plano que cuesta tanto resolver se cambia por otro (en el móvil no puede tardar)
+      if (Date.now() - tIntento > 700) { lento = true; break; }
     }
+    if (lento) continue;
+    if (!unica) unica = contarSoluciones(caso, elegidas) === 1;
     if (!unica) continue;
     // Quitar las que sobran
     for (let i = elegidas.length - 1; i >= 0; i--) {
+      if (Date.now() - tIntento > 1000) break; // sin pasarse de tiempo: alguna pista de más no rompe nada
       const sin = elegidas.filter((_, k) => k !== i);
       if (contarSoluciones(caso, sin) === 1) elegidas.splice(i, 1);
     }

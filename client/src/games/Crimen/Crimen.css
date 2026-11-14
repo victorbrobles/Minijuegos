@@ -53,3 +53,8 @@
 
 .crm-pistas .uj-etiqueta { margin-bottom: 0.15rem; }
 .crm-acciones .uj-boton { padding-top: 0.65rem !important; padding-bottom: 0.65rem !important; }
+.crm-preparando { text-align: center; }
+.crm-preparando span { display: inline-block; font-size: 3rem; animation: crmLupa 1s ease-in-out infinite alternate; }
+.crm-preparando p { margin: 0.3rem 0 0; font-weight: 900; color: #0f172a; }
+.crm-preparando small { color: #64748b; font-weight: 700; }
+@keyframes crmLupa { to { transform: translateX(14px) rotate(15deg); } }
