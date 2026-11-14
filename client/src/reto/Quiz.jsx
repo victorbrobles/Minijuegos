@@ -51,6 +51,7 @@ export default function Quiz({ datos, onFin }) {
       {elegida === null && <Barra valor={restante / segundos} etiqueta={`${Math.ceil(restante)} s`} invertida />}
       <div className="uj-tarjeta rto-pregunta">
         {q.etiqueta && <span className="rto-etiqueta">{q.etiqueta}</span>}
+        {q.grande && <div className="rto-grande">{q.grande}</div>}
         <h2>{q.p}</h2>
         <div className="rto-opciones">
           {q.opciones.map((o, k) => {

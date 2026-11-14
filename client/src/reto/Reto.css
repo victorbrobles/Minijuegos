@@ -57,3 +57,46 @@
 .rto-banner-estado { flex: none; padding: 0.35rem 0.7rem; border-radius: 999px; background: #ffffff; color: #92400e; font-weight: 900; font-size: 0.82rem; }
 .rto-banner-estado.ok { color: #15803d; }
 .rto-banner-estado.mal { color: #b91c1c; }
+
+/* ---------- Retos nuevos ---------- */
+.rto-grande { font-size: 5rem; line-height: 1.1; text-align: center; margin: 0.3rem 0; }
+.rto-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.rto-chip { padding: 0.45rem 0.7rem; border: 2px solid #e2e8f0; border-radius: 999px; background: #ffffff; color: #0f172a; font: inherit; font-size: 0.88rem; font-weight: 700; cursor: pointer; }
+.rto-chip:disabled { cursor: default; }
+.rto-chip.marcado { border-color: #f59e0b; background: #fffbeb; }
+.rto-chip.si { border-color: #22c55e; background: #dcfce7; }
+.rto-chip.no { border-color: #ef4444; background: #fee2e2; }
+.rto-chip.falta { border-color: #22c55e; border-style: dashed; }
+.rto-chip b { margin-left: 0.25rem; }
+.rto-famoso-preguntas .rto-chips { max-height: 30vh; overflow-y: auto; }
+.rto-famosos { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.3rem; max-height: 42vh; overflow-y: auto; }
+.rto-famoso { display: flex; align-items: center; gap: 0.3rem; padding: 0.4rem 0.5rem; border: 2px solid #e2e8f0; border-radius: 12px; background: #ffffff; color: #0f172a; font: inherit; font-size: 0.82rem; font-weight: 700; text-align: left; cursor: pointer; }
+.rto-famoso.fuera { opacity: 0.28; text-decoration: line-through; }
+.rto-famoso.bien { border-color: #22c55e; background: #dcfce7; }
+.rto-famoso.mal { border-color: #ef4444; background: #fee2e2; }
+.rto-ahorcado { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.3rem; margin: 0.6rem 0; }
+.rto-ahorcado span { display: grid; place-items: center; width: 1.7rem; height: 2.2rem; border-bottom: 3px solid #334155; font-size: 1.3rem; font-weight: 900; color: #0f172a; }
+.rto-ahorcado span.hueco { border: none; width: 0.8rem; }
+.rto-ahorcado span.falta { color: #dc2626; }
+.rto-vidas { margin: 0 0 0.6rem; text-align: center; letter-spacing: 0.1em; }
+.rto-teclado { display: grid; grid-template-columns: repeat(auto-fill, minmax(2.3rem, 1fr)); gap: 0.3rem; }
+.rto-teclado button { padding: 0.5rem 0; border: 2px solid #e2e8f0; border-radius: 10px; background: #ffffff; color: #0f172a; font: inherit; font-weight: 900; cursor: pointer; }
+.rto-teclado button.bien { background: #dcfce7; border-color: #22c55e; }
+.rto-teclado button.mal { background: #fee2e2; border-color: #fecaca; color: #b91c1c; }
+.rto-letras { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.3rem; margin: 0.7rem 0; }
+.rto-letras span { display: grid; place-items: center; width: 2.1rem; height: 2.4rem; border-radius: 10px; background: #fef3c7; color: #92400e; font-size: 1.3rem; font-weight: 900; box-shadow: 0 3px 0 #f59e0b66; }
+.rto-stroop { position: relative; text-align: center; }
+.rto-stroop-palabra { margin: 0.6rem 0 0.4rem; font-family: 'Bricolage Grotesque', sans-serif; font-size: clamp(2.6rem, 13vw, 3.6rem); font-weight: 900; }
+.rto-flash { position: absolute; top: 0.6rem; right: 0.9rem; font-size: 1.6rem; font-weight: 900; animation: rtoFlash 0.5s ease-out forwards; }
+.rto-flash.bien { color: #16a34a; } .rto-flash.mal { color: #dc2626; }
+@keyframes rtoFlash { from { opacity: 1; transform: scale(1.3); } to { opacity: 0; transform: scale(1); } }
+.rto-stroop-botones { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+.rto-stroop-botones button { padding: 1rem 0; border: 3px solid var(--c); border-radius: 18px; background: #ffffff; color: #0f172a; font: inherit; font-size: 1.1rem; font-weight: 900; text-transform: uppercase; cursor: pointer; touch-action: manipulation; }
+.rto-reflejos { display: grid; place-items: center; width: 100%; min-height: 45vh; border: none; border-radius: 28px; font: inherit; font-size: 1.6rem; font-weight: 900; color: #ffffff; cursor: pointer; background: #334155; touch-action: manipulation; }
+.rto-reflejos.espera { background: #dc2626; }
+.rto-reflejos.ya { background: #16a34a; }
+.rto-reflejos.resultado, .rto-reflejos.listo, .rto-reflejos.fin { background: #1e40af; }
+.rto-cartas { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0.5rem; width: 100%; max-width: 420px; margin: 0 auto; }
+.rto-carta { aspect-ratio: 3 / 4; border: none; border-radius: 16px; background: linear-gradient(145deg, #f59e0b, #b45309); color: #ffffff; font-size: 1.8rem; font-weight: 900; cursor: pointer; box-shadow: 0 4px 0 rgba(0, 0, 0, 0.25); transition: transform 0.2s; }
+.rto-carta.vista { background: #ffffff; color: #0f172a; transform: rotateY(0deg); font-size: 2.2rem; }
+.rto-carta.hecha { background: #dcfce7; opacity: 0.85; }

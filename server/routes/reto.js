@@ -13,6 +13,7 @@ import { elegir as elegirIntruso } from './intruso.js';
 import { elegir as elegirOrden } from './ponorden.js';
 import { BASE as FUTBOLISTAS } from './fichajes.js';
 import { CLUBES } from '../../client/src/games/Fichajes/engine.js';
+import { TIPOS_EXTRA } from '../lib/retosExtra.js';
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS retos_diarios (fecha TEXT PRIMARY KEY, tipo TEXT NOT NULL, datos TEXT NOT NULL);
@@ -114,8 +115,14 @@ export const TIPOS = {
     generar() { return { modo: 'crimen', semilla: Math.floor(Math.random() * 1e9), nivel: 'facil' }; }
   }
 };
-// Orden fijo de la rotación (así dos días seguidos nunca repiten tipo)
-const ROTACION = ['cultura', 'memoria', 'futbol', 'ordenar', 'pareja', 'calculo', 'intruso', 'crimen'];
+Object.assign(TIPOS, TIPOS_EXTRA);
+// Orden fijo de la rotación: 31 tipos, uno por cada día del mes, alternando conocimiento y habilidad
+// (dos días seguidos nunca repiten tipo)
+const ROTACION = [
+  'cultura', 'memoria', 'futbol', 'famoso', 'ordenar', 'stroop', 'pareja', 'ahorcado', 'cine', 'calculo', 'banderas',
+  'seleccionar', 'intruso', 'reflejos', 'frases', 'anagramas', 'historia', 'parejas', 'trayectoria', 'masmenos', 'siglas',
+  'crimen', 'ciencia', 'aproximar', 'datosobra', 'secuencias', 'verdadero', 'acta', 'capitales', 'once', 'musica'
+];
 const tipoDe = (fecha) => ROTACION[Math.floor(Date.parse(`${fecha}T12:00:00Z`) / 86400000) % ROTACION.length];
 
 const leerReto = db.prepare('SELECT * FROM retos_diarios WHERE fecha = ?');

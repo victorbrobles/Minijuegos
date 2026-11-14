@@ -17,13 +17,25 @@ for (const [k, t] of Object.entries(TIPOS)) {
     if (d.modo === 'ordenar') assert.equal(d.series.length, 2);
     if (d.modo === 'memoria') assert.ok(d.secuencia.length >= d.objetivo);
     if (d.modo === 'calculo') d.operaciones.forEach((o) => assert.ok(Number.isInteger(o.res) && o.res > 0, o.texto));
+    if (d.modo === 'famoso') {
+      const firma = (i) => d.preguntas.map((p) => p.si.includes(i)).join();
+      assert.equal(d.candidatos.filter((_, i) => firma(i) === firma(d.objetivo)).length, 1, 'famoso sin firma única');
+    }
+    if (d.modo === 'ahorcado') d.palabras.forEach((p) => assert.match(p.palabra, /^[A-Z ]+$/));
+    if (d.modo === 'anagramas') d.palabras.forEach((p) => assert.equal([...p.desordenada].sort().join(), [...p.palabra].sort().join()));
+    if (d.modo === 'aproximar') d.preguntas.forEach((q) => assert.ok(Number.isFinite(q.respuesta) && q.respuesta > 0, q.p));
+    if (d.modo === 'seleccionar') { assert.equal(d.correctos.length, 11); assert.ok(d.correctos.every((c) => d.nombres.includes(c))); assert.equal(new Set(d.nombres).size, d.nombres.length); }
+    if (d.modo === 'stroop') d.items.forEach((it) => assert.ok(['rojo', 'azul', 'verde', 'amarillo'].includes(it.tinta)));
+    if (d.modo === 'reflejos') assert.ok(d.esperas.length >= 3);
+    if (d.modo === 'parejas') assert.ok(d.cartas.length % 2 === 0 && d.maxIntentos >= d.cartas.length / 2);
   }
 }
-// Rotación: dos días seguidos nunca tienen el mismo tipo, y en 8 días salen todos
-const dias = Array.from({ length: 16 }, (_, i) => new Date(Date.UTC(2026, 10, 1 + i, 12)).toISOString().slice(0, 10));
+// Rotación: dos días seguidos nunca tienen el mismo tipo, y en 31 días salen los 31
+assert.ok(Object.keys(TIPOS).length >= 31);
+const dias = Array.from({ length: 62 }, (_, i) => new Date(Date.UTC(2026, 10, 1 + i, 12)).toISOString().slice(0, 10));
 const tipos = dias.map((f) => retoDe(f).tipo);
 tipos.forEach((t, i) => { if (i) assert.notEqual(t, tipos[i - 1]); });
-assert.equal(new Set(tipos.slice(0, 8)).size, 8);
+assert.equal(new Set(tipos.slice(0, 31)).size, 31);
 // El reto de un día no cambia
 assert.deepEqual(retoDe(dias[0]), retoDe(dias[0]));
 

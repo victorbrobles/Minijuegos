@@ -9,11 +9,18 @@ import Quiz from '../reto/Quiz.jsx';
 import Ordenar from '../reto/Ordenar.jsx';
 import Memoria from '../reto/Memoria.jsx';
 import Calculo from '../reto/Calculo.jsx';
+import Famoso from '../reto/Famoso.jsx';
+import { Ahorcado, Anagramas } from '../reto/Palabras.jsx';
+import { Stroop, Reflejos, Parejas } from '../reto/Habilidad.jsx';
+import { Aproximar, Seleccionar } from '../reto/Varios.jsx';
 import Crimen from '../games/Crimen/Crimen.jsx';
 import '../components/UnJugador.css';
 import '../reto/Reto.css';
 
-const MODOS = { quiz: Quiz, ordenar: Ordenar, memoria: Memoria, calculo: Calculo };
+const MODOS = {
+  quiz: Quiz, ordenar: Ordenar, memoria: Memoria, calculo: Calculo, famoso: Famoso, ahorcado: Ahorcado, anagramas: Anagramas,
+  stroop: Stroop, reflejos: Reflejos, parejas: Parejas, aproximar: Aproximar, seleccionar: Seleccionar
+};
 const post = (url, body) => fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
   .then(async (r) => ({ ok: r.ok, datos: await r.json().catch(() => ({})) }));
 
