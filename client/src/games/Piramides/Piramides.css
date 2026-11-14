@@ -37,3 +37,26 @@
 .pir-final li span { color: #4c1d95; font-weight: 800; }
 .pir-final li small { color: #64748b; font-weight: 600; }
 @keyframes pirEntra { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+
+/* ---------- Categorías y turnos (jugadores que verifican) ---------- */
+.pir-ver { width: 100%; padding: 0.75rem 1rem; border: 2px dashed rgba(255, 255, 255, 0.6); border-radius: 16px; background: rgba(255, 255, 255, 0.12); color: #ffffff; font: inherit; font-weight: 800; cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: none; }
+.pir-ver.visible { border-style: solid; background: #ffffff; color: #0f172a; }
+.pir-ver small { display: block; font-size: 0.72rem; color: #7c3aed; text-transform: uppercase; letter-spacing: 0.05em; }
+.pir-ver b { font-size: 1.1rem; }
+.pir-input { width: 100%; box-sizing: border-box; padding: 0.75rem 0.9rem; border: 3px solid #e2e8f0; border-radius: 14px; font: inherit; font-size: 1rem; font-weight: 700; color: #0f172a; outline: none; }
+.pir-input:focus { border-color: #7c3aed; }
+.pir-si, .pir-no { padding: 0.9rem 0.5rem; border: none; border-radius: 16px; font: inherit; font-size: 1.05rem; font-weight: 900; color: #ffffff; cursor: pointer; box-shadow: 0 4px 0 rgba(0, 0, 0, 0.2); }
+.pir-si { background: #16a34a; } .pir-no { background: #dc2626; }
+.pir-si:disabled, .pir-no:disabled { opacity: 0.4; cursor: default; }
+.pir-objetivos button:disabled { opacity: 0.45; }
+.pir-elegir { display: grid; gap: 0.5rem; }
+.pir-lista-cats { max-height: 46vh; overflow-y: auto; display: grid; gap: 0.25rem; padding-right: 0.2rem; }
+.pir-lista-cats > div { display: grid; gap: 0.25rem; }
+.pir-grupo { margin: 0.5rem 0 0.1rem !important; color: #7c3aed !important; font-size: 0.78rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.04em; }
+.pir-lista-cats button { padding: 0.5rem 0.7rem; border: 2px solid #e2e8f0; border-radius: 12px; background: #ffffff; color: #0f172a; font: inherit; font-size: 0.88rem; font-weight: 700; text-align: left !important; justify-content: flex-start !important; cursor: pointer; }
+.pir-lista-cats button.sel { border-color: #7c3aed; background: #f5f3ff; box-shadow: 0 0 0 2px #ddd6fe; }
+.pir-lista-cats button:disabled { opacity: 0.35; text-decoration: line-through; }
+.pir-jugador.eliminado { opacity: 0.75; background: #f1f5f9; }
+.pir-extra { display: block; font-size: 0.75rem; }
+.pir-tu-turno { background: #fef3c7 !important; color: #78350f !important; font-weight: 900; animation: pirLatido 1.2s ease-in-out infinite; }
+@keyframes pirLatido { 50% { transform: scale(1.02); } }

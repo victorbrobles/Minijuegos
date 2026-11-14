@@ -848,7 +848,7 @@ export const META = {
     icono: 'soccer',
     colores: ['#16a34a', '#1e3a8a'],
     etiquetas: 'futbol futbolistas regla secreta deduccion adivinar preguntar online',
-    descripcion: "Cada uno tiene una regla secreta sobre futbolistas. Ve diciendo nombres, mira qué encaja y qué no, y descubre las reglas de los demás antes que nadie.",
+    descripcion: "Cada uno tiene una categoría secreta sobre futbolistas. Los rivales te dicen nombres y tú dices si encajan. Adivina las categorías de los demás para eliminarlos y sé el último en pie.",
     categorias: ['futbol']
   },
   'transmision': {
