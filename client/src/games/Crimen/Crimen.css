@@ -33,3 +33,23 @@
 .uj-fin .crm-coord { color: #64748b; }
 
 .crm-tablero { padding: 0.35rem; border-radius: 14px; background: rgba(255, 255, 255, 0.12); }
+
+/* ---------- Distribución: plano y pistas a la vista a la vez ---------- */
+.crm-contenedor .uj-escena { gap: 0.55rem; }
+.crm-mision { margin-top: 0.4rem; padding: 0.35rem 0.65rem; font-size: 0.82rem; line-height: 1.25; }
+.crm-personas { flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; margin: 0; padding: 0.15rem 0.1rem 0.35rem; scrollbar-width: thin; }
+.crm-persona { flex: none; padding: 0.3rem 0.6rem; font-size: 0.9rem; }
+.crm-zona { display: grid; gap: 0.55rem; }
+/* El plano nunca ocupa más de la mitad del alto de la pantalla */
+.crm-zona .crm-tablero { width: min(94vw, 470px, 43vh); padding: 0.2rem; }
+.crm-pistas { padding: 0.65rem 0.75rem !important; }
+.crm-pistas ul { max-height: 25vh; overflow-y: auto; gap: 0.2rem; padding-right: 0.3rem; font-size: 0.88rem; line-height: 1.3; }
+.crm-acciones { grid-template-columns: 1fr auto; margin-top: 0; }
+@media (min-width: 860px) {
+  .crm-zona { grid-template-columns: auto 1fr; align-items: start; }
+  .crm-zona .crm-tablero { width: min(470px, 62vh); }
+  .crm-pistas ul { max-height: min(62vh, 470px); font-size: 0.95rem; }
+}
+
+.crm-pistas .uj-etiqueta { margin-bottom: 0.15rem; }
+.crm-acciones .uj-boton { padding-top: 0.65rem !important; padding-bottom: 0.65rem !important; }

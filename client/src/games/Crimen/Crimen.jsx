@@ -111,19 +111,10 @@ export default function Crimen() {
     <div className="crm-contenedor qq-en-partida">
       <section className="game uj-escena">
         <CabeceraPartida onSalir={() => setSalir(true)} chips={[<>🔎 {NIVELES[nivel].nombre}</>, <><Icon name="clock" size={14} /> {mmss(Math.round((Date.now() - inicio) / 1000))}</>]}>
-          <p className="crm-mision">¿Quién mató a <b>Víctor</b>? Coloca a todos con las pistas: el asesino es el único que estaba en su habitación.</p>
+          <p className="crm-mision">¿Quién mató a <b>Víctor</b>? Solo el asesino estaba en su habitación.</p>
         </CabeceraPartida>
 
-        <div className="uj-tarjeta crm-pistas">
-          <p className="uj-etiqueta">Pistas (toca para marcarlas)</p>
-          <ul>
-            {caso.pistas.map((q, i) => (
-              <li key={q} className={pistasHechas[i] ? 'hecha' : ''} onClick={() => setPistasHechas((x) => ({ ...x, [i]: !x[i] }))}>{q}</li>
-            ))}
-            <li className="regla">Una persona por fila y por columna. Nadie encima de 🍽️ 📚 🪴.</li>
-          </ul>
-        </div>
-
+        {/* En el móvil caben a la vez: personas, plano y pistas (con su propio scroll) */}
         <div className="crm-personas">
           {caso.personas.map((per, p) => (
             <button key={per.nombre} type="button" className={`crm-persona${sel === p && modo === 'colocar' ? ' sel' : ''}${coloc[p] != null ? ' puesta' : ''}${conflictos.has(p) ? ' mal' : ''}${per.victima ? ' victima' : ''}`}
@@ -134,11 +125,22 @@ export default function Crimen() {
           <button type="button" className={`crm-persona tachar${modo === 'tachar' ? ' sel' : ''}`} onClick={() => setModo(modo === 'tachar' ? 'colocar' : 'tachar')}><span>✖</span>Tachar</button>
         </div>
 
-        <Tablero caso={caso} coloc={coloc} enCelda={enCelda} tachadas={tachadas} onTocar={tocar} conflictos={conflictos} />
+        <div className="crm-zona">
+          <Tablero caso={caso} coloc={coloc} enCelda={enCelda} tachadas={tachadas} onTocar={tocar} conflictos={conflictos} />
+          <div className="uj-tarjeta crm-pistas">
+            <p className="uj-etiqueta">Pistas · toca para marcarlas</p>
+            <ul>
+              {caso.pistas.map((q, i) => (
+                <li key={q} className={pistasHechas[i] ? 'hecha' : ''} onClick={() => setPistasHechas((x) => ({ ...x, [i]: !x[i] }))}>{q}</li>
+              ))}
+              <li className="regla">Una persona por fila y por columna. Nadie encima de 🍽️ 📚 🪴.</li>
+            </ul>
+          </div>
+        </div>
 
         <div className="crm-acciones">
-          <button type="button" className="uj-boton grande" disabled={!completo} onClick={comprobar}><Icon name="check" size={20} /> Comprobar la escena</button>
-          <button type="button" className="uj-boton secundario" onClick={() => setAcusar(true)}>🫵 Acusar directamente</button>
+          <button type="button" className="uj-boton grande" disabled={!completo} onClick={comprobar}><Icon name="check" size={20} /> Comprobar</button>
+          <button type="button" className="uj-boton secundario" onClick={() => setAcusar(true)}>🫵 Acusar</button>
         </div>
       </section>
       {acusar && (

@@ -57,10 +57,13 @@
   line-height: 1.15;
 }
 
-.pc-texto.grande {
-  font-family: 'Bricolage Grotesque', sans-serif;
-  font-size: 2.1rem;
-}
+.pc-texto { max-width: 100%; overflow-wrap: break-word; hyphens: auto; }
+
+/* Sin emoji: el texto es el protagonista, pero su tamaño depende de lo largo que sea (en móvil no se sale) */
+.pc-texto.grande, .pc-texto.medio, .pc-texto.largo { font-family: 'Bricolage Grotesque', sans-serif; }
+.pc-texto.grande { font-size: clamp(1.5rem, 7vw, 2.1rem); }
+.pc-texto.medio { font-size: clamp(1.05rem, 4.6vw, 1.45rem); }
+.pc-texto.largo { font-size: clamp(0.95rem, 3.9vw, 1.15rem); }
 
 .pc-pecera.revelada .pc-pez { animation: none; cursor: default; opacity: 1; }
 .pc-pez.encaja { opacity: 0.55 !important; }

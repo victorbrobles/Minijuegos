@@ -167,7 +167,7 @@ export default function Pecera() {
             return (
               <button key={i} type="button" className={`pc-pez${clase}`} style={{ animationDelay: `${k * -0.7}s` }} onClick={() => resolver(i)} disabled={resultado}>
                 {emoji && <span className="pc-emoji">{emoji}</span>}
-                <span className={`pc-texto${emoji ? '' : ' grande'}`}>{texto}</span>
+                <span className={`pc-texto${emoji ? '' : String(texto).length <= 4 ? ' grande' : String(texto).length <= 9 ? ' medio' : ' largo'}`}>{texto}</span>
               </button>
             );
           })}
