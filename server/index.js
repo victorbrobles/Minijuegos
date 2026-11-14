@@ -110,6 +110,14 @@ app.use((req, res, next) => {
 const USUARIO = process.env.AUTH_USER || 'admin';
 const PASSWORD = process.env.AUTH_PASSWORD || 'miniJuegos123'; // Evita el '#' si da problemas en el túnel
 
+// Archivos de la app instalable (PWA): el navegador los pide sin la contraseña, así que van antes de la autenticación.
+// No contienen nada privado: manifiesto, iconos y service worker.
+const PUBLICOS_PWA = ['/manifest.webmanifest', '/sw.js', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png'];
+app.get(PUBLICOS_PWA, (req, res) => {
+  if (req.path === '/sw.js') res.set('Cache-Control', 'no-cache');
+  res.sendFile(path.join(__dirname, '../client/dist', req.path));
+});
+
 app.use(basicAuth({
   authorizer: (username, password) => {
     const userMatches = basicAuth.safeCompare(username, USUARIO);
