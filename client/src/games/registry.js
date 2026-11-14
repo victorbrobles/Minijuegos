@@ -86,7 +86,6 @@ import QuienSoy from './Solo/QuienSoy.jsx';
 import OncePerdido from './Solo/OncePerdido.jsx';
 import Conexion from './Solo/Conexion.jsx';
 import DueloFutbol from './Solo/DueloFutbol.jsx';
-import Escudo from './Solo/Escudo.jsx';
 import Manager from './Solo/Manager.jsx';
 import Misterioso from './Solo/Misterioso.jsx';
 import Crimen from './Crimen/Crimen.jsx';
@@ -176,7 +175,6 @@ const registry = {
   'onceperdido': OncePerdido,
   'conexion': Conexion,
   'duelofutbol': DueloFutbol,
-  'escudo': Escudo,
   'manager': Manager,
   'misterioso': Misterioso,
   'patata': Patata,

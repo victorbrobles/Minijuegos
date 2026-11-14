@@ -779,15 +779,7 @@ export const META = {
     descripcion: "¿Quién ha jugado en más clubes? ¿Quién es mayor? ¿Quién vale más? Dos futbolistas, una pregunta y diez segundos. El primer fallo acaba tu racha.",
     categorias: ['un_jugador']
   },
-  'escudo': {
-    titulo: 'Escudo Borroso',
-    imagen: '/covers/escudo.webp',
-    icono: 'shield',
-    colores: ['#64748b', '#0f172a'],
-    etiquetas: 'futbol escudos clubes logos borroso adivinar equipos un jugador solitario',
-    descripcion: "Los escudos de los grandes clubes aparecen borrosos y en gris y se van aclarando. Cuanto antes reconozcas el equipo, más puntos.",
-    categorias: ['un_jugador']
-  },
+
   'manager': {
     titulo: 'Manager por un Día',
     imagen: '/covers/manager.webp',

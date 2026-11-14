@@ -92,7 +92,6 @@ export const LIMITES = {
   onceperdido: { min: 1, max: 1 },
   conexion: { min: 1, max: 1 },
   duelofutbol: { min: 1, max: 1 },
-  escudo: { min: 1, max: 1 },
   manager: { min: 1, max: 1 },
   misterioso: { min: 1, max: 1 },
   patata: { min: 2, max: 8 },

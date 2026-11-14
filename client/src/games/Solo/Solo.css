@@ -98,11 +98,6 @@
 .df-carta.apagada { opacity: 0.75; }
 .df-avatar { display: grid; place-items: center; width: 3.4rem; height: 3.4rem; border-radius: 50%; background: linear-gradient(135deg, var(--g1, #16a34a), var(--g2, #14532d)); color: #ffffff; font-size: 1.2rem; font-weight: 900; }
 
-/* ---------- Escudo borroso ---------- */
-.esd-marco { position: relative; display: grid; place-items: center; height: 15rem; overflow: hidden; border-radius: 24px; background: #ffffff; }
-.esd-marco img { max-width: 70%; max-height: 12rem; transition: filter 0.12s linear, transform 0.12s linear; }
-.esd-tiempo { position: absolute; bottom: 0.5rem; right: 0.6rem; padding: 0.2rem 0.6rem; border-radius: 999px; background: rgba(15, 23, 42, 0.8); color: #ffffff; font-size: 0.8rem; font-weight: 800; }
-
 /* ---------- Manager por un día ---------- */
 .mg-huecos { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-top: 0.5rem; }
 .mg-huecos span { padding: 0.25rem 0.6rem; border-radius: 999px; background: rgba(255, 255, 255, 0.2); color: #ffffff; font-size: 0.8rem; font-weight: 900; }

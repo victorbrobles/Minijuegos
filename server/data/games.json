@@ -498,12 +498,6 @@
     "isNew": true
   },
   {
-    "id": "escudo",
-    "name": "Escudo Borroso",
-    "description": "Los escudos de los grandes clubes aparecen borrosos y en gris y se van aclarando. Cuanto antes reconozcas el equipo, más puntos.",
-    "isNew": true
-  },
-  {
     "id": "manager",
     "name": "Manager por un Día",
     "description": "Con 220 millones ficha tu once en tres mercados… sin ver la media de nadie. Después, 38 jornadas de liga dirán si tienes ojo de ojeador.",

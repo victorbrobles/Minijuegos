@@ -1,6 +1,6 @@
 // server/lib/solo.js
 // Contenido de los juegos de un jugador de trivia y fútbol (se sirve en /api/solo/:juego):
-//   escalera · cronologia · cadena · quiensoy · onceperdido · conexion · duelofutbol · escudo · manager · misterioso
+//   escalera · cronologia · cadena · quiensoy · onceperdido · conexion · duelofutbol · manager · misterioso
 // Todo sale de semillas que ya existen (Tablero, Ponlo en orden, Escondite, famosos del reto, Once Fantasma,
 // Modo carrera, Cuatro clubes y Director Deportivo).
 import { PREGUNTAS, CATEGORIAS as CATS_TABLERO } from '../data/seeds/tablero/preguntas.js';
@@ -9,7 +9,6 @@ import { TODAS as CATEGORIAS_ESCONDITE } from '../data/seeds/escondite/index.js'
 import { FAMOSOS, PREGUNTAS_FAMOSO } from '../data/seeds/reto/famosos.js';
 import { PARTIDOS } from '../data/seeds/oncefantasma/onces.js';
 import { RETOS_TRAYECTORIAS } from '../data/seeds/trayectoria/trayectorias.seed.js';
-import { CLUBES_INFO } from '../data/seeds/cuatroclubes/cuatroclubes.js';
 import { FUTBOLISTAS } from '../data/seeds/director/futbolistas.js';
 import { precio, mediaTemporada } from '../../client/src/games/Director/engine.js';
 
@@ -222,27 +221,6 @@ export function duelofutbol() {
   return { duelos: [...barajar(ordenados.slice(0, tercio)), ...barajar(ordenados.slice(tercio, 2 * tercio)), ...barajar(ordenados.slice(2 * tercio))] };
 }
 
-// ------------------------------------------------------------------ Escudo borroso
-const miniatura = (url) => {
-  const m = /^https:\/\/upload\.wikimedia\.org\/wikipedia\/(commons|en)\/([0-9a-f])\/([0-9a-f]{2})\/([^/]+\.svg)$/i.exec(url || '');
-  return m ? `https://upload.wikimedia.org/wikipedia/${m[1]}/thumb/${m[2]}/${m[3]}/${m[4]}/250px-${m[4]}.png` : url;
-};
-const NOMBRE_CLUB = { 'Inter de Milán': 'Inter de Milán', 'Paris Saint-Germain': 'PSG (Paris Saint-Germain)' };
-export function escudo() {
-  const clubes = new Map();
-  for (const t of RETOS_TRAYECTORIAS) for (const c of t.clubes) if (c.logo && !clubes.has(c.nombre)) clubes.set(c.nombre, { nombre: NOMBRE_CLUB[c.nombre] || c.nombre, logo: c.logo.replace('/120px-', '/250px-'), color: c.colores?.[0] });
-  for (const c of Object.values(CLUBES_INFO)) {
-    const ya = [...clubes.keys()].some((k) => norm(k).includes(norm(c.nombre)) || norm(c.nombre).includes(norm(k)));
-    if (c.escudo && !ya) clubes.set(c.nombre, { nombre: c.nombre, logo: miniatura(c.escudo), color: c.colores?.[0] });
-  }
-  const lista = [...clubes.values()];
-  const rondas = barajar(lista).slice(0, 10).map((c) => ({
-    logo: c.logo, correcta: c.nombre,
-    opciones: barajar([c.nombre, ...barajar(lista.filter((x) => x !== c)).slice(0, 3).map((x) => x.nombre)])
-  }));
-  return { rondas };
-}
-
 // ------------------------------------------------------------------ Manager por un día
 const RIVALES = ['Real Gamonal', 'Atlético Patatal', 'Unión Gazpacho', 'Sporting Tortilla', 'Deportivo Siesta', 'Racing Churros', 'CD Botijo',
   'Real Chistorra', 'UD Botafumeiro', 'CF Paella Mixta', 'Olímpico Pimentón', 'Club Croqueta', 'Recreativo Turrón', 'SD Migas', 'Inter de Lentejas',
@@ -286,4 +264,4 @@ export function misterioso() {
   return { futbolistas: todos, secretos };
 }
 
-export const JUEGOS_SOLO = { escalera, cronologia, cadena, quiensoy, onceperdido, conexion, duelofutbol, escudo, manager, misterioso };
+export const JUEGOS_SOLO = { escalera, cronologia, cadena, quiensoy, onceperdido, conexion, duelofutbol, manager, misterioso };

@@ -33,9 +33,6 @@ for (let n = 0; n < 5; n++) {
   const d = JUEGOS_SOLO.duelofutbol();
   assert.ok(d.duelos.length >= 100); d.duelos.forEach((y) => assert.ok(['a', 'b'].includes(y.gana) && y.a.nombre !== y.b.nombre));
 
-  const s = JUEGOS_SOLO.escudo();
-  assert.equal(s.rondas.length, 10); s.rondas.forEach((y) => { assert.ok(y.logo.startsWith('https://')); assert.equal(new Set(y.opciones).size, 4); assert.ok(y.opciones.includes(y.correcta)); });
-
   const m = JUEGOS_SOLO.manager();
   assert.equal(m.mercados.length, 3); m.mercados.forEach((mm) => assert.equal(mm.length, 12)); assert.equal(m.rivales.length, 19);
 
@@ -45,5 +42,5 @@ for (let n = 0; n < 5; n++) {
 assert.ok(buscarJugador('casillas'));
 assert.ok(enlace('Iker Casillas', 'Xavi Hernández').ok);
 const x = JUEGOS_SOLO.conexion(); console.log(x.nombres.length, 'jugadores en el grafo ·', x.retos.map((r) => `${r.desde} → ${r.hasta} (${r.eslabones})`).join(' | '));
-console.log(JUEGOS_SOLO.escudo().rondas.length, 'escudos ok ·', JUEGOS_SOLO.duelofutbol().duelos.slice(0, 2).map((d) => d.pregunta + ' ' + d.a.nombre + ' vs ' + d.b.nombre).join(' | '));
+console.log(JUEGOS_SOLO.duelofutbol().duelos.slice(0, 2).map((d) => d.pregunta + ' ' + d.a.nombre + ' vs ' + d.b.nombre).join(' | '));
 console.log('solo-sim OK');

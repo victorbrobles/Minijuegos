@@ -34,7 +34,7 @@ export default function Creditos() {
           <li><b>Mapas</b> (Test del viajero): © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">colaboradores de OpenStreetMap</a> · © <a href="https://carto.com/attributions" target="_blank" rel="noreferrer">CARTO</a>. Los nombres en español los añade el propio juego.</li>
           <li><b>Fragmentos de canciones</b> (Afina ese oído, Luces, Cámara… ¡Música!): fragmentos de 30 segundos facilitados por la API pública de <a href="https://www.deezer.com" target="_blank" rel="noreferrer">Deezer</a>. No se descargan ni se guardan en esta web.</li>
           <li><b>Iconos de marcas</b> (Logo Mania): <a href="https://simpleicons.org" target="_blank" rel="noreferrer">Simple Icons</a> (CC0). Las marcas pertenecen a sus propietarios.</li>
-          <li><b>Escudos de clubes</b> (Modo carrera, El club de los cuatro, Escudo borroso): imágenes de <a href="https://commons.wikimedia.org" target="_blank" rel="noreferrer">Wikimedia</a>. Son marcas de cada club.</li>
+          <li><b>Escudos de clubes</b> (Modo carrera, El club de los cuatro): imágenes de <a href="https://commons.wikimedia.org" target="_blank" rel="noreferrer">Wikimedia</a>. Son marcas de cada club.</li>
           <li><b>Datos de futbolistas</b>: nombres, clubes y trayectorias son datos públicos. Las «medias» y los precios de Director Deportivo, Manager por un Día y Futbolista Misterioso son valoraciones aproximadas propias, no oficiales ni de ningún videojuego.</li>
           <li><b>Tipografías</b>: <a href="https://fonts.google.com" target="_blank" rel="noreferrer">Google Fonts</a> (SIL Open Font License).</li>
         </ul>
