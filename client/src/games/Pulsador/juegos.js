@@ -102,7 +102,8 @@ export const JUEGOS = {
       'Sale un elemento (un actor, un inventor, un país, un personaje, un cantante o un pintor) y cuatro posibles parejas: su película más famosa, su invento, su moneda, su creador, su grupo o su cuadro.',
       `El reloj corre ${r.pareja.segRonda} segundos. Quien lo sepa, que pulse: tiene ${r.pareja.segRespuesta} segundos para elegir la pareja.`,
       `Acertar suma ${r.pareja.acierto} puntos y fallar resta ${r.pareja.fallo} (y te deja fuera de esa ronda).`,
-      'La dificultad sube: el primer tercio de la partida son parejas fáciles, luego medias (los puntos valen ×2) y al final difíciles (×3).'
+      'Las opciones falsas se parecen a la buena (mismo país, época o tipo), así que no vale descartar a ojo.',
+      'La dificultad sube: al principio salen unas pocas parejas fáciles, luego medias (los puntos valen ×2) y la mayor parte de la partida, difíciles (×3).'
     ]
   },
   acta: {

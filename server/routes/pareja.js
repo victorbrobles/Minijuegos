@@ -4,21 +4,29 @@
 // Motor común de pulsador (../pulsador/engine.js) y salas de ../lib/salasJuego.js.
 import express from 'express';
 import { CATEGORIAS } from '../data/seeds/pareja/parejas.js';
+import { familiaDe } from '../data/seeds/pareja/familias.js';
 import { montarSalas } from '../lib/salasJuego.js';
 import { REGLAS, OPCIONES_RONDAS } from '../pulsador/engine.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
 
 const router = express.Router();
 const barajar = (a) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
-const TODAS = CATEGORIAS.flatMap((c) => c.parejas.map(([elemento, pareja, nivel]) => ({ cat: c, elemento, pareja, nivel, clave: `${c.id}:${elemento}` })));
+const TODAS = CATEGORIAS.flatMap((c) => c.parejas.map(([elemento, pareja, nivel]) => ({ cat: c, elemento, pareja, nivel, familia: familiaDe(c.id, elemento, pareja), clave: `${c.id}:${elemento}` })));
 const NIVELES = ['', 'Fácil', 'Media', 'Difícil'];
 
-/** Tres parejas falsas de la misma categoría (primero del mismo nivel, para que no canten). */
+/**
+ * Tres parejas falsas que se parezcan a la buena: primero de su misma familia (mismo origen, época o tipo; ver
+ * familias.js), luego de la familia amplia y, si aun así faltan, del mismo nivel. Así no se descarta a ojo.
+ */
 function distractores(x) {
   const otras = TODAS.filter((y) => y.cat === x.cat && y.pareja !== x.pareja);
-  const mismas = barajar(otras.filter((y) => y.nivel === x.nivel));
-  const resto = barajar(otras.filter((y) => y.nivel !== x.nivel));
-  return [...mismas, ...resto].slice(0, 3).map((y) => y.pareja);
+  const fam = x.familia || '';
+  const amplia = fam.split(':')[0];
+  const fina = barajar(otras.filter((y) => fam && y.familia === fam));
+  const misma = barajar(otras.filter((y) => amplia && y.familia !== fam && (y.familia || '').split(':')[0] === amplia));
+  const nivel = barajar(otras.filter((y) => !fina.includes(y) && !misma.includes(y) && y.nivel === x.nivel));
+  const resto = barajar(otras.filter((y) => !fina.includes(y) && !misma.includes(y) && y.nivel !== x.nivel));
+  return [...fina, ...misma, ...nivel, ...resto].slice(0, 3).map((y) => y.pareja);
 }
 export const itemDe = (x) => ({
   pistas: [{ tipo: 'frase', etiqueta: `${x.cat.emoji} ${x.cat.nombre} · ${NIVELES[x.nivel]}${x.nivel > 1 ? ` (×${x.nivel})` : ''}`, valor: x.elemento }],
@@ -29,10 +37,10 @@ export const itemDe = (x) => ({
   solucion: { titulo: x.pareja, detalle: `${x.elemento} → ${x.pareja}` }
 });
 
-/** n parejas sin repetir en la sala: el primer tercio fáciles, luego medias y al final difíciles. */
+/** n parejas sin repetir en la sala: un 20 % fáciles al principio, luego un 40 % medias y un 40 % difíciles. */
 export function elegir(usados, n) {
-  const cuantos = [Math.ceil(n / 3), Math.ceil((n - Math.ceil(n / 3)) / 2)];
-  cuantos.push(n - cuantos[0] - cuantos[1]);
+  const cuantos = [Math.max(1, Math.round(n * 0.2)), Math.round(n * 0.4)];
+  cuantos.push(Math.max(0, n - cuantos[0] - cuantos[1]));
   const out = [];
   [1, 2, 3].forEach((nivel, i) => {
     let libres = TODAS.filter((x) => x.nivel === nivel && !usados.has(x.clave));

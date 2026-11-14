@@ -4,7 +4,7 @@
 export const CATEGORIAS_EXTRA = [
   { id: 'capital', nombre: 'País → su capital', emoji: '🏛️', pregunta: '¿Cuál es su capital?', parejas: [
     ['Francia', 'París', 1], ['Italia', 'Roma', 1], ['Alemania', 'Berlín', 1], ['Portugal', 'Lisboa', 1], ['Reino Unido', 'Londres', 1],
-    ['Japón', 'Tokio', 1], ['Rusia', 'Moscú', 1], ['Argentina', 'Buenos Aires', 1], ['México', 'Ciudad de México', 1], ['Grecia', 'Atenas', 1],
+    ['Japón', 'Tokio', 1], ['Rusia', 'Moscú', 1], ['Argentina', 'Buenos Aires', 1], ['Grecia', 'Atenas', 1],
     ['Egipto', 'El Cairo', 1], ['Irlanda', 'Dublín', 1],
     ['Australia', 'Canberra', 2], ['Canadá', 'Ottawa', 2], ['Brasil', 'Brasilia', 2], ['Turquía', 'Ankara', 2], ['Suiza', 'Berna', 2],
     ['Marruecos', 'Rabat', 2], ['Colombia', 'Bogotá', 2], ['Perú', 'Lima', 2], ['Hungría', 'Budapest', 2], ['Polonia', 'Varsovia', 2],
@@ -23,7 +23,7 @@ export const CATEGORIAS_EXTRA = [
     ['Nápoles', 'Diego Armando Maradona', 2], ['Ajax', 'Johan Cruyff Arena', 2], ['Benfica', 'Estádio da Luz', 2],
     ['Osasuna', 'El Sadar', 3], ['Getafe', 'Coliseum', 3], ['Rayo Vallecano', 'Estadio de Vallecas', 3], ['Deportivo de La Coruña', 'Riazor', 3],
     ['Real Zaragoza', 'La Romareda', 3], ['Sporting de Gijón', 'El Molinón', 3], ['Racing de Santander', 'El Sardinero', 3],
-    ['Tottenham', 'Tottenham Hotspur Stadium', 3], ['Roma', 'Olímpico de Roma', 3], ['Olympique de Marsella', 'Vélodrome', 3],
+    ['Olympique de Marsella', 'Vélodrome', 3],
     ['Flamengo', 'Maracaná', 3], ['Celtic', 'Celtic Park', 3], ['Galatasaray', 'Rams Park', 3]
   ] },
   { id: 'director', nombre: 'Director → su película', emoji: '🎥', pregunta: '¿Qué película dirigió?', parejas: [
