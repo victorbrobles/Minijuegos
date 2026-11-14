@@ -5,6 +5,7 @@ export const CATEGORIAS_PORTADA = [
   { id: 'favoritos', titulo: '⭐ Favoritos del Creador', desc: 'Los juegos más destacados, adictivos y jugados' },
   { id: 'prueba', titulo: '🧠 Para ponerte a prueba', desc: 'Retos de ingenio, cultura, velocidad y memoria' },
   { id: 'estrategia', titulo: '♟️ Estratégicos y de deducción', desc: 'Roles ocultos, engaños, gestión de cartas y táctica' },
+  { id: 'cartas', titulo: '🃏 Juegos de cartas', desc: 'Estrategia, faroles, apuestas y duelos con cartas' },
   { id: 'chill', titulo: '🌴 Para jugar de chill', desc: 'Risas, amigos, preguntas y pura diversión sin estrés' },
   { id: 'futbol', titulo: '⚽ Para amantes del fútbol', desc: 'Demuestra todo lo que sabes sobre el deporte rey' },
   { id: 'famosos', titulo: '🌟 De famosos y cultura pop', desc: 'Celebridades, cine, música, frases y televisión' },
@@ -57,7 +58,7 @@ export const META = {
     colores: ['#06b6d4', '#1e40af'],
     etiquetas: 'cartas azar coleccion estrategia numeros baraja',
     descripcion: 'Cada uno tiene un encargo secreto: la colección que debe reunir antes que nadie. Puede que otro vaya a por la misma sin que lo sepas. Roba, bombardea, espía, cambia encargos y arriésgate con las cartas de acción.',
-    categorias: ['estrategia']
+    categorias: ['cartas']
   },
   'golpe': {
     titulo: 'El Golpe',
@@ -75,7 +76,7 @@ export const META = {
     colores: ['#a78bfa', '#312e81'],
     etiquetas: 'cartas numeros suma cero sabotaje plantarse online',
     descripcion: 'Empiezas con 5 cartas positivas y negativas: consigue que tu mano sume exactamente 0. Roba, descarta, usa cartas especiales para fastidiar al resto y plántate a tiempo… porque te pueden destrozar la mano justo antes del final.',
-    categorias: ['estrategia']
+    categorias: ['cartas']
   },
   'invento': {
     titulo: 'El Invento del Siglo',
@@ -102,7 +103,7 @@ export const META = {
     colores: ['#10b981', '#022c22'],
     etiquetas: 'mus avanzado cartas baraja española faroles apuestas fichas desafiar categorias comodines parejas poker',
     descripcion: 'Mus de faroles con baraja pactada: comodines, bombas o espejos si todos aceptan. Cada ronda es una categoría distinta (la grande, parejas, escalera, colores…) y en cada una se anuncia, se sube, se pasa o se desafía. Individual o por parejas.',
-    categorias: ['estrategia', 'favoritos']
+    categorias: ['cartas', 'favoritos']
   },
   'datosobra': {
     titulo: 'El Dato que Sobra',
@@ -200,7 +201,7 @@ export const META = {
     colores: ['#16a34a', '#14532d'],
     etiquetas: 'mus cartas baraja española parejas envido ordago grande chica pares juego clasico bar',
     descripcion: 'El clásico juego de cartas español por parejas: mus o no hay mus, envites a grande, chica, pares y juego, faroles y órdagos. Juega online con tus amigos o contra la máquina.',
-    categorias: ['estrategia']
+    categorias: ['cartas']
   },
   'reinos': {
     titulo: 'Los Siete Reinos',
@@ -218,7 +219,7 @@ export const META = {
     colores: ['#38bdf8', '#0369a1'],
     etiquetas: 'numeros orden cartas mayor menor cuenta deduccion cartas accion',
     descripcion: 'Colocad números del 1 al 100 en orden ascendente sin comunicaros. En tu turno sueltas un número, usas una carta de acción al azar o pasas. Si sueltas uno que no tocaba o retienes el que tocaba, pierdes una vida. Gana quien se quede antes sin números.',
-    categorias: ['estrategia']
+    categorias: ['cartas']
   },
   'descarte': {
     titulo: '¡Descarta y Elimina!',
