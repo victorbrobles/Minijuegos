@@ -85,7 +85,17 @@ export const LIMITES = {
   crimen: { min: 1, max: 1 },
   fichajes: { min: 1, max: 10 },
   ponorden: { min: 1, max: 12 },
-  intruso: { min: 1, max: 10 }
+  intruso: { min: 1, max: 10 },
+  escalera: { min: 1, max: 1 },
+  cronologia: { min: 1, max: 1 },
+  cadena: { min: 1, max: 1 },
+  quiensoy: { min: 1, max: 1 },
+  onceperdido: { min: 1, max: 1 },
+  conexion: { min: 1, max: 1 },
+  duelofutbol: { min: 1, max: 1 },
+  escudo: { min: 1, max: 1 },
+  manager: { min: 1, max: 1 },
+  misterioso: { min: 1, max: 1 }
 };
 
 function base(id) {

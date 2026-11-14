@@ -724,6 +724,96 @@ export const META = {
     etiquetas: 'asesinato deduccion logica puzle sospechosos pistas detective murdoku un jugador solitario',
     descripcion: 'Han asesinado a Víctor. Coloca a cada sospechoso en el plano de la casa con las pistas (uno por fila y columna) y descubre quién estaba a solas con la víctima.',
     categorias: ['un_jugador']
+  },
+  'escalera': {
+    titulo: 'La Escalera',
+    imagen: '/covers/escalera.webp',
+    icono: 'podium',
+    colores: ['#f59e0b', '#7c2d12'],
+    etiquetas: 'trivia preguntas cultura general escalera millonario comodines plantarse dificultad un jugador solitario',
+    descripcion: "Quince preguntas cada vez más difíciles y una escalera de puntos hasta 10.000. Usa tus tres comodines, plántate a tiempo… o arriésgalo todo.",
+    categorias: ['un_jugador', 'prueba']
+  },
+  'cronologia': {
+    titulo: 'Línea del Tiempo',
+    imagen: '/covers/cronologia.webp',
+    icono: 'hourglass',
+    colores: ['#0ea5e9', '#1e3a8a'],
+    etiquetas: 'historia fechas años cronologia inventos peliculas libros ordenar linea del tiempo un jugador solitario',
+    descripcion: "Coloca inventos, películas, libros y hechos históricos en su sitio de la línea del tiempo. Cada acierto la alarga… y cada hueco es más fino.",
+    categorias: ['un_jugador', 'prueba']
+  },
+  'cadena': {
+    titulo: 'Categorías Encadenadas',
+    imagen: '/covers/cadena.webp',
+    icono: 'letters',
+    colores: ['#10b981', '#064e3b'],
+    etiquetas: 'categorias listas escribir contrarreloj cultura geografia futbol onces rapido un jugador solitario',
+    descripcion: "Noventa segundos y una categoría tras otra: escribe todas las respuestas que sepas. Supera el mínimo para ganar tiempo y encadenar la siguiente.",
+    categorias: ['un_jugador', 'prueba']
+  },
+  'quiensoy': {
+    titulo: '¿Quién Soy? Contrarreloj',
+    imagen: '/covers/quiensoy.webp',
+    icono: 'whois',
+    colores: ['#ec4899', '#581c87'],
+    etiquetas: 'famosos adivinar preguntas si no deduccion contrarreloj celebridades un jugador solitario',
+    descripcion: "Tres minutos para adivinar cuantos famosos puedas a base de preguntas de sí o no. Cada pregunta cuesta segundos: ¡pregunta con cabeza!",
+    categorias: ['un_jugador', 'famosos', 'prueba']
+  },
+  'onceperdido': {
+    titulo: 'El Once Perdido',
+    imagen: '/covers/onceperdido.webp',
+    icono: 'tacticboard',
+    colores: ['#22c55e', '#052e16'],
+    etiquetas: 'futbol alineaciones onces titulares historicos champions mundial memoria un jugador solitario',
+    descripcion: "Alineaciones de partidos históricos con cuatro titulares borrados. ¿Recuerdas quién jugaba con el 6 en la final del Mundial? Escríbelo antes de que se acabe el tiempo.",
+    categorias: ['un_jugador', 'futbol']
+  },
+  'conexion': {
+    titulo: 'Conexión',
+    imagen: '/covers/conexion.webp',
+    icono: 'teammates',
+    colores: ['#6366f1', '#1e1b4b'],
+    etiquetas: 'futbol futbolistas companeros cadena conectar clubes jugadores grafo un jugador solitario',
+    descripcion: "Une a dos futbolistas a través de compañeros de equipo. ¿Cómo llegas de Casillas a Haaland en el menor número de pasos?",
+    categorias: ['un_jugador', 'futbol']
+  },
+  'duelofutbol': {
+    titulo: 'Más o Menos Fútbol',
+    imagen: '/covers/duelofutbol.webp',
+    icono: 'scale',
+    colores: ['#ef4444', '#450a0a'],
+    etiquetas: 'futbol futbolistas comparar mas menos racha clubes edad valor mercado un jugador solitario',
+    descripcion: "¿Quién ha jugado en más clubes? ¿Quién es mayor? ¿Quién vale más? Dos futbolistas, una pregunta y diez segundos. El primer fallo acaba tu racha.",
+    categorias: ['un_jugador', 'futbol']
+  },
+  'escudo': {
+    titulo: 'Escudo Borroso',
+    imagen: '/covers/escudo.webp',
+    icono: 'shield',
+    colores: ['#64748b', '#0f172a'],
+    etiquetas: 'futbol escudos clubes logos borroso adivinar equipos un jugador solitario',
+    descripcion: "Los escudos de los grandes clubes aparecen borrosos y en gris y se van aclarando. Cuanto antes reconozcas el equipo, más puntos.",
+    categorias: ['un_jugador', 'futbol']
+  },
+  'manager': {
+    titulo: 'Manager por un Día',
+    imagen: '/covers/manager.webp',
+    icono: 'briefcase',
+    colores: ['#0d9488', '#134e4a'],
+    etiquetas: 'futbol fichajes mercado presupuesto plantilla liga simulacion estrategia manager un jugador solitario',
+    descripcion: "Con 220 millones ficha tu once en tres mercados… sin ver la media de nadie. Después, 38 jornadas de liga dirán si tienes ojo de ojeador.",
+    categorias: ['un_jugador', 'futbol', 'estrategia']
+  },
+  'misterioso': {
+    titulo: 'Futbolista Misterioso',
+    imagen: '/covers/misterioso.webp',
+    icono: 'sleuth',
+    colores: ['#eab308', '#713f12'],
+    etiquetas: 'futbol futbolista adivinar pistas pais liga club edad media deduccion un jugador solitario',
+    descripcion: "Adivina al futbolista misterioso en 8 intentos. Cada nombre que pruebes te dice si aciertas su país, liga, club, puesto, edad y media.",
+    categorias: ['un_jugador', 'futbol']
   }
 };
 

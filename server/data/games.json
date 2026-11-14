@@ -460,5 +460,65 @@
     "name": "Escena del Crimen",
     "description": "Han asesinado a Víctor. Coloca a cada sospechoso en el plano de la casa con las pistas (uno por fila y columna) y descubre quién estaba a solas con la víctima.",
     "isNew": true
+  },
+  {
+    "id": "escalera",
+    "name": "La Escalera",
+    "description": "Quince preguntas cada vez más difíciles y una escalera de puntos hasta 10.000. Usa tus tres comodines, plántate a tiempo… o arriésgalo todo.",
+    "isNew": true
+  },
+  {
+    "id": "cronologia",
+    "name": "Línea del Tiempo",
+    "description": "Coloca inventos, películas, libros y hechos históricos en su sitio de la línea del tiempo. Cada acierto la alarga… y cada hueco es más fino.",
+    "isNew": true
+  },
+  {
+    "id": "cadena",
+    "name": "Categorías Encadenadas",
+    "description": "Noventa segundos y una categoría tras otra: escribe todas las respuestas que sepas. Supera el mínimo para ganar tiempo y encadenar la siguiente.",
+    "isNew": true
+  },
+  {
+    "id": "quiensoy",
+    "name": "¿Quién Soy? Contrarreloj",
+    "description": "Tres minutos para adivinar cuantos famosos puedas a base de preguntas de sí o no. Cada pregunta cuesta segundos: ¡pregunta con cabeza!",
+    "isNew": true
+  },
+  {
+    "id": "onceperdido",
+    "name": "El Once Perdido",
+    "description": "Alineaciones de partidos históricos con cuatro titulares borrados. ¿Recuerdas quién jugaba con el 6 en la final del Mundial? Escríbelo antes de que se acabe el tiempo.",
+    "isNew": true
+  },
+  {
+    "id": "conexion",
+    "name": "Conexión",
+    "description": "Une a dos futbolistas a través de compañeros de equipo. ¿Cómo llegas de Casillas a Haaland en el menor número de pasos?",
+    "isNew": true
+  },
+  {
+    "id": "duelofutbol",
+    "name": "Más o Menos Fútbol",
+    "description": "¿Quién ha jugado en más clubes? ¿Quién es mayor? ¿Quién vale más? Dos futbolistas, una pregunta y diez segundos. El primer fallo acaba tu racha.",
+    "isNew": true
+  },
+  {
+    "id": "escudo",
+    "name": "Escudo Borroso",
+    "description": "Los escudos de los grandes clubes aparecen borrosos y en gris y se van aclarando. Cuanto antes reconozcas el equipo, más puntos.",
+    "isNew": true
+  },
+  {
+    "id": "manager",
+    "name": "Manager por un Día",
+    "description": "Con 220 millones ficha tu once en tres mercados… sin ver la media de nadie. Después, 38 jornadas de liga dirán si tienes ojo de ojeador.",
+    "isNew": true
+  },
+  {
+    "id": "misterioso",
+    "name": "Futbolista Misterioso",
+    "description": "Adivina al futbolista misterioso en 8 intentos. Cada nombre que pruebes te dice si aciertas su país, liga, club, puesto, edad y media.",
+    "isNew": true
   }
 ]

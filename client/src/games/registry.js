@@ -75,6 +75,16 @@ import Intruso from './Intruso/Intruso.jsx';
 import Lapiz from './Lapiz/Lapiz.jsx';
 import Fichajes from './Fichajes/Fichajes.jsx';
 import Eco from './Eco/Eco.jsx';
+import Escalera from './Solo/Escalera.jsx';
+import Cronologia from './Solo/Cronologia.jsx';
+import Cadena from './Solo/Cadena.jsx';
+import QuienSoy from './Solo/QuienSoy.jsx';
+import OncePerdido from './Solo/OncePerdido.jsx';
+import Conexion from './Solo/Conexion.jsx';
+import DueloFutbol from './Solo/DueloFutbol.jsx';
+import Escudo from './Solo/Escudo.jsx';
+import Manager from './Solo/Manager.jsx';
+import Misterioso from './Solo/Misterioso.jsx';
 import Crimen from './Crimen/Crimen.jsx';
 
 // id del juego (el mismo que en server/data/games.json) -> componente React
@@ -155,7 +165,17 @@ const registry = {
   'lapiz': Lapiz,
   'fichajes': Fichajes,
   'eco': Eco,
-  'crimen': Crimen
+  'crimen': Crimen,
+  'escalera': Escalera,
+  'cronologia': Cronologia,
+  'cadena': Cadena,
+  'quiensoy': QuienSoy,
+  'onceperdido': OncePerdido,
+  'conexion': Conexion,
+  'duelofutbol': DueloFutbol,
+  'escudo': Escudo,
+  'manager': Manager,
+  'misterioso': Misterioso
 };
 
 export default registry;
