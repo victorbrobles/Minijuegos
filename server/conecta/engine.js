@@ -1,5 +1,5 @@
 // server/conecta/engine.js
-// Motor de reglas de «Conecta 4» por turnos. Funciones puras sobre un objeto de estado
+// Motor de reglas de «Conexiones ocultas» por turnos. Funciones puras sobre un objeto de estado
 // (el tiempo se pasa como parámetro), sin dependencias de Express ni de React.
 // Lo usan:
 //   - server/routes/conecta.js (salas online)

@@ -2,16 +2,17 @@
 // Motor puro de «FrankensFootball». Lo usan las salas online (server/routes/footballsplit.js) y, copiado al cliente
 // con `npm run sync:footballsplit`, el modo «un solo dispositivo».
 //
-// Cada ronda se muestra una cara hecha con tres trozos de tres futbolistas (pelo, ojos y barbilla). Por turnos,
+// Cada ronda se muestra un futbolista DIBUJADO con tres trozos de tres futbolistas (cabeza, camiseta y piernas): cada
+// trozo lleva los colores de su club, su bandera, su edad y su puesto. Por turnos,
 // cada jugador elige un trozo y dice de quién es: si acierta suma y sigue; si falla o pasa, turno del siguiente.
 // La ronda acaba cuando se descubren los tres trozos o cuando todos han tenido su turno.
 
 export const AJUSTES = { min: 2, max: 12, segTurno: 60, puntos: 5, puntosPista: 2 };
 export const OPCIONES_RONDAS = [2, 3, 5]; // caras por jugador
 export const PARTES = [
-  { id: 'top', nombre: 'Pelo' },
-  { id: 'middle', nombre: 'Ojos' },
-  { id: 'bottom', nombre: 'Barbilla' }
+  { id: 'top', nombre: 'Cabeza' },
+  { id: 'middle', nombre: 'Camiseta' },
+  { id: 'bottom', nombre: 'Piernas' }
 ];
 const IDS = PARTES.map((x) => x.id);
 const nombreParte = (id) => PARTES.find((x) => x.id === id)?.nombre ?? id;
@@ -57,7 +58,7 @@ function anotar(p, texto, tipo = '') {
   if (p.log.length > 60) p.log.shift();
 }
 
-/** retos: [{ partes: { top:{jugador,pista,img}, middle, bottom } }] (uno por ronda). */
+/** retos: [{ partes: { top:{jugador,pista,dibujo}, middle, bottom } }] (uno por ronda). */
 export function crearPartida(jugadores, retos, ahora = Date.now()) {
   const p = {
     jugadores: jugadores.map((j) => ({ id: j.id, nombre: j.nombre, puntos: 0, aciertos: 0, fuera: false })),
@@ -235,7 +236,7 @@ export function vistaDe(p, yoId) {
       const x = reto.partes[k];
       const r = p.resueltas[k];
       return [k, {
-        img: x.img,
+        dibujo: x.dibujo,
         resuelta: Boolean(r),
         jugadorId: r?.jugadorId ?? null,
         puntos: r?.puntos ?? null,

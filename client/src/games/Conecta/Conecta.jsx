@@ -54,7 +54,7 @@ export default function Conecta({ onExit }) {
           >
             <div className="aprox-modal-header">
               <span className="aprox-modal-signo-title">?</span>
-              <h3>¿Cómo se juega a Conecta 4?</h3>
+              <h3>¿Cómo se juega a Conexiones ocultas?</h3>
             </div>
 
             <div className="aprox-modal-cuerpo">

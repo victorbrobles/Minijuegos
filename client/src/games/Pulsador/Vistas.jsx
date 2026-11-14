@@ -191,7 +191,8 @@ function Audio({ pista, sonar }) {
           {estado === 'error' && 'No se ha podido cargar el audio'}
         </strong>
         <span className="pzp-audio-barra"><span style={{ width: `${progreso * 100}%` }} /></span>
-      </div>
+        <p className="pzp-credito">🎧 Fragmento cortesía de <a href="https://www.deezer.com" target="_blank" rel="noopener noreferrer">Deezer</a></p>
+    </div>
     </div>
   );
 }
@@ -442,7 +443,10 @@ export function PantallaResultado({ v, juego, onSalir, children }) {
         {s.frase && <blockquote className="pzp-frase chica">{s.frase}</blockquote>}
         {s.atribucion && (
           <p className="pzp-atribucion">
-            Foto: {s.atribucion.autor}{s.atribucion.licencia ? ` · ${s.atribucion.licencia}` : ''}{s.atribucion.fuenteUrl && <> · <a href={s.atribucion.fuenteUrl} target="_blank" rel="noreferrer">fuente</a></>}
+            Foto: {s.atribucion.autor}
+            {s.atribucion.licencia && <> · {s.atribucion.licenciaUrl ? <a href={s.atribucion.licenciaUrl} target="_blank" rel="noreferrer">{s.atribucion.licencia}</a> : s.atribucion.licencia}</>}
+            {s.atribucion.fuenteUrl && <> · <a href={s.atribucion.fuenteUrl} target="_blank" rel="noreferrer">Wikimedia Commons</a></>}
+            {' · '}recortada en el juego
           </p>
         )}
         {r.tipo === 'acierto' && <p className="pzp-mensaje bien">+{r.puntos} puntos para {nombreDe(v, r.ganadorId)}</p>}

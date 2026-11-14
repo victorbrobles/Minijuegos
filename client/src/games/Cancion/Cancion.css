@@ -692,3 +692,6 @@
 @media (prefers-reduced-motion: reduce) {
   .afp-disco.gira, .afp-pulsador-cara, .afp-ecualizador i, .afp-puntos-escribe i, .afp-aviso { animation: none !important; }
 }
+
+.afp-credito { margin: 0.4rem 0 0; font-size: 0.72rem; font-weight: 700; color: #94a3b8; text-align: center; }
+.afp-credito a { color: inherit; text-decoration: underline; }

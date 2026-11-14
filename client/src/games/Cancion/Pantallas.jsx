@@ -90,6 +90,7 @@ export function Disco({ segundo = 0, sonando, estado }) {
         {estado === 'sonando' && <>Vale <strong>{puntosEn(segundo)}</strong> puntos si la aciertas ahora</>}
         {estado === 'pausa' && 'Canción en pausa'}
       </p>
+      <p className="afp-credito">🎧 Fragmento de 30 s cortesía de <a href="https://www.deezer.com" target="_blank" rel="noopener noreferrer">Deezer</a></p>
     </div>
   );
 }

@@ -87,8 +87,8 @@ export async function fotoCompleta(famoso) {
     .toBuffer();
 }
 
-// Filtra las entradas pendientes mientras no tengan URL asignada
+// Solo se juega con fotos que tienen URL y créditos completos (autor y licencia): las licencias libres lo exigen
 export const famosos = FAMOSOS.filter((f) => {
   if (!f.imagen || f.imagen.startsWith('TU_URL_AQUI')) return false;
-  return true;
+  return Boolean(f.attribution?.autor && f.attribution?.licencia);
 });

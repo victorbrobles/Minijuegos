@@ -1,9 +1,12 @@
 import { useEffect, useRef } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { PAISES, OCEANOS } from './etiquetas.js';
 
-// Capa base mundial libre de OpenStreetMap (no requiere API key ni añade marcas de agua)
-const TESELAS_OSM = 'https://mt1.google.com/vt/lyrs=y&hl=es&x={x}&y={y}&z={z}';
+// Mapa base de CARTO (datos de OpenStreetMap) SIN etiquetas: gratuito para uso no comercial citando la fuente.
+// Los nombres de países y océanos los pinta el juego encima, en español (ver etiquetas.js).
+const TESELAS = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png';
+const ATRIBUCION = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>';
 const LIMITES_MUNDO = [[-85, -180], [85, 180]];
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -43,11 +46,30 @@ export default function MapaMundi({ marcadores = [], lineas = [], onClickMapa, o
       maxBoundsViscosity: 1
     });
 
-    L.tileLayer(TESELAS_OSM, {
+    L.tileLayer(TESELAS, {
       maxZoom: 19,
+      subdomains: 'abcd',
       noWrap: true,
-      attribution: '&copy; Google Maps'
+      attribution: ATRIBUCION
     }).addTo(mapa);
+
+    // Nombres en español: cada etiqueta aparece a partir de su zoom mínimo
+    mapa.createPane('etiquetas');
+    mapa.getPane('etiquetas').style.zIndex = 450;
+    mapa.getPane('etiquetas').style.pointerEvents = 'none';
+    const etiquetas = [...OCEANOS.map((e) => [...e, 'oceano']), ...PAISES.map((e) => [...e, 'pais'])].map(([nombre, lat, lng, zmin, tipo]) => ({
+      zmin,
+      marca: L.marker([lat, lng], {
+        pane: 'etiquetas', interactive: false, keyboard: false,
+        icon: L.divIcon({ className: `ub-etiqueta ${tipo}`, html: `<span>${esc(nombre)}</span>`, iconSize: [0, 0] })
+      })
+    }));
+    const pintarEtiquetas = () => {
+      const z = mapa.getZoom();
+      etiquetas.forEach((e) => { if (z >= e.zmin) e.marca.addTo(mapa); else e.marca.remove(); });
+    };
+    mapa.on('zoomend', pintarEtiquetas);
+    pintarEtiquetas();
 
     capaRef.current = L.layerGroup().addTo(mapa);
     mapa.on('click', (e) => {

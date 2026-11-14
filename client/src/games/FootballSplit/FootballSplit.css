@@ -443,3 +443,9 @@
 .ffp-gate h2 { margin: 0.1rem 0 0.2rem; color: #0f172a; font-size: 2rem; font-weight: 900; letter-spacing: -0.5px; line-height: 1.1; }
 .ffp-gate .ffp-boton { margin-top: 0.6rem; }
 .ffp-avatar.grande { width: 84px; height: 84px; margin-bottom: 0.4rem; border-radius: 28px; font-size: 2.4rem; animation: ffpFlotar 2.6s ease-in-out infinite; }
+
+/* Futbolista dibujado (sin fotos) */
+.ffp-dibujo { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.ffp-franja + .ffp-franja { border-top: 2px dashed rgba(15, 23, 42, 0.25) !important; }
+.ffp-franja-datos { position: absolute; top: 6px; right: 6px; padding: 0.12rem 0.5rem; border-radius: 999px; background: #ffffff; color: #0f172a; font-size: 0.72rem; font-weight: 800; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2); }
+.ffp-franja-datos b { font-size: 0.95rem; }

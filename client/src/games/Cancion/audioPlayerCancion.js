@@ -2,8 +2,9 @@
 // Reproductor de «Afina ese oído». El volumen depende de la posición dentro del fragmento
 // (empieza casi inaudible y sube hasta el máximo a los 30 s), así que se puede saltar a
 // cualquier punto (sincronización online) y el volumen siempre es el correcto.
-// El audio llega desde nuestro servidor (/api/cancion/audio/…), así que Web Audio puede
-// controlar el volumen también en iOS/Android.
+// El audio es el fragmento original de Deezer (nuestro servidor solo redirige). Se pide con CORS para que Web Audio
+// controle el volumen también en iOS; si el navegador no lo permite, se vuelve a cargar sin CORS y se usa el volumen
+// normal del elemento de audio.
 
 export const DURACION_S = 30;
 const VOL_INICIAL = 0.02;
@@ -57,11 +58,17 @@ export function cargar(nuevaUrl, { onTick, onFin } = {}) {
   if (url === nuevaUrl && audio) return;
   detener();
   url = nuevaUrl;
+  crearAudio(nuevaUrl, true);
+}
+
+function crearAudio(src, conCors) {
   audio = new Audio();
   audio.preload = 'auto';
-  audio.src = nuevaUrl;
+  if (conCors) audio.crossOrigin = 'anonymous';
+  audio.src = src;
   audio.volume = VOL_INICIAL;
-  const c = contexto();
+  fuente = null; ganancia = null;
+  const c = conCors ? contexto() : null;
   if (c) {
     try {
       fuente = c.createMediaElementSource(audio);
@@ -73,6 +80,15 @@ export function cargar(nuevaUrl, { onTick, onFin } = {}) {
       fuente = null;
       ganancia = null;
     }
+  }
+  if (conCors) {
+    // Si el servidor del audio no permite CORS, se carga de nuevo sin Web Audio (el volumen lo lleva el propio <audio>)
+    const propio = audio;
+    propio.addEventListener('error', () => {
+      if (audio !== propio || url !== src) return;
+      try { fuente?.disconnect(); ganancia?.disconnect(); } catch { /* nada */ }
+      crearAudio(src, false);
+    }, { once: true });
   }
 }
 

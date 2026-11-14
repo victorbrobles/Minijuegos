@@ -3,6 +3,7 @@ import Home from './pages/Home.jsx';
 import GamePage from './pages/GamePage.jsx';
 import RetoDiario from './pages/RetoDiario.jsx';
 import Estadisticas from './pages/Estadisticas.jsx';
+import Creditos from './pages/Creditos.jsx';
 import { PuertaIdentidad } from './components/Identidad.jsx';
 
 export default function App() {
@@ -15,6 +16,7 @@ export default function App() {
           <Route path="/juego/:gameId" element={<GamePage />} />
           <Route path="/reto" element={<RetoDiario />} />
           <Route path="/estadisticas" element={<Estadisticas />} />
+          <Route path="/creditos" element={<Creditos />} />
           <Route path="*" element={<p>Página no encontrada.</p>} />
         </Routes>
       </PuertaIdentidad>

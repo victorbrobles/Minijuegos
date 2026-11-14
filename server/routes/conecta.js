@@ -81,7 +81,7 @@ router.get('/tablero', (req, res) => {
       tablero: barajar(items)
     });
   } catch (error) {
-    console.error('Error al obtener tablero de Conecta 4:', error);
+    console.error('Error al obtener tablero de Conexiones ocultas:', error);
     res.status(500).json({ success: false, error: 'Error del servidor' });
   }
 });

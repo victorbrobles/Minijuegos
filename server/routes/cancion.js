@@ -1,7 +1,7 @@
 // server/routes/cancion.js
 // «Afina ese oído»: adivina la canción mientras su volumen va subiendo.
 //
-// - El fragmento (30 s) se busca en Deezer y se sirve desde este servidor (/api/cancion/audio/:clave)
+// - El fragmento (30 s) se busca en Deezer; /api/cancion/audio/:clave redirige al fragmento original (no se guarda)
 //   para que el navegador pueda controlar el volumen también en móviles (sin problemas de CORS).
 // - Si una canción no tiene fragmento, se elige otra (antes sonaba un efecto de sonido cualquiera).
 // - Online, el servidor lleva el reloj de la canción: todos la oyen sincronizada, se pausa cuando alguien
@@ -127,13 +127,13 @@ async function buscarPreview(cancion) {
   return null;
 }
 
-// Fragmentos servidos por este servidor: clave → { url, buffer, tipo, creado }
+// Fragmentos de la partida: clave → { url (fragmento de Deezer), creado }
 const fragmentos = new Map();
 const CADUCIDAD_MS = 60 * 60 * 1000;
 
 function registrarFragmento(url) {
   const clave = crypto.randomBytes(9).toString('hex');
-  fragmentos.set(clave, { url, buffer: null, tipo: 'audio/mpeg', creado: Date.now() });
+  fragmentos.set(clave, { url, creado: Date.now() });
   // Limpieza sencilla
   if (fragmentos.size > 300) {
     const ahora = Date.now();
@@ -153,36 +153,11 @@ async function elegirCancion(usados = []) {
   return null;
 }
 
-router.get('/audio/:clave', async (req, res) => {
+// El fragmento NO se descarga ni se guarda aquí: se redirige al fragmento original de Deezer (como permite su API).
+router.get('/audio/:clave', (req, res) => {
   const f = fragmentos.get(req.params.clave);
   if (!f) return res.status(404).end();
-  try {
-    if (!f.buffer) {
-      const r = await fetch(f.url, { signal: AbortSignal.timeout(10000) });
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      f.buffer = Buffer.from(await r.arrayBuffer());
-      f.tipo = r.headers.get('content-type') || 'audio/mpeg';
-    }
-    const total = f.buffer.length;
-    res.setHeader('Accept-Ranges', 'bytes');
-    res.setHeader('Content-Type', f.tipo);
-    res.setHeader('Cache-Control', 'private, max-age=3600');
-    const rango = /bytes=(\d*)-(\d*)/.exec(req.headers.range || '');
-    if (rango) {
-      const inicio = rango[1] ? Number(rango[1]) : 0;
-      const fin = rango[2] ? Math.min(Number(rango[2]), total - 1) : total - 1;
-      if (inicio >= total) return res.status(416).setHeader('Content-Range', `bytes */${total}`).end();
-      res.status(206);
-      res.setHeader('Content-Range', `bytes ${inicio}-${fin}/${total}`);
-      res.setHeader('Content-Length', fin - inicio + 1);
-      return res.end(f.buffer.subarray(inicio, fin + 1));
-    }
-    res.setHeader('Content-Length', total);
-    return res.end(f.buffer);
-  } catch (err) {
-    console.error('[cancion] No se pudo servir el fragmento:', err.message);
-    return res.status(502).end();
-  }
+  res.set('Cache-Control', 'no-store').redirect(302, f.url);
 });
 
 /* ───────────────────────── Modo local ───────────────────────── */

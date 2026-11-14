@@ -41,7 +41,7 @@ function BotonVolver({ onClick, texto = 'Volver' }) {
 }
 
 export default function ConectaOnline({
-  tituloJuego = 'Conecta 4',
+  tituloJuego = 'Conexiones ocultas',
   descripcionJuego,
   onLocal,
   onSalir,

@@ -1,5 +1,5 @@
 // client/src/games/Conecta/ConectaPartida.jsx
-// Pantallas de una ronda de Conecta 4 por turnos. Las usan el modo local y el online.
+// Pantallas de una ronda de Conexiones ocultas por turnos. Las usan el modo local y el online.
 // Recibe la «vista» del motor (engine.js) y llama a onAccion(tipo, datos).
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';

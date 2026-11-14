@@ -10,6 +10,11 @@ import { REGLAS, OPCIONES_RONDAS } from '../pulsador/engine.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
 
 const router = express.Router();
+
+// Créditos de las fotos (página «Créditos y avisos legales»)
+router.get('/creditos', (req, res) => {
+  res.json({ success: true, fotos: famosos.map((f) => ({ nombre: f.nombre, ...f.attribution })).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es')) });
+});
 const RASGO = {
   ojos: 'son estos ojos', nariz: 'es esta nariz', boca: 'es esta boca', labios: 'son estos labios', dientes: 'es esta sonrisa',
   barbilla: 'es esta barbilla', frente: 'es esta frente', pelo: 'es este pelo', 'pelo pelirrojo': 'es este pelo', rizos: 'son estos rizos',

@@ -91,7 +91,7 @@
   },
   {
     "id": "conecta",
-    "name": "Conecta 4",
+    "name": "Conexiones ocultas",
     "description": "Encuentra las 4 conexiones que existen entre los 16 elementos del tablero (de 4 en 4). Descubre qué conexión les une y gana puntos extra.",
     "isNew": true
   },

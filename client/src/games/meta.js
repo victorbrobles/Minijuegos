@@ -249,7 +249,7 @@ export const META = {
     categorias: ['chill']
   },
   'conecta': {
-    titulo: 'Conecta 4',
+    titulo: 'Conexiones ocultas',
     imagen: '/covers/conecta.webp',
     icono: 'connect',
     colores: ['#0284c7', '#1e3a8a'],
@@ -721,7 +721,7 @@ export const META = {
     imagen: '/covers/crimen.webp',
     icono: 'detective',
     colores: ['#475569', '#0f172a'],
-    etiquetas: 'asesinato deduccion logica puzle sospechosos pistas detective murdoku un jugador solitario',
+    etiquetas: 'asesinato deduccion logica puzle sospechosos pistas detective un jugador solitario',
     descripcion: 'Han asesinado a Víctor. Coloca a cada sospechoso en el plano de la casa con las pistas (uno por fila y columna) y descubre quién estaba a solas con la víctima.',
     categorias: ['un_jugador']
   },

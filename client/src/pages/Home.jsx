@@ -4,6 +4,7 @@ import { BannerReto } from '../reto/Banner.jsx';
 import { Link } from 'react-router-dom';
 import Recomendador from '../components/Recomendador.jsx';
 import './Estadisticas.css';
+import './Creditos.css';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GameCard from '../components/GameCard.jsx';
@@ -422,7 +423,7 @@ export default function Home() {
         </div>
 
         <div className="footer-bottom">
-          <p>© {new Date().getFullYear()} Minigames Hub · Hecho para jugar con amigos y familia.</p>
+          <p>© {new Date().getFullYear()} Minigames Hub · Hecho para jugar con amigos y familia · <Link to="/creditos" className="footer-legal">Créditos y avisos legales</Link></p>
           <button
             type="button"
             className="footer-top-btn"

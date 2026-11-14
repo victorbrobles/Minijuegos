@@ -1,6 +1,6 @@
 // client/src/games/FootballSplit/FootballSplitLocal.jsx
 // Modo «un único dispositivo»: el móvil va pasando de jugador en jugador según el turno. Mismo motor que el online;
-// las caras se piden al servidor.
+// los futbolistas se piden al servidor.
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import * as E from './engine.js';
@@ -43,7 +43,7 @@ export default function FootballSplitLocal({ onVolver, onExit, onAbrirAyuda }) {
       estRef.current = E.crearPartida(limpios.map((nombre, i) => ({ id: i + 1, nombre })), d.retos, Date.now());
       setPaso('juego');
     } catch {
-      setError('No se han podido cargar las caras. Inténtalo de nuevo.');
+      setError('No se han podido cargar los futbolistas. Inténtalo de nuevo.');
     } finally {
       setCargando(false);
     }
@@ -100,7 +100,7 @@ export default function FootballSplitLocal({ onVolver, onExit, onAbrirAyuda }) {
     contenido = (
       <PantallaResultado v={v} onSalir={onSalir}>
         <div className="ffp-barra estatica">
-          <button type="button" className="ffp-boton grande" onClick={() => enviar('siguiente')}><Icon name="play" size={20} /> {v.ronda >= v.rondas ? 'Ver resultado final' : 'Nueva ronda: siguiente cara'}</button>
+          <button type="button" className="ffp-boton grande" onClick={() => enviar('siguiente')}><Icon name="play" size={20} /> {v.ronda >= v.rondas ? 'Ver resultado final' : 'Nueva ronda: siguiente futbolista'}</button>
           {v.ronda < v.rondas && <button type="button" className="ffp-enlace" onClick={() => enviar('terminar')}><Icon name="flagFinish" size={15} /> Terminar la partida ya</button>}
         </div>
       </PantallaResultado>

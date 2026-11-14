@@ -22,7 +22,7 @@ export default [
   { id: 420, item: "Cinta adhesiva de carrocero / pintor", colores: ["blanco", "amarillo"] },
   { id: 421, item: "Cubo de Rubik clásico (las 6 caras)", colores: ["blanco", "amarillo", "azul", "verde", "rojo", "naranja"] },
   { id: 422, item: "Tablero de ajedrez clásico", colores: ["blanco", "negro"] },
-  { id: 423, item: "Fichas del juego Conecta 4 clásico", colores: ["rojo", "amarillo"] },
+  { id: 423, item: "Fichas del clásico cuatro en raya", colores: ["rojo", "amarillo"] },
   { id: 424, item: "Casillas de salida y casas del Parchís (4 colores)", colores: ["amarillo", "azul", "rojo", "verde"] },
   { id: 425, item: "Cartas normales del juego UNO (4 colores)", colores: ["rojo", "azul", "verde", "amarillo"] },
   { id: 426, item: "Carta de cambio de color del juego UNO", colores: ["rojo", "azul", "amarillo", "verde", "negro"] },

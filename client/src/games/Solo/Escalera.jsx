@@ -1,7 +1,7 @@
 // client/src/games/Solo/Escalera.jsx
-// «La Escalera» (1 jugador): 15 preguntas de dificultad creciente. Cada escalón vale más; en el 5 y el 10 hay
-// suelo seguro. Puedes plantarte cuando quieras y quedarte lo ganado; si fallas, bajas al último suelo.
-// Tres comodines de un solo uso: 50/50, cambiar de pregunta y «lo que diría el público».
+// «La Escalera» (1 jugador): 15 preguntas de dificultad creciente. Cada escalón vale más; en el 3, el 7 y el 11 hay
+// rellano seguro. Puedes plantarte cuando quieras y quedarte lo ganado; si fallas, bajas al último rellano.
+// Tres comodines de un solo uso: tijeras (quita dos respuestas), cambio de pregunta y sondeo.
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
@@ -12,20 +12,20 @@ import './Solo.css';
 
 const ID = 'escalera';
 export const PREMIOS = [10, 20, 30, 50, 100, 150, 250, 400, 600, 1000, 1500, 2500, 4000, 6000, 10000];
-const SEGUROS = [4, 9];
+const SEGUROS = [2, 6, 10]; // rellanos: preguntas 3, 7 y 11
 const SEGUNDOS = 30;
 const LETRAS = ['A', 'B', 'C', 'D'];
 const fmt = (n) => n.toLocaleString('es-ES');
 const suelo = (k) => { const s = SEGUROS.filter((i) => i < k); return s.length ? PREMIOS[s.at(-1)] : 0; };
 
-/** Votos simulados del público: aciertan más cuanto más fácil es la pregunta. */
+/** Sondeo simulado: la gente acierta más cuanto más fácil es la pregunta. */
 function votosPublico(q) {
   const acierto = [0.72, 0.62, 0.5, 0.42, 0.34][q.nivel - 1] + Math.random() * 0.15;
   const resto = q.opciones.filter((o) => o !== q.correcta).map(() => Math.random());
   const suma = resto.reduce((a, b) => a + b, 0);
   let i = 0;
   const votos = q.opciones.map((o) => (o === q.correcta ? acierto : ((1 - acierto) * resto[i++]) / suma));
-  // A veces el público se equivoca en las difíciles
+  // A veces el sondeo se equivoca en las difíciles
   if (q.nivel >= 4 && Math.random() < 0.25) { const j = votos.findIndex((_, x) => q.opciones[x] !== q.correcta); [votos[j], votos[q.opciones.indexOf(q.correcta)]] = [votos[q.opciones.indexOf(q.correcta)], votos[j]]; }
   return votos.map((v) => Math.round(v * 100));
 }
@@ -80,9 +80,9 @@ export default function Escalera() {
   const ayudaModal = ayuda && (
     <AyudaUnJugador titulo="¿Cómo se juega?" onCerrar={() => setAyuda(false)}>
       <p>Responde <b>15 preguntas</b> cada vez más difíciles. Cada escalón vale más puntos, hasta <b>10.000</b>.</p>
-      <p>🛟 Las preguntas 5 y 10 son <b>suelo seguro</b>: si fallas después, te quedas con lo de ese escalón. Si fallas antes, te vas con 0.</p>
+      <p>🛟 Las preguntas 3, 7 y 11 son <b>rellanos seguros</b>: si fallas después, te quedas con lo de ese escalón. Si fallas antes del primero, te vas con 0.</p>
       <p>🛑 Puedes <b>plantarte</b> antes de responder y quedarte con lo que llevas.</p>
-      <p>Comodines (uno de cada): <b>50/50</b> quita dos respuestas falsas, <b>🔄 Cambiar</b> pone otra pregunta del mismo nivel y <b>👥 Público</b> muestra lo que votaría la gente (que no siempre acierta).</p>
+      <p>Comodines (uno de cada): <b>✂️ Tijeras</b> quita dos respuestas falsas, <b>🔄 Cambio</b> pone otra pregunta del mismo nivel y <b>📊 Sondeo</b> muestra lo que respondería la gente (que no siempre acierta).</p>
       <p>Tienes {SEGUNDOS} segundos por pregunta.</p>
     </AyudaUnJugador>
   );
@@ -124,7 +124,7 @@ export default function Escalera() {
                 const clase = elegida === null ? (fuera ? ' apagada' : '') : o === q.correcta ? ' bien' : o === elegida ? ' mal' : ' apagada';
                 return (
                   <button key={o} type="button" className={`rto-opcion${clase}`} disabled={elegida !== null || fuera} onClick={() => responder(o)}>
-                    <i>{LETRAS[i]}</i><span>{fuera ? '—' : o}</span>{votos && !fuera && <small>👥 {votos[i]} %</small>}
+                    <i>{LETRAS[i]}</i><span>{fuera ? '—' : o}</span>{votos && !fuera && <small>📊 {votos[i]} %</small>}
                   </button>
                 );
               })}
@@ -133,9 +133,9 @@ export default function Escalera() {
           </div>
           {elegida === null && (
             <div className="esc-comodines">
-              <button type="button" disabled={!comodines.mitad} onClick={() => usar('mitad')}>50/50</button>
-              <button type="button" disabled={!comodines.cambio} onClick={() => usar('cambio')}>🔄 Cambiar</button>
-              <button type="button" disabled={!comodines.publico} onClick={() => usar('publico')}>👥 Público</button>
+              <button type="button" disabled={!comodines.mitad} onClick={() => usar('mitad')}>✂️ Tijeras</button>
+              <button type="button" disabled={!comodines.cambio} onClick={() => usar('cambio')}>🔄 Cambio</button>
+              <button type="button" disabled={!comodines.publico} onClick={() => usar('publico')}>📊 Sondeo</button>
             </div>
           )}
           {elegida === null && k > 0 && <button type="button" className="uj-boton secundario" onClick={() => terminar(PREMIOS[k - 1], 'Te plantaste')}>🛑 Me planto con {fmt(PREMIOS[k - 1])} puntos</button>}

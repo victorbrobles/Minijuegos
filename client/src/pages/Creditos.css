@@ -1,0 +1,9 @@
+/* client/src/pages/Creditos.css */
+.crd-pagina .est-tarjeta p { margin: 0 0 0.6rem; color: #334155; line-height: 1.5; }
+.crd-pagina a { color: #6d28d9; font-weight: 700; }
+.crd-lista { margin: 0 0 0.8rem; padding-left: 1.1rem; display: grid; gap: 0.5rem; color: #334155; line-height: 1.45; }
+.crd-fotos { list-style: none; margin: 0 0 0.8rem; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.35rem; }
+.crd-fotos li { display: grid; padding: 0.45rem 0.6rem; border-radius: 12px; background: #f8fafc; font-size: 0.82rem; }
+.crd-fotos li b { color: #0f172a; }
+.crd-fotos li span { color: #64748b; }
+.footer-legal { color: inherit; font-weight: 800; text-decoration: underline; }

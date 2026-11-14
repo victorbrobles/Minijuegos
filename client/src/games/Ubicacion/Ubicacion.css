@@ -835,3 +835,10 @@
 @media (prefers-reduced-motion: reduce) {
   .ubp-globo, .ubp-foto, .ubp-foto-reloj.critico, .ubp-tiempo.critico .ubp-tiempo-num, .ubp-listo-avatar, .ubp-radar { animation: none; }
 }
+
+/* Nombres en español sobre el mapa base */
+.ub-etiqueta { background: none !important; border: none !important; }
+.ub-etiqueta span { position: absolute; transform: translate(-50%, -50%); white-space: nowrap; font-family: Figtree, system-ui, sans-serif; font-weight: 800; letter-spacing: 0.02em; pointer-events: none;
+  text-shadow: 0 0 3px #ffffff, 0 0 3px #ffffff, 0 0 5px #ffffff; }
+.ub-etiqueta.pais span { font-size: 11px; color: #334155; text-transform: uppercase; }
+.ub-etiqueta.oceano span { font-size: 12px; color: #1d4ed8; font-style: italic; opacity: 0.75; }
