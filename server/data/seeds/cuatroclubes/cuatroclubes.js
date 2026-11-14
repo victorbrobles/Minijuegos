@@ -8,7 +8,7 @@ export const CLUBES_INFO = {
       "#ffffff",
       "#00529f"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg"
+    "escudo": null
   },
   "FC Barcelona": {
     "nombre": "FC Barcelona",
@@ -17,7 +17,7 @@ export const CLUBES_INFO = {
       "#a50044",
       "#004d98"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg"
+    "escudo": null
   },
   "Atlético de Madrid": {
     "nombre": "Atlético de Madrid",
@@ -26,7 +26,7 @@ export const CLUBES_INFO = {
       "#cb3524",
       "#272e61"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/f/f9/Atletico_Madrid_Logo_2024.svg"
+    "escudo": null
   },
   "Sevilla FC": {
     "nombre": "Sevilla FC",
@@ -35,7 +35,7 @@ export const CLUBES_INFO = {
       "#ffffff",
       "#d4001f"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/3/3b/Sevilla_FC_logo.svg"
+    "escudo": null
   },
   "Valencia CF": {
     "nombre": "Valencia CF",
@@ -44,7 +44,7 @@ export const CLUBES_INFO = {
       "#ffffff",
       "#ff6600"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/c/ce/Valenciacf.svg"
+    "escudo": null
   },
   "Villarreal CF": {
     "nombre": "Villarreal CF",
@@ -53,7 +53,7 @@ export const CLUBES_INFO = {
       "#ffe667",
       "#005187"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/b/b9/Villarreal_CF_logo-en.svg"
+    "escudo": null
   },
   "Real Betis": {
     "nombre": "Real Betis",
@@ -62,7 +62,7 @@ export const CLUBES_INFO = {
       "#0bb363",
       "#ffffff"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/1/13/Real_betis_logo.svg"
+    "escudo": null
   },
   "Real Sociedad": {
     "nombre": "Real Sociedad",
@@ -71,7 +71,7 @@ export const CLUBES_INFO = {
       "#0067b1",
       "#ffffff"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/f/f1/Real_Sociedad_logo.svg"
+    "escudo": null
   },
   "RCD Mallorca": {
     "nombre": "RCD Mallorca",
@@ -80,7 +80,7 @@ export const CLUBES_INFO = {
       "#e20613",
       "#000000"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/e/e0/Rcd_mallorca.svg"
+    "escudo": null
   },
   "RCD Espanyol": {
     "nombre": "RCD Espanyol",
@@ -89,7 +89,7 @@ export const CLUBES_INFO = {
       "#007fc8",
       "#ffffff"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/d/d6/Rcd_espanyol_logo.svg"
+    "escudo": null
   },
   "Celta de Vigo": {
     "nombre": "Celta de Vigo",
@@ -98,7 +98,7 @@ export const CLUBES_INFO = {
       "#8ac3ee",
       "#d50032"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/1/12/RC_Celta_de_Vigo_logo.svg"
+    "escudo": null
   },
   "Málaga CF": {
     "nombre": "Málaga CF",
@@ -107,7 +107,7 @@ export const CLUBES_INFO = {
       "#009ee2",
       "#ffffff"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/6/6d/M%C3%A1laga_CF.svg"
+    "escudo": null
   },
   "Getafe CF": {
     "nombre": "Getafe CF",
@@ -116,7 +116,7 @@ export const CLUBES_INFO = {
       "#005999",
       "#ffffff"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/4/46/Getafe_logo.svg"
+    "escudo": null
   },
   "Manchester United": {
     "nombre": "Manchester United",
@@ -125,7 +125,7 @@ export const CLUBES_INFO = {
       "#da291c",
       "#fbe122"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg"
+    "escudo": null
   },
   "Manchester City": {
     "nombre": "Manchester City",
@@ -134,7 +134,7 @@ export const CLUBES_INFO = {
       "#6cabdd",
       "#1c2c5b"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg"
+    "escudo": null
   },
   "Liverpool": {
     "nombre": "Liverpool",
@@ -143,7 +143,7 @@ export const CLUBES_INFO = {
       "#c8102e",
       "#00b2a9"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg"
+    "escudo": null
   },
   "Chelsea": {
     "nombre": "Chelsea",
@@ -152,7 +152,7 @@ export const CLUBES_INFO = {
       "#034694",
       "#ffffff"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg"
+    "escudo": null
   },
   "Arsenal": {
     "nombre": "Arsenal",
@@ -161,7 +161,7 @@ export const CLUBES_INFO = {
       "#ef0107",
       "#ffffff"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg"
+    "escudo": null
   },
   "Tottenham Hotspur": {
     "nombre": "Tottenham Hotspur",
@@ -170,7 +170,7 @@ export const CLUBES_INFO = {
       "#ffffff",
       "#132257"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/b/b4/Tottenham_Hotspur.svg"
+    "escudo": null
   },
   "Everton": {
     "nombre": "Everton",
@@ -179,7 +179,7 @@ export const CLUBES_INFO = {
       "#003399",
       "#ffffff"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/7/7c/Everton_FC_logo.svg"
+    "escudo": null
   },
   "West Ham United": {
     "nombre": "West Ham United",
@@ -188,7 +188,7 @@ export const CLUBES_INFO = {
       "#7a263a",
       "#1bb1e7"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/c/c2/West_Ham_United_FC_logo.svg"
+    "escudo": null
   },
   "Aston Villa": {
     "nombre": "Aston Villa",
@@ -197,7 +197,7 @@ export const CLUBES_INFO = {
       "#670e36",
       "#95bfe5"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/9/9f/Aston_Villa_FC_new_crest.svg"
+    "escudo": null
   },
   "Newcastle United": {
     "nombre": "Newcastle United",
@@ -206,7 +206,7 @@ export const CLUBES_INFO = {
       "#241f20",
       "#ffffff"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/5/56/Newcastle_United_Logo.svg"
+    "escudo": null
   },
   "Juventus": {
     "nombre": "Juventus",
@@ -215,7 +215,7 @@ export const CLUBES_INFO = {
       "#000000",
       "#ffffff"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Juventus_FC_2017_icon_%28black%29.svg"
+    "escudo": null
   },
   "Inter de Milán": {
     "nombre": "Inter de Milán",
@@ -224,7 +224,7 @@ export const CLUBES_INFO = {
       "#010e80",
       "#000000"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg"
+    "escudo": null
   },
   "AC Milan": {
     "nombre": "AC Milan",
@@ -233,7 +233,7 @@ export const CLUBES_INFO = {
       "#fb090b",
       "#000000"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg"
+    "escudo": null
   },
   "AS Roma": {
     "nombre": "AS Roma",
@@ -242,7 +242,7 @@ export const CLUBES_INFO = {
       "#8e1f2f",
       "#f0bc42"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/f/f7/AS_Roma_logo_%282017%29.svg"
+    "escudo": null
   },
   "Napoli": {
     "nombre": "Napoli",
@@ -251,7 +251,7 @@ export const CLUBES_INFO = {
       "#12a0d7",
       "#003c82"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/commons/2/2d/SSC_Neapel.svg"
+    "escudo": null
   },
   "Lazio": {
     "nombre": "Lazio",
@@ -260,7 +260,7 @@ export const CLUBES_INFO = {
       "#87d8f7",
       "#ffffff"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/c/ce/S.S._Lazio_badge.svg"
+    "escudo": null
   },
   "Fiorentina": {
     "nombre": "Fiorentina",
@@ -269,7 +269,7 @@ export const CLUBES_INFO = {
       "#482e92",
       "#ffffff"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/commons/f/f2/2022_ACF_Fiorentina_logo.svg"
+    "escudo": null
   },
   "Parma": {
     "nombre": "Parma",
@@ -278,7 +278,7 @@ export const CLUBES_INFO = {
       "#fedd00",
       "#002f87"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/commons/9/97/Logo_Parma_Calcio_1913_%28adozione_2016%29.svg"
+    "escudo": null
   },
   "Sampdoria": {
     "nombre": "Sampdoria",
@@ -287,7 +287,7 @@ export const CLUBES_INFO = {
       "#0055a4",
       "#ef3340"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/d/d2/U.C._Sampdoria_logo.svg"
+    "escudo": null
   },
   "Bayern Múnich": {
     "nombre": "Bayern Múnich",
@@ -296,7 +296,7 @@ export const CLUBES_INFO = {
       "#dc052d",
       "#0066b2"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg"
+    "escudo": null
   },
   "Borussia Dortmund": {
     "nombre": "Borussia Dortmund",
@@ -305,7 +305,7 @@ export const CLUBES_INFO = {
       "#fde100",
       "#000000"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_logo.svg"
+    "escudo": null
   },
   "Bayer Leverkusen": {
     "nombre": "Bayer Leverkusen",
@@ -314,7 +314,7 @@ export const CLUBES_INFO = {
       "#e32221",
       "#000000"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/5/59/Bayer_04_Leverkusen_logo.svg"
+    "escudo": null
   },
   "Schalke 04": {
     "nombre": "Schalke 04",
@@ -323,7 +323,7 @@ export const CLUBES_INFO = {
       "#004d9d",
       "#ffffff"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/commons/6/6d/FC_Schalke_04_Logo.svg"
+    "escudo": null
   },
   "Paris Saint-Germain": {
     "nombre": "Paris Saint-Germain",
@@ -332,7 +332,7 @@ export const CLUBES_INFO = {
       "#004170",
       "#da291c"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg"
+    "escudo": null
   },
   "AS Mónaco": {
     "nombre": "AS Mónaco",
@@ -341,7 +341,7 @@ export const CLUBES_INFO = {
       "#e51b22",
       "#ffffff"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/b/ba/AS_Monaco_FC.svg"
+    "escudo": null
   },
   "Olympique de Marsella": {
     "nombre": "Olympique de Marsella",
@@ -350,7 +350,7 @@ export const CLUBES_INFO = {
       "#2faee0",
       "#ffffff"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/commons/d/d8/Olympique_Marseille_logo.svg"
+    "escudo": null
   },
   "Olympique de Lyon": {
     "nombre": "Olympique de Lyon",
@@ -359,7 +359,7 @@ export const CLUBES_INFO = {
       "#ffffff",
       "#19388a"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/1/1c/Olympique_Lyonnais_logo.svg"
+    "escudo": null
   },
   "Ajax": {
     "nombre": "Ajax",
@@ -368,7 +368,7 @@ export const CLUBES_INFO = {
       "#d2122e",
       "#ffffff"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/7/79/Ajax_Amsterdam.svg"
+    "escudo": null
   },
   "PSV Eindhoven": {
     "nombre": "PSV Eindhoven",
@@ -377,7 +377,7 @@ export const CLUBES_INFO = {
       "#ed1c24",
       "#ffffff"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/0/05/PSV_Eindhoven.svg"
+    "escudo": null
   },
   "Benfica": {
     "nombre": "Benfica",
@@ -386,7 +386,7 @@ export const CLUBES_INFO = {
       "#e83030",
       "#ffffff"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/a/a2/SL_Benfica_logo.svg"
+    "escudo": null
   },
   "FC Porto": {
     "nombre": "FC Porto",
@@ -395,7 +395,7 @@ export const CLUBES_INFO = {
       "#00428c",
       "#ffffff"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/f/f1/FC_Porto.svg"
+    "escudo": null
   },
   "Sporting CP": {
     "nombre": "Sporting CP",
@@ -404,7 +404,7 @@ export const CLUBES_INFO = {
       "#008057",
       "#ffffff"
     ],
-    "escudo": "https://upload.wikimedia.org/wikipedia/en/e/e1/Sporting_Clube_de_Portugal_%28Logo%29.svg"
+    "escudo": null
   }
 };
 

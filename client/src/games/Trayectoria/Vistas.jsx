@@ -24,14 +24,14 @@ function contraste(hex) {
   return (r * 299 + g * 587 + b * 114) / 1000 > 165 ? '#0f172a' : '#ffffff';
 }
 
-/** Escudo dibujado con los colores del club (se usa si no hay imagen o no carga). */
-function EscudoDibujado({ club }) {
+/** Escudo dibujado con los colores y las siglas del club (no se usan escudos reales: son marcas de cada club). */
+export function EscudoDibujado({ club, clase = 'mcp-escudo-svg' }) {
   const [c1, c2] = club.colores || ['#475569', '#ffffff'];
   const texto = contraste(c1);
   const s = club.siglas || inicial(club.nombre);
   const tam = s.length >= 4 ? 15 : s.length === 3 ? 19 : 24;
   return (
-    <svg viewBox="0 0 64 72" className="mcp-escudo-svg" role="img" aria-label={club.nombre}>
+    <svg viewBox="0 0 64 72" className={clase} role="img" aria-label={club.nombre}>
       <path d="M32 2 L60 10 V34 C60 52 47 64 32 70 C17 64 4 52 4 34 V10 Z" fill={c1} stroke="rgba(15,23,42,0.35)" strokeWidth="2" />
       <path d="M4 22 H60 V30 H4 Z" fill={c2} opacity="0.95" />
       <path d="M32 2 L60 10 V34 C60 52 47 64 32 70 C17 64 4 52 4 34 V10 Z" fill="url(#mcpBrillo)" />
@@ -47,10 +47,7 @@ function EscudoDibujado({ club }) {
 }
 
 export function Escudo({ club }) {
-  const [fallo, setFallo] = useState(false);
-  useEffect(() => setFallo(false), [club.logo]);
-  if (!club.logo || fallo) return <EscudoDibujado club={club} />;
-  return <img className="mcp-escudo-img" src={club.logo} alt={club.nombre} loading="lazy" referrerPolicy="no-referrer" onError={() => setFallo(true)} />;
+  return <EscudoDibujado club={club} />;
 }
 
 /** Segundos que faltan hasta `hasta` (con el desfase del reloj del servidor). */

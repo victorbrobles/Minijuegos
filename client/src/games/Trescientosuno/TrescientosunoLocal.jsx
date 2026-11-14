@@ -1,4 +1,5 @@
 // client/src/games/Trescientosuno/TrescientosunoLocal.jsx
+import { EscudoDibujado } from '../Trayectoria/Vistas.jsx';
 import { useRegistrarPartida } from '../../lib/registros.js';
 import { RecientesJugadores, ponerReciente } from '../../components/Recientes.jsx';
 import { nombreIdentidad } from '../../lib/identidad.js';
@@ -20,94 +21,26 @@ export const colorJugador = (i) => COLORES[((i % COLORES.length) + COLORES.lengt
 export const inicial = (nombre = '?') => nombre.trim().charAt(0).toUpperCase() || '?';
 export const indiceColor = (j, i) => (typeof j?.id === 'number' ? j.id - 1 : i);
 
-export const ESCUDOS_MAP = {
-  barcelona: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
-  fcbarcelona: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
-  madrid: "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg",
-  realmadrid: "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg",
-  atletico: "https://assets.football-logos.cc/logos/spain/512x512/atletico-madrid.0e6714cc.png",
-  atleticomadrid: "https://assets.football-logos.cc/logos/spain/512x512/atletico-madrid.0e6714cc.png",
-  atleticodemadrid: "https://assets.football-logos.cc/logos/spain/512x512/atletico-madrid.0e6714cc.png",
-  manutd: "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg",
-  manunited: "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg",
-  manchesterunited: "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg",
-  mancity: "https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg",
-  manchestercity: "https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg",
-  liverpool: "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg",
-  chelsea: "https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg",
-  arsenal: "https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg",
-  tottenham: "https://upload.wikimedia.org/wikipedia/en/b/b4/Tottenham_Hotspur.svg",
-  spurs: "https://upload.wikimedia.org/wikipedia/en/b/b4/Tottenham_Hotspur.svg",
-  psg: "https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg",
-  parissaintgermain: "https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg",
-  bayern: "https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg",
-  bayernmunchen: "https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg",
-  dortmund: "https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_logo.svg",
-  juventus: "https://assets.football-logos.cc/logos/italy/512x512/juventus.4efced70.png",
-  inter: "https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg",
-  milan: "https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg",
-  roma: "https://upload.wikimedia.org/wikipedia/en/f/f7/AS_Roma_logo_%282017%29.svg",
-  napoli: "https://assets.football-logos.cc/logos/italy/512x512/napoli.cbf9f0a6.png",
-  napoles: "https://assets.football-logos.cc/logos/italy/512x512/napoli.cbf9f0a6.png",
-  sevilla: "https://upload.wikimedia.org/wikipedia/en/3/3b/Sevilla_FC_logo.svg",
-  valencia: "https://upload.wikimedia.org/wikipedia/en/c/ce/Valenciacf.svg",
-  villarreal: "https://assets.football-logos.cc/logos/spain/512x512/villarreal.dca647c8.png",
-  sociedad: "https://upload.wikimedia.org/wikipedia/en/f/f1/Real_Sociedad_logo.svg",
-  realsociedad: "https://upload.wikimedia.org/wikipedia/en/f/f1/Real_Sociedad_logo.svg",
-  betis: "https://assets.football-logos.cc/logos/spain/512x512/real-betis.ff95aa03.png",
-  realbetis: "https://assets.football-logos.cc/logos/spain/512x512/real-betis.ff95aa03.png",
-  athletic: "https://upload.wikimedia.org/wikipedia/en/9/98/Club_Athletic_Bilbao_logo.svg",
-  athleticbilbao: "https://upload.wikimedia.org/wikipedia/en/9/98/Club_Athletic_Bilbao_logo.svg",
-  athleticclub: "https://upload.wikimedia.org/wikipedia/en/9/98/Club_Athletic_Bilbao_logo.svg",
-  porto: "https://upload.wikimedia.org/wikipedia/en/f/f1/FC_Porto.svg",
-  benfica: "https://upload.wikimedia.org/wikipedia/en/a/a2/SL_Benfica_logo.svg",
-  sporting: "https://upload.wikimedia.org/wikipedia/en/e/e1/Sporting_Clube_de_Portugal_%28Logo%29.svg",
-  ajax: "https://upload.wikimedia.org/wikipedia/en/7/79/Ajax_Amsterdam.svg",
-  miami: "https://upload.wikimedia.org/wikipedia/en/5/5c/Inter_Miami_CF_logo.svg",
-  intermiami: "https://upload.wikimedia.org/wikipedia/en/5/5c/Inter_Miami_CF_logo.svg",
-  monaco: "https://upload.wikimedia.org/wikipedia/en/b/ba/AS_Monaco_FC.svg",
-  lyon: "https://upload.wikimedia.org/wikipedia/en/c/c6/Olympique_Lyonnais.svg",
-  marseille: "https://upload.wikimedia.org/wikipedia/commons/d/d8/Olympique_Marseille_logo.svg",
-  river: "https://upload.wikimedia.org/wikipedia/commons/a/ac/Escudo_del_C_A_River_Plate.svg",
-  riverplate: "https://upload.wikimedia.org/wikipedia/commons/a/ac/Escudo_del_C_A_River_Plate.svg",
-  boca: "https://upload.wikimedia.org/wikipedia/commons/4/41/CABJ_escudo.svg",
-  bocajuniors: "https://upload.wikimedia.org/wikipedia/commons/4/41/CABJ_escudo.svg",
-  depor: "https://assets.football-logos.cc/logos/spain/512x512/deportivo-la-coruna.2a147b0c.png",
-  deportivo: "https://assets.football-logos.cc/logos/spain/512x512/deportivo-la-coruna.2a147b0c.png",
-  deportivodelacoruna: "https://assets.football-logos.cc/logos/spain/512x512/deportivo-la-coruna.2a147b0c.png",
-  celta: "https://upload.wikimedia.org/wikipedia/en/1/12/RC_Celta_de_Vigo_logo.svg",
-  celtadevigo: "https://upload.wikimedia.org/wikipedia/en/1/12/RC_Celta_de_Vigo_logo.svg",
-  espanyol: "https://upload.wikimedia.org/wikipedia/en/d/d6/Rcd_espanyol_logo.svg",
-  getafe: "https://upload.wikimedia.org/wikipedia/en/4/46/Getafe_logo.svg",
-  getafecf: "https://upload.wikimedia.org/wikipedia/en/4/46/Getafe_logo.svg",
-  zaragoza: "https://assets.football-logos.cc/logos/spain/512x512/zaragoza.966d5396.png",
-  osasuna: "https://assets.football-logos.cc/logos/spain/512x512/osasuna.44c61200.png",
-  alemania: "https://upload.wikimedia.org/wikipedia/en/e/e3/DFBEagle.svg",
-  seleccionalemana: "https://upload.wikimedia.org/wikipedia/en/e/e3/DFBEagle.svg",
-  argentina: "https://assets.football-logos.cc/logos/argentina/512x512/argentina-national-team.5c235057.png",
-  seleccionargentina: "https://assets.football-logos.cc/logos/argentina/512x512/argentina-national-team.5c235057.png",
-  brasil: "https://assets.football-logos.cc/logos/brazil/512x512/brazil-national-team.004213f2.png",
-  seleccionbrasilena: "https://assets.football-logos.cc/logos/brazil/512x512/brazil-national-team.004213f2.png",
-  espana: "https://assets.football-logos.cc/logos/spain/512x512/spain-national-team.4ad85efc.png",
-  seleccionespanola: "https://assets.football-logos.cc/logos/spain/512x512/spain-national-team.4ad85efc.png",
-  francia: "https://assets.football-logos.cc/logos/france/512x512/france-national-team.a17f83af.png",
-  seleccionfrancesa: "https://assets.football-logos.cc/logos/france/512x512/france-national-team.a17f83af.png",
-  holanda: "https://upload.wikimedia.org/wikipedia/en/7/78/Netherlands_national_football_team_logo.svg",
-  seleccionholandesa: "https://upload.wikimedia.org/wikipedia/en/7/78/Netherlands_national_football_team_logo.svg",
-  inglaterra: "https://assets.football-logos.cc/logos/england/512x512/england-national-team.daba5ba0.png",
-  seleccioninglesa: "https://assets.football-logos.cc/logos/england/512x512/england-national-team.daba5ba0.png",
-  italia: "https://assets.football-logos.cc/logos/italy/512x512/italy-national-team.2d467c1f.png",
-  seleccionitaliana: "https://assets.football-logos.cc/logos/italy/512x512/italy-national-team.2d467c1f.png",
-  portugal: "https://assets.football-logos.cc/logos/portugal/512x512/portuguese-football-federation.1a0b6707.png",
-  seleccionportuguesa: "https://assets.football-logos.cc/logos/portugal/512x512/portuguese-football-federation.1a0b6707.png"
+// Escudos DIBUJADOS (no se usan escudos reales: son marcas de clubes y federaciones): colores y siglas de cada equipo
+const ESCUDOS_301 = {
+  alemania: ['#000000', '#dd0000', 'GER'], argentina: ['#75aadb', '#ffffff', 'ARG'], arsenal: ['#ef0107', '#ffffff', 'ARS'],
+  athletic_bilbao: ['#ee2523', '#ffffff', 'ATH'], atletico_madrid: ['#cb3524', '#ffffff', 'ATM'], barcelona: ['#a50044', '#004d98', 'FCB'],
+  bayern: ['#dc052d', '#ffffff', 'BAY'], betis: ['#0bb363', '#ffffff', 'RBB'], brasil: ['#ffdf00', '#009c3b', 'BRA'],
+  celta: ['#8ac3ee', '#ffffff', 'RCC'], chelsea: ['#034694', '#ffffff', 'CFC'], depor: ['#0067b1', '#ffffff', 'RCD'],
+  dortmund: ['#fde100', '#000000', 'BVB'], espana: ['#c60b1e', '#ffc400', 'ESP'], espanyol: ['#007fc8', '#ffffff', 'RCDE'],
+  francia: ['#002395', '#ffffff', 'FRA'], getafe: ['#005999', '#ffffff', 'GCF'], holanda: ['#ff6600', '#ffffff', 'NED'],
+  inglaterra: ['#ffffff', '#cf081f', 'ENG'], inter: ['#0068a8', '#000000', 'INT'], italia: ['#0066b3', '#ffffff', 'ITA'],
+  juventus: ['#ffffff', '#000000', 'JUV'], liverpool: ['#c8102e', '#ffffff', 'LFC'], man_city: ['#6cabdd', '#ffffff', 'MCI'],
+  man_united: ['#da291c', '#000000', 'MUN'], milan: ['#fb090b', '#000000', 'ACM'], napoli: ['#12a0d7', '#ffffff', 'NAP'],
+  osasuna: ['#d91a21', '#0a346f', 'OSA'], portugal: ['#da291c', '#046a38', 'POR'], psg: ['#004170', '#da291c', 'PSG'],
+  real_madrid: ['#ffffff', '#1e3a8a', 'RMA'], real_sociedad: ['#0067b1', '#ffffff', 'RSO'], sevilla: ['#ffffff', '#d4021d', 'SFC'],
+  spurs: ['#ffffff', '#132257', 'THF'], valencia: ['#ffffff', '#000000', 'VCF'], villarreal: ['#ffe667', '#005187', 'VIL'],
+  zaragoza: ['#ffffff', '#0047ab', 'RZG']
 };
-
-export const getLogoUrl = (eq) => {
-  if (!eq) return null;
-  const normalizar = (str) => String(str || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]/g, '');
-  const idKey = normalizar(eq.id);
-  const nameKey = normalizar(eq.nombre);
-  return ESCUDOS_MAP[idKey] || ESCUDOS_MAP[nameKey] || null;
+/** Datos para dibujar el escudo de un equipo de 301 Goles. */
+export const clubDibujado = (eq) => {
+  const [c1, c2, siglas] = ESCUDOS_301[eq?.id] || ['#475569', '#ffffff', null];
+  return { nombre: eq?.nombre || '', colores: [c1, c2], siglas: siglas || undefined };
 };
 
 /* ==========================================================================
@@ -160,13 +93,6 @@ export function Avatar({ nombre, color, grande = false }) {
 }
 
 export function EscudoEquipo({ equipo, size = 52 }) {
-  const [falloImg, setFalloImg] = useState(false);
-  const url = getLogoUrl(equipo);
-
-  useEffect(() => {
-    setFalloImg(false);
-  }, [equipo?.id, equipo?.nombre]);
-
   if (!equipo) return null;
 
   return (
@@ -175,15 +101,7 @@ export function EscudoEquipo({ equipo, size = 52 }) {
       style={{ width: `${size}px`, height: `${size}px` }}
       title={equipo.nombre}
     >
-      {url && !falloImg ? (
-        <img
-          src={url}
-          alt={equipo.nombre}
-          onError={() => setFalloImg(true)}
-        />
-      ) : (
-        <strong>{inicial(equipo.nombre)}</strong>
-      )}
+      <EscudoDibujado club={clubDibujado(equipo)} clase="tcu-escudo-svg" />
     </span>
   );
 }
@@ -259,9 +177,6 @@ export function OrdenTurnos({ jugadores, activoId, yoId = null, eventoResta = nu
 }
 
 export function TarjetaEquipo({ equipo, seleccionado, onClick }) {
-  const [falloImg, setFalloImg] = useState(false);
-  const url = getLogoUrl(equipo);
-
   return (
     <button
       type="button"
@@ -270,16 +185,7 @@ export function TarjetaEquipo({ equipo, seleccionado, onClick }) {
       title={equipo.nombre}
     >
       <div className="tcu-equipo-logo-wrap">
-        {url && !falloImg ? (
-          <img
-            src={url}
-            alt={equipo.nombre}
-            className="tcu-escudo-img"
-            onError={() => setFalloImg(true)}
-          />
-        ) : (
-          <span className="tcu-escudo-fallback">{inicial(equipo.nombre)}</span>
-        )}
+        <EscudoDibujado club={clubDibujado(equipo)} clase="tcu-escudo-svg" />
       </div>
       <span className="tcu-equipo-nombre">{equipo.nombre}</span>
     </button>

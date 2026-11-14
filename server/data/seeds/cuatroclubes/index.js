@@ -19,14 +19,9 @@ const codigoDe = (nombre) => CODIGO.get(norm(nombre)) || ALIAS_CLUB[norm(nombre)
 /** Lista de todos los nombres (y alias de varias palabras) de la base, para saber si un futbolista es «conocido». */
 export const NOMBRES_BASE = JUGADORES.map((j) => ({ nombre: j.nombre, alias: j.alias }));
 
-// Los SVG de Wikipedia se piden como miniatura PNG (algunos no traen viewBox y se salen de su caja)
-const miniatura = (url) => {
-  const m = /^https:\/\/upload\.wikimedia\.org\/wikipedia\/(commons|en)\/([0-9a-f])\/([0-9a-f]{2})\/([^/]+\.svg)$/i.exec(url || '');
-  return m ? `https://upload.wikimedia.org/wikipedia/${m[1]}/thumb/${m[2]}/${m[3]}/${m[4]}/120px-${m[4]}.png` : url;
-};
-
 export const RETOS = COMBINACIONES.map((c0) => {
-  const c = { ...c0, clubes: c0.clubes.map((x) => ({ ...x, escudo: miniatura(x.escudo) })) };
+  // No se envían escudos reales (son marcas de cada club): el cliente dibuja uno con los colores y las siglas
+  const c = { ...c0, clubes: c0.clubes.map((x) => ({ ...x, escudo: null })) };
   const codigos = c.clubes.map((x) => codigoDe(x.nombre));
   const paises = c.clubes.map((x) => PAIS_SIN_CODIGO[norm(x.nombre)] || null);
   const conocidos = {};

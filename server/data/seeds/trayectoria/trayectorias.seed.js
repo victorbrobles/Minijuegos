@@ -2,57 +2,14 @@
 import { COLORES_CLUB, siglasDe } from './escudos.js';
 import { CLUBES_INFO } from '../cuatroclubes/cuatroclubes.js';
 
-const LOGOS = {
-  barca: "https://upload.wikimedia.org/wikipedia/en/4/47/FC_Barcelona_%28crest%29.svg",
-  madrid: "https://upload.wikimedia.org/wikipedia/en/5/56/Real_Madrid_CF.svg",
-  atletico: "https://upload.wikimedia.org/wikipedia/en/f/f4/Atletico_Madrid_2017_logo.svg",
-  manutd: "https://upload.wikimedia.org/wikipedia/en/7/7a/Manchester_United_FC_crest.svg",
-  mancity: "https://upload.wikimedia.org/wikipedia/en/e/eb/Manchester_City_FC_badge.svg",
-  liverpool: "https://upload.wikimedia.org/wikipedia/en/0/0c/Liverpool_FC.svg",
-  chelsea: "https://upload.wikimedia.org/wikipedia/en/c/cc/Chelsea_FC.svg",
-  arsenal: "https://upload.wikimedia.org/wikipedia/en/5/53/Arsenal_FC.svg",
-  tottenham: "https://upload.wikimedia.org/wikipedia/en/b/b4/Tottenham_Hotspur.svg",
-  psg: "https://upload.wikimedia.org/wikipedia/en/a/a7/Paris_Saint-Germain_F.C..svg",
-  bayern: "https://upload.wikimedia.org/wikipedia/commons/1/1b/FC_Bayern_M%C3%BCnchen_logo_%282017%29.svg",
-  dortmund: "https://upload.wikimedia.org/wikipedia/commons/6/67/Borussia_Dortmund_logo.svg",
-  juventus: "https://upload.wikimedia.org/wikipedia/commons/1/15/Juventus_FC_2017_logo.svg",
-  inter: "https://upload.wikimedia.org/wikipedia/commons/0/05/FC_Internazionale_Milano_2021.svg",
-  milan: "https://upload.wikimedia.org/wikipedia/commons/d/d0/Logo_of_AC_Milan.svg",
-  roma: "https://upload.wikimedia.org/wikipedia/en/f/f7/AS_Roma_logo_%282017%29.svg",
-  napoli: "https://upload.wikimedia.org/wikipedia/commons/b/ba/SSC_Napoli_2024.svg",
-  sevilla: "https://upload.wikimedia.org/wikipedia/en/3/3b/Sevilla_FC_logo.svg",
-  valencia: "https://upload.wikimedia.org/wikipedia/en/c/ce/Valenciacf.svg",
-  villarreal: "https://upload.wikimedia.org/wikipedia/en/7/70/Villarreal_CF_logo.svg",
-  sociedad: "https://upload.wikimedia.org/wikipedia/en/f/f1/Real_Sociedad_logo.svg",
-  betis: "https://upload.wikimedia.org/wikipedia/en/1/13/Real_betis_logo.svg",
-  athletic: "https://upload.wikimedia.org/wikipedia/en/9/98/Club_Athletic_Bilbao_logo.svg",
-  porto: "https://upload.wikimedia.org/wikipedia/en/f/f1/FC_Porto.svg",
-  benfica: "https://upload.wikimedia.org/wikipedia/en/a/a2/SL_Benfica_logo.svg",
-  sporting: "https://upload.wikimedia.org/wikipedia/en/e/e1/Sporting_Clube_de_Portugal_%28Logo%29.svg",
-  ajax: "https://upload.wikimedia.org/wikipedia/en/7/79/Ajax_Amsterdam.svg",
-  miami: "https://upload.wikimedia.org/wikipedia/en/5/5c/Inter_Miami_CF_logo.svg",
-  monaco: "https://upload.wikimedia.org/wikipedia/en/b/ba/AS_Monaco_FC.svg",
-  lyon: "https://upload.wikimedia.org/wikipedia/en/c/c6/Olympique_Lyonnais.svg",
-  marseille: "https://upload.wikimedia.org/wikipedia/commons/d/d8/Olympique_Marseille_logo.svg",
-  river: "https://upload.wikimedia.org/wikipedia/commons/a/ac/Escudo_del_C_A_River_Plate.svg",
-  boca: "https://upload.wikimedia.org/wikipedia/commons/4/41/CABJ_escudo.svg",
-  depor: "https://upload.wikimedia.org/wikipedia/en/4/4e/RC_Deportivo_La_Coru%C3%B1a_logo.svg",
-  celta: "https://upload.wikimedia.org/wikipedia/en/1/12/RC_Celta_de_Vigo_logo.svg",
-  espanyol: "https://upload.wikimedia.org/wikipedia/en/d/d6/Rcd_espanyol_logo.svg"
-};
+// Antes había aquí las URLs de los escudos reales; ya no se usan (los escudos se dibujan con colores y siglas).
+const LOGOS = {};
 
 // Escudo de cada club: imagen conocida (LOGOS o «Cuatro clubes») y, siempre, colores y siglas para dibujar
 // un escudo propio en el cliente si no hay imagen o no carga.
-// Los SVG de Wikipedia se piden como miniatura PNG: algunos SVG (p. ej. el del Milan) no traen viewBox y se
-// salen de su caja; la miniatura siempre escala bien y pesa menos.
-const miniatura = (url) => {
-  const m = /^https:\/\/upload\.wikimedia\.org\/wikipedia\/(commons|en)\/([0-9a-f])\/([0-9a-f]{2})\/([^/]+\.svg)$/i.exec(url || '');
-  return m ? `https://upload.wikimedia.org/wikipedia/${m[1]}/thumb/${m[2]}/${m[3]}/${m[4]}/120px-${m[4]}.png` : url;
-};
-
 const c = (nombre, logoUrl, periodo) => ({
   nombre,
-  logo: miniatura(logoUrl || CLUBES_INFO[nombre]?.escudo) || null,
+  logo: null, // sin escudos reales (son marcas de cada club): se dibuja uno con colores y siglas
   colores: COLORES_CLUB[nombre] || CLUBES_INFO[nombre]?.colores || ['#475569', '#ffffff'],
   siglas: siglasDe(nombre),
   periodo

@@ -132,7 +132,7 @@ npm run dev
 ## Minijuego: Modo carrera (`Trayectoria/`)
 - Online o en un único dispositivo, de 2 a 15 jugadores; 5, 10 o 15 futbolistas y dificultad mixta, fácil, media o difícil.
 - Los clubes salen uno a uno cada 6 s (sin nacionalidad ni número total de clubes a la vista). Quien lo sepa pulsa «¡Lo sé!» (el reloj se para) y tiene 20 s para escribirlo. Puntos: 1 + clubes aún ocultos (máx. 5, mín. 2). Tras el último club quedan 15 s; en los retos difíciles se puede pulsar «Desvelar pista» (+15 s, acertar vale 1). Fallar resta 1 y deja fuera de esa ronda.
-- Escudos: imagen conocida (miniatura PNG de Wikipedia, para que ningún SVG se salga de su caja) y, si no hay o no carga, escudo dibujado con los colores y siglas del club (`server/data/seeds/trayectoria/escudos.js`, los 336 clubes).
+- Escudos: siempre dibujados con los colores y las siglas del club (`server/data/seeds/trayectoria/escudos.js`, los 336 clubes); no se usan escudos reales.
 - Motor en `server/trayectoria/engine.js` (copia con `npm run sync:trayectoria`). Prueba: `node server/scripts/trayectoria-sim.mjs`. En local los futbolistas se cargan en un trozo aparte.
 
 ## Minijuego: Bingoball (`Bingoball/`)

@@ -1569,3 +1569,5 @@ body:has(.qq-en-partida) .back:not(.qq-btn-volver-sala) {
     transform: translate(-50%, 0);
   }
 }
+/* Escudos dibujados (colores y siglas; sin escudos reales) */
+.tcu-escudo-svg { width: 100%; height: 100%; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2)); }
