@@ -62,7 +62,6 @@ export const LIMITES = {
   jugadores: { min: 1, max: 16 },
   furbo: { min: 3, max: 12 },
   futbolgrid: { min: 2, max: 6 },
-  footballsplit: { min: 2, max: 12 },
   jugadas: { min: 1, max: 12 },
   cuatroclubes: { min: 2, max: 12 },
   geoquiz: { min: 3, max: 12 },

@@ -49,7 +49,6 @@ export const RONDAS = {
   jugadores: { opciones: [10, 15, 20] },
   furbo: { opciones: [2, 3, 5], porJugador: true },
   futbolgrid: { opciones: [3, 5, 7], unidad: 'partidas' },
-  footballsplit: { opciones: [2, 3, 5], porJugador: true },
   jugadas: { opciones: [5, 10, 15], unidad: 'jugadas' },
   cuatroclubes: { opciones: [10, 15, 20] },
   geoquiz: { opciones: [2, 3, 5], porJugador: true },

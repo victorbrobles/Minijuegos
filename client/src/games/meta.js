@@ -509,15 +509,6 @@ export const META = {
     descripcion: 'El típico juego de tres en raya versión fútbol. Cada fila y cada columna marcan una categoría. Coloca jugadores que encajen en las categorías de la fila y columna de la casilla elegida, y haz tres en raya antes que tu rival.',
     categorias: ['futbol']
   },
-  'footballsplit': {
-    titulo: 'FrankensFootball',
-    imagen: '/covers/footballsplit.webp',
-    icono: 'frankenstein',
-    colores: ['#818cf8', '#0f172a'],
-    etiquetas: 'futbol jugadores quiz clubes adivinar seleccion balon cara cabeza cuerpo',
-    descripcion: 'Una cara híbrida formada por tres partes de diferentes futbolistas (pelo, ojos y barbilla). Descubre a qué futbolista pertenece cada parte de la imagen antes de que acabe el tiempo.',
-    categorias: ['futbol']
-  },
   'jugadas': {
     titulo: '¡Qué jugadón!',
     imagen: '/covers/jugadas.webp',

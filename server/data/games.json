@@ -240,12 +240,6 @@
     "isNew": true
   },
   {
-    "id": "footballsplit",
-    "name": "FrankensFootball",
-    "description": "Una cara híbrida formada por tres partes de diferentes futbolistas (pelo, ojos y barbilla). Descubre a qué futbolista pertenece cada parte de la imagen antes de que acabe el tiempo.",
-    "isNew": true
-  },
-  {
     "id": "jugadas",
     "name": "Qué jugadón!",
     "description": "Un campo de fútbol en dos dimensiones con fichas de dos equipos y los dorsales reales de los jugadores. Descubre qué jugada icónica del fútbol se está recreando sobre ese campo y adelántate al resto.",

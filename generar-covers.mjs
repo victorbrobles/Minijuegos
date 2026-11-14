@@ -801,28 +801,6 @@ const JUEGOS = [
     badgeArt: `<g transform="translate(358, 178)">${soccerBall(0, 0, 38)}</g>`
   },
   {
-    id: 'footballsplit',
-    colores: ['#818cf8', '#0f172a'],
-    cards: [
-      { c1: '#f59e0b', c2: '#b45309', inner: mini.textBadge('1/3', 'PELO') },
-      { c1: '#ec4899', c2: '#9d174d', inner: mini.textBadge('2/3', 'OJOS') },
-      { c1: '#22c55e', c2: '#15803d', inner: mini.textBadge('3/3', 'BOCA') },
-      { c1: '#3b82f6', c2: '#1d4ed8', inner: mini.jersey('#38bdf8', '#ffffff', '?') }
-    ],
-    centerArt: `
-      <!-- Rostro dividido en 3 franjas -->
-      <rect x="34" y="34" width="108" height="38" rx="8" fill="#f59e0b" />
-      <path d="M52 72 Q88 36 124 72 Z" fill="#0f172a" />
-      <rect x="34" y="78" width="108" height="38" rx="8" fill="#38bdf8" />
-      <circle cx="68" cy="97" r="5" fill="#0f172a" />
-      <circle cx="108" cy="97" r="5" fill="#0f172a" />
-      <rect x="34" y="122" width="108" height="38" rx="8" fill="#4ade80" />
-      <path d="M70 138 Q88 152 106 138" fill="none" stroke="#0f172a" stroke-width="4" stroke-linecap="round" />
-      <line x1="24" y1="75" x2="152" y2="75" stroke="#facc15" stroke-width="3" stroke-dasharray="6 4" />
-      <line x1="24" y1="119" x2="152" y2="119" stroke="#facc15" stroke-width="3" stroke-dasharray="6 4" />`,
-    badgeArt: `<g transform="translate(358, 178)">${soccerBall(0, 0, 38)}</g>`
-  },
-  {
     id: 'jugadas',
     colores: ['#fbbf24', '#b45309'],
     cards: [

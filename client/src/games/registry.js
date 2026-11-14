@@ -51,7 +51,6 @@ import Trescientosuno from './Trescientosuno/Trescientosuno.jsx';
 import Jugadores from './Jugadores/Jugadores.jsx';
 import Furbo from './Furbo/Furbo.jsx';
 import FutbolGrid from './FutbolGrid/FutbolGrid.jsx';
-import FootballSplit from './FootballSplit/FootballSplit.jsx';
 import Jugadas from './Jugadas/Jugadas.jsx';
 import CuatroClubes from './CuatroClubes/CuatroClubes.jsx';
 import GeoQuiz from './GeoQuiz/GeoQuiz.jsx';
@@ -147,7 +146,6 @@ const registry = {
   'jugadores': Jugadores,
   'furbo': Furbo,
   'futbolgrid': FutbolGrid,
-  'footballsplit': FootballSplit,
   'jugadas': Jugadas,
   'cuatroclubes': CuatroClubes,
   'geoquiz': GeoQuiz,
