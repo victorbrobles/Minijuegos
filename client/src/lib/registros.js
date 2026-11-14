@@ -56,6 +56,16 @@ export function useSalon(juego) {
   return salon;
 }
 
+export function usePodiosMes() {
+  const [datos, setDatos] = useState(null);
+  useEffect(() => {
+    let vivo = true;
+    fetch('/api/registros/mes').then((r) => (r.ok ? r.json() : null)).then((d) => { if (vivo && d) setDatos(d); }).catch(() => {});
+    return () => { vivo = false; };
+  }, []);
+  return datos;
+}
+
 export function useRecientes() {
   const [lista, setLista] = useState([]);
   useEffect(() => {

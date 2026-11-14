@@ -6,24 +6,17 @@ import React, { useState } from 'react';
 import Icon from './Icon.jsx';
 import { useSalon } from '../lib/registros.js';
 import { NombreTag } from './Identidad.jsx';
-import { LIMITES } from '../games/limites.js';
+import { conVictorias } from '../games/limites.js';
 import { metaDe } from '../games/meta.js';
 import './SalonFama.css';
 
-// Juegos sin un ganador claro (por equipos, roles o sin final): sin podio de victorias
-const SIN_GANADOR = new Set(['lobos', 'quien-es-quien', 'traiciones', 'impostor', 'golpe', 'futbolgrid', 'mus', 'laberinto']);
-/** ¿Tiene sentido el podio de victorias? Solo en juegos con competición online y un ganador claro. */
-export function conVictorias(juegoId) {
-  const l = LIMITES[juegoId];
-  const online = l && (l.online ? l.online.max > 1 : l.max > 1);
-  return Boolean(online) && !SIN_GANADOR.has(juegoId);
-}
+export { conVictorias } from '../games/limites.js';
 
 const MEDALLAS = ['🥇', '🥈', '🥉'];
 const numero = (x) => (Number.isInteger(x) ? x : Math.round(x * 10) / 10).toLocaleString('es-ES');
 const fecha = (t) => new Date(t).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
 
-function Podio({ titulo, sub, icono, filas, unidad }) {
+export function Podio({ titulo, sub, icono, filas, unidad, vacio = 'Nadie todavía en los últimos 30 días.' }) {
   const col = [filas[1], filas[0], filas[2]]; // 2.º, 1.º, 3.º
   return (
     <section className="slf-seccion">
@@ -46,7 +39,7 @@ function Podio({ titulo, sub, icono, filas, unidad }) {
             );
           })}
         </div>
-      ) : <p className="slf-vacio">Nadie todavía en los últimos 30 días.</p>}
+      ) : <p className="slf-vacio">{vacio}</p>}
     </section>
   );
 }

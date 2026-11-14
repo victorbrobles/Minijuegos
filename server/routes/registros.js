@@ -2,12 +2,14 @@
 // Registros de partidas para el «salón de la fama» de cada juego (SQLite, el mismo fichero que el resto: db.js).
 //   POST /api/registros                 { juego, orden: 'desc'|'asc', jugadores: [{ nombre, puntos, gana }] }
 //   GET  /api/registros/salon/:juego    top 3 histórico + podios de los últimos 30 días (partidas y victorias)
+//   GET  /api/registros/mes             podios de la portada: más partidas y más victorias del mes actual
 //   GET  /api/registros/recientes       los 10 últimos jugadores (de cualquier juego)
 // En las salas online cada móvil envía el mismo resultado: se guarda una sola vez (misma partida = mismo juego,
 // mismos jugadores y mismos puntos en los últimos 30 minutos).
 import express from 'express';
 import { readFileSync } from 'node:fs';
 import db from '../db.js';
+import { conVictorias } from '../../client/src/games/limites.js';
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS registros_partidas (
@@ -86,6 +88,35 @@ export function salon(juego, ahora = Date.now()) {
   };
 }
 
+/** Instante (ms) en que empezó el mes actual en España. */
+export function inicioMes(ahora = Date.now()) {
+  const p = Object.fromEntries(new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Madrid', year: 'numeric', month: 'numeric', hour: 'numeric', hourCycle: 'h23' })
+    .formatToParts(new Date(ahora)).map((x) => [x.type, Number(x.value)]));
+  const utc = Date.UTC(p.year, p.month - 1, 1);
+  const h = Number(new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Madrid', hour: 'numeric', hourCycle: 'h23' }).format(new Date(utc)));
+  return utc - h * 3600000; // a las 00:00 UTC en Madrid son la 1 o las 2
+}
+const juegosConVictorias = () => [...JUEGOS].filter(conVictorias);
+const masPartidasMes = db.prepare(`SELECT jugador, COUNT(*) AS n, MAX(fecha) AS ultima FROM registros_resultados
+  WHERE fecha >= ? GROUP BY jugador ORDER BY n DESC, ultima DESC LIMIT 3`);
+const victoriasMes = db.prepare(`SELECT r.jugador, r.juego, MAX(r.fecha) AS ultima, SUM(r.gana) AS n FROM registros_resultados r
+  WHERE r.fecha >= ? AND r.gana = 1 AND (SELECT COUNT(*) FROM registros_resultados o WHERE o.partida = r.partida) > 1
+  GROUP BY r.jugador, r.juego`);
+
+/** Podios de la portada: más partidas y más victorias (en partidas de 2+ jugadores con ganador claro) del mes. */
+export function podiosMes(ahora = Date.now()) {
+  const desde = inicioMes(ahora);
+  const validos = new Set(juegosConVictorias());
+  const suma = new Map();
+  for (const f of victoriasMes.all(desde)) {
+    if (!validos.has(f.juego)) continue;
+    const a = suma.get(f.jugador) || { jugador: f.jugador, n: 0, ultima: 0 };
+    a.n += f.n; a.ultima = Math.max(a.ultima, f.ultima); suma.set(f.jugador, a);
+  }
+  const victorias = [...suma.values()].sort((a, b) => b.n - a.n || b.ultima - a.ultima).slice(0, 3);
+  return { desde, partidas: masPartidasMes.all(desde), victorias };
+}
+
 const router = express.Router();
 
 router.post('/', (req, res) => {
@@ -97,6 +128,10 @@ router.post('/', (req, res) => {
 router.get('/salon/:juego', (req, res) => {
   if (!JUEGOS.has(req.params.juego)) return res.status(404).json({ error: 'Juego desconocido.' });
   res.json({ success: true, ...salon(req.params.juego) });
+});
+
+router.get('/mes', (req, res) => {
+  res.json({ success: true, ...podiosMes() });
 });
 
 router.get('/recientes', (req, res) => {

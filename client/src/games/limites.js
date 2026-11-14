@@ -128,3 +128,12 @@ export function textoSala(id) {
   const o = limitesOnline(id);
   return o.min === o.max ? `${o.min} jugadores` : `de ${o.min} a ${o.max} jugadores`;
 }
+
+// Juegos sin un ganador claro (por equipos, roles o sin final): no cuentan para los podios de victorias
+export const SIN_GANADOR = new Set(['lobos', 'quien-es-quien', 'traiciones', 'impostor', 'golpe', 'futbolgrid', 'mus', 'laberinto']);
+/** ¿Tiene sentido contar victorias? Solo en juegos con competición online y un ganador claro. */
+export function conVictorias(juegoId) {
+  const l = LIMITES[juegoId];
+  const online = l && (l.online ? l.online.max > 1 : l.max > 1);
+  return Boolean(online) && !SIN_GANADOR.has(juegoId);
+}

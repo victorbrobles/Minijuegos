@@ -1,6 +1,7 @@
 // client/src/pages/Home.jsx
 import { ChipIdentidad } from '../components/Identidad.jsx';
 import { BannerReto } from '../reto/Banner.jsx';
+import PodiosMes from '../components/PodiosMes.jsx';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GameCard from '../components/GameCard.jsx';
@@ -324,6 +325,7 @@ export default function Home() {
       </header>
 
       {!hayBusqueda && <BannerReto />}
+      {!hayBusqueda && <PodiosMes />}
 
       {error && <p className="error">{error}</p>}
       {cargando && !error && <p className="loading">Cargando juegos…</p>}
