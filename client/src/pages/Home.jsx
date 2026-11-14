@@ -1,7 +1,8 @@
 // client/src/pages/Home.jsx
 import { ChipIdentidad } from '../components/Identidad.jsx';
 import { BannerReto } from '../reto/Banner.jsx';
-import PodiosMes from '../components/PodiosMes.jsx';
+import { Link } from 'react-router-dom';
+import './Estadisticas.css';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GameCard from '../components/GameCard.jsx';
@@ -324,8 +325,12 @@ export default function Home() {
         )}
       </header>
 
-      {!hayBusqueda && <BannerReto />}
-      {!hayBusqueda && <PodiosMes />}
+      {!hayBusqueda && (
+        <div className="home-accesos">
+          <BannerReto />
+          <Link to="/estadisticas" className="est-boton" aria-label="Estadísticas"><span>📊</span>Estadísticas</Link>
+        </div>
+      )}
 
       {error && <p className="error">{error}</p>}
       {cargando && !error && <p className="loading">Cargando juegos…</p>}

@@ -2,7 +2,8 @@
 // Registros de partidas para el «salón de la fama» de cada juego (SQLite, el mismo fichero que el resto: db.js).
 //   POST /api/registros                 { juego, orden: 'desc'|'asc', jugadores: [{ nombre, puntos, gana }] }
 //   GET  /api/registros/salon/:juego    top 3 histórico + podios de los últimos 30 días (partidas y victorias)
-//   GET  /api/registros/mes             podios de la portada: más partidas y más victorias del mes actual
+//   GET  /api/registros/mes             estadísticas generales del mes: podios, juegos más jugados y totales
+//   GET  /api/registros/jugador?nombre= estadísticas personales de Nombre#1234
 //   GET  /api/registros/recientes       los 10 últimos jugadores (de cualquier juego)
 // En las salas online cada móvil envía el mismo resultado: se guarda una sola vez (misma partida = mismo juego,
 // mismos jugadores y mismos puntos en los últimos 30 minutos).
@@ -117,6 +118,74 @@ export function podiosMes(ahora = Date.now()) {
   return { desde, partidas: masPartidasMes.all(desde), victorias };
 }
 
+const juegosMes = db.prepare(`SELECT p.juego, COUNT(*) AS n FROM registros_partidas p WHERE p.fecha >= ? GROUP BY p.juego ORDER BY n DESC LIMIT 3`);
+const totalesMes = db.prepare('SELECT (SELECT COUNT(*) FROM registros_partidas WHERE fecha >= ?) AS partidas, COUNT(DISTINCT jugador) AS jugadores FROM registros_resultados WHERE fecha >= ?');
+
+/** Estadísticas generales de la portada: podios del mes, juegos más jugados y totales. */
+export function generalesMes(ahora = Date.now()) {
+  const p = podiosMes(ahora);
+  return { ...p, juegos: juegosMes.all(p.desde), totales: totalesMes.get(p.desde, p.desde) };
+}
+
+const misResultados = db.prepare(`SELECT r.partida, r.juego, r.puntos, r.gana, r.fecha,
+  (SELECT COUNT(*) FROM registros_resultados o WHERE o.partida = r.partida) AS jugadores
+  FROM registros_resultados r WHERE r.jugador = ? ORDER BY r.fecha`);
+const companeros = db.prepare(`SELECT o.jugador, COUNT(*) AS n FROM registros_resultados r
+  JOIN registros_resultados o ON o.partida = r.partida AND o.jugador <> r.jugador
+  WHERE r.jugador = ? GROUP BY o.jugador ORDER BY n DESC LIMIT 3`);
+const clavesDia = (t) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Madrid' }).format(new Date(t));
+const diaSiguiente = (f) => new Date(Date.parse(`${f}T12:00:00Z`) + DIA).toISOString().slice(0, 10);
+
+/** Rachas de días seguidos a partir de una lista de fechas YYYY-MM-DD (ordenadas). */
+function rachas(dias, hoy) {
+  let mejor = 0; let actual = 0; let prev = null;
+  for (const d of dias) { actual = prev && diaSiguiente(prev) === d ? actual + 1 : 1; mejor = Math.max(mejor, actual); prev = d; }
+  const viva = prev && (prev === hoy || diaSiguiente(prev) === hoy);
+  return { actual: viva ? actual : 0, mejor };
+}
+
+/** Estadísticas personales de un jugador (Nombre#1234). */
+export function personales(jugador, ahora = Date.now()) {
+  const filas = misResultados.all(jugador);
+  const porJuego = new Map();
+  for (const f of filas) {
+    const g = porJuego.get(f.juego) || { juego: f.juego, partidas: 0, multi: 0, ganadas: 0, ultima: 0 };
+    g.partidas++; g.ultima = Math.max(g.ultima, f.fecha);
+    if (f.jugadores > 1) { g.multi++; if (f.gana) g.ganadas++; }
+    porJuego.set(f.juego, g);
+  }
+  // Récords: puestos en el top 3 histórico de cada juego
+  const records = [];
+  for (const j of porJuego.keys()) {
+    const s = salon(j, ahora);
+    s.top.forEach((t, i) => { if (t.jugador === jugador) records.push({ juego: j, puesto: i + 1, puntos: t.puntos, fecha: t.fecha, orden: s.orden }); });
+  }
+  records.sort((a, b) => a.puesto - b.puesto || b.fecha - a.fecha);
+  const hoy = clavesDia(ahora);
+  const dias = [...new Set(filas.map((f) => clavesDia(f.fecha)))];
+  const semana = Array(7).fill(0); filas.forEach((f) => { semana[new Date(`${clavesDia(f.fecha)}T12:00:00Z`).getUTCDay()]++; });
+  let reto = null;
+  try {
+    const r = db.prepare(`SELECT fecha, estado FROM retos_intentos WHERE jugador = ? ORDER BY fecha`).all(jugador);
+    const sup = r.filter((x) => x.estado === 'superado');
+    reto = { intentos: r.filter((x) => x.estado !== 'jugando' || x.fecha !== hoy).length, superados: sup.length, racha: rachas(sup.map((x) => x.fecha), hoy) };
+  } catch { /* sin tabla de retos */ }
+  const desdeMes = inicioMes(ahora);
+  return {
+    jugador,
+    juegos: [...porJuego.values()],
+    partidas: filas.length,
+    partidasMes: filas.filter((f) => f.fecha >= desdeMes).length,
+    primera: filas[0]?.fecha || null,
+    dias: dias.length,
+    racha: rachas(dias, hoy),
+    semana,
+    companeros: companeros.all(jugador),
+    records,
+    reto
+  };
+}
+
 const router = express.Router();
 
 router.post('/', (req, res) => {
@@ -131,7 +200,13 @@ router.get('/salon/:juego', (req, res) => {
 });
 
 router.get('/mes', (req, res) => {
-  res.json({ success: true, ...podiosMes() });
+  res.json({ success: true, ...generalesMes() });
+});
+
+router.get('/jugador', (req, res) => {
+  const j = String(req.query.nombre || '');
+  if (!/^.{1,15}#\d{4}$/.test(j)) return res.status(400).json({ error: 'Jugador no válido.' });
+  res.json({ success: true, ...personales(j) });
 });
 
 router.get('/recientes', (req, res) => {
