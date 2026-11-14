@@ -98,7 +98,8 @@ export const LIMITES = {
   subasta: { min: 2, max: 8 },
   dragon: { min: 2, max: 8 },
   piramides: { min: 2, max: 8 },
-  transmision: { min: 2, max: 6 }
+  transmision: { min: 2, max: 6 },
+  cuatrocuatros: { min: 2, max: 8 }
 };
 
 function base(id) {

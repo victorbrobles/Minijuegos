@@ -538,5 +538,11 @@
     "name": "Última Transmisión",
     "description": "Vuestra nave se cae a pedazos. Cada uno controla una sección, pero el manual de cada avería lo tiene otro. Hablad, coordinaos y aguantad hasta enviar la última transmisión.",
     "isNew": true
+  },
+  {
+    "id": "cuatrocuatros",
+    "name": "Cuatro Cuatros",
+    "description": "Dados de farol: cada uno ve solo los suyos y se apuesta cuántos hay de un valor en toda la mesa. Sube la apuesta, canta «¡Mentiroso!» o arriésgate con un «¡Exacto!». El último con dados gana.",
+    "isNew": true
   }
 ]

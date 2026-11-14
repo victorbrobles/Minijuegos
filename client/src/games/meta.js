@@ -842,6 +842,15 @@ export const META = {
     etiquetas: 'cooperativo nave espacio averias comunicacion tiempo real equipo online',
     descripcion: "Vuestra nave se cae a pedazos. Cada uno controla una sección, pero el manual de cada avería lo tiene otro. Hablad, coordinaos y aguantad hasta enviar la última transmisión.",
     categorias: ['estrategia']
+  },
+  'cuatrocuatros': {
+    titulo: 'Cuatro Cuatros',
+    imagen: '/covers/cuatrocuatros.webp',
+    icono: 'dice',
+    colores: ['#b91c1c', '#1c1917'],
+    etiquetas: 'dados farol mentiroso apostar perudo bluff tirar dados cartas online',
+    descripcion: "Dados de farol: cada uno ve solo los suyos y se apuesta cuántos hay de un valor en toda la mesa. Sube la apuesta, canta «¡Mentiroso!» o arriésgate con un «¡Exacto!». El último con dados gana.",
+    categorias: ['estrategia', 'chill']
   }
 };
 
