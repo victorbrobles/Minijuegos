@@ -2,6 +2,7 @@
 import { ChipIdentidad } from '../components/Identidad.jsx';
 import { BannerReto } from '../reto/Banner.jsx';
 import { Link } from 'react-router-dom';
+import Recomendador from '../components/Recomendador.jsx';
 import './Estadisticas.css';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -287,6 +288,7 @@ export default function Home() {
     <div className="home-view">
       <header className="hub-head">
         <Icon name="gamepad" className="hub-bg" aria-hidden="true" />
+        <Recomendador ids={games.map((g) => g.id)} />
 
         <div className="hub-top">
           <span className="hub-logo"><Icon name="gamepad" size={34} strokeWidth={1.9} /></span>
