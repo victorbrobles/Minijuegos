@@ -25,7 +25,8 @@ export const NIVELES = {
   facil: { n: 5, nombre: 'Fácil', directas: true },
   normal: { n: 6, nombre: 'Normal', directas: true },
   // 8×8 sin pistas de fila/columna y con las pistas más débiles primero: hay que encadenar muchas deducciones
-  experto: { n: 8, nombre: 'Experto', directas: false, debiles: true }
+  // 8×8 con UNA sola afirmación por personaje (algunas combinan dos datos) y una condición general
+  experto: { n: 8, nombre: 'Experto', directas: false, unaPorPersona: true }
 };
 export const COLUMNAS = 'ABCDEFGH';
 
@@ -110,6 +111,7 @@ export function contarSoluciones(caso, pistas, tope = 2) {
   const cand = personas.map((_, p) => libres.filter((c) => pistas.every((q) => q.tipo !== 'u' || q.p !== p || q.f(c))));
   if (cand.some((l) => !l.length)) return 0;
   const binarias = pistas.filter((q) => q.tipo === 'b');
+  const globales = pistas.filter((q) => q.tipo === 'g');
   const porPersona = personas.map((_, p) => binarias.filter((q) => q.a === p || q.b === p));
   const pos = Array(personas.length).fill(-1);
   const filas = Array(n).fill(false); const cols = Array(n).fill(false);
@@ -122,7 +124,7 @@ export function contarSoluciones(caso, pistas, tope = 2) {
     && porPersona[p].every((q) => { const x = q.a === p ? c : pos[q.a]; const y = q.b === p ? c : pos[q.b]; return x < 0 || y < 0 || q.f(x, y); });
   function rec(colocados) {
     if (total >= tope) return;
-    if (colocados === personas.length) { if (vale()) total += 1; return; }
+    if (colocados === personas.length) { if (vale() && globales.every((q) => q.f(pos))) total += 1; return; }
     // Se coloca primero a quien menos opciones le quedan (y si alguien no tiene ninguna, se corta aquí)
     let mejor = -1; let opciones = null;
     for (let p = 0; p < personas.length; p++) {
@@ -140,6 +142,82 @@ export function contarSoluciones(caso, pistas, tope = 2) {
   }
   rec(0);
   return total;
+}
+
+
+// ---------------------------------------------------------------- Nivel experto: una afirmación por personaje
+/** Afirmaciones verdaderas posibles sobre cada persona (algunas combinan dos datos en una sola frase). */
+function afirmacionesDe(caso) {
+  const { n, sala, mueble, pos, personas } = caso;
+  const fila = (c) => Math.floor(c / n); const col = (c) => c % n;
+  const borde = (c) => fila(c) === 0 || col(c) === 0 || fila(c) === n - 1 || col(c) === n - 1;
+  const junto = (c, t) => vecinos(c, n).some((v) => mueble[v] === t);
+  return personas.map((per, p) => {
+    const c = pos[p]; const nom = per.nombre; const g = per.f ? 1 : 0; const s = sala[c]; const enSala = art(caso.salas[s]);
+    const pegado = per.f ? 'pegada' : 'pegado';
+    const sobre = mueble[c] && MUEBLES[mueble[c]].sobre ? mueble[c] : null;
+    const juntoA = ['mesa', 'planta', 'estanteria', 'silla', 'cama'].filter((t) => junto(c, t));
+    const L = [];
+    const U = (texto, f, fuerza) => L.push({ tipo: 'u', p, texto, f, fuerza });
+    U(`${nom} estaba en ${enSala}.`, (x) => sala[x] === s, 2);
+    if (sobre) {
+      U(`${nom} estaba ${MUEBLES[sobre].sobre[g]}.`, (x) => mueble[x] === sobre, 2);
+      U(`${nom} estaba en ${enSala}, ${MUEBLES[sobre].sobre[g]}.`, (x) => sala[x] === s && mueble[x] === sobre, 3);
+    } else {
+      U(`${nom} estaba en ${enSala}, de pie en el suelo.`, (x) => sala[x] === s && !mueble[x], 3);
+    }
+    juntoA.forEach((t) => {
+      U(`${nom} estaba junto a ${MUEBLES[t].nombre}.`, (x) => junto(x, t), 1);
+      U(`${nom} estaba en ${enSala}, junto a ${MUEBLES[t].nombre}.`, (x) => sala[x] === s && junto(x, t), 3);
+      if (sobre) U(`${nom} estaba ${MUEBLES[sobre].sobre[g]}, junto a ${MUEBLES[t].nombre}.`, (x) => mueble[x] === sobre && junto(x, t), 3);
+    });
+    U(borde(c) ? `${nom} estaba en ${enSala}, ${pegado} a una pared exterior.` : `${nom} estaba en ${enSala}, lejos de las paredes exteriores.`,
+      (x) => sala[x] === s && borde(x) === borde(c), 3);
+    return L;
+  });
+}
+
+/** Condiciones generales verdaderas («Solo una persona estaba tumbada en una cama», «Nadie estaba en el jardín»…). */
+function condicionesGenerales(caso) {
+  const { sala, mueble, pos, salas } = caso;
+  const out = [];
+  const G = (texto, f) => out.push({ tipo: 'g', texto, f });
+  const cuenta = (ps, pred) => ps.filter((c) => c >= 0 && pred(c)).length;
+  const nombre = { silla: ['nadie estaba sentado en una silla', 'solo una persona estaba sentada en una silla', 'exactamente dos personas estaban sentadas en una silla'],
+    cama: ['nadie estaba tumbado en una cama', 'solo una persona estaba tumbada en una cama', 'exactamente dos personas estaban tumbadas en una cama'],
+    alfombra: ['nadie estaba sobre una alfombra', 'solo una persona estaba sobre una alfombra', 'exactamente dos personas estaban sobre una alfombra'] };
+  for (const t of ['silla', 'cama', 'alfombra']) {
+    const k = cuenta(pos, (c) => mueble[c] === t);
+    if (k <= 2) G(`Además, ${nombre[t][k]}.`, (ps) => cuenta(ps, (c) => mueble[c] === t) === k);
+  }
+  const enSuelo = cuenta(pos, (c) => !mueble[c]);
+  G(`Además, exactamente ${enSuelo} ${enSuelo === 1 ? 'persona estaba' : 'personas estaban'} en el suelo, sin ningún mueble debajo.`, (ps) => cuenta(ps, (c) => !mueble[c]) === enSuelo);
+  salas.forEach((nom, k) => {
+    if (!pos.some((c) => sala[c] === k)) G(`Además, nadie estaba en ${art(nom)}.`, (ps) => !ps.some((c) => c >= 0 && sala[c] === k));
+  });
+  return out;
+}
+
+/** Elige una afirmación por persona (y una condición general) hasta que la solución sea única. */
+function pistasUnaPorPersona(caso, r, limiteMs = 900) {
+  const t0 = Date.now();
+  const porPersona = afirmacionesDe(caso);
+  const generales = condicionesGenerales(caso);
+  // Comprobación rápida: con lo más fuerte de cada uno y todas las generales, ¿hay solución única?
+  const fuertes = porPersona.map((l) => l.filter((q) => q.fuerza === 3));
+  if (contarSoluciones(caso, [...porPersona.flat(), ...generales]) !== 1) return null;
+  for (let intento = 0; Date.now() - t0 < limiteMs; intento++) {
+    // Al principio se prueban pistas más débiles (más difícil); poco a poco se permiten más fuertes
+    const debil = Math.max(0, 0.6 - intento * 0.004);
+    const elegidas = porPersona.map((l, p) => {
+      const pool = r() < debil ? l.filter((q) => q.fuerza < 3) : fuertes[p];
+      const lista = pool.length ? pool : l;
+      return lista[Math.floor(r() * lista.length)];
+    });
+    const g = generales[Math.floor(r() * generales.length)];
+    if (contarSoluciones(caso, [...elegidas, g]) === 1) return [g, ...elegidas];
+  }
+  return null;
 }
 
 // ---------------------------------------------------------------- Caso
@@ -163,6 +241,13 @@ export function generarCaso(nivel = 'normal', semilla = Date.now()) {
     const conVictima = pos.slice(1).map((c, i) => [c, i + 1]).filter(([c]) => sala[c] === sv);
     if (conVictima.length !== 1) continue;
     const caso = { n, sala, salas, colores: COLORES_SALA, mueble, personas, pos, asesino: conVictima[0][1], semilla };
+    if (cfg.unaPorPersona) {
+      const pistas = pistasUnaPorPersona(caso, r);
+      if (!pistas) continue;
+      // La condición general va al final; las de los personajes, en orden de aparición
+      caso.pistas = [...pistas.slice(1).map((q) => q.texto), pistas[0].texto];
+      return caso;
+    }
     const todas = barajar(pistasVerdaderas(caso, cfg.directas), r)
       .sort((a, b) => (cfg.debiles ? a.peso - b.peso : b.peso - a.peso) + (r() - 0.5) * 2.2);
     // Si ni con todas las pistas hay una sola solución, se descarta este plano

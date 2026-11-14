@@ -224,6 +224,7 @@ function AyudaCrimen({ onCerrar }) {
         <li>Usa las pistas para colocar a todos. Elige una persona y toca su casilla; toca otra vez para quitarla. Con «Tachar» puedes descartar casillas.</li>
         <li>Cuando estén todos, comprueba la escena. O acusa directamente si lo tienes claro… pero si fallas, el asesino se escapa.</li>
         <li>Cada caso es nuevo y tiene una sola solución. Tu récord es el menor tiempo en cada nivel.</li>
+        <li>En el nivel <strong>Experto (8×8)</strong> solo hay <strong>una pista por personaje</strong> y una condición general al final («Además, …»). Hay que exprimir cada pista y la regla de una persona por fila y columna.</li>
       </ul>
     </AyudaUnJugador>
   );
