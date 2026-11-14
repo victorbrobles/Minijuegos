@@ -1,0 +1,41 @@
+/* client/src/games/Transmision/Transmision.css */
+.tr-tienes { color: #b45309; }
+.tr-alarmas { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.45rem; }
+.tr-alarma { padding: 0.55rem 0.7rem; border-radius: 14px; background: #f8fafc; border: 2px solid #e2e8f0; animation: trEntra 0.35s ease-out; }
+.tr-alarma.mia { border-color: #f59e0b; background: #fffbeb; }
+.tr-alarma.urgente { border-color: #ef4444; animation: trParpadeo 0.8s ease-in-out infinite; }
+.tr-alarma-cab { display: grid; grid-template-columns: auto 1fr auto; column-gap: 0.5rem; align-items: center; }
+.tr-alarma-cab span { grid-row: span 2; font-size: 1.5rem; }
+.tr-alarma-cab b { color: #0f172a; }
+.tr-alarma-cab small { grid-column: 2; color: #64748b; font-weight: 800; font-size: 0.72rem; }
+.tr-alarma-cab em { grid-row: 1 / span 2; grid-column: 3; font-style: normal; font-weight: 900; color: #b91c1c; }
+.tr-alarma-barra { display: block; height: 0.35rem; margin-top: 0.35rem; border-radius: 999px; background: #e2e8f0; overflow: hidden; }
+.tr-alarma-barra span { display: block; height: 100%; background: linear-gradient(90deg, #ef4444, #f59e0b); }
+.tr-manual { margin: 0.45rem 0 0 !important; padding: 0.45rem 0.6rem; border-radius: 10px; background: #0f172a; color: #a7f3d0 !important; font-family: ui-monospace, monospace; font-size: 0.85rem; }
+.tr-manual b { color: #ffffff !important; font-family: inherit; }
+.tr-paneles { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.6rem; }
+.tr-panel { padding: 0.7rem; border-radius: 18px; background: #1e293b; color: #e2e8f0; }
+.tr-panel-titulo { margin: 0 0 0.5rem !important; font-weight: 900; color: #ffffff !important; }
+.tr-palancas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; }
+.tr-palanca { position: relative; display: grid; justify-items: center; gap: 0.1rem; padding: 2.6rem 0 0.4rem; border: 2px solid #334155; border-radius: 14px; background: #0f172a; color: #94a3b8; font: inherit; cursor: pointer; }
+.tr-palanca-mango { position: absolute; top: 1.4rem; width: 0.5rem; height: 0.7rem; border-radius: 4px; background: #64748b; transition: top 0.15s, height 0.15s; }
+.tr-palanca.arriba .tr-palanca-mango { background: #22c55e; top: 0.35rem; height: 1.75rem; }
+.tr-palanca b { color: #ffffff; font-size: 1.1rem; }
+.tr-palanca small { font-size: 0.6rem; font-weight: 900; }
+.tr-palanca.arriba { border-color: #22c55e; color: #86efac; }
+.tr-dial { margin-top: 0.55rem; }
+.tr-dial span { font-size: 0.72rem; font-weight: 900; color: #94a3b8; text-transform: uppercase; }
+.tr-dial div { display: grid; grid-template-columns: repeat(10, 1fr); gap: 0.2rem; margin-top: 0.2rem; }
+.tr-dial button { padding: 0.45rem 0; border: 2px solid #334155; border-radius: 8px; background: #0f172a; color: #e2e8f0; font: inherit; font-weight: 900; cursor: pointer; }
+.tr-dial button.sel { background: #0ea5e9; border-color: #0ea5e9; color: #ffffff; }
+.tr-colores { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.3rem; margin-top: 0.55rem; }
+.tr-colores button { padding: 0.55rem 0; border: 3px solid var(--c); border-radius: 12px; background: transparent; color: #ffffff; font: inherit; font-size: 0.72rem; font-weight: 900; text-transform: uppercase; cursor: pointer; }
+.tr-colores button.sel { background: var(--c); box-shadow: 0 0 14px var(--c); }
+.tr-log p { margin: 0.1rem 0; font-size: 0.82rem; font-weight: 700; }
+.tr-log p.bien { color: #15803d; }
+.tr-log p.mal { color: #b91c1c; }
+.tr-resumen { text-align: center; }
+.tr-resumen > span { font-size: 3.5rem; }
+.tr-resumen > p { color: #0f172a; }
+@keyframes trEntra { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: none; } }
+@keyframes trParpadeo { 50% { background: #fee2e2; } }

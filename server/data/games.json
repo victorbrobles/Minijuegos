@@ -520,5 +520,35 @@
     "name": "Futbolista Misterioso",
     "description": "Adivina al futbolista misterioso en 8 intentos. Cada nombre que pruebes te dice si aciertas su país, liga, club, puesto, edad y media.",
     "isNew": true
+  },
+  {
+    "id": "patata",
+    "name": "La Patata Caliente",
+    "description": "Una bomba con mecha secreta pasa de mano en mano. Juega cartas que superen la cifra o el color pedido para quitártela de encima… sin dejárselo fácil al siguiente.",
+    "isNew": true
+  },
+  {
+    "id": "subasta",
+    "name": "Subasta a Ciegas",
+    "description": "Lotes misteriosos, pujas secretas y a la vez. Puede ser un tesoro, un trasto o una maldición: arruínate o hazte de oro.",
+    "isNew": true
+  },
+  {
+    "id": "dragon",
+    "name": "El Dragón",
+    "description": "Explorad juntos una mazmorra llena de tesoros. Tras cada sala, ¿sigues o vuelves con tu botín? Cada paso aumenta el riesgo de despertar al dragón.",
+    "isNew": true
+  },
+  {
+    "id": "piramides",
+    "name": "Pirámides Futbolísticas",
+    "description": "Cada uno tiene una regla secreta sobre futbolistas. Ve diciendo nombres, mira qué encaja y qué no, y descubre las reglas de los demás antes que nadie.",
+    "isNew": true
+  },
+  {
+    "id": "transmision",
+    "name": "Última Transmisión",
+    "description": "Vuestra nave se cae a pedazos. Cada uno controla una sección, pero el manual de cada avería lo tiene otro. Hablad, coordinaos y aguantad hasta enviar la última transmisión.",
+    "isNew": true
   }
 ]

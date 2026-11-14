@@ -1,0 +1,34 @@
+/* client/src/games/Subasta/Subasta.css */
+.sba-extra { display: block; font-size: 0.7rem; font-weight: 800; }
+.sba-lote { text-align: center; animation: sbaEntra 0.4s ease-out; }
+.sba-lote-emoji { display: block; font-size: 4rem; line-height: 1.1; }
+.sba-lote h2 { margin: 0.2rem 0 0.4rem; color: #0f172a; }
+.sba-tasacion { margin: 0; color: #475569; font-weight: 700; }
+.sba-soplo { margin: 0.6rem 0 0; padding: 0.5rem 0.7rem; border-radius: 12px; background: #f5f3ff; color: #5b21b6; font-weight: 800; font-style: italic; }
+.sba-lupa { margin: 0.5rem 0 0; padding: 0.5rem 0.7rem; border-radius: 12px; background: #ecfeff; color: #155e75; font-weight: 700; }
+.sba-pujar { display: grid; gap: 0.6rem; text-align: center; }
+.sba-cantidad { font-family: 'Bricolage Grotesque', sans-serif; font-size: 3rem; font-weight: 900; color: #b45309; line-height: 1; }
+.sba-cantidad small { display: block; font-size: 0.85rem; color: #94a3b8; }
+.sba-slider { width: 100%; accent-color: #d97706; }
+.sba-rapidos { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.3rem; }
+.sba-rapidos button { padding: 0.5rem 0; border: 2px solid #fde68a; border-radius: 12px; background: #fffbeb; color: #92400e; font: inherit; font-weight: 900; cursor: pointer; }
+.sba-hecho { text-align: center; }
+.sba-hecho p { margin: 0.2rem 0; color: #0f172a; }
+.sba-resultado { text-align: center; animation: sbaEntra 0.4s ease-out; }
+.sba-resultado h2 { margin: 0 0 0.6rem; color: #0f172a; font-size: 1.3rem; }
+.sba-pujas { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.3rem; text-align: left; }
+.sba-pujas li { display: flex; align-items: center; gap: 0.5rem; padding: 0.45rem 0.7rem; border-radius: 12px; background: #f8fafc; }
+.sba-pujas li b { flex: 1; color: #0f172a; }
+.sba-pujas li em { font-style: normal; font-weight: 900; color: #b45309; }
+.sba-pujas li.gana { background: #fef3c7; box-shadow: 0 0 0 2px #f59e0b; }
+.sba-efecto { display: flex; align-items: center; gap: 0.7rem; margin-top: 0.7rem; padding: 0.7rem; border-radius: 16px; background: #1e1b4b; color: #ffffff; text-align: left; }
+.sba-efecto span { font-size: 2.4rem; }
+.sba-efecto p { margin: 0.1rem 0 0 !important; font-size: 0.85rem; color: #e0e7ff !important; }
+.sba-efecto b { color: #ffffff !important; }
+.sba-secreto { margin: 0.7rem 0 0; padding: 0.5rem 0.7rem; border-radius: 12px; background: #dcfce7; color: #14532d; }
+.sba-inventario { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.3rem; text-align: left; }
+.sba-inventario li { display: grid; grid-template-columns: auto 1fr; column-gap: 0.5rem; align-items: center; padding: 0.4rem 0.6rem; border-radius: 12px; background: #f8fafc; }
+.sba-inventario li span { grid-row: span 2; font-size: 1.5rem; }
+.sba-inventario li b { color: #0f172a; font-size: 0.9rem; }
+.sba-inventario li small { color: #64748b; font-weight: 700; font-size: 0.75rem; }
+@keyframes sbaEntra { from { opacity: 0; transform: translateY(10px) scale(0.97); } to { opacity: 1; transform: none; } }

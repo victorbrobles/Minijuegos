@@ -1,0 +1,31 @@
+/* client/src/games/Dragon/Dragon.css */
+.drg-estado { display: block; font-size: 0.7rem; font-weight: 800; opacity: 0.9; }
+.drg-salas { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.drg-salas li { display: grid; justify-items: center; min-width: 3.6rem; padding: 0.4rem 0.45rem; border-radius: 14px; background: #fef3c7; color: #78350f; animation: drgEntra 0.35s ease-out; }
+.drg-salas li span { font-size: 1.4rem; }
+.drg-salas li b { font-size: 0.95rem; }
+.drg-salas li small { font-size: 0.62rem; font-weight: 700; opacity: 0.8; }
+.drg-salas li.reliquia { background: #ede9fe; color: #5b21b6; }
+.drg-salas li.dragon { background: #fee2e2; color: #991b1b; animation: drgSacude 0.5s 2; }
+.drg-suelo { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; margin-top: 0.6rem; color: #334155; font-weight: 700; font-size: 0.9rem; }
+.drg-riesgo { position: relative; display: flex; align-items: center; gap: 0.6rem; overflow: hidden; padding: 0.7rem 0.9rem; border-radius: 18px; background: #fff7ed; color: #9a3412; font-weight: 700; }
+.drg-riesgo span { font-size: 1.6rem; position: relative; z-index: 1; }
+.drg-riesgo div { position: relative; z-index: 1; }
+.drg-riesgo i { position: absolute; left: 0; top: 0; bottom: 0; background: rgba(249, 115, 22, 0.22); transition: width 0.4s; }
+.drg-riesgo.medio { background: #ffedd5; }
+.drg-riesgo.alto { background: #fee2e2; color: #991b1b; animation: drgLatido 1.2s ease-in-out infinite; }
+.drg-riesgo.alto i { background: rgba(239, 68, 68, 0.25); }
+.drg-ultimo p { margin: 0.15rem 0; color: #334155; font-weight: 700; font-size: 0.9rem; }
+.drg-decision { display: grid; gap: 0.6rem; }
+.drg-decision .pzp-etiqueta { color: #ffffff; }
+.drg-boton { display: flex; align-items: center; justify-content: center; gap: 0.6rem; padding: 1.1rem; border: none; border-radius: 22px; font: inherit; font-size: 1.15rem; font-weight: 900; color: #ffffff; cursor: pointer; box-shadow: 0 6px 0 rgba(0, 0, 0, 0.3); transition: transform 0.12s; }
+.drg-boton:active { transform: translateY(3px); box-shadow: 0 3px 0 rgba(0, 0, 0, 0.3); }
+.drg-boton span { font-size: 1.6rem; }
+.drg-boton.seguir { background: linear-gradient(135deg, #dc2626, #7f1d1d); }
+.drg-boton.volver { background: linear-gradient(135deg, #16a34a, #14532d); }
+.drg-dragon { text-align: center; background: #450a0a !important; color: #fecaca; }
+.drg-dragon-emoji { display: block; font-size: 4rem; animation: drgSacude 0.6s 3; }
+.drg-dragon p { margin: 0.3rem 0 0; font-weight: 900; }
+@keyframes drgEntra { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: none; } }
+@keyframes drgSacude { 25% { transform: translateX(-6px) rotate(-4deg); } 75% { transform: translateX(6px) rotate(4deg); } }
+@keyframes drgLatido { 50% { filter: brightness(1.08); } }

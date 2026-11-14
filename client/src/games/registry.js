@@ -75,6 +75,11 @@ import Intruso from './Intruso/Intruso.jsx';
 import Lapiz from './Lapiz/Lapiz.jsx';
 import Fichajes from './Fichajes/Fichajes.jsx';
 import Eco from './Eco/Eco.jsx';
+import Patata from './Patata/Patata.jsx';
+import Subasta from './Subasta/Subasta.jsx';
+import Dragon from './Dragon/Dragon.jsx';
+import Piramides from './Piramides/Piramides.jsx';
+import Transmision from './Transmision/Transmision.jsx';
 import Escalera from './Solo/Escalera.jsx';
 import Cronologia from './Solo/Cronologia.jsx';
 import Cadena from './Solo/Cadena.jsx';
@@ -175,7 +180,12 @@ const registry = {
   'duelofutbol': DueloFutbol,
   'escudo': Escudo,
   'manager': Manager,
-  'misterioso': Misterioso
+  'misterioso': Misterioso,
+  'patata': Patata,
+  'subasta': Subasta,
+  'dragon': Dragon,
+  'piramides': Piramides,
+  'transmision': Transmision
 };
 
 export default registry;

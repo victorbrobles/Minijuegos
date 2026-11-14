@@ -27,11 +27,11 @@ const post = async (url, body) => {
   return data;
 };
 
-export default function PulsadorOnline({ juego, onVolver, onSalir, onAbrirAyuda }) {
+export default function PulsadorOnline({ juego, onVolver, onSalir, onAbrirAyuda, inicial = 'menu' }) {
   const CLAVE = claveSesion(juego.id);
   const API = `${juego.api}/online`;
   const [sesion, setSesion] = useState(() => leerSesion(CLAVE));
-  const [menu, setMenu] = useState('menu');
+  const [menu, setMenu] = useState(inicial);
   const [nombre, setNombre] = useState(nombreIdentidad);
   const [codigo, setCodigo] = useState('');
   const [errorMenu, setErrorMenu] = useState('');

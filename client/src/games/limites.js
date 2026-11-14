@@ -95,7 +95,12 @@ export const LIMITES = {
   duelofutbol: { min: 1, max: 1 },
   escudo: { min: 1, max: 1 },
   manager: { min: 1, max: 1 },
-  misterioso: { min: 1, max: 1 }
+  misterioso: { min: 1, max: 1 },
+  patata: { min: 2, max: 8 },
+  subasta: { min: 2, max: 8 },
+  dragon: { min: 2, max: 8 },
+  piramides: { min: 2, max: 8 },
+  transmision: { min: 2, max: 6 }
 };
 
 function base(id) {
@@ -140,7 +145,7 @@ export function textoSala(id) {
 }
 
 // Juegos sin un ganador claro (por equipos, roles o sin final): no cuentan para los podios de victorias
-export const SIN_GANADOR = new Set(['lobos', 'quien-es-quien', 'traiciones', 'impostor', 'golpe', 'futbolgrid', 'mus', 'laberinto']);
+export const SIN_GANADOR = new Set(['lobos', 'quien-es-quien', 'traiciones', 'impostor', 'golpe', 'futbolgrid', 'mus', 'laberinto', 'transmision']);
 /** ¿Tiene sentido contar victorias? Solo en juegos con competición online y un ganador claro. */
 export function conVictorias(juegoId) {
   const l = LIMITES[juegoId];

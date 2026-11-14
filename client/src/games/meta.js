@@ -814,6 +814,51 @@ export const META = {
     etiquetas: 'futbol futbolista adivinar pistas pais liga club edad media deduccion un jugador solitario',
     descripcion: "Adivina al futbolista misterioso en 8 intentos. Cada nombre que pruebes te dice si aciertas su país, liga, club, puesto, edad y media.",
     categorias: ['un_jugador', 'futbol']
+  },
+  'patata': {
+    titulo: 'La Patata Caliente',
+    imagen: '/covers/patata.webp',
+    icono: 'bomb',
+    colores: ['#f97316', '#7c2d12'],
+    etiquetas: 'bomba patata caliente cartas condicion pasar vidas eliminacion reflejos online',
+    descripcion: "Una bomba con mecha secreta pasa de mano en mano. Juega cartas que superen la cifra o el color pedido para quitártela de encima… sin dejárselo fácil al siguiente.",
+    categorias: ['cartas', 'chill']
+  },
+  'subasta': {
+    titulo: 'Subasta a Ciegas',
+    imagen: '/covers/subasta.webp',
+    icono: 'tag',
+    colores: ['#d97706', '#422006'],
+    etiquetas: 'subasta pujas secretas lotes tesoros farol dinero estrategia online',
+    descripcion: "Lotes misteriosos, pujas secretas y a la vez. Puede ser un tesoro, un trasto o una maldición: arruínate o hazte de oro.",
+    categorias: ['estrategia', 'chill']
+  },
+  'dragon': {
+    titulo: 'El Dragón',
+    imagen: '/covers/dragon.webp',
+    icono: 'flame',
+    colores: ['#dc2626', '#1c1917'],
+    etiquetas: 'dragon mazmorra tesoros riesgo seguir volver valor tension online',
+    descripcion: "Explorad juntos una mazmorra llena de tesoros. Tras cada sala, ¿sigues o vuelves con tu botín? Cada paso aumenta el riesgo de despertar al dragón.",
+    categorias: ['estrategia', 'chill']
+  },
+  'piramides': {
+    titulo: 'Pirámides Futbolísticas',
+    imagen: '/covers/piramides.webp',
+    icono: 'soccer',
+    colores: ['#16a34a', '#1e3a8a'],
+    etiquetas: 'futbol futbolistas regla secreta deduccion adivinar preguntar online',
+    descripcion: "Cada uno tiene una regla secreta sobre futbolistas. Ve diciendo nombres, mira qué encaja y qué no, y descubre las reglas de los demás antes que nadie.",
+    categorias: ['futbol', 'estrategia']
+  },
+  'transmision': {
+    titulo: 'Última Transmisión',
+    imagen: '/covers/transmision.webp',
+    icono: 'zap',
+    colores: ['#0ea5e9', '#0c0a3e'],
+    etiquetas: 'cooperativo nave espacio averias comunicacion tiempo real equipo online',
+    descripcion: "Vuestra nave se cae a pedazos. Cada uno controla una sección, pero el manual de cada avería lo tiene otro. Hablad, coordinaos y aguantad hasta enviar la última transmisión.",
+    categorias: ['chill', 'estrategia']
   }
 };
 

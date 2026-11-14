@@ -1,0 +1,39 @@
+/* client/src/games/Piramides/Piramides.css */
+.pir-mia { text-align: center; }
+.pir-mia span { font-size: 3rem; }
+.pir-mia h2 { margin: 0.3rem 0; color: #0f172a; }
+.pir-mia-mini { margin: 0; padding: 0.5rem 0.8rem; border-radius: 14px; background: rgba(255, 255, 255, 0.16); color: #ffffff; font-size: 0.9rem; }
+.pir-ultimo { margin: 0; padding: 0.6rem 0.8rem; border-radius: 14px; background: #ffffff; color: #0f172a; font-weight: 700; font-size: 0.9rem; animation: pirEntra 0.35s ease-out; }
+.pir-ultimo.si { box-shadow: inset 5px 0 0 #22c55e; }
+.pir-ultimo.no { box-shadow: inset 5px 0 0 #ef4444; }
+.pir-turno { display: grid; gap: 0.4rem; }
+.pir-objetivos { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.pir-objetivos button { padding: 0.45rem 0.8rem; border: 2px solid #e2e8f0; border-radius: 999px; background: #ffffff; color: #0f172a; font: inherit; font-weight: 800; cursor: pointer; }
+.pir-objetivos button.sel { background: #7c3aed; border-color: #7c3aed; color: #ffffff; }
+.pir-respuesta { margin: 0; padding: 0.6rem; border-radius: 12px; font-weight: 900; text-align: center; }
+.pir-respuesta.si { background: #dcfce7; color: #14532d; }
+.pir-respuesta.no { background: #fee2e2; color: #7f1d1d; }
+.pir-opciones { display: grid; gap: 0.35rem; }
+.pir-opciones button { padding: 0.6rem 0.8rem; border: 2px solid #e2e8f0; border-radius: 14px; background: #ffffff; color: #0f172a; font: inherit; font-weight: 700; text-align: left; cursor: pointer; }
+.pir-opciones button:hover:not(:disabled) { border-color: #7c3aed; background: #f5f3ff; }
+.pir-opciones button:disabled { opacity: 0.4; text-decoration: line-through; }
+.pir-tableros { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 0.5rem; }
+.pir-jugador { padding: 0.6rem; border-radius: 18px; background: #ffffff; color: #0f172a; }
+.pir-jugador.turno { box-shadow: 0 0 0 3px #f59e0b; }
+.pir-jugador.descubierta { background: #f8fafc; }
+.pir-cab { display: flex; justify-content: space-between; margin-bottom: 0.3rem; }
+.pir-cab span { color: #7c3aed; font-weight: 900; }
+.pir-regla { margin: 0 0 0.4rem; padding: 0.35rem 0.5rem; border-radius: 10px; background: #ede9fe; color: #4c1d95; font-weight: 800; font-size: 0.82rem; }
+.pir-regla small { font-weight: 600; opacity: 0.75; }
+.pir-columnas { display: grid; grid-template-columns: 1fr 1fr; gap: 0.3rem; }
+.pir-columnas ul { list-style: none; margin: 0; padding: 0.3rem; border-radius: 10px; display: flex; flex-direction: column-reverse; justify-content: flex-end; gap: 0.15rem; min-height: 2rem; }
+.pir-columnas ul.si { background: #f0fdf4; }
+.pir-columnas ul.no { background: #fef2f2; }
+.pir-columnas li { font-size: 0.74rem; font-weight: 700; line-height: 1.2; text-align: center; }
+.pir-columnas li.vacio { opacity: 0.4; }
+.pir-fallos { margin: 0.35rem 0 0; color: #94a3b8; font-size: 0.7rem; font-weight: 700; }
+.pir-final { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.35rem; }
+.pir-final li { display: grid; padding: 0.45rem 0.6rem; border-radius: 12px; background: #f8fafc; }
+.pir-final li span { color: #4c1d95; font-weight: 800; }
+.pir-final li small { color: #64748b; font-weight: 600; }
+@keyframes pirEntra { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }

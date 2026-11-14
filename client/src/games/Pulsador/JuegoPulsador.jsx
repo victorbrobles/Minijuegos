@@ -25,16 +25,18 @@ export default function JuegoPulsador({ juegoId: id, juego: propio, onExit, onVo
   const { titulo, descripcion } = metaDe(juegoId);
   const [modo, setModo] = useState(() => (haySesion(juegoId) ? 'online' : 'menu'));
   const [ayuda, setAyuda] = useState(false);
+  const [inicial, setInicial] = useState('menu');
   const navigate = useNavigate();
   const irAPortada = () => (typeof onExit === 'function' ? onExit() : navigate('/'));
 
   return (
     <>
       {modo === 'menu' && (
-        <MenuInicioJuego juegoId={juegoId} local={juego.menuLocal} onOnline={() => setModo('online')} onLocal={() => setModo('local')} onAyuda={() => setAyuda(true)} onVolver={onVolverMenu} textoVolver={textoVolverMenu} />
+        <MenuInicioJuego juegoId={juegoId} local={juego.menuLocal} onOnline={() => setModo('online')} onLocal={juego.sinLocal ? undefined : () => setModo('local')}
+          onCrear={() => { setInicial('crear'); setModo('online'); }} onUnirse={() => { setInicial('unirse'); setModo('online'); }} onAyuda={() => setAyuda(true)} onVolver={onVolverMenu} textoVolver={textoVolverMenu} />
       )}
       {modo === 'local' && <Local juego={juego} onVolver={() => setModo('menu')} onExit={irAPortada} onAbrirAyuda={() => setAyuda(true)} />}
-      {modo === 'online' && <PulsadorOnline juego={juego} onVolver={() => setModo('menu')} onSalir={irAPortada} onAbrirAyuda={() => setAyuda(true)} />}
+      {modo === 'online' && <PulsadorOnline juego={juego} inicial={inicial} onVolver={() => { setInicial('menu'); setModo('menu'); }} onSalir={irAPortada} onAbrirAyuda={() => setAyuda(true)} />}
       {ayuda && <Ayuda titulo={titulo} descripcion={descripcion} reglas={juego.reglas} onCerrar={() => setAyuda(false)} />}
     </>
   );
