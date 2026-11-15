@@ -102,7 +102,8 @@ export const LIMITES = {
   cuatrocuatros: { min: 2, max: 8 },
   garabato: { min: 3, max: 10 },
   torre: { min: 2, max: 6 },
-  minigolf: { min: 1, max: 8 }
+  minigolf: { min: 1, max: 8 },
+  canicas: { min: 1, max: 8, local: { min: 1, max: 1 }, online: { min: 2, max: 8 } }
 };
 
 function base(id) {

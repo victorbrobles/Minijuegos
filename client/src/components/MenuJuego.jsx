@@ -66,7 +66,7 @@ export function OpcionMenu({ icono, titulo, texto, onClick, principal = false })
   );
 }
 
-function Cabecera({ icono, titulo, descripcion, h1 = false, tamIcono = 40, juegoId }) {
+export function Cabecera({ icono, titulo, descripcion, h1 = false, tamIcono = 40, juegoId }) {
   const Titulo = h1 ? 'h1' : 'h2';
   return (
     <>

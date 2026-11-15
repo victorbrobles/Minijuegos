@@ -877,6 +877,14 @@ export const META = {
     etiquetas: 'minigolf golf hoyos bola golpes 3d rampas molinos obstáculos puntería deporte online',
     descripcion: "Minigolf en 3D con 200 hoyos originales: rampas, molinos, puentes sin barandilla, agua, arena y saltos. Online todos golpean a la vez; gana quien termine el recorrido con menos golpes.",
     categorias: ['habilidad', 'chill', 'dos_jugadores']
+  },
+  'canicas': {
+    titulo: 'Carrera de Canicas',
+    icono: 'car',
+    colores: ['#8b5cf6', '#0f766e'],
+    etiquetas: 'canicas carrera 3d giroscopio inclinar atajos turbos objetos velocidad circuito online',
+    descripcion: "Carreras de canicas en 3D: inclina el móvil para guiar la tuya por circuitos con atajos, turbos y objetos contra los rivales. Cada canica tiene su habilidad. ¡El primero en llegar a meta gana!",
+    categorias: ['habilidad', 'favoritos']
   }
 };
 
