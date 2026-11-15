@@ -550,5 +550,11 @@
     "name": "Garabato Encadenado",
     "description": "El teléfono escacharrado con dibujos: uno escribe una frase, otro la dibuja, otro describe el dibujo sin ver la frase… Al final se destapan las cadenas, del original al desastre.",
     "isNew": true
+  },
+  {
+    "id": "torre",
+    "name": "Torre Inestable",
+    "description": "Construid una torre pieza a pieza en 3D: elige dónde dejar la tuya y cómo girarla, y suéltala. Las piezas son cada vez más pequeñas y raras… y quien la derribe, pierde.",
+    "isNew": true
   }
 ]

@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "better-sqlite3": "^13.0.3",
+    "cannon-es": "^0.20.0",
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "express-basic-auth": "^1.2.1",

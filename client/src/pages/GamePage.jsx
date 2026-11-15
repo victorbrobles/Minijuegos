@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import registry from '../games/registry.js';
 import Icon from '../components/Icon.jsx';
@@ -60,7 +60,7 @@ export default function GamePage() {
       {invitacion && (
         <div className="qq-invitacion">📲 Te han invitado a la sala <b>{invitacion}</b>: entra en <b>Online</b> → <b>Unirse con código</b> y ya lo tendrás puesto.</div>
       )}
-      <Game />
+      <Suspense fallback={<p className="loading">Cargando el juego…</p>}><Game /></Suspense>
       <Reacciones juego={gameId} />
       {enNoche && (
         <Link to="/noche" className={`nch-banner${noche.resultados[noche.actual] ? ' hecho' : ''}`}>

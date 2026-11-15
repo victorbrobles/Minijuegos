@@ -1,3 +1,4 @@
+import { lazy } from 'react';
 import Siglas from './Siglas/Siglas.jsx';
 import QuienEsQuien from './QuienEsQuien/QuienEsQuien.jsx';
 import Rapidfire from './Rapidfire/Rapidfire.jsx';
@@ -76,6 +77,8 @@ import Fichajes from './Fichajes/Fichajes.jsx';
 import Eco from './Eco/Eco.jsx';
 import CuatroCuatros from './CuatroCuatros/CuatroCuatros.jsx';
 import Garabato from './Garabato/Garabato.jsx';
+// Los juegos en 3D se cargan aparte (three.js pesa mucho)
+const Torre = lazy(() => import('./Torre/Torre.jsx'));
 import Patata from './Patata/Patata.jsx';
 import Subasta from './Subasta/Subasta.jsx';
 import Dragon from './Dragon/Dragon.jsx';
@@ -185,7 +188,8 @@ const registry = {
   'piramides': Piramides,
   'transmision': Transmision,
   'cuatrocuatros': CuatroCuatros,
-  'garabato': Garabato
+  'garabato': Garabato,
+  'torre': Torre
 };
 
 export default registry;
