@@ -595,7 +595,7 @@
   },
   {
     "id": "palabra",
-    "name": "Palabra a palabra",
+    "name": "Palabra oculta",
     "description": "Adivina la palabra oculta en seis intentos con pistas de colores. De 3 a 8 letras… pero si fallas una, se acabó.",
     "isNew": true
   }

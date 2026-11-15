@@ -1,5 +1,5 @@
 // server/data/palabras/banco.js
-// Palabras objetivo (comunes y conocidas) para «Palabra a palabra» y raíces de 7 letras para «Letras en cadena».
+// Palabras objetivo (comunes y conocidas) para «Palabra oculta» y raíces de 7 letras para «Letras en cadena».
 // Sin tildes, en minúsculas (la ñ sí cuenta como letra). Todas están en el diccionario (lo comprueba la simulación).
 const lista = (s) => s.trim().split(/\s+/);
 

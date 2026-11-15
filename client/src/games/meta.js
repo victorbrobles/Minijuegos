@@ -926,7 +926,7 @@ export const META = {
     categorias: ['un_jugador']
   },
   'palabra': {
-    titulo: 'Palabra a palabra',
+    titulo: 'Palabra oculta',
     imagen: '/covers/palabra.webp',
     icono: 'palabra',
     colores: ['#16a34a', '#ca8a04'],

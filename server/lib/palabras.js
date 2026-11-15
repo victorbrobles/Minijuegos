@@ -1,5 +1,5 @@
 // server/lib/palabras.js
-// Diccionario de español (3 a 8 letras, sin tildes) y partidas de «Palabra a palabra» y «Letras en cadena».
+// Diccionario de español (3 a 8 letras, sin tildes) y partidas de «Palabra oculta» y «Letras en cadena».
 import fs from 'fs';
 import zlib from 'zlib';
 import path from 'path';
@@ -25,7 +25,7 @@ export const existe = (p) => diccionario().has(normalizar(p));
 const azar = (l) => l[Math.floor(Math.random() * l.length)];
 const barajar = (l) => { const b = [...l]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
 
-// ---------------------------------------------------------------- Palabra a palabra
+// ---------------------------------------------------------------- Palabra oculta
 export const ESCALONES = [3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8]; // después, palabras de 8 sin fin
 let objetivos = null;
 export function objetivosValidos() {

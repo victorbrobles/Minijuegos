@@ -1,4 +1,4 @@
-// Simulación de «Palabra a palabra» y «Letras en cadena»: bancos válidos, colores con letras repetidas y raíces.
+// Simulación de «Palabra oculta» y «Letras en cadena»: bancos válidos, colores con letras repetidas y raíces.
 import { existe, normalizar, partidaPalabra, partidaLetras, objetivosValidos, raicesValidas, ESCALONES } from '../lib/palabras.js';
 import { OBJETIVOS } from '../data/palabras/banco.js';
 let mal = 0; const fallo = (m) => { mal++; console.log('FALLO', m); };

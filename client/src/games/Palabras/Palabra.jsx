@@ -1,5 +1,5 @@
 // client/src/games/Palabras/Palabra.jsx
-// «Palabra a palabra» (1 jugador): adivina palabras ocultas cada vez más largas (dos de 3 letras, dos de 4… hasta 8,
+// «Palabra oculta» (1 jugador): adivina palabras ocultas cada vez más largas (dos de 3 letras, dos de 4… hasta 8,
 // y luego palabras de 8 sin fin). Seis intentos por palabra con pistas de colores. En cuanto fallas una, se acaba.
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
