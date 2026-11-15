@@ -8,6 +8,7 @@ export const CATEGORIAS_PORTADA = [
   { id: 'cartas', titulo: '🃏 Juegos de cartas', desc: 'Estrategia, faroles, apuestas y duelos con cartas' },
   { id: 'chill', titulo: '🌴 Para jugar de chill', desc: 'Risas, amigos, preguntas y pura diversión sin estrés' },
   { id: 'futbol', titulo: '⚽ Para amantes del fútbol', desc: 'Demuestra todo lo que sabes sobre el deporte rey' },
+  { id: 'habilidad', titulo: '🎮 Juegos de habilidad', desc: 'Reflejos, precisión, coordinación y destreza para superar cualquier reto' },
   { id: 'famosos', titulo: '🌟 De famosos y cultura pop', desc: 'Celebridades, cine, música, frases y televisión' },
   { id: 'dos_jugadores', titulo: '👥 Para dos jugadores', desc: 'Ideales para competir o cooperar frente a frente' },
   { id: 'un_jugador', titulo: '🎯 Para un jugador', desc: 'Retos en solitario: lógica, memoria, estrategia y reflejos' }
