@@ -854,6 +854,7 @@ export const META = {
   },
   'garabato': {
     titulo: 'Garabato Encadenado',
+    imagen: '/covers/garabato.webp',
     icono: 'brush',
     colores: ['#fb923c', '#be185d'],
     etiquetas: 'dibujar dibujo pintar teléfono escacharrado frases cadena risas fiesta online grupo',
