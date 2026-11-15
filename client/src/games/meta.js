@@ -16,21 +16,21 @@ export const CATEGORIAS_PORTADA = [
 
 // ⭐ Top 15 del Creador: en este orden (el primero es el nº 1). Para cambiarlo, mueve o sustituye ids aquí.
 export const TOP_CREADOR = [
-  'lobos',          // 1 · Luna de Sangre
-  'habilidad', // 2 · ¿Sabes quién soy?
-  'cuentas',     // 3 · Traiciones
-  'buscaminas',      // 4 · Test de habilidad
-  'conoce',        // 5 · Conexiones ocultas
-  'trescientosuno',          // 6 · Furbo!
-  'quien-es-quien',     // 7 · Cuidado que explota
-  'conecta',        // 8 · Carrera de Canicas
-  'traiciones',      // 9 · Test del viajero
-  'musavanzado',        // 10 · Afina ese oído
-  'colores',    // 11 · Mus Avanzado
-  'furbo',       // 12 · Director Deportivo
-  'adivina',       // 13 · Garabato Encadenado
-  'fundadores',        // 14 · La vida en colores
-  'ponorden', // 15 · 301 goles
+  'lobos',           // 1 · Luna de Sangre
+  'habilidad',       // 2 · Test de habilidad
+  'cuentas',         // 3 · Lleva la cuenta
+  'buscaminas',      // 4 · Cuidado que explota
+  'conoce',          // 5 · Conoce a tus amigos
+  'trescientosuno',  // 6 · 301 goles
+  'quien-es-quien',  // 7 · ¿Sabes quién soy?
+  'conecta',         // 8 · Conexiones ocultas
+  'traiciones',      // 9 · Traiciones
+  'musavanzado',     // 10 · Mus Avanzado
+  'colores',         // 11 · La vida en colores
+  'furbo',           // 12 · Furbo!
+  'adivina',         // 13 · Luces, Cámara... ¡Música!
+  'fundadores',      // 14 · Fundadores
+  'ponorden',        // 15 · Ponlo en orden
 ];
 
 // Cada uno de los minijuegos tiene un icono único y una combinación de colores (degradado) única
