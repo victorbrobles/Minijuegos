@@ -859,6 +859,14 @@ export const META = {
     etiquetas: 'dibujar dibujo pintar teléfono escacharrado frases cadena risas fiesta online grupo',
     descripcion: "El teléfono escacharrado con dibujos: uno escribe una frase, otro la dibuja, otro describe el dibujo sin ver la frase… Al final se destapan las cadenas, del original al desastre.",
     categorias: ['chill']
+  },
+  'torre': {
+    titulo: 'Torre Inestable',
+    icono: 'tower',
+    colores: ['#0d9488', '#1e1b4b'],
+    etiquetas: 'torre construir apilar piezas equilibrio pulso precisión física 3d derribar bloques online',
+    descripcion: "Construid una torre pieza a pieza en 3D: elige dónde dejar la tuya y cómo girarla, y suéltala. Las piezas son cada vez más pequeñas y raras… y quien la derribe, pierde.",
+    categorias: ['estrategia', 'dos_jugadores']
   }
 };
 
