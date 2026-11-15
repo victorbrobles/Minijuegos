@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, lazy, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import registry from '../games/registry.js';
 import Icon from '../components/Icon.jsx';
@@ -11,6 +11,10 @@ import BotonSonido from '../components/Sonido.jsx';
 import Reacciones from '../components/Reacciones.jsx';
 import '../components/MenuJuego.css';
 
+// Ayuda común (se descarga solo al abrirla)
+const AyudaJuego = lazy(() => import('../components/AyudaJuego.jsx'));
+const BOTON_AYUDA = '.qq-btn-ayuda, [aria-label="Cómo jugar"], [title="Cómo jugar"]';
+
 export default function GamePage() {
   const { gameId } = useParams();
   const Game = registry[gameId];
@@ -19,6 +23,13 @@ export default function GamePage() {
   const enNoche = noche && noche.juegos[noche.actual] === gameId;
 
   // Invitación a una sala por enlace/QR (?sala=CODIGO)
+  // Cualquier botón «?» del juego abre la ayuda común (en vez de la ventana propia de cada juego)
+  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = (e) => {
+    if (!e.target.closest?.(BOTON_AYUDA) || e.target.closest('.ayj')) return;
+    e.preventDefault(); e.stopPropagation(); setAyuda(true);
+  };
+
   const [invitacion, setInvitacion] = useState(() => capturarInvitacion(gameId));
   useEffect(() => {
     const f = () => setInvitacion(leerInvitacion(gameId));
@@ -51,7 +62,7 @@ export default function GamePage() {
   }
 
   return (
-    <div className="game-shell" style={{ '--g1': m.colores[0], '--g2': m.colores[1] }}>
+    <div className="game-shell" style={{ '--g1': m.colores[0], '--g2': m.colores[1] }} onClickCapture={abrirAyuda}>
       <Link to="/" className="back" aria-label="Volver a la portada">
         <Icon name="arrowLeft" size={20} strokeWidth={2.500} />
         <span>Portada</span>
@@ -62,6 +73,7 @@ export default function GamePage() {
       )}
       <Suspense fallback={<p className="loading">Cargando el juego…</p>}><Game /></Suspense>
       <Reacciones juego={gameId} />
+      {ayuda && <Suspense fallback={null}><AyudaJuego juegoId={gameId} onCerrar={() => setAyuda(false)} /></Suspense>}
       {enNoche && (
         <Link to="/noche" className={`nch-banner${noche.resultados[noche.actual] ? ' hecho' : ''}`}>
           🎉 {noche.resultados[noche.actual] ? '¡Resultado apuntado! Ver marcador' : `Noche de juegos · ${noche.actual + 1}/${noche.juegos.length}`}
