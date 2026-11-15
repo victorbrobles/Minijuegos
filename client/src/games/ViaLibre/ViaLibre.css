@@ -1,0 +1,21 @@
+/* client/src/games/ViaLibre/ViaLibre.css */
+.vl-escena { padding-top: 0.2rem; }
+.vl-caja { position: relative; border-radius: 24px; overflow: hidden; box-shadow: 0 12px 34px rgba(0, 0, 0, 0.35); user-select: none; -webkit-user-select: none; background: #7dd3fc; }
+.vl-lienzo { width: 100%; height: min(76vh, 720px); touch-action: none; cursor: pointer; }
+.vl-lienzo canvas { display: block; }
+.vl-hud { position: absolute; top: 0.6rem; left: 0.6rem; right: 0.6rem; display: flex; align-items: center; gap: 0.35rem; pointer-events: none; }
+.vl-hud button { pointer-events: auto; display: grid; place-items: center; width: 2.3rem; height: 2.3rem; border: none; border-radius: 50%; background: rgba(255, 255, 255, 0.92); color: #334155; cursor: pointer; }
+.vl-hud span { padding: 0.35rem 0.7rem; border-radius: 999px; background: rgba(15, 23, 42, 0.72); color: #ffffff; font-weight: 900; font-size: 0.85rem; white-space: nowrap; }
+.vl-hud .vl-tiempo { margin-left: auto; font-size: 1rem; }
+.vl-hud .vl-tiempo.urgente { background: #dc2626; animation: vlLatido 0.5s ease-in-out infinite alternate; }
+@keyframes vlLatido { to { transform: scale(1.12); } }
+.vl-abajo { position: absolute; left: 0.6rem; right: 0.6rem; bottom: 0.6rem; display: grid; gap: 0.45rem; justify-items: center; pointer-events: none; }
+.vl-abajo p { margin: 0; padding: 0.35rem 0.8rem; border-radius: 999px; background: rgba(15, 23, 42, 0.7); color: #ffffff; font-weight: 800; font-size: 0.8rem; text-align: center; }
+.vl-abajo button { pointer-events: auto; width: 100%; padding: 0.9rem; border: none; border-radius: 18px; background: rgba(255, 255, 255, 0.92); color: #334155; font: inherit; font-size: 1.1rem; font-weight: 900; cursor: pointer; box-shadow: 0 4px 0 rgba(15, 23, 42, 0.3); }
+.vl-abajo button.lista { background: linear-gradient(135deg, #16a34a, #22c55e); color: #ffffff; animation: vlLatido 0.7s ease-in-out infinite alternate; }
+.vl-cartel { position: absolute; left: 0.8rem; right: 0.8rem; bottom: 0.8rem; display: grid; gap: 0.5rem; padding: 1rem; border-radius: 20px; background: #ffffff; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); animation: vlEntra 0.3s ease-out; }
+.vl-cartel h3 { margin: 0; font-size: 1.3rem; color: #15803d; }
+.vl-cartel.descarrilado h3 { color: #b91c1c; }
+.vl-cartel p { margin: 0; color: #475569; font-weight: 700; }
+@keyframes vlEntra { from { transform: translateY(30px); opacity: 0; } }
+.game-shell:has(.vl-lienzo) .rx-barra, .game-shell:has(.vl-lienzo) .snd.en-juego { display: none; }

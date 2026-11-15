@@ -104,7 +104,11 @@ export const LIMITES = {
   torre: { min: 2, max: 6 },
   minigolf: { min: 1, max: 8 },
   canicas: { min: 1, max: 8, local: { min: 1, max: 1 }, online: { min: 2, max: 8 } },
-  habilidad: { min: 1, max: 12 }
+  habilidad: { min: 1, max: 12 },
+  vialibre: { min: 1, max: 1 },
+  rascacielos: { min: 1, max: 1 },
+  letras: { min: 1, max: 1 },
+  palabra: { min: 1, max: 1 }
 };
 
 function base(id) {

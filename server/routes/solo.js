@@ -6,6 +6,7 @@
 import express from 'express';
 import { JUEGOS_SOLO, enlace } from '../lib/solo.js';
 import db from '../db.js';
+import { existe, partidaPalabra, partidaLetras } from '../lib/palabras.js';
 
 // ---------------------------------------------------------------- Retos entre amigos
 // Quien termina una partida de un jugador puede retar a otros: se guarda la partida exacta (sus datos) con un código;
@@ -15,7 +16,7 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS retos_amigo_resultados (codigo TEXT NOT NULL, jugador TEXT NOT NULL, puntos REAL NOT NULL, fecha INTEGER NOT NULL, retador INTEGER NOT NULL DEFAULT 0,
     PRIMARY KEY (codigo, jugador));
 `);
-const JUEGOS_RETO = new Set(['escalera', 'cronologia', 'cadena', 'quiensoy', 'onceperdido', 'conexion', 'duelofutbol', 'manager', 'misterioso', 'crimen']);
+const JUEGOS_RETO = new Set(['escalera', 'cronologia', 'cadena', 'quiensoy', 'onceperdido', 'conexion', 'duelofutbol', 'manager', 'misterioso', 'crimen', 'palabra', 'letras']);
 const nuevoCodigo = () => Array.from({ length: 6 }, () => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[Math.floor(Math.random() * 32)]).join('');
 const jugadorValido = (j) => /^.{1,15}#\d{4}$/.test(String(j || ''));
 const leerReto = db.prepare('SELECT * FROM retos_amigo WHERE codigo = ?');
@@ -58,8 +59,14 @@ router.post('/retos/:codigo/resultado', (req, res) => {
   res.json({ success: true, orden: reto.orden, resultados: clasificar(reto) });
 });
 
+// ¿Existe la palabra en el diccionario? (para validar los intentos de los juegos de palabras)
+router.post('/palabras/existe', (req, res) => {
+  res.json({ success: true, existe: existe(String(req.body?.palabra || '').slice(0, 20)) });
+});
+
+const PALABRAS = { palabra: partidaPalabra, letras: partidaLetras };
 router.get('/:juego', (req, res) => {
-  const f = JUEGOS_SOLO[req.params.juego];
+  const f = JUEGOS_SOLO[req.params.juego] || PALABRAS[req.params.juego];
   if (!f) return res.status(404).json({ error: 'Juego desconocido.' });
   res.json({ success: true, ...f() });
 });

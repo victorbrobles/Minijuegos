@@ -1,0 +1,56 @@
+/* client/src/games/Palabras/Palabras.css — «Palabra a palabra» y «Letras en cadena» */
+.pal-escena, .let-escena { display: grid; gap: 0.55rem; }
+.game-shell:has(.pal-escena) .snd.en-juego, .game-shell:has(.let-escena) .snd.en-juego, .game-shell:has(.pal-escena) .rx-barra, .game-shell:has(.let-escena) .rx-barra { display: none; }
+.pal-escalones { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.22rem; }
+.pal-escalones span { display: grid; place-items: center; min-width: 1.45rem; height: 1.45rem; padding: 0 0.25rem; border-radius: 999px; background: rgba(255, 255, 255, 0.18); color: rgba(255, 255, 255, 0.75); font-size: 0.78rem; font-weight: 900; }
+.pal-escalones span.hecho { background: #22c55e; color: #ffffff; }
+.pal-escalones span.actual { background: #ffffff; color: #0f172a; box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.8); }
+.pal-escalones span.sinfin { padding: 0 0.6rem; }
+.pal-tablero { position: relative; display: grid; gap: 0.3rem; justify-content: center; padding: 0.1rem 0; --cas: min(3.1rem, calc((100vw - 3rem - (var(--n) - 1) * 0.3rem) / var(--n)), calc((100dvh - 25rem) / 6)); }
+.pal-fila { display: grid; grid-template-columns: repeat(var(--n), max(1.9rem, var(--cas))); gap: 0.3rem; }
+.pal-fila.agita { animation: palAgita 0.45s; }
+@keyframes palAgita { 20%, 60% { transform: translateX(-7px); } 40%, 80% { transform: translateX(7px); } }
+.pal-casilla { display: grid; place-items: center; aspect-ratio: 1; border: 2px solid rgba(255, 255, 255, 0.28); border-radius: 10px; background: rgba(15, 23, 42, 0.35); color: #ffffff; font-size: clamp(1rem, calc(var(--cas) * 0.55), 1.6rem); font-weight: 900; text-transform: uppercase; }
+.pal-casilla.llena { border-color: rgba(255, 255, 255, 0.75); animation: palPop 0.12s; }
+@keyframes palPop { 50% { transform: scale(1.1); } }
+.pal-casilla.v, .pal-teclado button.v, .pal-ej.v { background: #16a34a; border-color: #16a34a; color: #ffffff; }
+.pal-casilla.a, .pal-teclado button.a, .pal-ej.a { background: #eab308; border-color: #eab308; color: #ffffff; }
+.pal-casilla.g, .pal-teclado button.g, .pal-ej.g { background: #475569; border-color: #475569; color: #ffffff; }
+.pal-casilla.girada { animation: palGira 0.45s both; }
+@keyframes palGira { 0% { transform: rotateX(90deg); } 100% { transform: rotateX(0); } }
+.pal-ej { padding: 0 0.35rem; border-radius: 6px; }
+.pal-aviso { position: absolute; top: 40%; left: 50%; transform: translateX(-50%); margin: 0; padding: 0.5rem 1rem; border-radius: 12px; background: #ffffff; color: #0f172a; font-weight: 900; white-space: nowrap; box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); z-index: 2; }
+.pal-teclado { display: grid; gap: 0.35rem; user-select: none; }
+.pal-teclado div { display: flex; justify-content: center; gap: 0.25rem; }
+.pal-teclado button { flex: 1; max-width: 2.6rem; height: 2.9rem; padding: 0; border: none; border-radius: 8px; background: rgba(255, 255, 255, 0.9); color: #0f172a; font: inherit; font-size: 1.05rem; font-weight: 900; cursor: pointer; touch-action: manipulation; display: grid; place-items: center; }
+.pal-teclado button.ancha { flex: 1.6; max-width: 4.2rem; font-size: 0.72rem; background: #e0e7ff; }
+.pal-teclado button:active { transform: scale(0.94); }
+.pal-resultado { text-align: center; display: grid; gap: 0.5rem; }
+.pal-resultado h3 { margin: 0; font-size: 1.4rem; }
+.pal-resultado p { margin: 0; color: #475569; font-weight: 600; }
+.pal-resultado.acierto h3 { color: #15803d; }
+.pal-resultado.fallo h3 { color: #b91c1c; }
+
+.let-mesa { display: grid; gap: 0.9rem; justify-items: center; }
+.let-palabra { min-height: 3rem; width: 100%; display: grid; place-items: center; border-radius: 14px; background: #f1f5f9; color: #0f172a; font-size: 1.8rem; font-weight: 900; letter-spacing: 0.14em; }
+.let-palabra span { color: #94a3b8; font-size: 1rem; letter-spacing: 0; font-weight: 700; }
+.let-palabra.bien { background: #dcfce7; color: #15803d; }
+.let-palabra.top { background: linear-gradient(135deg, #fde68a, #f59e0b); color: #78350f; animation: palPop 0.3s; }
+.let-palabra.mal { background: #fee2e2; color: #b91c1c; letter-spacing: 0; font-size: 1.2rem; }
+.let-fichas { display: flex; justify-content: center; gap: 0.35rem; width: 100%; }
+.let-fichas button { flex: 1; max-width: 3.4rem; min-width: 0; height: 3.5rem; padding: 0; border: none; border-radius: 14px; background: linear-gradient(180deg, #fef3c7, #fcd34d); color: #78350f; font: inherit; font-size: 1.7rem; font-weight: 900; box-shadow: 0 4px 0 #b45309; cursor: pointer; touch-action: manipulation; transition: transform 0.1s, opacity 0.15s; }
+.let-fichas button:active { transform: translateY(3px); box-shadow: 0 1px 0 #b45309; }
+.let-fichas button.usada { opacity: 0.25; transform: translateY(3px); box-shadow: none; }
+.let-acciones { display: flex; gap: 0.45rem; width: 100%; }
+.let-acciones button { flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.3rem; padding: 0.75rem 0.4rem; border: 2px solid #e2e8f0; border-radius: 14px; background: #ffffff; color: #334155; font: inherit; font-weight: 800; cursor: pointer; }
+.let-acciones button.enviar { border-color: transparent; background: var(--g1, #7c3aed); color: #ffffff; }
+.let-acciones button:disabled { opacity: 0.45; }
+.let-halladas { display: grid; gap: 0.5rem; }
+.let-halladas small, .let-escapadas small { color: #64748b; font-weight: 800; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.04em; }
+.let-halladas p, .let-escapadas p { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0.25rem 0 0; }
+.let-halladas span, .let-escapadas span { padding: 0.2rem 0.55rem; border-radius: 999px; background: #ede9fe; color: #4c1d95; font-weight: 800; font-size: 0.85rem; text-transform: uppercase; }
+.let-halladas span.siete { background: #fde68a; color: #78350f; }
+.let-escapadas span { background: #f1f5f9; color: #475569; }
+.let-escapadas { margin: 0.4rem 0; text-align: left; }
+.let-secreta { margin: 0.4rem 0; font-weight: 700; color: #334155; }
+.let-secreta b { color: #b45309; letter-spacing: 0.08em; }

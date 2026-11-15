@@ -574,5 +574,29 @@
     "name": "Test de habilidad",
     "description": "30 minijuegos de habilidad en 3D de un par de minutos: cruza la carretera, apila bloques, memoriza luces, frena al límite, clava cuchillos… El anfitrión elige cuáles y en qué orden; gana el más hábil.",
     "isNew": true
+  },
+  {
+    "id": "vialibre",
+    "name": "Vía libre",
+    "description": "Gira las piezas de vía para unir las dos estaciones antes de que salga el tren. Tableros cada vez más grandes, cruces, señuelos y menos tiempo.",
+    "isNew": true
+  },
+  {
+    "id": "rascacielos",
+    "name": "Rascacielos infinito",
+    "description": "Suelta cada planta justo encima de la anterior: lo que sobresale se corta. Clava las perfectas y sube del día a la noche… hasta las estrellas.",
+    "isNew": true
+  },
+  {
+    "id": "letras",
+    "name": "Letras en cadena",
+    "description": "Siete letras y dos minutos: forma todas las palabras que puedas. Las largas valen mucho más… y siempre hay una que usa las siete.",
+    "isNew": true
+  },
+  {
+    "id": "palabra",
+    "name": "Palabra a palabra",
+    "description": "Adivina la palabra oculta en seis intentos con pistas de colores. De 3 a 8 letras… pero si fallas una, se acabó.",
+    "isNew": true
   }
 ]

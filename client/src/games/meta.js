@@ -896,6 +896,38 @@ export const META = {
     etiquetas: 'habilidad minijuegos reflejos punteria memoria precision ritmo 3d test retos cortos online',
     descripcion: "30 minijuegos de habilidad en 3D de un par de minutos: cruza la carretera, apila bloques, memoriza luces, frena al límite, clava cuchillos… El anfitrión elige cuáles y en qué orden; gana el más hábil.",
     categorias: ['habilidad', 'favoritos']
+  },
+  'vialibre': {
+    titulo: 'Vía libre',
+    icono: 'tren',
+    colores: ['#16a34a', '#0f766e'],
+    etiquetas: 'tren vias puzle girar piezas estacion 3d logica rapidez niveles un jugador solitario',
+    descripcion: "Gira las piezas de vía para unir las dos estaciones antes de que salga el tren. Tableros cada vez más grandes, cruces, señuelos y menos tiempo. ¿Hasta qué nivel llegarás?",
+    categorias: ['un_jugador']
+  },
+  'rascacielos': {
+    titulo: 'Rascacielos infinito',
+    icono: 'edificio',
+    colores: ['#0ea5e9', '#6d28d9'],
+    etiquetas: 'apilar plantas edificio torre 3d habilidad punteria reflejos record infinito un jugador solitario',
+    descripcion: "Suelta cada planta justo encima de la anterior: lo que sobresale se corta. Clava las perfectas, atrapa las plantas doradas y sube del día a la noche… hasta las estrellas.",
+    categorias: ['un_jugador']
+  },
+  'letras': {
+    titulo: 'Letras en cadena',
+    icono: 'letras',
+    colores: ['#f59e0b', '#b45309'],
+    etiquetas: 'palabras letras anagramas formar diccionario vocabulario contrarreloj un jugador solitario',
+    descripcion: "Siete letras y dos minutos: forma todas las palabras que puedas. Las largas valen mucho más… y siempre hay una que usa las siete.",
+    categorias: ['un_jugador']
+  },
+  'palabra': {
+    titulo: 'Palabra a palabra',
+    icono: 'palabra',
+    colores: ['#16a34a', '#ca8a04'],
+    etiquetas: 'palabra oculta adivinar letras colores intentos diccionario vocabulario muerte subita un jugador solitario',
+    descripcion: "Adivina la palabra oculta en seis intentos con pistas de colores. Empiezas con 3 letras y subes hasta 8… pero si fallas una, se acabó.",
+    categorias: ['un_jugador']
   }
 };
 

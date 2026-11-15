@@ -82,6 +82,10 @@ const Torre = lazy(() => import('./Torre/Torre.jsx'));
 const Minigolf = lazy(() => import('./Minigolf/Minigolf.jsx'));
 const Canicas = lazy(() => import('./Canicas/Canicas.jsx'));
 const Habilidad = lazy(() => import('./Habilidad/Habilidad.jsx'));
+const ViaLibre = lazy(() => import('./ViaLibre/ViaLibre.jsx'));
+const Rascacielos = lazy(() => import('./Rascacielos/Rascacielos.jsx'));
+const Letras = lazy(() => import('./Palabras/Letras.jsx'));
+const Palabra = lazy(() => import('./Palabras/Palabra.jsx'));
 import Patata from './Patata/Patata.jsx';
 import Subasta from './Subasta/Subasta.jsx';
 import Dragon from './Dragon/Dragon.jsx';
@@ -195,7 +199,11 @@ const registry = {
   'torre': Torre,
   'minigolf': Minigolf,
   'canicas': Canicas,
-  'habilidad': Habilidad
+  'habilidad': Habilidad,
+  'vialibre': ViaLibre,
+  'rascacielos': Rascacielos,
+  'letras': Letras,
+  'palabra': Palabra
 };
 
 export default registry;
