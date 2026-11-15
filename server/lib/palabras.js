@@ -22,8 +22,9 @@ function diccionario() {
 export const normalizar = (t) => String(t ?? '').toLowerCase().replace(/ñ/g, '\u0001').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/\u0001/g, 'ñ').replace(/[^a-zñ]/g, '');
 export const existe = (p) => diccionario().has(normalizar(p));
 
-const azar = (l) => l[Math.floor(Math.random() * l.length)];
-const barajar = (l) => { const b = [...l]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
+// rnd: generador de números en [0, 1). Por defecto Math.random; los retos diarios usan uno con semilla (la fecha).
+const azar = (l, rnd = Math.random) => l[Math.floor(rnd() * l.length)];
+const barajar = (l, rnd = Math.random) => { const b = [...l]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
 
 // ---------------------------------------------------------------- Palabra oculta
 export const ESCALONES = [3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8]; // después, palabras de 8 sin fin
@@ -35,10 +36,10 @@ export function objetivosValidos() {
   }
   return objetivos;
 }
-export function partidaPalabra() {
+export function partidaPalabra(rnd = Math.random) {
   const o = objetivosValidos();
   const usadas = new Set();
-  const sacar = (n) => { const libres = o[n].filter((p) => !usadas.has(p)); const p = azar(libres.length ? libres : o[n]); usadas.add(p); return p; };
+  const sacar = (n) => { const libres = o[n].filter((p) => !usadas.has(p)); const p = azar(libres.length ? libres : o[n], rnd); usadas.add(p); return p; };
   const palabras = ESCALONES.map(sacar);
   for (let i = 0; i < 40; i++) palabras.push(sacar(8));
   return { palabras };
@@ -60,10 +61,10 @@ export function raicesValidas() {
   if (!raices) { const d = diccionario(); raices = [...new Set(RAICES)].filter((r) => d.has(r) && escondidas(r).length >= 80); }
   return raices;
 }
-export function partidaLetras() {
-  const raiz = azar(raicesValidas());
-  let letras = barajar([...raiz]); let n = 0;
-  while (letras.join('') === raiz && n++ < 10) letras = barajar([...raiz]);
+export function partidaLetras(rnd = Math.random) {
+  const raiz = azar(raicesValidas(), rnd);
+  let letras = barajar([...raiz], rnd); let n = 0;
+  while (letras.join('') === raiz && n++ < 10) letras = barajar([...raiz], rnd);
   const validas = escondidas(raiz);
   return { letras, validas, secretas: [raiz, ...validas.filter((p) => p.length === 7 && p !== raiz)], segundos: 120 };
 }

@@ -1,0 +1,21 @@
+/* client/src/components/FiltrosJuegos.css — filtros de la portada */
+.fj-boton { display: inline-flex; align-items: center; gap: 0.35rem; flex: none; padding: 0 0.85rem; border: none; border-radius: 14px; background: rgba(255, 255, 255, 0.92); color: #4c1d95; font: inherit; font-weight: 800; font-size: 0.9rem; cursor: pointer; box-shadow: 0 3px 0 rgba(15, 23, 42, 0.18); }
+.fj-boton.activo { background: #fde68a; color: #78350f; }
+.fj-boton em { display: grid; place-items: center; min-width: 1.3rem; height: 1.3rem; border-radius: 999px; background: #7c3aed; color: #ffffff; font-style: normal; font-size: 0.72rem; }
+.fj-panel { display: grid; gap: 0.75rem; margin-top: 0.75rem; padding: 0.9rem; border-radius: 22px; background: #ffffff; color: #0f172a; text-align: left; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.25); animation: fjEntra 0.2s ease-out; }
+@keyframes fjEntra { from { transform: translateY(-8px); opacity: 0; } }
+.fj-grupo { display: grid; gap: 0.4rem; }
+.fj-etiqueta { font-size: 0.74rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.06em; color: #64748b; }
+.fj-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.fj-chip { padding: 0.42rem 0.75rem; border: 1.5px solid #e2e8f0; border-radius: 999px; background: #f8fafc; color: #334155; font: inherit; font-size: 0.82rem; font-weight: 700; cursor: pointer; }
+.fj-chip.activo { border-color: transparent; background: linear-gradient(135deg, #7c3aed, #db2777); color: #ffffff; }
+.fj-somos { display: flex; align-items: center; gap: 0.5rem; }
+.fj-somos button { width: 2.4rem; height: 2.4rem; border: none; border-radius: 12px; background: #ede9fe; color: #5b21b6; font: inherit; font-size: 1.3rem; font-weight: 900; cursor: pointer; }
+.fj-somos button:disabled { opacity: 0.4; }
+.fj-somos b { min-width: 7.5rem; text-align: center; font-size: 1rem; }
+.fj-pie { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; padding-top: 0.6rem; border-top: 1px solid #f1f5f9; }
+.fj-cuenta { margin-left: auto; color: #475569; font-size: 0.85rem; font-weight: 800; }
+.fj-limpiar { display: inline-flex; align-items: center; gap: 0.2rem; padding: 0.4rem 0.7rem; border: none; border-radius: 999px; background: #fee2e2; color: #b91c1c; font: inherit; font-size: 0.8rem; font-weight: 800; cursor: pointer; }
+.fj-listo { padding: 0.5rem 0.9rem; border: none; border-radius: 12px; background: #0f172a; color: #ffffff; font: inherit; font-weight: 800; cursor: pointer; }
+.fj-activos { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.5rem; }
+.fj-activos span { padding: 0.25rem 0.6rem; border-radius: 999px; background: rgba(255, 255, 255, 0.22); color: #ffffff; font-size: 0.76rem; font-weight: 800; }

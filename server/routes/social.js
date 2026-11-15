@@ -94,8 +94,28 @@ function detalleGrupo(codigo) {
     juegos[p.juego] = (juegos[p.juego] || 0) + 1;
     p.resultados.forEach((r) => { ranking[r.jugador].partidas += 1; if (r.gana && conVictorias(p.juego)) ranking[r.jugador].victorias += 1; });
   });
+  // Liga mensual: 3 puntos por victoria y 1 por partida jugada juntos; también los campeones de meses anteriores
+  const mesDe = (t) => { const d = new Date(t); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; };
+  const meses = {};
+  juntas.forEach((p) => {
+    const m = (meses[mesDe(p.fecha)] ||= {});
+    p.resultados.forEach((r) => {
+      const j = (m[r.jugador] ||= { jugador: r.jugador, puntos: 0, partidas: 0, victorias: 0, porJuego: {} });
+      const gana = r.gana && conVictorias(p.juego);
+      j.partidas += 1; j.puntos += 1 + (gana ? 3 : 0); if (gana) j.victorias += 1;
+      const pj = (j.porJuego[p.juego] ||= { p: 0, v: 0 }); pj.p += 1; if (gana) pj.v += 1;
+    });
+  });
+  const ordenar = (m) => Object.values(m || {}).sort((a, b) => b.puntos - a.puntos || b.victorias - a.victorias);
+  const mesActual = mesDe(Date.now());
+  const liga = {
+    mes: mesActual,
+    clasificacion: ordenar(meses[mesActual]),
+    campeones: Object.keys(meses).filter((k) => k !== mesActual).sort().reverse().slice(0, 6)
+      .map((k) => { const c = ordenar(meses[k])[0]; return c ? { mes: k, jugador: c.jugador, puntos: c.puntos } : null; }).filter(Boolean)
+  };
   return {
-    codigo: g.codigo, nombre: g.nombre, creador: g.creador, creado: g.creado, miembros: lista,
+    codigo: g.codigo, nombre: g.nombre, creador: g.creador, creado: g.creado, miembros: lista, liga,
     partidasJuntos: juntas.length,
     ranking: Object.values(ranking).sort((a, b) => b.victorias - a.victorias || b.partidas - a.partidas),
     juegos: Object.entries(juegos).map(([juego, n]) => ({ juego, n })).sort((a, b) => b.n - a.n).slice(0, 6),
@@ -150,6 +170,85 @@ router.post('/grupos/:codigo/noches', (req, res) => {
   if (marcador.length < 2 || !juegos.length) return res.status(400).json({ error: 'Noche incompleta.' });
   db.prepare('INSERT INTO grupo_noches (codigo, fecha, datos) VALUES (?, ?, ?)').run(codigo, Date.now(), JSON.stringify({ marcador, juegos }));
   res.json({ success: true });
+});
+
+/* ───────── Sala fija del grupo ─────────
+   Cada grupo tiene una sala (con el código del grupo) donde los miembros conectados esperan juntos. El anfitrión
+   elige un juego, crea su partida online y la anuncia aquí; los demás entran en ella sin teclear el código.
+   Al acabar, todos vuelven a la sala y el anfitrión elige el siguiente. Se guarda en memoria (si el servidor se
+   reinicia, la sala vuelve a estar vacía, pero el grupo y su código siguen). */
+const salasGrupo = new Map(); // codigo → { anfitrion, presencia: { jugador: t }, juego: { id, codigo, desde, por } | null, cambios }
+const VIVO_MS = 15000;
+const salaGrupo = (codigo) => {
+  if (!salasGrupo.has(codigo)) salasGrupo.set(codigo, { anfitrion: null, presencia: {}, juego: null, cambios: 0, actualizado: Date.now() });
+  return salasGrupo.get(codigo);
+};
+const CADUCA_GRUPO = 6 * 60 * 60 * 1000;
+setInterval(() => { const t = Date.now(); salasGrupo.forEach((s, k) => { if (t - s.actualizado > CADUCA_GRUPO) salasGrupo.delete(k); }); }, 10 * 60 * 1000).unref();
+const conectadosDe = (s, ahora = Date.now()) => Object.entries(s.presencia).filter(([, t]) => ahora - t < VIVO_MS).map(([j]) => j);
+function vistaSalaGrupo(codigo, s) {
+  const ahora = Date.now();
+  const conectados = conectadosDe(s, ahora);
+  // Si el anfitrión se ha ido, pasa al que más tiempo lleva conectado
+  if (!s.anfitrion || !conectados.includes(s.anfitrion)) { s.anfitrion = conectados[0] || null; s.cambios++; }
+  return { success: true, codigo, anfitrion: s.anfitrion, conectados, juego: s.juego, cambios: s.cambios, ahora };
+}
+function comprobarMiembro(req, res) {
+  const codigo = String(req.params.codigo).toUpperCase();
+  const jugador = String(req.body?.jugador || '');
+  if (!grupo.get(codigo)) { res.status(404).json({ error: 'Ese grupo no existe.' }); return null; }
+  if (!valido(jugador)) { res.status(400).json({ error: 'Entra con tu nombre.' }); return null; }
+  if (!miembros.all(codigo).some((m) => m.jugador === jugador)) { res.status(403).json({ error: 'No eres de este grupo: únete primero.' }); return null; }
+  return { codigo, jugador, s: salaGrupo(codigo) };
+}
+// Latido: estoy en la sala (o jugando un juego de la sala). Devuelve el estado.
+router.post('/grupos/:codigo/sala/latido', (req, res) => {
+  const c = comprobarMiembro(req, res); if (!c) return;
+  const nuevo = !c.s.presencia[c.jugador] || Date.now() - c.s.presencia[c.jugador] > VIVO_MS;
+  c.s.presencia[c.jugador] = Date.now(); c.s.actualizado = Date.now();
+  if (nuevo) c.s.cambios++;
+  res.json(vistaSalaGrupo(c.codigo, c.s));
+});
+router.post('/grupos/:codigo/sala/salir', (req, res) => {
+  const c = comprobarMiembro(req, res); if (!c) return;
+  delete c.s.presencia[c.jugador]; c.s.cambios++;
+  if (c.s.anfitrion === c.jugador) c.s.anfitrion = null;
+  res.json(vistaSalaGrupo(c.codigo, c.s));
+});
+// El anfitrión anuncia la partida que acaba de crear (o la cierra con juego: null)
+router.post('/grupos/:codigo/sala/juego', (req, res) => {
+  const c = comprobarMiembro(req, res); if (!c) return;
+  vistaSalaGrupo(c.codigo, c.s);
+  if (c.s.anfitrion !== c.jugador) return res.status(403).json({ error: 'Solo el anfitrión elige el juego.' });
+  const j = req.body?.juego;
+  if (j === null) c.s.juego = null;
+  else {
+    const id = String(j?.id || '').slice(0, 30); const cod = String(j?.codigo || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 8);
+    if (!/^[a-z0-9-]+$/.test(id)) return res.status(400).json({ error: 'Juego no válido.' });
+    const api = String(j?.api || '').toLowerCase().replace(/[^a-z0-9-]/g, '').slice(0, 30) || null;
+    // Si es la misma partida (ya anunciada sin código), se completa; si no, empieza una nueva
+    const misma = c.s.juego && c.s.juego.id === id && !c.s.juego.codigo && cod;
+    c.s.juego = { id, codigo: cod || null, api, desde: misma ? c.s.juego.desde : Date.now(), por: c.jugador };
+  }
+  c.s.cambios++; c.s.actualizado = Date.now();
+  res.json(vistaSalaGrupo(c.codigo, c.s));
+});
+// Pasar la corona a otro conectado
+router.post('/grupos/:codigo/sala/anfitrion', (req, res) => {
+  const c = comprobarMiembro(req, res); if (!c) return;
+  vistaSalaGrupo(c.codigo, c.s);
+  const nuevo = String(req.body?.nuevo || '');
+  if (c.s.anfitrion !== c.jugador) return res.status(403).json({ error: 'Solo el anfitrión puede pasar la corona.' });
+  if (!conectadosDe(c.s).includes(nuevo)) return res.status(400).json({ error: 'Esa persona no está en la sala.' });
+  c.s.anfitrion = nuevo; c.s.cambios++;
+  res.json(vistaSalaGrupo(c.codigo, c.s));
+});
+// Quién está ahora en la sala (para la página del grupo, sin contar como presente)
+router.get('/grupos/:codigo/sala', (req, res) => {
+  const codigo = String(req.params.codigo).toUpperCase();
+  if (!grupo.get(codigo)) return res.status(404).json({ error: 'Ese grupo no existe.' });
+  const s = salasGrupo.get(codigo);
+  res.json(s ? vistaSalaGrupo(codigo, s) : { success: true, codigo, anfitrion: null, conectados: [], juego: null, cambios: 0, ahora: Date.now() });
 });
 
 /* ───────── Sala viva: marcador y reacciones de las salas online (para el modo tele) ───────── */

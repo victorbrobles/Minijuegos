@@ -1,5 +1,5 @@
 // client/src/components/GameCard.jsx
-import React, { useEffect, useState } from 'react';
+import React, { Suspense, lazy, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import Icon from './Icon.jsx';
@@ -8,6 +8,35 @@ import { LIMITES, textoJugadores } from '../games/limites.js';
 import { useFavoritos, alternarFavorito } from '../lib/favoritos.js';
 import { miniatura } from '../lib/portadas.js';
 import { precargarJuego } from '../games/registry.js';
+import { MODOS } from '../games/modos.js';
+import SalonFama from './SalonFama.jsx';
+import './Ficha.css';
+
+// Ficha previa: jugadores, duración, modos, objetivo (de la ayuda) y tu récord
+const AyudaJuego = lazy(() => import('./AyudaJuego.jsx'));
+function negritas(t) { return String(t || '').split(/\*\*(.+?)\*\*/g).map((p, i) => (i % 2 ? <b key={i}>{p}</b> : p)); }
+function FichaExtra({ id, m }) {
+  const [objetivo, setObjetivo] = useState(null);
+  useEffect(() => {
+    let vivo = true;
+    import('../ayudas/index.js').then(({ AYUDAS }) => { if (vivo) setObjetivo(AYUDAS[id]?.objetivo || ''); }).catch(() => {});
+    return () => { vivo = false; };
+  }, [id]);
+  const modos = MODOS[id];
+  let record = null;
+  try { record = JSON.parse(localStorage.getItem(`minijuegos_record_${id}`)); } catch { /* nada */ }
+  return (
+    <div className="gm-extra">
+      <div className="gm-chips">
+        <span>⏱️ ~{m.duracion || 15} min</span>
+        {modos.online && <span>🌐 Online</span>}
+        {modos.local && <span>📱 Un solo móvil</span>}
+      </div>
+      {objetivo && <p className="gm-objetivo"><span>🎯</span><span>{negritas(objetivo)}</span></p>}
+      {record?.valor != null && <p className="gm-record">🏆 Tu récord: <b>{Number(record.valor).toLocaleString('es-ES')}</b></p>}
+    </div>
+  );
+}
 
 export default function GameCard({ game }) {
   const [mostrarDesc, setMostrarDesc] = useState(false);
@@ -18,6 +47,7 @@ export default function GameCard({ game }) {
 
   const descripcion = m?.descripcion || game?.description || 'Sin descripción disponible.';
   const [usarMini, setUsarMini] = useState(true);
+  const [verAyuda, setVerAyuda] = useState(false);
   const tienePortada = Boolean(m?.imagen) && !imgFallida;
 
   // Ventana de ayuda: Esc para cerrar y bloqueo del scroll de fondo
@@ -172,6 +202,11 @@ export default function GameCard({ game }) {
             </div>
 
             <p className="gm-texto">{descripcion}</p>
+            <FichaExtra id={game.id} m={m} />
+            <div className="gm-acciones" onClick={(e) => e.stopPropagation()}>
+              <button type="button" className="gm-secundario" onClick={() => setVerAyuda(true)}>📖 Cómo se juega</button>
+              <SalonFama juegoId={game.id} />
+            </div>
 
             <button
               type="button"
@@ -185,6 +220,11 @@ export default function GameCard({ game }) {
               Jugar ahora
             </button>
           </div>
+          {verAyuda && (
+            <div style={{ '--g1': m.colores[0], '--g2': m.colores[1] }} onClick={(e) => e.stopPropagation()}>
+              <Suspense fallback={null}><AyudaJuego juegoId={game.id} onCerrar={() => setVerAyuda(false)} /></Suspense>
+            </div>
+          )}
         </div>,
         document.body
       )}

@@ -11,9 +11,63 @@ import { metaDe } from '../games/meta.js';
 import './Estadisticas.css';
 import './Noche.css';
 import './Grupos.css';
+import '../components/SalaGrupo.css';
 import { miniatura } from '../lib/portadas.js';
 
 const MEDALLAS = ['🥇', '🥈', '🥉'];
+const NOMBRE_MES = (k) => { const [a, m] = k.split('-').map(Number); return new Date(a, m - 1, 1).toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }); };
+// Medallas del mes: quien más gana en cada tipo de juego (categorías de la portada)
+const TITULOS = {
+  futbol: ['⚽', 'Rey del fútbol'], habilidad: ['🎮', 'Manos de oro'], cartas: ['🃏', 'Tahúr del mes'], estrategia: ['♟️', 'Gran estratega'],
+  chill: ['🌴', 'Alma de la fiesta'], famosos: ['🌟', 'Experto en famosos'], prueba: ['🧠', 'Cerebrito del mes']
+};
+function medallasDe(clasificacion) {
+  const out = [];
+  for (const [cat, [emoji, titulo]] of Object.entries(TITULOS)) {
+    let mejor = null;
+    for (const j of clasificacion) {
+      const v = Object.entries(j.porJuego || {}).filter(([juego]) => (metaDe(juego).categorias || []).includes(cat)).reduce((s, [, x]) => s + x.v, 0);
+      if (v > 0 && (!mejor || v > mejor.v)) mejor = { jugador: j.jugador, v };
+    }
+    if (mejor) out.push({ emoji, titulo, jugador: mejor.jugador, texto: `${mejor.v} ${mejor.v === 1 ? 'victoria' : 'victorias'}` });
+  }
+  const juega = [...clasificacion].sort((a, b) => b.partidas - a.partidas)[0];
+  if (juega?.partidas >= 3) out.push({ emoji: '🔥', titulo: 'Incansable', jugador: juega.jugador, texto: `${juega.partidas} partidas` });
+  return out;
+}
+
+function Liga({ liga, yo }) {
+  if (!liga) return null;
+  const c = liga.clasificacion || [];
+  const medallas = medallasDe(c);
+  return (
+    <section className="est-tarjeta grp-liga">
+      <h2>🏅 Liga de {NOMBRE_MES(liga.mes)}</h2>
+      {c.length ? (
+        <ol className="nch-marcador">
+          {c.map((r, i) => (
+            <li key={r.jugador} className={i === 0 ? 'lider' : ''}>
+              <span>{MEDALLAS[i] || `${i + 1}.`}</span>
+              <b><EnlacePerfil nombre={r.jugador} tam={26}>{partirNombre(r.jugador).nombre}</EnlacePerfil>{r.jugador === yo && <small className="grp-tu"> (tú)</small>}</b>
+              <span className="grp-stat"><em>{r.puntos}</em><small>pts · {r.victorias} v · {r.partidas} p.</small></span>
+            </li>
+          ))}
+        </ol>
+      ) : <p className="nch-nota">Aún no habéis jugado juntos este mes. ¡La liga empieza con la primera partida!</p>}
+      {medallas.length > 0 && (
+        <div className="grp-medallas">
+          {medallas.map((m) => (
+            <div key={m.titulo}><span>{m.emoji}</span><b>{m.titulo}</b><small>{partirNombre(m.jugador).nombre} · {m.texto}</small></div>
+          ))}
+        </div>
+      )}
+      <p className="nch-nota">3 puntos por victoria y 1 por partida jugada entre al menos dos del grupo. Se reinicia cada mes.</p>
+      {liga.campeones?.length > 0 && (
+        <p className="nch-nota grp-campeones">🏆 Campeones: {liga.campeones.map((x) => `${NOMBRE_MES(x.mes)}: ${partirNombre(x.jugador).nombre} (${x.puntos})`).join(' · ')}</p>
+      )}
+    </section>
+  );
+}
 const fecha = (t) => new Date(t).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
 const post = (url, body) => fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then((r) => r.json());
 
@@ -79,6 +133,7 @@ export function GrupoDetalle() {
   const d = useJson(`/api/social/grupos/${codigo}?r=${recarga}`);
   const [copiado, setCopiado] = useState(false);
   const navigate = useNavigate();
+  const salaViva = useJson(`/api/social/grupos/${codigo}/sala`);
   if (!d) return <div className="game-shell est-pagina"><Cabecera titulo="Grupo" sub="Cargando…" /></div>;
   if (d.error) return <div className="game-shell est-pagina"><Cabecera titulo="Grupo" sub="No encontrado" /><section className="est-tarjeta"><p>Ese grupo no existe.</p><Link to="/grupos">Ver tus grupos</Link></section></div>;
   const dentro = d.miembros.includes(yo);
@@ -94,14 +149,22 @@ export function GrupoDetalle() {
   return (
     <div className="game-shell est-pagina">
       <Cabecera titulo={d.nombre} sub={`Grupo · ${d.miembros.length} miembros`} />
+      {dentro && (
+        <Link className="grp-sala" to={`/grupo/${d.codigo}/sala`}>
+          <span>🚪</span>
+          <div><b>Entrar en la sala del grupo</b><small>El anfitrión elige juego y entráis todos sin códigos</small></div>
+          {salaViva?.conectados?.length > 0 && <em>🟢 {salaViva.conectados.length} dentro</em>}
+        </Link>
+      )}
       {!dentro && (
         <section className="est-tarjeta grp-invitacion">
           <p>Te han invitado a <b>{d.nombre}</b>.</p>
           <button type="button" className="nch-empezar" onClick={unirse}>👥 Unirme al grupo</button>
         </section>
       )}
+      <Liga liga={d.liga} yo={yo} />
       <section className="est-tarjeta">
-        <h2>🏆 Ranking del grupo <small className="nch-sub">{d.partidasJuntos} partidas juntos</small></h2>
+        <h2>🏆 Ranking histórico <small className="nch-sub">{d.partidasJuntos} partidas juntos</small></h2>
         <ol className="nch-marcador">
           {d.ranking.map((r, i) => (
             <li key={r.jugador} className={i === 0 && r.victorias > 0 ? 'lider' : ''}>

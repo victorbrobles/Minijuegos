@@ -7,6 +7,7 @@ import express from 'express';
 import { JUEGOS_SOLO, enlace } from '../lib/solo.js';
 import db from '../db.js';
 import { existe, partidaPalabra, partidaLetras } from '../lib/palabras.js';
+import { JUEGOS_DIARIO, estadoDiario, guardarDiario } from '../lib/diario.js';
 
 // ---------------------------------------------------------------- Retos entre amigos
 // Quien termina una partida de un jugador puede retar a otros: se guarda la partida exacta (sus datos) con un código;
@@ -64,7 +65,26 @@ router.post('/palabras/existe', (req, res) => {
   res.json({ success: true, existe: existe(String(req.body?.palabra || '').slice(0, 20)) });
 });
 
-const PALABRAS = { palabra: partidaPalabra, letras: partidaLetras };
+// ---------------------------------------------------------------- Retos diarios (misma partida para todos cada día)
+//   GET  /api/solo/diario/:juego?jugador=   partida de hoy (si aún no has jugado), tu intento, clasificación y racha
+//   POST /api/solo/diario/:juego            { jugador, puntos, resumen }: guarda tu intento (solo el primero cuenta)
+router.get('/diario/:juego', (req, res) => {
+  const def = JUEGOS_DIARIO[req.params.juego];
+  if (!def) return res.status(404).json({ error: 'Ese juego no tiene reto diario.' });
+  const jugador = jugadorValido(req.query.jugador) ? String(req.query.jugador) : '';
+  const e = estadoDiario(req.params.juego, jugador);
+  res.json({ success: true, ...e, datos: e.intento ? null : def.partida(e.dia) });
+});
+router.post('/diario/:juego', (req, res) => {
+  const def = JUEGOS_DIARIO[req.params.juego];
+  if (!def) return res.status(404).json({ error: 'Ese juego no tiene reto diario.' });
+  const { jugador, puntos, resumen } = req.body || {};
+  if (!jugadorValido(jugador) || !Number.isFinite(Number(puntos))) return res.status(400).json({ error: 'Datos no válidos.' });
+  const nuevo = guardarDiario(req.params.juego, jugador, Number(puntos), resumen);
+  res.json({ success: true, nuevo, ...estadoDiario(req.params.juego, jugador) });
+});
+
+const PALABRAS = { palabra: () => partidaPalabra(), letras: () => partidaLetras() };
 router.get('/:juego', (req, res) => {
   const f = JUEGOS_SOLO[req.params.juego] || PALABRAS[req.params.juego];
   if (!f) return res.status(404).json({ error: 'Juego desconocido.' });

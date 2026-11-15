@@ -145,6 +145,7 @@ const NUEVOS = {
 
 // Iconos exclusivos para que cada uno de los 36 minijuegos tenga un icono único sin repetir
 const EXTRA = {
+  share: <><circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" /><path d="M8.600 13.500l6.800 4M15.400 6.500l-6.800 4" /></>,
   tren: <><rect x="5" y="3" width="14" height="13" rx="3" /><path d="M5 10h14M9 6.500h6" /><circle cx="8.500" cy="13" r=".8" /><circle cx="15.500" cy="13" r=".8" /><path d="M8 16l-2.500 5M16 16l2.500 5M7 19h10" /></>,
   edificio: <><path d="M5 21V8l7-4 7 4v13" /><path d="M3 21h18" /><path d="M9 10h1.500M13.500 10H15M9 13.500h1.500M13.500 13.500H15M10.500 21v-4h3v4" /></>,
   letras: <><rect x="2.500" y="6" width="8" height="8" rx="1.500" /><rect x="13.500" y="10" width="8" height="8" rx="1.500" /><path d="M4.800 12l1.700-4.500 1.700 4.500M5.400 10.600h2.200M16 16v-4h1.700a1 1 0 0 1 0 2H16h2a1 1 0 0 1 0 2z" /></>,

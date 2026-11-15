@@ -8,7 +8,8 @@ import { THREE, useEscena, tocado, mat } from '../Habilidad/tres.js';
 import Icon from '../../components/Icon.jsx';
 import { PortadaUnJugador, FinUnJugador, ConfirmarSalida, useRecord } from '../../components/UnJugador.jsx';
 import { sonar, vibrar } from '../../lib/sonido.js';
-import { generarNivel, recorrer, trazo, conexiones, puntosNivel, DX, DZ } from './vias.js';
+import { generarNivel, recorrer, trazo, conexiones, puntosNivel, rngSimple, DX, DZ } from './vias.js';
+import { useDiario, TarjetaDiario, FinDiario } from '../../components/DiarioJuego.jsx';
 import './ViaLibre.css';
 import { useAbrirAyuda } from '../../lib/ayuda.js';
 
@@ -232,12 +233,18 @@ export default function ViaLibre() {
   const finRef = useRef(0);
   const sobranteRef = useRef(0);
 
-  const cargarNivel = (n) => {
-    const nv = generarNivel(n);
+  // Reto del día: los niveles salen de la semilla del día (iguales para todos)
+  const diario = useDiario(ID);
+  const [semillaDia, setSemillaDia] = useState(null);
+  const cargarNivel = (n, semilla = semillaDia) => {
+    const nv = generarNivel(n, semilla != null ? rngSimple(semilla + n * 7919) : Math.random);
     setNivel(nv); setNivelN(n); setEstado('jugando'); setResultado(null); setInfo({ completa: false, unidas: 0 });
     finRef.current = Date.now() + nv.tiempo * 1000; setRestante(nv.tiempo);
   };
-  const empezar = () => { setPuntos(0); cargarNivel(1); setFase('jugando'); };
+  const empezar = (delDia = false) => {
+    const semilla = delDia === true && diario.estado?.datos ? diario.estado.datos.semilla : null;
+    setSemillaDia(semilla); setPuntos(0); cargarNivel(1, semilla); setFase('jugando');
+  };
 
   const salida = useCallback(() => {
     setEstado((e) => {
@@ -267,12 +274,16 @@ export default function ViaLibre() {
   }, [nivelN]);
   const terminar = () => {
     const superados = nivelN - 1;
-    setNuevoRecord(puntos > 0 && registrar(puntos, { nivel: superados })); setFase('fin');
+    setNuevoRecord(puntos > 0 && registrar(puntos, { nivel: superados }));
+    if (semillaDia != null) diario.enviar(puntos, `${superados} ${superados === 1 ? 'nivel' : 'niveles'}`);
+    setFase('fin');
   };
 
   if (fase === 'portada') {
-    return <><PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record}
-      textoRecord={(r) => `${fmt(r.valor)} puntos${r.nivel != null ? ` · ${r.nivel} niveles` : ''}`} /></>;
+    return <><PortadaUnJugador juegoId={ID} onJugar={() => empezar(false)} onAyuda={abrirAyuda} record={record}
+      textoRecord={(r) => `${fmt(r.valor)} puntos${r.nivel != null ? ` · ${r.nivel} niveles` : ''}`}>
+      <TarjetaDiario diario={diario} onJugar={() => empezar(true)} />
+    </PortadaUnJugador></>;
   }
   if (fase === 'fin') {
     const sup = nivelN - 1;
@@ -280,8 +291,9 @@ export default function ViaLibre() {
       <FinUnJugador icono="trophy" etiqueta={resultado?.motivo === 'vía cortada' ? 'El tren se encontró la vía cortada' : resultado?.motivo === 'dando vueltas' ? 'El tren se quedó dando vueltas' : 'El tren se salió de la vía'}
         titulo={sup >= 15 ? '¡Jefe de estación!' : sup >= 8 ? '¡Gran maquinista!' : sup >= 3 ? 'Buen viaje' : 'Descarrilamiento'}
         puntos={fmt(puntos)} unidad="puntos" nuevoRecord={nuevoRecord} record={record} textoRecord={(r) => `${fmt(r.valor)} puntos`}
-        exito={sup > 0} onRepetir={empezar} onMenu={() => setFase('portada')}>
+        exito={sup > 0} onRepetir={() => empezar(false)} onMenu={() => { diario.recargar(); setFase('portada'); }}>
         <p className="uj-mini">🚉 Superaste {sup} {sup === 1 ? 'nivel' : 'niveles'}.</p>
+        {semillaDia != null && <FinDiario estado={diario.estado} />}
       </FinUnJugador>
     );
   }

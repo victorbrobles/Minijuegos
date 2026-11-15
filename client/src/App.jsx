@@ -20,11 +20,14 @@ const Noche = lazy(() => import('./pages/Noche.jsx'));
 const Tele = lazy(() => import('./pages/Tele.jsx'));
 const Grupos = lazy(() => import('./pages/Grupos.jsx'));
 const GrupoDetalle = lazy(() => import('./pages/Grupos.jsx').then((m) => ({ default: m.GrupoDetalle })));
+const SalaGrupo = lazy(() => import('./pages/SalaGrupo.jsx'));
 const Cargando = () => <p className="loading">Cargando…</p>;
 // Solo en desarrollo: probar los minijuegos del Test de habilidad uno a uno
 const PruebaHabilidad = import.meta.env.DEV ? lazy(() => import('./games/Habilidad/Prueba.jsx')) : null;
 import { PuertaIdentidad } from './components/Identidad.jsx';
 import AvisoLogros from './components/AvisoLogros.jsx';
+import SalaGrupoGlobal from './components/SalaGrupo.jsx';
+import { AvisoSinConexion } from './components/Ajustes.jsx';
 
 export default function App() {
   const { pathname } = useLocation();
@@ -46,10 +49,13 @@ export default function App() {
           {PruebaHabilidad && <Route path="/prueba-habilidad/:id" element={<Suspense fallback={null}><PruebaHabilidad /></Suspense>} />}
           <Route path="/grupos" element={<Grupos />} />
           <Route path="/grupo/:codigo" element={<GrupoDetalle />} />
+          <Route path="/grupo/:codigo/sala" element={<SalaGrupo />} />
           <Route path="*" element={<p>Página no encontrada.</p>} />
         </Routes>
         </Suspense>
         <AvisoLogros />
+        <SalaGrupoGlobal />
+        <AvisoSinConexion />
       </PuertaIdentidad>
     </main>
   );

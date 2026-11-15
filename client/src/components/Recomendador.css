@@ -62,3 +62,6 @@
   .hub-head .hub-logo { display: none; }
   .hub-head .hub-title { font-size: 1.6rem; }
 }
+/* Paso de tiempo y forma de jugar */
+.rec-opciones.tres { grid-template-columns: repeat(3, 1fr); }
+.rec-sub { margin-top: 0.9rem !important; }

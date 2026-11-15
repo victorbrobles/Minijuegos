@@ -12,6 +12,8 @@ import './Creditos.css';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GameCard from '../components/GameCard.jsx';
+import { useFiltros, cuantosFiltros, cumpleFiltros, PanelFiltros } from '../components/FiltrosJuegos.jsx';
+import { BotonAjustes } from '../components/Ajustes.jsx';
 import Icon from '../components/Icon.jsx';
 import AdminPanel from '../components/AdminPanel.jsx';
 import { metaDe, CATEGORIAS_PORTADA as CATEGORIAS_EXPORTADAS } from '../games/meta.js';
@@ -238,10 +240,15 @@ export default function Home() {
     [games]
   );
 
+  // Filtros (cuántos sois, modo, duración, tipo, favoritos): se combinan con la búsqueda
+  const [filtros, setFiltros] = useFiltros();
+  const [verFiltros, setVerFiltros] = useState(false);
+  const nFiltros = cuantosFiltros(filtros);
   const resultados = useMemo(() => {
     const palabras = normalizar(busqueda).split(' ').filter(Boolean);
-    if (palabras.length === 0) return games;
-    return indice
+    const pasa = (g) => cumpleFiltros(g.id, filtros, favoritos);
+    if (palabras.length === 0) return games.filter(pasa);
+    return indice.filter((it) => pasa(it.game))
       .map((it) => {
         const enNombre = palabras.every((p) => it.nombre.includes(p));
         const enTodo = palabras.every((p) => it.nombre.includes(p) || it.resto.includes(p));
@@ -250,9 +257,9 @@ export default function Home() {
       .filter((r) => r.puntos >= 0)
       .sort((a, b) => a.puntos - b.puntos)
       .map((r) => r.it.game);
-  }, [busqueda, games, indice]);
+  }, [busqueda, games, indice, filtros, favoritos]);
 
-  const hayBusqueda = busqueda.trim() !== '';
+  const hayBusqueda = busqueda.trim() !== '' || nFiltros > 0;
 
   const juegosPorCategoria = useMemo(() => {
     const grupos = {};
@@ -305,7 +312,7 @@ export default function Home() {
             <p className="hub-sub">¡Elige un minijuego y a jugar!</p>
           </div>
         </div>
-        <div className="hub-yo"><ChipIdentidad /><Link to="/grupos" className="hub-grupos">👥 Grupos</Link><BotonSonido clase="en-portada" /></div>
+        <div className="hub-yo"><ChipIdentidad /><Link to="/grupos" className="hub-grupos">👥 Grupos</Link><BotonSonido clase="en-portada" /><BotonAjustes /></div>
 
         <div className="hub-search" role="search">
           <Icon name="search" size={22} className="hub-search-icon" />
@@ -323,12 +330,16 @@ export default function Home() {
             autoCorrect="off"
             spellCheck="false"
           />
-          {hayBusqueda && (
+          {busqueda.trim() !== '' && (
             <button type="button" className="hub-clear" onClick={limpiar} aria-label="Borrar búsqueda">
               <Icon name="x" size={18} strokeWidth={2.6} />
             </button>
           )}
+          <button type="button" className={`fj-boton${nFiltros ? ' activo' : ''}`} onClick={() => setVerFiltros((v) => !v)} aria-expanded={verFiltros} aria-label="Filtros">
+            <Icon name="settings" size={16} /> Filtros{nFiltros > 0 && <em>{nFiltros}</em>}
+          </button>
         </div>
+        {verFiltros && <PanelFiltros filtros={filtros} onCambiar={setFiltros} resultados={resultados.length} onCerrar={() => setVerFiltros(false)} />}
 
         {!cargando && !error && hayBusqueda && (
           <p className="hub-count" aria-live="polite">{resultados.length} de {games.length} juegos</p>
@@ -381,9 +392,9 @@ export default function Home() {
       {!cargando && !error && hayBusqueda && resultados.length === 0 && (
         <div className="empty">
           <span className="empty-icon"><Icon name="search" size={30} /></span>
-          <p className="empty-title">Ningún juego coincide con «{busqueda.trim()}»</p>
-          <p className="empty-text">Prueba con otra palabra: «música», «fútbol», «cartas»…</p>
-          <button type="button" className="secondary" onClick={limpiar}>Borrar búsqueda</button>
+          <p className="empty-title">{busqueda.trim() ? `Ningún juego coincide con «${busqueda.trim()}»` : 'Ningún juego cumple los filtros'}</p>
+          <p className="empty-text">{nFiltros ? 'Prueba a quitar algún filtro.' : 'Prueba con otra palabra: «música», «fútbol», «cartas»…'}</p>
+          <button type="button" className="secondary" onClick={() => { limpiar(); setFiltros({ ...filtros, jugadores: null, modo: 'todos', duracion: null, tipos: [], favoritos: false }); }}>Borrar búsqueda y filtros</button>
         </div>
       )}
 

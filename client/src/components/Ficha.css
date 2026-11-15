@@ -1,0 +1,10 @@
+/* client/src/components/Ficha.css — ficha previa del juego (ventana del botón «i») */
+.gm-extra { display: grid; gap: 0.6rem; margin: -0.4rem 0 1rem; text-align: left; }
+.gm-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.gm-chips span { padding: 0.3rem 0.65rem; border-radius: 999px; background: color-mix(in srgb, var(--g1) 12%, #ffffff); color: color-mix(in srgb, var(--g1) 75%, #000000); font-size: 0.8rem; font-weight: 800; }
+.gm-objetivo { display: flex; gap: 0.55rem; margin: 0; padding: 0.7rem 0.8rem; border-radius: 16px; background: linear-gradient(135deg, color-mix(in srgb, var(--g1) 12%, #ffffff), color-mix(in srgb, var(--g2) 10%, #ffffff)); color: #1e293b; font-size: 0.92rem; font-weight: 600; line-height: 1.45; }
+.gm-objetivo b { color: #0f172a; }
+.gm-record { margin: 0; padding: 0.5rem 0.8rem; border-radius: 14px; background: #fef3c7; color: #78350f; font-size: 0.88rem; font-weight: 700; }
+.gm-acciones { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; margin-bottom: 0.9rem; }
+.gm-secundario { padding: 0.55rem 1rem; border: 2px solid color-mix(in srgb, var(--g1) 35%, #ffffff); border-radius: 999px; background: #ffffff; color: color-mix(in srgb, var(--g1) 80%, #000000); font: inherit; font-weight: 800; cursor: pointer; }
+.gm-acciones .slf-boton { margin: 0; }

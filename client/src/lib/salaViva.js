@@ -5,7 +5,7 @@
 import { useEffect, useState } from 'react';
 import { nombreIdentidad } from './identidad.js';
 
-const RUTA = /^\/api\/[a-z0-9-]+\/(?:[a-z-]+\/)?sala\/([A-Za-z0-9]{3,8})(?:\?|$)/;
+const RUTA = /^\/api\/([a-z0-9-]+)\/(?:[a-z-]+\/)?sala\/([A-Za-z0-9]{3,8})(?:\?|$)/;
 const EVENTO = 'minijuegos-sala-viva';
 let actual = null; // { juego, code, jugadores, estado, visto }
 let ultimoEnvio = 0;
@@ -25,12 +25,12 @@ function extraer(d) {
   return { jugadores, estado: normalizarEstado(s?.estado ?? d?.estado ?? d?.vista?.fase) };
 }
 
-function anotar(code, datos) {
+function anotar(code, datos, api) {
   const juego = juegoDeLaPagina();
   if (!juego) return;
   const { jugadores, estado } = extraer(datos);
   const nuevo = !actual || actual.code !== code || actual.juego !== juego;
-  actual = { juego, code: code.toUpperCase(), jugadores, estado, visto: Date.now() };
+  actual = { juego, api, code: code.toUpperCase(), jugadores, estado, visto: Date.now() };
   if (nuevo) window.dispatchEvent(new Event(EVENTO));
   const ahora = Date.now();
   if (ahora - ultimoEnvio > 3000) {
@@ -55,7 +55,7 @@ export function instalarSalaViva() {
       const metodo = (opciones?.method || entrada?.method || 'GET').toUpperCase();
       const ruta = url.startsWith('http') ? new URL(url).pathname + new URL(url).search : url;
       const m = metodo === 'GET' && res.ok ? RUTA.exec(ruta) : null;
-      if (m) res.clone().json().then((d) => anotar(m[1], d)).catch(() => {});
+      if (m) res.clone().json().then((d) => anotar(m[2], d, m[1])).catch(() => {});
     } catch { /* nunca molesta al juego */ }
     return res;
   };
@@ -73,4 +73,7 @@ export function useSalaViva(juego) {
   if (!actual || actual.juego !== juego || Date.now() - actual.visto > 10000) return null;
   return actual;
 }
+/** Última sala online detectada (o null). */
+export const salaActual = () => actual;
+export const EVENTO_SALA_VIVA = EVENTO;
 export const fetchOriginal = (...a) => (original || window.fetch)(...a);

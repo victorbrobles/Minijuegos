@@ -1,0 +1,14 @@
+/* client/src/styles/accesibilidad.css — ajustes de accesibilidad (lib/ajustes.js) */
+
+/* Menos animaciones: todo aparece al instante (también si el sistema lo pide y no se ha elegido otra cosa) */
+html.sin-animaciones *, html.sin-animaciones *::before, html.sin-animaciones *::after {
+  animation-duration: 0.001ms !important; animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important; scroll-behavior: auto !important;
+}
+
+/* Alto contraste: más contraste general, textos secundarios más oscuros y contornos de foco bien visibles */
+/* En <html> y no en <body>: un filtro en body haría que las ventanas fijas se colocasen respecto a la página */
+html.alto-contraste { filter: contrast(1.18) saturate(1.08); }
+html.alto-contraste :is(small, .nch-nota, .sg-nota, .dj-nota, .uj-mini, .hub-sub, .gc-caption, .fj-etiqueta) { color: inherit !important; opacity: 1 !important; }
+html.alto-contraste :focus-visible { outline: 3px solid #facc15 !important; outline-offset: 2px !important; }
+html.alto-contraste :is(button, a, input, select, textarea) { text-decoration-thickness: 2px; }

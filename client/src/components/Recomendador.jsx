@@ -8,7 +8,8 @@ import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import Icon from './Icon.jsx';
 import { metaDe } from '../games/meta.js';
-import { LIMITES } from '../games/limites.js';
+import { LIMITES, limitesLocal, limitesOnline } from '../games/limites.js';
+import { MODOS } from '../games/modos.js';
 import { nombreCompleto } from '../lib/identidad.js';
 import './Recomendador.css';
 import { miniatura } from '../lib/portadas.js';
@@ -35,6 +36,18 @@ const GANAS = [
   { id: 'famosos', texto: 'Famosos', emoji: '🌟', cats: ['famosos'], kw: ['famosos', 'cine', 'musica', 'television', 'celebridades', 'peliculas', 'series', 'cantantes'], dice: ['famosos', 'famoso', 'cine', 'peliculas', 'pelis', 'series', 'musica', 'canciones', 'cantantes', 'actores', 'tele', 'television', 'pop', 'celebridades'] }
 ];
 
+// Tiempo que tenéis y cómo jugáis (para descartar lo que no encaja)
+const TIEMPOS = [
+  { id: 10, texto: 'Unos minutos', emoji: '⏱️' },
+  { id: 25, texto: 'Media hora', emoji: '🕧' },
+  { id: null, texto: 'Toda la tarde', emoji: '🌙' }
+];
+const FORMAS = [
+  { id: 'online', texto: 'Cada uno en su móvil', emoji: '🌐' },
+  { id: 'local', texto: 'Con un solo móvil', emoji: '📱' },
+  { id: null, texto: 'Me da igual', emoji: '🤷' }
+];
+
 const NOVEDAD = [
   { id: 'nuevo', texto: 'Sorpréndeme con algo que no haya jugado', emoji: '✨' },
   { id: 'fav', texto: 'Mis favoritos de siempre', emoji: '❤️' },
@@ -56,20 +69,28 @@ export function leerTexto(texto) {
   else if (/\b(grupo grande|muchos|mucha gente|fiesta|familia)\b/.test(t)) jugadores = 6;
   const ganas = GANAS.filter((g) => g.dice.some((d) => pal.includes(d) || (d.length > 5 && pal.some((p) => p.length > 4 && (p.startsWith(d.slice(0, 5)) || d.startsWith(p.slice(0, 5))))))).map((g) => g.id);
   const sueltas = pal.filter((p) => p.length > 2 && !VACIAS.has(p) && !NUMEROS[p] && !/^\d+$/.test(p));
-  return { jugadores, ganas, sueltas, nuevo: /\b(nuevo|nueva|nuevos|distinto|diferente|no he jugado|sorprendeme|probar|probado|descubrir)\b/.test(t) };
+  const mins = t.match(/(\d+)\s*(min|minutos)/);
+  const tiempo = mins ? Number(mins[1]) : /\b(rapidito|cortito|un rato corto|5 minutos|poco tiempo|algo rapido)\b/.test(t) ? 10 : /\b(media hora)\b/.test(t) ? 30 : null;
+  const forma = /\b(cada uno (en|con) su movil|online|a distancia|cada uno desde su casa)\b/.test(t) ? 'online' : /\b(un (solo )?movil|pasandonos el movil|mismo movil)\b/.test(t) ? 'local' : null;
+  return { jugadores, ganas, sueltas, tiempo, forma, nuevo: /\b(nuevo|nueva|nuevos|distinto|diferente|no he jugado|sorprendeme|probar|probado|descubrir)\b/.test(t) };
 }
 
 /** Puntúa y ordena los juegos según lo pedido. Devuelve [{ id, puntos, motivos }]. */
-export function recomendar(ids, { grupo, ganas = [], novedad = 'igual', sueltas = [], jugadas = {} }, azar = Math.random) {
+export function recomendar(ids, { grupo, ganas = [], novedad = 'igual', sueltas = [], jugadas = {}, tiempo = null, forma = null }, azar = Math.random) {
   const total = Object.values(jugadas).reduce((a, b) => a + b, 0) || 1;
   return ids.map((id) => {
     const m = metaDe(id); const l = LIMITES[id];
     if (!m || !l) return null;
-    if (grupo && (l.min > grupo.max || l.max < grupo.min)) return null; // no caben
+    const modos = MODOS[id];
+    if (forma && !modos[forma]) return null; // no se puede jugar así
+    const lim = forma === 'online' ? limitesOnline(id) : forma === 'local' ? limitesLocal(id) : l;
+    if (grupo && (lim.min > grupo.max || lim.max < grupo.min)) return null; // no caben
+    if (tiempo && (m.duracion || 15) > tiempo) return null; // no da tiempo
     const etq = norm(m.etiquetas); const desc = norm(m.descripcion); const tit = norm(m.titulo);
     const cats = m.categorias || [];
     let puntos = 0; const motivos = [];
-    if (grupo) motivos.push(l.min === l.max ? `${l.min} ${l.min === 1 ? 'jugador' : 'jugadores'}` : `${l.min} a ${l.max} jugadores`);
+    if (grupo) motivos.push(lim.min === lim.max ? `${lim.min} ${lim.min === 1 ? 'jugador' : 'jugadores'}` : `${lim.min} a ${lim.max} jugadores`);
+    if (tiempo) motivos.push(`⏱️ ~${m.duracion || 15} min`);
     for (const gid of ganas) {
       const g = GANAS.find((x) => x.id === gid);
       let p = g.cats.some((c) => cats.includes(c)) ? 4 : 0;
@@ -154,7 +175,9 @@ function Resultados({ lista, tanda, setTanda, onReiniciar, onCerrar }) {
 
 function Ventana({ ids, onCerrar }) {
   const [modo, setModo] = useState('preguntas'); // preguntas | texto
-  const [paso, setPaso] = useState(0); // 0 jugadores · 1 ganas · 2 novedad · 3 resultados
+  const [paso, setPaso] = useState(0); // 0 jugadores · 1 ganas · 2 tiempo y forma · 3 novedad · 4 resultados
+  const [tiempo, setTiempo] = useState(null);
+  const [forma, setForma] = useState(null);
   const [grupo, setGrupo] = useState(null);
   const [ganas, setGanas] = useState([]);
   const [novedad, setNovedad] = useState('igual');
@@ -170,25 +193,25 @@ function Ventana({ ids, onCerrar }) {
   }, [onCerrar]);
 
   const lista = useMemo(() => (peticion ? recomendar(ids, { ...peticion, jugadas }) : []), [peticion, ids, jugadas, semilla]); // eslint-disable-line react-hooks/exhaustive-deps
-  const ver = (p) => { setPeticion(p); setTanda(0); setSemilla((s) => s + 1); setPaso(3); };
-  const reiniciar = () => { setPaso(0); setPeticion(null); setGrupo(null); setGanas([]); setNovedad('igual'); };
+  const ver = (p) => { setPeticion(p); setTanda(0); setSemilla((s) => s + 1); setPaso(4); };
+  const reiniciar = () => { setPaso(0); setPeticion(null); setGrupo(null); setGanas([]); setNovedad('igual'); setTiempo(null); setForma(null); };
   const buscarTexto = (e) => {
     e.preventDefault();
     if (!texto.trim()) return;
     const l = leerTexto(texto);
     const g = l.jugadores ? GRUPOS.find((x) => l.jugadores >= x.min && l.jugadores <= x.max) : null;
-    ver({ grupo: g, ganas: l.ganas, sueltas: l.ganas.length ? [] : l.sueltas, novedad: l.nuevo ? 'nuevo' : 'igual', leido: l });
+    ver({ grupo: g, ganas: l.ganas, sueltas: l.ganas.length ? [] : l.sueltas, novedad: l.nuevo ? 'nuevo' : 'igual', tiempo: l.tiempo, forma: l.forma, leido: l });
   };
   const toggle = (id) => setGanas((g) => (g.includes(id) ? g.filter((x) => x !== id) : g.length < 3 ? [...g, id] : g));
 
   let cuerpo;
-  if (paso === 3) {
+  if (paso === 4) {
     const l = peticion?.leido;
     cuerpo = (
       <>
         {l && (
           <p className="rec-entendido">
-            He entendido: {[l.jugadores && `${l.jugadores} ${l.jugadores === 1 ? 'jugador' : 'jugadores'}`, ...l.ganas.map((g) => GANAS.find((x) => x.id === g).texto.toLowerCase()), !l.ganas.length && l.sueltas.length && `«${l.sueltas.join(' ')}»`, l.nuevo && 'algo nuevo'].filter(Boolean).join(' · ') || 'lo que sea'}
+            He entendido: {[l.jugadores && `${l.jugadores} ${l.jugadores === 1 ? 'jugador' : 'jugadores'}`, l.tiempo && `≤ ${l.tiempo} min`, l.forma && (l.forma === 'online' ? 'cada uno en su móvil' : 'un solo móvil'), ...l.ganas.map((g) => GANAS.find((x) => x.id === g).texto.toLowerCase()), !l.ganas.length && l.sueltas.length && `«${l.sueltas.join(' ')}»`, l.nuevo && 'algo nuevo'].filter(Boolean).join(' · ') || 'lo que sea'}
           </p>
         )}
         <Resultados lista={lista} tanda={tanda} setTanda={setTanda} onReiniciar={reiniciar} onCerrar={onCerrar} />
@@ -226,15 +249,36 @@ function Ventana({ ids, onCerrar }) {
         </div>
       </div>
     );
+  } else if (paso === 2) {
+    cuerpo = (
+      <div className="rec-paso">
+        <h4><span className="rec-num">3</span>¿Cuánto tiempo tenéis?</h4>
+        <div className="rec-opciones tres">
+          {TIEMPOS.map((t) => <button key={String(t.id)} type="button" className={tiempo === t.id ? 'activa' : ''} onClick={() => setTiempo(t.id)}><span>{t.emoji}</span>{t.texto}</button>)}
+        </div>
+        {grupo?.min !== 1 && (
+          <>
+            <h4 className="rec-sub">¿Cómo vais a jugar?</h4>
+            <div className="rec-opciones tres">
+              {FORMAS.map((f) => <button key={String(f.id)} type="button" className={forma === f.id ? 'activa' : ''} onClick={() => setForma(f.id)}><span>{f.emoji}</span>{f.texto}</button>)}
+            </div>
+          </>
+        )}
+        <div className="rec-acciones">
+          <button type="button" className="rec-secundario" onClick={() => setPaso(1)}><Icon name="arrowLeft" size={18} /> Atrás</button>
+          <button type="button" className="rec-principal" onClick={() => setPaso(3)}>Seguir <Icon name="forward" size={18} /></button>
+        </div>
+      </div>
+    );
   } else {
     cuerpo = (
       <div className="rec-paso">
-        <h4><span className="rec-num">3</span>¿Algo nuevo o de siempre?</h4>
+        <h4><span className="rec-num">4</span>¿Algo nuevo o de siempre?</h4>
         <div className="rec-opciones lista">
-          {NOVEDAD.map((n) => <button key={n.id} type="button" onClick={() => { setNovedad(n.id); ver({ grupo, ganas, novedad: n.id }); }}><span>{n.emoji}</span>{n.texto}</button>)}
+          {NOVEDAD.map((n) => <button key={n.id} type="button" onClick={() => { setNovedad(n.id); ver({ grupo, ganas, novedad: n.id, tiempo, forma }); }}><span>{n.emoji}</span>{n.texto}</button>)}
         </div>
         <div className="rec-acciones">
-          <button type="button" className="rec-secundario" onClick={() => setPaso(1)}><Icon name="arrowLeft" size={18} /> Atrás</button>
+          <button type="button" className="rec-secundario" onClick={() => setPaso(2)}><Icon name="arrowLeft" size={18} /> Atrás</button>
         </div>
       </div>
     );
@@ -248,7 +292,7 @@ function Ventana({ ids, onCerrar }) {
           <div><p>Recomendador</p><h3>¿A qué jugamos hoy?</h3></div>
           <button type="button" className="rec-cerrar" onClick={onCerrar} aria-label="Cerrar"><Icon name="x" size={18} strokeWidth={2.6} /></button>
         </header>
-        {paso !== 3 && (
+        {paso !== 4 && (
           <div className="rec-pestanas" role="tablist">
             <button type="button" role="tab" aria-selected={modo === 'preguntas'} className={modo === 'preguntas' ? 'activa' : ''} onClick={() => setModo('preguntas')}>💬 Pregúntame</button>
             <button type="button" role="tab" aria-selected={modo === 'texto'} className={modo === 'texto' ? 'activa' : ''} onClick={() => setModo('texto')}>✍️ Lo escribo yo</button>

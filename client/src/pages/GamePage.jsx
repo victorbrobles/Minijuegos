@@ -1,5 +1,5 @@
 import { Suspense, lazy, useCallback, useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import registry from '../games/registry.js';
 import Icon from '../components/Icon.jsx';
 import { metaDe } from '../games/meta.js';
@@ -11,6 +11,7 @@ import BotonSonido from '../components/Sonido.jsx';
 import Reacciones from '../components/Reacciones.jsx';
 import '../components/MenuJuego.css';
 import { AyudaContexto } from '../lib/ayuda.js';
+import { usePilotoGrupo } from '../lib/salaGrupo.js';
 
 // Ayuda común (se descarga solo al abrirla)
 const AyudaJuego = lazy(() => import('../components/AyudaJuego.jsx'));
@@ -25,6 +26,10 @@ export default function GamePage() {
 
   // Invitación a una sala por enlace/QR (?sala=CODIGO)
   // Cualquier botón «?» del juego abre la ayuda común (en vez de la ventana propia de cada juego)
+  // Abierto desde la sala del grupo: crea o entra en la partida sin teclear el código
+  // (cada navegación remonta el juego: así el grupo puede abrir otra partida del mismo juego)
+  const { key: claveNavegacion } = useLocation();
+  const avisoPiloto = usePilotoGrupo(gameId, claveNavegacion);
   const [ayuda, setAyuda] = useState(false);
   const abrirAyudaJuego = useCallback(() => setAyuda(true), []);
   const abrirAyuda = (e) => {
@@ -74,9 +79,10 @@ export default function GamePage() {
         <div className="qq-invitacion">📲 Te han invitado a la sala <b>{invitacion}</b>: entra en <b>Online</b> → <b>Unirse con código</b> y ya lo tendrás puesto.</div>
       )}
       <AyudaContexto.Provider value={abrirAyudaJuego}>
-        <Suspense fallback={<p className="loading">Cargando el juego…</p>}><Game /></Suspense>
+        <Suspense fallback={<p className="loading">Cargando el juego…</p>}><Game key={claveNavegacion} /></Suspense>
       </AyudaContexto.Provider>
       <Reacciones juego={gameId} />
+      {avisoPiloto && <p className="sgg-piloto" role="status">👥 {avisoPiloto}</p>}
       {ayuda && <Suspense fallback={null}><AyudaJuego juegoId={gameId} onCerrar={() => setAyuda(false)} /></Suspense>}
       {enNoche && (
         <Link to="/noche" className={`nch-banner${noche.resultados[noche.actual] ? ' hecho' : ''}`}>

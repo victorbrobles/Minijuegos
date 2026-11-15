@@ -7,6 +7,7 @@ import Icon from '../../components/Icon.jsx';
 import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, useRecord } from '../../components/UnJugador.jsx';
 import { cargarSolo, Cargando, RetoAmigo } from '../Solo/comun.jsx';
 import { sonar, vibrar } from '../../lib/sonido.js';
+import { useDiario, TarjetaDiario, FinDiario } from '../../components/DiarioJuego.jsx';
 import './Palabras.css';
 import { useAbrirAyuda } from '../../lib/ayuda.js';
 
@@ -62,10 +63,14 @@ export default function Palabra() {
   const objetivo = lista[k] || '';
   const largo = objetivo.length;
 
-  const empezar = async () => {
+  // Reto del día: la misma partida para todos (un solo intento al día)
+  const diario = useDiario(ID);
+  const [esDiario, setEsDiario] = useState(false);
+  const empezar = async (delDia = false) => {
     setFase('cargando'); setError('');
     try {
-      const d = await cargarSolo(ID);
+      const d = delDia === true && diario.estado?.datos ? diario.estado.datos : await cargarSolo(ID);
+      setEsDiario(delDia === true);
       setLista(d.palabras); setK(0); setIntentos([]); setActual(''); setPuntos(0); setEstado('jugando'); setAviso(null);
       setFase('jugando');
     } catch (e) { setError(e.message); }
@@ -74,8 +79,9 @@ export default function Palabra() {
 
   const terminar = useCallback((pts, aciertos) => {
     setNuevoRecord(pts > 0 && registrar(pts, { palabras: aciertos }));
+    if (esDiario) diario.enviar(pts, `${aciertos} ${aciertos === 1 ? 'palabra' : 'palabras'}`);
     setFase('fin');
-  }, [registrar]);
+  }, [registrar, esDiario, diario]);
 
   const enviar = async () => {
     if (estado !== 'jugando' || comprobando) return;
@@ -127,8 +133,10 @@ export default function Palabra() {
 
   if (fase === 'portada' || fase === 'cargando') {
     if (fase === 'cargando') return <Cargando error={error} onReintentar={empezar} />;
-    return <><PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record}
-      textoRecord={(r) => `${fmt(r.valor)} puntos${r.palabras != null ? ` · ${r.palabras} palabras` : ''}`} /></>;
+    return <><PortadaUnJugador juegoId={ID} onJugar={() => empezar(false)} onAyuda={abrirAyuda} record={record}
+      textoRecord={(r) => `${fmt(r.valor)} puntos${r.palabras != null ? ` · ${r.palabras} palabras` : ''}`}>
+      <TarjetaDiario diario={diario} onJugar={() => empezar(true)} />
+    </PortadaUnJugador></>;
   }
   const aciertos = k + (estado === 'acierto' ? 1 : 0);
   if (fase === 'fin') {
@@ -136,9 +144,9 @@ export default function Palabra() {
       <FinUnJugador icono={aciertos >= ESCALONES ? 'crown' : 'trophy'} etiqueta={`La palabra era «${objetivo.toUpperCase()}»`}
         titulo={aciertos >= ESCALONES ? '¡Leyenda de las palabras!' : aciertos >= 8 ? '¡Gran racha!' : aciertos >= 4 ? 'Nada mal' : 'A la próxima'}
         puntos={fmt(puntos)} unidad="puntos" nuevoRecord={nuevoRecord} record={record} textoRecord={(r) => `${fmt(r.valor)} puntos`}
-        exito={aciertos > 0} onRepetir={empezar} onMenu={() => setFase('portada')}>
+        exito={aciertos > 0} onRepetir={() => empezar(false)} onMenu={() => { diario.recargar(); setFase('portada'); }}>
         <p className="uj-mini">Acertaste {aciertos} {aciertos === 1 ? 'palabra' : 'palabras'}{aciertos >= ESCALONES ? ` (${aciertos - ESCALONES} en el modo sin fin)` : ''}.</p>
-        <RetoAmigo juego={ID} puntos={puntos} formato={(x) => `${fmt(x)} puntos`} />
+        {esDiario ? <FinDiario estado={diario.estado} /> : <RetoAmigo juego={ID} puntos={puntos} formato={(x) => `${fmt(x)} puntos`} />}
       </FinUnJugador>
     );
   }

@@ -18,6 +18,7 @@ export const CATEGORIAS_PORTADA = [
 export const META = {
   'bingoball': {
     titulo: 'Bingoball',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/bingoball.webp',
     icono: 'bingocard',
     colores: ['#2563eb', '#0f172a'],
@@ -27,6 +28,7 @@ export const META = {
   },
   'trayectoria': {
     titulo: 'Modo carrera',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/trayectoria.webp',
     icono: 'careerpath',
     colores: ['#22c55e', '#14532d'],
@@ -36,6 +38,7 @@ export const META = {
   },
   'traiciones': {
     titulo: 'Traiciones',
+    duracion: 20, // minutos aproximados de una partida
     imagen: '/covers/traiciones.webp',
     icono: 'dagger',
     colores: ['#d97706', '#451a03'],
@@ -45,6 +48,7 @@ export const META = {
   },
   'fundadores': {
     titulo: 'Fundadores',
+    duracion: 40, // minutos aproximados de una partida
     imagen: '/covers/fundadores.webp',
     icono: 'landmark',
     colores: ['#ea580c', '#7c2d12'],
@@ -54,6 +58,7 @@ export const META = {
   },
   'coleccion': {
     titulo: 'Colecciona con cabeza',
+    duracion: 25, // minutos aproximados de una partida
     imagen: '/covers/coleccion.webp',
     icono: 'cards',
     colores: ['#06b6d4', '#1e40af'],
@@ -63,6 +68,7 @@ export const META = {
   },
   'golpe': {
     titulo: 'El Golpe',
+    duracion: 20, // minutos aproximados de una partida
     imagen: '/covers/golpe.webp',
     icono: 'lock',
     colores: ['#fbbf24', '#1c1917'],
@@ -72,6 +78,7 @@ export const META = {
   },
   'sumacero': {
     titulo: 'Suma Cero',
+    duracion: 20, // minutos aproximados de una partida
     imagen: '/covers/sumacero.webp',
     icono: 'scale',
     colores: ['#a78bfa', '#312e81'],
@@ -81,6 +88,7 @@ export const META = {
   },
   'invento': {
     titulo: 'El Invento del Siglo',
+    duracion: 20, // minutos aproximados de una partida
     imagen: '/covers/invento.webp',
     icono: 'bulb',
     colores: ['#a78bfa', '#5b21b6'],
@@ -90,6 +98,7 @@ export const META = {
   },
   'director': {
     titulo: 'Director Deportivo',
+    duracion: 30, // minutos aproximados de una partida
     imagen: '/covers/director.webp',
     icono: 'soccer',
     colores: ['#38bdf8', '#0c4a6e'],
@@ -99,6 +108,7 @@ export const META = {
   },
   'musavanzado': {
     titulo: 'Mus Avanzado',
+    duracion: 30, // minutos aproximados de una partida
     imagen: '/covers/musavanzado.webp',
     icono: 'cards',
     colores: ['#10b981', '#022c22'],
@@ -108,6 +118,7 @@ export const META = {
   },
   'datosobra': {
     titulo: 'El Dato que Sobra',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/datosobra.webp',
     icono: 'detective',
     colores: ['#f97316', '#431407'],
@@ -117,6 +128,7 @@ export const META = {
   },
   'pareja': {
     titulo: 'La Pareja Perfecta',
+    duracion: 10, // minutos aproximados de una partida
     imagen: '/covers/pareja.webp',
     icono: 'heart',
     colores: ['#ec4899', '#500724'],
@@ -126,6 +138,7 @@ export const META = {
   },
   'tablero': {
     titulo: 'El Tablero de Puntos',
+    duracion: 30, // minutos aproximados de una partida
     imagen: '/covers/tablero.webp',
     icono: 'target',
     colores: ['#8b5cf6', '#1e1b4b'],
@@ -135,6 +148,7 @@ export const META = {
   },
   'hemeroteca': {
     titulo: 'La Hemeroteca',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/hemeroteca.webp',
     icono: 'book',
     colores: ['#a8a29e',  '#292524'],
@@ -144,6 +158,7 @@ export const META = {
   },
   'acta': {
     titulo: 'Acta del Partido',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/acta.webp',
     icono: 'edit',
     colores: ['#22c55e',  '#052e16'],
@@ -153,6 +168,7 @@ export const META = {
   },
   'oncefantasma': {
     titulo: 'El Once Fantasma',
+    duracion: 25, // minutos aproximados de una partida
     imagen: '/covers/oncefantasma.webp',
     icono: 'soccer',
     colores: ['#3b82f6',  '#0b1437'],
@@ -162,6 +178,7 @@ export const META = {
   },
   'unapieza': {
     titulo: 'Una Pieza Más',
+    duracion: 20, // minutos aproximados de una partida
     imagen: '/covers/unapieza.webp',
     icono: 'box',
     colores: ['#f59e0b',  '#78350f'],
@@ -171,6 +188,7 @@ export const META = {
   },
   'laberinto': {
     titulo: 'El Laberinto',
+    duracion: 20, // minutos aproximados de una partida
     imagen: '/covers/laberinto.webp',
     icono: 'key',
     colores: ['#2dd4bf', '#134e4a'],
@@ -197,6 +215,7 @@ export const META = {
   },
   'mus': {
     titulo: 'Mus',
+    duracion: 40, // minutos aproximados de una partida
     imagen: '/covers/mus.webp',
     icono: 'cards',
     colores: ['#16a34a', '#14532d'],
@@ -206,6 +225,7 @@ export const META = {
   },
   'reinos': {
     titulo: 'Los Siete Reinos',
+    duracion: 45, // minutos aproximados de una partida
     imagen: '/covers/reinos.webp',
     icono: 'shield',
     colores: ['#b45309', '#451a03'],
@@ -215,6 +235,7 @@ export const META = {
   },
   'cuentas': {
     titulo: 'Lleva la cuenta',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/cuentas.webp',
     icono: 'numcards',
     colores: ['#38bdf8', '#0369a1'],
@@ -224,6 +245,7 @@ export const META = {
   },
   'descarte': {
     titulo: '¡Descarta y Elimina!',
+    duracion: 20, // minutos aproximados de una partida
     imagen: '/covers/descarte.webp',
     icono: 'x',
     colores: ['#f43f5e', '#881337'],
@@ -233,6 +255,7 @@ export const META = {
   },
   'lobos': {
     titulo: 'Luna de Sangre',
+    duracion: 30, // minutos aproximados de una partida
     imagen: '/covers/lobos.webp',
     icono: 'moon',
     colores: ['#dc2626', '#1e1b4b'],
@@ -242,6 +265,7 @@ export const META = {
   },
   'impostor': {
     titulo: 'Miente como puedas',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/impostor.webp',
     icono: 'mask',
     colores: ['#9333ea', '#3b0764'],
@@ -251,6 +275,7 @@ export const META = {
   },
   'conecta': {
     titulo: 'Conexiones ocultas',
+    duracion: 20, // minutos aproximados de una partida
     imagen: '/covers/conecta.webp',
     icono: 'connect',
     colores: ['#0284c7', '#1e3a8a'],
@@ -260,6 +285,7 @@ export const META = {
   },
   'buscaminas': {
     titulo: 'Cuidado que explota',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/buscaminas.webp',
     icono: 'bomb',
     colores: ['#64748b', '#090d16'],
@@ -269,6 +295,7 @@ export const META = {
   },
   'quien-es-quien': {
     titulo: '¿Sabes quién soy?',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/quienesquien.webp',
     icono: 'whois',
     colores: ['#3b82f6', '#6d28d9'],
@@ -278,6 +305,7 @@ export const META = {
   },
   'rasgos': {
     titulo: 'El paparazzi',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/rasgos.webp',
     icono: 'zoomface',
     colores: ['#f97316', '#9a3412'],
@@ -287,6 +315,7 @@ export const META = {
   },
   'adivina': {
     titulo: 'Luces, Cámara... ¡Música!',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/adivina.webp',
     icono: 'clapperboard',
     colores: ['#ec4899', '#831843'],
@@ -296,6 +325,7 @@ export const META = {
   },
   'cancion': {
     titulo: 'Afina ese oído',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/cancion.webp',
     icono: 'music',
     colores: ['#a3e635', '#15803d'],
@@ -305,6 +335,7 @@ export const META = {
   },
   'frasescelebres': {
     titulo: 'Frases Célebres',
+    duracion: 10, // minutos aproximados de una partida
     imagen: '/covers/frasescelebres.webp',
     icono: 'quote',
     colores: ['#06b6d4', '#164e63'],
@@ -314,6 +345,7 @@ export const META = {
   },
   'colores': {
     titulo: 'La vida en colores',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/colores.webp',
     icono: 'palette',
     colores: ['#f472b6', '#f59e0b'],
@@ -323,6 +355,7 @@ export const META = {
   },
   'siglas': {
     titulo: 'D.E.S.C.I.F.R.A',
+    duracion: 5, // minutos aproximados de una partida
     imagen: '/covers/siglas.webp',
     icono: 'letters',
     colores: ['#6366f1', '#312e81'],
@@ -332,6 +365,7 @@ export const META = {
   },
   'rankings': {
     titulo: 'Ranking oculto',
+    duracion: 20, // minutos aproximados de una partida
     imagen: '/covers/rankings.webp',
     icono: 'podium',
     colores: ['#facc15', '#a16207'],
@@ -341,6 +375,7 @@ export const META = {
   },
   'aproximacion': {
     titulo: 'Aproxímate',
+    duracion: 20, // minutos aproximados de una partida
     imagen: '/covers/aproximacion.webp',
     icono: 'target',
     colores: ['#8b5cf6', '#4c1d95'],
@@ -350,6 +385,7 @@ export const META = {
   },
   'velocidad': {
     titulo: 'Minuto de Infarto',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/velocidad.webp',
     icono: 'stopwatch',
     colores: ['#84cc16', '#365314'],
@@ -359,6 +395,7 @@ export const META = {
   },
   'rapidfire': {
     titulo: 'Rápido y certero',
+    duracion: 20, // minutos aproximados de una partida
     imagen: '/covers/rapidfire.webp',
     icono: 'zap',
     colores: ['#ef4444', '#7f1d1d'],
@@ -368,6 +405,7 @@ export const META = {
   },
   'pistas': {
     titulo: 'No seas des(pista)do',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/pistas.webp',
     icono: 'sleuth',
     colores: ['#475569', '#1e293b'],
@@ -377,6 +415,7 @@ export const META = {
   },
   'ubicacion': {
     titulo: 'Test del viajero',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/ubicacion.webp',
     icono: 'pin',
     colores: ['#10b981', '#064e3b'],
@@ -386,6 +425,7 @@ export const META = {
   },
   'masmenos': {
     titulo: 'Entre dos aguas',
+    duracion: 10, // minutos aproximados de una partida
     imagen: '/covers/masmenos.webp',
     icono: 'scale',
     colores: ['#3b82f6', '#1d4ed8'],
@@ -395,6 +435,7 @@ export const META = {
   },
   'conoce': {
     titulo: 'Conoce a tus amigos',
+    duracion: 25, // minutos aproximados de una partida
     imagen: '/covers/conoce.webp',
     icono: 'heartchat',
     colores: ['#818cf8', '#3730a3'],
@@ -404,6 +445,7 @@ export const META = {
   },
   'ciegas': {
     titulo: 'Top a Ciegas',
+    duracion: 20, // minutos aproximados de una partida
     imagen: '/covers/ciegas.webp',
     icono: 'eyeoff',
     colores: ['#f59e0b', '#92400e'],
@@ -413,6 +455,7 @@ export const META = {
   },
   'unoadiez': {
     titulo: 'Del 1 al 10...',
+    duracion: 20, // minutos aproximados de una partida
     imagen: '/covers/unoadiez.webp',
     icono: 'dial10',
     colores: ['#c084fc', '#9d174d'],
@@ -422,6 +465,7 @@ export const META = {
   },
   'quienmas': {
     titulo: 'Quién es más...',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/quienmas.webp',
     icono: 'users',
     colores: ['#fb7185', '#be123c'],
@@ -431,6 +475,7 @@ export const META = {
   },
   'telepatia': {
     titulo: 'Telepatía',
+    duracion: 10, // minutos aproximados de una partida
     imagen: '/covers/telepatia.webp',
     icono: 'telepathy',
     colores: ['#2dd4bf', '#115e59'],
@@ -440,6 +485,7 @@ export const META = {
   },
   'confianzaciega': {
     titulo: 'Confianza Ciega',
+    duracion: 20, // minutos aproximados de una partida
     imagen: '/covers/confianzaciega.webp',
     icono: 'dice',
     colores: ['#14b8a6', '#0f766e'],
@@ -449,6 +495,7 @@ export const META = {
   },
   'popular': {
     titulo: 'Sigue la moda',
+    duracion: 20, // minutos aproximados de una partida
     imagen: '/covers/popular.webp',
     icono: 'flame',
     colores: ['#fb923c', '#dc2626'],
@@ -458,6 +505,7 @@ export const META = {
   },
   'logos': {
     titulo: 'Logo Mania',
+    duracion: 10, // minutos aproximados de una partida
     imagen: '/covers/logos.webp',
     icono: 'logobadge',
     colores: ['#22d3ee', '#0284c7'],
@@ -467,6 +515,7 @@ export const META = {
   },
   'hipotesis': {
     titulo: 'La Hipótesis Ganadora',
+    duracion: 25, // minutos aproximados de una partida
     imagen: '/covers/hipotesis.webp',
     icono: 'bulb',
     colores: ['#60a5fa', '#1e3a8a'],
@@ -476,6 +525,7 @@ export const META = {
   },
   'trescientosuno': {
     titulo: '301 goles',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/trescientosuno.webp',
     icono: 'goal301',
     colores: ['#34d399', '#047857'],
@@ -485,6 +535,7 @@ export const META = {
   },
   'jugadores': {
     titulo: '¿Con quién he jugado?',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/jugadores.webp',
     icono: 'teammates',
     colores: ['#f97316', '#b91c1c'],
@@ -494,6 +545,7 @@ export const META = {
   },
   'furbo': {
     titulo: 'Furbo!',
+    duracion: 30, // minutos aproximados de una partida
     imagen: '/covers/furbo.webp',
     icono: 'soccer',
     colores: ['#4ade80', '#166534'],
@@ -503,6 +555,7 @@ export const META = {
   },
   'futbolgrid': {
     titulo: 'Fútbol en raya',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/futbolgrid.webp',
     icono: 'futbolgrid',
     colores: ['#a855f7', '#b91c1c'],
@@ -512,6 +565,7 @@ export const META = {
   },
   'jugadas': {
     titulo: '¡Qué jugadón!',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/jugadas.webp',
     icono: 'tacticboard',
     colores: ['#fbbf24', '#b45309'],
@@ -521,6 +575,7 @@ export const META = {
   },
   'cuatroclubes': {
     titulo: 'El club de los cuatro',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/cuatroclubes.webp',
     icono: 'fourshields',
     colores: ['#e879f9', '#9d174d'],
@@ -530,6 +585,7 @@ export const META = {
   },
   'geoquiz': {
     titulo: 'GeoQuiz',
+    duracion: 20, // minutos aproximados de una partida
     imagen: '/covers/geoquiz.webp',
     icono: 'geoquiz',
     colores: ['#0ea5e9', '#047857'],
@@ -539,6 +595,7 @@ export const META = {
   },
   'verdaderofalso': {
     titulo: '¿Verdadero o falso? Exprés',
+    duracion: 3, // minutos aproximados de una partida
     imagen: '/covers/verdaderofalso.webp',
     icono: 'verdaderofalso',
     colores: ['#22c55e', '#be123c'],
@@ -548,6 +605,7 @@ export const META = {
   },
   'pecera': {
     titulo: '¿Qué sobra en la pecera?',
+    duracion: 5, // minutos aproximados de una partida
     imagen: '/covers/pecera.webp',
     icono: 'pecera',
     colores: ['#67e8f9', '#1d4ed8'],
@@ -557,6 +615,7 @@ export const META = {
   },
   'criptohacker': {
     titulo: 'Cripto-Hacker',
+    duracion: 10, // minutos aproximados de una partida
     imagen: '/covers/criptohacker.webp',
     icono: 'criptohacker',
     colores: ['#4ade80', '#020617'],
@@ -566,6 +625,7 @@ export const META = {
   },
   'anomalias': {
     titulo: 'Inspector de Anomalías',
+    duracion: 5, // minutos aproximados de una partida
     imagen: '/covers/anomalias.webp',
     icono: 'anomalias',
     colores: ['#f59e0b', '#27272a'],
@@ -575,6 +635,7 @@ export const META = {
   },
   'trinchera': {
     titulo: 'Trinchera 1914',
+    duracion: 10, // minutos aproximados de una partida
     imagen: '/covers/trinchera.webp',
     icono: 'trinchera',
     colores: ['#a3a380', '#3f2d1c'],
@@ -584,6 +645,7 @@ export const META = {
   },
   'ovejas': {
     titulo: 'Cuenta Ovejas',
+    duracion: 5, // minutos aproximados de una partida
     imagen: '/covers/ovejas.webp',
     icono: 'ovejas',
     colores: ['#86efac', '#15803d'],
@@ -593,6 +655,7 @@ export const META = {
   },
   'segundero': {
     titulo: 'El Segundero Interior',
+    duracion: 3, // minutos aproximados de una partida
     imagen: '/covers/segundero.webp',
     icono: 'segundero',
     colores: ['#38bdf8', '#312e81'],
@@ -602,6 +665,7 @@ export const META = {
   },
   'encadenada': {
     titulo: 'Palabra Encadenada',
+    duracion: 10, // minutos aproximados de una partida
     imagen: '/covers/encadenada.webp',
     icono: 'encadenada',
     colores: ['#fb7185', '#7e22ce'],
@@ -611,6 +675,7 @@ export const META = {
   },
   'mapamentiroso': {
     titulo: 'El Mapa Mentiroso',
+    duracion: 5, // minutos aproximados de una partida
     imagen: '/covers/mapamentiroso.webp',
     icono: 'mapamentiroso',
     colores: ['#fbbf24', '#9a3412'],
@@ -620,6 +685,7 @@ export const META = {
   },
   'ordenalos': {
     titulo: 'Ordénalos sin mirar',
+    duracion: 10, // minutos aproximados de una partida
     imagen: '/covers/ordenalos.webp',
     icono: 'ordenalos',
     colores: ['#2dd4bf', '#1e3a8a'],
@@ -629,6 +695,7 @@ export const META = {
   },
   'excusas': {
     titulo: 'Excusas a Domicilio',
+    duracion: 10, // minutos aproximados de una partida
     imagen: '/covers/excusas.webp',
     icono: 'excusas',
     colores: ['#25d366', '#075e54'],
@@ -638,6 +705,7 @@ export const META = {
   },
   'semaforo': {
     titulo: 'Semáforo Invertido',
+    duracion: 3, // minutos aproximados de una partida
     imagen: '/covers/semaforo.webp',
     icono: 'semaforo',
     colores: ['#ef4444', '#1e293b'],
@@ -647,6 +715,7 @@ export const META = {
   },
   'untrazo': {
     titulo: 'Un Solo Trazo',
+    duracion: 10, // minutos aproximados de una partida
     imagen: '/covers/untrazo.webp',
     icono: 'untrazo',
     colores: ['#f472b6', '#0f766e'],
@@ -656,6 +725,7 @@ export const META = {
   },
   'escondite': {
     titulo: 'El Escondite',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/escondite.webp',
     icono: 'eyeoff',
     colores: ['#14b8a6', '#042f2e'],
@@ -665,6 +735,7 @@ export const META = {
   },
   'ponorden': {
     titulo: 'Ponlo en orden',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/orden.webp',
     icono: 'podium',
     colores: ['#6366f1', '#1e1b4b'],
@@ -674,6 +745,7 @@ export const META = {
   },
   'intruso': {
     titulo: 'El Intruso Histórico',
+    duracion: 10, // minutos aproximados de una partida
     imagen: '/covers/intruso.webp',
     icono: 'search',
     colores: ['#ef4444', '#450a0a'],
@@ -683,6 +755,7 @@ export const META = {
   },
   'lapiz': {
     titulo: '¡Lápiz fuera!',
+    duracion: 20, // minutos aproximados de una partida
     imagen: '/covers/lapiz.webp',
     icono: 'edit',
     colores: ['#f59e0b', '#431407'],
@@ -692,6 +765,7 @@ export const META = {
   },
   'fichajes': {
     titulo: 'Fichaje exprés',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/fichaje.webp',
     icono: 'soccer',
     colores: ['#22c55e', '#052e16'],
@@ -701,6 +775,7 @@ export const META = {
   },
   'eco': {
     titulo: 'Eco Cromático',
+    duracion: 5, // minutos aproximados de una partida
     imagen: '/covers/cromatico.webp',
     icono: 'orb',
     colores: ['#a855f7', '#1e1b4b'],
@@ -710,6 +785,7 @@ export const META = {
   },
   'crimen': {
     titulo: 'Escena del Crimen',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/crimen.webp',
     icono: 'detective',
     colores: ['#475569', '#0f172a'],
@@ -719,6 +795,7 @@ export const META = {
   },
   'escalera': {
     titulo: 'La Escalera',
+    duracion: 10, // minutos aproximados de una partida
     imagen: '/covers/escalera.webp',
     icono: 'podium',
     colores: ['#f59e0b', '#7c2d12'],
@@ -728,6 +805,7 @@ export const META = {
   },
   'cronologia': {
     titulo: 'Línea del Tiempo',
+    duracion: 5, // minutos aproximados de una partida
     imagen: '/covers/lineatiempo.webp',
     icono: 'hourglass',
     colores: ['#0ea5e9', '#1e3a8a'],
@@ -737,6 +815,7 @@ export const META = {
   },
   'cadena': {
     titulo: 'Categorías Encadenadas',
+    duracion: 5, // minutos aproximados de una partida
     imagen: '/covers/categorias.webp',
     icono: 'letters',
     colores: ['#10b981', '#064e3b'],
@@ -746,6 +825,7 @@ export const META = {
   },
   'quiensoy': {
     titulo: '¿Quién Soy? Contrarreloj',
+    duracion: 5, // minutos aproximados de una partida
     imagen: '/covers/quiensoy.webp',
     icono: 'whois',
     colores: ['#ec4899', '#581c87'],
@@ -755,6 +835,7 @@ export const META = {
   },
   'onceperdido': {
     titulo: 'El Once Perdido',
+    duracion: 10, // minutos aproximados de una partida
     imagen: '/covers/onceperdido.webp',
     icono: 'tacticboard',
     colores: ['#22c55e', '#052e16'],
@@ -764,6 +845,7 @@ export const META = {
   },
   'conexion': {
     titulo: 'Conexión',
+    duracion: 10, // minutos aproximados de una partida
     imagen: '/covers/conexion.webp',
     icono: 'teammates',
     colores: ['#6366f1', '#1e1b4b'],
@@ -773,6 +855,7 @@ export const META = {
   },
   'duelofutbol': {
     titulo: 'Más o Menos Fútbol',
+    duracion: 5, // minutos aproximados de una partida
     imagen: '/covers/masomenos.webp',
     icono: 'scale',
     colores: ['#ef4444', '#450a0a'],
@@ -783,6 +866,7 @@ export const META = {
 
   'manager': {
     titulo: 'Manager por un Día',
+    duracion: 10, // minutos aproximados de una partida
     imagen: '/covers/manager.webp',
     icono: 'briefcase',
     colores: ['#0d9488', '#134e4a'],
@@ -792,6 +876,7 @@ export const META = {
   },
   'misterioso': {
     titulo: 'Futbolista Misterioso',
+    duracion: 10, // minutos aproximados de una partida
     imagen: '/covers/futbolistamisterioso.webp',
     icono: 'sleuth',
     colores: ['#eab308', '#713f12'],
@@ -801,6 +886,7 @@ export const META = {
   },
   'patata': {
     titulo: 'La Patata Caliente',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/patata.webp',
     icono: 'bomb',
     colores: ['#f97316', '#7c2d12'],
@@ -810,6 +896,7 @@ export const META = {
   },
   'subasta': {
     titulo: 'Subasta a Ciegas',
+    duracion: 20, // minutos aproximados de una partida
     imagen: '/covers/subasta.webp',
     icono: 'tag',
     colores: ['#d97706', '#422006'],
@@ -819,6 +906,7 @@ export const META = {
   },
   'dragon': {
     titulo: 'El Dragón',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/dragon.webp',
     icono: 'flame',
     colores: ['#dc2626', '#1c1917'],
@@ -828,6 +916,7 @@ export const META = {
   },
   'piramides': {
     titulo: 'Pirámides Futbolísticas',
+    duracion: 25, // minutos aproximados de una partida
     imagen: '/covers/piramides.webp',
     icono: 'soccer',
     colores: ['#16a34a', '#1e3a8a'],
@@ -837,6 +926,7 @@ export const META = {
   },
   'transmision': {
     titulo: 'Última Transmisión',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/transmision.webp',
     icono: 'zap',
     colores: ['#0ea5e9', '#0c0a3e'],
@@ -846,6 +936,7 @@ export const META = {
   },
   'cuatrocuatros': {
     titulo: 'Cuatro Cuatros',
+    duracion: 20, // minutos aproximados de una partida
     imagen: '/covers/cuatrocuatros.webp',
     icono: 'dice',
     colores: ['#b91c1c', '#1c1917'],
@@ -855,6 +946,7 @@ export const META = {
   },
   'garabato': {
     titulo: 'Garabato Encadenado',
+    duracion: 20, // minutos aproximados de una partida
     imagen: '/covers/garabato.webp',
     icono: 'brush',
     colores: ['#fb923c', '#be185d'],
@@ -864,6 +956,7 @@ export const META = {
   },
   'torre': {
     titulo: 'Torre Inestable',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/torre.webp',
     icono: 'tower',
     colores: ['#0d9488', '#1e1b4b'],
@@ -873,6 +966,7 @@ export const META = {
   },
   'minigolf': {
     titulo: 'Minigolf',
+    duracion: 20, // minutos aproximados de una partida
     imagen: '/covers/minigolf.webp',
     icono: 'flagFinish',
     colores: ['#16a34a', '#0c4a6e'],
@@ -882,6 +976,7 @@ export const META = {
   },
   'canicas': {
     titulo: 'Carrera de Canicas',
+    duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/carrera.webp',
     icono: 'car',
     colores: ['#8b5cf6', '#0f766e'],
@@ -891,6 +986,7 @@ export const META = {
   },
   'habilidad': {
     titulo: 'Test de habilidad',
+    duracion: 20, // minutos aproximados de una partida
     imagen: '/covers/testhabilidad.webp',
     icono: 'gamepad',
     colores: ['#7c3aed', '#db2777'],
@@ -900,6 +996,7 @@ export const META = {
   },
   'vialibre': {
     titulo: 'Vía libre',
+    duracion: 10, // minutos aproximados de una partida
     imagen: '/covers/vialibre.webp',
     icono: 'tren',
     colores: ['#16a34a', '#0f766e'],
@@ -909,6 +1006,7 @@ export const META = {
   },
   'rascacielos': {
     titulo: 'Rascacielos infinito',
+    duracion: 5, // minutos aproximados de una partida
     imagen: '/covers/rascacielos.webp',
     icono: 'edificio',
     colores: ['#0ea5e9', '#6d28d9'],
@@ -918,6 +1016,7 @@ export const META = {
   },
   'letras': {
     titulo: 'Letras en cadena',
+    duracion: 3, // minutos aproximados de una partida
     imagen: '/covers/letras.webp',
     icono: 'letras',
     colores: ['#f59e0b', '#b45309'],
@@ -927,6 +1026,7 @@ export const META = {
   },
   'palabra': {
     titulo: 'Palabra oculta',
+    duracion: 10, // minutos aproximados de una partida
     imagen: '/covers/palabra.webp',
     icono: 'palabra',
     colores: ['#16a34a', '#ca8a04'],

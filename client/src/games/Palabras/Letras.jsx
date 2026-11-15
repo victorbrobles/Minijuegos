@@ -8,6 +8,7 @@ import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, useRe
 import { cargarSolo, useCuenta, Cargando, RetoAmigo } from '../Solo/comun.jsx';
 import { sonar, vibrar } from '../../lib/sonido.js';
 import { limpiar } from './Palabra.jsx';
+import { useDiario, TarjetaDiario, FinDiario } from '../../components/DiarioJuego.jsx';
 import './Palabras.css';
 import { useAbrirAyuda } from '../../lib/ayuda.js';
 
@@ -37,10 +38,14 @@ export default function Letras() {
   const puntos = halladas.reduce((s, p) => s + valorDe(p), 0);
   const palabra = elegidas.map((i) => datos.letras[i]).join('');
 
-  const empezar = async () => {
+  // Reto del día: las mismas 7 letras para todos (un solo intento al día)
+  const diario = useDiario(ID);
+  const [esDiario, setEsDiario] = useState(false);
+  const empezar = async (delDia = false) => {
     setFase('cargando'); setError('');
     try {
-      const d = await cargarSolo(ID);
+      const d = delDia === true && diario.estado?.datos ? diario.estado.datos : await cargarSolo(ID);
+      setEsDiario(delDia === true);
       setDatos(d); setOrden(d.letras.map((_, i) => i)); setElegidas([]); setHalladas([]); setAviso(null);
       cuenta.empezar(d.segundos || 120); setFase('jugando');
     } catch (e) { setError(e.message); }
@@ -52,7 +57,10 @@ export default function Letras() {
     });
   }
   useEffect(() => {
-    if (fase === 'fin' && datos) setNuevoRecord(puntos > 0 && registrar(puntos, { palabras: halladas.length }));
+    if (fase === 'fin' && datos) {
+      setNuevoRecord(puntos > 0 && registrar(puntos, { palabras: halladas.length }));
+      if (esDiario) diario.enviar(puntos, `${halladas.length} ${halladas.length === 1 ? 'palabra' : 'palabras'}`);
+    }
   }, [fase]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const avisar = (texto, tipo) => { setAviso({ texto, tipo }); setTimeout(() => setAviso((a) => (a?.texto === texto ? null : a)), 1300); };
@@ -90,8 +98,10 @@ export default function Letras() {
 
   if (fase === 'portada' || fase === 'cargando') {
     if (fase === 'cargando') return <Cargando error={error} onReintentar={empezar} />;
-    return <><PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record}
-      textoRecord={(r) => `${fmt(r.valor)} puntos${r.palabras != null ? ` · ${r.palabras} palabras` : ''}`} /></>;
+    return <><PortadaUnJugador juegoId={ID} onJugar={() => empezar(false)} onAyuda={abrirAyuda} record={record}
+      textoRecord={(r) => `${fmt(r.valor)} puntos${r.palabras != null ? ` · ${r.palabras} palabras` : ''}`}>
+      <TarjetaDiario diario={diario} onJugar={() => empezar(true)} />
+    </PortadaUnJugador></>;
   }
   if (fase === 'fin') {
     const siete = halladas.filter((p) => p.length === 7);
@@ -99,14 +109,14 @@ export default function Letras() {
     return (
       <FinUnJugador icono="trophy" etiqueta="¡Tiempo!" titulo={puntos >= 80 ? '¡Maestro de las letras!' : puntos >= 40 ? '¡Muy bien!' : puntos > 0 ? 'Buen intento' : 'Sin palabras'}
         puntos={fmt(puntos)} unidad="puntos" nuevoRecord={nuevoRecord} record={record} textoRecord={(r) => `${fmt(r.valor)} puntos`}
-        exito={puntos > 0} onRepetir={empezar} onMenu={() => setFase('portada')}>
+        exito={puntos > 0} onRepetir={() => empezar(false)} onMenu={() => { diario.recargar(); setFase('portada'); }}>
         <p className="uj-mini">{halladas.length} palabras de {datos.validas.length} posibles.</p>
         <p className="let-secreta">{siete.length ? '🔎 ¡Encontraste la de 7 letras!' : '🔎 Con las 7 letras:'} <b>{(siete[0] || datos.secretas[0] || '').toUpperCase()}</b>
           {datos.secretas.length > 1 && <small> (y {datos.secretas.length - 1} más)</small>}</p>
         {escapadas.length > 0 && (
           <div className="let-escapadas"><small>Algunas que se te escaparon:</small><p>{escapadas.map((p) => <span key={p}>{p}</span>)}</p></div>
         )}
-        <RetoAmigo juego={ID} puntos={puntos} formato={(x) => `${fmt(x)} puntos`} />
+        {esDiario ? <FinDiario estado={diario.estado} /> : <RetoAmigo juego={ID} puntos={puntos} formato={(x) => `${fmt(x)} puntos`} />}
       </FinUnJugador>
     );
   }
