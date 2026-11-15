@@ -1,7 +1,15 @@
 // client/src/reto/Banner.jsx — acceso al reto diario desde la portada, con su estado para el jugador
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useRetoHoy } from '../pages/RetoDiario.jsx';
+import { useRetoHoy } from './hoy.js';
+// Antes la página del reto se importaba aquí entera; ahora solo su CSS, en el mismo orden (no cambia el aspecto)
+import '../components/Perfil.css';
+import '../components/Identidad.css';
+import '../components/SalonFama.css';
+import '../components/MenuJuego.css';
+import '../components/UnJugador.css';
+import '../games/Solo/Solo.css';
+import '../games/Crimen/Crimen.css';
 import './Reto.css';
 
 export function BannerReto() {

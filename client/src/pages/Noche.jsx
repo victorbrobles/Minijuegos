@@ -11,6 +11,7 @@ import { useRecientes } from '../lib/registros.js';
 import { useNoche, crearNoche, terminarNoche, avanzarNoche, saltarJuego, apuntarAMano, marcador } from '../lib/noche.js';
 import './Estadisticas.css';
 import './Noche.css';
+import { miniatura } from '../lib/portadas.js';
 
 const MEDALLAS = ['🥇', '🥈', '🥉'];
 const norm = (t) => String(t ?? '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
@@ -68,7 +69,7 @@ function Preparar() {
             return (
               <button key={id} type="button" className={dentro ? 'sel' : ''} style={{ '--g1': m.colores[0], '--g2': m.colores[1] }}
                 onClick={() => setJuegos(dentro ? juegos.filter((x) => x !== id) : [...juegos, id])}>
-                {m.imagen ? <img src={m.imagen} alt="" loading="lazy" /> : <Icon name={m.icono} size={26} />}
+                {m.imagen ? <img src={miniatura(m.imagen)} alt="" loading="lazy" /> : <Icon name={m.icono} size={26} />}
                 <span>{m.titulo}</span>{dentro && <i>{juegos.indexOf(id) + 1}</i>}
               </button>
             );

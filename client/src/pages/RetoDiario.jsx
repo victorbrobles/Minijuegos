@@ -14,6 +14,7 @@ import { Ahorcado, Anagramas } from '../reto/Palabras.jsx';
 import { Stroop, Reflejos, Parejas } from '../reto/Habilidad.jsx';
 import { Aproximar, Seleccionar } from '../reto/Varios.jsx';
 import Crimen from '../games/Crimen/Crimen.jsx';
+import { useRetoHoy } from '../reto/hoy.js';
 import '../components/UnJugador.css';
 import '../reto/Reto.css';
 
@@ -30,16 +31,7 @@ export function tiempoRestante(ms) {
 }
 export const fechaLarga = (f) => new Date(`${f}T12:00:00`).toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
 
-/** Reto de hoy y el intento del jugador (para la portada y la página). */
-export function useRetoHoy() {
-  const [reto, setReto] = useState(null);
-  const [error, setError] = useState('');
-  const cargar = () => fetch(`/api/reto/hoy?jugador=${encodeURIComponent(nombreCompleto())}`)
-    .then((r) => r.json()).then((d) => (d.success ? setReto(d) : setError(d.error || 'No se ha podido cargar el reto.')))
-    .catch(() => setError('No se ha podido cargar el reto.'));
-  useEffect(() => { cargar(); }, []);
-  return [reto, setReto, error, cargar];
-}
+export { useRetoHoy };
 
 function Resultado({ reto, intento }) {
   const ok = intento.estado === 'superado';

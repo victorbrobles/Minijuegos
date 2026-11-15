@@ -11,6 +11,7 @@ import { metaDe } from '../games/meta.js';
 import './Estadisticas.css';
 import './Noche.css';
 import './Grupos.css';
+import { miniatura } from '../lib/portadas.js';
 
 const MEDALLAS = ['🥇', '🥈', '🥉'];
 const fecha = (t) => new Date(t).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
@@ -115,7 +116,7 @@ export function GrupoDetalle() {
       {d.juegos.length > 0 && (
         <section className="est-tarjeta">
           <h2>🎮 A lo que más jugáis</h2>
-          <div className="grp-juegos">{d.juegos.map((j) => <Link key={j.juego} to={`/juego/${j.juego}`} style={{ '--g1': metaDe(j.juego).colores[0], '--g2': metaDe(j.juego).colores[1] }}>{metaDe(j.juego).imagen && <img src={metaDe(j.juego).imagen} alt="" />}<b>{metaDe(j.juego).titulo}</b><small>{j.n} {j.n === 1 ? 'partida' : 'partidas'}</small></Link>)}</div>
+          <div className="grp-juegos">{d.juegos.map((j) => <Link key={j.juego} to={`/juego/${j.juego}`} style={{ '--g1': metaDe(j.juego).colores[0], '--g2': metaDe(j.juego).colores[1] }}>{metaDe(j.juego).imagen && <img src={miniatura(metaDe(j.juego).imagen)} alt="" loading="lazy" />}<b>{metaDe(j.juego).titulo}</b><small>{j.n} {j.n === 1 ? 'partida' : 'partidas'}</small></Link>)}</div>
         </section>
       )}
       {d.noches.length > 0 && (

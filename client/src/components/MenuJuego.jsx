@@ -6,7 +6,6 @@
 import { RecientesJugadores } from './Recientes.jsx';
 import SalonFama from './SalonFama.jsx';
 import { nombreIdentidad } from '../lib/identidad.js';
-import QRCode from 'qrcode';
 import { enlaceSala, usarInvitacion } from '../lib/invitacion.js';
 import { useEffect, useRef, useState } from 'react';
 import Icon from './Icon.jsx';
@@ -323,7 +322,8 @@ export function QRSala({ codigo }) {
   useEffect(() => {
     if (!abierto) return undefined;
     let vivo = true;
-    QRCode.toDataURL(enlace, { margin: 1, width: 360, color: { dark: '#0f172a', light: '#ffffff' } }).then((u) => { if (vivo) setImg(u); }).catch(() => {});
+    // La librería del QR se descarga solo al abrirlo
+    import('qrcode').then(({ default: QRCode }) => QRCode.toDataURL(enlace, { margin: 1, width: 360, color: { dark: '#0f172a', light: '#ffffff' } })).then((u) => { if (vivo) setImg(u); }).catch(() => {});
     return () => { vivo = false; };
   }, [abierto, enlace]);
   const compartir = async () => {

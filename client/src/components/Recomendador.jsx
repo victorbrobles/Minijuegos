@@ -11,6 +11,7 @@ import { metaDe } from '../games/meta.js';
 import { LIMITES } from '../games/limites.js';
 import { nombreCompleto } from '../lib/identidad.js';
 import './Recomendador.css';
+import { miniatura } from '../lib/portadas.js';
 
 const norm = (t) => String(t ?? '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9ñ\s]/g, ' ').replace(/\s+/g, ' ').trim();
 
@@ -131,7 +132,7 @@ function Resultados({ lista, tanda, setTanda, onReiniciar, onCerrar }) {
             <li key={r.id} style={{ '--i': i }}>
               <Link to={`/juego/${r.id}`} className="rec-juego" onClick={onCerrar}>
                 <span className="rec-img" style={{ background: `linear-gradient(135deg, ${m.colores?.[0] || '#7c3aed'}, ${m.colores?.[1] || '#312e81'})` }}>
-                  {m.imagen && <img src={m.imagen} alt="" loading="lazy" />}
+                  {m.imagen && <img src={miniatura(m.imagen)} alt="" loading="lazy" decoding="async" onError={(e) => { if (!e.currentTarget.dataset.grande) { e.currentTarget.dataset.grande = '1'; e.currentTarget.src = m.imagen; } }} />}
                 </span>
                 <span className="rec-txt">
                   <b>{tanda === 0 && i === 0 ? '⭐ ' : ''}{m.titulo}</b>

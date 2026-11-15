@@ -1,6 +1,7 @@
 // server/index.js
 
 import express from 'express';
+import compression from 'compression';
 import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -101,6 +102,8 @@ const PORT = process.env.PORT || 3001;
 const trustProxy = process.env.TRUST_PROXY;
 app.set('trust proxy', trustProxy === undefined ? 1 : Number.isNaN(Number(trustProxy)) ? trustProxy : Number(trustProxy));
 
+// Comprime las respuestas (JS, CSS, JSON…): la web pesa unas 4 veces menos al cargar
+app.use(compression());
 app.use(cors());
 // Los dibujos de «Garabato Encadenado» pesan más que una acción normal
 app.use('/api/garabato', express.json({ limit: '300kb' }));
@@ -136,8 +139,15 @@ app.use(basicAuth({
   realm: 'Acceso privado'
 }));
 
-// 3. Servir frontend compilado
-app.use(express.static(path.join(__dirname, '../client/dist')));
+// 3. Servir frontend compilado. Los archivos de /assets llevan una huella en el nombre (cambian de nombre en cada
+// versión), así que el navegador puede guardarlos un año. Las portadas, una semana. index.html, siempre fresco.
+app.use(express.static(path.join(__dirname, '../client/dist'), {
+  setHeaders: (res, ruta) => {
+    if (/[\\/]assets[\\/]/.test(ruta)) res.set('Cache-Control', 'public, max-age=31536000, immutable');
+    else if (/[\\/]covers[\\/]/.test(ruta)) res.set('Cache-Control', 'public, max-age=604800');
+    else if (/\.html$/.test(ruta)) res.set('Cache-Control', 'no-cache');
+  }
+}));
 
 app.use('/api/admin', adminRouter);
 app.use('/api/games', gamesRouter);
@@ -222,6 +232,7 @@ app.use('/api/escondite', esconditeRoutes);
 
 // 5. Redirección para React Router (Single Page Application)
 app.get('*', (req, res) => {
+  res.set('Cache-Control', 'no-cache');
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
 

@@ -6,6 +6,8 @@ import Icon from './Icon.jsx';
 import { metaDe } from '../games/meta.js';
 import { LIMITES, textoJugadores } from '../games/limites.js';
 import { useFavoritos, alternarFavorito } from '../lib/favoritos.js';
+import { miniatura } from '../lib/portadas.js';
+import { precargarJuego } from '../games/registry.js';
 
 export default function GameCard({ game }) {
   const [mostrarDesc, setMostrarDesc] = useState(false);
@@ -15,6 +17,7 @@ export default function GameCard({ game }) {
   const favorito = useFavoritos().includes(game.id);
 
   const descripcion = m?.descripcion || game?.description || 'Sin descripción disponible.';
+  const [usarMini, setUsarMini] = useState(true);
   const tienePortada = Boolean(m?.imagen) && !imgFallida;
 
   // Ventana de ayuda: Esc para cerrar y bloqueo del scroll de fondo
@@ -62,6 +65,9 @@ export default function GameCard({ game }) {
       className={`gc${tienePortada ? ' con-portada' : ''}`}
       style={{ '--g1': m.colores[0], '--g2': m.colores[1], cursor: 'pointer' }}
       onClick={entrarAlJuego}
+      onPointerDown={() => precargarJuego(game.id)}
+      onPointerEnter={(e) => { if (e.pointerType === 'mouse') precargarJuego(game.id); }}
+      onFocus={() => precargarJuego(game.id)}
       role="button"
       tabIndex={0}
       aria-label={m.titulo || game.name}
@@ -101,12 +107,15 @@ export default function GameCard({ game }) {
       {tienePortada ? (
         /* Modo Portada Ilustrada (la imagen ya contiene el título del juego integrado) */
         <img
-          src={m.imagen}
+          src={usarMini ? miniatura(m.imagen) : m.imagen}
           alt={m.titulo || game.name}
           className="gc-cover-img"
           loading="lazy"
+          decoding="async"
+          width="320"
+          height="320"
           draggable="false"
-          onError={() => setImgFallida(true)}
+          onError={() => (usarMini ? setUsarMini(false) : setImgFallida(true))}
         />
       ) : (
         /* Modo Icono + Degradado Único */
