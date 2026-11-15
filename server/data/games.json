@@ -568,5 +568,11 @@
     "name": "Carrera de Canicas",
     "description": "Carreras de canicas en 3D: inclina el móvil para guiar la tuya por circuitos con atajos, turbos y objetos contra los rivales. Cada canica tiene su habilidad. ¡El primero en llegar a meta gana!",
     "isNew": true
+  },
+  {
+    "id": "habilidad",
+    "name": "Test de habilidad",
+    "description": "30 minijuegos de habilidad en 3D de un par de minutos: cruza la carretera, apila bloques, memoriza luces, frena al límite, clava cuchillos… El anfitrión elige cuáles y en qué orden; gana el más hábil.",
+    "isNew": true
   }
 ]
