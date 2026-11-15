@@ -17,20 +17,20 @@ export const CATEGORIAS_PORTADA = [
 // ⭐ Top 15 del Creador: en este orden (el primero es el nº 1). Para cambiarlo, mueve o sustituye ids aquí.
 export const TOP_CREADOR = [
   'lobos',          // 1 · Luna de Sangre
-  'quien-es-quien', // 2 · ¿Sabes quién soy?
-  'traiciones',     // 3 · Traiciones
-  'habilidad',      // 4 · Test de habilidad
-  'conecta',        // 5 · Conexiones ocultas
-  'furbo',          // 6 · Furbo!
-  'buscaminas',     // 7 · Cuidado que explota
-  'canicas',        // 8 · Carrera de Canicas
-  'ubicacion',      // 9 · Test del viajero
-  'cancion',        // 10 · Afina ese oído
-  'musavanzado',    // 11 · Mus Avanzado
-  'director',       // 12 · Director Deportivo
-  'garabato',       // 13 · Garabato Encadenado
-  'colores',        // 14 · La vida en colores
-  'trescientosuno', // 15 · 301 goles
+  'habilidad', // 2 · ¿Sabes quién soy?
+  'cuentas',     // 3 · Traiciones
+  'buscaminas',      // 4 · Test de habilidad
+  'conoce',        // 5 · Conexiones ocultas
+  'trescientosuno',          // 6 · Furbo!
+  'quien-es-quien',     // 7 · Cuidado que explota
+  'conecta',        // 8 · Carrera de Canicas
+  'traiciones',      // 9 · Test del viajero
+  'musavanzado',        // 10 · Afina ese oído
+  'colores',    // 11 · Mus Avanzado
+  'furbo',       // 12 · Director Deportivo
+  'adivina',       // 13 · Garabato Encadenado
+  'fundadores',        // 14 · La vida en colores
+  'ponorden', // 15 · 301 goles
 ];
 
 // Cada uno de los minijuegos tiene un icono único y una combinación de colores (degradado) única
@@ -882,7 +882,6 @@ export const META = {
     descripcion: "¿Quién ha jugado en más clubes? ¿Quién es mayor? ¿Quién vale más? Dos futbolistas, una pregunta y diez segundos. El primer fallo acaba tu racha.",
     categorias: ['un_jugador']
   },
-
   'manager': {
     titulo: 'Manager por un Día',
     duracion: 10, // minutos aproximados de una partida
