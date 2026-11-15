@@ -556,5 +556,11 @@
     "name": "Torre Inestable",
     "description": "Construid una torre pieza a pieza en 3D: elige dónde dejar la tuya y cómo girarla, y suéltala. Las piezas son cada vez más pequeñas y raras… y quien la derribe, pierde.",
     "isNew": true
+  },
+  {
+    "id": "minigolf",
+    "name": "Minigolf",
+    "description": "Minigolf en 3D con 200 hoyos originales: rampas, molinos, puentes sin barandilla, agua, arena y saltos. Online todos golpean a la vez; gana quien termine el recorrido con menos golpes.",
+    "isNew": true
   }
 ]

@@ -868,6 +868,14 @@ export const META = {
     etiquetas: 'torre construir apilar piezas equilibrio pulso precisión física 3d derribar bloques online',
     descripcion: "Construid una torre pieza a pieza en 3D: elige dónde dejar la tuya y cómo girarla, y suéltala. Las piezas son cada vez más pequeñas y raras… y quien la derribe, pierde.",
     categorias: ['estrategia', 'dos_jugadores']
+  },
+  'minigolf': {
+    titulo: 'Minigolf',
+    icono: 'flagFinish',
+    colores: ['#16a34a', '#0c4a6e'],
+    etiquetas: 'minigolf golf hoyos bola golpes 3d rampas molinos obstáculos puntería deporte online',
+    descripcion: "Minigolf en 3D con 200 hoyos originales: rampas, molinos, puentes sin barandilla, agua, arena y saltos. Online todos golpean a la vez; gana quien termine el recorrido con menos golpes.",
+    categorias: ['chill', 'dos_jugadores']
   }
 };
 
