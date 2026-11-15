@@ -891,6 +891,7 @@ export const META = {
   },
   'habilidad': {
     titulo: 'Test de habilidad',
+    imagen: '/covers/testhabilidad.webp',
     icono: 'gamepad',
     colores: ['#7c3aed', '#db2777'],
     etiquetas: 'habilidad minijuegos reflejos punteria memoria precision ritmo 3d test retos cortos online',
