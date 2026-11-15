@@ -27,27 +27,51 @@ function Selector({ config, onCambiar, onCerrar }) {
   const n = config.n;
   const alternar = (id) => setLista((l) => (l.includes(id) ? l.filter((x) => x !== id) : l.length >= n ? l : [...l, id]));
   const guardar = () => { onCambiar({ juegos: lista }); onCerrar(); };
+  const lleno = lista.length >= n;
   return (
-    <div className="hb-selector" role="dialog" aria-label="Elegir minijuegos">
-      <div className="hb-selector-cab">
-        <div><b>Elige {n} minijuegos en orden</b><small>{lista.length}/{n} elegidos · los que falten saldrán al azar</small></div>
-        <button type="button" onClick={guardar}>✓ Listo</button>
-      </div>
-      <div className="hb-selector-acc">
-        <button type="button" onClick={() => setLista(E.completarLista([], n))}>🎲 Al azar</button>
-        <button type="button" onClick={() => setLista(E.completarLista(lista, n))}>➕ Completar</button>
-        <button type="button" onClick={() => setLista([])}>🧹 Vaciar</button>
-      </div>
-      <div className="hb-selector-grid">
-        {MINIJUEGOS.map((j) => {
-          const k = lista.indexOf(j.id);
-          return (
-            <button key={j.id} type="button" className={k >= 0 ? 'sel' : ''} onClick={() => alternar(j.id)}>
-              {k >= 0 && <i>{k + 1}</i>}
-              <span>{j.emoji}</span><b>{j.nombre}</b><small>{j.como.split('.')[0]}.</small>
-            </button>
-          );
-        })}
+    <div className="rg-modal-fondo hb-sel-fondo" onClick={guardar}>
+      <div className="hb-sel" role="dialog" aria-label="Elegir minijuegos" onClick={(e) => e.stopPropagation()}>
+        <header className="hb-sel-cab">
+          <div className="hb-sel-titulo">
+            <div>
+              <small>Test de habilidad</small>
+              <h3>Elige {n} minijuegos</h3>
+            </div>
+            <button type="button" className="hb-sel-cerrar" onClick={guardar} aria-label="Cerrar"><Icon name="close" size={18} /></button>
+          </div>
+          <div className="hb-sel-huecos" aria-label="Orden elegido">
+            {Array.from({ length: n }, (_, i) => {
+              const id = lista[i];
+              return id
+                ? <button key={i} type="button" className="lleno" title={`Quitar ${POR_ID[id].nombre}`} onClick={() => alternar(id)}><i>{i + 1}</i>{POR_ID[id].emoji}</button>
+                : <span key={i}><i>{i + 1}</i>?</span>;
+            })}
+          </div>
+          <p>{lista.length}/{n} elegidos · tócalos en el orden en que se jugarán{lista.length < n ? ' · los huecos saldrán al azar' : ''}</p>
+        </header>
+        <div className="hb-sel-acc">
+          <button type="button" onClick={() => setLista(E.completarLista([], n))}>🎲 Al azar</button>
+          <button type="button" onClick={() => setLista(E.completarLista(lista, n))} disabled={lleno}>➕ Completar</button>
+          <button type="button" onClick={() => setLista([])} disabled={!lista.length}>🧹 Vaciar</button>
+        </div>
+        <div className="hb-sel-grid">
+          {MINIJUEGOS.map((j) => {
+            const k = lista.indexOf(j.id);
+            return (
+              <button key={j.id} type="button" className={k >= 0 ? 'sel' : lleno ? 'apagado' : ''} onClick={() => alternar(j.id)} aria-pressed={k >= 0}>
+                {k >= 0 && <i>{k + 1}</i>}
+                <span>{j.emoji}</span>
+                <b>{j.nombre}</b>
+                <small>{j.como.split('.')[0]}.</small>
+              </button>
+            );
+          })}
+        </div>
+        <footer className="hb-sel-pie">
+          <button type="button" className="big full qq-btn-principal" onClick={guardar}>
+            <Icon name="check" size={20} /> {lista.length ? `Listo (${lista.length}/${n})` : 'Listo: todos al azar'}
+          </button>
+        </footer>
       </div>
     </div>
   );
