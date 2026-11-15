@@ -888,6 +888,14 @@ export const META = {
     etiquetas: 'canicas carrera 3d giroscopio inclinar atajos turbos objetos velocidad circuito online',
     descripcion: "Carreras de canicas en 3D: inclina el móvil para guiar la tuya por circuitos con atajos, turbos y objetos contra los rivales. Cada canica tiene su habilidad. ¡El primero en llegar a meta gana!",
     categorias: ['habilidad', 'favoritos']
+  },
+  'habilidad': {
+    titulo: 'Test de habilidad',
+    icono: 'gamepad',
+    colores: ['#7c3aed', '#db2777'],
+    etiquetas: 'habilidad minijuegos reflejos punteria memoria precision ritmo 3d test retos cortos online',
+    descripcion: "30 minijuegos de habilidad en 3D de un par de minutos: cruza la carretera, apila bloques, memoriza luces, frena al límite, clava cuchillos… El anfitrión elige cuáles y en qué orden; gana el más hábil.",
+    categorias: ['habilidad', 'favoritos']
   }
 };
 

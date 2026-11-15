@@ -8,6 +8,9 @@ import PerfilJugador from './pages/PerfilJugador.jsx';
 import Noche from './pages/Noche.jsx';
 import Tele from './pages/Tele.jsx';
 import Grupos, { GrupoDetalle } from './pages/Grupos.jsx';
+import { lazy, Suspense } from 'react';
+// Solo en desarrollo: probar los minijuegos del Test de habilidad uno a uno
+const PruebaHabilidad = import.meta.env.DEV ? lazy(() => import('./games/Habilidad/Prueba.jsx')) : null;
 import { PuertaIdentidad } from './components/Identidad.jsx';
 import AvisoLogros from './components/AvisoLogros.jsx';
 
@@ -27,6 +30,7 @@ export default function App() {
           <Route path="/creditos" element={<Creditos />} />
           <Route path="/jugador/:nombre" element={<PerfilJugador />} />
           <Route path="/noche" element={<Noche />} />
+          {PruebaHabilidad && <Route path="/prueba-habilidad/:id" element={<Suspense fallback={null}><PruebaHabilidad /></Suspense>} />}
           <Route path="/grupos" element={<Grupos />} />
           <Route path="/grupo/:codigo" element={<GrupoDetalle />} />
           <Route path="*" element={<p>Página no encontrada.</p>} />

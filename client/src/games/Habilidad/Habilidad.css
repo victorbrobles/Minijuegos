@@ -1,0 +1,66 @@
+/* client/src/games/Habilidad/Habilidad.css */
+.hb-caja { position: relative; border-radius: 22px; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); user-select: none; -webkit-user-select: none; background: #0f172a; }
+.hb-lienzo { width: 100%; height: min(68vh, 600px); touch-action: none; }
+.hb-lienzo canvas { display: block; }
+.hb-hud { position: absolute; top: 0.55rem; left: 0.55rem; right: 0.55rem; display: flex; justify-content: space-between; gap: 0.4rem; pointer-events: none; }
+.hb-hud > span { padding: 0.3rem 0.65rem; border-radius: 999px; background: rgba(15, 23, 42, 0.72); color: #ffffff; font-size: 0.8rem; font-weight: 800; max-width: 60%; }
+.hb-hud > span:last-child { text-align: right; }
+.hb-msg { position: absolute; top: 28%; left: 50%; transform: translateX(-50%); padding: 0.5rem 1rem; border-radius: 16px; background: rgba(255, 255, 255, 0.94); color: #0f172a; font-size: 1.15rem; font-weight: 900; white-space: nowrap; pointer-events: none; animation: hbMsg 0.25s ease-out; }
+.hb-msg.mal { background: #fee2e2; color: #991b1b; }
+@keyframes hbMsg { from { transform: translateX(-50%) scale(0.7); opacity: 0; } }
+.hb-pista { position: absolute; bottom: 0.6rem; left: 50%; transform: translateX(-50%); margin: 0; padding: 0.3rem 0.7rem; border-radius: 999px; background: rgba(15, 23, 42, 0.6); color: #ffffff; font-size: 0.72rem; font-weight: 700; white-space: nowrap; pointer-events: none; }
+.hb-botones { position: absolute; left: 0.6rem; right: 0.6rem; bottom: 0.6rem; display: flex; gap: 0.45rem; }
+.hb-boton { flex: 1; min-height: 3.6rem; border: none; border-radius: 18px; background: rgba(255, 255, 255, 0.9); color: #0f172a; font: inherit; font-size: 1.3rem; font-weight: 900; cursor: pointer; touch-action: manipulation; box-shadow: 0 4px 0 rgba(15, 23, 42, 0.35); }
+.hb-boton.ancho { flex: 2; font-size: 1rem; }
+.hb-boton:active { transform: translateY(3px); box-shadow: none; }
+.hb-carriles, .hb-colores { position: absolute; left: 0.6rem; right: 0.6rem; bottom: 0.6rem; display: flex; gap: 0.45rem; }
+.hb-carriles button, .hb-colores button { flex: 1; height: 4.2rem; border: 3px solid rgba(255, 255, 255, 0.8); border-radius: 18px; cursor: pointer; touch-action: manipulation; }
+.hb-carriles button:active, .hb-colores button:active { transform: scale(0.94); }
+.hb-colores { bottom: 2.6rem; }
+.hb-pregunta { position: absolute; left: 0.6rem; right: 0.6rem; bottom: 0.6rem; padding: 0.8rem; border-radius: 18px; background: rgba(255, 255, 255, 0.95); text-align: center; }
+.hb-pregunta p { margin: 0 0 0.6rem; color: #0f172a; font-weight: 900; font-size: 1.05rem; }
+.hb-pregunta div { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; }
+.hb-pregunta button { padding: 0.7rem 0; border: none; border-radius: 14px; background: #0ea5e9; color: #ffffff; font: inherit; font-size: 1.4rem; font-weight: 900; cursor: pointer; }
+.hb-intro { display: grid; justify-items: center; gap: 0.5rem; padding: 1.4rem 1rem; border-radius: 22px; background: #ffffff; color: #0f172a; text-align: center; min-height: min(60vh, 520px); align-content: center; }
+.hb-intro h2 { margin: 0; font-size: 1.6rem; }
+.hb-intro-emoji { font-size: 4rem; }
+.hb-como { margin: 0; max-width: 28rem; color: #334155; font-weight: 600; line-height: 1.45; }
+.hb-meta { margin: 0; color: #64748b; font-size: 0.8rem; font-weight: 700; }
+.hb-quien { margin: 0; padding: 0.3rem 0.8rem; border-radius: 999px; background: #ede9fe; color: #5b21b6; font-weight: 700; }
+.hb-intro .pzp-boton { margin-top: 0.6rem; }
+.hb-cuenta span { font-size: 6rem; font-weight: 900; color: #7c3aed; animation: hbMsg 0.4s ease-out; }
+.hb-cuenta p { margin: 0; font-weight: 800; color: #64748b; }
+.hb-barra { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; padding: 0.4rem 0.5rem; border-radius: 999px; background: rgba(255, 255, 255, 0.92); color: #0f172a; font-weight: 800; font-size: 0.88rem; }
+.hb-barra span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hb-barra button { display: grid; place-items: center; width: 2rem; height: 2rem; padding: 0; border: none; border-radius: 50%; background: #f1f5f9; color: #334155; cursor: pointer; }
+.hb-barra small { color: #7c3aed; font-weight: 900; }
+.hb-espera { text-align: center; }
+.hb-espera > span { font-size: 2.6rem; }
+.hb-hechos { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.35rem; margin: 0.6rem 0; }
+.hb-hechos span { padding: 0.3rem 0.7rem; border-radius: 999px; background: #f1f5f9; color: #475569; font-weight: 800; font-size: 0.82rem; }
+.hb-hechos span.si { background: #dcfce7; color: #166534; }
+.hb-tabla { list-style: none; margin: 0 0 0.8rem; padding: 0; display: grid; gap: 0.35rem; }
+.hb-tabla li { display: grid; grid-template-columns: 2.2rem 1fr auto auto 2.4rem; align-items: center; gap: 0.5rem; padding: 0.55rem 0.7rem; border-radius: 14px; background: #f8fafc; color: #0f172a; box-shadow: inset 4px 0 0 var(--c); }
+.hb-tabla li b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hb-tabla li small { color: #475569; font-weight: 700; }
+.hb-tabla li em { font-style: normal; font-weight: 900; color: #7c3aed; }
+.hb-tabla li strong { text-align: right; font-size: 1.1rem; }
+.hb-tabla li.primero { background: #fef3c7; }
+.hb-elegidos { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-bottom: 0.5rem; }
+.hb-elegidos span { padding: 0.25rem 0.6rem; border-radius: 999px; background: #ede9fe; color: #4c1d95; font-size: 0.78rem; font-weight: 800; }
+.hb-elegidos small { color: #64748b; font-weight: 700; }
+.hb-abrir { width: 100%; padding: 0.8rem; border: none; border-radius: 16px; background: #7c3aed; color: #ffffff; font: inherit; font-weight: 900; cursor: pointer; }
+.hb-selector { position: fixed; inset: 0; z-index: 300; display: flex; flex-direction: column; background: #f8fafc; }
+.hb-selector-cab { display: flex; align-items: center; gap: 0.6rem; padding: 0.9rem 1rem; background: #ffffff; box-shadow: 0 2px 10px rgba(15, 23, 42, 0.1); }
+.hb-selector-cab div { flex: 1; display: grid; color: #0f172a; }
+.hb-selector-cab small { color: #64748b; font-weight: 600; }
+.hb-selector-cab button { padding: 0.6rem 1rem; border: none; border-radius: 14px; background: #16a34a; color: #ffffff; font: inherit; font-weight: 900; cursor: pointer; }
+.hb-selector-acc { display: flex; gap: 0.4rem; padding: 0.6rem 1rem; }
+.hb-selector-acc button { padding: 0.45rem 0.8rem; border: 2px solid #e2e8f0; border-radius: 999px; background: #ffffff; color: #334155; font: inherit; font-size: 0.82rem; font-weight: 800; cursor: pointer; }
+.hb-selector-grid { flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.5rem; padding: 0 1rem 1.5rem; align-content: start; }
+.hb-selector-grid button { position: relative; display: grid; justify-items: center; gap: 0.2rem; padding: 0.7rem 0.5rem; border: 3px solid transparent; border-radius: 18px; background: #ffffff; color: #0f172a; font: inherit; text-align: center; cursor: pointer; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08); }
+.hb-selector-grid button span { font-size: 2rem; }
+.hb-selector-grid button small { color: #64748b; font-size: 0.7rem; font-weight: 600; line-height: 1.25; }
+.hb-selector-grid button.sel { border-color: #7c3aed; background: #f5f3ff; }
+.hb-selector-grid button i { position: absolute; top: 0.4rem; left: 0.4rem; display: grid; place-items: center; width: 1.6rem; height: 1.6rem; border-radius: 50%; background: #7c3aed; color: #ffffff; font-style: normal; font-weight: 900; }
+.game-shell:has(.hb-lienzo) .rx-barra, .game-shell:has(.hb-lienzo) .snd.en-juego { display: none; }

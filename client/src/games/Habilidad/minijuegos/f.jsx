@@ -171,7 +171,7 @@ function Cuchillos({ semilla, alTerminar }) {
     };
     preparar();
     const listo = cuchillo(); listo.position.set(0, -2.6, 0); scene.add(listo);
-    camera.position.set(0, 0.8, 9); camera.lookAt(0, 0.6, 0);
+    camera.position.set(0, 1.2, 12.5); camera.lookAt(0, 1.1, 0);
     return {
       toque() { if (!st.fin && !st.vuelo) { st.vuelo = { y: -2.6 }; sonar('toque', { minimo: 0 }); } },
       frame(dt) {

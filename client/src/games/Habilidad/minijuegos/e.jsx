@@ -10,13 +10,13 @@ function Stroop({ semilla, alTerminar }) {
   const ref = useRef(null); const ctl = useRef({}); const [hud, setHud] = useState({ pts: 0, t: 30 }); const [msg, setMsg] = useState(null);
   useEscena(ref, (ctx) => {
     const { scene, camera } = ctx; const r = rng(semilla);
-    const cubo = crea.caja(4.6, 2.2, 0.6, 0xf8fafc); scene.add(cubo);
-    const cartel = marcador({ tam: 1.6, fondo: null, ancho: 800 }); cartel.position.set(0, 0, 0.5); scene.add(cartel);
+    const cubo = crea.caja(4.2, 2, 0.6, 0xf8fafc); scene.add(cubo);
+    const cartel = marcador({ tam: 1.0, fondo: null, ancho: 800 }); cartel.position.set(0, 0, 0.5); cartel.material.depthTest = false; cartel.renderOrder = 5; scene.add(cartel);
     const st = { t: 0, pts: 0, palabra: 0, tinta: 1, fin: false };
     const nueva = () => { st.palabra = r.entero(0, 3); do { st.tinta = r.entero(0, 3); } while (r() < 0.75 && st.tinta === st.palabra); cartel.poner(TINTAS[st.palabra][0], TINTAS[st.tinta][1]); cubo.rotation.y = r.entre(-0.3, 0.3); };
     nueva();
     ctl.current.elegir = (k) => { if (st.fin) return; if (k === st.tinta) { st.pts++; sonar('tic', { minimo: 0, vibrar: false }); } else { st.pts = Math.max(0, st.pts - 1); sonar('fallo', { vibrar: false }); vibrar(40); setMsg('✗'); setTimeout(() => setMsg(null), 250); } nueva(); };
-    camera.position.set(0, 0.5, 7); camera.lookAt(0, 0, 0);
+    camera.position.set(0, 0.5, 8); camera.lookAt(0, 0, 0);
     return {
       frame(dt, t) {
         if (st.fin) return; st.t += dt; cubo.position.y = Math.sin(t * 2) * 0.15; cartel.position.y = cubo.position.y;
