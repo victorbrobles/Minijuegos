@@ -67,3 +67,19 @@
 @media (max-width: 360px) {
   .hub-head .hub-logo { display: none; }
 }
+
+/* ⭐ Top 15 del Creador: número de cada juego en el ranking */
+.top-sub { margin: 0.15rem 0 0; font-size: 0.82rem; font-weight: 700; color: rgba(255, 255, 255, 0.65); }
+.home-carousel-item.top-item { position: relative; container-type: inline-size; }
+.home-carousel-item > .top-num { position: absolute; z-index: 5; left: 8px; top: calc(100cqw - 50px); display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%;
+  background: linear-gradient(145deg, #7c3aed, #4c1d95); color: #ffffff; font-size: 1.25rem; font-weight: 900; line-height: 1;
+  border: 3px solid #ffffff; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45); pointer-events: none; font-variant-numeric: tabular-nums; }
+.home-carousel-item > .top-num.podio { width: 48px; height: 48px; top: calc(100cqw - 56px); font-size: 1.45rem; }
+.top-num.p1 { background: linear-gradient(145deg, #fde047, #ca8a04); color: #422006; }
+.top-num.p2 { background: linear-gradient(145deg, #f1f5f9, #94a3b8); color: #1e293b; }
+.top-num.p3 { background: linear-gradient(145deg, #fdba74, #b45309); color: #431407; }
+.top-num.p1::before { content: '👑'; position: absolute; top: -17px; font-size: 1rem; transform: rotate(-12deg); }
+@media (max-width: 680px) {
+  .home-carousel-item > .top-num { width: 34px; height: 34px; top: calc(100cqw - 41px); left: 6px; font-size: 1.02rem; border-width: 2px; }
+  .home-carousel-item > .top-num.podio { width: 40px; height: 40px; top: calc(100cqw - 47px); font-size: 1.2rem; }
+}

@@ -17,11 +17,11 @@ import { useFiltros, cuantosFiltros, cumpleFiltros, PanelFiltros } from '../comp
 import { BotonAjustes } from '../components/Ajustes.jsx';
 import Icon from '../components/Icon.jsx';
 import AdminPanel from '../components/AdminPanel.jsx';
-import { metaDe, CATEGORIAS_PORTADA as CATEGORIAS_EXPORTADAS } from '../games/meta.js';
+import { metaDe, TOP_CREADOR, CATEGORIAS_PORTADA as CATEGORIAS_EXPORTADAS } from '../games/meta.js';
 
 // Lista de categorías por defecto de respaldo
 const CATEGORIAS_DEFAULT = [
-  { id: 'favoritos', titulo: '⭐ Favoritos del Creador', desc: 'Los juegos más destacados, adictivos y jugados' },
+  { id: 'favoritos', titulo: '⭐ Top 15 del Creador', desc: 'Los juegos más destacados, adictivos y jugados' },
   { id: 'prueba', titulo: '🧠 Para ponerte a prueba', desc: 'Retos de ingenio, cultura, velocidad y memoria' },
   { id: 'estrategia', titulo: '♟️ Estratégicos y de deducción', desc: 'Roles ocultos, engaños, gestión de cartas y táctica' },
   { id: 'cartas', titulo: '🃏 Juegos de cartas', desc: 'Estrategia, faroles, apuestas y duelos con cartas' },
@@ -149,6 +149,7 @@ function FilaCarrusel({ cat, juegos }) {
       <div className="home-categoria-header">
         <div>
           <h2 className="home-categoria-titulo">{cat.titulo}</h2>
+          {cat.id === 'favoritos' && <p className="top-sub">Mi ranking personal, del 1 al 15</p>}
         </div>
         <div className="home-carousel-nav">
           <button
@@ -184,9 +185,10 @@ function FilaCarrusel({ cat, juegos }) {
         {juegos.map((g, i) => (
           <li
             key={`${cat.id}-${g.id}`}
-            className="home-carousel-item"
+            className={`home-carousel-item${cat.id === 'favoritos' ? ' top-item' : ''}`}
             style={{ '--i': Math.min(i, 8) }}
           >
+            {cat.id === 'favoritos' && <span className={`top-num${i < 3 ? ` podio p${i + 1}` : ''}`} aria-label={`Número ${i + 1}`}>{i + 1}</span>}
             <GameCard game={g} />
           </li>
         ))}
@@ -284,6 +286,8 @@ export default function Home() {
       });
     });
 
+    // El top del creador va en su orden
+    if (grupos.favoritos) grupos.favoritos.sort((a, b) => TOP_CREADOR.indexOf(a.id) - TOP_CREADOR.indexOf(b.id));
     return grupos;
   }, [games]);
 

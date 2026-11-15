@@ -2,7 +2,7 @@
 
 // Categorías temáticas de la portada
 export const CATEGORIAS_PORTADA = [
-  { id: 'favoritos', titulo: '⭐ Favoritos del Creador', desc: 'Los juegos más destacados, adictivos y jugados' },
+  { id: 'favoritos', titulo: '⭐ Top 15 del Creador', desc: 'Los juegos más destacados, adictivos y jugados' },
   { id: 'prueba', titulo: '🧠 Para ponerte a prueba', desc: 'Retos de ingenio, cultura, velocidad y memoria' },
   { id: 'estrategia', titulo: '♟️ Estratégicos y de deducción', desc: 'Roles ocultos, engaños, gestión de cartas y táctica' },
   { id: 'cartas', titulo: '🃏 Juegos de cartas', desc: 'Estrategia, faroles, apuestas y duelos con cartas' },
@@ -12,6 +12,25 @@ export const CATEGORIAS_PORTADA = [
   { id: 'famosos', titulo: '🌟 De famosos y cultura pop', desc: 'Celebridades, cine, música, frases y televisión' },
   { id: 'dos_jugadores', titulo: '👥 Para dos jugadores', desc: 'Ideales para competir o cooperar frente a frente' },
   { id: 'un_jugador', titulo: '🎯 Para un jugador', desc: 'Retos en solitario: lógica, memoria, estrategia y reflejos' }
+];
+
+// ⭐ Top 15 del Creador: en este orden (el primero es el nº 1). Para cambiarlo, mueve o sustituye ids aquí.
+export const TOP_CREADOR = [
+  'lobos',          // 1 · Luna de Sangre
+  'quien-es-quien', // 2 · ¿Sabes quién soy?
+  'traiciones',     // 3 · Traiciones
+  'habilidad',      // 4 · Test de habilidad
+  'conecta',        // 5 · Conexiones ocultas
+  'furbo',          // 6 · Furbo!
+  'buscaminas',     // 7 · Cuidado que explota
+  'canicas',        // 8 · Carrera de Canicas
+  'ubicacion',      // 9 · Test del viajero
+  'cancion',        // 10 · Afina ese oído
+  'musavanzado',    // 11 · Mus Avanzado
+  'director',       // 12 · Director Deportivo
+  'garabato',       // 13 · Garabato Encadenado
+  'colores',        // 14 · La vida en colores
+  'trescientosuno', // 15 · 301 goles
 ];
 
 // Cada uno de los minijuegos tiene un icono único y una combinación de colores (degradado) única
@@ -44,7 +63,7 @@ export const META = {
     colores: ['#d97706', '#451a03'],
     etiquetas: 'traidores caravana desierto sabotaje mafia deduccion engano coartada votar roles online',
     descripcion: 'Una caravana cruza el desierto hacia el Oasis, dos bandos: buenos y traidores. Los buenos deben completar misiones para llegar al objetivo, los traidores deben sabotear y matar a todos sin ser descubiertos.',
-    categorias: ['estrategia', 'favoritos']
+    categorias: ['estrategia']
   },
   'fundadores': {
     titulo: 'Fundadores',
@@ -104,7 +123,7 @@ export const META = {
     colores: ['#38bdf8', '#0c4a6e'],
     etiquetas: 'futbol fichajes mercado presupuesto plantilla manager liga tactica pujas',
     descripcion: 'Dirige un club con presupuesto limitado: puja en secreto por futbolistas reales, monta una plantilla equilibrada, elige táctica y compite en una liga simulada. No basta con fichar a los mejores.',
-    categorias: ['futbol', 'favoritos']
+    categorias: ['futbol']
   },
   'musavanzado': {
     titulo: 'Mus Avanzado',
@@ -114,7 +133,7 @@ export const META = {
     colores: ['#10b981', '#022c22'],
     etiquetas: 'mus avanzado cartas baraja española faroles apuestas fichas desafiar categorias comodines parejas poker',
     descripcion: 'Mus de faroles con baraja pactada: comodines, bombas o espejos si todos aceptan. Cada ronda es una categoría distinta (la grande, parejas, escalera, colores…) y en cada una se anuncia, se sube, se pasa o se desafía. Individual o por parejas.',
-    categorias: ['cartas', 'favoritos']
+    categorias: ['cartas']
   },
   'datosobra': {
     titulo: 'El Dato que Sobra',
@@ -261,7 +280,7 @@ export const META = {
     colores: ['#dc2626', '#1e1b4b'],
     etiquetas: 'hombres lobo roles pueblo noche narrador mafia',
     descripcion: 'Lobos contra el pueblo, con multitud de rol y caos infinito. El pueblo trata de destapar a los lobos, mientras que los lobos van matando al pueblo en secreto. ¡Descúbrelos antes de ser cazado!',
-    categorias: ['estrategia', 'favoritos']
+    categorias: ['estrategia']
   },
   'impostor': {
     titulo: 'Miente como puedas',
@@ -281,7 +300,7 @@ export const META = {
     colores: ['#0284c7', '#1e3a8a'],
     etiquetas: 'conexiones grupos 16 elementos palabras relacionar',
     descripcion: 'Encuentra las 4 conexiones que existen entre los 16 elementos del tablero (de 4 en 4). Descubre qué conexión les une y gana puntos extra.',
-    categorias: ['prueba', 'favoritos']
+    categorias: ['prueba']
   },
   'buscaminas': {
     titulo: 'Cuidado que explota',
@@ -291,7 +310,7 @@ export const META = {
     colores: ['#64748b', '#090d16'],
     etiquetas: 'minas bombas casillas explota tablero suerte',
     descripcion: 'Un tablero, 10 respuestas correctas y 5 bombas. Elige una respuesta y evita topar con una de las bombas para no quedar eliminado de la ronda.',
-    categorias: ['prueba', 'favoritos']
+    categorias: ['prueba']
   },
   'quien-es-quien': {
     titulo: '¿Sabes quién soy?',
@@ -301,7 +320,7 @@ export const META = {
     colores: ['#3b82f6', '#6d28d9'],
     etiquetas: 'personajes adivinar descartar rasgos clasico tablero preguntas',
     descripcion: 'Una categoría conjunta, un elemento a adivinar para cada uno de los jugadores. Cada jugador sabe el elemento de todos los demás menos el suyo. Adivina tu elemento antes que nadie haciendo preguntas de \'sí\' o \'no\'.',
-    categorias: ['famosos', 'favoritos']
+    categorias: ['famosos']
   },
   'rasgos': {
     titulo: 'El paparazzi',
@@ -331,7 +350,7 @@ export const META = {
     colores: ['#a3e635', '#15803d'],
     etiquetas: 'musica canciones escuchar oido volumen adivinar tema',
     descripcion: 'Adivina una canción mediante su reproducción. La canción aumenta progresivamente de volumen, cuanto antes aciertes, más puntos podrás conseguir.',
-    categorias: ['famosos', 'favoritos']
+    categorias: ['famosos']
   },
   'frasescelebres': {
     titulo: 'Frases Célebres',
@@ -351,7 +370,7 @@ export const META = {
     colores: ['#f472b6', '#f59e0b'],
     etiquetas: 'colores marcas personajes logos combinacion',
     descripcion: 'Algo que todo el mundo conoce, once colores disponibles. Adivina la combinación de colores presente en cada elemento.',
-    categorias: ['chill', 'favoritos']
+    categorias: ['chill']
   },
   'siglas': {
     titulo: 'D.E.S.C.I.F.R.A',
@@ -421,7 +440,7 @@ export const META = {
     colores: ['#10b981', '#064e3b'],
     etiquetas: 'mapa lugares monumentos geografia mundo foto',
     descripcion: 'Sitúa en el mapa del mundo un lugar o monumento icónico que solo verás unos segundos. Cada kilómetro de error suma un punto y gana quien menos acumule. En un solo dispositivo, además, deja señuelos para engañar al siguiente jugador.',
-    categorias: ['chill', 'favoritos']
+    categorias: ['chill']
   },
   'masmenos': {
     titulo: 'Entre dos aguas',
@@ -531,7 +550,7 @@ export const META = {
     colores: ['#34d399', '#047857'],
     etiquetas: 'futbol goles clubes goleadores asistencias partidos adivinar seleccion balon',
     descripcion: 'Un club, un número objetivo y una estadística elegida (goles, asistencias o partidos). Di jugadores de ese club hasta llegar al número objetivo de la estadística elegida. Sé el primero en llegar a 0 o el que más cerca quede, pero ojo, no te pases de la cifra.',
-    categorias: ['futbol', 'favoritos']
+    categorias: ['futbol']
   },
   'jugadores': {
     titulo: '¿Con quién he jugado?',
@@ -551,7 +570,7 @@ export const META = {
     colores: ['#4ade80', '#166534'],
     etiquetas: 'futbol jugadores quiz clubes adivinar seleccion balon',
     descripcion: 'Un verdadero quiz de fútbol dividido en diversas fases. Calienta con el vestuario, ponte a punto con la quiniela o cierra el partido con los penaltis. No te desenganches de los primeros puestos y llega con opciones a la final.',
-    categorias: ['futbol', 'favoritos']
+    categorias: ['futbol']
   },
   'futbolgrid': {
     titulo: 'Fútbol en raya',
@@ -982,7 +1001,7 @@ export const META = {
     colores: ['#8b5cf6', '#0f766e'],
     etiquetas: 'canicas carrera 3d giroscopio inclinar atajos turbos objetos velocidad circuito online',
     descripcion: "Carreras de canicas en 3D: inclina el móvil para guiar la tuya por circuitos con atajos, turbos y objetos contra los rivales. Cada canica tiene su habilidad. ¡El primero en llegar a meta gana!",
-    categorias: ['habilidad', 'favoritos']
+    categorias: ['habilidad']
   },
   'habilidad': {
     titulo: 'Test de habilidad',
@@ -992,7 +1011,7 @@ export const META = {
     colores: ['#7c3aed', '#db2777'],
     etiquetas: 'habilidad minijuegos reflejos punteria memoria precision ritmo 3d test retos cortos online',
     descripcion: "30 minijuegos de habilidad en 3D de un par de minutos: cruza la carretera, apila bloques, memoriza luces, frena al límite, clava cuchillos… El anfitrión elige cuáles y en qué orden; gana el más hábil.",
-    categorias: ['habilidad', 'favoritos']
+    categorias: ['habilidad']
   },
   'vialibre': {
     titulo: 'Vía libre',
@@ -1035,6 +1054,9 @@ export const META = {
     categorias: ['un_jugador']
   }
 };
+
+// Los del top entran en la categoría «favoritos» (no hace falta ponerla a mano en cada juego)
+TOP_CREADOR.forEach((id) => { if (META[id]) META[id].categorias = [...(META[id].categorias || []), 'favoritos']; });
 
 export const META_POR_DEFECTO = {
   icono: 'star',
