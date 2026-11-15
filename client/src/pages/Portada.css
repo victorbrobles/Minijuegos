@@ -69,7 +69,6 @@
 }
 
 /* ⭐ Top 15 del Creador: número de cada juego en el ranking */
-.top-sub { margin: 0.15rem 0 0; font-size: 0.82rem; font-weight: 700; color: rgba(255, 255, 255, 0.65); }
 .home-carousel-item.top-item { position: relative; container-type: inline-size; }
 .home-carousel-item > .top-num { position: absolute; z-index: 5; left: 8px; top: calc(100cqw - 50px); display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%;
   background: linear-gradient(145deg, #7c3aed, #4c1d95); color: #ffffff; font-size: 1.25rem; font-weight: 900; line-height: 1;
@@ -82,4 +81,84 @@
 @media (max-width: 680px) {
   .home-carousel-item > .top-num { width: 34px; height: 34px; top: calc(100cqw - 41px); left: 6px; font-size: 1.02rem; border-width: 2px; }
   .home-carousel-item > .top-num.podio { width: 40px; height: 40px; top: calc(100cqw - 47px); font-size: 1.2rem; }
+}
+
+/* =====================================================================
+   Secciones de juegos: sin panel (menos cajas dentro de cajas), cabecera con
+   el emoji en un cuadradito del color de la categoría y su descripción.
+   El Top 15 sí va en un panel dorado para destacar.
+   ===================================================================== */
+.home-categoria-bloque { --a1: #8b5cf6; --a2: #ec4899; }
+.cat-favoritos { --a1: #fbbf24; --a2: #f97316; }
+.cat-seguir { --a1: #818cf8; --a2: #6366f1; }
+.cat-favs { --a1: #fb7185; --a2: #e11d48; }
+.cat-prueba { --a1: #a78bfa; --a2: #7c3aed; }
+.cat-estrategia { --a1: #38bdf8; --a2: #4f46e5; }
+.cat-cartas { --a1: #34d399; --a2: #0f766e; }
+.cat-chill { --a1: #f9a8d4; --a2: #fb923c; }
+.cat-futbol { --a1: #4ade80; --a2: #15803d; }
+.cat-habilidad { --a1: #fdba74; --a2: #ea580c; }
+.cat-famosos { --a1: #f472b6; --a2: #a21caf; }
+.cat-dos_jugadores { --a1: #22d3ee; --a2: #2563eb; }
+.cat-un_jugador { --a1: #f87171; --a2: #c2410c; }
+
+.home-view .home-categoria-bloque { margin: 0 0 2rem; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; }
+.home-view .home-categoria-header { align-items: center; margin-bottom: 0.9rem; }
+.hc-cab { display: flex; align-items: center; gap: 0.75rem; min-width: 0; }
+.hc-ico { display: grid; place-items: center; flex: none; width: 2.75rem; height: 2.75rem; border-radius: 15px; font-size: 1.45rem; line-height: 1;
+  background: linear-gradient(145deg, var(--a1), var(--a2)); box-shadow: 0 4px 0 rgba(8, 10, 22, 0.35), inset 0 1px 1px rgba(255, 255, 255, 0.45); transform: rotate(-4deg); }
+.hc-textos { min-width: 0; }
+.home-view .home-categoria-titulo { font-size: 1.4rem; line-height: 1.1; }
+.home-view .home-categoria-titulo::after { display: none; }
+.home-view .home-categoria-desc { margin: 0.2rem 0 0; color: rgba(226, 232, 240, 0.62); font-size: 0.84rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.home-view .home-carousel-track { margin-inline: 0; padding-inline: 0; scroll-padding-inline: 0; padding-top: 0.35rem; }
+
+/* «Ver todos» */
+.hc-todos { display: inline-flex; align-items: center; gap: 0.35rem; height: 36px; padding: 0 0.85rem; border: 1.5px solid rgba(255, 255, 255, 0.2); border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07); color: #f1f5f9; font: inherit; font-size: 0.82rem; font-weight: 800; cursor: pointer; white-space: nowrap; transition: background 0.15s; }
+.hc-todos:hover { background: rgba(255, 255, 255, 0.16); }
+.hc-todos b { display: grid; place-items: center; min-width: 1.4rem; height: 1.4rem; padding: 0 0.3rem; border-radius: 999px; background: linear-gradient(145deg, var(--a1), var(--a2)); color: #ffffff; font-size: 0.72rem; }
+/* Abierta: todas las tarjetas en rejilla */
+.home-view .home-carousel-track.en-rejilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 1.1rem 1rem; overflow: visible; cursor: default; }
+.home-view .home-carousel-track.en-rejilla .home-carousel-item { min-width: 0; }
+
+/* Top 15: panel dorado */
+.home-view .cat-favoritos { padding: 1.15rem 1.15rem 0.6rem; border-radius: 28px; border: 1.5px solid rgba(251, 191, 36, 0.35);
+  background: radial-gradient(120% 90% at 0% 0%, rgba(251, 191, 36, 0.2), transparent 60%), linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02));
+  box-shadow: 0 6px 0 rgba(8, 10, 22, 0.38), 0 0 40px -12px rgba(251, 191, 36, 0.35); }
+.home-view .cat-favoritos .home-carousel-track { margin-inline: -1.15rem; padding-inline: 1.15rem; scroll-padding-inline: 1.15rem; }
+.home-view .cat-favoritos .home-categoria-titulo { background: linear-gradient(90deg, #fde68a, #fbbf24); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* Seguir jugando: tarjetas más pequeñas (es solo un atajo) */
+.home-view .compacta .home-carousel-item { flex-basis: calc((100% - 5rem) / 6); min-width: 128px; }
+.home-view .compacta .gc-name, .home-view .compacta .gc-wrap > :last-child { font-size: 0.86rem; }
+.home-view .compacta .gc-wrap { gap: 0.6rem; }
+.home-view .compacta .gc-fav-btn, .home-view .compacta .gc-info-btn { display: none; }
+
+/* Corazón e «i» más discretos: no tapan el título de las portadas */
+.home-view .gc .gc-fav-btn, .home-view .gc .gc-info-btn, .home-view .gc .gc-info-btn:hover { width: 28px; height: 28px; background: rgba(15, 23, 42, 0.62); border: 1px solid rgba(255, 255, 255, 0.25); color: #ffffff; box-shadow: none; opacity: 0.85; transition: opacity 0.15s, transform 0.15s; }
+.home-view .gc-fav-btn.activo { background: rgba(255, 255, 255, 0.92); opacity: 1; }
+.home-view .gc .gc-info-btn .gc-info-btn-text { color: #ffffff; font-size: 0.95rem; }
+.home-view .gc .gc-fav-btn.activo { background: rgba(255, 255, 255, 0.92); }
+@media (hover: hover) {
+  .home-view .gc-wrap .gc-fav-btn:not(.activo), .home-view .gc-wrap .gc-info-btn { opacity: 0; }
+  .home-view .gc-wrap:hover .gc-fav-btn, .home-view .gc-wrap:hover .gc-info-btn, .home-view .gc-wrap :focus-visible { opacity: 1; }
+}
+
+@media (max-width: 680px) {
+  .home-view .home-categoria-bloque { margin-bottom: 1.6rem; }
+  .home-view .home-categoria-header .carousel-nav-btn { display: none; }
+  .hc-ico { width: 2.4rem; height: 2.4rem; border-radius: 13px; font-size: 1.25rem; }
+  .home-view .home-categoria-titulo { font-size: 1.18rem; }
+  .home-view .home-categoria-desc { font-size: 0.76rem; }
+  .hc-todos { height: 32px; padding: 0 0.45rem 0 0.35rem; font-size: 0.95rem; }
+  .hc-todos .hc-todos-txt { display: none; }
+  .hc-todos::after { content: '›'; font-weight: 900; }
+  .hc-todos[aria-expanded="true"]::after { content: none; }
+  /* Las filas llegan hasta el borde de la pantalla: se ve que siguen */
+  .home-view .home-carousel-track { margin-inline: -1rem; padding-inline: 1rem; scroll-padding-inline: 1rem; }
+  .home-view .home-carousel-track.en-rejilla { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.9rem 0.75rem; margin-inline: 0; padding-inline: 0; }
+  .home-view .cat-favoritos { padding: 0.95rem 0.85rem 0.4rem; border-radius: 24px; }
+  .home-view .cat-favoritos .home-carousel-track { margin-inline: -0.85rem; padding-inline: 0.85rem; scroll-padding-inline: 0.85rem; }
+  .home-view .compacta .home-carousel-item { flex-basis: 30%; min-width: 104px; }
 }

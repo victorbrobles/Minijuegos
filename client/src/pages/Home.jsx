@@ -75,8 +75,12 @@ const coincideCategoria = (catDeseada, catPortada) => {
 };
 
 // Componente carrusel horizontal con soporte de rueda de ratón, arrastre y flechas
-function FilaCarrusel({ cat, juegos }) {
+function FilaCarrusel({ cat, juegos, compacta = false }) {
   const trackRef = useRef(null);
+  const [rejilla, setRejilla] = useState(false);
+  // «⭐ Top 15 del Creador» → emoji en su cuadradito de color y el texto como título
+  const [, emoji = '', texto = cat.titulo] = cat.titulo.match(/^(\S+)\s+(.*)$/) || [];
+  const desc = cat.id === 'favoritos' ? 'Mi ranking personal, del 1 al 15' : cat.desc;
   const [arrastrando, setArrastrando] = useState(false);
   const isDown = useRef(false);
   const startX = useRef(0);
@@ -145,37 +149,33 @@ function FilaCarrusel({ cat, juegos }) {
   };
 
   return (
-    <section className="home-categoria-bloque">
+    <section className={`home-categoria-bloque cat-${cat.id}${compacta ? ' compacta' : ''}${rejilla ? ' abierta' : ''}`}>
       <div className="home-categoria-header">
-        <div>
-          <h2 className="home-categoria-titulo">{cat.titulo}</h2>
-          {cat.id === 'favoritos' && <p className="top-sub">Mi ranking personal, del 1 al 15</p>}
+        <div className="hc-cab">
+          {emoji && <span className="hc-ico" aria-hidden="true">{emoji}</span>}
+          <div className="hc-textos">
+            <h2 className="home-categoria-titulo">{texto}</h2>
+            {desc && <p className="home-categoria-desc">{desc}</p>}
+          </div>
         </div>
         <div className="home-carousel-nav">
-          <button
-            type="button"
-            className="carousel-nav-btn"
-            onClick={() => deslizar('izq')}
-            aria-label="Anterior"
-            title="Anterior"
-          >
-            ‹
-          </button>
-          <button
-            type="button"
-            className="carousel-nav-btn"
-            onClick={() => deslizar('der')}
-            aria-label="Siguiente"
-            title="Siguiente"
-          >
-            ›
-          </button>
+          {juegos.length > 4 && (
+            <button type="button" className="hc-todos" onClick={() => setRejilla((v) => !v)} aria-expanded={rejilla}>
+              {rejilla ? <span>Ver menos</span> : <><span className="hc-todos-txt">Ver todos</span><b>{juegos.length}</b></>}
+            </button>
+          )}
+          {!rejilla && (
+            <>
+              <button type="button" className="carousel-nav-btn" onClick={() => deslizar('izq')} aria-label="Anterior" title="Anterior">‹</button>
+              <button type="button" className="carousel-nav-btn" onClick={() => deslizar('der')} aria-label="Siguiente" title="Siguiente">›</button>
+            </>
+          )}
         </div>
       </div>
 
       <ul
         ref={trackRef}
-        className={`home-carousel-track ${arrastrando ? 'arrastrando' : ''}`}
+        className={`home-carousel-track ${arrastrando ? 'arrastrando' : ''}${rejilla ? ' en-rejilla' : ''}`}
         onMouseDown={onMouseDown}
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUpOrLeave}
@@ -391,7 +391,7 @@ export default function Home() {
             const favs = deIds(favoritos); const recientes = deIds(jugados);
             return (
               <>
-                {recientes.length > 0 && <FilaCarrusel cat={{ id: 'seguir', titulo: '🕹️ Seguir jugando' }} juegos={recientes} />}
+                {recientes.length > 0 && <FilaCarrusel cat={{ id: 'seguir', titulo: '🕹️ Seguir jugando' }} juegos={recientes} compacta />}
                 {favs.length > 0 && <FilaCarrusel cat={{ id: 'favs', titulo: '❤️ Tus favoritos' }} juegos={favs} />}
               </>
             );
