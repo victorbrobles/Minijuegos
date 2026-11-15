@@ -101,7 +101,8 @@ export const LIMITES = {
   transmision: { min: 2, max: 6 },
   cuatrocuatros: { min: 2, max: 8 },
   garabato: { min: 3, max: 10 },
-  torre: { min: 2, max: 6 }
+  torre: { min: 2, max: 6 },
+  minigolf: { min: 1, max: 8 }
 };
 
 function base(id) {

@@ -79,6 +79,7 @@ import CuatroCuatros from './CuatroCuatros/CuatroCuatros.jsx';
 import Garabato from './Garabato/Garabato.jsx';
 // Los juegos en 3D se cargan aparte (three.js pesa mucho)
 const Torre = lazy(() => import('./Torre/Torre.jsx'));
+const Minigolf = lazy(() => import('./Minigolf/Minigolf.jsx'));
 import Patata from './Patata/Patata.jsx';
 import Subasta from './Subasta/Subasta.jsx';
 import Dragon from './Dragon/Dragon.jsx';
@@ -189,7 +190,8 @@ const registry = {
   'transmision': Transmision,
   'cuatrocuatros': CuatroCuatros,
   'garabato': Garabato,
-  'torre': Torre
+  'torre': Torre,
+  'minigolf': Minigolf
 };
 
 export default registry;
