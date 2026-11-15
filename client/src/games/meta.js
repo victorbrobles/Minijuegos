@@ -900,6 +900,7 @@ export const META = {
   },
   'vialibre': {
     titulo: 'Vía libre',
+    imagen: '/covers/vialibre.webp',
     icono: 'tren',
     colores: ['#16a34a', '#0f766e'],
     etiquetas: 'tren vias puzle girar piezas estacion 3d logica rapidez niveles un jugador solitario',
@@ -908,6 +909,7 @@ export const META = {
   },
   'rascacielos': {
     titulo: 'Rascacielos infinito',
+    imagen: '/covers/rascacielos.webp',
     icono: 'edificio',
     colores: ['#0ea5e9', '#6d28d9'],
     etiquetas: 'apilar plantas edificio torre 3d habilidad punteria reflejos record infinito un jugador solitario',
@@ -916,6 +918,7 @@ export const META = {
   },
   'letras': {
     titulo: 'Letras en cadena',
+    imagen: '/covers/letras.webp',
     icono: 'letras',
     colores: ['#f59e0b', '#b45309'],
     etiquetas: 'palabras letras anagramas formar diccionario vocabulario contrarreloj un jugador solitario',
@@ -924,6 +927,7 @@ export const META = {
   },
   'palabra': {
     titulo: 'Palabra a palabra',
+    imagen: '/covers/palabra.webp',
     icono: 'palabra',
     colores: ['#16a34a', '#ca8a04'],
     etiquetas: 'palabra oculta adivinar letras colores intentos diccionario vocabulario muerte subita un jugador solitario',
