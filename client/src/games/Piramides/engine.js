@@ -2,8 +2,9 @@
 // «Pirámides futbolísticas»: motor puro (salas online en server/routes/piramides.js y modo un dispositivo).
 // Cada jugador tiene una categoría secreta («Ha ganado la Champions», «Es zurdo»…) que puede consultar cuando quiera.
 // Turno de un jugador:
-//   1. Si quiere, intenta adivinar la categoría de UN rival (solo hay un intento por rival en toda la partida):
-//      acierto → el rival queda eliminado y sumas 2; fallo → −1 y todos ven que no era esa.
+//   1. Si quiere, intenta adivinar la categoría de un rival (solo hay un intento por rival en toda la partida):
+//      acierto → el rival queda eliminado, sumas 2 y puedes seguir intentándolo con otro rival;
+//      fallo → −1, todos ven que no era esa y se acaba la ronda de adivinar.
 //   2. Cada rival vivo le dice un futbolista; él lo apunta y dice (honradamente) si encaja o no en SU categoría.
 //      Cuando ha apuntado uno de cada rival, pasa el turno.
 // Final: el último en pie suma 2·N (N = jugadores al empezar), el siguiente 2·N − 1, y así sucesivamente.
@@ -43,6 +44,7 @@ export function visto(p, id) {
 
 function empezarTurno(p) {
   p.dichos = [];
+  p.racha = 0;
   // Si no puede adivinar a nadie, va directo a apuntar futbolistas
   p.paso = objetivos(p, actual(p)).length ? 'adivinar' : 'apuntar';
 }
@@ -69,7 +71,9 @@ export function adivinar(p, id, objetivo, catId) {
   p.ultimo = { tipo: 'adivina', de: a.id, a: o.id, categoria: c.texto, acierta };
   p.log.unshift(p.ultimo);
   if (enJuego(p).length <= 1) { terminar(p); return { ok: true, acierta }; }
-  p.paso = 'apuntar';
+  // Con un acierto se puede seguir adivinando a otros rivales; con un fallo se pasa a los futbolistas
+  p.paso = acierta && objetivos(p, a).length ? 'adivinar' : 'apuntar';
+  p.racha = acierta ? (p.racha || 0) + 1 : 0;
   return { ok: true, acierta };
 }
 
@@ -196,6 +200,6 @@ export function vistaDe(p, id) {
     yo: yo ? { id: yo.id, categoria: categoria(yo.categoria).texto, listo: yo.listo, eliminado: yo.eliminado } : null,
     // Un solo móvil: quien tiene el turno puede consultar su categoría (manteniendo pulsado)
     categoriaTurno: id === -1 && act ? categoria(act.categoria).texto : null,
-    ultimo: p.ultimo, log: p.log.slice(0, 8), fin: p.fin
+    ultimo: p.ultimo, racha: p.racha || 0, log: p.log.slice(0, 8), fin: p.fin
   };
 }

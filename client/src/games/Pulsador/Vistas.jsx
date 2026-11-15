@@ -385,7 +385,7 @@ export function PantallaJuego({ v, juego, t0, offset = 0, enviar, onSalir, local
     abajo = (
       <Pulsador onPulsar={() => enviar('pulsar')} deshabilitado={reloj.cuenta > 0 || bloqueado}
         texto={reloj.cuenta > 0 ? `Empieza en ${Math.ceil(reloj.cuenta / 1000)}…` : juego.textoPulsador}
-        motivo={bloqueado ? 'Has fallado: quedas fuera de esta ronda.' : local ? 'Quien lo sepa, que pulse y diga quién es.' : null} />
+        motivo={bloqueado ? 'Has fallado: quedas fuera de esta ronda.' : local ? (juego.ayudaPulsar || 'Quien lo sepa, que pulse y diga quién es.') : null} />
     );
   } else if (local && p.jugadorId == null) {
     abajo = <QuienPulso v={v} reloj={reloj} onElegir={(id) => enviar('identificar', { id })} onCancelar={() => enviar('cancelar')} />;

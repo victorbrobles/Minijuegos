@@ -290,11 +290,35 @@ export function CabeceraSala({ codigo, onVolver, onAyuda, texto }) {
   );
 }
 
+// Modo tele: es para abrirlo en OTRA pantalla (tele, portátil). Se explica y se da el enlace para copiarlo.
+function AvisoTele({ codigo, onCerrar }) {
+  const ruta = `/tele/${window.location.pathname.split('/')[2]}/${codigo}`;
+  const url = `${window.location.origin}${ruta}`;
+  const [copiado, setCopiado] = useState(false);
+  const copiar = () => { navigator.clipboard?.writeText(url).then(() => { setCopiado(true); setTimeout(() => setCopiado(false), 2000); }).catch(() => {}); };
+  return (
+    <div className="qq-tele-fondo" role="dialog" aria-label="Modo tele" onClick={onCerrar}>
+      <div className="qq-tele-caja" onClick={(e) => e.stopPropagation()}>
+        <span className="qq-tele-ico">📺</span>
+        <h3>Modo tele</h3>
+        <p>Abre esta dirección en la <b>tele</b> o en un <b>portátil</b>: verán el código, el QR para entrar, el marcador en grande y vuestras reacciones. Vosotros seguís jugando con el móvil.</p>
+        <code>{url}</code>
+        <div className="qq-tele-botones">
+          <button type="button" onClick={copiar}>{copiado ? '¡Copiado!' : '📋 Copiar dirección'}</button>
+          <a href={ruta} target="_blank" rel="noreferrer" onClick={onCerrar}>Abrir en otra pestaña</a>
+        </div>
+        <button type="button" className="qq-tele-cerrar" onClick={onCerrar}>Cerrar</button>
+      </div>
+    </div>
+  );
+}
+
 // QR (y enlace) para entrar en la sala desde otro móvil sin teclear el código.
 export function QRSala({ codigo }) {
   const [abierto, setAbierto] = useState(false);
   const [img, setImg] = useState('');
   const [hecho, setHecho] = useState(false);
+  const [tele, setTele] = useState(false);
   const enlace = enlaceSala(codigo);
   useEffect(() => {
     if (!abierto) return undefined;
@@ -313,10 +337,11 @@ export function QRSala({ codigo }) {
       <div className="qq-qr-botones">
         <button type="button" onClick={() => setAbierto(!abierto)}>📱 {abierto ? 'Ocultar QR' : 'Mostrar QR'}</button>
         <button type="button" onClick={compartir}>🔗 {hecho ? '¡Enlace copiado!' : 'Compartir enlace'}</button>
-        <a className="qq-qr-tele" href={`/tele/${window.location.pathname.split('/')[2]}/${codigo}`} target="_blank" rel="noreferrer">📺 Modo tele</a>
+        <button type="button" className="qq-qr-tele" onClick={() => setTele(true)}>📺 Modo tele</button>
       </div>
       {abierto && (img ? <img src={img} alt={`QR para unirse a la sala ${codigo}`} /> : <p className="hint small">Generando QR…</p>)}
       {abierto && <p className="hint small">Escanéalo con la cámara del móvil para entrar directamente.</p>}
+      {tele && <AvisoTele codigo={codigo} onCerrar={() => setTele(false)} />}
     </div>
   );
 }

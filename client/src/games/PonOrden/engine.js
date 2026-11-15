@@ -40,7 +40,7 @@ export const M = crearMotor({
   vistaItem(p, item, id, fase) {
     return {
       titulo: item.titulo, emoji: item.emoji, criterio: item.criterio, unidad: item.unidad,
-      elementos: item.elementos.map((e) => ({ nombre: e.nombre, valor: fase === 'resuelta' ? e.valor : undefined })),
+      elementos: item.elementos.map((e) => ({ nombre: e.nombre, valor: fase === 'resuelta' ? e.valor : undefined, etiqueta: fase === 'resuelta' ? e.etiqueta : undefined })),
       mio: p.respuestas[id] ?? null
     };
   }

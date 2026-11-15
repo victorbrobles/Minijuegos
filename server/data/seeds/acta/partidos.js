@@ -57,5 +57,6 @@ export const PARTIDOS = [
 import EXTRA1 from './extra1.js';
 import EXTRA2 from './extra2.js';
 import EXTRA3 from './extra3.js';
+import EXTRA4 from './extra4.js';
 // Mismo resultado puede repetirse en partidos distintos: se compara nombre y detalle
-for (const x of [...EXTRA1, ...EXTRA2, ...EXTRA3]) if (!PARTIDOS.some((p) => p.nombre === x.nombre && p.detalle === x.detalle)) PARTIDOS.push(x);
+for (const x of [...EXTRA1, ...EXTRA2, ...EXTRA3, ...EXTRA4]) if (!PARTIDOS.some((p) => p.nombre === x.nombre && p.detalle === x.detalle)) PARTIDOS.push(x);

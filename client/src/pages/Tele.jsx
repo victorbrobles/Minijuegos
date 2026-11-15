@@ -2,7 +2,7 @@
 // Modo tele: /tele/<juego>/<código>. Para poner en la tele o en el portátil mientras se juega con los móviles:
 // QR y código para entrar, marcador en grande y la lluvia de reacciones de la sala.
 import { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import QRCode from 'qrcode';
 import { metaDe } from '../games/meta.js';
 import { useLluviaReacciones, Globos } from '../components/Reacciones.jsx';
@@ -15,6 +15,9 @@ const MEDALLAS = ['🥇', '🥈', '🥉'];
 export default function Tele() {
   const { juego, code } = useParams();
   const m = metaDe(juego);
+  const navigate = useNavigate();
+  // Volver: si se abrió en otra pestaña, se cierra; si no, a la página anterior (o al juego)
+  const volver = () => { if (window.opener) { window.close(); return; } if (window.history.length > 1) navigate(-1); else navigate(`/juego/${juego}`); };
   const [d, setD] = useState(null);
   const [qr, setQr] = useState('');
   const enlace = `${window.location.origin}/juego/${juego}?sala=${code}`;
@@ -42,6 +45,7 @@ export default function Tele() {
   return (
     <div className={`tv tv-${estado}`} style={{ '--g1': m.colores[0], '--g2': m.colores[1] }}>
       <header className="tv-cab">
+        <button type="button" className="tv-volver" onClick={volver} aria-label="Volver">←</button>
         {m.imagen && <img src={m.imagen} alt="" />}
         <div><p>{ESTADOS[estado] || ESTADOS.jugando}</p><h1>{m.titulo}</h1></div>
         <button type="button" className="tv-pc" onClick={pantallaCompleta}>⛶ Pantalla completa</button>

@@ -3,15 +3,16 @@
 // Motor común de pulsador (../pulsador/engine.js) y salas de ../lib/salasJuego.js.
 import express from 'express';
 import { PARTIDOS } from '../data/seeds/acta/partidos.js';
+import { marcadorDe, recortarGoles } from '../lib/acta.js';
 import { montarSalas, elegirSinRepetir } from '../lib/salasJuego.js';
 import { REGLAS, OPCIONES_RONDAS } from '../pulsador/engine.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
 
 const router = express.Router();
+// La respuesta son los dos equipos y los goles de cada uno (en cualquier orden). Los goleadores nunca salen todos.
 const itemDe = (x) => ({
-  pistas: x.acta.map((linea, i) => ({ tipo: 'texto', etiqueta: `📋 Acta · dato ${i + 1}`, valor: linea })),
-  respuestas: [x.nombre],
-  claves: x.claves,
+  pistas: x.acta.map((linea, i) => ({ tipo: 'texto', etiqueta: `📋 Acta · dato ${i + 1}`, valor: recortarGoles(linea) })),
+  marcador: marcadorDe(x.nombre),
   solucion: { titulo: x.nombre, detalle: x.detalle }
 });
 const rondasValidas = (n, def = 10) => (OPCIONES_RONDAS.includes(Number(n)) ? Number(n) : def);

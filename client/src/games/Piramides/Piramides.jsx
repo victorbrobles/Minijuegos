@@ -85,15 +85,15 @@ function Adivinar({ v, enviar, actorId }) {
   if (r) return <ElegirCategoria rival={r} onCancelar={() => setRival(null)} onElegir={(cat) => { enviar('adivinar', { objetivo: r.id, categoria: cat }); setRival(null); }} />;
   return (
     <div className="pzp-tarjeta pir-turno">
-      <p className="pzp-etiqueta">1. ¿Quieres adivinar la categoría de un rival?</p>
-      <p className="pzp-nota">Si aciertas, queda eliminado y sumas 2. Si fallas, −1. Solo un intento por rival en toda la partida.</p>
+      <p className="pzp-etiqueta">{v.racha ? `🎯 ¡Acierto! ¿Intentas con otro rival?` : '1. ¿Quieres adivinar la categoría de un rival?'}</p>
+      <p className="pzp-nota">Si aciertas, queda eliminado, sumas 2 y puedes seguir con otro. Si fallas, −1 y pasas a los futbolistas. Solo un intento por rival en toda la partida.</p>
       <div className="pir-objetivos">
         {rivales.map((j) => {
           const usado = actor.intentos[j.id];
           return <button key={j.id} type="button" disabled={Boolean(usado)} onClick={() => setRival(j.id)}>{j.nombre}{usado ? ' (ya lo intentaste)' : ''}</button>;
         })}
       </div>
-      <button type="button" className="pzp-boton secundario" onClick={() => enviar('noAdivinar')}>No, pasar a los futbolistas →</button>
+      <button type="button" className="pzp-boton secundario" onClick={() => enviar('noAdivinar')}>{v.racha ? 'Plantarme y pasar a los futbolistas →' : 'No, pasar a los futbolistas →'}</button>
     </div>
   );
 }
@@ -219,7 +219,7 @@ const JUEGO = {
   detalleFin: (j) => `${j.aciertos >= 0 ? '+' : ''}${j.aciertos} adivinando · +${j.supervivencia} por aguantar`,
   reglas: [
     `Cada jugador recibe una categoría secreta sobre futbolistas (de un banco de ${CATEGORIAS.length}): «Ha ganado la Champions», «Es zurdo», «Ha jugado en el Madrid y en el Barça»… Puedes consultar la tuya cuando quieras.`,
-    'En tu turno, primero decides si intentas adivinar la categoría de un rival. Solo tienes un intento por rival en toda la partida: si aciertas, queda eliminado y sumas 2 puntos; si fallas, pierdes 1 y todos verán que no es esa.',
+    'En tu turno, primero decides si intentas adivinar la categoría de un rival. Solo tienes un intento por rival en toda la partida: si aciertas, queda eliminado, sumas 2 puntos y puedes seguir intentándolo con otro rival; si fallas, pierdes 1, todos verán que no es esa y pasas a los futbolistas.',
     'Después, cada rival te dice en voz alta un futbolista (actual o retirado). Tú lo apuntas y dices, honradamente, si encaja ✅ o no ❌ en tu categoría. Todo queda en tu pirámide, a la vista de todos.',
     'Cuando todos te han dicho su futbolista, pasa el turno.',
     'Al final, el último en pie suma 2 × el número de jugadores; el siguiente, uno menos; y así sucesivamente. Si se acaban las vueltas, los que siguen vivos comparten el primer puesto. ¡Gana quien más puntos tenga!'

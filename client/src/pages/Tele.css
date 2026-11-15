@@ -30,7 +30,21 @@
 .tv-pista { margin: 1.5vh 0 0; opacity: 0.6; font-size: 0.75em; font-weight: 700; }
 @keyframes tvEntra { from { opacity: 0; transform: translateX(3vw); } }
 @media (max-width: 800px), (orientation: portrait) {
-  .tv { position: static; min-height: 100vh; overflow: auto; font-size: 16px; }
-  .tv-cuerpo, .tv-jugando .tv-cuerpo { grid-template-columns: 1fr; }
-  .tv-unete img { width: min(70vw, 300px); }
+  .tv { position: fixed; inset: 0; overflow-x: hidden; overflow-y: auto; font-size: 15px; padding: 1rem; gap: 1rem; -webkit-overflow-scrolling: touch; }
+  .tv-cab { flex-wrap: wrap; gap: 0.6rem; }
+  .tv-cab img { width: 3.2rem; height: 3.2rem; border-radius: 12px; }
+  .tv-cab h1 { font-size: 1.7rem; }
+  .tv-pc { display: none; }
+  .tv-cuerpo, .tv-jugando .tv-cuerpo { flex: none; display: flex; flex-direction: column; gap: 1rem; }
+  .tv-unete { padding: 1rem; border-radius: 20px; gap: 0.5rem; }
+  .tv-unete img, .tv-qr-vacio { width: min(62vw, 260px); border-width: 6px; }
+  .tv-codigo, .tv-jugando .tv-codigo { font-size: 2.4rem; }
+  .tv-marcador h2 { font-size: 1.3rem; margin-bottom: 0.6rem; }
+  .tv-marcador ol { overflow: visible; gap: 0.45rem; }
+  .tv-marcador li { padding: 0.6rem 0.8rem; border-radius: 14px; gap: 0.6rem; }
+  .tv-marcador li b { font-size: 1.05rem; }
+  .tv-marcador li em { font-size: 1.3rem; }
+  .tv-espera { margin: 1rem 0; font-size: 1.05rem; }
+  .tv-lluvia, .rx-lluvia.grande .rx-globo b { font-size: 3.4rem; }
 }
+.tv-volver { flex: none; display: grid; place-items: center; width: 2.6rem; height: 2.6rem; padding: 0; border: 2px solid rgba(255, 255, 255, 0.35); border-radius: 50%; background: rgba(255, 255, 255, 0.12); color: #ffffff; font: inherit; font-size: 1.3rem; font-weight: 900; cursor: pointer; }

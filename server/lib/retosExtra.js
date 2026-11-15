@@ -13,6 +13,7 @@ import AFIRMACIONES from '../../client/src/games/VerdaderoFalso/afirmaciones.js'
 import { FUTBOLISTAS as DATOSOBRA } from '../data/seeds/datosobra/futbolistas.js';
 import { PARTIDOS as ONCES } from '../data/seeds/oncefantasma/onces.js';
 import { PARTIDOS as ACTAS } from '../data/seeds/acta/partidos.js';
+import { recortarGoles } from './acta.js';
 import { RETOS_TRAYECTORIAS } from '../data/seeds/trayectoria/trayectorias.seed.js';
 import { PREGUNTAS as APROX } from '../data/seeds/aproximacion/aproximacion.seed.js';
 import { TEMAS, separados } from '../data/seeds/ordenar/temas.js';
@@ -135,7 +136,7 @@ export const TIPOS_EXTRA = {
       return quiz(elegidos.map((x) => {
         const otros = barajar(ACTAS.filter((y) => y.nombre !== x.nombre)).slice(0, 3).map((y) => `${y.nombre} (${y.detalle.split(' · ')[0]})`);
         const bueno = `${x.nombre} (${x.detalle.split(' · ')[0]})`;
-        return { p: x.acta.slice(0, 4).join(' · '), opciones: barajar([bueno, ...otros]), correcta: bueno, etiqueta: '📋 ¿Qué partido es?' };
+        return { p: x.acta.slice(0, 4).map(recortarGoles).join(' · '), opciones: barajar([bueno, ...otros]), correcta: bueno, etiqueta: '📋 ¿Qué partido es?' };
       }), 30, 3);
     }
   },
@@ -179,7 +180,7 @@ export const TIPOS_EXTRA = {
     descripcion: 'Diez parejas (inventos, ríos, montañas, películas…): elige cuál va primero según el criterio. 8 segundos cada una. Necesitas 8 aciertos.',
     generar() {
       const preguntas = Array.from({ length: 10 }, () => {
-        const t = azar(TEMAS);
+        const t = azar(TEMAS.filter((x) => !x.soloOrden));
         let a; let b;
         do { [a, b] = barajar(t.items).slice(0, 2); } while (!separados(t, a[1], b[1]));
         const primero = a[1] < b[1] ? a : b;

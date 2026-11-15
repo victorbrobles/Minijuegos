@@ -115,14 +115,15 @@ export const JUEGOS = {
     etiqueta: (v) => (v.fase === 'jugando' ? `Dato ${v.pistas.length} de ${v.totalPistas}` : ''),
     pregunta: () => '¿Qué partido es?',
     era: 'Era…',
-    placeholder: 'Los dos equipos (o el nombre del partido)',
-    notaRespuesta: 'Escribe los dos equipos (por ejemplo «Liverpool Milan») o el nombre con el que se conoce el partido.',
+    placeholder: 'Equipos y goles: «Liverpool 3 Milan 3»',
+    ayudaPulsar: 'Quien lo sepa, que pulse y escriba los dos equipos con sus goles.',
+    notaRespuesta: 'Escribe los dos equipos con sus goles, en el orden que quieras: «Liverpool 3 Milan 3», «Milan 3-3 Liverpool»… (cuenta el resultado de la prórroga, no los penaltis).',
     textoPulsador: '¡Lo sé!',
     ganador: (n) => (n.length > 1 ? `¡Empate entre ${n.join(' y ')}!` : `¡${n[0]} se sabe todas las actas!`),
     reglas: [
-      'Se presenta un partido histórico mediante su acta incompleta: resultados parciales, minutos clave, tarjetas, cambios, estadio y goleadores.',
+      'Se presenta un partido histórico mediante su acta incompleta: resultados parciales, minutos clave, tarjetas, estadio y algunos de los goleadores (nunca todos).',
       `Los datos se destapan solos cada ${r.acta.segPistas[1]} segundos, de más vagos a más reveladores.`,
-      `Quien lo sepa, que pulse y escriba los dos equipos (o el nombre del partido, como «Maracanazo»). Tiene ${r.acta.segRespuesta} segundos.`,
+      `Quien lo sepa, que pulse y escriba los dos equipos y los goles de cada uno (da igual cuál pongas primero; en partidos con penaltis vale el resultado tras la prórroga). Tiene ${r.acta.segRespuesta} segundos.`,
       `Cuanto antes aciertes, más puntos: ${r.acta.puntosPista.join(', ')} según los datos que se hayan visto. Fallar no resta, pero te deja fuera de ese partido.`
     ]
   }

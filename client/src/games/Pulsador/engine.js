@@ -26,7 +26,7 @@ export const REGLAS = {
   adivina: { segRonda: 75, segRespuesta: 20, segPistas: [0, 20, 40], puntos: 'pista', puntosPista: [10, 5, 3], fallo: 0, respuesta: 'texto' },
   frasescelebres: { segRonda: 30, segRespuesta: 10, segPistas: [0], puntos: 'fijo', acierto: 3, fallo: 1, respuesta: 'opciones' },
   hemeroteca: { segRonda: 75, segRespuesta: 20, segPistas: [0, 15, 30, 45], puntos: 'pista', puntosPista: [10, 7, 5, 3], fallo: 0, respuesta: 'texto' },
-  acta: { segRonda: 80, segRespuesta: 20, segPistas: [0, 12, 24, 36, 48], puntos: 'pista', puntosPista: [10, 8, 6, 4, 2], fallo: 0, respuesta: 'texto' },
+  acta: { segRonda: 80, segRespuesta: 45, segPistas: [0, 12, 24, 36, 48], puntos: 'pista', puntosPista: [10, 8, 6, 4, 2], fallo: 0, respuesta: 'texto' },
   pareja: { segRonda: 25, segRespuesta: 10, segPistas: [0], puntos: 'fijo', acierto: 2, fallo: 1, respuesta: 'opciones' }
 };
 
@@ -75,6 +75,42 @@ export function coincideClaves(texto, claves = []) {
     return palabras.some((w) => w.length >= 4 && distancia(w, kk) <= (kk.length >= 8 ? 2 : kk.length >= 5 ? 1 : 0));
   };
   return claves.some((grupo) => grupo.every(esta));
+}
+
+/**
+ * Respuesta con resultado («Acta del partido»): los dos equipos y los goles de cada uno, en cualquier orden
+ * («Liverpool 3 Milan 3», «Milan 3-3 Liverpool», «barça 6 madrid 2»…). Cada número va con el equipo que
+ * aparece en la misma posición (el primer número, con el primer equipo nombrado).
+ * marcador = { equipos: [{ alias: ['liverpool', …], goles: 3 }, { alias: [...], goles: 3 }] }
+ */
+const NUMEROS = { cero: 0, un: 1, uno: 1, una: 1, dos: 2, tres: 3, cuatro: 4, cinco: 5, seis: 6, siete: 7, ocho: 8, nueve: 9, diez: 10 };
+export function coincideMarcador(texto, marcador) {
+  let s = ` ${base(texto)} `;
+  const pos = [];
+  for (const [k, eq] of marcador.equipos.entries()) {
+    const alias = [...new Set(eq.alias.map(base).filter(Boolean))].sort((a, b) => b.length - a.length);
+    let hallado = null;
+    for (const a of alias) {
+      const i = s.indexOf(` ${a} `);
+      if (i >= 0) { hallado = { i, largo: a.length + 1 }; break; }
+    }
+    if (!hallado) {
+      // Erratas pequeñas en alias de una palabra (al menos 5 letras)
+      const palabras = s.trim().split(' ');
+      for (const a of alias.filter((x) => !x.includes(' ') && x.length >= 5)) {
+        const w = palabras.find((x) => x.length >= 4 && distancia(x, a) <= (a.length >= 8 ? 2 : 1));
+        if (w) { const i = s.indexOf(` ${w} `); hallado = { i, largo: w.length + 1 }; break; }
+      }
+    }
+    if (!hallado) return false;
+    pos.push({ k, i: hallado.i });
+    // Se borra para que no lo encuentre el otro equipo ni se lea como número
+    s = `${s.slice(0, hallado.i)} ${'·'.repeat(hallado.largo - 1)} ${s.slice(hallado.i + hallado.largo + 1)}`;
+  }
+  const nums = s.trim().split(/\s+/).map((w) => (/^\d{1,2}$/.test(w) ? Number(w) : NUMEROS[w])).filter((n) => n !== undefined);
+  if (nums.length < 2) return false;
+  const orden = [...pos].sort((a, b) => a.i - b.i);
+  return orden.every((o, idx) => marcador.equipos[o.k].goles === nums[idx]);
 }
 
 // ---------------------------------------------------------------- Partida
@@ -226,7 +262,8 @@ export function responder(p, id, respuesta, ahora = Date.now()) {
   if (!texto) return { ok: false, error: 'Escribe una respuesta.' };
   const it = item(p);
   const bien = p.reglas.respuesta === 'opciones' ? texto === it.correcta
-    : coincide(texto, it.respuestas || []) || (it.claves ? coincideClaves(texto, it.claves) : false);
+    : it.marcador ? coincideMarcador(texto, it.marcador)
+      : coincide(texto, it.respuestas || []) || (it.claves ? coincideClaves(texto, it.claves) : false);
   if (!bien) {
     fallo(p, quien, ahora, 'mal');
     return { ok: true, correcto: false, texto };

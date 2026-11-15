@@ -52,4 +52,3 @@
 .est-boton { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.15rem; flex: none; min-width: 5.6rem; padding: 0.6rem 0.8rem; border-radius: 22px; background: linear-gradient(135deg, #6366f1 0%, #7c3aed 100%); color: #ffffff; text-decoration: none; font-weight: 900; font-size: 0.82rem; box-shadow: 0 6px 0 rgba(49, 46, 129, 0.55); transition: transform 0.15s; }
 .est-boton:hover { transform: translateY(-2px); }
 .est-boton span { font-size: 1.6rem; line-height: 1; }
-@media (max-width: 420px) { .home-accesos .rto-banner-estado { display: none; } }

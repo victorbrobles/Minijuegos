@@ -73,7 +73,7 @@ function Resultado({ v }) {
       <ol className="pno-solucion">
         {r.solucion.map((i, k) => (
           <li key={i}>
-            <b>{k + 1}</b><span>{it.elementos[i].nombre}</span><small>{ano(it.unidad, it.elementos[i].valor)} {/año/.test(it.unidad) ? '' : it.unidad}</small>
+            <b>{k + 1}</b><span>{it.elementos[i].nombre}</span><small>{it.elementos[i].etiqueta || `${ano(it.unidad, it.elementos[i].valor)} ${/año/.test(it.unidad) ? '' : it.unidad}`}</small>
             <span className="smx-quienes">{jug.filter((j) => j.orden?.[k] === i).map((j) => <Avatar key={j.id} id={j.id} nombre={nombreDe(v, j.id)} />)}</span>
           </li>
         ))}

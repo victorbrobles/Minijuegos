@@ -23,7 +23,7 @@ export function ronda(tema) {
       const desc = Math.random() < 0.35;
       return {
         titulo: tema.titulo, emoji: tema.emoji, criterio: desc ? tema.mayor : tema.criterio, unidad: tema.unidad, desc,
-        elementos: barajar(elegidos).map(([nombre, valor]) => ({ nombre, valor }))
+        elementos: barajar(elegidos).map(([nombre, valor, etiqueta]) => (etiqueta ? { nombre, valor, etiqueta } : { nombre, valor }))
       };
     }
   }
