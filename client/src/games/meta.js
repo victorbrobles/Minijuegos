@@ -864,22 +864,25 @@ export const META = {
   },
   'torre': {
     titulo: 'Torre Inestable',
+    imagen: '/covers/torre.webp',
     icono: 'tower',
     colores: ['#0d9488', '#1e1b4b'],
     etiquetas: 'torre construir apilar piezas equilibrio pulso precisión física 3d derribar bloques online',
     descripcion: "Construid una torre pieza a pieza en 3D: elige dónde dejar la tuya y cómo girarla, y suéltala. Las piezas son cada vez más pequeñas y raras… y quien la derribe, pierde.",
-    categorias: ['habilidad', 'estrategia', 'dos_jugadores']
+    categorias: ['habilidad']
   },
   'minigolf': {
     titulo: 'Minigolf',
+    imagen: '/covers/minigolf.webp',
     icono: 'flagFinish',
     colores: ['#16a34a', '#0c4a6e'],
     etiquetas: 'minigolf golf hoyos bola golpes 3d rampas molinos obstáculos puntería deporte online',
     descripcion: "Minigolf en 3D con 200 hoyos originales: rampas, molinos, puentes sin barandilla, agua, arena y saltos. Online todos golpean a la vez; gana quien termine el recorrido con menos golpes.",
-    categorias: ['habilidad', 'chill', 'dos_jugadores']
+    categorias: ['habilidad']
   },
   'canicas': {
     titulo: 'Carrera de Canicas',
+    imagen: '/covers/carrera.webp',
     icono: 'car',
     colores: ['#8b5cf6', '#0f766e'],
     etiquetas: 'canicas carrera 3d giroscopio inclinar atajos turbos objetos velocidad circuito online',
