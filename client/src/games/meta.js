@@ -851,6 +851,14 @@ export const META = {
     etiquetas: 'dados farol mentiroso apostar perudo bluff tirar dados cartas online',
     descripcion: "Dados de farol: cada uno ve solo los suyos y se apuesta cuántos hay de un valor en toda la mesa. Sube la apuesta, canta «¡Mentiroso!» o arriésgate con un «¡Exacto!». El último con dados gana.",
     categorias: ['cartas']
+  },
+  'garabato': {
+    titulo: 'Garabato Encadenado',
+    icono: 'brush',
+    colores: ['#fb923c', '#be185d'],
+    etiquetas: 'dibujar dibujo pintar teléfono escacharrado frases cadena risas fiesta online grupo',
+    descripcion: "El teléfono escacharrado con dibujos: uno escribe una frase, otro la dibuja, otro describe el dibujo sin ver la frase… Al final se destapan las cadenas, del original al desastre.",
+    categorias: ['chill']
   }
 };
 

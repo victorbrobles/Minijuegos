@@ -75,6 +75,7 @@ import Lapiz from './Lapiz/Lapiz.jsx';
 import Fichajes from './Fichajes/Fichajes.jsx';
 import Eco from './Eco/Eco.jsx';
 import CuatroCuatros from './CuatroCuatros/CuatroCuatros.jsx';
+import Garabato from './Garabato/Garabato.jsx';
 import Patata from './Patata/Patata.jsx';
 import Subasta from './Subasta/Subasta.jsx';
 import Dragon from './Dragon/Dragon.jsx';
@@ -183,7 +184,8 @@ const registry = {
   'dragon': Dragon,
   'piramides': Piramides,
   'transmision': Transmision,
-  'cuatrocuatros': CuatroCuatros
+  'cuatrocuatros': CuatroCuatros,
+  'garabato': Garabato
 };
 
 export default registry;

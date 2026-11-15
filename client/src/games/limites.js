@@ -99,7 +99,8 @@ export const LIMITES = {
   dragon: { min: 2, max: 8 },
   piramides: { min: 2, max: 8 },
   transmision: { min: 2, max: 6 },
-  cuatrocuatros: { min: 2, max: 8 }
+  cuatrocuatros: { min: 2, max: 8 },
+  garabato: { min: 3, max: 10 }
 };
 
 function base(id) {

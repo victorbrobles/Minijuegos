@@ -75,6 +75,7 @@ import soloRoutes from './routes/solo.js';
 import perfilRoutes from './routes/perfil.js';
 import socialRoutes from './routes/social.js';
 import cuatrocuatrosRoutes from './routes/cuatrocuatros.js';
+import garabatoRoutes from './routes/garabato.js';
 import dragonRoutes from './routes/dragon.js';
 import subastaRoutes from './routes/subasta.js';
 import patataRoutes from './routes/patata.js';
@@ -97,6 +98,8 @@ const trustProxy = process.env.TRUST_PROXY;
 app.set('trust proxy', trustProxy === undefined ? 1 : Number.isNaN(Number(trustProxy)) ? trustProxy : Number(trustProxy));
 
 app.use(cors());
+// Los dibujos de «Garabato Encadenado» pesan más que una acción normal
+app.use('/api/garabato', express.json({ limit: '300kb' }));
 app.use(express.json());
 
 // 2. Permitir peticiones OPTIONS (CORS preflight) antes de autenticar
@@ -198,6 +201,7 @@ app.use('/api/solo', soloRoutes);
 app.use('/api/perfil', perfilRoutes);
 app.use('/api/social', socialRoutes);
 app.use('/api/cuatrocuatros', cuatrocuatrosRoutes);
+app.use('/api/garabato', garabatoRoutes);
 app.use('/api/dragon', dragonRoutes);
 app.use('/api/subasta', subastaRoutes);
 app.use('/api/patata', patataRoutes);

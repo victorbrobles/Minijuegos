@@ -1,0 +1,53 @@
+/* client/src/games/Garabato/Garabato.css */
+.gbt-tarea { display: grid; gap: 0.6rem; }
+.gbt-frase { margin: 0; padding: 0.7rem 0.9rem; border-radius: 14px; background: #fef9c3; color: #0f172a; font-size: 1.15rem; font-weight: 900; text-align: center; }
+.gbt-texto { width: 100%; box-sizing: border-box; padding: 0.7rem 0.9rem; border: 2px solid #e2e8f0; border-radius: 14px; font: inherit; font-size: 1.05rem; font-weight: 700; color: #0f172a; resize: none; }
+.gbt-texto:focus { outline: none; border-color: #f97316; }
+.gbt-sugerir { justify-self: start; padding: 0.4rem 0.8rem; border: 2px dashed #fdba74; border-radius: 999px; background: #fff7ed; color: #c2410c; font: inherit; font-weight: 800; cursor: pointer; }
+.gbt-lienzo { display: grid; gap: 0.5rem; }
+.gbt-canvas { width: 100%; aspect-ratio: 1; border-radius: 16px; background: #ffffff; box-shadow: inset 0 0 0 3px #e2e8f0; touch-action: none; cursor: crosshair; }
+.gbt-herramientas { display: grid; gap: 0.4rem; }
+.gbt-colores { display: grid; grid-template-columns: repeat(10, 1fr); gap: 0.3rem; }
+.gbt-color { aspect-ratio: 1; min-width: 0; padding: 0; border: 3px solid #ffffff; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 1px #cbd5e1; cursor: pointer; }
+.gbt-color.goma { background: repeating-linear-gradient(45deg, #ffffff 0 4px, #e2e8f0 4px 8px); }
+.gbt-color.sel { box-shadow: 0 0 0 3px #0f172a; transform: scale(1.12); }
+.gbt-fila { display: flex; gap: 0.35rem; align-items: center; }
+.gbt-grosor { display: grid; place-items: center; width: 2.4rem; height: 2.4rem; padding: 0; border: 2px solid #e2e8f0; border-radius: 12px; background: #ffffff; cursor: pointer; }
+.gbt-grosor i { display: block; border-radius: 50%; background: #0f172a; }
+.gbt-grosor.sel { border-color: #f97316; background: #fff7ed; }
+.gbt-accion { padding: 0.5rem 0.7rem; border: 2px solid #e2e8f0; border-radius: 12px; background: #ffffff; color: #334155; font: inherit; font-size: 0.85rem; font-weight: 800; cursor: pointer; }
+.gbt-accion:first-of-type { margin-left: auto; }
+.gbt-accion:disabled { opacity: 0.4; }
+.gbt-dibujo { display: grid; place-items: center; width: 100%; aspect-ratio: 1; border-radius: 16px; overflow: hidden; background: #ffffff; box-shadow: inset 0 0 0 2px #e2e8f0; }
+.gbt-dibujo.cargando span, .gbt-vacio { color: #94a3b8; font-weight: 800; }
+.gbt-svg { width: 100%; height: 100%; display: block; }
+.gbt-reloj { position: relative; display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.6rem; padding: 0.5rem 0.8rem; border-radius: 999px; background: #ffffff; overflow: hidden; }
+.gbt-reloj i { position: absolute; left: 0; bottom: 0; height: 4px; background: #f97316; transition: width 0.25s linear; }
+.gbt-reloj-num { font-weight: 900; color: #0f172a; font-variant-numeric: tabular-nums; }
+.gbt-reloj.urgente { background: #fee2e2; }
+.gbt-reloj.urgente .gbt-reloj-num { color: #b91c1c; }
+.gbt-espera { text-align: center; }
+.gbt-espera-ico { font-size: 2.6rem; }
+.gbt-ok { color: #16a34a; font-weight: 900; }
+.gbt-cadena { display: grid; gap: 0.8rem; }
+.gbt-entrada { display: grid; gap: 0.35rem; animation: gbtEntra 0.45s ease-out both; }
+.gbt-quien { margin: 0; color: #64748b; font-weight: 700; font-size: 0.9rem; }
+.gbt-quien b { color: #0f172a; }
+.gbt-bocadillo { margin: 0; padding: 0.8rem 1rem; border-radius: 18px 18px 18px 4px; background: #fef9c3; color: #0f172a; font-size: 1.15rem; font-weight: 900; }
+.gbt-entrada.dibujo .gbt-dibujo { max-width: 420px; justify-self: center; }
+@keyframes gbtEntra { from { opacity: 0; transform: translateY(14px) scale(0.97); } }
+.gbt-galeria { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 0.5rem; }
+.gbt-galeria button { display: grid; gap: 0.2rem; padding: 0.3rem; border: 3px solid transparent; border-radius: 16px; background: #f8fafc; color: #475569; font: inherit; font-size: 0.75rem; font-weight: 800; cursor: pointer; }
+.gbt-galeria button.sel, .gbt-frases button.sel { border-color: #f97316; background: #fff7ed; }
+.gbt-frases { display: grid; gap: 0.35rem; }
+.gbt-frases button { padding: 0.6rem 0.8rem; border: 3px solid transparent; border-radius: 14px; background: #f8fafc; color: #0f172a; font: inherit; font-weight: 800; text-align: left; cursor: pointer; }
+.gbt-frases small { display: block; color: #94a3b8; font-weight: 700; }
+.gbt-final { margin-bottom: 0.5rem; padding: 0.6rem 0.8rem; border-radius: 14px; background: #f8fafc; }
+.gbt-final summary { cursor: pointer; font-weight: 800; color: #0f172a; }
+.gbt-final .gbt-entrada { margin-top: 0.6rem; }
+/* Mientras se dibuja, fuera botones flotantes que se podrían tocar sin querer */
+.game-shell:has(.gbt-canvas) .rx-barra, .game-shell:has(.gbt-canvas) .snd.en-juego { display: none; }
+.gbt-frases button { display: block; width: 100%; text-align: left !important; }
+/* Que lienzo, colores y botón quepan a la vez en la pantalla del móvil */
+.gbt-canvas { width: min(100%, 48vh); justify-self: center; }
+.gbt-tarea .gbt-frase { padding: 0.5rem 0.8rem; font-size: 1.05rem; }

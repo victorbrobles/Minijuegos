@@ -544,5 +544,11 @@
     "name": "Cuatro Cuatros",
     "description": "Dados de farol: cada uno ve solo los suyos y se apuesta cuántos hay de un valor en toda la mesa. Sube la apuesta, canta «¡Mentiroso!» o arriésgate con un «¡Exacto!». El último con dados gana.",
     "isNew": true
+  },
+  {
+    "id": "garabato",
+    "name": "Garabato Encadenado",
+    "description": "El teléfono escacharrado con dibujos: uno escribe una frase, otro la dibuja, otro describe el dibujo sin ver la frase… Al final se destapan las cadenas, del original al desastre.",
+    "isNew": true
   }
 ]
