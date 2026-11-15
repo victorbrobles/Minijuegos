@@ -5,11 +5,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import { PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, leerRecord, guardarRecord, registrarUnJugador, Aviso } from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, leerRecord, guardarRecord, registrarUnJugador, Aviso } from '../../components/UnJugador.jsx';
 import { RetoAmigo, datosDeReto, recordarPartida } from '../Solo/comun.jsx';
 import '../Solo/Solo.css';
 import { generarCaso, MUEBLES, NIVELES, COLUMNAS } from './generador.js';
 import './Crimen.css';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'crimen';
 const mmss = (s) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
@@ -19,7 +20,7 @@ export default function Crimen({ reto } = {}) {
   const navigate = useNavigate();
   const [fase, setFase] = useState(reto ? 'juego' : 'portada'); // portada | juego | fin
   const [nivel, setNivel] = useState(reto?.nivel || 'normal');
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [salir, setSalir] = useState(false);
   // Récord (menor tiempo) por nivel
   const record = leerRecord(`${ID}-${nivel}`);
@@ -71,14 +72,13 @@ export default function Crimen({ reto } = {}) {
   if (fase === 'portada') {
     return (
       <div className="crm-contenedor">
-        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={() => setAyuda(true)} record={record} textoRecord={(r) => `${mmss(r.valor)} (${NIVELES[nivel].nombre})`} textoBoton="Abrir el caso" iconoBoton="search">
+        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record} textoRecord={(r) => `${mmss(r.valor)} (${NIVELES[nivel].nombre})`} textoBoton="Abrir el caso" iconoBoton="search">
           <div className="qq-chips">
             {Object.entries(NIVELES).map(([k, x]) => (
               <button key={k} type="button" className={`qq-chip${nivel === k ? ' activo' : ''}`} onClick={() => setNivel(k)}>{x.nombre} · {x.n}×{x.n}</button>
             ))}
           </div>
         </PortadaUnJugador>
-        {ayuda && <AyudaCrimen onCerrar={() => setAyuda(false)} />}
       </div>
     );
   }
@@ -179,7 +179,6 @@ export default function Crimen({ reto } = {}) {
         </div>
       )}
       <Aviso texto={aviso.t} clave={aviso.k} tipo={aviso.tipo} />
-      {ayuda && <AyudaCrimen onCerrar={() => setAyuda(false)} />}
       {salir && <ConfirmarSalida onSeguir={() => setSalir(false)} onSalir={() => navigate('/')} texto={reto ? 'Si sales, el reto de hoy contará como fallado.' : undefined} />}
     </div>
   );
@@ -222,19 +221,3 @@ function Tablero({ caso, enCelda, tachadas, onTocar, conflictos, resuelto }) {
   );
 }
 
-function AyudaCrimen({ onCerrar }) {
-  return (
-    <AyudaUnJugador titulo="¿Cómo se juega?" onCerrar={onCerrar}>
-      <p>Han asesinado a <b>Víctor</b> 💀 y tienes el plano de la casa: habitaciones de colores y muebles.</p>
-      <ul>
-        <li>En cada <strong>fila</strong> y en cada <strong>columna</strong> había exactamente una persona (la víctima incluida).</li>
-        <li>Nadie puede estar encima de una mesa 🍽️, una planta 🪴 o una estantería 📚. Sí en una silla 🪑, una alfombra 🧶 o una cama 🛏️.</li>
-        <li>El <strong>asesino</strong> es el único sospechoso que estaba en la misma habitación que la víctima.</li>
-        <li>Usa las pistas para colocar a todos. Elige una persona y toca su casilla; toca otra vez para quitarla. Con «Tachar» puedes descartar casillas.</li>
-        <li>Cuando estén todos, comprueba la escena. O acusa directamente si lo tienes claro… pero si fallas, el asesino se escapa.</li>
-        <li>Cada caso es nuevo y tiene una sola solución. Tu récord es el menor tiempo en cada nivel.</li>
-        <li>En el nivel <strong>Experto (8×8)</strong> solo hay <strong>una pista por personaje</strong> y una condición general al final («Además, …»). Hay que exprimir cada pista y la regla de una persona por fila y columna.</li>
-      </ul>
-    </AyudaUnJugador>
-  );
-}

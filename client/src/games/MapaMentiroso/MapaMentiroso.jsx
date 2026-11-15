@@ -4,11 +4,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import {
-  PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, Barra, useRecord
-} from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, Barra, useRecord } from '../../components/UnJugador.jsx';
 import { LADO, DIRECCIONES, girar, generarRuta, textoPaso } from './motor.js';
 import './MapaMentiroso.css';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'mapamentiroso';
 const VIDAS = 3;
@@ -39,7 +38,7 @@ function Rosa({ giro }) {
 export default function MapaMentiroso() {
   const navigate = useNavigate();
   const [fase, setFase] = useState('portada'); // portada | memorizar | responder | resultado | fin
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [salir, setSalir] = useState(false);
   const [record, registrar] = useRecord(ID);
   const [nivel, setNivel] = useState(1);
@@ -108,24 +107,12 @@ export default function MapaMentiroso() {
 
   const camino = useMemo(() => (ruta ? recorrido(ruta) : []), [ruta]);
 
-  const ayudaModal = ayuda && (
-    <AyudaUnJugador titulo="¿Cómo se juega?" onCerrar={() => setAyuda(false)}>
-      <p>Empiezas en el lugar marcado con <strong>📍</strong>. Lee las indicaciones (por ejemplo «2 casillas al Norte») y <strong>memorízalas</strong>: desaparecerán.</p>
-      <ul>
-        <li>Después toca la casilla del mapa donde terminas. Tienes {SEGUNDOS_RESPUESTA} segundos.</li>
-        <li>Desde el nivel 3 la <strong>brújula está girada</strong>: el Norte es hacia donde apunte la aguja roja, no hacia arriba.</li>
-        <li>Desde el nivel 5 una indicación está <strong>invertida</strong> (te diremos cuál): haz justo lo contrario.</li>
-        <li>Si fallas pierdes una vida. Tienes 3.</li>
-      </ul>
-    </AyudaUnJugador>
-  );
-
   if (fase === 'portada') {
     return (
       <div className="mm-contenedor">
-        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={() => setAyuda(true)} record={record}
+        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record}
           textoRecord={(r) => `${r.valor} ${r.valor === 1 ? 'ruta' : 'rutas'}`} />
-        {ayudaModal}
+        
       </div>
     );
   }

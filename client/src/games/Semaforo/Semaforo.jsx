@@ -4,10 +4,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import {
-  PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, useRecord
-} from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, useRecord } from '../../components/UnJugador.jsx';
 import './Semaforo.css';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'semaforo';
 const VIDAS = 3;
@@ -60,7 +59,7 @@ function nuevoEstimulo(regla) {
 export default function Semaforo() {
   const navigate = useNavigate();
   const [fase, setFase] = useState('portada'); // portada | cuenta | juego | fin
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [salir, setSalir] = useState(false);
   const [record, registrar] = useRecord(ID);
   const [regla, setRegla] = useState(null);
@@ -172,24 +171,11 @@ export default function Semaforo() {
     return () => window.removeEventListener('keydown', onKey);
   }, [fase, tocar]);
 
-  const ayudaModal = ayuda && (
-    <AyudaUnJugador titulo="¿Cómo se juega?" onCerrar={() => setAyuda(false)}>
-      <p>Irán apareciendo palabras de colores… pintadas de otro color. Por ejemplo, <b style={{ color: '#ef4444' }}>VERDE</b>.</p>
-      <ul>
-        <li>Arriba tienes la <strong>regla</strong>: «toca si el COLOR es rojo», «toca si la PALABRA dice AZUL», «toca si NO coinciden»…</li>
-        <li>Toca la pantalla solo cuando se cumpla. Si no se cumple, no hagas nada.</li>
-        <li>La regla <strong>cambia cada {SEGUNDOS_REGLA} segundos</strong>. ¡Léela bien!</li>
-        <li>Tocar cuando no toca o dejar escapar uno bueno cuesta una vida. Tienes 3. Cada vez va más rápido.</li>
-        <li>Con teclado: barra espaciadora.</li>
-      </ul>
-    </AyudaUnJugador>
-  );
-
   if (fase === 'portada') {
     return (
       <div className="sm-contenedor">
-        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={() => setAyuda(true)} record={record} textoRecord={(r) => `${r.valor} puntos`} />
-        {ayudaModal}
+        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record} textoRecord={(r) => `${r.valor} puntos`} />
+        
       </div>
     );
   }

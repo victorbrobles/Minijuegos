@@ -5,7 +5,7 @@
 import { useRegistrarPartida, resultadoDesdeFin } from '../../lib/registros.js';
 import React, { useEffect, useState } from 'react';
 import Icon from './IconoF.jsx';
-import { ROLES, ROL, TIPOS, ORDEN_TIPOS, SINGULARES, AJUSTES, DURACIONES } from './engine.js';
+import { ROLES, ROL, TIPOS, ORDEN_TIPOS, AJUSTES } from './engine.js';
 import './Fundadores.css';
 
 export const COLORES = ['#ef4444', '#2563eb', '#16a34a', '#f59e0b', '#9333ea', '#ec4899', '#0d9488', '#ea580c', '#475569'];
@@ -480,52 +480,3 @@ export function PantallaFin({ v, onSalir, yoId = v.yo?.id, children }) {
   );
 }
 
-// ---------------------------------------------------------------- Ayuda
-export function Ayuda({ onCerrar, titulo = 'Fundadores', descripcion }) {
-  return (
-    <div className="rg-modal-fondo" onClick={onCerrar}>
-      <div className="rg-modal qq-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-        <div className="qq-modal-ayuda-header">
-          <span className="qq-ayuda-badge">❓ Cómo jugar</span>
-          <h3>{titulo}</h3>
-        </div>
-        <div className="qq-modal-ayuda-body">
-          {descripcion && <p>{descripcion}</p>}
-          <p className="fdp-ayuda-sub">🏗️ Objetivo</p>
-          <ul>
-            <li>Cada uno levanta su propio pueblo. Empiezas con {AJUSTES.monedasIni} monedas y {AJUSTES.planosIni} planos.</li>
-            <li>Cuando alguien completa su pueblo ({DURACIONES.corto}, {DURACIONES.normal} u {DURACIONES.largo} edificios, según la duración) se acaba esa ronda y gana el mejor pueblo.</li>
-          </ul>
-          <p className="fdp-ayuda-sub">🎭 Cada ronda</p>
-          <ul>
-            <li>Se retiran al azar algunos de los 10 oficios: quedan tantos como jugadores (los retirados se ven).</li>
-            <li>Por orden, empezando por quien tiene el sello 👑, cada uno elige un oficio <strong>en secreto</strong>.</li>
-            <li>Los oficios se llaman por número (1 → 10). Al llamarte, se descubre tu oficio y juegas tu turno:</li>
-          </ul>
-          <ol>
-            <li><strong>Cobrar:</strong> {AJUSTES.cobro} monedas, o robar {AJUSTES.planosRobo} planos y quedarte 1.</li>
-            <li><strong>Habilidad</strong> de tu oficio (puedes no usarla).</li>
-            <li><strong>Construir</strong> un edificio de tu mano pagando su coste (no puedes repetir edificio).</li>
-          </ol>
-          <p className="fdp-ayuda-sub">📜 Los oficios</p>
-          <ul>
-            {ROLES.map((r) => <li key={r.id}><strong>{r.id}. {r.nombre}:</strong> {r.desc}</li>)}
-          </ul>
-          <p className="fdp-ayuda-sub">🏠 Edificios</p>
-          <ul>
-            {ORDEN_TIPOS.slice(0, 4).map((t) => <li key={t}><strong>{TIPOS[t].nombre}</strong>: cuestan lo que valen. Hay oficios que cobran por ellos.</li>)}
-            <li><strong>Singulares</strong> (uno de cada): dan ventajas.
-              <ul>{SINGULARES.map((s) => <li key={s.efecto}><strong>{s.nombre}</strong> ({s.coste}): {s.texto}</li>)}</ul>
-            </li>
-          </ul>
-          <p className="fdp-ayuda-sub">🏆 Puntos al final</p>
-          <ul>
-            <li>Puntos de tus edificios · +{AJUSTES.bonusVariedad} si tienes los 5 tipos · +{AJUSTES.bonusPrimero} quien completa primero, +{AJUSTES.bonusCompleto} los demás que completen.</li>
-            <li>1 punto por cada {AJUSTES.monedasPorPunto} monedas que te sobren · +{AJUSTES.puntosMedalla} por medalla · ventajas de tus edificios. Si hay empate, gana quien tenga más monedas.</li>
-          </ul>
-        </div>
-        <button type="button" className="big full qq-btn-principal" onClick={onCerrar}>¡Entendido!</button>
-      </div>
-    </div>
-  );
-}

@@ -4,12 +4,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import {
-  PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, Aviso, useRecord
-} from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, Aviso, useRecord } from '../../components/UnJugador.jsx';
 import { RECURSOS, FINALES } from './cartas.js';
-import { nuevoEstado, robar, decidir, fechaDe, DIAS, MAXIMO, CADA_RACION } from './motor.js';
+import { nuevoEstado, robar, decidir, fechaDe, DIAS, MAXIMO } from './motor.js';
 import './Trinchera.css';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'trinchera';
 
@@ -28,7 +27,7 @@ function Puntos({ ef }) {
 export default function Trinchera() {
   const navigate = useNavigate();
   const [fase, setFase] = useState('portada'); // portada | juego | fin
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [salir, setSalir] = useState(false);
   const [record, registrar] = useRecord(ID);
   const [estado, setEstado] = useState(null);
@@ -60,25 +59,12 @@ export default function Trinchera() {
     }
   };
 
-  const ayudaModal = ayuda && (
-    <AyudaUnJugador titulo="¿Cómo se juega?" onCerrar={() => setAyuda(false)}>
-      <p>Es el invierno de 1914. Mandas una pequeña compañía en una trinchera del frente. Tu objetivo: <strong>llegar a Navidad</strong>.</p>
-      <ul>
-        <li>Cada día llega una situación con <strong>dos decisiones</strong>.</li>
-        <li>Debajo de cada decisión ves <strong>qué recursos</strong> se verán afectados (más grande = más efecto), pero no si suben o bajan. Piénsalo.</li>
-        <li>Recursos: 🎖️ moral, 🥫 comida, 💥 munición y 🩹 salud. Si cualquiera llega a <strong>cero</strong>, pierdes. El máximo es {MAXIMO}.</li>
-        <li>Cada {CADA_RACION} días se reparte una ración extra de comida.</li>
-        <li>Algunas decisiones tienen consecuencias días después…</li>
-      </ul>
-    </AyudaUnJugador>
-  );
-
   if (fase === 'portada') {
     return (
       <div className="tn-contenedor">
-        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={() => setAyuda(true)} record={record}
+        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record}
           textoRecord={(r) => (r.valor > DIAS ? '¡Llegaste a Navidad!' : `${r.valor} días`)} textoBoton="Entrar en la trinchera" />
-        {ayudaModal}
+        
       </div>
     );
   }

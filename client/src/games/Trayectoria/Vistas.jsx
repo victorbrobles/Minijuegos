@@ -332,30 +332,3 @@ export function SelectorDificultad({ valor, onCambiar }) {
   );
 }
 
-export function Ayuda({ onCerrar, titulo, descripcion }) {
-  return (
-    <div className="rg-modal-fondo" onClick={onCerrar}>
-      <div className="rg-modal qq-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-        <div className="qq-modal-ayuda-header">
-          <span className="qq-ayuda-badge">❓ Cómo jugar</span>
-          <h3>{titulo}</h3>
-        </div>
-        <div className="qq-modal-ayuda-body">
-          {descripcion && <p>{descripcion}</p>}
-          <ul>
-            <li>Los clubes del futbolista aparecen uno a uno, cada {AJUSTES.segClub} segundos (no se sabe cuántos tiene hasta que salen todos).</li>
-            <li>Si crees que lo sabes, pulsa <strong>«¡Lo sé!»</strong>: el reloj se para y tienes {AJUSTES.segRespuesta} segundos para escribirlo.</li>
-            <li>Si fallas, pierdes {AJUSTES.puntosFallo} punto y quedas fuera de ese futbolista.</li>
-            <li>Tras el último club quedan {AJUSTES.segTrasUltimo} segundos. En los retos difíciles se puede pulsar «Desvelar pista» (da {AJUSTES.segPista} segundos más, pero acertar vale menos).</li>
-          </ul>
-          <p className="mcp-ayuda-sub">Puntuación</p>
-          <ul>
-            <li>Cuantos menos clubes hayan salido, más puntos: hasta <strong>{AJUSTES.puntosMax}</strong>.</li>
-            <li>Con todos los clubes a la vista, <strong>{AJUSTES.puntosTodos}</strong>; con la pista, <strong>{AJUSTES.puntosPista}</strong>.</li>
-          </ul>
-        </div>
-        <button type="button" className="big full qq-btn-principal" onClick={onCerrar}>¡Entendido!</button>
-      </div>
-    </div>
-  );
-}

@@ -131,14 +131,6 @@ const JUEGO = {
   ganador: (n) => `¡${n.join(' y ')} sobrevive a la patata caliente!`,
   detalleFin: (j) => (j.vidas > 0 ? `${j.vidas} ${j.vidas === 1 ? 'vida' : 'vidas'}` : 'eliminado'),
   unidadPuntos: '❤️',
-  reglas: [
-    'Hay una bomba con una mecha secreta (entre 20 y 50 segundos) que pasa de mano en mano. Cada uno tiene 5 cartas: números del 1 al 12 en cuatro colores y cartas especiales.',
-    'Para pasar la bomba tienes que cumplir la condición: superar la cifra anterior (con una carta o con dos del mismo color sumadas), jugar el color pedido o, si está libre, lo que quieras.',
-    'Lo que juegas marca la condición del siguiente: si sumas 15, el siguiente tendrá que superar 15. ¡No se lo pongas fácil!',
-    'Especiales (se pueden jugar siempre): 🔄 invertir el sentido, ⏭️ saltar al siguiente, 🎯 pasarla a quien quieras, 🌶️ calentar (+4 a la cifra), 🧊 enfriar (vale cualquier carta) y 🎨 elegir color.',
-    'Si no puedes (o no quieres) jugar, roba una carta… pero el tiempo sigue corriendo.',
-    'Cuando la mecha se acaba, quien tiene la bomba pierde una vida. Gana el último que siga en pie.'
-  ]
 };
 
 export default function Patata({ onExit }) {

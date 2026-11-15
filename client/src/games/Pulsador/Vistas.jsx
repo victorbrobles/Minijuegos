@@ -553,23 +553,6 @@ export function Pildoras({ opciones, valor, onCambiar }) {
 }
 export const opcionesRondas = (unidad, lista = OPCIONES_RONDAS) => lista.map((n) => [n, `${n} ${unidad}`]);
 
-export function Ayuda({ onCerrar, titulo, descripcion, reglas }) {
-  return (
-    <div className="rg-modal-fondo" onClick={onCerrar}>
-      <div className="rg-modal qq-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-        <div className="qq-modal-ayuda-header">
-          <span className="qq-ayuda-badge">❓ Cómo jugar</span>
-          <h3>{titulo}</h3>
-        </div>
-        <div className="qq-modal-ayuda-body">
-          {descripcion && <p>{descripcion}</p>}
-          <ul>{reglas.map((r) => <li key={r}>{r}</li>)}</ul>
-        </div>
-        <button type="button" className="big full qq-btn-principal" onClick={onCerrar}>¡Entendido!</button>
-      </div>
-    </div>
-  );
-}
 
 /**
  * Pantalla intermedia de turno para el modo online: cuando `clave` cambia (y no es null), aparece unos segundos

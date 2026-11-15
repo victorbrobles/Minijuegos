@@ -5,10 +5,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import { PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, useRecord, Barra } from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, useRecord, Barra } from '../../components/UnJugador.jsx';
 import { cargarSolo, useCuenta, Cargando, RetoAmigo } from './comun.jsx';
 import '../../reto/Reto.css';
 import './Solo.css';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'escalera';
 export const PREMIOS = [10, 20, 30, 50, 100, 150, 250, 400, 600, 1000, 1500, 2500, 4000, 6000, 10000];
@@ -35,7 +36,7 @@ export default function Escalera() {
   const [fase, setFase] = useState('portada');
   const [datos, setDatos] = useState(null);
   const [error, setError] = useState('');
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [salir, setSalir] = useState(false);
   const [record, registrar] = useRecord(ID);
   const [nuevoRecord, setNuevoRecord] = useState(false);
@@ -77,19 +78,9 @@ export default function Escalera() {
     if (c === 'cambio') { setQ(datos.reservas[q.nivel - 1]); setQuitadas([]); setVotos(null); cuenta.empezar(SEGUNDOS); }
   };
 
-  const ayudaModal = ayuda && (
-    <AyudaUnJugador titulo="¿Cómo se juega?" onCerrar={() => setAyuda(false)}>
-      <p>Responde <b>15 preguntas</b> cada vez más difíciles. Cada escalón vale más puntos, hasta <b>10.000</b>.</p>
-      <p>🛟 Las preguntas 3, 7 y 11 son <b>rellanos seguros</b>: si fallas después, te quedas con lo de ese escalón. Si fallas antes del primero, te vas con 0.</p>
-      <p>🛑 Puedes <b>plantarte</b> antes de responder y quedarte con lo que llevas.</p>
-      <p>Comodines (uno de cada): <b>✂️ Tijeras</b> quita dos respuestas falsas, <b>🔄 Cambio</b> pone otra pregunta del mismo nivel y <b>📊 Sondeo</b> muestra lo que respondería la gente (que no siempre acierta).</p>
-      <p>Tienes {SEGUNDOS} segundos por pregunta.</p>
-    </AyudaUnJugador>
-  );
-
   if (fase === 'portada' || fase === 'cargando') {
     if (fase === 'cargando') return <Cargando error={error} onReintentar={empezar} />;
-    return <><PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={() => setAyuda(true)} record={record} textoRecord={(r) => `${fmt(r.valor)} puntos`} />{ayudaModal}</>;
+    return <><PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record} textoRecord={(r) => `${fmt(r.valor)} puntos`} /></>;
   }
   if (fase === 'fin') {
     return (

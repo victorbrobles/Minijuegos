@@ -1,47 +1,9 @@
 // client/src/games/Furbo/FurboComun.jsx
 // Piezas compartidas por el modo local y el online: ayuda y configuración del partido.
 import React from 'react';
-import { FASES_INFO, DURACIONES_INFO, ORDEN_FASES, PUNTOS_INFO } from './FurboInfo.js';
+import { FASES_INFO, DURACIONES_INFO, ORDEN_FASES } from './FurboInfo.js';
 import './Furbo.css';
 
-/** Modal «Cómo jugar» (mismo formato que el resto de juegos). */
-export function AyudaFurbo({ titulo, descripcion, onCerrar }) {
-  return (
-    <div className="rg-modal-fondo" onClick={onCerrar}>
-      <div className="rg-modal qq-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-        <div className="qq-modal-ayuda-header">
-          <span className="qq-ayuda-badge">❓ Cómo jugar</span>
-          <h3>{titulo}</h3>
-        </div>
-        <div className="qq-modal-ayuda-body">
-          <p>{descripcion}</p>
-          <p>Online, cada jugador usa su móvil y el anfitrión marca el ritmo. En un solo dispositivo, la pantalla avisa de a quién pasar el móvil cuando toca responder en secreto (y no hay cuenta atrás salvo en la Prórroga).</p>
-          {ORDEN_FASES.map((id, i) => {
-            const f = FASES_INFO[id];
-            return (
-              <React.Fragment key={id}>
-                <p className="fbp-ayuda-sub">{i + 1}. {f.emoji} {f.nombre} · {f.lema}</p>
-                <ul>
-                  {f.reglas.map((r, k) => (
-                    // eslint-disable-next-line react/no-danger
-                    <li key={k} dangerouslySetInnerHTML={{ __html: r }} />
-                  ))}
-                </ul>
-              </React.Fragment>
-            );
-          })}
-          <p className="fbp-ayuda-sub">🏆 Puntuación</p>
-          <div className="fbp-tabla-puntos">
-            {PUNTOS_INFO.map(([txt, pts]) => (
-              <div key={txt}><span>{txt}</span><strong>{pts}</strong></div>
-            ))}
-          </div>
-        </div>
-        <button type="button" className="big full qq-btn-principal" onClick={onCerrar}>¡Entendido!</button>
-      </div>
-    </div>
-  );
-}
 
 /**
  * Selección de fases y duración del partido.

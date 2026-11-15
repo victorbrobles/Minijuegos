@@ -245,27 +245,3 @@ export function ModalSalir({ titulo, texto, onSeguir, onSalir }) {
   );
 }
 
-export function Ayuda({ onCerrar, titulo, descripcion }) {
-  return (
-    <div className="rg-modal-fondo" onClick={onCerrar}>
-      <div className="rg-modal qq-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-        <div className="qq-modal-ayuda-header">
-          <span className="qq-ayuda-badge">❓ Cómo jugar</span>
-          <h3>{titulo}</h3>
-        </div>
-        <div className="qq-modal-ayuda-body">
-          {descripcion && <p>{descripcion}</p>}
-          <ul>
-            <li>Dos equipos: <strong>Azul ✕</strong> y <strong>Rojo ◯</strong>. Cada fila y cada columna del tablero es una categoría.</li>
-            <li>Cada equipo tiene {AJUSTES.segTurno} segundos por turno para elegir una casilla libre y decir un futbolista que cumpla la categoría de su fila y la de su columna (puede cambiar de casilla sin que se pare el reloj).</li>
-            <li>Si acierta, la casilla es suya. Acierte o falle, el turno pasa al otro equipo. Un futbolista no puede repetirse en el tablero.</li>
-            <li>Gana el primero que hace <strong>tres en raya</strong>. Si se llena el tablero sin raya, es empate.</li>
-            <li>Si nadie consigue la raya, podéis <strong>rendiros</strong>: se desvelan futbolistas válidos para cada casilla libre.</li>
-            <li>Vale el apellido o el nombre por el que se conoce al jugador, y se perdonan tildes y pequeñas erratas.</li>
-          </ul>
-        </div>
-        <button type="button" className="big full qq-btn-principal" onClick={onCerrar}>¡Entendido!</button>
-      </div>
-    </div>
-  );
-}

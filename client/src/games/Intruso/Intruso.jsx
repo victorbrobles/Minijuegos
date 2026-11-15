@@ -4,7 +4,7 @@ import React, { useRef, useState } from 'react';
 import JuegoPulsador from '../Pulsador/JuegoPulsador.jsx';
 import { crearJuegoSimultaneo, useCuentaLocal } from '../comun/Simultaneo.jsx';
 import { Avatar, Cuenta } from '../Pulsador/Vistas.jsx';
-import { M, SEGUNDOS, RAPIDO_MS } from './engine.js';
+import { M, SEGUNDOS } from './engine.js';
 import './Intruso.css';
 
 const nombreDe = (v, id) => v.jugadores.find((j) => j.id === id)?.nombre ?? '¿?';
@@ -87,12 +87,6 @@ const JUEGO = crearJuegoSimultaneo({
   notaSala: '🕵️ Todos responden a la vez desde su móvil: 10 segundos por ronda.',
   detalleFin: (j) => `${j.aciertos} ${j.aciertos === 1 ? 'intruso encontrado' : 'intrusos encontrados'}`,
   ganador: (n) => (n.length > 1 ? `¡Empate entre ${n.join(' y ')}!` : `¡${n[0]} huele a los intrusos!`),
-  reglas: [
-    'Salen cinco elementos (inventos, obras, hechos históricos, películas, personajes…) y uno no encaja: es de otra época o no pertenece a la categoría.',
-    `Tienes ${SEGUNDOS} segundos para encontrarlo.`,
-    `Acertar da 1 punto, y 1 más si respondes en menos de ${RAPIDO_MS / 1000} segundos. Fallar no resta.`,
-    'Al resolver se explica por qué era el intruso (con los años de cada uno, si era de época).'
-  ]
 });
 
 export default function Intruso({ onExit }) {

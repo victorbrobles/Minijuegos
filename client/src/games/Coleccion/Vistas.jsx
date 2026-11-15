@@ -325,34 +325,3 @@ export function PantallaFin({ v, onSalir, children }) {
   );
 }
 
-export function Ayuda({ onCerrar, titulo, descripcion }) {
-  return (
-    <div className="rg-modal-fondo" onClick={onCerrar}>
-      <div className="rg-modal qq-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-        <div className="qq-modal-ayuda-header">
-          <span className="qq-ayuda-badge">❓ Cómo jugar</span>
-          <h3>{titulo}</h3>
-        </div>
-        <div className="qq-modal-ayuda-body">
-          {descripcion && <p>{descripcion}</p>}
-          <p className="cxp-ayuda-sub">🎯 Objetivo</p>
-          <ul>
-            <li>Recibes un <strong>encargo secreto</strong>: la colección que debes reunir en tu vitrina (por ejemplo, 4 dinosaurios, o 2 planetas y 2 piratas, o 5 palos distintos). Puede que otro vaya a por lo mismo… sin que lo sepas.</li>
-            <li>En cuanto tu vitrina cumple tu encargo, <strong>ganas</strong> (aunque sea por culpa de otro). Los 🌟 comodines valen por cualquier palo.</li>
-          </ul>
-          <p className="cxp-ayuda-sub">🔁 Tu turno</p>
-          <ol>
-            <li>Robas {AJUSTES.roboTurno} cartas.</li>
-            <li>Tienes {AJUSTES.jugadasTurno} jugadas: poner una carta de colección en tu vitrina (máx. {AJUSTES.maxVitrina}), devolver una de la vitrina a la mano o jugar una carta de acción.</li>
-            <li>Al terminar, no puedes tener más de {AJUSTES.maxMano} cartas en la mano.</li>
-          </ol>
-          <p className="cxp-ayuda-sub">🃏 Cartas de acción</p>
-          <ul>{Object.values(ACCIONES).map((a) => <li key={a.nombre}>{a.e} <strong>{a.nombre}:</strong> {a.desc}</li>)}</ul>
-          <p className="cxp-ayuda-sub">Palos</p>
-          <p>{PALOS.map((p) => `${p.e} ${p.nombre}`).join(' · ')} · {COMODIN.e} Comodín</p>
-        </div>
-        <button type="button" className="big full qq-btn-principal" onClick={onCerrar}>¡Entendido!</button>
-      </div>
-    </div>
-  );
-}

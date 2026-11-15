@@ -5,10 +5,11 @@
 import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import { PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, useRecord, Barra, Aviso } from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, useRecord, Barra, Aviso } from '../../components/UnJugador.jsx';
 import { cargarSolo, useCuenta, Cargando, RetoAmigo } from './comun.jsx';
 import '../../reto/Reto.css';
 import './Solo.css';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'quiensoy';
 const SEGUNDOS = 180;
@@ -21,7 +22,7 @@ export default function QuienSoy() {
   const navigate = useNavigate();
   const [fase, setFase] = useState('portada');
   const [error, setError] = useState('');
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [salir, setSalir] = useState(false);
   const [record, registrar] = useRecord(ID);
   const [nuevoRecord, setNuevoRecord] = useState(false);
@@ -63,16 +64,7 @@ export default function QuienSoy() {
       setFallados((f) => [...f, i]); cuenta.sumar(-CASTIGO); setAviso({ t: `✗ No es ${datos.candidatos[i].nombre} · −${CASTIGO} s`, k: Date.now(), tipo: 'malo' });
     }
   };
-
-  const ayudaModal = ayuda && (
-    <AyudaUnJugador titulo="¿Cómo se juega?" onCerrar={() => setAyuda(false)}>
-      <p>Tienes <b>3 minutos</b>. La máquina piensa en un famoso de la lista y tú haces preguntas de sí o no.</p>
-      <p>Cada pregunta cuesta <b>{COSTE} s</b>, y los famosos que ya no encajan se tachan solos.</p>
-      <p>Cuando lo tengas, tócalo: si aciertas ganas <b>+{PREMIO} s</b> y sale otro; si fallas, <b>−{CASTIGO} s</b>.</p>
-      <p>Pregunta bien: ¡con pocas preguntas puedes descartar a la mitad!</p>
-    </AyudaUnJugador>
-  );
-  if (fase === 'portada') return <><PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={() => setAyuda(true)} record={record} textoRecord={(r) => `${r.valor} famosos`} />{ayudaModal}</>;
+  if (fase === 'portada') return <><PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record} textoRecord={(r) => `${r.valor} famosos`} /></>;
   if (fase === 'cargando') return <Cargando error={error} onReintentar={empezar} />;
   if (fase === 'fin') {
     return (

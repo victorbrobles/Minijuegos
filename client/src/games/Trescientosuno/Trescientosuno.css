@@ -524,28 +524,6 @@ body:has(.qq-en-partida) .back:not(.qq-btn-volver-sala) {
   color: #0f172a;
 }
 
-.qq-modal-ayuda-body {
-  font-size: 0.95rem;
-  color: #334155;
-  line-height: 1.5;
-  margin-bottom: 1.4rem;
-}
-
-.qq-modal-ayuda-body ul {
-  padding-left: 1.2rem;
-  margin: 0.7rem 0 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
-}
-
-.tcu-ayuda-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
-  margin-top: 1rem;
-}
-
 .tcu-ayuda-chip {
   padding: 0.4rem 0.75rem;
   border-radius: 10px;

@@ -5,11 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import { MenuInicioJuego } from '../../components/MenuJuego.jsx';
 import JugadoresLocal from './JugadoresLocal.jsx';
 import JugadoresOnline, { CLAVE_SESION_JUGADORES } from './JugadoresOnline.jsx';
-import { Ayuda } from './Vistas.jsx';
 import './Jugadores.css';
-import { metaDe } from '../meta.js';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
-const { titulo: TITULO, descripcion: DESCRIPCION } = metaDe('jugadores');
 
 const haySesion = () => {
   try {
@@ -21,18 +19,17 @@ const haySesion = () => {
 
 export default function Jugadores({ onExit }) {
   const [modo, setModo] = useState(() => (haySesion() ? 'online' : 'menu'));
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const navigate = useNavigate();
   const irAPortada = () => (typeof onExit === 'function' ? onExit() : navigate('/'));
 
   return (
     <>
       {modo === 'menu' && (
-        <MenuInicioJuego juegoId="jugadores" onOnline={() => setModo('online')} onLocal={() => setModo('local')} onAyuda={() => setAyuda(true)} />
+        <MenuInicioJuego juegoId="jugadores" onOnline={() => setModo('online')} onLocal={() => setModo('local')} onAyuda={abrirAyuda} />
       )}
-      {modo === 'local' && <JugadoresLocal onVolver={() => setModo('menu')} onExit={irAPortada} onAbrirAyuda={() => setAyuda(true)} />}
-      {modo === 'online' && <JugadoresOnline onVolver={() => setModo('menu')} onSalir={irAPortada} onAbrirAyuda={() => setAyuda(true)} />}
-      {ayuda && <Ayuda titulo={TITULO} descripcion={DESCRIPCION} onCerrar={() => setAyuda(false)} />}
+      {modo === 'local' && <JugadoresLocal onVolver={() => setModo('menu')} onExit={irAPortada} onAbrirAyuda={abrirAyuda} />}
+      {modo === 'online' && <JugadoresOnline onVolver={() => setModo('menu')} onSalir={irAPortada} onAbrirAyuda={abrirAyuda} />}
     </>
   );
 }

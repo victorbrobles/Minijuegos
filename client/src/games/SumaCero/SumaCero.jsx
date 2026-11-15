@@ -5,11 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import { MenuInicioJuego } from '../../components/MenuJuego.jsx';
 import SumaCeroLocal from './SumaCeroLocal.jsx';
 import SumaCeroOnline, { CLAVE_SESION_SUMACERO } from './SumaCeroOnline.jsx';
-import { Ayuda } from './Vistas.jsx';
 import './SumaCero.css';
-import { metaDe } from '../meta.js';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
-const { titulo: TITULO, descripcion: DESCRIPCION } = metaDe('sumacero');
 
 const haySesion = () => {
   try {
@@ -21,18 +19,17 @@ const haySesion = () => {
 
 export default function SumaCero({ onExit }) {
   const [modo, setModo] = useState(() => (haySesion() ? 'online' : 'menu'));
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const navigate = useNavigate();
   const irAPortada = () => (typeof onExit === 'function' ? onExit() : navigate('/'));
 
   return (
     <>
       {modo === 'menu' && (
-        <MenuInicioJuego juegoId="sumacero" onOnline={() => setModo('online')} onLocal={() => setModo('local')} onAyuda={() => setAyuda(true)} />
+        <MenuInicioJuego juegoId="sumacero" onOnline={() => setModo('online')} onLocal={() => setModo('local')} onAyuda={abrirAyuda} />
       )}
-      {modo === 'local' && <SumaCeroLocal onVolver={() => setModo('menu')} onExit={irAPortada} onAbrirAyuda={() => setAyuda(true)} />}
-      {modo === 'online' && <SumaCeroOnline onVolver={() => setModo('menu')} onSalir={irAPortada} onAbrirAyuda={() => setAyuda(true)} />}
-      {ayuda && <Ayuda titulo={TITULO} descripcion={DESCRIPCION} onCerrar={() => setAyuda(false)} />}
+      {modo === 'local' && <SumaCeroLocal onVolver={() => setModo('menu')} onExit={irAPortada} onAbrirAyuda={abrirAyuda} />}
+      {modo === 'online' && <SumaCeroOnline onVolver={() => setModo('menu')} onSalir={irAPortada} onAbrirAyuda={abrirAyuda} />}
     </>
   );
 }

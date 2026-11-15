@@ -4,11 +4,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import {
-  PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, Barra, useRecord
-} from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, Barra, useRecord } from '../../components/UnJugador.jsx';
 import { crearEscena, aplicarAnomalia, tiempos } from './salas.js';
 import './Anomalias.css';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'anomalias';
 const VIDAS = 3;
@@ -41,7 +40,7 @@ function Sala({ sala, objetos, onTocar, objetivo, revelar, fallo, interactiva })
 export default function Anomalias() {
   const navigate = useNavigate();
   const [fase, setFase] = useState('portada'); // portada | observar | estatica | buscar | resultado | fin
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [salir, setSalir] = useState(false);
   const [record, registrar] = useRecord(ID);
   const [nivel, setNivel] = useState(1);
@@ -142,24 +141,12 @@ export default function Anomalias() {
     nuevaRonda(nv);
   };
 
-  const ayudaModal = ayuda && (
-    <AyudaUnJugador titulo="¿Cómo se juega?" onCerrar={() => setAyuda(false)}>
-      <p>Vigilas una habitación con una <strong>cámara fija</strong>.</p>
-      <ul>
-        <li><strong>Observa</strong> la escena mientras dura la cuenta atrás.</li>
-        <li>La señal se corta un momento y, al volver, <strong>algo habrá cambiado</strong>: un objeto que desaparece, aparece, se mueve, cambia de color, de tamaño, se inclina…</li>
-        <li><strong>Toca el objeto</strong> que ha cambiado antes de que acabe el tiempo. Si ha desaparecido, toca el hueco donde estaba.</li>
-        <li>Cada nivel hay más objetos y los cambios son más sutiles. Tienes 3 vidas.</li>
-      </ul>
-    </AyudaUnJugador>
-  );
-
   if (fase === 'portada') {
     return (
       <div className="an-contenedor">
-        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={() => setAyuda(true)} record={record}
+        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record}
           textoRecord={(r) => `${r.valor} ${r.valor === 1 ? 'anomalía' : 'anomalías'}`} textoBoton="Empezar la guardia" iconoBoton="eye" />
-        {ayudaModal}
+        
       </div>
     );
   }

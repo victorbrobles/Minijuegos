@@ -140,14 +140,6 @@ const JUEGO = {
   notaSala: '🏗️ Cada uno coloca su pieza desde su móvil, por turnos. ¡Pulso firme!',
   ganador: (n) => (n.length > 1 ? `¡${n.join(' y ')} empatan con pulso de cirujano!` : `¡${n[0]} tiene el pulso más firme!`),
   detalleFin: (j) => `${j.derribos} ${j.derribos === 1 ? 'derribo' : 'derribos'} · ${j.colocadas} piezas`,
-  reglas: [
-    'Por turnos, cada jugador recibe una pieza: cubo, viga, losa, cilindro, cuña, cruz, rueda…',
-    'Muévela arrastrando el dedo por el recuadro, gírala (⟲ ⟳) o túmbala, y suéltala encima de la torre. La línea amarilla marca dónde caerá.',
-    'La física es real: las piezas pesan, resbalan y ruedan. Si alguna pieza acaba cayendo de la plataforma, quien soltó la última ha derribado la torre.',
-    'Quien derriba la torre pierde la ronda y los demás suman 1 punto. Se vuelve a empezar desde cero.',
-    'Las piezas son cada vez más pequeñas y raras. Online tienes 40 segundos por turno; si se acaba, tu pieza cae en el centro tal cual.',
-    'Gana quien más puntos tenga al acabar las rondas.'
-  ]
 };
 
 export default function Torre({ onExit }) {

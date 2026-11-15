@@ -260,25 +260,3 @@ export function SelectorRondas({ valor, onCambiar }) {
   );
 }
 
-export function Ayuda({ onCerrar, titulo, descripcion }) {
-  return (
-    <div className="rg-modal-fondo" onClick={onCerrar}>
-      <div className="rg-modal qq-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-        <div className="qq-modal-ayuda-header">
-          <span className="qq-ayuda-badge">❓ Cómo jugar</span>
-          <h3>{titulo}</h3>
-        </div>
-        <div className="qq-modal-ayuda-body">
-          {descripcion && <p>{descripcion}</p>}
-          <ul>
-            <li>Cada ronda salen cuatro clubes. Por turnos, cada jugador pulsa «¡Listo!» y tiene {AJUSTES.segTurno} segundos para decir un futbolista.</li>
-            <li>Suma un punto por cada uno de los cuatro clubes en los que jugó: si jugó en los cuatro, ¡pleno!</li>
-            <li>Si el futbolista está en nuestra base, se puntúa solo. Si no, el anfitrión (o el grupo, en un dispositivo) marca en qué clubes jugó.</li>
-            <li>No se puede repetir un futbolista ya dicho en la ronda. Al acabarla se ven las mejores respuestas posibles.</li>
-          </ul>
-        </div>
-        <button type="button" className="big full qq-btn-principal" onClick={onCerrar}>¡Entendido!</button>
-      </div>
-    </div>
-  );
-}

@@ -5,9 +5,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import { PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, useRecord, Barra, Aviso } from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, useRecord, Barra, Aviso } from '../../components/UnJugador.jsx';
 import { cargarSolo, useCuenta, Cargando, coincide, RetoAmigo } from './comun.jsx';
 import './Solo.css';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'onceperdido';
 const SEGUNDOS = 90;
@@ -17,7 +18,7 @@ export default function OncePerdido() {
   const navigate = useNavigate();
   const [fase, setFase] = useState('portada');
   const [error, setError] = useState('');
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [salir, setSalir] = useState(false);
   const [record, registrar] = useRecord(ID);
   const [nuevoRecord, setNuevoRecord] = useState(false);
@@ -60,16 +61,7 @@ export default function OncePerdido() {
     if (k + 1 >= rondas.length) { setNuevoRecord(puntos > 0 && registrar(puntos)); setFase('fin'); return; }
     setK(k + 1); nuevaRonda();
   };
-
-  const ayudaModal = ayuda && (
-    <AyudaUnJugador titulo="¿Cómo se juega?" onCerrar={() => setAyuda(false)}>
-      <p>Verás <b>5 alineaciones</b> de partidos históricos con <b>4 titulares ocultos</b> (solo ves su dorsal y su puesto).</p>
-      <p>Escribe sus nombres en cualquier orden; vale el apellido y se perdonan pequeñas erratas.</p>
-      <p>Cada hueco acertado vale <b>3 puntos</b>. Toca un hueco y pide pista: la primera dice su club o su país y la segunda un dato. Cada pista resta 1 punto (mínimo 1).</p>
-      <p>Tienes {SEGUNDOS} segundos por alineación.</p>
-    </AyudaUnJugador>
-  );
-  if (fase === 'portada') return <><PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={() => setAyuda(true)} record={record} textoRecord={(r) => `${r.valor} puntos`} />{ayudaModal}</>;
+  if (fase === 'portada') return <><PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record} textoRecord={(r) => `${r.valor} puntos`} /></>;
   if (fase === 'cargando') return <Cargando error={error} onReintentar={empezar} />;
   if (fase === 'fin') {
     return (

@@ -128,13 +128,6 @@ const JUEGO = {
   ganador: (n) => `¡${n.join(' y ')} sale con más oro!`,
   detalleFin: () => 'oro en el cofre',
   unidadPuntos: '🪙',
-  reglas: [
-    'Entráis todos en la mazmorra. En cada sala hay un tesoro que se reparte a partes iguales entre los que siguen dentro; lo que sobra se queda en el suelo.',
-    'Después de cada sala, todos decidís a la vez y en secreto: seguir explorando o volver.',
-    'Los que vuelven guardan su mochila en el cofre (ya no se puede perder) y se reparten lo que había en el suelo. Si vuelve uno solo, se lleva también las reliquias 🏺.',
-    'Cada sala nueva aumenta la probabilidad de que aparezca el dragón 🐉 (la veis en pantalla). Si aparece, los que siguen dentro pierden toda su mochila de esa expedición.',
-    'Al final de todas las expediciones, gana quien tenga más oro en el cofre.'
-  ]
 };
 
 export default function Dragon({ onExit }) {

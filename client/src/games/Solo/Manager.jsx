@@ -5,9 +5,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import { PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, useRecord, Aviso } from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, useRecord, Aviso } from '../../components/UnJugador.jsx';
 import { cargarSolo, Cargando, RetoAmigo } from './comun.jsx';
 import './Solo.css';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'manager';
 export const HUECOS = { POR: 1, DEF: 4, MED: 3, DEL: 3 };
@@ -38,7 +39,7 @@ export default function Manager() {
   const navigate = useNavigate();
   const [fase, setFase] = useState('portada'); // portada | cargando | mercado | simulando | fin
   const [error, setError] = useState('');
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [salir, setSalir] = useState(false);
   const [record, registrar] = useRecord(ID);
   const [nuevoRecord, setNuevoRecord] = useState(false);
@@ -77,16 +78,7 @@ export default function Manager() {
       setNuevoRecord(registrar(yo.pts)); setFase('fin');
     }, 2200);
   };
-
-  const ayudaModal = ayuda && (
-    <AyudaUnJugador titulo="¿Cómo se juega?" onCerrar={() => setAyuda(false)}>
-      <p>Eres el nuevo mánager. Con <b>220 M€</b> tienes que fichar un once: <b>1 portero, 4 defensas, 3 medios y 3 delanteros</b>.</p>
-      <p>Hay <b>3 mercados</b> con 12 ofertas cada uno. Ves el nombre, el puesto, la edad, el club y el precio… pero <b>no su media</b>: ahí entra tu ojo de ojeador. Los jóvenes con potencial rinden algo más y los veteranos, algo menos.</p>
-      <p>Si al final te falta algún puesto, lo cubrirá un canterano (media {CANTERANO}).</p>
-      <p>Después se juega una <b>liga de 20 equipos a 38 jornadas</b>. Tu puntuación son los puntos que sumes.</p>
-    </AyudaUnJugador>
-  );
-  if (fase === 'portada') return <><PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={() => setAyuda(true)} record={record} textoRecord={(r) => `${r.valor} puntos en liga`} />{ayudaModal}</>;
+  if (fase === 'portada') return <><PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record} textoRecord={(r) => `${r.valor} puntos en liga`} /></>;
   if (fase === 'cargando') return <Cargando error={error} onReintentar={empezar} />;
   if (fase === 'simulando') {
     return <section className="game uj-escena rto-escena"><div className="uj-tarjeta sl-centro mg-simulando"><span>⚽</span><p>Simulando la temporada…</p><small>38 jornadas · 380 partidos</small></div></section>;

@@ -5,9 +5,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import { PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, useRecord, Aviso } from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, useRecord, Aviso } from '../../components/UnJugador.jsx';
 import { cargarSolo, Cargando, Buscador, norm, RetoAmigo } from './comun.jsx';
 import './Solo.css';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'misterioso';
 const INTENTOS = 8;
@@ -29,7 +30,7 @@ export default function Misterioso() {
   const navigate = useNavigate();
   const [fase, setFase] = useState('portada');
   const [error, setError] = useState('');
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [salir, setSalir] = useState(false);
   const [record, registrar] = useRecord(ID);
   const [nuevoRecord, setNuevoRecord] = useState(false);
@@ -61,16 +62,7 @@ export default function Misterioso() {
     if (s + 1 >= datos.secretos.length) { setNuevoRecord(puntos > 0 && registrar(puntos)); setFase('fin'); return; }
     setS(s + 1); setIntentos([]); setEstado('jugando');
   };
-
-  const ayudaModal = ayuda && (
-    <AyudaUnJugador titulo="¿Cómo se juega?" onCerrar={() => setAyuda(false)}>
-      <p>Hay un <b>futbolista misterioso</b> de la temporada 2025/26 (de los buenos: media 83 o más). Tienes <b>{INTENTOS} intentos</b>.</p>
-      <p>Escribe cualquier futbolista y verás cuánto se parece al misterioso:</p>
-      <p>🟩 igual · 🟨 cerca (mismo continente, o edad/media a 2 o menos) · ⬜ distinto. Las flechas ⬆⬇ dicen si el misterioso tiene más o menos edad y media.</p>
-      <p>Son <b>3 misterios</b>; cada uno vale 9 puntos menos los intentos que gastes.</p>
-    </AyudaUnJugador>
-  );
-  if (fase === 'portada') return <><PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={() => setAyuda(true)} record={record} textoRecord={(r) => `${r.valor} puntos`} />{ayudaModal}</>;
+  if (fase === 'portada') return <><PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record} textoRecord={(r) => `${r.valor} puntos`} /></>;
   if (fase === 'cargando') return <Cargando error={error} onReintentar={empezar} />;
   if (fase === 'fin') {
     return (

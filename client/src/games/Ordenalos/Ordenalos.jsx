@@ -4,10 +4,9 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import {
-  PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, Aviso, useRecord, barajar
-} from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, Aviso, useRecord, barajar } from '../../components/UnJugador.jsx';
 import './Ordenalos.css';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'ordenalos';
 const VIDAS = 3;
@@ -26,7 +25,7 @@ function nuevasCajas(n) {
 export default function Ordenalos() {
   const navigate = useNavigate();
   const [fase, setFase] = useState('portada'); // portada | pesar | ordenar | resultado | fin
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [salir, setSalir] = useState(false);
   const [record, registrar] = useRecord(ID);
   const [ronda, setRonda] = useState(0);
@@ -101,24 +100,12 @@ export default function Ordenalos() {
     preparar(ganadas > 0 ? ronda + 1 : ronda);
   };
 
-  const ayudaModal = ayuda && (
-    <AyudaUnJugador titulo="¿Cómo se juega?" onCerrar={() => setAyuda(false)}>
-      <p>Cada caja tiene un peso <strong>secreto</strong>. Tienes que ordenarlas de la más <strong>ligera</strong> a la más <strong>pesada</strong>.</p>
-      <ul>
-        <li>Toca dos cajas para ponerlas en la <strong>balanza</strong>: verás cuál pesa más (pero no cuánto).</li>
-        <li>Las pesadas quedan apuntadas. Usa la lógica: si A &lt; B y B &lt; C, no hace falta comparar A y C.</li>
-        <li>Cuando lo tengas, pulsa <strong>Ordenar</strong>, toca las cajas en orden y comprueba.</li>
-        <li>⭐⭐⭐ si no pasas del número de pesadas marcado, ⭐⭐ con hasta 2 más y ⭐ si te pasas más. Si el orden está mal pierdes una vida.</li>
-      </ul>
-    </AyudaUnJugador>
-  );
-
   if (fase === 'portada') {
     return (
       <div className="or-contenedor">
-        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={() => setAyuda(true)} record={record}
+        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record}
           textoRecord={(r) => `${r.valor} ⭐`} />
-        {ayudaModal}
+        
       </div>
     );
   }

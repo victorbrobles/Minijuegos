@@ -304,7 +304,6 @@
   font-weight: 800 !important;
   cursor: pointer;
 }
-.cxp-ayuda-sub { margin: 0.9rem 0 0.2rem !important; color: #0f172a !important; font-weight: 800; }
 
 .cxp-modal { max-width: 400px !important; padding: 1.6rem 1.3rem !important; border-radius: 24px !important; text-align: center; }
 .cxp-modal h3 { margin: 0 0 0.4rem; }
@@ -338,7 +337,6 @@
 @media (prefers-reduced-motion: reduce) {
   .cxp-carga, .cxp-gate .cxp-avatar.grande { animation: none !important; }
 }
-
 
 /* ═════════════ Propio de Colecciona con cabeza ═════════════ */
 .cxp-cartas-fondo { position: absolute !important; right: -10px; bottom: -22px; font-size: 6rem; opacity: 0.16; transform: rotate(-14deg); pointer-events: none; }
@@ -422,7 +420,6 @@ button.cxp-carta:disabled .cxp-carta-accion { background: #e2e8f0; color: #64748
 .cxp-log { display: flex; flex-direction: column; gap: 0.25rem; max-height: 260px; overflow-y: auto; }
 .cxp-log p { margin: 0; padding: 0.3rem 0.5rem; border-radius: 10px; background: #f8fafc; color: #334155 !important; font-size: 0.86rem; }
 .cxp-toast.info { background: #0e7490; }
-.cxp-ayuda-sub { margin: 0.9rem 0 0.2rem !important; color: #0f172a !important; font-weight: 800; }
 
 @media (prefers-reduced-motion: reduce) { .cxp-ultimo { animation: none !important; } }
 .cxp-util { position: absolute; top: -8px; right: -6px; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: #facc15; color: #713f12; font-size: 0.8rem; font-weight: 900; box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2); }

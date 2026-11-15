@@ -514,42 +514,6 @@ body:has(.qq-en-partida) .back:not(.qq-btn-volver-sala) {
   color: #0f172a;
 }
 
-.qq-modal-ayuda-body {
-  font-size: 0.95rem;
-  color: #334155;
-  line-height: 1.5;
-  margin-bottom: 1.4rem;
-}
-
-.qq-modal-ayuda-body ul {
-  padding-left: 1.2rem;
-  margin: 0.7rem 0 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
-}
-
-.rk-ayuda-puntos {
-  display: flex;
-  flex-direction: column;
-  gap: 0.45rem;
-  margin-top: 1rem;
-}
-
-.rk-ayuda-fila {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.5rem 0.85rem;
-  border-radius: 12px;
-  font-size: 0.88rem;
-  font-weight: 700;
-}
-
-.rk-ayuda-fila.sin-pista { background: #dcfce7; color: #166534; }
-.rk-ayuda-fila.con-pista { background: #fef3c7; color: #92400e; }
-.rk-ayuda-fila.fallo { background: #fee2e2; color: #991b1b; }
-
 /* ==========================================================================
    SISTEMA DE ESCENAS Y CABECERAS DE PARTIDA (.qqp-*)
    ========================================================================== */

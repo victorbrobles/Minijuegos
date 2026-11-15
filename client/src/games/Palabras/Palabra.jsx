@@ -4,10 +4,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import { PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, useRecord } from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, useRecord } from '../../components/UnJugador.jsx';
 import { cargarSolo, Cargando, RetoAmigo } from '../Solo/comun.jsx';
 import { sonar, vibrar } from '../../lib/sonido.js';
 import './Palabras.css';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'palabra';
 const INTENTOS = 6;
@@ -44,7 +45,7 @@ export default function Palabra() {
   const navigate = useNavigate();
   const [fase, setFase] = useState('portada');
   const [error, setError] = useState('');
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [salir, setSalir] = useState(false);
   const [record, registrar] = useRecord(ID);
   const [nuevoRecord, setNuevoRecord] = useState(false);
@@ -124,20 +125,10 @@ export default function Palabra() {
     });
   }
 
-  const ayudaModal = ayuda && (
-    <AyudaUnJugador titulo="¿Cómo se juega?" onCerrar={() => setAyuda(false)}>
-      <p>Adivina la palabra oculta. Tienes <b>{INTENTOS} intentos</b> y cada intento tiene que ser una palabra que exista.</p>
-      <p>Tras cada intento, las letras se colorean: <b className="pal-ej v">verde</b> está en su sitio, <b className="pal-ej a">amarillo</b> está en la palabra pero en otro sitio y <b className="pal-ej g">gris</b> no está.</p>
-      <p>Empiezas con palabras de <b>3 letras</b> y cada dos aciertos son una letra más, hasta <b>8</b>. Después, palabras de 8 sin fin.</p>
-      <p>💀 <b>Si fallas una palabra, se acaba la partida.</b> Cuanto más larga la palabra y menos intentos uses, más puntos.</p>
-      <p>Las tildes no cuentan: «raton» vale por «ratón».</p>
-    </AyudaUnJugador>
-  );
-
   if (fase === 'portada' || fase === 'cargando') {
     if (fase === 'cargando') return <Cargando error={error} onReintentar={empezar} />;
-    return <><PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={() => setAyuda(true)} record={record}
-      textoRecord={(r) => `${fmt(r.valor)} puntos${r.palabras != null ? ` · ${r.palabras} palabras` : ''}`} />{ayudaModal}</>;
+    return <><PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record}
+      textoRecord={(r) => `${fmt(r.valor)} puntos${r.palabras != null ? ` · ${r.palabras} palabras` : ''}`} /></>;
   }
   const aciertos = k + (estado === 'acierto' ? 1 : 0);
   if (fase === 'fin') {
@@ -215,7 +206,7 @@ export default function Palabra() {
         )}
       </section>
       {salir && <ConfirmarSalida onSeguir={() => setSalir(false)} onSalir={() => navigate('/')} />}
-      {ayudaModal}
+      
     </div>
   );
 }

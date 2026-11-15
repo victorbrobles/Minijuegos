@@ -5,7 +5,7 @@ import Icon from '../../components/Icon.jsx';
 import JuegoPulsador from '../Pulsador/JuegoPulsador.jsx';
 import { crearJuegoSimultaneo } from '../comun/Simultaneo.jsx';
 import { Avatar } from '../Pulsador/Vistas.jsx';
-import { M, SEGUNDOS, PERFECTO } from './engine.js';
+import { M } from './engine.js';
 import './PonOrden.css';
 
 const nombreDe = (v, id) => v.jugadores.find((j) => j.id === id)?.nombre ?? '¿?';
@@ -99,12 +99,6 @@ const JUEGO = crearJuegoSimultaneo({
   notaSala: '📊 Todos ordenan a la vez desde su móvil.',
   detalleFin: (j) => `${j.aciertos} ${j.aciertos === 1 ? 'orden perfecto' : 'órdenes perfectos'}`,
   ganador: (n) => (n.length > 1 ? `¡Empate entre ${n.join(' y ')}!` : `¡${n[0]} lo tiene todo en su sitio!`),
-  reglas: [
-    'Cada ronda salen seis elementos de un tema: inventos, hechos históricos, películas, ríos, montañas, planetas, animales, edificios, países…',
-    'Hay que ordenarlos según lo que se pida: del más antiguo al más moderno, del más corto al más largo, del más lejano al más cercano…',
-    `Cada elemento en su posición correcta es 1 punto. Si aciertas el orden completo te llevas ${PERFECTO}.`,
-    `Online todos ordenan a la vez y hay ${SEGUNDOS} segundos. En un dispositivo, os pasáis el móvil.`
-  ]
 });
 
 export default function PonOrden({ onExit }) {

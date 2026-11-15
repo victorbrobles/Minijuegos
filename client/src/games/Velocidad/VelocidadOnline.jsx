@@ -16,6 +16,7 @@ import {
 import { limitesOnline, textoSala } from '../limites.js';
 import { SelectorRondas } from '../../components/MenuJuego.jsx';
 import { rondasPorDefecto } from '../rondas.js';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const LIM_ON = limitesOnline('velocidad');
 
@@ -32,7 +33,7 @@ export default function VelocidadOnline({ onLocal }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modalSalir, setModalSalir] = useState(false);
-  const [modalAyuda, setModalAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
 
   const [sesion, setSesion] = useState(() => {
     try {
@@ -420,29 +421,6 @@ export default function VelocidadOnline({ onLocal }) {
       {sinRed && <div className="ptp-sin-red">📶 Reconectando con la sala…</div>}
 
       {/* MODAL DE AYUDA */}
-      {modalAyuda && (
-        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
-          <div className="rg-modal ptp-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-            <div className="ptp-modal-ayuda-header">
-              <span className="ptp-ayuda-badge">❓ Cómo jugar</span>
-              <h3>Test de Velocidad</h3>
-            </div>
-
-            <div className="ptp-modal-ayuda-body">
-              <p>Compite por turnos de 60 segundos desde cada móvil mientras el resto sigue tu ronda en directo.</p>
-              <ul>
-                <li><strong>Turnos sorteados:</strong> El juego sortea quién empieza con una cuenta atrás de <strong>10 segundos</strong>.</li>
-                <li><strong>60 segundos contrarreloj:</strong> Cada pregunta tiene 4 opciones y suma <strong>+1 punto</strong> por acierto. Todos ven tus preguntas y aciertos en tiempo real.</li>
-                <li><strong>⭐ Pregunta Especial (30s):</strong> A los 30 segundos el cronómetro se pausa y aparece una pregunta abierta que otorga <strong>+30 segundos extra</strong> si aciertas.</li>
-              </ul>
-            </div>
-
-            <button type="button" className="ptp-boton" onClick={() => setModalAyuda(false)}>
-              ¡Entendido!
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* 1. MENÚ PRINCIPAL */}
       {vista === 'menu' && (
@@ -450,7 +428,7 @@ export default function VelocidadOnline({ onLocal }) {
           juegoId="velocidad"
           onOnline={() => { setVista('online_menu'); setErrorMsg(''); }}
           onLocal={onLocal}
-          onAyuda={() => setModalAyuda(true)}
+          onAyuda={abrirAyuda}
           error={errorMsg}
         />
       )}
@@ -460,7 +438,7 @@ export default function VelocidadOnline({ onLocal }) {
           onVolver={() => { setVista('menu'); setErrorMsg(''); }}
           onCrear={() => { setVista('crear'); setErrorMsg(''); }}
           onUnirse={() => { setVista('unirse'); setErrorMsg(''); }}
-          onAyuda={() => setModalAyuda(true)}
+          onAyuda={abrirAyuda}
           error={errorMsg}
         />
       )}
@@ -469,7 +447,7 @@ export default function VelocidadOnline({ onLocal }) {
       {vista === 'crear' && (
         <FormCrearSala
           onVolver={() => { setVista('online_menu'); setErrorMsg(''); }}
-          onAyuda={() => setModalAyuda(true)}
+          onAyuda={abrirAyuda}
           nombre={nombre}
           setNombre={setNombre}
           onCrear={handleCrear}
@@ -482,7 +460,7 @@ export default function VelocidadOnline({ onLocal }) {
       {vista === 'unirse' && (
         <FormUnirseSala
           onVolver={() => { setVista('online_menu'); setErrorMsg(''); }}
-          onAyuda={() => setModalAyuda(true)}
+          onAyuda={abrirAyuda}
           codigo={codigoInput}
           setCodigo={setCodigoInput}
           nombre={nombre}
@@ -499,7 +477,7 @@ export default function VelocidadOnline({ onLocal }) {
           <CabeceraSala
             codigo={sala.code}
             onVolver={() => setModalSalir(true)}
-            onAyuda={() => setModalAyuda(true)}
+            onAyuda={abrirAyuda}
           />
 
           <ListaSala

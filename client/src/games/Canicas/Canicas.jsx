@@ -8,7 +8,7 @@ import { BloqueConfig, PanelMenu, Cabecera } from '../../components/MenuJuego.js
 import Icon from '../../components/Icon.jsx';
 import { nombreIdentidad } from '../../lib/identidad.js';
 import * as E from './engine.js';
-import { CANICAS, IDS_CANICAS, OBJETOS } from './canicas.js';
+import { CANICAS, IDS_CANICAS } from './canicas.js';
 import { CIRCUITOS, IDS_CIRCUITOS } from './circuitos.js';
 import Carrera3D from './Carrera3D.jsx';
 import './Canicas.css';
@@ -172,13 +172,6 @@ const JUEGO = {
   notaSala: '🔮 Cada uno corre en su móvil. Inclínalo para guiar tu canica (o usa el joystick).',
   ganador: (n) => (n.length > 1 ? `¡${n.join(' y ')} empatan en lo más alto!` : `¡${n[0]} es la canica más rápida!`),
   detalleFin: (j) => `${j.victorias} ${j.victorias === 1 ? 'victoria' : 'victorias'}`,
-  reglas: [
-    'Antes de cada carrera eliges canica. Cada una tiene una habilidad: velocidad punta, peso, salto, imán para objetos, atravesar rivales, turbos más largos, agarre o un objeto gratis cada 15 segundos.',
-    'Guía tu canica inclinando el móvil (📱 Inclinar; en iPhone hace falta https) o con el joystick. «Calibrar» toma como recto cómo tienes el móvil ahora.',
-    'Los circuitos tienen atajos: más cortos pero estrechos y muchas veces sin barandilla. Si te caes, vuelves un poco más atrás. El minimapa muestra a todos y cuánto queda.',
-    `Pasa por las flechas naranjas para coger turbo y por las cajas ❓ para coger un objeto: ${Object.values(OBJETOS).map((o) => `${o.emoji} ${o.nombre}`).join(', ')}. Quien va detrás recibe objetos mejores.`,
-    `Puntos por puesto en cada carrera: ${E.PUNTOS.join(', ')}. Gana quien más sume. Sin rivales a mano, juega la práctica contra bots.`
-  ]
 };
 
 export default function Canicas({ onExit }) {

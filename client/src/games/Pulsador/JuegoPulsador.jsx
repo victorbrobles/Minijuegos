@@ -5,9 +5,8 @@ import { useNavigate } from 'react-router-dom';
 import { MenuInicioJuego } from '../../components/MenuJuego.jsx';
 import PulsadorLocal from './PulsadorLocal.jsx';
 import PulsadorOnline, { claveSesion } from './PulsadorOnline.jsx';
-import { Ayuda } from './Vistas.jsx';
 import { JUEGOS } from './juegos.js';
-import { metaDe } from '../meta.js';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const haySesion = (id) => {
   try {
@@ -22,9 +21,8 @@ export default function JuegoPulsador({ juegoId: id, juego: propio, onExit, onVo
   const juego = propio || JUEGOS[id];
   const juegoId = juego.id;
   const Local = juego.Local || PulsadorLocal;
-  const { titulo, descripcion } = metaDe(juegoId);
   const [modo, setModo] = useState(() => (haySesion(juegoId) ? 'online' : 'menu'));
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [inicial, setInicial] = useState('menu');
   const navigate = useNavigate();
   const irAPortada = () => (typeof onExit === 'function' ? onExit() : navigate('/'));
@@ -33,11 +31,10 @@ export default function JuegoPulsador({ juegoId: id, juego: propio, onExit, onVo
     <>
       {modo === 'menu' && (
         <MenuInicioJuego juegoId={juegoId} local={juego.menuLocal} onOnline={() => setModo('online')} onLocal={juego.sinLocal ? undefined : () => setModo('local')}
-          onCrear={() => { setInicial('crear'); setModo('online'); }} onUnirse={() => { setInicial('unirse'); setModo('online'); }} onAyuda={() => setAyuda(true)} onVolver={onVolverMenu} textoVolver={textoVolverMenu} />
+          onCrear={() => { setInicial('crear'); setModo('online'); }} onUnirse={() => { setInicial('unirse'); setModo('online'); }} onAyuda={abrirAyuda} onVolver={onVolverMenu} textoVolver={textoVolverMenu} />
       )}
-      {modo === 'local' && <Local juego={juego} onVolver={() => setModo('menu')} onExit={irAPortada} onAbrirAyuda={() => setAyuda(true)} />}
-      {modo === 'online' && <PulsadorOnline juego={juego} inicial={inicial} onVolver={() => { setInicial('menu'); setModo('menu'); }} onSalir={irAPortada} onAbrirAyuda={() => setAyuda(true)} />}
-      {ayuda && <Ayuda titulo={titulo} descripcion={descripcion} reglas={juego.reglas} onCerrar={() => setAyuda(false)} />}
+      {modo === 'local' && <Local juego={juego} onVolver={() => setModo('menu')} onExit={irAPortada} onAbrirAyuda={abrirAyuda} />}
+      {modo === 'online' && <PulsadorOnline juego={juego} inicial={inicial} onVolver={() => { setInicial('menu'); setModo('menu'); }} onSalir={irAPortada} onAbrirAyuda={abrirAyuda} />}
     </>
   );
 }

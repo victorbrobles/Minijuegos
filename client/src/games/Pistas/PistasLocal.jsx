@@ -8,6 +8,7 @@ import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx'
 import { limitesLocal } from '../limites.js';
 import { SelectorRondas } from '../../components/MenuJuego.jsx';
 import { rondasPorDefecto, totalRondas } from '../rondas.js';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const MAX_PISTAS = 6;
 const TIEMPO_PISTA_SEGUNDOS = 10;
@@ -21,7 +22,7 @@ const inicial = (n = '?') => n.trim().charAt(0).toUpperCase() || '?';
 export default function PistasLocal({ onVolver, onExit }) {
   const navigate = useNavigate();
   const [fase, setFase] = useState('setup'); // 'setup' | 'jugando' | 'resolucion' | 'final'
-  const [modalAyuda, setModalAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [modalSalirPortada, setModalSalirPortada] = useState(false);
 
   // Setup
@@ -432,35 +433,12 @@ export default function PistasLocal({ onVolver, onExit }) {
   return (
     <div className={`pts-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
       {/* MODAL DE AYUDA */}
-      {modalAyuda && (
-        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
-          <div className="rg-modal ptp-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-            <div className="ptp-modal-ayuda-header">
-              <span className="ptp-ayuda-badge">❓ Cómo jugar</span>
-              <h3>6 Pistas</h3>
-            </div>
-
-            <div className="ptp-modal-ayuda-body">
-              <p>Descubre el personaje, película, lugar o canción secreta con el menor número de pistas posible.</p>
-              <ul>
-                <li><strong>6 pistas progresivas:</strong> Se revela una nueva pista cada <strong>10 segundos</strong>.</li>
-                <li><strong>Pulsador rojo:</strong> Pulsa el botón para detener el reloj. Elegid quién ha pulsado y tendréis <strong>30 segundos</strong> para escribir y enviar la respuesta.</li>
-                <li><strong>Puntuación:</strong> Cuanto antes aciertes, más puntos sumas (de <strong>+6 pts</strong> en la primera pista a <strong>+1 pt</strong> en la última). Si fallas, no podrás volver a intentarlo en esa ronda.</li>
-              </ul>
-            </div>
-
-            <button type="button" className="ptp-boton" onClick={() => setModalAyuda(false)}>
-              ¡Entendido!
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* 1. SETUP */}
       {fase === 'setup' && (
         <SelectorJugadores
           onVolver={onVolver}
-          onAyuda={() => setModalAyuda(true)}
+          onAyuda={abrirAyuda}
           min={MIN_JUGADORES}
           max={MAX_JUGADORES}
           numJugadores={numJugadores}

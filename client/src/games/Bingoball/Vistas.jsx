@@ -350,27 +350,3 @@ export function PantallaTipos({ grupos = [], inicial: elegidoInicial, esAdmin, a
   );
 }
 
-export function Ayuda({ onCerrar, titulo, descripcion }) {
-  return (
-    <div className="rg-modal-fondo" onClick={onCerrar}>
-      <div className="rg-modal qq-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-        <div className="qq-modal-ayuda-header">
-          <span className="qq-ayuda-badge">❓ Cómo jugar</span>
-          <h3>{titulo}</h3>
-        </div>
-        <div className="qq-modal-ayuda-body">
-          {descripcion && <p>{descripcion}</p>}
-          <ul>
-            <li>Cada jugador recibe un cartón con {AJUSTES.filas * AJUSTES.columnas} categorías ({AJUSTES.filas} filas de {AJUSTES.columnas}).</li>
-            <li>Cada {AJUSTES.segFutbolista} segundos sale un futbolista. Si encaja en una casilla abierta de tu cartón, tócala (una por futbolista).</li>
-            <li>Acertar suma <strong>{AJUSTES.puntosAcierto}</strong>. Fallar resta <strong>{AJUSTES.puntosFallo}</strong> y te deja sin marcar hasta el siguiente futbolista.</li>
-            <li>Con una fila completa aparece el botón <strong>«Cantar línea»</strong>. El bingo se para mientras decides: si la cantas sumas <strong>{AJUSTES.puntosLinea}</strong> y esa fila cambia por 3 categorías nuevas; si no, todo sigue igual. Solo hay <strong>una línea por bingo</strong>: la primera que se cante.</li>
-            <li>Quien completa el cartón canta <strong>bingo</strong> (+{AJUSTES.puntosBingo}) y termina la partida.</li>
-            <li>Los futbolistas salen al azar, pero salen más los que encajan en más casillas abiertas y los que hace más que no salen; los que no sirven a nadie ya no salen.</li>
-          </ul>
-        </div>
-        <button type="button" className="big full qq-btn-principal" onClick={onCerrar}>¡Entendido!</button>
-      </div>
-    </div>
-  );
-}

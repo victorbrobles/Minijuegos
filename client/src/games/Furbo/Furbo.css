@@ -38,7 +38,6 @@
   padding-top: 1rem;
 }
 
-
 .furbo-reloj { margin: 0.4rem 0 1rem; }
 .furbo-reloj-barra { height: 8px; border-radius: 9999px; overflow: hidden; background: rgba(148, 163, 184, 0.35); }
 .furbo-reloj-fill {
@@ -622,7 +621,7 @@
 }
 
 /* ---------- Ayuda ---------- */
-.fbp-ayuda-sub { margin: 0.9rem 0 0.2rem !important; color: #0f172a; font-weight: 800; }
+
 .fbp-tabla-puntos { display: flex; flex-direction: column; gap: 0.35rem; }
 .fbp-tabla-puntos div { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; padding: 0.45rem 0.7rem; border-radius: 12px; background: #f0fdf4; color: #14532d; font-size: 0.88rem; font-weight: 600; }
 .fbp-tabla-puntos strong { white-space: nowrap; }

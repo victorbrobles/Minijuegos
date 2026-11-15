@@ -461,11 +461,4 @@ export const JUEGO_CONSTRUCTORES = {
   Config,
   notaSala: '🧱 De 2 a 8 jugadores: cada ronda construyes para un rival y corres el laberinto que te hacen.',
   ganador: (n) => (n.length > 1 ? `¡Empate entre ${n.join(' y ')}!` : `¡${n[0]} domina el laberinto!`),
-  reglas: [
-    `Cada ronda tiene dos fases. Primero, CONSTRUIR: diseñas en secreto un laberinto de ${L}×${L} para otro jugador, de 🚩 a 🏁, con ${E.AJUSTES.presupuesto.muro} muros 🧱, ${E.AJUSTES.presupuesto.hielo} casillas de hielo 🧊, ${E.AJUSTES.presupuesto.flecha} flechas ➡️ y un par de portales 🌀. Tiene que tener salida (la pantalla te lo comprueba).`,
-    'Hielo: al pisarlo resbalas hasta chocar. Flecha: te empuja en su dirección. Portal: apareces en el otro portal.',
-    'Después, CARRERA: todos recorréis a la vez el laberinto que os han hecho, deslizando el dedo o con las flechas. Con niebla solo ves las casillas cercanas.',
-    `Puntos por puestos (${E.AJUSTES.puntos.join(', ')}…): el corredor más rápido suma más, y el constructor cuyo laberinto más tarda en resolverse, también. Quien no llega cuenta con el tiempo máximo.`,
-    'Cada ronda construyes para un rival distinto. Gana quien más puntos tenga al final.'
-  ]
 };

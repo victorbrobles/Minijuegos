@@ -5,11 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import { MenuInicioJuego } from '../../components/MenuJuego.jsx';
 import FurboLocal from './FurboLocal.jsx';
 import FurboOnline, { CLAVE_SESION_FURBO } from './FurboOnline.jsx';
-import { AyudaFurbo } from './FurboComun.jsx';
 import './Furbo.css';
-import { metaDe } from '../meta.js';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
-const { titulo: TITULO_JUEGO, descripcion: DESCRIPCION_JUEGO } = metaDe('furbo');
 
 const haySesion = () => {
   try {
@@ -21,7 +19,7 @@ const haySesion = () => {
 
 export default function Furbo({ onExit }) {
   const [modo, setModo] = useState(() => (haySesion() ? 'online' : 'menu'));
-  const [mostrarAyuda, setMostrarAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const navigate = useNavigate();
   const irAPortada = () => (typeof onExit === 'function' ? onExit() : navigate('/'));
 
@@ -32,13 +30,12 @@ export default function Furbo({ onExit }) {
           juegoId="furbo"
           onOnline={() => setModo('online')}
           onLocal={() => setModo('local')}
-          onAyuda={() => setMostrarAyuda(true)}
+          onAyuda={abrirAyuda}
         />
       )}
-      {modo === 'local' && <FurboLocal onVolver={() => setModo('menu')} onExit={irAPortada} onAbrirAyuda={() => setMostrarAyuda(true)} />}
-      {modo === 'online' && <FurboOnline onVolver={() => setModo('menu')} onSalir={irAPortada} onAbrirAyuda={() => setMostrarAyuda(true)} />}
+      {modo === 'local' && <FurboLocal onVolver={() => setModo('menu')} onExit={irAPortada} onAbrirAyuda={abrirAyuda} />}
+      {modo === 'online' && <FurboOnline onVolver={() => setModo('menu')} onSalir={irAPortada} onAbrirAyuda={abrirAyuda} />}
 
-      {mostrarAyuda && <AyudaFurbo titulo={TITULO_JUEGO} descripcion={DESCRIPCION_JUEGO} onCerrar={() => setMostrarAyuda(false)} />}
     </>
   );
 }

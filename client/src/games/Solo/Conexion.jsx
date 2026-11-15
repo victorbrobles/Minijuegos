@@ -6,9 +6,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import { PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, useRecord, Aviso } from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, useRecord, Aviso } from '../../components/UnJugador.jsx';
 import { cargarSolo, Cargando, Buscador, RetoAmigo } from './comun.jsx';
 import './Solo.css';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'conexion';
 const MAX_ESLABONES = 5;
@@ -18,7 +19,7 @@ export default function Conexion() {
   const navigate = useNavigate();
   const [fase, setFase] = useState('portada');
   const [error, setError] = useState('');
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [salir, setSalir] = useState(false);
   const [record, registrar] = useRecord(ID);
   const [nuevoRecord, setNuevoRecord] = useState(false);
@@ -72,17 +73,7 @@ export default function Conexion() {
     setK(k + 1); iniciar(datos.retos[k + 1]);
   };
   const rendirse = () => { setPuntosReto((l) => [...l, 0]); setEstado('rendido'); };
-
-  const ayudaModal = ayuda && (
-    <AyudaUnJugador titulo="¿Cómo se juega?" onCerrar={() => setAyuda(false)}>
-      <p>Tienes que <b>unir a dos futbolistas</b> con una cadena de compañeros de equipo.</p>
-      <p>Escribe un jugador que haya coincidido con el último de la cadena (en un club o como titulares en un partido histórico). Cuando el último de tu cadena haya jugado con el destino, ¡la cadena se cierra sola!</p>
-      <p>Hay <b>5 retos</b>: los dos primeros se pueden cerrar con un jugador en medio y los demás con dos.</p>
-      <p>Cada reto vale <b>5 puntos</b>: restan los eslabones de más, los intentos fallidos y la pista. Si te rindes, 0.</p>
-      <p>Ojo: solo valen las coincidencias que hay en los datos del juego (los grandes partidos y trayectorias de la web y las plantillas de 2025/26).</p>
-    </AyudaUnJugador>
-  );
-  if (fase === 'portada') return <><PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={() => setAyuda(true)} record={record} textoRecord={(r) => `${r.valor} puntos`} />{ayudaModal}</>;
+  if (fase === 'portada') return <><PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record} textoRecord={(r) => `${r.valor} puntos`} /></>;
   if (fase === 'cargando') return <Cargando error={error} onReintentar={empezar} />;
   if (fase === 'fin') {
     return (

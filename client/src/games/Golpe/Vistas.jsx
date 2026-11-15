@@ -411,35 +411,3 @@ export function PantallaFin({ v, onSalir, children }) {
   );
 }
 
-export function Ayuda({ onCerrar, titulo, descripcion }) {
-  return (
-    <div className="rg-modal-fondo" onClick={onCerrar}>
-      <div className="rg-modal qq-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-        <div className="qq-modal-ayuda-header">
-          <span className="qq-ayuda-badge">❓ Cómo jugar</span>
-          <h3>{titulo}</h3>
-        </div>
-        <div className="qq-modal-ayuda-body">
-          {descripcion && <p>{descripcion}</p>}
-          <p className="gpp-ayuda-sub">🎬 Cada misión</p>
-          <ol>
-            <li><strong>El encargo:</strong> una misión con 3 pasos (entrar, dar el golpe y huir) y 4 opciones en cada uno. Cada opción es segura ✅, peligrosa ⚠️ (funciona, pero arriesgada) o imposible ⛔ (el plan fracasa).</li>
-            <li><strong>Información privada:</strong> recibes pistas sobre algunas opciones y un objetivo secreto.</li>
-            <li><strong>El plan:</strong> cada uno propone un plan eligiendo una opción por paso.</li>
-            <li><strong>El debate:</strong> cuestiona, defiende y, si te conviene, miente sobre tus pistas.</li>
-            <li><strong>La votación:</strong> votas en secreto el mejor plan (no el tuyo) y acusas a quien creas traidor.</li>
-            <li><strong>La resolución:</strong> se ejecuta el plan más votado, se revelan las condiciones reales y los objetivos de todos.</li>
-          </ol>
-          <p className="gpp-ayuda-sub">🎭 Objetivos secretos (hay un traidor por misión)</p>
-          <ul>{Object.values(OBJETIVOS).map((o) => <li key={o.nombre}>{o.e} <strong>{o.nombre}:</strong> {o.desc}</li>)}</ul>
-          <p className="gpp-ayuda-sub">🏆 Puntos</p>
-          <ul>
-            <li>+{PUNTOS.viable} si tu plan era viable · +{PUNTOS.votado} si alguien votó tu plan · +{PUNTOS.objetivo} si cumples tu objetivo secreto.</li>
-            <li>+{PUNTOS.acusar} si aciertas quién es el traidor · el traidor gana +{PUNTOS.traidorOculto} si sabotea el golpe sin que la mitad de los demás le acuse.</li>
-          </ul>
-        </div>
-        <button type="button" className="big full qq-btn-principal" onClick={onCerrar}>¡Entendido!</button>
-      </div>
-    </div>
-  );
-}

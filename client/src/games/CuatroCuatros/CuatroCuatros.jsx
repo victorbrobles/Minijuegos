@@ -163,14 +163,6 @@ const JUEGO = {
   notaSala: '🎲 Cada uno ve sus dados en su móvil. ¡Farolea con cara de póker!',
   ganador: (n) => `¡${n.join(' y ')} es el mejor mentiroso!`,
   detalleFin: (j) => (j.dados ? `aguanta con ${j.dados} ${j.dados === 1 ? 'dado' : 'dados'}` : `${j.puesto}.º en caer`),
-  reglas: [
-    'Cada jugador tiene unos dados (5 por defecto) que tira en secreto: solo ve los suyos.',
-    'Por turnos se apuesta cuántos dados de un valor hay en TODA la mesa: «al menos cuatro cuatros». Los unos son comodines y cuentan como cualquier valor.',
-    'El siguiente tiene que subir la apuesta (más cantidad, o la misma cantidad de un valor más alto) o cantar. A unos se pasa con la mitad de la cantidad (redondeando hacia arriba); de unos a otro valor, con el doble más uno.',
-    '🤥 «¡Mentiroso!»: se levantan los dados. Si hay menos de lo apostado, pierde un dado quien apostó; si hay lo apostado o más, pierde un dado quien dudó.',
-    '🎯 «¡Exacto!»: si hay justo lo apostado, recuperas un dado; si no, pierdes uno.',
-    'Quien pierde un dado empieza la ronda siguiente. Sin dados, quedas eliminado. Gana el último que conserve dados.'
-  ]
 };
 
 export default function CuatroCuatros({ onExit }) {

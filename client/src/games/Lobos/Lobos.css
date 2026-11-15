@@ -102,7 +102,6 @@
 .lb-cartas p { margin: .25rem 0; }
 .lb-textarea { width: 100%; padding: .8rem 1rem; margin: .6rem 0 1rem; font: inherit; border: 3px solid #dcd6ff; border-radius: 16px; resize: vertical; }
 
-
 /* ========================================================
    LOBBY ONLINE: TARJETAS CON EL COLOR TEMÁTICO DEL JUEGO
    ======================================================== */
@@ -197,9 +196,6 @@
 .lb-punto {
   display: none !important;
 }
-
-
-
 
 /* ========================================================
    LEGIBILIDAD: texto oscuro sobre las tarjetas claras
@@ -697,21 +693,6 @@ body:has(.qq-en-partida) .back {
   font-size: 1.45rem;
   font-weight: 900;
   color: #0f172a;
-}
-
-.qq-modal-ayuda-body {
-  font-size: 0.94rem;
-  color: #334155;
-  line-height: 1.5;
-  margin-bottom: 1.2rem;
-}
-
-.qq-modal-ayuda-body ul {
-  padding-left: 1.2rem;
-  margin: 0.7rem 0 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
 }
 
 .qq-codigo-btn {

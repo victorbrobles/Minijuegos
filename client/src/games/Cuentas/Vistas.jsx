@@ -4,7 +4,7 @@
 import { useRegistrarPartida, resultadoDesdeFin } from '../../lib/registros.js';
 import React, { useState } from 'react';
 import Icon from '../../components/Icon.jsx';
-import { ACCIONES, AJUSTES } from './engine.js';
+import { AJUSTES } from './engine.js';
 import './Cuentas.css';
 
 export const COLORES = ['#ef4444', '#2563eb', '#16a34a', '#f59e0b', '#9333ea', '#ec4899', '#0d9488', '#ea580c'];
@@ -156,33 +156,3 @@ export function PantallaFin({ v, onSalir, children }) {
   );
 }
 
-export function Ayuda({ onCerrar, titulo, descripcion }) {
-  return (
-    <div className="rg-modal-fondo" onClick={onCerrar}>
-      <div className="rg-modal qq-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-        <div className="qq-modal-ayuda-header">
-          <span className="qq-ayuda-badge">❓ Cómo jugar</span>
-          <h3>{titulo}</h3>
-        </div>
-        <div className="qq-modal-ayuda-body">
-          {descripcion && <p>{descripcion}</p>}
-          <p className="ctp-ayuda-sub">🎯 Objetivo</p>
-          <ul>
-            <li>Cada uno recibe unos números del 1 al {AJUSTES.maxNumero} (secretos). Entre todos hay que colocarlos en <strong>orden ascendente, sin hablar</strong>.</li>
-            <li>Gana quien se queda antes sin números. Puntos de la sala: {AJUSTES.puntos.join(', ')} para los tres primeros.</li>
-          </ul>
-          <p className="ctp-ayuda-sub">🔁 Tu turno</p>
-          <ul>
-            <li><strong>Soltar un número.</strong> Si no era el que tocaba (había uno más bajo en alguna mano), pierdes una vida y el número vuelve a tu mano.</li>
-            <li><strong>Usar una carta de acción</strong> (tienes {AJUSTES.accionesPorJugador} en toda la partida): sale una al azar, se resuelve y <strong>sigues en tu turno</strong>.</li>
-            <li><strong>Pasar.</strong> Pero si pasas dos turnos seguidos teniendo tú el número que tocaba, pierdes una vida.</li>
-          </ul>
-          <p>Tienes {AJUSTES.vidas} vidas: al perderlas quedas eliminado y tus números salen del juego.</p>
-          <p className="ctp-ayuda-sub">🃏 Cartas de acción (al azar)</p>
-          <ul>{Object.values(ACCIONES).map((a) => <li key={a.nombre}>{a.e} <strong>{a.nombre}</strong>{a.tipo === 'mala' ? ' (mala suerte)' : ''}: {a.desc}</li>)}</ul>
-        </div>
-        <button type="button" className="big full qq-btn-principal" onClick={onCerrar}>¡Entendido!</button>
-      </div>
-    </div>
-  );
-}

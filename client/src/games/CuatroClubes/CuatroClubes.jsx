@@ -5,11 +5,9 @@ import { useNavigate } from 'react-router-dom';
 import { MenuInicioJuego } from '../../components/MenuJuego.jsx';
 import CuatroClubesLocal from './CuatroClubesLocal.jsx';
 import CuatroClubesOnline, { CLAVE_SESION_CUATROCLUBES } from './CuatroClubesOnline.jsx';
-import { Ayuda } from './Vistas.jsx';
 import './CuatroClubes.css';
-import { metaDe } from '../meta.js';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
-const { titulo: TITULO, descripcion: DESCRIPCION } = metaDe('cuatroclubes');
 
 const haySesion = () => {
   try {
@@ -21,18 +19,17 @@ const haySesion = () => {
 
 export default function CuatroClubes({ onExit }) {
   const [modo, setModo] = useState(() => (haySesion() ? 'online' : 'menu'));
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const navigate = useNavigate();
   const irAPortada = () => (typeof onExit === 'function' ? onExit() : navigate('/'));
 
   return (
     <>
       {modo === 'menu' && (
-        <MenuInicioJuego juegoId="cuatroclubes" onOnline={() => setModo('online')} onLocal={() => setModo('local')} onAyuda={() => setAyuda(true)} />
+        <MenuInicioJuego juegoId="cuatroclubes" onOnline={() => setModo('online')} onLocal={() => setModo('local')} onAyuda={abrirAyuda} />
       )}
-      {modo === 'local' && <CuatroClubesLocal onVolver={() => setModo('menu')} onExit={irAPortada} onAbrirAyuda={() => setAyuda(true)} />}
-      {modo === 'online' && <CuatroClubesOnline onVolver={() => setModo('menu')} onSalir={irAPortada} onAbrirAyuda={() => setAyuda(true)} />}
-      {ayuda && <Ayuda titulo={TITULO} descripcion={DESCRIPCION} onCerrar={() => setAyuda(false)} />}
+      {modo === 'local' && <CuatroClubesLocal onVolver={() => setModo('menu')} onExit={irAPortada} onAbrirAyuda={abrirAyuda} />}
+      {modo === 'online' && <CuatroClubesOnline onVolver={() => setModo('menu')} onSalir={irAPortada} onAbrirAyuda={abrirAyuda} />}
     </>
   );
 }

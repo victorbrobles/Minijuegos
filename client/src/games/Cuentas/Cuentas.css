@@ -304,7 +304,6 @@
   font-weight: 800 !important;
   cursor: pointer;
 }
-.ctp-ayuda-sub { margin: 0.9rem 0 0.2rem !important; color: #0f172a !important; font-weight: 800; }
 
 .ctp-modal { max-width: 400px !important; padding: 1.6rem 1.3rem !important; border-radius: 24px !important; text-align: center; }
 .ctp-modal h3 { margin: 0 0 0.4rem; }
@@ -338,7 +337,6 @@
 @media (prefers-reduced-motion: reduce) {
   .ctp-carga, .ctp-gate .ctp-avatar.grande { animation: none !important; }
 }
-
 
 /* ═════════════ Propio de Lleva la cuenta ═════════════ */
 .ctp-numeros-fondo { position: absolute !important; right: -6px; bottom: -26px; color: rgba(255, 255, 255, 0.14); font-family: 'Bricolage Grotesque', sans-serif; font-size: 5.5rem; font-weight: 900; letter-spacing: -4px; pointer-events: none; }
@@ -393,6 +391,5 @@
 .ctp-log p.ok { background: #f0fdf4; }
 .ctp-log p.mal { background: #fef2f2; }
 .ctp-ranking-nombre small { display: block; color: #64748b; font-size: 0.78rem; font-weight: 600; }
-.ctp-ayuda-sub { margin: 0.9rem 0 0.2rem !important; color: #0f172a !important; font-weight: 800; }
 
 @media (prefers-reduced-motion: reduce) { .ctp-aviso { animation: none !important; } }

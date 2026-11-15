@@ -4,11 +4,10 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import {
-  PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, useRecord, barajar
-} from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, useRecord, barajar } from '../../components/UnJugador.jsx';
 import AFIRMACIONES from './afirmaciones.js';
 import './VerdaderoFalso.css';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'verdaderofalso';
 const SEGUNDOS = 3;
@@ -16,7 +15,7 @@ const SEGUNDOS = 3;
 export default function VerdaderoFalso() {
   const navigate = useNavigate();
   const [fase, setFase] = useState('portada'); // portada | cuenta | juego | fin
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [salir, setSalir] = useState(false);
   const [record, registrar] = useRecord(ID);
   const [cuenta, setCuenta] = useState(3);
@@ -106,23 +105,11 @@ export default function VerdaderoFalso() {
     return () => window.removeEventListener('keydown', onKey);
   }, [fase, responder]);
 
-  const ayudaModal = ayuda && (
-    <AyudaUnJugador titulo="¿Cómo se juega?" onCerrar={() => setAyuda(false)}>
-      <p>Aparecen afirmaciones de cultura general, una tras otra. Solo tienes que decir si son <strong>verdaderas</strong> o <strong>falsas</strong>.</p>
-      <ul>
-        <li>Tienes <strong>3 segundos</strong> para cada una y el reloj nunca se detiene.</li>
-        <li>Un solo fallo, o quedarte sin tiempo, termina la partida.</li>
-        <li>Muchas son mitos populares que casi todo el mundo cree… ¡cuidado!</li>
-        <li>Con teclado: <strong>←</strong> o <strong>V</strong> para verdadero, <strong>→</strong> o <strong>F</strong> para falso.</li>
-      </ul>
-    </AyudaUnJugador>
-  );
-
   if (fase === 'portada') {
     return (
       <div className="vf-contenedor">
-        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={() => setAyuda(true)} record={record} textoRecord={(r) => `${r.valor} seguidas`} />
-        {ayudaModal}
+        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record} textoRecord={(r) => `${r.valor} seguidas`} />
+        
       </div>
     );
   }

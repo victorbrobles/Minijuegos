@@ -4,12 +4,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import {
-  PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, Barra, useRecord
-} from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, Barra, useRecord } from '../../components/UnJugador.jsx';
 import { HECHOS, REACCIONES_OK, AVISOS_JEFE } from './datos.js';
 import { DIAS, nuevaPartida, generarOpciones, evaluar, avanzar } from './motor.js';
 import './Excusas.css';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'excusas';
 const azar = (l) => l[Math.floor(Math.random() * l.length)];
@@ -18,7 +17,7 @@ const DIAS_SEMANA = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes'];
 export default function Excusas() {
   const navigate = useNavigate();
   const [fase, setFase] = useState('portada'); // portada | juego | fin
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [salir, setSalir] = useState(false);
   const [verFicha, setVerFicha] = useState(false);
   const [record, registrar] = useRecord(ID);
@@ -87,24 +86,12 @@ export default function Excusas() {
     }, 900);
   };
 
-  const ayudaModal = ayuda && (
-    <AyudaUnJugador titulo="¿Cómo se juega?" onCerrar={() => setAyuda(false)}>
-      <p>Tu jefe te escribe por el chat y te pide explicaciones. Monta una <strong>excusa</strong> eligiendo una ficha de cada fila: <em>quién</em>, <em>qué hizo</em> y <em>a qué</em>.</p>
-      <ul>
-        <li>Cualquier locura vale… mientras <strong>no contradiga lo que el jefe sabe</strong> de ti. Si sabe que no tienes perro, no culpes a tu perro.</li>
-        <li>Lo que sabe está en tu <strong>ficha de empleado</strong>, y va descubriendo cosas nuevas.</li>
-        <li>Repetir una ficha o decir algo absurdo («mi bici ha roto mi bici») también resta credibilidad.</li>
-        <li>Si tu credibilidad llega a 0, te despiden. Aguanta {DIAS} días laborables.</li>
-      </ul>
-    </AyudaUnJugador>
-  );
-
   if (fase === 'portada') {
     return (
       <div className="ex-contenedor">
-        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={() => setAyuda(true)} record={record}
+        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record}
           textoRecord={(r) => (r.dias >= DIAS ? `¡${DIAS} días sin que te despidan! (${r.valor} pts)` : `${r.dias ?? 0} días (${r.valor} pts)`)} textoBoton="Abrir el chat del trabajo" iconoBoton="heartchat" />
-        {ayudaModal}
+        
       </div>
     );
   }

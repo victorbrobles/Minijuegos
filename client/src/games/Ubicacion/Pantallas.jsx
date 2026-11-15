@@ -4,7 +4,7 @@
 // blancas y barra de botones fija abajo. Mobile first.
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
-import { formatearKm, formatearPuntos, PENALIZACION_SIN_MARCA } from './geo.js';
+import { formatearKm, formatearPuntos } from './geo.js';
 import { centrarActivo } from '../../lib/centrarActivo.js';
 
 export const inicial = (n = '?') => n.trim().charAt(0).toUpperCase() || '?';
@@ -231,22 +231,3 @@ export function ModalSalir({ titulo = '¿Salir de la partida?', texto, onSeguir,
   );
 }
 
-/** Texto de ayuda común (modal «Cómo jugar»). */
-export function TextoAyuda() {
-  return (
-    <>
-      <ul>
-        <li><strong>Observa la foto:</strong> al empezar cada ronda verás un lugar o monumento durante 10 segundos.</li>
-        <li><strong>Sitúalo en el mapa:</strong> toca el mapa para colocar tu marcador. Puedes arrastrarlo para afinar y volver a ver la foto.</li>
-        <li><strong>En un dispositivo (por turnos):</strong> además de tu marcador real (★) colocas 2 señuelos. El siguiente jugador verá tus 3 marcas con «?» sin saber cuál es la buena. El último solo coloca la real.</li>
-        <li><strong>Online (a la vez):</strong> cada 15 segundos un radar enseña durante 1 segundo los marcadores de los rivales que aún no han confirmado.</li>
-      </ul>
-      <p style={{ marginTop: '0.9rem', fontWeight: 800, color: '#0f172a' }}>Puntuación</p>
-      <ul>
-        <li>Cada ronda sumas <strong>tantos puntos como kilómetros</strong> te separen del lugar real.</li>
-        <li>Si no colocas tu marcador a tiempo, sumas <strong>{formatearPuntos(PENALIZACION_SIN_MARCA)} puntos</strong>.</li>
-        <li>Al final <strong>gana quien menos puntos tenga</strong>. ¡Como en el golf!</li>
-      </ul>
-    </>
-  );
-}

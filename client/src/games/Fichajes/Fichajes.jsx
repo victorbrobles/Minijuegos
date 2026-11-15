@@ -150,14 +150,6 @@ const JUEGO = {
   notaSala: '⚽ Por turnos: el que juega responde desde su móvil y los demás lo ven en directo.',
   detalleFin: (j) => `Mejor racha: ${j.mejor}`,
   ganador: (n) => (n.length > 1 ? `¡Empate entre ${n.join(' y ')}!` : `¡${n[0]} se sabe todas las plantillas!`),
-  reglas: [
-    'Sale un futbolista y tienes que decir en qué equipo juega ahora (temporada 2025/26). Tienes 15 segundos.',
-    'Si aciertas, sale otro; si fallas o se acaba el tiempo, tu racha termina.',
-    'Cuanto más aguantas, menos conocidos son los futbolistas.',
-    'Al terminar tu turno sumas tantos puntos como futbolistas hayas acertado seguidos.',
-    'Cada ronda juegan todos, uno detrás de otro. Se juegan 5, 7 o 10 rondas.',
-    'Vale el nombre del club o cómo se le conoce (Atleti, Barça, City, Napoli…).'
-  ]
 };
 
 export default function Fichajes({ onExit }) {

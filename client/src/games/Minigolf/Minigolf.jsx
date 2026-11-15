@@ -327,14 +327,6 @@ const JUEGO = {
   notaSala: '⛳ Todos juegan el mismo hoyo a la vez, cada uno desde su móvil.',
   ganador: (n) => (n.length > 1 ? `¡${n.join(' y ')} empatan con los mismos golpes!` : `¡${n[0]} gana el recorrido!`),
   detalleFin: (j) => (j.vsPar === 0 ? 'al par' : j.vsPar > 0 ? `+${j.vsPar} sobre el par` : `${j.vsPar} bajo el par`),
-  reglas: [
-    'Para golpear, arrastra el dedo hacia atrás desde cualquier punto de la escena (como un tirachinas) y suelta: cuanto más arrastres, más fuerte.',
-    'Con ⟲ ⟳ giras la cámara y con 🗺️ ves el hoyo entero desde arriba.',
-    'Hay 200 hoyos originales y cada partida elige 6, 9 o 18 de dificultad creciente: el último siempre es de los más difíciles. Cuidado con molinos, bloques móviles, arena (frena), turbos, puentes sin barandilla, agua y saltos.',
-    'Si la bola cae al agua o fuera del recorrido, vuelve a donde estaba y sumas un golpe. Como mucho se apuntan 10 golpes por hoyo.',
-    'Online todos juegan el mismo hoyo a la vez y ves las bolas de los demás; en un solo móvil se juega por turnos, golpe a golpe.',
-    'Gana quien termine con menos golpes.'
-  ]
 };
 
 export default function Minigolf({ onExit }) {

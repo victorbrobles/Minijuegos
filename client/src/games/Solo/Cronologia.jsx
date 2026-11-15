@@ -5,9 +5,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import { PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, useRecord, Aviso } from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, useRecord, Aviso } from '../../components/UnJugador.jsx';
 import { cargarSolo, Cargando, RetoAmigo } from './comun.jsx';
 import './Solo.css';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'cronologia';
 const VIDAS = 3;
@@ -17,7 +18,7 @@ export default function Cronologia() {
   const navigate = useNavigate();
   const [fase, setFase] = useState('portada');
   const [error, setError] = useState('');
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [salir, setSalir] = useState(false);
   const [record, registrar] = useRecord(ID);
   const [nuevoRecord, setNuevoRecord] = useState(false);
@@ -56,16 +57,7 @@ export default function Cronologia() {
     }
     setI(i + 1);
   };
-
-  const ayudaModal = ayuda && (
-    <AyudaUnJugador titulo="¿Cómo se juega?" onCerrar={() => setAyuda(false)}>
-      <p>Arriba aparece un acontecimiento: un invento, una película, un libro, un hecho histórico, el nacimiento de un personaje…</p>
-      <p>Pulsa el hueco <b>«Aquí»</b> de la línea del tiempo donde creas que va: antes, entre o después de las cartas que ya tienes.</p>
-      <p>Si aciertas, suma un punto. Si fallas, pierdes una vida ({VIDAS} en total) y la carta se coloca en su sitio en rojo.</p>
-      <p>Cuantas más cartas tengas, más finos serán los huecos. ¿Hasta dónde llegas?</p>
-    </AyudaUnJugador>
-  );
-  if (fase === 'portada') return <><PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={() => setAyuda(true)} record={record} textoRecord={(r) => `${r.valor} cartas`} />{ayudaModal}</>;
+  if (fase === 'portada') return <><PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record} textoRecord={(r) => `${r.valor} cartas`} /></>;
   if (fase === 'cargando') return <Cargando error={error} onReintentar={empezar} />;
   if (fase === 'fin') {
     return (

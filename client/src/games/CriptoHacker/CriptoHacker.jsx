@@ -4,10 +4,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import {
-  PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, Aviso, Barra, useRecord
-} from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, Aviso, Barra, useRecord } from '../../components/UnJugador.jsx';
 import './CriptoHacker.css';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'criptohacker';
 const SIMBOLOS = ['A', 'B', 'C', 'D', 'E', 'F', '7', '9'];
@@ -51,7 +50,7 @@ const COSTE_ESCANEO = 15;
 export default function CriptoHacker() {
   const navigate = useNavigate();
   const [fase, setFase] = useState('portada'); // portada | juego | hackeado | fin
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [salir, setSalir] = useState(false);
   const [record, registrar] = useRecord(ID);
   const [servidor, setServidor] = useState(1);
@@ -159,26 +158,12 @@ export default function CriptoHacker() {
     return () => window.removeEventListener('keydown', onKey);
   });
 
-  const ayudaModal = ayuda && (
-    <AyudaUnJugador titulo="¿Cómo se juega?" onCerrar={() => setAyuda(false)}>
-      <p>Cada servidor está protegido por un <strong>código secreto</strong>. Prueba combinaciones y deduce cuál es.</p>
-      <ul>
-        <li><span className="ch-ayuda-led ok" /> <strong>Verde</strong>: un símbolo correcto en su sitio.</li>
-        <li><span className="ch-ayuda-led medio" /> <strong>Amarillo</strong>: un símbolo que está en el código, pero en otra posición.</li>
-        <li>No te decimos cuáles son: ¡dedúcelo!</li>
-        <li>El <strong>rastreo</strong> sube con cada intento y poco a poco con el tiempo. Si llega al 100 %, te pillan.</li>
-        <li>El <strong>escáner</strong> revela un símbolo, pero dispara el rastreo un {COSTE_ESCANEO} %.</li>
-        <li>Al hackear un servidor, el rastreo baja (pero no del todo) y pasas al siguiente, más difícil.</li>
-      </ul>
-    </AyudaUnJugador>
-  );
-
   if (fase === 'portada') {
     return (
       <div className="ch-contenedor">
-        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={() => setAyuda(true)} record={record}
+        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record}
           textoRecord={(r) => `${r.valor} ${r.valor === 1 ? 'servidor' : 'servidores'}`} textoBoton="Iniciar intrusión" iconoBoton="lock" />
-        {ayudaModal}
+        
       </div>
     );
   }

@@ -328,13 +328,6 @@ const JUEGO = {
   notaSala: '✏️ Mínimo 3 jugadores. Cada uno dibuja y escribe en su móvil, todos a la vez.',
   ganador: (n) => (n.length > 1 ? `¡${n.join(' y ')} empatan como artistas!` : `¡${n[0]} es el artista de la noche!`),
   detalleFin: (j) => `${j.dibujo} ${j.dibujo === 1 ? 'voto' : 'votos'} al dibujo · ${j.texto} a la frase${j.pillados ? ` · ${j.pillados} 🎯` : ''}`,
-  reglas: [
-    'Cada jugador empieza una cadena escribiendo una frase absurda (o pide una idea).',
-    'La frase pasa a otro jugador, que la dibuja. Ese dibujo pasa a otro, que lo describe sin ver la frase. Y así sucesivamente: frase, dibujo, frase, dibujo…',
-    'Cada uno solo ve lo último de la cadena que le toca. Online todos juegan a la vez y con reloj; en un solo móvil, cada uno hace su parte en secreto y lo pasa.',
-    'Al final se destapan las cadenas paso a paso: de la frase original al desastre final.',
-    'Se vota el mejor dibujo (+3 por voto) y la mejor frase (+2). Si al describir un dibujo usas alguna palabra de la frase original de esa cadena, sumas +1: 🎯 ¡lo pillaste!'
-  ]
 };
 
 export default function Garabato({ onExit }) {

@@ -539,7 +539,6 @@
 }
 .tr-config-resumen { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.4rem; margin-top: 0.8rem; }
 .tr-config-resumen span { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.35rem 0.75rem; border-radius: 999px; background: #fff7ed; color: #9a3412; font-size: 0.85rem; font-weight: 800; }
-.tr-ayuda-sub { margin: 0.9rem 0 0.2rem !important; color: #0f172a; font-weight: 800; }
 
 /* ---------- Modales, avisos flotantes ---------- */
 .trp-modal { max-width: 400px !important; padding: 1.6rem 1.3rem !important; border-radius: 24px !important; text-align: center; }

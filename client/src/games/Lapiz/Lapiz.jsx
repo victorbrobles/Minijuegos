@@ -5,7 +5,7 @@ import Icon from '../../components/Icon.jsx';
 import JuegoPulsador from '../Pulsador/JuegoPulsador.jsx';
 import { crearJuegoSimultaneo, useCuentaLocal } from '../comun/Simultaneo.jsx';
 import { Avatar, Cuenta } from '../Pulsador/Vistas.jsx';
-import { M, SEGUNDOS, SEGUNDOS_LOCAL, CIERRE, PUNTOS, conLetra } from './engine.js';
+import { M, SEGUNDOS_LOCAL, CIERRE, PUNTOS, conLetra } from './engine.js';
 import './Lapiz.css';
 
 const nombreDe = (v, id) => v.jugadores.find((j) => j.id === id)?.nombre ?? '¿?';
@@ -126,14 +126,6 @@ const JUEGO = crearJuegoSimultaneo({
   notaSala: `✏️ Cada uno escribe en su móvil. Cuando alguien suelta el lápiz, el resto tiene ${CIERRE} segundos.`,
   detalleFin: (j) => `${j.aciertos} ${j.aciertos === 1 ? 'ronda completa' : 'rondas completas'}`,
   ganador: (n) => (n.length > 1 ? `¡Empate entre ${n.join(' y ')}!` : `¡${n[0]} tiene el lápiz más rápido!`),
-  reglas: [
-    'Cada ronda sale una letra y ocho categorías: nombre, animal, país o ciudad, cosa… y cuatro más que cambian.',
-    'Escribe una palabra por categoría que empiece por esa letra.',
-    `Cuando termines, pulsa «¡Lápiz fuera!». Online, a los demás les quedan ${CIERRE} segundos (y lo que tengan escrito cuenta). Si nadie termina, la ronda dura ${SEGUNDOS} segundos.`,
-    'Después se revisan las respuestas entre todos: las que no valgan se anulan (online, si la mitad o más votáis en contra).',
-    `Puntos por categoría: ${PUNTOS.unica} si nadie más ha puesto lo mismo, ${PUNTOS.repetida} si está repetida y ${PUNTOS.sola} si eres el único que ha escrito algo válido.`,
-    `En un dispositivo, cada uno escribe por turnos con ${SEGUNDOS_LOCAL} segundos.`
-  ]
 });
 
 export default function Lapiz({ onExit }) {

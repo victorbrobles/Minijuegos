@@ -5,9 +5,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import { PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, useRecord, Barra, Aviso } from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, useRecord, Barra, Aviso } from '../../components/UnJugador.jsx';
 import { cargarSolo, useCuenta, Cargando, coincide, RetoAmigo } from './comun.jsx';
 import './Solo.css';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'cadena';
 const SEGUNDOS = 90;
@@ -19,7 +20,7 @@ export default function Cadena() {
   const navigate = useNavigate();
   const [fase, setFase] = useState('portada');
   const [error, setError] = useState('');
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [salir, setSalir] = useState(false);
   const [record, registrar] = useRecord(ID);
   const [nuevoRecord, setNuevoRecord] = useState(false);
@@ -67,16 +68,7 @@ export default function Cadena() {
     if (h.length === necesarias) { cuenta.sumar(BONUS); setSuperadas((s) => s + 1); setAviso({ t: `¡Categoría superada! +${BONUS} s`, k: Date.now(), tipo: 'bueno' }); }
     if (h.length === cat.opciones.length) setTimeout(pasar, 600);
   };
-
-  const ayudaModal = ayuda && (
-    <AyudaUnJugador titulo="¿Cómo se juega?" onCerrar={() => setAyuda(false)}>
-      <p>Empiezas con <b>{SEGUNDOS} segundos</b>. Sale una categoría con una lista cerrada de respuestas: escribe todas las que sepas.</p>
-      <p>Cuando llegas al <b>mínimo</b> (más o menos el 60 %), la categoría queda superada y ganas <b>+{BONUS} s</b>. Puedes seguir sumando o pasar a la siguiente.</p>
-      <p>Si pasas sin llegar al mínimo, pierdes {SALTO} s.</p>
-      <p>Cada respuesta correcta es un punto. Se aceptan apellidos y pequeñas erratas.</p>
-    </AyudaUnJugador>
-  );
-  if (fase === 'portada') return <><PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={() => setAyuda(true)} record={record} textoRecord={(r) => `${r.valor} respuestas`} />{ayudaModal}</>;
+  if (fase === 'portada') return <><PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record} textoRecord={(r) => `${r.valor} respuestas`} /></>;
   if (fase === 'cargando') return <Cargando error={error} onReintentar={empezar} />;
   if (fase === 'fin') {
     return (

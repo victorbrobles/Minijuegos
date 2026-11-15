@@ -8,6 +8,7 @@ import { MenuInicioJuego, MenuModoOnline, FormCrearSala, FormUnirseSala, Cabecer
 import { limitesOnline, textoSala } from '../limites.js';
 import { SelectorRondas } from '../../components/MenuJuego.jsx';
 import { rondasPorDefecto } from '../rondas.js';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const LIM_ON = limitesOnline('pistas');
 
@@ -24,7 +25,7 @@ export default function PistasOnline({ onLocal, onSalir }) {
   const [errorMsg, setErrorMsg] = useState('');
   const [cargando, setCargando] = useState(false);
   const [modalSalir, setModalSalir] = useState(false);
-  const [modalAyuda, setModalAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
 
   const [sesion, setSesion] = useState(() => {
     try {
@@ -288,29 +289,6 @@ export default function PistasOnline({ onLocal, onSalir }) {
       {sinRed && <div className="ptp-sin-red">📶 Reconectando con la sala…</div>}
 
       {/* MODAL DE AYUDA */}
-      {modalAyuda && (
-        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
-          <div className="rg-modal ptp-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-            <div className="ptp-modal-ayuda-header">
-              <span className="ptp-ayuda-badge">❓ Cómo jugar</span>
-              <h3>6 Pistas</h3>
-            </div>
-
-            <div className="ptp-modal-ayuda-body">
-              <p>Descubre el personaje, película, lugar o canción secreta antes que los demás.</p>
-              <ul>
-                <li><strong>6 pistas progresivas:</strong> Se descubre una nueva pista cada <strong>10 segundos</strong>.</li>
-                <li><strong>Respuesta secreta en cualquier momento:</strong> Escribe y envía tu respuesta cuando quieras desde tu móvil. Los demás solo verán un icono de que ya has respondido (✅), pero no sabrán qué has puesto ni si has acertado hasta que termine la ronda.</li>
-                <li><strong>Fin de ronda automático:</strong> Cuando todos hayan respondido o se acabe el tiempo de la 6.ª pista, se mostrará la solución y las puntuaciones.</li>
-              </ul>
-            </div>
-
-            <button type="button" className="ptp-boton" onClick={() => setModalAyuda(false)}>
-              ¡Entendido!
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* 1. MENÚ PRINCIPAL */}
       {vista === 'menu' && (
@@ -318,7 +296,7 @@ export default function PistasOnline({ onLocal, onSalir }) {
           juegoId="pistas"
           onOnline={() => { setVista('online_menu'); setErrorMsg(''); }}
           onLocal={onLocal}
-          onAyuda={() => setModalAyuda(true)}
+          onAyuda={abrirAyuda}
           error={errorMsg}
         />
       )}
@@ -328,7 +306,7 @@ export default function PistasOnline({ onLocal, onSalir }) {
           onVolver={() => { setVista('menu'); setErrorMsg(''); }}
           onCrear={() => { setVista('crear'); setErrorMsg(''); }}
           onUnirse={() => { setVista('unirse'); setErrorMsg(''); }}
-          onAyuda={() => setModalAyuda(true)}
+          onAyuda={abrirAyuda}
           error={errorMsg}
         />
       )}
@@ -337,7 +315,7 @@ export default function PistasOnline({ onLocal, onSalir }) {
       {vista === 'crear' && (
         <FormCrearSala
           onVolver={() => { setVista('online_menu'); setErrorMsg(''); }}
-          onAyuda={() => setModalAyuda(true)}
+          onAyuda={abrirAyuda}
           nombre={nombre}
           setNombre={setNombre}
           onCrear={handleCrear}
@@ -350,7 +328,7 @@ export default function PistasOnline({ onLocal, onSalir }) {
       {vista === 'unirse' && (
         <FormUnirseSala
           onVolver={() => { setVista('online_menu'); setErrorMsg(''); }}
-          onAyuda={() => setModalAyuda(true)}
+          onAyuda={abrirAyuda}
           codigo={codigoInput}
           setCodigo={setCodigoInput}
           nombre={nombre}
@@ -364,7 +342,7 @@ export default function PistasOnline({ onLocal, onSalir }) {
       {/* 4. SALA: LOBBY */}
       {vista === 'sala' && sala && sala.estado === 'lobby' && (
         <section className="game qq-pantalla">
-          <CabeceraSala codigo={sala.code} onVolver={() => setModalSalir(true)} onAyuda={() => setModalAyuda(true)} />
+          <CabeceraSala codigo={sala.code} onVolver={() => setModalSalir(true)} onAyuda={abrirAyuda} />
 
           <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
             <h3 className="qq-sala-titulo"><Icon name="dice" size={20} /> Modo de juego</h3>

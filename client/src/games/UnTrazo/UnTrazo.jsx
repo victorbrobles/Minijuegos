@@ -4,11 +4,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import {
-  PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, Aviso, Barra, useRecord
-} from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, Aviso, Barra, useRecord } from '../../components/UnJugador.jsx';
 import { COLS, FILAS, posNodo, generarFigura, grados, clave } from './motor.js';
 import './UnTrazo.css';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'untrazo';
 const VIDAS = 3;
@@ -24,7 +23,7 @@ const segundosPara = (nivel) => Math.max(25, 50 - nivel * 2);
 export default function UnTrazo() {
   const navigate = useNavigate();
   const [fase, setFase] = useState('portada'); // portada | juego | resultado | fin
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [salir, setSalir] = useState(false);
   const [record, registrar] = useRecord(ID);
   const [nivel, setNivel] = useState(1);
@@ -167,25 +166,12 @@ export default function UnTrazo() {
     preparar(n);
   };
 
-  const ayudaModal = ayuda && (
-    <AyudaUnJugador titulo="¿Cómo se juega?" onCerrar={() => setAyuda(false)}>
-      <p>Repasa <strong>todas las líneas</strong> de la figura en un único recorrido, sin pasar dos veces por la misma línea.</p>
-      <ul>
-        <li>Arrastra el dedo de punto a punto (o ve tocando los puntos uno detrás de otro).</li>
-        <li>Si te atascas, toca otro punto para empezar desde ahí o pulsa <strong>Borrar</strong>.</li>
-        <li>Algunas figuras son <strong>imposibles</strong>. Si lo descubres, pulsa <strong>¡Es imposible!</strong> Si en realidad se podía, pierdes una vida.</li>
-        <li>💡 El truco: cuenta cuántas líneas salen de cada punto. Si hay más de dos puntos con un número impar de líneas, es imposible. Si hay dos, empieza en uno de ellos.</li>
-        <li>Si se acaba el tiempo pierdes una vida. Tienes 3.</li>
-      </ul>
-    </AyudaUnJugador>
-  );
-
   if (fase === 'portada') {
     return (
       <div className="ut-contenedor">
-        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={() => setAyuda(true)} record={record}
+        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record}
           textoRecord={(r) => `${r.valor} ${r.valor === 1 ? 'figura' : 'figuras'}`} />
-        {ayudaModal}
+        
       </div>
     );
   }

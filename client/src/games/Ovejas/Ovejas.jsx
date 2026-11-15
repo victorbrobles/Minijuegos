@@ -4,11 +4,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import {
-  PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, useRecord
-} from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, useRecord } from '../../components/UnJugador.jsx';
 import { ANIMALES, generarRonda } from './motor.js';
 import './Ovejas.css';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'ovejas';
 const VIDAS = 3;
@@ -17,7 +16,7 @@ const CARRILES = 5;
 export default function Ovejas() {
   const navigate = useNavigate();
   const [fase, setFase] = useState('portada'); // portada | listo | desfile | pregunta | resultado | fin
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [salir, setSalir] = useState(false);
   const [record, registrar] = useRecord(ID);
   const [nivel, setNivel] = useState(1);
@@ -79,23 +78,12 @@ export default function Ovejas() {
     preparar(n);
   };
 
-  const ayudaModal = ayuda && (
-    <AyudaUnJugador titulo="¿Cómo se juega?" onCerrar={() => setAyuda(false)}>
-      <p>Una manada va a cruzar el prado a toda velocidad. <strong>Cuenta</strong> lo que pasa.</p>
-      <ul>
-        <li>Al terminar te preguntaremos cuántos animales de <strong>un tipo</strong> han pasado… y no sabrás cuál hasta el final.</li>
-        <li>Con cada acierto la manada es más grande y más rápida, aparecen otros animales, arbustos que tapan y animales que van en sentido contrario.</li>
-        <li>Si fallas pierdes una vida. Tienes 3.</li>
-      </ul>
-    </AyudaUnJugador>
-  );
-
   if (fase === 'portada') {
     return (
       <div className="ov-contenedor">
-        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={() => setAyuda(true)} record={record}
+        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record}
           textoRecord={(r) => `${r.valor} ${r.valor === 1 ? 'ronda' : 'rondas'}`} />
-        {ayudaModal}
+        
       </div>
     );
   }

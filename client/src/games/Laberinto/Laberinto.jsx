@@ -4,12 +4,11 @@
 import React, { useState } from 'react';
 import JuegoPulsador from '../Pulsador/JuegoPulsador.jsx';
 import { PanelMenu, CabeceraJuego } from '../../components/MenuJuego.jsx';
-import { Ayuda } from '../Pulsador/Vistas.jsx';
 import { claveSesion } from '../Pulsador/PulsadorOnline.jsx';
-import { metaDe } from '../meta.js';
 import { JUEGO_MINOTAURO } from './Minotauro.jsx';
 import { JUEGO_CONSTRUCTORES } from './Constructores.jsx';
 import './Laberinto.css';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const JUEGOS = { minotauro: JUEGO_MINOTAURO, constructores: JUEGO_CONSTRUCTORES };
 const OPCIONES = [
@@ -24,15 +23,14 @@ function sesionAbierta() {
 
 export default function Laberinto({ onExit }) {
   const [elegido, setElegido] = useState(sesionAbierta);
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   if (elegido) {
     return <JuegoPulsador key={elegido} juego={JUEGOS[elegido]} onExit={onExit} onVolverMenu={() => setElegido(null)} textoVolverMenu="Elegir juego" />;
   }
-  const m = metaDe('laberinto');
   return (
     <>
       <section className="game qq-pantalla lbs-selector">
-        <PanelMenu onAyuda={() => setAyuda(true)}>
+        <PanelMenu onAyuda={abrirAyuda}>
           <CabeceraJuego juegoId="laberinto" />
           <p className="lbs-pregunta">¿A cuál jugáis?</p>
           <div className="lbs-opciones">
@@ -45,11 +43,6 @@ export default function Laberinto({ onExit }) {
           </div>
         </PanelMenu>
       </section>
-      {ayuda && (
-        <Ayuda titulo={m.titulo} descripcion={m.descripcion} onCerrar={() => setAyuda(false)}
-          reglas={['Bajo esta portada hay dos juegos distintos. Elige uno y después decide si jugáis online (cada uno con su móvil) o en un solo móvil.',
-            ...JUEGO_MINOTAURO.reglas.slice(0, 2).map((r) => `🐂 ${r}`), ...JUEGO_CONSTRUCTORES.reglas.slice(0, 1).map((r) => `🧱 ${r}`)]} />
-      )}
     </>
   );
 }

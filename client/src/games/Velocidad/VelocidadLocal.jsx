@@ -7,6 +7,7 @@ import './Velocidad.css';
 import { SelectorJugadores, BloqueConfig, SelectorRondas } from '../../components/MenuJuego.jsx';
 import { limitesLocal } from '../limites.js';
 import { rondasPorDefecto, totalRondas } from '../rondas.js';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const TIEMPO_TURNO = 60;
 const TIEMPO_PREPARACION = 10;
@@ -19,7 +20,7 @@ const inicial = (n = '?') => n.trim().charAt(0).toUpperCase() || '?';
 export default function VelocidadLocal({ onVolver, onExit }) {
   const navigate = useNavigate();
   const [fase, setFase] = useState('setup'); // 'setup' | 'cuenta_atras' | 'jugando' | 'resumen_turno' | 'final'
-  const [modalAyuda, setModalAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [modalSalirPortada, setModalSalirPortada] = useState(false);
 
   const [numJugadores, setNumJugadores] = useState(MIN_JUGADORES);
@@ -297,35 +298,12 @@ export default function VelocidadLocal({ onVolver, onExit }) {
   return (
     <div className={`vel-contenedor ${enPartidaActiva ? 'qq-en-partida' : ''}`}>
       {/* MODAL DE AYUDA */}
-      {modalAyuda && (
-        <div className="rg-modal-fondo" onClick={() => setModalAyuda(false)}>
-          <div className="rg-modal ptp-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-            <div className="ptp-modal-ayuda-header">
-              <span className="ptp-ayuda-badge">❓ Cómo jugar</span>
-              <h3>Test de Velocidad</h3>
-            </div>
-
-            <div className="ptp-modal-ayuda-body">
-              <p>Responde tantas preguntas de cultura general como puedas antes de que se agote tu minuto.</p>
-              <ul>
-                <li><strong>Sorteo y preparación:</strong> El juego elige al azar quién juega cada turno con una cuenta atrás de <strong>10 segundos</strong>.</li>
-                <li><strong>60 segundos contrarreloj:</strong> Cada pregunta tiene 4 opciones y cada acierto suma <strong>+1 punto</strong>. Si fallas, pasas de inmediato a la siguiente.</li>
-                <li><strong>⭐ Pregunta Especial (30s):</strong> Cuando queden 30 segundos, el reloj se detiene con una pregunta abierta. Si la aciertas sin opciones, ganas <strong>+30 segundos extra</strong>.</li>
-              </ul>
-            </div>
-
-            <button type="button" className="ptp-boton" onClick={() => setModalAyuda(false)}>
-              ¡Entendido!
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* 1. SETUP */}
       {fase === 'setup' && (
         <SelectorJugadores
           onVolver={onVolver}
-          onAyuda={() => setModalAyuda(true)}
+          onAyuda={abrirAyuda}
           min={MIN_JUGADORES}
           max={MAX_JUGADORES}
           numJugadores={numJugadores}

@@ -7,9 +7,10 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { THREE, useEscena, mat } from '../Habilidad/tres.js';
 import Icon from '../../components/Icon.jsx';
-import { PortadaUnJugador, FinUnJugador, AyudaUnJugador, ConfirmarSalida, useRecord } from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, FinUnJugador, ConfirmarSalida, useRecord } from '../../components/UnJugador.jsx';
 import { sonar, vibrar } from '../../lib/sonido.js';
 import './Rascacielos.css';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'rascacielos';
 const ALTO = 0.6; // altura de cada planta
@@ -193,7 +194,7 @@ function Escena({ onEstado, onFin }) {
 export default function Rascacielos() {
   const navigate = useNavigate();
   const [fase, setFase] = useState('portada');
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [salir, setSalir] = useState(false);
   const [record, registrar] = useRecord(ID);
   const [nuevoRecord, setNuevoRecord] = useState(false);
@@ -212,19 +213,9 @@ export default function Rascacielos() {
     setFinal(f); setNuevoRecord(f.puntos > 0 && registrar(f.puntos, { plantas: f.plantas })); setFase('fin');
   }, [registrar]);
 
-  const ayudaModal = ayuda && (
-    <AyudaUnJugador titulo="¿Cómo se juega?" onCerrar={() => setAyuda(false)}>
-      <p>Cada planta entra deslizándose de un lado a otro. <b>Toca la pantalla</b> (o pulsa Espacio) para soltarla encima de la anterior.</p>
-      <p>✂️ Lo que sobresalga se corta y cae: la siguiente planta será más estrecha. Si no toca nada, el edificio se acaba.</p>
-      <p>✨ <b>Perfecta</b>: si la dejas justo encima, no pierdes nada y ganas +2. Con <b>3 perfectas seguidas</b>, la planta vuelve a crecer.</p>
-      <p>🏆 Cada 10 plantas llega una <b>planta dorada</b>: clávala para +5 extra.</p>
-      <p>Cada planta va un poco más rápida. ¿Hasta dónde llegarás? Al subir verás el atardecer, la noche… y las estrellas.</p>
-    </AyudaUnJugador>
-  );
-
   if (fase === 'portada') {
-    return <><PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={() => setAyuda(true)} record={record}
-      textoRecord={(r) => `${fmt(r.valor)} puntos${r.plantas != null ? ` · ${r.plantas} plantas` : ''}`} />{ayudaModal}</>;
+    return <><PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record}
+      textoRecord={(r) => `${fmt(r.valor)} puntos${r.plantas != null ? ` · ${r.plantas} plantas` : ''}`} /></>;
   }
   if (fase === 'fin') {
     const p = final.plantas;
@@ -251,7 +242,7 @@ export default function Rascacielos() {
         </div>
       </section>
       {salir && <ConfirmarSalida onSeguir={() => setSalir(false)} onSalir={() => navigate('/')} />}
-      {ayudaModal}
+      
     </div>
   );
 }

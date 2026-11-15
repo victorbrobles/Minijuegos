@@ -131,21 +131,6 @@ export function FinUnJugador({ icono = 'trophy', etiqueta = 'Fin de la partida',
   );
 }
 
-/** Ventana de ayuda «Cómo jugar». */
-export function AyudaUnJugador({ titulo, onCerrar, children }) {
-  return (
-    <div className="rg-modal-fondo" onClick={onCerrar}>
-      <div className="rg-modal aprox-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-        <div className="aprox-modal-header">
-          <span className="aprox-modal-signo-title">?</span>
-          <h3>{titulo}</h3>
-        </div>
-        <div className="aprox-modal-cuerpo">{children}</div>
-        <button type="button" className="big full qq-btn-principal" onClick={onCerrar}>¡Entendido!</button>
-      </div>
-    </div>
-  );
-}
 
 /** Confirmación de salida durante la partida. */
 export function ConfirmarSalida({ onSeguir, onSalir, texto = 'Se perderá la partida en curso.' }) {

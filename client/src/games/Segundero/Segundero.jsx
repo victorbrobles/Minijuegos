@@ -4,10 +4,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import {
-  PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, useRecord
-} from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, useRecord } from '../../components/UnJugador.jsx';
 import './Segundero.css';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'segundero';
 
@@ -35,7 +34,7 @@ function veredicto(error) {
 export default function Segundero() {
   const navigate = useNavigate();
   const [fase, setFase] = useState('portada'); // portada | preparado | corriendo | resultado | fin
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [salir, setSalir] = useState(false);
   const [record, registrar] = useRecord(ID);
   const [ronda, setRonda] = useState(0);
@@ -121,24 +120,12 @@ export default function Segundero() {
     } else preparar(ronda + 1);
   };
 
-  const ayudaModal = ayuda && (
-    <AyudaUnJugador titulo="¿Cómo se juega?" onCerrar={() => setAyuda(false)}>
-      <p>Te diremos un tiempo, por ejemplo <strong>7,3 segundos</strong>. Pulsa para arrancar el reloj y vuelve a pulsar cuando creas que ha pasado justo ese tiempo.</p>
-      <ul>
-        <li>El contador <strong>se oculta</strong> al poco de empezar: tienes que sentir el tiempo.</li>
-        <li>En cada ronda hay una distracción nueva: pulsos de fondo con otro ritmo, destellos, un contador mentiroso…</li>
-        <li>Cuanto más cerca, más puntos (máximo 100 por ronda). Son {RONDAS.length} rondas.</li>
-        <li>Con teclado puedes usar la barra espaciadora.</li>
-      </ul>
-    </AyudaUnJugador>
-  );
-
   if (fase === 'portada') {
     return (
       <div className="sg-contenedor">
-        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={() => setAyuda(true)} record={record}
+        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record}
           textoRecord={(r) => `${r.valor} de ${RONDAS.length * 100} puntos`} />
-        {ayudaModal}
+        
       </div>
     );
   }

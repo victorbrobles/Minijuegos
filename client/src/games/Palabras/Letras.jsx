@@ -4,11 +4,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import { PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, useRecord, Barra } from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, useRecord, Barra } from '../../components/UnJugador.jsx';
 import { cargarSolo, useCuenta, Cargando, RetoAmigo } from '../Solo/comun.jsx';
 import { sonar, vibrar } from '../../lib/sonido.js';
 import { limpiar } from './Palabra.jsx';
 import './Palabras.css';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'letras';
 const fmt = (n) => n.toLocaleString('es-ES');
@@ -21,7 +22,7 @@ export default function Letras() {
   const navigate = useNavigate();
   const [fase, setFase] = useState('portada');
   const [error, setError] = useState('');
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [salir, setSalir] = useState(false);
   const [record, registrar] = useRecord(ID);
   const [nuevoRecord, setNuevoRecord] = useState(false);
@@ -87,20 +88,10 @@ export default function Letras() {
     return () => window.removeEventListener('keydown', tecla);
   });
 
-  const ayudaModal = ayuda && (
-    <AyudaUnJugador titulo="¿Cómo se juega?" onCerrar={() => setAyuda(false)}>
-      <p>Tienes <b>7 letras</b> y <b>2 minutos</b>. Forma todas las palabras que puedas de <b>3 a 7 letras</b>, usando cada letra una sola vez por palabra.</p>
-      <p>Valen: 3 letras <b>1</b> · 4 letras <b>2</b> · 5 letras <b>4</b> · 6 letras <b>7</b> · 7 letras <b>12 + {PREMIO_SIETE} de premio</b>.</p>
-      <p>🔎 Siempre hay al menos una palabra que usa <b>las 7 letras</b>. ¡Búscala!</p>
-      <p>Valen las formas de los verbos, los plurales y los femeninos (por ejemplo «cantas», «rojas»). Las tildes no cuentan.</p>
-      <p>Con teclado: escribe, <b>Intro</b> para enviar, <b>Espacio</b> para mezclar.</p>
-    </AyudaUnJugador>
-  );
-
   if (fase === 'portada' || fase === 'cargando') {
     if (fase === 'cargando') return <Cargando error={error} onReintentar={empezar} />;
-    return <><PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={() => setAyuda(true)} record={record}
-      textoRecord={(r) => `${fmt(r.valor)} puntos${r.palabras != null ? ` · ${r.palabras} palabras` : ''}`} />{ayudaModal}</>;
+    return <><PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record}
+      textoRecord={(r) => `${fmt(r.valor)} puntos${r.palabras != null ? ` · ${r.palabras} palabras` : ''}`} /></>;
   }
   if (fase === 'fin') {
     const siete = halladas.filter((p) => p.length === 7);
@@ -153,7 +144,7 @@ export default function Letras() {
         </div>
       </section>
       {salir && <ConfirmarSalida onSeguir={() => setSalir(false)} onSalir={() => navigate('/')} />}
-      {ayudaModal}
+      
     </div>
   );
 }

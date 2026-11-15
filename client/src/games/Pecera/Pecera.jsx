@@ -4,11 +4,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import {
-  PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, Barra, useRecord, barajar
-} from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, Barra, useRecord, barajar } from '../../components/UnJugador.jsx';
 import RETOS from './retos.js';
 import './Pecera.css';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'pecera';
 const VIDAS = 3;
@@ -22,7 +21,7 @@ function prepararReto(r) {
 export default function Pecera() {
   const navigate = useNavigate();
   const [fase, setFase] = useState('portada'); // portada | juego | resultado | fin
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [salir, setSalir] = useState(false);
   const [record, registrar] = useRecord(ID);
   const [mazo, setMazo] = useState([]);
@@ -93,23 +92,12 @@ export default function Pecera() {
     setFase('juego');
   };
 
-  const ayudaModal = ayuda && (
-    <AyudaUnJugador titulo="¿Cómo se juega?" onCerrar={() => setAyuda(false)}>
-      <p>En la pecera hay <strong>6 cosas</strong>. Cinco tienen algo en común que no te decimos; una no. ¡Encuentra al intruso!</p>
-      <ul>
-        <li>Casi siempre hay una <strong>trampa</strong>: algo que parece sobrar a simple vista pero sí encaja. Piensa dos veces.</li>
-        <li>Tienes {SEGUNDOS} segundos por pecera. Cuanto antes aciertes, más puntos.</li>
-        <li>Si fallas o se acaba el tiempo pierdes una vida. Tienes 3.</li>
-      </ul>
-    </AyudaUnJugador>
-  );
-
   if (fase === 'portada') {
     return (
       <div className="pc-contenedor">
-        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={() => setAyuda(true)} record={record}
+        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record}
           textoRecord={(r) => `${r.valor} puntos`} />
-        {ayudaModal}
+        
       </div>
     );
   }

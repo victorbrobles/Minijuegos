@@ -322,13 +322,4 @@ export const JUEGO_MINOTAURO = {
   Config,
   notaSala: '🐂 De 2 a 8 jugadores. Al empezar, a uno le tocará en secreto ser el Minotauro.',
   ganador: (n) => `¡Ganan ${n.join(' y ')}!`,
-  reglas: [
-    `Laberinto de ${E.AJUSTES.lado}×${E.AJUSTES.lado} casillas con niebla: cada uno solo ve lo que tiene cerca (a ${E.AJUSTES.vista.explorador} casillas por los pasillos) y recuerda lo que ya ha visto.`,
-    'Al empezar, a un jugador le toca en secreto ser el Minotauro: conoce todo el laberinto pero no ve a nadie que no tenga cerca. Los demás son exploradores y salen del centro.',
-    `Cada turno todos trazáis a la vez vuestro recorrido tocando casillas: los exploradores, ${E.AJUSTES.pasos.explorador} pasos (o ${E.AJUSTES.pasos.correr} corriendo, pero hace ruido); el Minotauro, ${E.AJUSTES.pasos.minotauro}. Luego os movéis a la vez, paso a paso.`,
-    'Si el Minotauro pisa la casilla de un explorador o se cruzan, lo atrapa: ese jugador pasa a ser su ayudante (👹) y también caza.',
-    `Las ${E.AJUSTES.llaves} llaves brillan: los exploradores saben dónde están (el Minotauro no, hasta que las ve). Cuando se han recogido todas, se abren las dos salidas 🚪.`,
-    `Los exploradores ganan si escapa al menos un tercio de ellos (mínimo uno). Si no, gana el Minotauro con sus ayudantes.`,
-    `Ayudas: cada explorador tiene ${E.AJUSTES.trampas} trampa 🪤 (el cazador que la pisa se queda quieto y aturdido un turno) y hay antorchas 🔦 que dejan ver más lejos. El Minotauro oye a quien corre o abre un candado, y los exploradores oyen sus pasos cuando está cerca.`
-  ]
 };

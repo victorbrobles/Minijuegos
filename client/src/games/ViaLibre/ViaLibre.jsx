@@ -6,10 +6,11 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { THREE, useEscena, tocado, mat } from '../Habilidad/tres.js';
 import Icon from '../../components/Icon.jsx';
-import { PortadaUnJugador, FinUnJugador, AyudaUnJugador, ConfirmarSalida, useRecord } from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, FinUnJugador, ConfirmarSalida, useRecord } from '../../components/UnJugador.jsx';
 import { sonar, vibrar } from '../../lib/sonido.js';
 import { generarNivel, recorrer, trazo, conexiones, puntosNivel, DX, DZ } from './vias.js';
 import './ViaLibre.css';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'vialibre';
 const fmt = (n) => n.toLocaleString('es-ES');
@@ -216,7 +217,7 @@ function Tablero({ nivel, onCambio, onFinTren, salidaRef }) {
 export default function ViaLibre() {
   const navigate = useNavigate();
   const [fase, setFase] = useState('portada');
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [salir, setSalir] = useState(false);
   const [record, registrar] = useRecord(ID);
   const [nuevoRecord, setNuevoRecord] = useState(false);
@@ -269,19 +270,9 @@ export default function ViaLibre() {
     setNuevoRecord(puntos > 0 && registrar(puntos, { nivel: superados })); setFase('fin');
   };
 
-  const ayudaModal = ayuda && (
-    <AyudaUnJugador titulo="¿Cómo se juega?" onCerrar={() => setAyuda(false)}>
-      <p>🚂 El tren saldrá de la estación <b>verde</b> cuando se acabe la cuenta atrás y tiene que llegar a la estación <b>roja</b> (la de la bandera).</p>
-      <p><b>Toca una casilla</b> para girar su pieza de vía. Las vías que ya están unidas desde la salida se ven <b>doradas</b>.</p>
-      <p>Cuando la ruta esté completa, pulsa <b>¡Salida!</b> para que salga ya: cada segundo que sobre da puntos.</p>
-      <p>Cuidado: hay <b>piezas señuelo</b> que no llevan a ninguna parte, y desde el nivel 4 aparecen <b>cruces</b> (no se giran). Si el tren descarrila, se acabó.</p>
-      <p>Cada nivel el tablero crece o el tiempo se acorta. ¿Hasta qué nivel llegarás?</p>
-    </AyudaUnJugador>
-  );
-
   if (fase === 'portada') {
-    return <><PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={() => setAyuda(true)} record={record}
-      textoRecord={(r) => `${fmt(r.valor)} puntos${r.nivel != null ? ` · ${r.nivel} niveles` : ''}`} />{ayudaModal}</>;
+    return <><PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record}
+      textoRecord={(r) => `${fmt(r.valor)} puntos${r.nivel != null ? ` · ${r.nivel} niveles` : ''}`} /></>;
   }
   if (fase === 'fin') {
     const sup = nivelN - 1;
@@ -333,7 +324,7 @@ export default function ViaLibre() {
         </div>
       </section>
       {salir && <ConfirmarSalida onSeguir={() => setSalir(false)} onSalir={() => navigate('/')} />}
-      {ayudaModal}
+      
     </div>
   );
 }

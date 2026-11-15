@@ -203,25 +203,3 @@ export function SelectorRondas({ valor, onCambiar }) {
   );
 }
 
-export function Ayuda({ onCerrar, titulo, descripcion }) {
-  return (
-    <div className="rg-modal-fondo" onClick={onCerrar}>
-      <div className="rg-modal qq-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-        <div className="qq-modal-ayuda-header">
-          <span className="qq-ayuda-badge">❓ Cómo jugar</span>
-          <h3>{titulo}</h3>
-        </div>
-        <div className="qq-modal-ayuda-body">
-          {descripcion && <p>{descripcion}</p>}
-          <ul>
-            <li>Cada ronda salen dos futbolistas. Busca un tercero que haya coincidido en algún <strong>club</strong> con los dos (con cada uno en un club distinto también vale). La selección no cuenta.</li>
-            <li>Quien lo sepa pulsa <strong>«¡Lo sé!»</strong> y tiene {AJUSTES.segRespuesta} segundos para escribirlo. Hay {AJUSTES.segRonda} segundos por pareja.</li>
-            <li>Si está en nuestra lista, acierto (+{AJUSTES.puntosAcierto}). Si no está, decide el anfitrión (o el grupo, en un dispositivo).</li>
-            <li>Fallar resta {AJUSTES.puntosFallo} y deja fuera de esa pareja. Al acabar se ven ejemplos de respuestas válidas.</li>
-          </ul>
-        </div>
-        <button type="button" className="big full qq-btn-principal" onClick={onCerrar}>¡Entendido!</button>
-      </div>
-    </div>
-  );
-}

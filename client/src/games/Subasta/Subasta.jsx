@@ -165,13 +165,6 @@ const JUEGO = {
   ganador: (n) => `¡${n.join(' y ')} hace la mejor fortuna!`,
   detalleFin: (j) => `${j.monedas} monedas + ${j.objetos} en objetos`,
   unidadPuntos: '🪙',
-  reglas: [
-    `Todos empezáis con ${E.INICIAL} monedas. En cada ronda sale un lote con una tasación orientativa (que puede engañar).`,
-    'Algunos jugadores reciben en secreto el soplo de su experto sobre ese lote.',
-    'Todos pujáis a la vez y en secreto. La puja más alta se lleva el lote y lo paga. Si hay empate arriba, nadie se lo lleva y los empatados pagan la mitad.',
-    'El lote puede ser un tesoro 💰, un trasto 🗑️ o un efecto especial: maldición 💀, ladrón 🦹, varita duplicadora ✨, lupa 🔍, garantía 💸 o regalo para todos 🎁. Los efectos se aplican al momento; el valor de tesoros y trastos solo lo conoce quien los gana… hasta el final.',
-    'Al final se abren todos los lotes: gana quien sume más monedas + valor de sus objetos.'
-  ]
 };
 
 export default function Subasta({ onExit }) {

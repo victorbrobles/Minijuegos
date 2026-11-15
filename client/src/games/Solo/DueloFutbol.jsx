@@ -5,9 +5,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import { PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, useRecord, Barra } from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, useRecord, Barra } from '../../components/UnJugador.jsx';
 import { cargarSolo, useCuenta, Cargando, RetoAmigo } from './comun.jsx';
 import './Solo.css';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'duelofutbol';
 const SEGUNDOS = 10;
@@ -16,7 +17,7 @@ export default function DueloFutbol() {
   const navigate = useNavigate();
   const [fase, setFase] = useState('portada');
   const [error, setError] = useState('');
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [salir, setSalir] = useState(false);
   const [record, registrar] = useRecord(ID);
   const [nuevoRecord, setNuevoRecord] = useState(false);
@@ -47,16 +48,7 @@ export default function DueloFutbol() {
       setTimeout(() => { setNuevoRecord(racha > 0 && registrar(racha)); setFase('fin'); }, 2000);
     }
   }
-
-  const ayudaModal = ayuda && (
-    <AyudaUnJugador titulo="¿Cómo se juega?" onCerrar={() => setAyuda(false)}>
-      <p>Salen <b>dos futbolistas</b> y una pregunta: ¿quién ha jugado en más clubes?, ¿quién debutó antes?, ¿quién es mayor?, ¿quién vale más?…</p>
-      <p>Toca al que creas. Tienes <b>{SEGUNDOS} segundos</b>.</p>
-      <p>Cada acierto suma uno a tu <b>racha</b> y los duelos se van igualando. El primer fallo acaba la partida.</p>
-      <p>Los datos de edad, media y valor son los de la temporada 2025/26 de «Director Deportivo».</p>
-    </AyudaUnJugador>
-  );
-  if (fase === 'portada') return <><PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={() => setAyuda(true)} record={record} textoRecord={(r) => `racha de ${r.valor}`} />{ayudaModal}</>;
+  if (fase === 'portada') return <><PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record} textoRecord={(r) => `racha de ${r.valor}`} /></>;
   if (fase === 'cargando') return <Cargando error={error} onReintentar={empezar} />;
   if (fase === 'fin') {
     return (

@@ -217,13 +217,6 @@ const JUEGO = {
   notaSala: '🔺 Cada uno ve su categoría en su móvil. Los futbolistas se dicen en voz alta: jugad juntos o en llamada.',
   ganador: (n) => `¡${n.join(' y ')} gana las Pirámides!`,
   detalleFin: (j) => `${j.aciertos >= 0 ? '+' : ''}${j.aciertos} adivinando · +${j.supervivencia} por aguantar`,
-  reglas: [
-    `Cada jugador recibe una categoría secreta sobre futbolistas (de un banco de ${CATEGORIAS.length}): «Ha ganado la Champions», «Es zurdo», «Ha jugado en el Madrid y en el Barça»… Puedes consultar la tuya cuando quieras.`,
-    'En tu turno, primero decides si intentas adivinar la categoría de un rival. Solo tienes un intento por rival en toda la partida: si aciertas, queda eliminado, sumas 2 puntos y puedes seguir intentándolo con otro rival; si fallas, pierdes 1, todos verán que no es esa y pasas a los futbolistas.',
-    'Después, cada rival te dice en voz alta un futbolista (actual o retirado). Tú lo apuntas y dices, honradamente, si encaja ✅ o no ❌ en tu categoría. Todo queda en tu pirámide, a la vista de todos.',
-    'Cuando todos te han dicho su futbolista, pasa el turno.',
-    'Al final, el último en pie suma 2 × el número de jugadores; el siguiente, uno menos; y así sucesivamente. Si se acaban las vueltas, los que siguen vivos comparten el primer puesto. ¡Gana quien más puntos tenga!'
-  ]
 };
 
 export default function Piramides({ onExit }) {

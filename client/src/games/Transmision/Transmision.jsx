@@ -110,13 +110,6 @@ const JUEGO = {
   Config,
   notaSala: '🛰️ Cooperativo: cada uno ve cosas distintas en su móvil. ¡Jugad en la misma habitación (o en llamada) y hablad mucho!',
   ganador: () => '¡Misión cumplida!',
-  reglas: [
-    'Estáis en una nave que se cae a pedazos. Cada jugador controla una o dos secciones (motores, oxígeno, navegación…). Cada sección tiene tres palancas, un dial del 0 al 9 y un botón de color.',
-    'Van saltando averías. Todos veis qué falla y dónde, pero el MANUAL con la solución («dial al 7, palanca B arriba…») lo tiene otro jugador, y nadie sabe quién.',
-    'Hablad: quien tiene el manual lo lee en voz alta y el dueño de la sección lo ejecuta en su panel. En cuanto el panel cumple el manual, la avería queda reparada.',
-    'Cada avería tiene su cuenta atrás. Si se acaba, el casco pierde un punto. Con el casco a cero, la nave se pierde.',
-    'Si aguantáis hasta que acabe el tiempo, la transmisión llega a la Tierra y ganáis todos.'
-  ]
 };
 
 export default function Transmision({ onExit }) {

@@ -8,8 +8,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import { PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, useRecord, Aviso, barajar } from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, useRecord, Aviso, barajar } from '../../components/UnJugador.jsx';
 import './Eco.css';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'eco';
 const VIDAS = 3;
@@ -51,7 +52,7 @@ function sonar(f, ms = 220, tipo = 'sine') {
 export default function Eco() {
   const navigate = useNavigate();
   const [fase, setFase] = useState('portada'); // portada | mostrando | turno | fin
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [salir, setSalir] = useState(false);
   const [record, registrar] = useRecord(ID);
   const [nuevoRecord, setNuevoRecord] = useState(false);
@@ -156,26 +157,13 @@ export default function Eco() {
     }
   };
 
-  const ayudaModal = ayuda && (
-    <AyudaUnJugador titulo="¿Cómo se juega?" onCerrar={() => setAyuda(false)}>
-      <p>Mira la secuencia de luces y repítela tocando los botones en el mismo orden. Cada ronda tiene un paso más.</p>
-      <ul>
-        <li>Empiezas con 4 botones; desde la ronda 6 hay 6 y desde la 11, 9. Además, cada vez va más rápido.</li>
-        <li><strong>↩️ Al revés:</strong> repite la secuencia de atrás hacia delante.</li>
-        <li><strong>⛔ Trampa:</strong> algunos pasos se iluminan en rojo con un pitido grave: esos no se repiten.</li>
-        <li><strong>🔀 Barajado:</strong> justo antes de tu turno los botones cambian de sitio. Recuerda los colores, no las posiciones.</li>
-        <li>Tienes {VIDAS} vidas: si fallas, se repite la ronda. Tu puntuación son las rondas superadas.</li>
-      </ul>
-    </AyudaUnJugador>
-  );
-
   if (fase === 'portada') {
     return (
       <div className="eco-contenedor">
-        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={() => setAyuda(true)} record={record} textoRecord={(r) => `${r.valor} rondas`}>
+        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record} textoRecord={(r) => `${r.valor} rondas`}>
           <button type="button" className={`qq-chip${sonido ? ' activo' : ''}`} onClick={() => setSonido((s) => !s)}>{sonido ? '🔊 Con sonido' : '🔇 Sin sonido'}</button>
         </PortadaUnJugador>
-        {ayudaModal}
+        
       </div>
     );
   }

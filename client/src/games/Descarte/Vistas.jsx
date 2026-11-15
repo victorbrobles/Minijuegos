@@ -401,38 +401,3 @@ export function PantallaFin({ v, onSalir, children }) {
   );
 }
 
-export function Ayuda({ onCerrar, titulo, descripcion }) {
-  return (
-    <div className="rg-modal-fondo" onClick={onCerrar}>
-      <div className="rg-modal qq-modal-ayuda" onClick={(e) => e.stopPropagation()}>
-        <div className="qq-modal-ayuda-header">
-          <span className="qq-ayuda-badge">❓ Cómo jugar</span>
-          <h3>{titulo}</h3>
-        </div>
-        <div className="qq-modal-ayuda-body">
-          {descripcion && <p>{descripcion}</p>}
-          <p className="dsp-ayuda-sub">🎯 El reto</p>
-          <ul>
-            <li>Sale la pantalla de turno del <strong>retador</strong>: al pulsar «listo» elige a un rival (que no haya jugado aún en esta vuelta) y una de <strong>tres categorías</strong>.</li>
-            <li>Después sale el turno del rival: al pulsar «listo» ve su categoría y tiene <strong>{AJUSTES.segundosRespuesta} segundos</strong> para decir en voz alta una palabra que empiece por una letra que siga en el tablero.</li>
-            <li>Puede acertar, fallar o <strong>pasar turno</strong> (no suma y cuenta como fallo). Después, el rival pasa a ser el nuevo retador.</li>
-          </ul>
-          <p className="dsp-ayuda-sub">🔤 Letras y puntos</p>
-          <ul>
-            <li>Si la palabra vale, su letra <strong>se elimina</strong> del tablero y el rival suma sus puntos.</li>
-            <li><strong>1 punto:</strong> A B C D E L M P R S T · <strong>2 puntos:</strong> F G H I N O U V · <strong>3 puntos:</strong> J K Q W X Y Z.</li>
-          </ul>
-          <p className="dsp-ayuda-sub">📱 Online</p>
-          <ul>
-            <li>El retado toca en su móvil la letra por la que ha dicho la palabra y el <strong>anfitrión</strong> decide si es correcta (si el retado es el anfitrión, decide el retador).</li>
-          </ul>
-          <p className="dsp-ayuda-sub">🏁 Tableros</p>
-          <ul>
-            <li>Un tablero termina cuando no quedan letras o cuando <strong>todos fallan seguidos</strong>. Gana quien más puntos sume al acabar el último tablero.</li>
-          </ul>
-        </div>
-        <button type="button" className="big full qq-btn-principal" onClick={onCerrar}>¡Entendido!</button>
-      </div>
-    </div>
-  );
-}

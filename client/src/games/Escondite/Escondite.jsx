@@ -4,7 +4,7 @@ import React from 'react';
 import JuegoPulsador from '../Pulsador/JuegoPulsador.jsx';
 import { crearJuegoSimultaneo, FormTexto } from '../comun/Simultaneo.jsx';
 import { Avatar } from '../Pulsador/Vistas.jsx';
-import { M, SEGUNDOS } from './engine.js';
+import { M } from './engine.js';
 
 const nombreDe = (v, id) => v.jugadores.find((j) => j.id === id)?.nombre ?? '¿?';
 
@@ -92,14 +92,6 @@ const JUEGO = crearJuegoSimultaneo({
   notaSala: '🙈 Cada uno responde en secreto desde su móvil.',
   detalleFin: (j) => `${j.aciertos} ${j.aciertos === 1 ? 'ronda ganada' : 'rondas ganadas'}`,
   ganador: (n) => (n.length > 1 ? `¡Empate entre ${n.join(' y ')}!` : `¡${n[0]} es el rey del escondite!`),
-  reglas: [
-    'Sale una categoría con pocas respuestas posibles, de 5 a 11: los ríos más largos de España, un once histórico, los planetas…',
-    'Cada ronda un jugador se esconde: escribe en secreto una de esas respuestas intentando que nadie la adivine. Los demás escriben cuál creen que ha elegido.',
-    'Si nadie la adivina, el escondido suma 1 punto. Si alguien la adivina, el escondido no suma y cada uno de los que la adivinan suma 1.',
-    'Si escribes algo que no está entre las respuestas posibles, no vale: se te muestran las posibles y vuelves a intentarlo.',
-    `Online hay ${SEGUNDOS} segundos por ronda. Con muchos jugadores solo salen categorías con muchas respuestas posibles.`,
-    'Las rondas son 2, 3 o 4 por jugador, así que todos se esconden las mismas veces.'
-  ]
 });
 
 export default function Escondite({ onExit }) {

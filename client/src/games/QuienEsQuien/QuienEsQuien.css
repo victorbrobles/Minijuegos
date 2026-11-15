@@ -1091,21 +1091,6 @@ body:has(.qq-en-partida) .back {
   color: #0f172a;
 }
 
-.qq-modal-ayuda-body {
-  font-size: 0.95rem;
-  color: #334155;
-  line-height: 1.5;
-  margin-bottom: 1.4rem;
-}
-
-.qq-modal-ayuda-body ul {
-  padding-left: 1.2rem;
-  margin: 0.7rem 0 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
-}
-
 /* ========================================================
    ESTILOS DE SALA Y PARTIDA EXISTENTES
    ======================================================== */
@@ -1344,7 +1329,6 @@ body:has(.qq-en-partida) .back {
 /* ========================================================
    FONDO IDÉNTICO AL MENÚ PRINCIPAL Y CONTROL DE PORTADA
    ======================================================== */
-
 
 body:has(.qq-en-partida) .back:not(.qq-btn-volver-sala) {
   display: none !important;
@@ -1782,21 +1766,6 @@ body:has(.qq-en-partida) .back:not(.qq-btn-volver-sala) {
   color: #0f172a;
 }
 
-.qq-modal-ayuda-body {
-  font-size: 0.95rem;
-  color: #334155;
-  line-height: 1.5;
-  margin-bottom: 1.4rem;
-}
-
-.qq-modal-ayuda-body ul {
-  padding-left: 1.2rem;
-  margin: 0.7rem 0 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.55rem;
-}
-
 /* ========================================================
    TABLERO DE PARTIDA COHESIONADO (DENTRO DEL JUEGO)
    ======================================================== */
@@ -2112,7 +2081,6 @@ body:has(.qq-en-partida) .back:not(.qq-btn-volver-sala) {
 .qq-en-partida .back:not(.qq-btn-volver-sala) {
   display: none !important;
 }
-
 
 body:has(.qq-en-partida) .back:not(.qq-btn-volver-sala) {
   display: none !important;

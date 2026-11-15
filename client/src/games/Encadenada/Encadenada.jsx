@@ -4,11 +4,10 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import {
-  PortadaUnJugador, CabeceraPartida, FinUnJugador, AyudaUnJugador, ConfirmarSalida, Aviso, useRecord
-} from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, Aviso, useRecord } from '../../components/UnJugador.jsx';
 import { DICCIONARIO, difiereEnUna, caminoMinimo, generarReto } from './motor.js';
 import './Encadenada.css';
+import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'encadenada';
 const PASOS_RETOS = [3, 3, 4, 4, 5, 6];
@@ -23,7 +22,7 @@ function medallaDe(pasos, optimo) {
 export default function Encadenada() {
   const navigate = useNavigate();
   const [fase, setFase] = useState('portada'); // portada | juego | resuelto | fin
-  const [ayuda, setAyuda] = useState(false);
+  const abrirAyuda = useAbrirAyuda();
   const [salir, setSalir] = useState(false);
   const [record, registrar] = useRecord(ID);
   const [ronda, setRonda] = useState(0);
@@ -123,24 +122,11 @@ export default function Encadenada() {
     return () => window.removeEventListener('keydown', onKey);
   });
 
-  const ayudaModal = ayuda && (
-    <AyudaUnJugador titulo="¿Cómo se juega?" onCerrar={() => setAyuda(false)}>
-      <p>Tienes que llegar de una palabra a otra <strong>cambiando una sola letra en cada paso</strong>. Cada paso tiene que ser una palabra que exista.</p>
-      <p>Ejemplo: <strong>CASA → CAPA → COPA → COLA</strong></p>
-      <ul>
-        <li>Toca la letra que quieres cambiar y después la nueva letra en el teclado.</li>
-        <li>🥇 Oro si llegas en el mínimo de pasos, 🥈 plata con uno más y 🥉 bronce con más.</li>
-        <li>Cada <strong>pista</strong> te dice el siguiente cambio, pero cuesta 50 puntos.</li>
-        <li>Son {PASOS_RETOS.length} retos, cada vez más largos.</li>
-      </ul>
-    </AyudaUnJugador>
-  );
-
   if (fase === 'portada') {
     return (
       <div className="ec-contenedor">
-        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={() => setAyuda(true)} record={record} textoRecord={(r) => `${r.valor} puntos`} />
-        {ayudaModal}
+        <PortadaUnJugador juegoId={ID} onJugar={empezar} onAyuda={abrirAyuda} record={record} textoRecord={(r) => `${r.valor} puntos`} />
+        
       </div>
     );
   }

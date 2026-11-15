@@ -170,13 +170,6 @@ const JUEGO = {
   notaSala: '🎮 Todos juegan cada minijuego a la vez, cada uno en su móvil.',
   ganador: (n) => (n.length > 1 ? `¡${n.join(' y ')} empatan como los más hábiles!` : `¡${n[0]} es el más hábil!`),
   detalleFin: (j) => `${j.victorias} ${j.victorias === 1 ? 'minijuego ganado' : 'minijuegos ganados'}`,
-  reglas: [
-    'El anfitrión elige a cuántos minijuegos se juega y cuáles, en orden (los que no elija salen al azar). Hay 30 para elegir: reflejos, puntería, memoria, precisión, ritmo, equilibrio…',
-    'Cada minijuego dura como mucho un par de minutos. Antes de empezar se explica cómo se juega.',
-    'Online, todos juegan a la vez el mismo minijuego (exactamente igual para todos). En un solo móvil, se juega por turnos: el móvil pasa de mano en mano.',
-    `Al terminar cada minijuego se ve su clasificación. Puntos por puesto: ${E.PUNTOS.join(', ')}. Los empates comparten puesto.`,
-    'Gana quien más puntos acumule al final.'
-  ]
 };
 
 export default function Habilidad({ onExit }) {
