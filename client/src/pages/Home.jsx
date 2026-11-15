@@ -9,6 +9,7 @@ import { useFavoritos, useJugados } from '../lib/favoritos.js';
 import './Estadisticas.css';
 import './Noche.css';
 import './Creditos.css';
+import './Portada.css';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import GameCard from '../components/GameCard.jsx';
@@ -303,7 +304,14 @@ export default function Home() {
     <div className="home-view">
       <header className="hub-head">
         <Icon name="gamepad" className="hub-bg" aria-hidden="true" />
-        <Recomendador ids={games.map((g) => g.id)} />
+        <div className="hub-barra">
+          <div className="hub-yo"><ChipIdentidad /></div>
+          <nav className="hub-iconos" aria-label="Opciones">
+            <Link to="/grupos" className="hub-grupos" aria-label="Grupos" title="Grupos"><span aria-hidden="true">👥</span><em>Grupos</em></Link>
+            <BotonSonido clase="en-portada" />
+            <BotonAjustes />
+          </nav>
+        </div>
 
         <div className="hub-top">
           <span className="hub-logo"><Icon name="gamepad" size={34} strokeWidth={1.9} /></span>
@@ -312,7 +320,6 @@ export default function Home() {
             <p className="hub-sub">¡Elige un minijuego y a jugar!</p>
           </div>
         </div>
-        <div className="hub-yo"><ChipIdentidad /><Link to="/grupos" className="hub-grupos">👥 Grupos</Link><BotonSonido clase="en-portada" /><BotonAjustes /></div>
 
         <div className="hub-search" role="search">
           <Icon name="search" size={22} className="hub-search-icon" />
@@ -330,14 +337,16 @@ export default function Home() {
             autoCorrect="off"
             spellCheck="false"
           />
-          {busqueda.trim() !== '' && (
-            <button type="button" className="hub-clear" onClick={limpiar} aria-label="Borrar búsqueda">
-              <Icon name="x" size={18} strokeWidth={2.6} />
+          <div className="hub-search-acc">
+            {busqueda.trim() !== '' && (
+              <button type="button" className="hub-clear" onClick={limpiar} aria-label="Borrar búsqueda">
+                <Icon name="x" size={18} strokeWidth={2.6} />
+              </button>
+            )}
+            <button type="button" className={`fj-boton${nFiltros ? ' activo' : ''}`} onClick={() => setVerFiltros((v) => !v)} aria-expanded={verFiltros} aria-label="Filtros">
+              <Icon name="filtros" size={19} strokeWidth={2.4} /><span>Filtros</span>{nFiltros > 0 && <em>{nFiltros}</em>}
             </button>
-          )}
-          <button type="button" className={`fj-boton${nFiltros ? ' activo' : ''}`} onClick={() => setVerFiltros((v) => !v)} aria-expanded={verFiltros} aria-label="Filtros">
-            <Icon name="settings" size={16} /> Filtros{nFiltros > 0 && <em>{nFiltros}</em>}
-          </button>
+          </div>
         </div>
         {verFiltros && <PanelFiltros filtros={filtros} onCambiar={setFiltros} resultados={resultados.length} onCerrar={() => setVerFiltros(false)} />}
 
@@ -349,8 +358,11 @@ export default function Home() {
       {!hayBusqueda && (
         <div className="home-accesos">
           <BannerReto />
-          <Link to="/noche" className="est-boton noche" aria-label="Noche de juegos"><span>🎉</span>Noche de juegos</Link>
-          <Link to="/estadisticas" className="est-boton" aria-label="Estadísticas"><span>📊</span>Estadísticas</Link>
+          <div className="home-atajos">
+            <Recomendador ids={games.map((g) => g.id)} />
+            <Link to="/noche" className="est-boton noche" aria-label="Noche de juegos"><span>🎉</span>Noche de juegos</Link>
+            <Link to="/estadisticas" className="est-boton" aria-label="Estadísticas"><span>📊</span>Estadísticas</Link>
+          </div>
         </div>
       )}
       {!hayBusqueda && <Instalar />}

@@ -152,6 +152,7 @@ const EXTRA = {
   palabra: <><rect x="2" y="8" width="5.500" height="8" rx="1.200" /><rect x="9.250" y="8" width="5.500" height="8" rx="1.200" /><rect x="16.500" y="8" width="5.500" height="8" rx="1.200" /><path d="M12 11v2M12 15v.01" /></>,
   search: <><circle cx="11" cy="11" r="7" /><path d="m20 20-3.500-3.500" /></>,
   x: <path d="M6 6l12 12M18 6 6 18" />,
+  filtros: <><path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0" /><circle cx="16" cy="6" r="2" /><circle cx="10" cy="12" r="2" /><circle cx="18" cy="18" r="2" /></>,
   sleuth: <><path d="M3 10h18" /><path d="M6 10l1.600-5.500h8.800L18 10" /><path d="M7 10v1.500a5 5 0 0 0 7 4.500" /><path d="M10 12.500h.01M14 12.500h.01" /><circle cx="17.500" cy="17.500" r="3" /><path d="M19.700 19.700 22 22" /></>,
   stopwatch: <><circle cx="12" cy="14" r="8" /><path d="M12 14l3-3M10 2h4M12 2v4M19 6l1.500-1.500" /></>,
   podium: <><path d="m12 2 1.100 2.200 2.400.4-1.700 1.700.4 2.400L12 7.500 9.800 8.700l.4-2.400-1.700-1.700 2.400-.4z" /><path d="M9 21V11h6v10M3 21v-6h6M15 21v-4h6M2 21h20" /></>,

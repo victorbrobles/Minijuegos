@@ -18,14 +18,10 @@
 /* Dentro de los juegos: a la derecha del botón «Portada» */
 .snd.en-juego { position: absolute; top: 0.25rem; right: 0.3rem; }
 .game-shell { position: relative; }
-.hub-yo { display: flex; align-items: center; gap: 0.5rem; }
 .snd.en-portada .snd-btn { width: 2.3rem; height: 2.3rem; font-size: 1.05rem; background: rgba(255, 255, 255, 0.22); box-shadow: none; }
 .snd.en-portada .snd-panel { left: 0; right: auto; }
-.hub-grupos { display: inline-flex; align-items: center; height: 2.3rem; padding: 0 0.85rem; border-radius: 999px; background: rgba(255, 255, 255, 0.22); color: #ffffff; font-size: 0.85rem; font-weight: 800; text-decoration: none; white-space: nowrap; }
-.hub-yo { flex-wrap: wrap; }
 .snd.en-portada .snd-panel { position: fixed; top: 5rem; left: 50%; right: auto; transform: translateX(-50%); animation: none; z-index: 90; }
-@media (max-width: 440px) { .hub-grupos { padding: 0 0.7rem; font-size: 0.8rem; } }
-/* Durante la partida el botón baja a la esquina inferior derecha para no tapar la cabecera del juego */
+@media (max-width: 440px) { /* Durante la partida el botón baja a la esquina inferior derecha para no tapar la cabecera del juego */
 .game-shell:has(.qq-en-partida) .snd.en-juego { position: fixed; top: auto; right: 0.7rem; bottom: calc(0.8rem + env(safe-area-inset-bottom)); }
 .game-shell:has(.qq-en-partida) .snd.en-juego .snd-btn { width: 2.4rem; height: 2.4rem; font-size: 1.05rem; opacity: 0.9; }
 .game-shell:has(.qq-en-partida) .snd.en-juego .snd-panel { top: auto; bottom: calc(100% + 0.5rem); }

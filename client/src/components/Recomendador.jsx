@@ -308,7 +308,7 @@ export default function Recomendador({ ids }) {
   const [abierto, setAbierto] = useState(false);
   return (
     <>
-      <button type="button" className="rec-boton" onClick={() => setAbierto(true)}><span>🎲</span>¿A qué jugamos hoy?</button>
+      <button type="button" className="est-boton rec-boton" onClick={() => setAbierto(true)}><span>🎲</span>¿A qué jugamos?</button>
       {abierto && createPortal(<Ventana ids={ids} onCerrar={() => setAbierto(false)} />, document.body)}
     </>
   );

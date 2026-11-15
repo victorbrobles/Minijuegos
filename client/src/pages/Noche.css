@@ -49,13 +49,6 @@
 @keyframes nchLatido { 50% { transform: scale(1.05); } }
 /* Botón de la portada */
 .est-boton.noche { background: linear-gradient(135deg, #f43f5e 0%, #c026d3 100%); box-shadow: 0 6px 0 rgba(112, 26, 117, 0.55); }
-/* Móvil: reto diario, noche y estadísticas, cada uno en su línea */
-@media (max-width: 640px) {
-  .home-accesos { flex-direction: column; gap: 0.55rem; }
-  .home-accesos .est-boton { flex-direction: row; justify-content: flex-start; gap: 0.75rem; min-width: 0; padding: 0.75rem 1.1rem; border-radius: 18px; font-size: 1rem; box-shadow: 0 4px 0 rgba(49, 46, 129, 0.5); }
-  .home-accesos .est-boton span { font-size: 1.5rem; }
-  .home-accesos .est-boton::after { content: '›'; margin-left: auto; font-size: 1.5rem; opacity: 0.8; }
-}
 /* Aviso de instalar como app */
 .inst-aviso { display: flex; align-items: center; gap: 0.6rem; margin: 0 0 1rem; padding: 0.65rem 0.8rem; border-radius: 18px; background: rgba(255, 255, 255, 0.95); color: #0f172a; box-shadow: 0 6px 18px rgba(15, 23, 42, 0.18); }
 .inst-aviso > div { flex: 1; min-width: 0; display: grid; }

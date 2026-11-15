@@ -1,15 +1,4 @@
 /* client/src/components/Recomendador.css */
-.rec-boton { position: absolute; top: 1.1rem; right: 1.1rem; z-index: 2; display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.55rem 0.95rem; border: 2px solid rgba(255, 255, 255, 0.55); border-radius: 999px; background: rgba(255, 255, 255, 0.95); color: #6d28d9; font: inherit; font-size: 0.9rem; font-weight: 900; cursor: pointer; box-shadow: 0 4px 0 rgba(49, 46, 129, 0.35); transition: transform 0.15s; animation: recLatido 3.2s ease-in-out infinite; }
-.rec-boton:hover { transform: translateY(-2px) rotate(-1deg); }
-.rec-boton span { font-size: 1.15rem; }
-@keyframes recLatido { 0%, 88%, 100% { transform: none; } 92% { transform: rotate(-4deg) scale(1.04); } 96% { transform: rotate(4deg) scale(1.04); } }
-@media (max-width: 560px) {
-  .rec-boton { top: 0.7rem; right: 0.7rem; flex-direction: column; gap: 0; width: 4.9rem; padding: 0.35rem 0.4rem; border-radius: 16px; font-size: 0.66rem; line-height: 1.15; text-align: center; white-space: normal; }
-  .hub-head .hub-top { padding-right: 4.6rem; gap: 0.7rem; }
-  .hub-head .hub-title { font-size: clamp(1.6rem, 8.4vw, 2.1rem); }
-  .hub-head .hub-logo { width: 3.2rem; height: 3.2rem; }
-}
-
 .rec-fondo { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 0.8rem; background: rgba(31, 26, 71, 0.65); backdrop-filter: blur(3px); }
 .rec-modal { display: flex; flex-direction: column; width: min(100%, 520px); max-height: 92vh; overflow: hidden; border-radius: 26px; background: #ffffff; color: #0f172a; text-align: left; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35); animation: recEntra 0.25s ease-out; }
 @keyframes recEntra { from { opacity: 0; transform: translateY(14px) scale(0.98); } to { opacity: 1; transform: none; } }
@@ -58,10 +47,7 @@
 .rec-motivos em { padding: 0.1rem 0.45rem; border-radius: 999px; background: #f5f3ff; color: #6d28d9; font-size: 0.7rem; font-style: normal; font-weight: 800; }
 .rec-vacio { display: grid; justify-items: center; gap: 0.5rem; padding: 1rem 0; text-align: center; color: #475569; }
 .rec-vacio span { font-size: 2.6rem; }
-@media (max-width: 360px) {
-  .hub-head .hub-logo { display: none; }
-  .hub-head .hub-title { font-size: 1.6rem; }
-}
+
 /* Paso de tiempo y forma de jugar */
 .rec-opciones.tres { grid-template-columns: repeat(3, 1fr); }
 .rec-sub { margin-top: 0.9rem !important; }
