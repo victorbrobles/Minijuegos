@@ -1,9 +1,10 @@
 // server/routes/perfil.js
-// Perfil de cada jugador (Nombre#1234): avatar (emoji) y color. Lo ven los demás en podios y en su página de perfil.
+// Perfil de cada jugador (Nombre#1234): avatar (dibujado con piezas, o un emoji en los perfiles antiguos) y color. Lo ven los demás en podios y en su página de perfil.
 //   GET  /api/perfil?nombres=Ana#1234,Pablo#5678   → { perfiles: { 'Ana#1234': { avatar, color } } }
 //   POST /api/perfil { jugador, avatar, color }
 import express from 'express';
 import db from '../db.js';
+import { leerAvatar } from '../../client/src/lib/avatarPartes.js';
 
 export const AVATARES = ['😎', '🤓', '🥳', '😺', '🐶', '🦊', '🐼', '🐸', '🐵', '🦁', '🐯', '🐧', '🦄', '🐙', '🦖', '🐲', '👽', '🤖', '👻', '🎃',
   '🧙', '🥷', '🦸', '🧛', '🧑‍🚀', '🧑‍🍳', '⚽', '🏀', '🎸', '🎮', '🎲', '🃏', '♟️', '🚀', '🌵', '🍕', '🍩', '🌈', '🔥', '⭐'];
@@ -25,8 +26,9 @@ router.get('/', (req, res) => {
 router.post('/', (req, res) => {
   const { jugador, avatar, color } = req.body || {};
   if (!valido(String(jugador || ''))) return res.status(400).json({ error: 'Jugador no válido.' });
-  if (!AVATARES.includes(avatar) || !COLORES.includes(color)) return res.status(400).json({ error: 'Avatar o color no válido.' });
-  guardar.run(jugador, avatar, color, Date.now());
+  const dibujo = leerAvatar(avatar); // avatar dibujado (JSON con sus piezas) o, como antes, un emoji
+  if ((!dibujo && !AVATARES.includes(avatar)) || !COLORES.includes(color)) return res.status(400).json({ error: 'Avatar o color no válido.' });
+  guardar.run(jugador, dibujo ? JSON.stringify(dibujo) : avatar, color, Date.now());
   res.json({ success: true });
 });
 

@@ -26,3 +26,20 @@
 .pf-cab h1 small { font-size: 0.9rem; opacity: 0.75; -webkit-text-fill-color: rgba(255, 255, 255, 0.75) !important; }
 .pf-cab p { margin: 0; font-size: 0.75rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.9; }
 .pf-cab button { margin-left: auto; padding: 0.45rem 0.8rem; border: none; border-radius: 999px; background: rgba(255, 255, 255, 0.9); color: #6d28d9; font: inherit; font-weight: 900; cursor: pointer; }
+
+/* ---------- Avatar dibujado y su editor ---------- */
+.pf-avatar.dibujo { overflow: hidden; background: none; }
+.pf-avatar.dibujo .av-svg { display: block; width: 100%; height: 100%; }
+.pf-editor { width: min(94vw, 460px); }
+.pf-previa-dibujo { display: block; width: 108px; height: 108px; border-radius: 50%; box-shadow: 0 0 0 4px #ffffff, 0 10px 24px rgba(15, 23, 42, 0.25); }
+.pf-previa-dibujo .av-svg { display: block; }
+.pf-azar { padding: 0.35rem 0.8rem; border: 2px solid #e2e8f0; border-radius: 999px; background: #ffffff; color: #475569; font: inherit; font-weight: 800; cursor: pointer; }
+.pf-pestanas { display: flex; gap: 0.35rem; margin: 0.4rem -0.2rem 0.7rem; padding: 0.2rem 0.2rem 0.5rem; overflow-x: auto; scrollbar-width: thin; }
+.pf-pestanas button { display: inline-flex; align-items: center; gap: 0.3rem; flex: none; padding: 0.4rem 0.7rem; border: 2px solid #e2e8f0; border-radius: 999px; background: #f8fafc; color: #334155; font: inherit; font-size: 0.82rem; font-weight: 800; white-space: nowrap; cursor: pointer; }
+.pf-pestanas button.sel { border-color: #7c3aed; background: #ede9fe; color: #5b21b6; }
+.pf-opciones { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 0.4rem; }
+.pf-opciones button { display: grid; justify-items: center; gap: 0.2rem; padding: 0.4rem 0.2rem; border: 2px solid transparent; border-radius: 14px; background: #f1f5f9; color: #475569; font: inherit; cursor: pointer; }
+.pf-opciones button .av-svg { border-radius: 50%; }
+.pf-opciones button small { font-size: 0.7rem; font-weight: 700; line-height: 1.1; }
+.pf-opciones button.sel { border-color: #7c3aed; background: #ede9fe; color: #5b21b6; }
+.pf-editor .pf-colores { grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); }
