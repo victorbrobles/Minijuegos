@@ -17,20 +17,41 @@ import seedQuienEsQuien from './data/seeds/quienesquien/quienesquien.js';
 
 // libSQL añade un campo «_metadata» a cada fila: se quita para que todo funcione (y se responda) igual que antes
 const limpiar = (fila) => { if (fila && typeof fila === 'object') delete fila._metadata; return fila; };
-function envolver(base) {
+// Con Turso, cada escritura va directa a Turso y la copia local no se entera hasta que se sincroniza. Para que lo
+// recién guardado se vea al momento (estadísticas, salón de la fama…), tras cada escritura se trae de Turso.
+// Dentro de una transacción se espera a que termine entera.
+function envolver(base, { sincronizar = null } = {}) {
+  let enTransaccion = 0;
+  const traer = () => {
+    if (!sincronizar || enTransaccion) return;
+    try { sincronizar(); } catch (e) { console.error('[datos] Error al sincronizar con Turso:', e.message); }
+  };
   return new Proxy(base, {
     get(objetivo, clave) {
       if (clave === 'prepare') {
         return (sql) => {
           const st = objetivo.prepare(sql);
+          // Con Turso, cada uso prepara la consulta de nuevo: así nunca lee una «foto» antigua de la copia local
+          const actual = () => (sincronizar ? objetivo.prepare(sql) : st);
           return new Proxy(st, {
             get(s, m) {
-              if (m === 'get') return (...a) => limpiar(s.get(...a));
-              if (m === 'all') return (...a) => s.all(...a).map(limpiar);
+              if (m === 'get') return (...a) => limpiar(actual().get(...a));
+              if (m === 'all') return (...a) => actual().all(...a).map(limpiar);
+              if (m === 'run') return (...a) => { const r = actual().run(...a); if (r?.changes) traer(); return r; };
               const v = s[m];
               return typeof v === 'function' ? v.bind(s) : v;
             }
           });
+        };
+      }
+      if (clave === 'exec') return (sql) => { const r = objetivo.exec(sql); traer(); return r; };
+      if (clave === 'transaction') {
+        return (fn) => {
+          const tx = objetivo.transaction(fn);
+          return (...a) => {
+            enTransaccion += 1;
+            try { return tx(...a); } finally { enTransaccion -= 1; traer(); }
+          };
         };
       }
       const v = objetivo[clave];
@@ -43,16 +64,18 @@ function envolver(base) {
 const TURSO_URL = process.env.TURSO_DATABASE_URL?.trim();
 const TURSO_TOKEN = process.env.TURSO_AUTH_TOKEN?.trim();
 let base;
+let conTurso = false;
 if (TURSO_URL) {
   // Réplica local de Turso: lecturas rápidas en local y escrituras guardadas en Turso
   const rutaReplica = process.env.DB_PATH ?? fileURLToPath(new URL('./data/turso-replica.db', import.meta.url));
   mkdirSync(dirname(rutaReplica), { recursive: true });
   try {
     // Al abrirla se descarga todo lo guardado en Turso
-    base = new Database(rutaReplica, { syncUrl: TURSO_URL, authToken: TURSO_TOKEN });
+    base = new Database(rutaReplica, { syncUrl: TURSO_URL, authToken: TURSO_TOKEN, readYourWrites: true });
+    conTurso = true;
     console.log('[datos] Conectado a Turso: los datos se guardan de forma permanente.');
-    // Por si acaso, cada 5 minutos se vuelve a sincronizar (con un solo servidor no suele hacer falta)
-    setInterval(() => { try { base.sync(); } catch (e) { console.error('[datos] Error al sincronizar con Turso:', e.message); } }, 5 * 60 * 1000).unref();
+    // Además de tras cada escritura, cada minuto se trae de Turso por si acaso
+    setInterval(() => { try { base.sync(); } catch (e) { console.error('[datos] Error al sincronizar con Turso:', e.message); } }, 60 * 1000).unref();
   } catch (e) {
     // Turso no responde o la URL/token están mal: la web sigue funcionando, pero lo de ahora no se guardará para siempre
     console.error(`[datos] ⚠️ NO SE PUDO CONECTAR CON TURSO (${e.message}). Se usa un archivo local temporal: revisa TURSO_DATABASE_URL y TURSO_AUTH_TOKEN.`);
@@ -64,7 +87,7 @@ if (TURSO_URL) {
   base = new Database(ruta);
   if (process.env.RENDER) console.warn('[datos] ⚠️ EN RENDER sin TURSO_DATABASE_URL: los datos se perderán al desplegar o reiniciar.');
 }
-const db = envolver(base);
+const db = envolver(base, { sincronizar: conTurso ? () => base.sync() : null });
 
 /* ───────── Contenido (en memoria, se carga en cada arranque) ───────── */
 export const contenido = envolver(new Database(':memory:'));
