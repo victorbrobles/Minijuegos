@@ -1,100 +1,156 @@
 // client/src/games/Logos/LogosLocal.jsx
-// Un solo dispositivo: cada logo lo responden todos por turnos, cada uno con su reloj. Se puede jugar solo.
-import React, { useEffect, useRef, useState } from 'react';
+// Modo «un único dispositivo»: el servidor no guarda nada; el cliente conserva la partida y la reenvía.
+import React, { useState, useRef, useCallback } from 'react';
 import Icon from '../../components/Icon.jsx';
-import * as E from './engine.js';
-import { Partida } from './Partida.jsx';
-import ConfigJuego from '../Pulsador/Config.jsx';
-import { PantallaFin, ModalSalir } from '../Pulsador/Vistas.jsx';
-import { SelectorJugadores } from '../../components/MenuJuego.jsx';
+import { SelectorJugadores, BloqueConfig } from '../../components/MenuJuego.jsx';
+import LogosPartida from './LogosPartida.jsx';
+import { ModalSalir } from './LogosOnline.jsx';
+import { ConfigPartida } from './LogosComun.jsx';
+import { fasesDe } from './LogosInfo.js';
+import './Logos.css';
 import { limitesLocal } from '../limites.js';
 
-const LIM_JUG = limitesLocal('logos');
+const { min: MIN, max: MAX } = limitesLocal('logos');
 
-export default function LogosLocal({ juego, onVolver, onExit, onAbrirAyuda }) {
-  const [paso, setPaso] = useState('config');
-  const [nombres, setNombres] = useState(() => Array(LIM_JUG.min).fill(''));
-  const [config, setConfig] = useState(juego.config);
+export default function LogosLocal({ onVolver, onExit, onAbrirAyuda }) {
+  const [fase, setFase] = useState('setup'); // 'setup' | 'jugando'
+  const [modalSalir, setModalSalir] = useState(false);
+  const [nombres, setNombres] = useState(() => Array.from({ length: MIN }, () => ''));
+  const [config, setConfig] = useState({ fases: fasesDe(true), duracion: 'normal' });
+  const [vista, setVista] = useState(null);
+  const [sostiene, setSostiene] = useState(null);
   const [error, setError] = useState('');
+  const [aviso, setAviso] = useState('');
   const [cargando, setCargando] = useState(false);
-  const [modal, setModal] = useState(false);
-  const estRef = useRef(null);
-  const [, setVer] = useState(0);
-  const refrescar = () => setVer((x) => x + 1);
 
-  useEffect(() => {
-    if (paso !== 'juego') return undefined;
-    const i = setInterval(() => { if (estRef.current && E.tick(estRef.current, Date.now())) refrescar(); }, 150);
-    return () => clearInterval(i);
-  }, [paso]);
+  const partidaRef = useRef(null);
+  const colaRef = useRef(Promise.resolve());
+  const avisoTimer = useRef(null);
 
-  const empezar = async () => {
-    const limpios = nombres.map((n) => n.trim());
-    if (limpios.some((n) => !n)) return setError('Todos los jugadores necesitan un nombre.');
-    if (new Set(limpios.map((n) => n.toLowerCase())).size !== limpios.length) return setError('Hay nombres repetidos.');
-    setError(''); setCargando(true);
+  const cambiarNum = (n) => {
+    const num = Math.max(MIN, Math.min(MAX, n));
+    setNombres((prev) => Array.from({ length: num }, (_, i) => prev[i] ?? ''));
+  };
+
+  const nombresLimpios = nombres.map((n, i) => n.trim() || `Jugador ${i + 1}`);
+  const repetidos = new Set(nombresLimpios.map((n) => n.toLowerCase())).size !== nombresLimpios.length;
+
+  const iniciarPartida = async () => {
+    setError('');
+    setCargando(true);
     try {
-      const r = await fetch(`/api/logos/local?n=${config.rondas}`);
-      const d = await r.json();
-      if (!d.success) throw new Error();
-      estRef.current = E.crearPartida(limpios.map((nombre, i) => ({ id: i + 1, nombre })), d.items, { porTurnos: true }, Date.now());
-      setPaso('juego');
-    } catch {
-      setError('No se ha podido preparar la partida. Inténtalo de nuevo.');
+      const res = await fetch('/api/logos/local/nueva', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ nombres: nombresLimpios, config })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.ok) throw new Error(data.error || 'No se ha podido crear la partida.');
+      partidaRef.current = data.partida;
+      setVista(data.vista);
+      setSostiene(null);
+      setFase('jugando');
+    } catch (err) {
+      setError(err.message);
     } finally {
       setCargando(false);
     }
-    return undefined;
   };
 
-  if (paso === 'config') {
+  // Las acciones se encadenan en una cola. Antes, una acción que llegaba mientras otra estaba en
+  // vuelo (p. ej. el aviso de «tiempo» de la Prórroga) se descartaba y la ronda se quedaba colgada.
+  const enviarAccion = useCallback((accion) => {
+    colaRef.current = colaRef.current.then(async () => {
+      if (!partidaRef.current) return;
+      try {
+        const res = await fetch('/api/logos/local/accion', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ partida: partidaRef.current, accion })
+        });
+        const data = await res.json();
+        if (data.partida && partidaRef.current) {
+          partidaRef.current = data.partida;
+          setVista(data.vista);
+        }
+        if (data.ok === false && data.error && accion.tipo !== 'tiempo') {
+          setAviso(data.error);
+          clearTimeout(avisoTimer.current);
+          avisoTimer.current = setTimeout(() => setAviso(''), 3000);
+        }
+      } catch {
+        setAviso('No se ha podido conectar con el servidor. Inténtalo de nuevo.');
+        clearTimeout(avisoTimer.current);
+        avisoTimer.current = setTimeout(() => setAviso(''), 3000);
+      }
+    });
+    return colaRef.current;
+  }, []);
+
+  const avisarTiempo = useCallback(() => enviarAccion({ tipo: 'tiempo' }), [enviarAccion]);
+
+  const nuevaPartida = () => {
+    partidaRef.current = null;
+    setVista(null);
+    setFase('setup');
+  };
+
+  if (fase === 'setup') {
     return (
-      <div className={`pzp-contenedor ${juego.id}`}>
+      <div className="lgm-contenedor">
         <SelectorJugadores
-          onVolver={onVolver} onAyuda={onAbrirAyuda} min={LIM_JUG.min} max={LIM_JUG.max}
+          onVolver={onVolver}
+          onAyuda={onAbrirAyuda}
+          min={MIN}
+          max={MAX}
           numJugadores={nombres.length}
-          onCambiarNum={(n) => setNombres((l) => (n > l.length ? [...l, ...Array(n - l.length).fill('')] : l.slice(0, n)))}
+          onCambiarNum={cambiarNum}
           nombres={nombres}
-          onNombre={(i, valor) => setNombres((l) => l.map((x, k) => (k === i ? valor : x)))}
-          onEmpezar={empezar} textoBoton={cargando ? 'Preparando…' : '¡Empezar partida!'} error={error}
+          onNombre={(i, v) => setNombres((prev) => prev.map((n, k) => (k === i ? v : n)))}
+          onEmpezar={iniciarPartida}
+          textoBoton="¡A jugar!"
+          puedeEmpezar={!cargando && !repetidos}
+          error={error || (repetidos ? 'Hay dos jugadores con el mismo nombre.' : '')}
+          maxLength={20}
         >
-          <ConfigJuego juego={juego} config={config} onCambiar={(c) => setConfig((x) => ({ ...x, ...c }))} />
+          <BloqueConfig>
+            <ConfigPartida config={config} onChange={setConfig} numJugadores={nombres.length} local />
+          </BloqueConfig>
         </SelectorJugadores>
       </div>
     );
   }
 
-  const est = estRef.current;
-  const v = { ...E.vistaDe(est, -1), yo: null };
-  const enviar = (tipo, d = {}) => {
-    const t = Date.now();
-    if (tipo === 'listo') E.listo(est, null, t);
-    else if (tipo === 'responder') E.responder(est, null, d.respuesta, t);
-    else if (tipo === 'pasar') E.pasar(est, null);
-    else if (tipo === 'siguiente') E.siguiente(est, t);
-    else if (tipo === 'terminar') E.terminar(est);
-    refrescar();
-  };
-  const onSalir = () => setModal(true);
   return (
-    <div className={`pzp-contenedor ${juego.id} qq-en-partida`}>
-      <section className="game pzp-escena">
-        {est.fase === 'fin' ? (
-          <PantallaFin v={v} juego={juego} onSalir={onSalir}>
-            <div className="pzp-barra estatica">
-              <button type="button" className="pzp-boton grande" onClick={() => setPaso('config')}><Icon name="refresh" size={20} /> Nueva partida</button>
-              <button type="button" className="pzp-boton secundario" onClick={() => onExit?.()}><Icon name="door" size={18} /> Salir a la portada</button>
+    <div className="lgm-contenedor qq-en-partida">
+      {aviso && <p className="lgm-toast" role="alert" onClick={() => setAviso('')}>{aviso}</p>}
+      {vista && (
+        <LogosPartida
+          vista={vista}
+          local
+          esHost
+          sostiene={sostiene}
+          setSostiene={setSostiene}
+          onAccion={enviarAccion}
+          onTiempo={avisarTiempo}
+          onSalir={() => setModalSalir(true)}
+          finalAcciones={(
+            <div className="lgm-barra estatica">
+              <button type="button" className="lgm-boton grande" onClick={nuevaPartida}>
+                <Icon name="refresh" size={20} /> Nueva partida
+              </button>
+              <button type="button" className="lgm-enlace" onClick={() => setModalSalir(true)}>Salir a la portada</button>
             </div>
-          </PantallaFin>
-        ) : (
-          <>
-            <Partida v={v} enviar={enviar} onSalir={onSalir} local />
-          </>
-        )}
-      </section>
-      {modal && (
-        <ModalSalir titulo="¿Salir de la partida?" texto="Se perderá la partida en curso y volverás a la portada."
-          onSeguir={() => setModal(false)} onSalir={() => { setModal(false); onExit?.(); }} />
+          )}
+        />
+      )}
+      {modalSalir && (
+        <ModalSalir
+          titulo="¿Salir de la partida?"
+          texto="Se perderá la partida en curso y volverás a la portada."
+          onSeguir={() => setModalSalir(false)}
+          onSalir={() => { setModalSalir(false); onExit?.(); }}
+        />
       )}
     </div>
   );

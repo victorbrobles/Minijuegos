@@ -215,12 +215,15 @@ export default {
     puntos: [['💚', 'Os acertáis mutuamente', '+3 cada uno (+6 con tu mejor amigo)'], ['💙', 'Solo uno acierta al otro', '+2 / -1'], ['💔', 'Ninguno acierta al otro', '-1 cada uno']]
   },
   'logos': {
-    objetivo: 'Identifica la **marca** que se esconde tras el logo antes de que el reloj llegue a cero.',
+    objetivo: 'Súper quiz de **marcas**: el anfitrión elige qué **fases** se juegan y cuántas rondas por jugador. Gana quien más puntos sume al final.',
     pasos: [
-      'Cada ronda sale un logo y un reloj de **45 segundos**. Cada jugador responde **una sola vez**.',
-      '**Online** respondéis todos a la vez; en **un dispositivo**, por turnos y cada uno con su reloj, sin ver lo que han dicho los demás.',
-      'Se perdonan tildes, mayúsculas y erratas pequeñas.'
+      '🗣️ **El logomaníaco**: di en voz alta 5, 4 o 3 marcas que cumplan el requisito en 25 s. Validan los demás. Si fallas, rebote solo para el siguiente.',
+      '🎨 **El pintor** (solo online): dibuja logos durante 60 s; los demás escriben la marca en su móvil.',
+      '🕵️ **El retrato robot** y 📢 **El eslogan**: todos escriben a la vez de qué marca es la descripción o el eslogan.',
+      '🛂 **El pasaporte**: todos eligen de qué país es la marca.',
+      '🤥 **El mentiroso**: uno dice si una curiosidad es verdad o mentira y los demás deciden si se fían.',
+      '🎓 **El experto**: eliges una de dos marcas rivales; una esconde una pregunta difícil y la otra una fácil.'
     ],
-    puntos: [['✅', 'Acierto', '+ segundos que quedaban'], ['❌', 'Fallo', '- segundos que quedaban'], ['🤷', 'Pasar', '0 (no arriesgas)']]
+    puntos: [['🗣️', 'Logomaníaco / rebote', '+2 / +1'], ['🎨', 'Pintor: adivinar y que te adivinen', '+1 / +1'], ['🕵️', 'Retrato robot · Eslogan', '+2'], ['🛂', 'Pasaporte', '+1'], ['🤥', 'Mentiroso: acertar · desconfiar y que falle · confiar y que falle', '+1 · +1 · −1'], ['🎓', 'Experto: fácil / difícil', '+1 / +3']]
   }
 };

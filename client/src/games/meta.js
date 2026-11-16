@@ -523,13 +523,13 @@ export const META = {
     categorias: ['chill']
   },
   'logos': {
-    titulo: 'Logo Mania',
-    duracion: 10, // minutos aproximados de una partida
+    titulo: 'Logomanía',
+    duracion: 30, // minutos aproximados de una partida
     imagen: '/covers/logos.webp',
     icono: 'logobadge',
     colores: ['#22d3ee', '#0284c7'],
-    etiquetas: 'logos marcas empresas adivinar velocidad memoria simbolos',
-    descripcion: 'Identifica la marca que se oculta tras el logo antes de que el cronómetro llegue a cero. Suma segundos al acertar y evita arriesgar si no estás seguro.',
+    etiquetas: 'logos marcas empresas quiz eslogan dibujar paises verdad mentira fases',
+    descripcion: 'Súper quiz de marcas con 7 fases a elegir: enumera logos a contrarreloj, dibújalos, adivínalos por su descripción, su eslogan o su país, desconfía del mentiroso y arriésgate con el experto.',
     categorias: ['dos_jugadores']
   },
   'hipotesis': {
