@@ -51,6 +51,7 @@ export default function Privacidad() {
         <ul className="crd-lista">
           <li><b>Alojamiento</b>: la web funciona en <b>Render</b> y los datos se guardan en <b>Turso</b>. Pueden tener servidores fuera de la Unión Europea, con las garantías que exige la normativa europea.</li>
           <li>Algunos juegos cargan contenido de otros servicios, que reciben la dirección de tu conexión como cualquier web que visitas: fotos de <b>Wikimedia</b>, mapas de <b>Esri</b>, datos de <b>Wikipedia</b> (Test del viajero) y fragmentos de canciones de <b>Deezer</b>. Ver los <Link to="/creditos">créditos</Link>.</li>
+          <li><b>Música</b>: los fragmentos de 30 segundos de Deezer (en «Afina ese oído» y «Luces, Cámara… ¡Música!») son solo para <b>uso privado y familiar</b>, como exigen sus condiciones.</li>
         </ul>
       </section>
 

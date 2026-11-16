@@ -191,7 +191,7 @@ function Audio({ pista, sonar }) {
           {estado === 'error' && 'No se ha podido cargar el audio'}
         </strong>
         <span className="pzp-audio-barra"><span style={{ width: `${progreso * 100}%` }} /></span>
-        <p className="pzp-credito">🎧 Fragmento cortesía de <a href="https://www.deezer.com" target="_blank" rel="noopener noreferrer">Deezer</a></p>
+        <p className="pzp-credito">🎧 Fragmento de 30 s cortesía de <a href="https://www.deezer.com" target="_blank" rel="noopener noreferrer">Deezer</a> · solo para uso privado y familiar</p>
     </div>
     </div>
   );

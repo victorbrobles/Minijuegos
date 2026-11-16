@@ -40,7 +40,28 @@ export function barajar(lista) {
   return a;
 }
 
-// Fotos: se piden a Wikipedia (imagen principal del artículo, 960 px de ancho).
+// Fotos: se piden a Wikipedia (imagen principal del artículo, 960 px de ancho), junto con su autor y su licencia
+// para poder citarlos (lo exigen las licencias libres de Wikimedia Commons).
+const API_WIKI = 'https://en.wikipedia.org/w/api.php';
+const sinHtml = (t) => String(t || '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+
+async function creditoDe(archivo) {
+  const params = new URLSearchParams({
+    action: 'query', format: 'json', origin: '*',
+    titles: `File:${archivo}`, prop: 'imageinfo', iiprop: 'extmetadata',
+    iiextmetadatafilter: 'Artist|LicenseShortName|LicenseUrl'
+  });
+  const r = await fetch(`${API_WIKI}?${params}`);
+  if (!r.ok) return null;
+  const meta = Object.values((await r.json())?.query?.pages ?? {})[0]?.imageinfo?.[0]?.extmetadata || {};
+  return {
+    autor: sinHtml(meta.Artist?.value).slice(0, 120) || 'Autor desconocido',
+    licencia: sinHtml(meta.LicenseShortName?.value) || 'Licencia libre',
+    licenciaUrl: meta.LicenseUrl?.value || null,
+    fuenteUrl: `https://commons.wikimedia.org/wiki/File:${encodeURIComponent(archivo)}`
+  };
+}
+
 export async function resolverImagen(tituloWiki) {
   const params = new URLSearchParams({
     action: 'query',
@@ -48,16 +69,19 @@ export async function resolverImagen(tituloWiki) {
     origin: '*',
     redirects: '1',
     prop: 'pageimages',
-    piprop: 'thumbnail',
+    piprop: 'thumbnail|name',
     pithumbsize: '960',
     titles: tituloWiki
   });
-  const r = await fetch(`https://en.wikipedia.org/w/api.php?${params}`);
+  const r = await fetch(`${API_WIKI}?${params}`);
   if (!r.ok) return null;
   const data = await r.json();
   const pagina = Object.values(data?.query?.pages ?? {})[0];
   const src = pagina?.thumbnail?.source;
-  return src && src.includes('/wikipedia/commons/') ? src : null;
+  if (!src || !src.includes('/wikipedia/commons/')) return null;
+  let credito = null;
+  try { credito = pagina.pageimage ? await creditoDe(pagina.pageimage) : null; } catch { /* sin crédito detallado */ }
+  return { src, credito };
 }
 
 export async function resolverImagenes(candidatos) {
@@ -65,8 +89,8 @@ export async function resolverImagenes(candidatos) {
     candidatos.map(async (lugar) => {
       if (lugar.imagen) return { ...lugar, imagenUrl: lugar.imagen };
       try {
-        const url = await resolverImagen(lugar.wiki);
-        return url ? { ...lugar, imagenUrl: url } : null;
+        const foto = await resolverImagen(lugar.wiki);
+        return foto ? { ...lugar, imagenUrl: foto.src, credito: foto.credito } : null;
       } catch {
         return null;
       }

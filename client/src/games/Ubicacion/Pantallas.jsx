@@ -95,7 +95,7 @@ export function TarjetaFoto({ src, segundos, total, cargando, onLoad, onError })
       {!cargando && segundos != null && (
         <div className="ubp-foto-progreso"><span style={{ width: `${(segundos / total) * 100}%` }} /></div>
       )}
-      <p className="ubp-credito">Foto de Wikimedia Commons (licencia libre)</p>
+      <p className="ubp-credito">Foto de Wikimedia Commons (licencia libre) · autor y licencia, al revelar el lugar</p>
     </div>
   );
 }
@@ -121,6 +121,17 @@ export function ModalFoto({ src, onCerrar }) {
   );
 }
 
+/** Autor y licencia de la foto (Wikimedia Commons). Se enseña al revelar el lugar. */
+export function CreditoFoto({ credito }) {
+  if (!credito) return <p className="ubp-credito">📷 Foto de Wikimedia Commons (licencia libre)</p>;
+  return (
+    <p className="ubp-credito">
+      📷 Foto: {credito.autor} · {credito.licenciaUrl ? <a href={credito.licenciaUrl} target="_blank" rel="noopener noreferrer">{credito.licencia}</a> : credito.licencia}
+      {' · '}<a href={credito.fuenteUrl} target="_blank" rel="noopener noreferrer">Wikimedia Commons</a>
+    </p>
+  );
+}
+
 /** Resultado de la ronda: lugar revelado y lo que suma cada jugador. */
 export function TablaRonda({ lugar, filas, onEnfocar, yoId }) {
   const url = urlWiki(lugar);
@@ -134,6 +145,7 @@ export function TablaRonda({ lugar, filas, onEnfocar, yoId }) {
           <small>{lugar.pais}</small>
         </span>
       </div>
+      <CreditoFoto credito={lugar.credito} />
       <ol className="ubp-filas">
         {filas.map((f, i) => (
           <li key={f.id}>
