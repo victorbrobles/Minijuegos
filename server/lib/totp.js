@@ -66,6 +66,6 @@ export function base32Codificar(buffer) {
 export const nuevoSecreto = () => base32Codificar(randomBytes(20)); // 160 bits, como pide la RFC 4226
 
 // URL otpauth:// para convertir en QR o pegar en la app de autenticación
-export const urlOtpauth = (secreto, cuenta = 'admin', emisor = 'Minigames Hub') =>
+export const urlOtpauth = (secreto, cuenta = 'admin', emisor = 'Al juego, juego') =>
   `otpauth://totp/${encodeURIComponent(emisor)}:${encodeURIComponent(cuenta)}` +
   `?secret=${secreto}&issuer=${encodeURIComponent(emisor)}&algorithm=SHA1&digits=${DIGITOS}&period=${PERIODO}`;

@@ -1,4 +1,4 @@
-# Minigames Hub
+# Al juego, juego
 
 Backend: Node + Express (`server/`). Frontend: React + Vite (`client/`).
 

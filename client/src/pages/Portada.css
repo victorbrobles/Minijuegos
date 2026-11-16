@@ -162,3 +162,8 @@
   .home-view .cat-favoritos .home-carousel-track { margin-inline: -0.85rem; padding-inline: 0.85rem; scroll-padding-inline: 0.85rem; }
   .home-view .compacta .home-carousel-item { flex-basis: 30%; min-width: 104px; }
 }
+
+/* Lema bajo el subtítulo */
+.hub-head .hub-sub { font-style: italic; }
+.hub-head .hub-lema { margin: 0.3rem 0 0; display: inline-block; padding: 0.15rem 0.6rem; border-radius: 999px; background: rgba(255, 255, 255, 0.18); color: #ffffff; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.01em; }
+@media (max-width: 560px) { .hub-head .hub-lema { font-size: 0.72rem; } }

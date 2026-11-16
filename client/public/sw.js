@@ -1,4 +1,4 @@
-// Service worker de Minigames Hub: permite instalar la web como app, abrirla más rápido y jugar sin conexión.
+// Service worker de Al juego, juego: permite instalar la web como app, abrirla más rápido y jugar sin conexión.
 // - Navegación: primero la red (para tener siempre la última versión) y, sin conexión, la portada guardada.
 // - Recursos estáticos (JS/CSS con huella, portadas, iconos, fuentes): primero la caché.
 // - API de contenido (preguntas, palabras… de los juegos de un móvil): primero la red y, sin conexión, la última

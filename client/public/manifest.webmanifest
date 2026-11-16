@@ -1,7 +1,7 @@
 {
-  "name": "Minigames Hub",
-  "short_name": "Minijuegos",
-  "description": "Minijuegos para jugar solo, en grupo en un móvil o online con amigos.",
+  "name": "Al juego, juego",
+  "short_name": "Al juego, juego",
+  "description": "Más de 100 juegos para jugar con amigos: en un móvil, cada uno en el suyo o solo. ¡Y el que pierda paga el vino!",
   "lang": "es",
   "start_url": "/",
   "scope": "/",

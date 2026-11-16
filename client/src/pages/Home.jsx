@@ -320,8 +320,9 @@ export default function Home() {
         <div className="hub-top">
           <span className="hub-logo"><Icon name="gamepad" size={34} strokeWidth={1.9} /></span>
           <div>
-            <h1 className="hub-title">Minigames Hub</h1>
-            <p className="hub-sub">¡Elige un minijuego y a jugar!</p>
+            <h1 className="hub-title">Al juego, juego</h1>
+            <p className="hub-sub">…y el que pierda paga el vino 🍷</p>
+            <p className="hub-lema">Más de 100 juegos para jugar con amigos</p>
           </div>
         </div>
 
@@ -425,7 +426,7 @@ export default function Home() {
               <span className="footer-logo">
                 <Icon name="gamepad" size={24} strokeWidth={2} />
               </span>
-              <h3>Minigames Hub</h3>
+              <h3>Al juego, juego</h3>
             </div>
             <p className="footer-text">
               Tu plataforma definitiva de minijuegos sociales y de mesa interactivos. Diseñada para jugar en grupo, ya sea en un solo dispositivo pasando el móvil o cada uno desde el suyo con salas online en tiempo real.
@@ -469,7 +470,7 @@ export default function Home() {
         </div>
 
         <div className="footer-bottom">
-          <p>© {new Date().getFullYear()} Minigames Hub · Hecho para jugar con amigos y familia · <Link to="/creditos" className="footer-legal">Créditos y avisos legales</Link></p>
+          <p>© {new Date().getFullYear()} Al juego, juego · Hecho para jugar con amigos y familia · <Link to="/creditos" className="footer-legal">Créditos y avisos legales</Link></p>
           <button
             type="button"
             className="footer-top-btn"
