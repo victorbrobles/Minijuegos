@@ -16,7 +16,11 @@ function ejecutar(f) {
     p.stdout.on('data', (d) => { salida += d; });
     p.stderr.on('data', (d) => { salida += d; });
     const t = setTimeout(() => { p.kill('SIGKILL'); salida += '\n(se pasó del tiempo límite)'; }, LIMITE);
-    p.on('close', (codigo) => { clearTimeout(t); resolve({ f, codigo, salida, ms: Date.now() - inicio }); });
+    p.on('close', (codigo, senal) => {
+      clearTimeout(t);
+      if (codigo !== 0) salida += `\n(terminó con código ${codigo}${senal ? `, señal ${senal}` : ''})`;
+      resolve({ f, codigo, salida, ms: Date.now() - inicio });
+    });
   });
 }
 
