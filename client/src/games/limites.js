@@ -56,7 +56,7 @@ export const LIMITES = {
   telepatia: { min: 4, max: 20 },
   confianzaciega: { min: 3, max: 16 },
   popular: { min: 1, max: 12 },
-  logos: { min: 1, max: 12 },
+  logos: { min: 2, max: 12 },
   hipotesis: { min: 3, max: 10 },
   trescientosuno: { min: 1, max: 8 },
   jugadores: { min: 1, max: 16 },

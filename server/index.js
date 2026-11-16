@@ -121,6 +121,7 @@ const limiteEscritura = limitePeticiones({ clave: 'escritura', maximo: 60, mensa
 app.use('/api', (req, res, next) => (ES_ESCRITURA(req) ? limiteEscritura(req, res, next) : next()));
 // Los dibujos de «Garabato Encadenado» pesan más que una acción normal
 app.use('/api/garabato', express.json({ limit: '300kb' }));
+app.use('/api/logos', express.json({ limit: '300kb' })); // los dibujos de «El pintor»
 // La copia del perfil (récords, favoritos, logros…) puede pasar de los 100 KB normales
 app.use('/api/perfil/copia', express.json({ limit: '1mb' }));
 app.use('/api/usuarios/datos', express.json({ limit: '1mb' }));

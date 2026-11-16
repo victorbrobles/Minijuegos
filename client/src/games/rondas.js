@@ -43,7 +43,6 @@ export const RONDAS = {
   telepatia: { opciones: [10, 15, 20] },
   confianzaciega: { opciones: [2, 3, 5], porJugador: true },
   popular: { opciones: [5, 10, 15] },
-  logos: { opciones: [10, 15, 20], unidad: 'logos' },
   hipotesis: { opciones: [5, 10, 15] },
   trescientosuno: { opciones: [3, 5, 7], unidad: 'partidas' },
   jugadores: { opciones: [10, 15, 20] },

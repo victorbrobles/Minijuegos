@@ -205,8 +205,8 @@
   },
   {
     "id": "logos",
-    "name": "Logo Mania",
-    "description": "Identifica la marca que se oculta tras el logo antes de que el cronómetro llegue a cero. Suma segundos al acertar y evita arriesgar si no estás seguro.",
+    "name": "Logomanía",
+    "description": "Súper quiz de marcas con 7 fases a elegir: enumera logos a contrarreloj, dibújalos, adivínalos por su descripción, su eslogan o su país, desconfía del mentiroso y arriésgate con el experto.",
     "isNew": true
   },
   {
