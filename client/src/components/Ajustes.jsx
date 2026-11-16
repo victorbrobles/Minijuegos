@@ -7,6 +7,7 @@ import { LETRAS, leerAjustes, guardarAjustes } from '../lib/ajustes.js';
 import { descargarTodo, descargadoEl, useEnLinea } from '../lib/sinConexion.js';
 import { crearCopia, miCopia, recuperarCopia } from '../lib/copiaPerfil.js';
 import { guardarIdentidad, ultimaIdentidad } from '../lib/identidad.js';
+import { SeccionInstalar } from './Instalar.jsx';
 import './Ajustes.css';
 
 function Opcion({ activo, onClick, children }) {
@@ -63,6 +64,7 @@ export function PanelAjustes({ onCerrar }) {
             <Opcion activo={a.castigo === 'no'} onClick={() => cambiar('castigo', 'no')}>Desactivada</Opcion>
           </div>
         </section>
+        <SeccionInstalar />
         <PasarMovil />
         <section>
           <h3>📴 Jugar sin conexión</h3>
