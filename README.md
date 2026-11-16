@@ -35,6 +35,14 @@ npm run dev
   - `TURSO_AUTH_TOKEN` → el token de acceso de esa base de datos.
 - Al arrancar, el registro del servidor dice `[datos] Conectado a Turso…` si todo va bien.
 
+## Web pública, buscadores y textos legales
+- La web no tiene contraseña de acceso. La administración va con el código de 6 dígitos (ver más abajo).
+- Mientras no esté terminada, **no aparece en Google**: `client/index.html` lleva `<meta name="robots" content="noindex">`
+  y el servidor manda `X-Robots-Tag: noindex`. Para publicarla: quitar esa etiqueta y definir `PERMITIR_BUSCADORES=1`.
+- Privacidad y aviso legal en `/privacidad`. El responsable y el correo de contacto se cambian en `client/src/legal.js`.
+- Sin cookies: las estadísticas de uso no guardan nada en el móvil (huella diaria cifrada en el servidor) y las
+  fuentes se sirven desde la propia web (paquetes `@fontsource`), no desde Google Fonts.
+
 ## Minijuego: Siglas y acrónimos
 - Al entrar se elige una categoría (o todas mezcladas); cada sigla tiene 20 segundos y la partida acaba al fallar.
 - Las siglas se cargan en memoria al arrancar desde `server/data/seeds/siglas/siglas.seed.js`, agrupado por

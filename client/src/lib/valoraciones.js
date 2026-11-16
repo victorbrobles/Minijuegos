@@ -2,7 +2,6 @@
 // 👍/👎 de cada juego: tu voto se recuerda en este navegador y el resumen de todos viene del servidor.
 import { useEffect, useState } from 'react';
 import { nombreCompleto } from './identidad.js';
-import { visitante } from './metricas.js';
 
 const MIOS = 'minijuegos_valoraciones';
 let cache = null;
@@ -36,8 +35,11 @@ export function votar(juego, voto) {
     if (voto === 1) r.si += 1; if (voto === -1) r.no += 1;
     cache = { ...cache, [juego]: r }; oyentes.forEach((f) => f(cache));
   }
+  // Un voto por jugador (Nombre#1234); sin nombre, el voto solo se recuerda en este móvil
+  const quien = nombreCompleto();
+  if (!quien) return;
   fetch('/api/valoraciones', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ juego, voto, quien: nombreCompleto() || `v:${visitante()}` }) }).catch(() => {});
+    body: JSON.stringify({ juego, voto, quien }) }).catch(() => {});
 }
 
 /** Porcentaje de 👍 (o null si hay pocos votos). */

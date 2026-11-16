@@ -1,6 +1,7 @@
 // client/src/components/Identidad.jsx
 // Identidad del jugador (Nombre#1234): pantalla de entrada, nombre con etiqueta y chip para cambiarla.
 import React, { useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import Icon from './Icon.jsx';
 import { AvatarJugador, EditarPerfil } from './Perfil.jsx';
 import {
@@ -60,6 +61,7 @@ function Entrada({ onListo }) {
         {error && <p className="idn-error">{error}</p>}
         <button type="submit" className="big full qq-btn-principal"><Icon name="play" size={20} /> Entrar</button>
         <RecuperarDesdeEntrada />
+        <p className="idn-legal">Puedes usar un apodo. <Link to="/privacidad">Privacidad y aviso legal</Link></p>
       </form>
     </div>
   );
@@ -96,7 +98,9 @@ function RecuperarDesdeEntrada() {
 /** Pide la identidad antes de mostrar la aplicación (una vez por sesión). */
 export function PuertaIdentidad({ children }) {
   const yo = useIdentidad();
-  if (!yo) return <Entrada />;
+  const { pathname } = useLocation();
+  // La privacidad y los créditos se pueden leer sin elegir nombre
+  if (!yo && !/^\/(privacidad|creditos)\/?$/.test(pathname)) return <Entrada />;
   return children;
 }
 

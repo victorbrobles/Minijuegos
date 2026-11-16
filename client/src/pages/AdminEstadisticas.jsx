@@ -1,5 +1,5 @@
 // client/src/pages/AdminEstadisticas.jsx
-// /admin/estadisticas — panel de uso para el administrador: visitantes por día, nuevos, cuántos usan la app instalada,
+// /admin/estadisticas — panel de uso para el administrador: visitantes por día, cuántos usan la app instalada,
 // partidas terminadas y, por juego, cuántas veces se abre, cuántas se acaba (y cuántas se deja a medias) y su valoración.
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -75,8 +75,8 @@ export default function AdminEstadisticas() {
       {d && !d.error && (
         <>
           <div className="ae-tarjetas">
-            <Tarjeta icono="👥" valor={num(t.visitantes)} texto="personas distintas" nota={`${num(t.nuevos)} nuevas`} />
-            <Tarjeta icono="📲" valor={num(t.enApp)} texto="con la app instalada" nota={t.visitantes ? `${Math.round((t.enApp / t.visitantes) * 100)} % del total` : null} />
+            <Tarjeta icono="👥" valor={num(t.visitas)} texto="visitas (personas distintas cada día)" nota={`${num(t.mediaDiaria)} al día de media`} />
+            <Tarjeta icono="📲" valor={num(t.enApp)} texto="con la app instalada" nota={t.visitas ? `${Math.round((t.enApp / t.visitas) * 100)} % de las visitas` : null} />
             <Tarjeta icono="⬇️" valor={num(t.instalaciones)} texto="instalaciones" />
             <Tarjeta icono="🎲" valor={num(t.partidas)} texto="partidas terminadas" />
           </div>
@@ -105,7 +105,7 @@ export default function AdminEstadisticas() {
             {juegos.length === 0 ? <p className="ae-nota">Aún no hay datos en este periodo.</p> : (
               <div className="ae-tabla-caja">
                 <table className="ae-tabla">
-                  <thead><tr><th>Juego</th><th>Abierto</th><th>Personas</th><th>Partidas</th><th title="Días en que alguien lo abrió y terminó al menos una partida">Acaban</th><th>👍</th></tr></thead>
+                  <thead><tr><th>Juego</th><th>Abierto</th><th title="Personas distintas cada día, sumadas">Personas/día</th><th>Partidas</th><th title="Días en que alguien lo abrió y terminó al menos una partida">Acaban</th><th>👍</th></tr></thead>
                   <tbody>
                     {juegos.map((j) => {
                       const m = metaDe(j.juego);
@@ -124,7 +124,7 @@ export default function AdminEstadisticas() {
                 </table>
               </div>
             )}
-            <p className="ae-nota">«Acaban»: de las veces que alguien abre el juego (una por persona y día), en cuántas termina al menos una partida. Un porcentaje bajo indica que la gente lo deja a medias o no lo entiende. Los datos son anónimos.</p>
+            <p className="ae-nota">«Acaban»: de las veces que alguien abre el juego (una por persona y día), en cuántas termina al menos una partida. Un porcentaje bajo indica que la gente lo deja a medias o no lo entiende. Los datos son anónimos y no se guarda nada en el móvil: cada persona se cuenta por día (no se puede seguir a nadie de un día a otro).</p>
           </section>
         </>
       )}

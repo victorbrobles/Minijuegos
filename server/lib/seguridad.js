@@ -3,13 +3,13 @@
 
 // Cabeceras de seguridad (lo mismo que haría «helmet», a medida de esta web):
 //  - CSP: solo se ejecuta JavaScript de la propia web; imágenes, audio y mapas pueden venir de fuera (Wikimedia,
-//    Deezer, mapas), las fuentes de Google Fonts y las conexiones a la propia web y a Wikipedia (Test del viajero).
+//    Deezer, mapas). Las fuentes son de la propia web. Conexiones: la propia web y Wikipedia (Test del viajero).
 //  - Nadie puede meter la web dentro de otra página (clickjacking), ni el navegador «adivina» tipos de archivo.
 const CSP = [
   "default-src 'self'",
   "script-src 'self'",
-  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  "font-src 'self' data: https://fonts.gstatic.com",
+  "style-src 'self' 'unsafe-inline'",
+  "font-src 'self' data:",
   "img-src 'self' data: blob: https:",
   "media-src 'self' blob: https:",
   "connect-src 'self' https: wss:",
@@ -30,6 +30,9 @@ export function cabecerasSeguridad(req, res, next) {
     'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=()',
     'Cross-Origin-Opener-Policy': 'same-origin'
   });
+  // Mientras la web no esté terminada, los buscadores no la indexan. Para publicarla: PERMITIR_BUSCADORES=1 (y
+  // quitar la etiqueta «robots» de client/index.html).
+  if (!process.env.PERMITIR_BUSCADORES) res.set('X-Robots-Tag', 'noindex, nofollow');
   // En HTTPS (Render), el navegador recordará usar siempre HTTPS
   if (req.secure) res.set('Strict-Transport-Security', 'max-age=15552000; includeSubDomains');
   next();

@@ -4,7 +4,6 @@ import express from 'express';
 import compression from 'compression';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import basicAuth from 'express-basic-auth';
 
 // Definición de __dirname para ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -123,47 +122,15 @@ app.use('/api/garabato', express.json({ limit: '300kb' }));
 app.use('/api/perfil/copia', express.json({ limit: '1mb' }));
 app.use(express.json());
 
-// Contraseña de acceso a la web: solo si se define AUTH_PASSWORD (en Render, en las variables de entorno).
-// Sin ella (p. ej. en localhost) la web queda abierta. No hay ninguna contraseña escrita en el código.
-// Basta con AUTH_PASSWORD: si no se define AUTH_USER, el usuario es «admin» (como siempre ha sido).
-const PASSWORD = process.env.AUTH_PASSWORD; // Evita el '#' si da problemas en el túnel
-const USUARIO = process.env.AUTH_USER || 'admin';
-const CON_CONTRASENA = Boolean(PASSWORD);
-if (CON_CONTRASENA) console.log(`[acceso] Web protegida con contraseña (usuario «${USUARIO}»).`);
-else console.warn(`[acceso] ${process.env.RENDER ? '⚠️ EN RENDER y s' : 'S'}in AUTH_PASSWORD: la web está abierta, sin contraseña.`);
+// La web es pública: no hay contraseña de acceso (la parte de administración va con su código de 6 dígitos).
 
-// Archivos de la app instalable (PWA): el navegador los pide sin la contraseña, así que van antes de la autenticación.
-// No contienen nada privado: manifiesto, iconos y service worker.
+// Archivos de la app instalable (PWA): manifiesto, iconos y service worker (el sw.js, siempre fresco).
 const PUBLICOS_PWA = ['/manifest.webmanifest', '/sw.js', '/icon-192.png', '/icon-512.png', '/icon-maskable-512.png', '/apple-touch-icon.png',
   '/favicon.svg', '/logo.svg', '/og-imagen.jpg'];
 app.get(PUBLICOS_PWA, (req, res) => {
   if (req.path === '/sw.js') res.set('Cache-Control', 'no-cache');
   res.sendFile(path.join(__dirname, '../client/dist', req.path));
 });
-
-if (CON_CONTRASENA) {
-  // Máximo 20 contraseñas fallidas por IP cada 10 minutos: probar contraseñas a lo bruto queda frenado
-  const fallosAcceso = new Map(); // ip → [instantes de fallos]
-  const recientesAcceso = (ip) => (fallosAcceso.get(ip) || []).filter((t) => Date.now() - t < 10 * 60_000);
-  app.use((req, res, next) => {
-    if (recientesAcceso(req.ip).length >= 20) return res.status(429).send('Demasiados intentos de acceso. Espera unos minutos.');
-    next();
-  });
-  setInterval(() => { for (const ip of fallosAcceso.keys()) { const l = recientesAcceso(ip); if (l.length) fallosAcceso.set(ip, l); else fallosAcceso.delete(ip); } }, 10 * 60_000).unref();
-  app.use(basicAuth({
-    authorizer: (username, password) => {
-      const userMatches = basicAuth.safeCompare(username, USUARIO);
-      const passwordMatches = basicAuth.safeCompare(password, PASSWORD);
-      return userMatches && passwordMatches;
-    },
-    challenge: true,
-    realm: 'Acceso privado',
-    unauthorizedResponse: (req) => {
-      if (req.headers.authorization) fallosAcceso.set(req.ip, [...recientesAcceso(req.ip), Date.now()]); // contraseña mal puesta
-      return 'Acceso privado';
-    }
-  }));
-}
 
 // 3. Servir frontend compilado. Los archivos de /assets llevan una huella en el nombre (cambian de nombre en cada
 // versión), así que el navegador puede guardarlos un año. Las portadas, una semana. index.html, siempre fresco.

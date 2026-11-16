@@ -38,7 +38,6 @@
     "cannon-es": "^0.20.0",
     "compression": "^1.7.5",
     "express": "^4.19.2",
-    "express-basic-auth": "^1.2.1",
     "libsql": "^0.5.29",
     "sharp": "^0.35.5",
     "simple-icons": "^16.35.0",

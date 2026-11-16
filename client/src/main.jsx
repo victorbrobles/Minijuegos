@@ -1,6 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
+// Fuentes servidas desde la propia web (antes, Google Fonts: así no se envía la IP de nadie a Google)
+import '@fontsource/bricolage-grotesque/500.css';
+import '@fontsource/bricolage-grotesque/800.css';
+import '@fontsource/figtree/400.css';
+import '@fontsource/figtree/600.css';
 import App from './App.jsx';
 import './styles.css';
 import { instalarEfectos } from './lib/efectos.js';

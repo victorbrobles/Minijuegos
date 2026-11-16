@@ -12,6 +12,7 @@ import './Creditos.css';
 import './Portada.css';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useValoraciones, puntuacion } from '../lib/valoraciones.js';
+import { LEGAL } from '../legal.js';
 import { useNavigate } from 'react-router-dom';
 import GameCard from '../components/GameCard.jsx';
 import { useFiltros, cuantosFiltros, cumpleFiltros, PanelFiltros } from '../components/FiltrosJuegos.jsx';
@@ -475,19 +476,19 @@ export default function Home() {
                 <span>X (Twitter)</span>
               </a>
               <a
-                href="mailto:contacto@minigameshub.com"
+                href={`mailto:${LEGAL.contacto}`}
                 className="footer-btn email"
                 title="Correo electrónico"
               >
                 <span className="footer-btn-icon">✉️</span>
-                <span>contacto@minigameshub.com</span>
+                <span>{LEGAL.contacto}</span>
               </a>
             </div>
           </div>
         </div>
 
         <div className="footer-bottom">
-          <p>© {new Date().getFullYear()} Al juego, juego · Hecho para jugar con amigos y familia · <Link to="/creditos" className="footer-legal">Créditos y avisos legales</Link></p>
+          <p>© {new Date().getFullYear()} Al juego, juego · Hecho para jugar con amigos y familia · <Link to="/creditos" className="footer-legal">Créditos</Link> · <Link to="/privacidad" className="footer-legal">Privacidad y aviso legal</Link></p>
           <button
             type="button"
             className="footer-top-btn"

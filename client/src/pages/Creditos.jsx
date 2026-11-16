@@ -26,6 +26,7 @@ export default function Creditos() {
         <p>Los nombres, marcas, logotipos y escudos pertenecen a sus respectivos propietarios. Se usan únicamente para identificarlos en juegos de preguntas.</p>
         <p>Las mecánicas de algunos juegos se inspiran en juegos clásicos o populares, pero todos los nombres, textos, preguntas y gráficos de esta web son propios.</p>
         <p>Si eres titular de algún derecho y quieres que se retire o corrija algún contenido, escríbenos desde el apartado de contacto de la portada y lo atenderemos lo antes posible.</p>
+        <p>Consulta también la <Link to="/privacidad">política de privacidad y el aviso legal</Link>.</p>
       </section>
 
       <section className="est-tarjeta">
@@ -36,7 +37,7 @@ export default function Creditos() {
           <li><b>Iconos de marcas</b> (Logo Mania): <a href="https://simpleicons.org" target="_blank" rel="noreferrer">Simple Icons</a> (CC0). Las marcas pertenecen a sus propietarios.</li>
           <li><b>Escudos</b> (Modo carrera, El club de los cuatro, 301 Goles): no se usan escudos reales; se dibujan con los colores y las siglas de cada club o selección.</li>
           <li><b>Datos de futbolistas</b>: nombres, clubes y trayectorias son datos públicos. Las «medias» y los precios de Director Deportivo, Manager por un Día y Futbolista Misterioso son valoraciones aproximadas propias, no oficiales ni de ningún videojuego.</li>
-          <li><b>Tipografías</b>: <a href="https://fonts.google.com" target="_blank" rel="noreferrer">Google Fonts</a> (SIL Open Font License).</li>
+          <li><b>Tipografías</b>: Bricolage Grotesque y Figtree (SIL Open Font License), servidas desde esta misma web.</li>
         </ul>
       </section>
 

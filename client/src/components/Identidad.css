@@ -33,3 +33,5 @@
 .idn-recuperar button { padding: 0 1rem; border: none; border-radius: 14px; background: #7c3aed; color: #ffffff; font: inherit; font-weight: 900; cursor: pointer; }
 .idn-recuperar button:disabled { opacity: 0.5; }
 .idn-recuperar p { flex-basis: 100%; margin: 0.2rem 0 0; font-size: 0.85rem; font-weight: 700; color: #475569; }
+.idn-legal { margin: 0.7rem 0 0; color: #94a3b8; font-size: 0.78rem; font-weight: 600; text-align: center; }
+.idn-legal a { color: #7c3aed; font-weight: 800; }
