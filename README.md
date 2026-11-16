@@ -24,11 +24,22 @@ npm run dev
 - Juegos con modo local: menú principal → *Jugar online* (crear / unirse) o *Jugar en un único dispositivo* (selector de jugadores).
   Juegos solo online (p. ej. Traiciones, Bingoball, Lleva la cuenta): el menú principal muestra directamente *Crear partida* / *Unirse con código*.
 
+## Datos guardados (récords, grupos, retos…) y Turso
+- Lo que genera la gente (récords y salón de la fama, reto diario, grupos y su liga, preguntas de grupo, valoraciones,
+  estadísticas de uso, retos a amigos, copias de «pasar a otro móvil») se guarda en SQLite con libSQL (`server/db.js`).
+- **En local**, en el archivo `server/data/minigames.db` (o el que diga `DB_PATH`).
+- **En Render (o cualquier servidor con disco temporal)**, en **Turso** (plan gratuito), para que no se pierda nada al
+  desplegar ni cuando el servidor se duerme. El servidor guarda una réplica local para leer rápido y las escrituras
+  van a Turso. Hay que definir dos variables de entorno:
+  - `TURSO_DATABASE_URL` → la URL de la base de datos (empieza por `libsql://…`).
+  - `TURSO_AUTH_TOKEN` → el token de acceso de esa base de datos.
+- Al arrancar, el registro del servidor dice `[datos] Conectado a Turso…` si todo va bien.
+
 ## Minijuego: Siglas y acrónimos
 - Al entrar se elige una categoría (o todas mezcladas); cada sigla tiene 20 segundos y la partida acaba al fallar.
-- Datos en SQLite (`server/data/minigames.db`, se crea solo). La fuente de verdad es `server/data/siglas.seed.js`,
-  agrupado por categoría. Al guardar el archivo el servidor se reinicia y la base se sincroniza
-  (se añaden, actualizan y eliminan siglas). Para una categoría nueva basta con añadir una clave nueva.
+- Las siglas se cargan en memoria al arrancar desde `server/data/seeds/siglas/siglas.seed.js`, agrupado por
+  categoría. Al guardar el archivo el servidor se reinicia y se vuelven a cargar. Para una categoría nueva basta con
+  añadir una clave nueva.
 - Formato de cada entrada: `['SIGLA', 'Respuesta', ['alternativa opcional']]`.
 - La comprobación se hace en el servidor e ignora mayúsculas, tildes, signos y palabras de relleno.
 

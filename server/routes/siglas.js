@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import db from '../db.js';
+import { contenido as db } from '../db.js'; // las siglas son contenido fijo (en memoria)
 import seed from '../data/seeds/siglas/siglas.seed.js';
 import { esCorrecta } from '../lib/normalizar.js';
 
