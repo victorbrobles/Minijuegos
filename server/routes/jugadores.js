@@ -1,6 +1,7 @@
 // server/routes/jugadores.js
 // Salas online de «¿Con quién he jugado?». Mismo esquema que el resto de juegos: salas en memoria + sondeo HTTP.
 // La lógica vive en ../jugadores/engine.js; la lista de respuestas no sale del servidor hasta que acaba la ronda.
+import { randomUUID } from 'node:crypto';
 import express from 'express';
 import * as E from '../jugadores/engine.js';
 import { DUPLAS } from '../data/seeds/jugadores/index.js';
@@ -34,7 +35,7 @@ const codigoSala = () => {
   for (let i = 0; i < 4; i++) c += chars.charAt(Math.floor(Math.random() * chars.length));
   return c;
 };
-const nuevoToken = () => Math.random().toString(36).slice(2) + Date.now().toString(36) + Math.random().toString(36).slice(2);
+const nuevoToken = () => randomUUID();
 
 setInterval(() => {
   const ahora = Date.now();

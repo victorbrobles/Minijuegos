@@ -1,4 +1,5 @@
 // server/routes/aproximacion.js
+import { randomUUID } from 'node:crypto';
 import { Router } from 'express';
 import { PREGUNTAS } from '../data/seeds/aproximacion/aproximacion.seed.js';
 import { barajar } from '../lib/barajar.js';
@@ -151,7 +152,7 @@ router.post('/online/crear', (req, res) => {
   let code = generarCodigo();
   while (salasOnline.has(code)) code = generarCodigo();
 
-  const tokenAdmin = 'tok_' + Math.random().toString(36).substring(2);
+  const tokenAdmin = 'tok_' + randomUUID();
   const sala = {
     code,
     estado: 'lobby', // 'lobby' | 'jugando' | 'final'
@@ -176,7 +177,7 @@ router.post('/online/unirse', (req, res) => {
   if (sala.estado !== 'lobby') return res.status(400).json({ error: 'La partida ya ha comenzado.' });
   if (sala.jugadores.length >= LIM.max) return res.status(400).json({ error: `La sala está llena (máx. ${LIM.max}).` });
 
-  const token = 'tok_' + Math.random().toString(36).substring(2);
+  const token = 'tok_' + randomUUID();
   const nuevoId = sala.jugadores.length + 1;
 
   sala.jugadores.push({

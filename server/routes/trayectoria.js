@@ -1,6 +1,7 @@
 // server/routes/trayectoria.js
 // Salas online de «Modo carrera». Mismo esquema que el resto de juegos: salas en memoria + sondeo HTTP.
 // La lógica vive en ../trayectoria/engine.js; el reloj de cada ronda avanza al consultar la sala.
+import { randomUUID } from 'node:crypto';
 import express from 'express';
 import * as E from '../trayectoria/engine.js';
 import { RETOS_TRAYECTORIAS } from '../data/seeds/trayectoria/trayectorias.seed.js';
@@ -29,7 +30,7 @@ const codigoSala = () => {
   for (let i = 0; i < 4; i++) c += chars.charAt(Math.floor(Math.random() * chars.length));
   return c;
 };
-const nuevoToken = () => Math.random().toString(36).slice(2) + Date.now().toString(36) + Math.random().toString(36).slice(2);
+const nuevoToken = () => randomUUID();
 
 setInterval(() => {
   const ahora = Date.now();

@@ -1,6 +1,7 @@
 // server/routes/geoquiz.js
 // GeoQuiz: banco de preguntas (modo local) y salas online por turnos.
 // Las reglas están en server/geoquiz/engine.js (el cliente usa una copia idéntica en el modo local).
+import { randomUUID } from 'node:crypto';
 import express from 'express';
 import CATEGORIAS from '../data/seeds/geoquiz/index.js';
 import * as E from '../geoquiz/engine.js';
@@ -46,7 +47,7 @@ function generarCodigo() {
   return c;
 }
 
-const generarToken = () => Math.random().toString(36).substring(2) + Date.now().toString(36);
+const generarToken = () => randomUUID();
 
 function configValida(cfg = {}) {
   const modo = E.MODOS[cfg.modo] ? cfg.modo : 'geomix';

@@ -5,19 +5,22 @@
 import { chromium, devices } from 'playwright';
 
 const URL_BASE = process.argv[2] || 'http://127.0.0.1:3001';
-const USUARIO = process.env.AUTH_USER || 'admin';
-const CLAVE = process.env.AUTH_PASSWORD || 'miniJuegos123';
+// Si el servidor tiene contraseña (AUTH_USER y AUTH_PASSWORD), se usa la misma
+const USUARIO = process.env.AUTH_USER || '';
+const CLAVE = process.env.AUTH_PASSWORD || '';
 // Errores que vienen de fuera (fotos o audios de internet, WebGL sin tarjeta gráfica) y no son fallos de la web
 const IGNORAR = [/Failed to fetch/i, /NetworkError/i, /Load failed/i, /WebGL/i, /ResizeObserver loop/i];
 
 const navegador = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-webgl', '--ignore-gpu-blocklist'] });
-const contexto = await navegador.newContext({ ...devices['iPhone 13'], httpCredentials: { username: USUARIO, password: CLAVE } });
+const contexto = await navegador.newContext({ ...devices['iPhone 13'], ...(USUARIO ? { httpCredentials: { username: USUARIO, password: CLAVE } } : {}) });
 const pagina = await contexto.newPage();
 let errores = [];
 pagina.on('pageerror', (e) => { if (!IGNORAR.some((r) => r.test(e.message))) errores.push(e.message); });
+// Algo bloqueado por la política de seguridad (CSP) también es un fallo: la web dejaría de funcionar en parte
+pagina.on('console', (m) => { if (m.type() === 'error' && /Content Security Policy/i.test(m.text())) errores.push(m.text().slice(0, 200)); });
 
-const auth = 'Basic ' + Buffer.from(`${USUARIO}:${CLAVE}`).toString('base64');
-const juegos = await (await fetch(`${URL_BASE}/api/games`, { headers: { Authorization: auth } })).json();
+const cabeceras = USUARIO ? { Authorization: 'Basic ' + Buffer.from(`${USUARIO}:${CLAVE}`).toString('base64') } : {};
+const juegos = await (await fetch(`${URL_BASE}/api/games`, { headers: cabeceras })).json();
 const ids = (Array.isArray(juegos) ? juegos : juegos.games || juegos.juegos || []).map((j) => j.id).filter(Boolean);
 if (!ids.length) { console.error('❌ No se pudo leer la lista de juegos'); process.exit(1); }
 

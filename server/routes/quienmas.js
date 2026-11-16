@@ -1,4 +1,5 @@
 // server/routes/quienmas.js
+import { randomUUID } from 'node:crypto';
 import express from 'express';
 import { esAdmin } from '../lib/admin.js';
 import preguntasNormalRaw from '../data/seeds/quienmas/preguntas.js';
@@ -68,7 +69,7 @@ function generarCodigoSala() {
 }
 
 function generarToken() {
-  return Math.random().toString(36).substring(2) + Date.now().toString(36);
+  return randomUUID();
 }
 
 function procesarResultado(sala) {

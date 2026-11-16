@@ -1,6 +1,7 @@
 // server/routes/hipotesis.js
 // Salas online de «La Hipótesis Ganadora». Mismo esquema que el resto de juegos: salas en memoria + sondeo HTTP.
 // La lógica vive en ../hipotesis/engine.js; cada jugador recibe solo SU vista (nadie ve lo que saben los demás).
+import { randomUUID } from 'node:crypto';
 import express from 'express';
 import * as E from '../hipotesis/engine.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
@@ -16,7 +17,7 @@ const codigoSala = () => {
   for (let i = 0; i < 4; i++) c += chars.charAt(Math.floor(Math.random() * chars.length));
   return c;
 };
-const nuevoToken = () => Math.random().toString(36).slice(2) + Date.now().toString(36) + Math.random().toString(36).slice(2);
+const nuevoToken = () => randomUUID();
 
 setInterval(() => {
   const ahora = Date.now();

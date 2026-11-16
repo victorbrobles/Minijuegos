@@ -1,6 +1,7 @@
 // server/routes/golpe.js
 // Salas online de «El Golpe». Mismo esquema que el resto de juegos: salas en memoria + sondeo HTTP.
 // La lógica vive en ../golpe/engine.js; cada jugador recibe solo SU vista (nadie ve pistas ni objetivos ajenos).
+import { randomUUID } from 'node:crypto';
 import express from 'express';
 import * as E from '../golpe/engine.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
@@ -16,7 +17,7 @@ const codigoSala = () => {
   for (let i = 0; i < 4; i++) c += chars.charAt(Math.floor(Math.random() * chars.length));
   return c;
 };
-const nuevoToken = () => Math.random().toString(36).slice(2) + Date.now().toString(36) + Math.random().toString(36).slice(2);
+const nuevoToken = () => randomUUID();
 
 setInterval(() => {
   const ahora = Date.now();

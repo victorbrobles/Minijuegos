@@ -11,6 +11,7 @@
 //   reglas(config) -> reglas del motor,
 //   prepararItems(sala) -> Promise<items>,  // ítems de la partida (con la solución dentro)
 // }
+import { randomUUID } from 'node:crypto';
 import * as E from '../pulsador/engine.js';
 
 export const MIN = 2;
@@ -23,7 +24,7 @@ const codigoSala = () => {
   for (let i = 0; i < 4; i++) c += chars.charAt(Math.floor(Math.random() * chars.length));
   return c;
 };
-const nuevoToken = () => Math.random().toString(36).slice(2) + Date.now().toString(36) + Math.random().toString(36).slice(2);
+const nuevoToken = () => randomUUID();
 
 export function montarSalas(router, opciones) {
   const salas = {};

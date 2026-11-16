@@ -2,7 +2,6 @@
 
 import express from 'express';
 import compression from 'compression';
-import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import basicAuth from 'express-basic-auth';
@@ -94,36 +93,42 @@ import registrosRoutes from './routes/registros.js';
 import retoRoutes from './routes/reto.js';
 import valoracionesRoutes from './routes/valoraciones.js';
 import metricasRoutes from './routes/metricas.js';
+import { cabecerasSeguridad, limitePeticiones, ES_ESCRITURA } from './lib/seguridad.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Detrás de un proxy/túnel (ngrok, Render, Railway, Nginx...) la IP real del visitante llega en
-// X-Forwarded-For. Sin esto todos compartirían la IP del proxy y el límite de intentos del login de
-// administrador bloquearía a todo el mundo a la vez. TRUST_PROXY=<nº de proxies> lo ajusta (0 = desactivar).
+// IP real del visitante. En Render (que define RENDER=true) hay un proxy delante que la manda en X-Forwarded-For:
+// se confía en ese único salto. Fuera de Render no se confía en la cabecera, porque cualquiera podría inventársela
+// y saltarse los límites de intentos. TRUST_PROXY=<nº de proxies> lo ajusta a mano (0 = no confiar).
 const trustProxy = process.env.TRUST_PROXY;
-app.set('trust proxy', trustProxy === undefined ? 1 : Number.isNaN(Number(trustProxy)) ? trustProxy : Number(trustProxy));
+app.set('trust proxy', trustProxy !== undefined
+  ? (Number.isNaN(Number(trustProxy)) ? trustProxy : Number(trustProxy))
+  : (process.env.RENDER ? 1 : false));
+app.disable('x-powered-by'); // no anunciar que el servidor es Express
 
+app.use(cabecerasSeguridad);
 // Comprime las respuestas (JS, CSS, JSON…): la web pesa unas 4 veces menos al cargar
 app.use(compression());
-app.use(cors());
+// Sin CORS: la web y la API van en el mismo dominio, así que ninguna otra web puede leer la API
+
+// Límites por IP: generoso para el uso normal (las salas consultan el estado cada segundo, y en una misma casa
+// varios móviles comparten IP) y más estricto para lo que crea o guarda algo.
+app.use('/api', limitePeticiones({ clave: 'api', maximo: 1500 }));
+const limiteEscritura = limitePeticiones({ clave: 'escritura', maximo: 60, mensaje: 'Vas muy rápido. Espera un momento y vuelve a intentarlo.' });
+app.use('/api', (req, res, next) => (ES_ESCRITURA(req) ? limiteEscritura(req, res, next) : next()));
 // Los dibujos de «Garabato Encadenado» pesan más que una acción normal
 app.use('/api/garabato', express.json({ limit: '300kb' }));
 // La copia del perfil (récords, favoritos, logros…) puede pasar de los 100 KB normales
 app.use('/api/perfil/copia', express.json({ limit: '1mb' }));
 app.use(express.json());
 
-// 2. Permitir peticiones OPTIONS (CORS preflight) antes de autenticar
-app.use((req, res, next) => {
-  if (req.method === 'OPTIONS') {
-    return next();
-  }
-  next();
-});
-
-// 3. Autenticación tolerante con ngrok y proxys
-const USUARIO = process.env.AUTH_USER || 'admin';
-const PASSWORD = process.env.AUTH_PASSWORD || 'miniJuegos123'; // Evita el '#' si da problemas en el túnel
+// Contraseña de acceso a la web: solo si se definen AUTH_USER y AUTH_PASSWORD (en Render, en las variables de
+// entorno). Sin ellas (p. ej. en localhost) la web queda abierta. No hay ninguna contraseña escrita en el código.
+const USUARIO = process.env.AUTH_USER;
+const PASSWORD = process.env.AUTH_PASSWORD; // Evita el '#' si da problemas en el túnel
+const CON_CONTRASENA = Boolean(USUARIO && PASSWORD);
+if (!CON_CONTRASENA) console.warn('[acceso] Sin AUTH_USER/AUTH_PASSWORD: la web está abierta, sin contraseña.');
 
 // Archivos de la app instalable (PWA): el navegador los pide sin la contraseña, así que van antes de la autenticación.
 // No contienen nada privado: manifiesto, iconos y service worker.
@@ -134,15 +139,29 @@ app.get(PUBLICOS_PWA, (req, res) => {
   res.sendFile(path.join(__dirname, '../client/dist', req.path));
 });
 
-app.use(basicAuth({
-  authorizer: (username, password) => {
-    const userMatches = basicAuth.safeCompare(username, USUARIO);
-    const passwordMatches = basicAuth.safeCompare(password, PASSWORD);
-    return userMatches && passwordMatches;
-  },
-  challenge: true,
-  realm: 'Acceso privado'
-}));
+if (CON_CONTRASENA) {
+  // Máximo 20 contraseñas fallidas por IP cada 10 minutos: probar contraseñas a lo bruto queda frenado
+  const fallosAcceso = new Map(); // ip → [instantes de fallos]
+  const recientesAcceso = (ip) => (fallosAcceso.get(ip) || []).filter((t) => Date.now() - t < 10 * 60_000);
+  app.use((req, res, next) => {
+    if (recientesAcceso(req.ip).length >= 20) return res.status(429).send('Demasiados intentos de acceso. Espera unos minutos.');
+    next();
+  });
+  setInterval(() => { for (const ip of fallosAcceso.keys()) { const l = recientesAcceso(ip); if (l.length) fallosAcceso.set(ip, l); else fallosAcceso.delete(ip); } }, 10 * 60_000).unref();
+  app.use(basicAuth({
+    authorizer: (username, password) => {
+      const userMatches = basicAuth.safeCompare(username, USUARIO);
+      const passwordMatches = basicAuth.safeCompare(password, PASSWORD);
+      return userMatches && passwordMatches;
+    },
+    challenge: true,
+    realm: 'Acceso privado',
+    unauthorizedResponse: (req) => {
+      if (req.headers.authorization) fallosAcceso.set(req.ip, [...recientesAcceso(req.ip), Date.now()]); // contraseña mal puesta
+      return 'Acceso privado';
+    }
+  }));
+}
 
 // 3. Servir frontend compilado. Los archivos de /assets llevan una huella en el nombre (cambian de nombre en cada
 // versión), así que el navegador puede guardarlos un año. Las portadas, una semana. index.html, siempre fresco.

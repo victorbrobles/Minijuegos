@@ -1,4 +1,5 @@
 // server/routes/pistas.js
+import { randomUUID } from 'node:crypto';
 import { Router } from 'express';
 import { PISTAS_SEED } from '../data/seeds/pistas/pistas.seed.js';
 import { barajar } from '../lib/barajar.js';
@@ -106,7 +107,7 @@ function generarCodigoSala() {
 }
 
 function generarToken() {
-  return Math.random().toString(36).substring(2) + Date.now().toString(36);
+  return randomUUID();
 }
 
 function iniciarNuevaRondaOnline(sala) {

@@ -1,4 +1,5 @@
 // server/routes/colores.js
+import { randomUUID } from 'node:crypto';
 import express from 'express';
 import parte1 from '../data/seeds/colores/parte1.js';
 import parte2 from '../data/seeds/colores/parte2.js';
@@ -68,7 +69,7 @@ function generarCodigoSala() {
 }
 
 function generarToken() {
-  return Math.random().toString(36).substring(2) + Date.now().toString(36);
+  return randomUUID();
 }
 
 function prepararRondaOnline(sala) {

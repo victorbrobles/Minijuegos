@@ -152,7 +152,7 @@ function PreguntasPropias({ codigo, yo }) {
   return (
     <section className="est-tarjeta grp-preguntas" id="preguntas">
       <h2>✍️ Vuestras preguntas</h2>
-      <p className="nch-nota">Preguntas con vuestras anécdotas y vuestra gente. Al jugar, elegid «Preguntas de vuestro grupo» en la configuración.</p>
+      <p className="nch-nota">Preguntas con vuestras anécdotas y vuestra gente. Al jugar, elegid «Preguntas de vuestro grupo» en la configuración.{d.creador !== yo && ` Solo ${partirNombre(d.creador).nombre}, que creó el grupo, puede borrarlas.`}</p>
       <div className="grp-preg-pestanas" role="tablist">
         {Object.entries(d.juegos).map(([id, j]) => (
           <button key={id} type="button" role="tab" aria-selected={juego === id} className={juego === id ? 'activa' : ''} onClick={() => { setJuego(id); setError(''); }}>
@@ -171,7 +171,7 @@ function PreguntasPropias({ codigo, yo }) {
             <li key={p.id}>
               <span>{p.texto}</span>
               <small>{partirNombre(p.autor).nombre}</small>
-              <button type="button" onClick={() => borrar(p.id)} aria-label="Borrar pregunta" title="Borrar">✕</button>
+              {d.creador === yo && <button type="button" onClick={() => borrar(p.id)} aria-label="Borrar pregunta" title="Borrar">✕</button>}
             </li>
           ))}
         </ul>

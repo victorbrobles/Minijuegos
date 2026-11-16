@@ -1,6 +1,7 @@
 // server/routes/bingoball.js
 // Salas online de «Bingoball». Mismo esquema que el resto de juegos: salas en memoria + sondeo HTTP.
 // La lógica vive en ../bingoball/engine.js; cada jugador recibe solo su cartón. El reloj avanza al consultar.
+import { randomUUID } from 'node:crypto';
 import express from 'express';
 import * as E from '../bingoball/engine.js';
 import { GRUPOS_BINGOS } from '../data/seeds/bingoball/bingoballData.js';
@@ -23,7 +24,7 @@ const codigoSala = () => {
   for (let i = 0; i < 4; i++) c += chars.charAt(Math.floor(Math.random() * chars.length));
   return c;
 };
-const nuevoToken = () => Math.random().toString(36).slice(2) + Date.now().toString(36) + Math.random().toString(36).slice(2);
+const nuevoToken = () => randomUUID();
 
 setInterval(() => {
   const ahora = Date.now();

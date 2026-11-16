@@ -9,6 +9,7 @@
 //   GET  /api/social/sala/:juego/:code?desde=       «sala viva»: marcador y reacciones de una sala online (modo tele)
 //   POST /api/social/sala/:juego/:code/estado       { nombre, jugadores: [{ nombre, puntos }], estado }
 //   POST /api/social/sala/:juego/:code/reaccion     { nombre, emoji }
+import { puntosSeguros, textoSeguro } from '../lib/validar.js';
 import { JUEGOS_PREGUNTAS, preguntasDelGrupo } from '../lib/preguntasGrupo.js';
 import express from 'express';
 import db from '../db.js';
@@ -166,7 +167,7 @@ router.get('/grupos/:codigo/preguntas', (req, res) => {
   const codigo = String(req.params.codigo).toUpperCase();
   if (!grupo.get(codigo)) return res.status(404).json({ error: 'Ese grupo no existe.' });
   const preguntas = db.prepare('SELECT id, juego, texto, autor, creado FROM grupo_preguntas WHERE codigo = ? ORDER BY id DESC').all(codigo);
-  res.json({ success: true, preguntas, juegos: JUEGOS_PREGUNTAS });
+  res.json({ success: true, preguntas, juegos: JUEGOS_PREGUNTAS, creador: grupo.get(codigo).creador });
 });
 router.post('/grupos/:codigo/preguntas', (req, res) => {
   const codigo = String(req.params.codigo).toUpperCase();
@@ -186,7 +187,9 @@ router.post('/grupos/:codigo/preguntas', (req, res) => {
 router.post('/grupos/:codigo/preguntas/:id/borrar', (req, res) => {
   const codigo = String(req.params.codigo).toUpperCase();
   const jugador = String(req.body?.jugador || '');
-  if (!miembros.all(codigo).some((m) => m.jugador === jugador)) return res.status(403).json({ error: 'Solo los del grupo pueden borrar preguntas.' });
+  const g = grupo.get(codigo);
+  if (!g) return res.status(404).json({ error: 'Ese grupo no existe.' });
+  if (g.creador !== jugador) return res.status(403).json({ error: 'Solo quien creó el grupo puede borrar preguntas.' });
   db.prepare('DELETE FROM grupo_preguntas WHERE codigo = ? AND id = ?').run(codigo, Number(req.params.id));
   res.json({ success: true });
 });
@@ -207,8 +210,8 @@ router.post('/grupos/:codigo/noches', (req, res) => {
   if (!grupo.get(codigo)) return res.status(404).json({ error: 'Ese grupo no existe.' });
   const n = req.body?.noche || {};
   const marcador = (Array.isArray(n.marcador) ? n.marcador : []).slice(0, 20)
-    .map((t) => ({ nombre: String(t?.nombre || '').slice(0, 20), puntos: Number(t?.puntos) || 0 })).filter((t) => t.nombre);
-  const juegos = (Array.isArray(n.juegos) ? n.juegos : []).slice(0, 30).map((x) => String(x).slice(0, 30));
+    .map((t) => ({ nombre: textoSeguro(t?.nombre, 20), puntos: puntosSeguros(t?.puntos) ?? 0 })).filter((t) => t.nombre);
+  const juegos = (Array.isArray(n.juegos) ? n.juegos : []).slice(0, 30).map((x) => textoSeguro(x, 30)).filter((x) => /^[a-z0-9-]{2,30}$/.test(x));
   if (marcador.length < 2 || !juegos.length) return res.status(400).json({ error: 'Noche incompleta.' });
   db.prepare('INSERT INTO grupo_noches (codigo, fecha, datos) VALUES (?, ?, ?)').run(codigo, Date.now(), JSON.stringify({ marcador, juegos }));
   res.json({ success: true });

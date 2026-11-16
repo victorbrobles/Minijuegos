@@ -1,4 +1,5 @@
 // server/routes/confianzaciega.js
+import { randomUUID } from 'node:crypto';
 import express from 'express';
 import CATEGORIAS_NORMALES from '../data/seeds/confianzaciega/categorias.js';
 import CATEGORIAS_PICANTES from '../data/seeds/confianzaciega/personalizadas.js';
@@ -70,7 +71,7 @@ function generarCodigoSala() {
 }
 
 function generarToken() {
-  return Math.random().toString(36).substring(2) + Date.now().toString(36);
+  return randomUUID();
 }
 
 function obtenerDosConsignasSala(sala) {

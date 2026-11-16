@@ -2,6 +2,7 @@
 // Salas online de «Traiciones». Mismo esquema que el resto de juegos: salas en memoria + sondeo HTTP.
 // Toda la lógica de la partida vive en ../traiciones/engine.js (el servidor es la única fuente de verdad
 // y cada jugador solo recibe SU vista, así nadie puede leer roles ajenos desde el navegador).
+import { randomUUID } from 'node:crypto';
 import express from 'express';
 import * as E from '../traiciones/engine.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
@@ -20,7 +21,7 @@ function codigoSala() {
   for (let i = 0; i < 4; i++) c += chars.charAt(Math.floor(Math.random() * chars.length));
   return c;
 }
-const nuevoToken = () => Math.random().toString(36).slice(2) + Date.now().toString(36) + Math.random().toString(36).slice(2);
+const nuevoToken = () => randomUUID();
 
 // Limpieza de salas abandonadas
 setInterval(() => {

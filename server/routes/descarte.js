@@ -1,6 +1,7 @@
 // server/routes/descarte.js
 // Salas online de «¡Descarta y Elimina!». Mismo esquema que el resto de juegos: salas en memoria + sondeo HTTP.
 // La lógica vive en ../descarte/engine.js; el reloj de cada reto avanza al consultar la sala (sin temporizadores).
+import { randomUUID } from 'node:crypto';
 import express from 'express';
 import * as E from '../descarte/engine.js';
 import { TODAS_LAS_CATEGORIAS } from '../data/seeds/descarte/descarte.js';
@@ -17,7 +18,7 @@ const codigoSala = () => {
   for (let i = 0; i < 4; i++) c += chars.charAt(Math.floor(Math.random() * chars.length));
   return c;
 };
-const nuevoToken = () => Math.random().toString(36).slice(2) + Date.now().toString(36) + Math.random().toString(36).slice(2);
+const nuevoToken = () => randomUUID();
 
 setInterval(() => {
   const ahora = Date.now();

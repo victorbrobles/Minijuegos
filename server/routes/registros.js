@@ -7,6 +7,7 @@
 //   GET  /api/registros/recientes       los 10 últimos jugadores (de cualquier juego)
 // En las salas online cada móvil envía el mismo resultado: se guarda una sola vez (misma partida = mismo juego,
 // mismos jugadores y mismos puntos en los últimos 30 minutos).
+import { puntosSeguros } from '../lib/validar.js';
 import express from 'express';
 import { readFileSync } from 'node:fs';
 import db from '../db.js';
@@ -49,7 +50,7 @@ const insertarResultado = db.prepare('INSERT INTO registros_resultados (partida,
 export function guardarPartida({ juego, orden, jugadores }, ahora = Date.now()) {
   if (!JUEGOS.has(juego)) return { error: 'Juego desconocido.' };
   const lista = (Array.isArray(jugadores) ? jugadores : [])
-    .map((j) => ({ nombre: limpiarNombre(j?.nombre), puntos: Number.isFinite(Number(j?.puntos)) && j?.puntos !== null && j?.puntos !== '' ? Number(j.puntos) : null, gana: j?.gana ? 1 : 0 }))
+    .map((j) => ({ nombre: limpiarNombre(j?.nombre), puntos: puntosSeguros(j?.puntos), gana: j?.gana ? 1 : 0 }))
     .filter((j) => j.nombre)
     .slice(0, 30);
   if (!lista.length) return { error: 'Sin jugadores.' };

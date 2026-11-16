@@ -1,4 +1,5 @@
 // server/routes/conecta.js
+import { randomUUID } from 'node:crypto';
 import express from 'express';
 import futbolistas from '../data/seeds/conecta/futbolistas.js';
 import deportistas from '../data/seeds/conecta/deportistas.js';
@@ -102,7 +103,7 @@ function generarCodigoSala() {
 }
 
 function generarToken() {
-  return Math.random().toString(36).substring(2) + Date.now().toString(36);
+  return randomUUID();
 }
 
 function elegirTablero(catId) {

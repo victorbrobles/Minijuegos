@@ -1,4 +1,5 @@
 // server/routes/velocidad.js
+import { randomUUID } from 'node:crypto';
 import { Router } from 'express';
 import { PREGUNTAS_NORMALES, PREGUNTAS_ESPECIALES } from '../data/seeds/velocidad/index.js';
 import { barajar } from '../lib/barajar.js';
@@ -66,7 +67,7 @@ function generarCodigoSala() {
 }
 
 function generarToken() {
-  return Math.random().toString(36).substring(2) + Date.now().toString(36);
+  return randomUUID();
 }
 
 // 1. Crear sala online

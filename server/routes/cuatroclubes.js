@@ -1,6 +1,7 @@
 // server/routes/cuatroclubes.js
 // Salas online de «El club de los cuatro». Mismo esquema que el resto de juegos: salas en memoria + sondeo HTTP.
 // La lógica vive en ../cuatroclubes/engine.js; el anfitrión hace de juez con los futbolistas que no están en la base.
+import { randomUUID } from 'node:crypto';
 import express from 'express';
 import * as E from '../cuatroclubes/engine.js';
 import { RETOS, NOMBRES_BASE } from '../data/seeds/cuatroclubes/index.js';
@@ -33,7 +34,7 @@ const codigoSala = () => {
   for (let i = 0; i < 4; i++) c += chars.charAt(Math.floor(Math.random() * chars.length));
   return c;
 };
-const nuevoToken = () => Math.random().toString(36).slice(2) + Date.now().toString(36) + Math.random().toString(36).slice(2);
+const nuevoToken = () => randomUUID();
 
 setInterval(() => {
   const ahora = Date.now();

@@ -47,7 +47,7 @@ jobs:
       - name: Los 100 juegos arrancan
         run: |
           DB_PATH=/tmp/revision.db PORT=3001 node server/index.js > /tmp/servidor.log 2>&1 &
-          for i in $(seq 1 30); do curl -s -o /dev/null -u admin:miniJuegos123 http://127.0.0.1:3001/api/games && break; sleep 1; done
+          for i in $(seq 1 30); do curl -sf -o /dev/null http://127.0.0.1:3001/api/games && break; sleep 1; done
           node scripts/revision/arranque.mjs http://127.0.0.1:3001
 
       - name: Registro del servidor (si algo ha fallado)

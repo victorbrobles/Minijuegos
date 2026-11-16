@@ -1,4 +1,5 @@
 // server/routes/quienesquien.js
+import { randomUUID } from 'node:crypto';
 import { Router } from 'express';
 import SEED_DATA from '../data/seeds/quienesquien/quienesquien.js';
 import { esAdmin } from '../lib/admin.js';
@@ -74,7 +75,7 @@ function generarCodigo() {
 }
 
 function generarToken() {
-  return Math.random().toString(36).substring(2) + Date.now().toString(36);
+  return randomUUID();
 }
 
 // 1. Obtener categorías

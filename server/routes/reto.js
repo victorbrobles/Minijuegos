@@ -5,6 +5,7 @@
 //   GET  /api/reto/hoy?jugador=…   reto de hoy + el intento del jugador (si lo hay) + estadísticas del día
 //   POST /api/reto/empezar         { jugador }                       → empieza su único intento
 //   POST /api/reto/terminar        { jugador, superado, puntos, resumen }
+import { puntosSeguros, textoSeguro } from '../lib/validar.js';
 import express from 'express';
 import db from '../db.js';
 import { PREGUNTAS } from '../data/seeds/tablero/preguntas.js';
@@ -177,7 +178,7 @@ router.post('/terminar', (req, res) => {
   const jugador = String(req.body?.jugador || '');
   const fecha = String(req.body?.fecha || fechaHoy());
   if (!jugadorValido(jugador)) return res.status(400).json({ error: 'Jugador no válido.' });
-  const r = cerrarIntento.run(req.body?.superado ? 'superado' : 'fallado', Number(req.body?.puntos) || 0, String(req.body?.resumen || '').slice(0, 120), Date.now(), fecha, jugador);
+  const r = cerrarIntento.run(req.body?.superado ? 'superado' : 'fallado', puntosSeguros(req.body?.puntos) ?? 0, textoSeguro(req.body?.resumen, 120), Date.now(), fecha, jugador);
   if (!r.changes) return res.status(409).json({ error: 'Este intento ya estaba cerrado.' });
   res.json({ success: true, intento: leerIntento.get(fecha, jugador) });
 });

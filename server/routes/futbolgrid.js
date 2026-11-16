@@ -1,6 +1,7 @@
 // server/routes/futbolgrid.js
 // Salas online de «Fútbol en raya». Mismo esquema que el resto de juegos: salas en memoria + sondeo HTTP.
 // La lógica vive en ../futbolgrid/engine.js; las respuestas del grid nunca salen del servidor.
+import { randomUUID } from 'node:crypto';
 import express from 'express';
 import * as E from '../futbolgrid/engine.js';
 import { GRIDS_JUGABLES } from '../data/seeds/futbolgrid/index.js';
@@ -32,7 +33,7 @@ const codigoSala = () => {
   for (let i = 0; i < 4; i++) c += chars.charAt(Math.floor(Math.random() * chars.length));
   return c;
 };
-const nuevoToken = () => Math.random().toString(36).slice(2) + Date.now().toString(36) + Math.random().toString(36).slice(2);
+const nuevoToken = () => randomUUID();
 
 setInterval(() => {
   const ahora = Date.now();

@@ -3,6 +3,7 @@
 //   GET  /api/solo/:juego            contenido de una partida nueva
 //   POST /api/solo/conexion/enlace   { a, b } → ¿jugaron juntos? (con el motivo)
 //   POST /api/solo/retos · GET /api/solo/retos/:codigo · POST /api/solo/retos/:codigo/resultado   retos entre amigos
+import { puntosSeguros, textoSeguro } from '../lib/validar.js';
 import express from 'express';
 import { JUEGOS_SOLO, enlace } from '../lib/solo.js';
 import db from '../db.js';
@@ -41,7 +42,7 @@ router.post('/retos', (req, res) => {
   if (texto.length > 200000) return res.status(400).json({ error: 'Partida demasiado grande.' });
   let codigo = nuevoCodigo(); while (leerReto.get(codigo)) codigo = nuevoCodigo();
   db.prepare('INSERT INTO retos_amigo (codigo, juego, datos, orden, creado) VALUES (?, ?, ?, ?, ?)').run(codigo, juego, texto, orden === 'asc' ? 'asc' : 'desc', Date.now());
-  guardarResultado.run(codigo, jugador, Number(puntos), Date.now(), 1);
+  guardarResultado.run(codigo, jugador, puntosSeguros(puntos), Date.now(), 1);
   res.json({ success: true, codigo });
 });
 
@@ -56,7 +57,7 @@ router.post('/retos/:codigo/resultado', (req, res) => {
   if (!reto) return res.status(404).json({ error: 'Ese reto no existe.' });
   const { jugador, puntos } = req.body || {};
   if (!jugadorValido(jugador) || !Number.isFinite(Number(puntos))) return res.status(400).json({ error: 'Datos no válidos.' });
-  guardarResultado.run(reto.codigo, jugador, Number(puntos), Date.now(), 0); // solo cuenta el primer intento de cada uno
+  guardarResultado.run(reto.codigo, jugador, puntosSeguros(puntos), Date.now(), 0); // solo cuenta el primer intento de cada uno
   res.json({ success: true, orden: reto.orden, resultados: clasificar(reto) });
 });
 
@@ -80,7 +81,7 @@ router.post('/diario/:juego', (req, res) => {
   if (!def) return res.status(404).json({ error: 'Ese juego no tiene reto diario.' });
   const { jugador, puntos, resumen } = req.body || {};
   if (!jugadorValido(jugador) || !Number.isFinite(Number(puntos))) return res.status(400).json({ error: 'Datos no válidos.' });
-  const nuevo = guardarDiario(req.params.juego, jugador, Number(puntos), resumen);
+  const nuevo = guardarDiario(req.params.juego, jugador, puntosSeguros(puntos), textoSeguro(resumen, 80));
   res.json({ success: true, nuevo, ...estadoDiario(req.params.juego, jugador) });
 });
 

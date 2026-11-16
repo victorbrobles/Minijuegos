@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import express from 'express';
 import { equiposData } from '../data/seeds/trescientosuno/index.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
@@ -106,7 +107,7 @@ function generarCodigo() {
   return cod;
 }
 
-const nuevoToken = () => 'tok_' + Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2);
+const nuevoToken = () => 'tok_' + randomUUID();
 
 const turnoActual = (sala) => sala.jugadores[sala.turnoActualIndex];
 
