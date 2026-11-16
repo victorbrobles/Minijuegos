@@ -28,7 +28,7 @@ export const TOP_CREADOR = [
   'musavanzado',     // 10 · Mus Avanzado
   'colores',         // 11 · La vida en colores
   'furbo',           // 12 · Furbo!
-  'adivina',         // 13 · Luces, Cámara... ¡Música!
+  'ubicacion',         // 13 · Luces, Cámara... ¡Música!
   'fundadores',      // 14 · Fundadores
   'ponorden',        // 15 · Ponlo en orden
 ];
