@@ -26,11 +26,11 @@ export function SeccionInstalar() {
   };
   let contenido;
   if (instalada() || hecho) contenido = <p className="aj-texto">✅ Ya la tienes instalada. Ábrela desde el icono de los dos dados de tu pantalla de inicio.</p>;
-  else if (puede) contenido = <button type="button" className="aj-descargar aj-instalar" onClick={instalar}>📲 Instalar «Al juego, juego»</button>;
+  else if (puede) contenido = <button type="button" className="aj-descargar aj-instalar" onClick={instalar}>📲 Instalar «Los 100+ minijuegos»</button>;
   else if (esIOS()) contenido = <ol className="aj-pasos"><li>Pulsa el botón <b>Compartir</b> ⬆️ de Safari (abajo).</li><li>Elige <b>«Añadir a pantalla de inicio»</b>.</li><li>Pulsa <b>Añadir</b>: saldrá el icono de los dos dados.</li></ol>;
   else if (esIOSOtroNavegador()) contenido = <p className="aj-texto">En iPhone solo se puede instalar desde <b>Safari</b>: abre esta web en Safari y pulsa Compartir ⬆️ → «Añadir a pantalla de inicio».</p>;
   else if (esAndroid()) contenido = <ol className="aj-pasos"><li>Abre el menú <b>⋮</b> del navegador (arriba a la derecha).</li><li>Pulsa <b>«Instalar aplicación»</b> o <b>«Añadir a pantalla de inicio»</b>.</li></ol>;
-  else contenido = <ol className="aj-pasos"><li>En Chrome o Edge, pulsa el icono de <b>instalar</b> 🖥️⬇️ a la derecha de la barra de direcciones (o el menú ⋮ → «Instalar Al juego, juego»).</li><li>Se abrirá en su propia ventana, como un programa más.</li></ol>;
+  else contenido = <ol className="aj-pasos"><li>En Chrome o Edge, pulsa el icono de <b>instalar</b> 🖥️⬇️ a la derecha de la barra de direcciones (o el menú ⋮ → «Instalar Los 100+ minijuegos»).</li><li>Se abrirá en su propia ventana, como un programa más.</li></ol>;
   return (
     <section>
       <h3>📲 Instalar la app</h3>

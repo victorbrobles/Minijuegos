@@ -16,12 +16,12 @@ export default function Creditos() {
       <Link to="/" className="back" aria-label="Volver a la portada"><Icon name="arrowLeft" size={20} strokeWidth={2.5} /><span>Portada</span></Link>
       <header className="est-cab">
         <span className="est-cab-ico">📜</span>
-        <div><p>Al juego, juego</p><h1>Créditos y avisos legales</h1></div>
+        <div><p>Los 100+ minijuegos</p><h1>Créditos y avisos legales</h1></div>
       </header>
 
       <section className="est-tarjeta">
         <h2>ℹ️ Sobre esta web</h2>
-        <p>«Al juego, juego» es un proyecto personal para jugar con amigos y familia, sin ánimo de lucro y sin publicidad.</p>
+        <p>«Los 100+ minijuegos» es un proyecto personal para jugar con amigos y familia, sin ánimo de lucro y sin publicidad.</p>
         <p>No tiene relación, patrocinio ni afiliación con ningún club, liga, federación, futbolista, marca, artista o empresa de los que aparecen en los juegos.</p>
         <p>Los nombres, marcas, logotipos y escudos pertenecen a sus respectivos propietarios. Se usan únicamente para identificarlos en juegos de preguntas.</p>
         <p>Las mecánicas de algunos juegos se inspiran en juegos clásicos o populares, pero todos los nombres, textos, preguntas y gráficos de esta web son propios.</p>

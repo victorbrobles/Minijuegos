@@ -96,14 +96,14 @@ export function RetoAmigo({ juego, puntos, orden = 'desc', formato = (x) => x })
     } catch (e) { setEstado({ fase: 'error', error: e.message || 'No se pudo crear el reto.' }); }
   };
   if (estado.fase === 'creado') {
-    const texto = `⚔️ Te reto a superar mis ${formato(puntos)} en este juego de «Al juego, juego»:`;
+    const texto = `⚔️ Te reto a superar mis ${formato(puntos)} en este juego de «Los 100+ minijuegos»:`;
     return (
       <div className="sl-reto">
         <p className="sl-reto-titulo">⚔️ ¡Reto creado! Mándale este enlace:</p>
         <input className="sl-input sl-reto-url" readOnly value={estado.url} onFocus={(e) => e.target.select()} />
         <div className="sl-fila">
           <button type="button" className="uj-boton secundario" onClick={() => { navigator.clipboard?.writeText(`${texto} ${estado.url}`); setEstado({ ...estado, copiado: true }); }}>{estado.copiado ? '✓ Copiado' : '📋 Copiar'}</button>
-          {navigator.share && <button type="button" className="uj-boton secundario" onClick={() => navigator.share({ title: 'Al juego, juego', text: texto, url: estado.url }).catch(() => {})}>📤 Compartir</button>}
+          {navigator.share && <button type="button" className="uj-boton secundario" onClick={() => navigator.share({ title: 'Los 100+ minijuegos', text: texto, url: estado.url }).catch(() => {})}>📤 Compartir</button>}
         </div>
         <p className="sl-nota">Jugará exactamente la misma partida. Cuando termine, verá quién ha ganado.</p>
       </div>

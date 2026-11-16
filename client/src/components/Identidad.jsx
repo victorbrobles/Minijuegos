@@ -104,7 +104,7 @@ function Entrada() {
   return (
     <div className="idn-fondo">
       <form className="idn-caja" onSubmit={enviar}>
-        <img className="idn-logo idn-logo-img" src="/logo.svg" alt="Al juego, juego" width="72" height="72" />
+        <img className="idn-logo idn-logo-img" src="/logo.svg" alt="Los 100+ minijuegos" width="72" height="72" />
         <h1>{modo === 'entrar' ? '¡Hola de nuevo!' : modo === 'registro' ? 'Crea tu cuenta' : '¿Quién juega?'}</h1>
         <div className="idn-pestanas" role="tablist">
           <button type="button" role="tab" aria-selected={modo === 'entrar'} className={modo === 'entrar' ? 'activa' : ''} onClick={() => cambiarModo('entrar')}>Iniciar sesión</button>

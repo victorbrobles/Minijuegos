@@ -1,6 +1,6 @@
 {
-  "name": "Al juego, juego",
-  "short_name": "Al juego, juego",
+  "name": "Los 100+ minijuegos",
+  "short_name": "Los 100+",
   "description": "Más de 100 juegos para jugar con amigos: en un móvil, cada uno en el suyo o solo. ¡Y el que pierda paga el vino!",
   "lang": "es",
   "start_url": "/",
@@ -8,7 +8,7 @@
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#1e1b4b",
-  "theme_color": "#7c3aed",
+  "theme_color": "#6366f1",
   "icons": [
     { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },

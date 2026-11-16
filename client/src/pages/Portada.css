@@ -175,3 +175,61 @@
 .hub-head .hub-logo-img { padding: 0; background: none; border: 0; border-radius: 22%; box-shadow: 0 10px 18px -8px rgba(0, 0, 0, 0.5); object-fit: contain; }
 .footer-logo-img { padding: 0 !important; background: none !important; border: 0 !important; box-shadow: none !important; }
 .footer-logo-img img { display: block; width: 100%; height: 100%; border-radius: 22%; }
+
+/* ---------------------------------------------------------------- Cabecera «Los 100+ minijuegos»: cielo con juegos cayendo */
+.hub-head.cielo {
+  padding-bottom: 1.4rem;
+  background:
+    radial-gradient(110% 55% at 50% 0%, rgba(255, 255, 255, 0.42), transparent 60%),
+    radial-gradient(55% 22% at 10% 28%, rgba(255, 255, 255, 0.26), transparent 70%),
+    radial-gradient(60% 25% at 90% 50%, rgba(255, 255, 255, 0.2), transparent 70%),
+    radial-gradient(80% 35% at 30% 72%, rgba(255, 120, 200, 0.32), transparent 70%),
+    linear-gradient(180deg, #38bdf8 0%, #6366f1 34%, #a21caf 68%, #2e1065 100%);
+  box-shadow: 0 8px 0 rgba(8, 10, 22, 0.5), 0 26px 40px -18px rgba(99, 102, 241, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.4);
+}
+.hub-head.cielo::before { opacity: 0.25; }
+.hub-head.cielo > :not(.cielo-fichas) { position: relative; z-index: 2; }
+.hub-head.cielo > .hub-barra { z-index: 4; }
+.hub-head.cielo .hub-yo .idn-chip,
+.hub-head.cielo .hub-grupos,
+.hub-head.cielo .snd.en-portada .snd-btn,
+.hub-head.cielo .aj-boton { background: rgba(46, 16, 101, 0.62); border-color: rgba(255, 255, 255, 0.35); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.hub-head.cielo .hub-grupos:hover,
+.hub-head.cielo .snd.en-portada .snd-btn:hover,
+.hub-head.cielo .aj-boton:hover { background: rgba(46, 16, 101, 0.8); }
+
+.cielo-fichas { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.cielo-fichas .cae {
+  position: absolute; left: var(--x); top: var(--y); width: min(var(--t), 19vw); height: min(var(--t), 19vw); border-radius: 22%; overflow: hidden;
+  box-shadow: 0 14px 24px rgba(30, 27, 75, 0.35); transform: rotate(var(--r0));
+  animation: cieloCaer linear infinite;
+}
+.cielo-fichas .cae img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.cielo-fichas .cae.lejos { filter: blur(1.5px) saturate(0.85); opacity: 0.65; box-shadow: none; }
+@keyframes cieloCaer {
+  from { top: -150px; transform: rotate(var(--r0)); }
+  to { top: 104%; transform: rotate(var(--r1)); }
+}
+html.sin-animaciones .cielo-fichas .cae { animation: none !important; }
+
+/* Logo: «LOS / 1OO+ / MINIJUEGOS» */
+.cien-logo { display: flex; flex-direction: column; align-items: center; margin: 1.6rem auto 0; color: #ffffff; text-align: center; text-shadow: 0 2px 10px rgba(30, 27, 75, 0.5); }
+.cien-logo::before { /* halo para que se lea aunque pase una ficha por detrás */
+  content: ''; position: absolute; left: 50%; top: 50%; z-index: -1; width: 150%; height: 160%; transform: translate(-50%, -50%);
+  background: radial-gradient(closest-side, rgba(46, 16, 101, 0.42), rgba(46, 16, 101, 0.15) 60%, transparent); pointer-events: none;
+}
+.cien-los { font: 500 1rem/1 'Bricolage Grotesque', sans-serif; letter-spacing: 0.9em; padding-left: 0.9em; }
+.cien-num { display: inline-flex; align-items: center; margin: 0.35rem 0 0 1.2rem; height: 104px; }
+.cien-num i { display: block; }
+.cien-uno { width: 19px; height: 92px; margin-right: 13px; border-radius: 3px; background: #ffffff; box-shadow: 0 4px 14px rgba(30, 27, 75, 0.45); transform: skewX(-3deg); }
+.cien-cero { width: 92px; height: 92px; border: 9px solid #ffffff; border-radius: 50%; box-shadow: 0 4px 14px rgba(30, 27, 75, 0.45), inset 0 4px 14px rgba(30, 27, 75, 0.3); }
+.cien-cero + .cien-cero { margin-left: -21px; }
+.cien-cero.amarillo { border-color: #facc15; }
+.cien-num b { align-self: flex-start; margin: -6px 0 0 4px; color: #facc15; font: 800 4rem/1 'Bricolage Grotesque', sans-serif; text-shadow: 0 3px 12px rgba(30, 27, 75, 0.5); }
+.cien-mini { margin-top: 0.55rem; font: 800 1.3rem/1 'Bricolage Grotesque', sans-serif; letter-spacing: 0.38em; padding-left: 0.38em; }
+.cien-lema { margin: 0.9rem auto 1.5rem; max-width: 320px; color: #e0e7ff; font-size: 0.72rem; font-weight: 600; line-height: 1.5; letter-spacing: 0.14em; text-align: center; text-transform: uppercase; }
+
+@media (max-width: 380px) {
+  .cien-num { transform: scale(0.85); margin-top: 0; }
+  .cien-mini { font-size: 1.1rem; }
+}

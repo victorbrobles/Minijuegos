@@ -206,7 +206,7 @@ export default function Estadisticas() {
       <Link to="/" className="back" aria-label="Volver a la portada"><Icon name="arrowLeft" size={20} strokeWidth={2.5} /><span>Portada</span></Link>
       <header className="est-cab">
         <span className="est-cab-ico">📊</span>
-        <div><p>Al juego, juego</p><h1>Estadísticas</h1></div>
+        <div><p>Los 100+ minijuegos</p><h1>Estadísticas</h1></div>
       </header>
       <section className="est-tarjeta">
         <h2>🏆 Los mejores de {mes}</h2>

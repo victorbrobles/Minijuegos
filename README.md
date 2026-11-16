@@ -1,4 +1,4 @@
-# Al juego, juego
+# Los 100+ minijuegos
 
 Backend: Node + Express (`server/`). Frontend: React + Vite (`client/`).
 

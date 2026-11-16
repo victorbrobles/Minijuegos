@@ -1,9 +1,9 @@
-// Service worker de Al juego, juego: permite instalar la web como app, abrirla más rápido y jugar sin conexión.
+// Service worker de Los 100+ minijuegos: permite instalar la web como app, abrirla más rápido y jugar sin conexión.
 // - Navegación: primero la red (para tener siempre la última versión) y, sin conexión, la portada guardada.
 // - Recursos estáticos (JS/CSS con huella, portadas, iconos, fuentes): primero la caché.
 // - API de contenido (preguntas, palabras… de los juegos de un móvil): primero la red y, sin conexión, la última
 //   respuesta guardada. Lo que es en directo (salas, grupos, récords, retos) nunca se guarda.
-const VERSION = 'mj-v2';
+const VERSION = 'mj-v3';
 const API = 'mj-api-v1';
 const MAX_API = 200;
 // Lo que nunca se sirve de la caché: salas online, social, registros, retos, administración, retos diarios.

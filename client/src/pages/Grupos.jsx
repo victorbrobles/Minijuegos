@@ -194,7 +194,7 @@ export function GrupoDetalle() {
   const enlace = `${window.location.origin}/grupo/${d.codigo}`;
   const invitar = async () => {
     try {
-      if (navigator.share) await navigator.share({ title: d.nombre, text: `Únete a «${d.nombre}» en «Al juego, juego»`, url: enlace });
+      if (navigator.share) await navigator.share({ title: d.nombre, text: `Únete a «${d.nombre}» en «Los 100+ minijuegos»`, url: enlace });
       else { await navigator.clipboard.writeText(enlace); setCopiado(true); setTimeout(() => setCopiado(false), 2000); }
     } catch { /* cancelado */ }
   };

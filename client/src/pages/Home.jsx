@@ -11,6 +11,7 @@ import './Estadisticas.css';
 import './Noche.css';
 import './Creditos.css';
 import './Portada.css';
+import { miniatura } from '../lib/portadas.js';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useValoraciones, puntuacion } from '../lib/valoraciones.js';
 import { LEGAL } from '../legal.js';
@@ -200,6 +201,38 @@ function FilaCarrusel({ cat, juegos, compacta = false }) {
   );
 }
 
+// Cabecera: las portadas de los juegos caen por el cielo, como en un póster de película. Las grandes pasan cerca
+// (nítidas, por los lados para no tapar el título) y las pequeñas al fondo (borrosas). Con «menos animaciones», quietas.
+function FichasCayendo({ juegos }) {
+  const fichas = useMemo(() => {
+    let semilla = 11;
+    const azar = () => (semilla = (semilla * 9301 + 49297) % 233280) / 233280;
+    return juegos.map((g) => metaDe(g.id).imagen).filter(Boolean).slice(0, 18).map((img, i) => {
+      const cerca = i % 3 === 0;
+      const dur = cerca ? 8 + azar() * 4 : 13 + azar() * 6;
+      return {
+        img, cerca,
+        estilo: {
+          '--t': `${cerca ? 70 + azar() * 26 : 34 + azar() * 20}px`,
+          '--x': cerca ? `${(i % 2 ? 82 : -9) + azar() * 10}%` : `${azar() * 94 - 4}%`,
+          '--y': `${azar() * 88}%`,
+          '--r0': `${(azar() - 0.5) * 60}deg`,
+          '--r1': `${(azar() - 0.5) * 220}deg`,
+          animationDuration: `${dur}s`,
+          animationDelay: `${-azar() * dur}s`
+        }
+      };
+    });
+  }, [juegos]);
+  return (
+    <div className="cielo-fichas" aria-hidden="true">
+      {fichas.map((f, i) => (
+        <span key={i} className={`cae${f.cerca ? '' : ' lejos'}`} style={f.estilo}><img src={miniatura(f.img)} alt="" loading="lazy" /></span>
+      ))}
+    </div>
+  );
+}
+
 export default function Home() {
   const [games, setGames] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -318,8 +351,8 @@ export default function Home() {
 
   return (
     <div className="home-view">
-      <header className="hub-head">
-        <Icon name="gamepad" className="hub-bg" aria-hidden="true" />
+      <header className="hub-head cielo">
+        <FichasCayendo juegos={games} />
         <div className="hub-barra">
           <div className="hub-yo"><ChipIdentidad /></div>
           <nav className="hub-iconos" aria-label="Opciones">
@@ -329,14 +362,12 @@ export default function Home() {
           </nav>
         </div>
 
-        <div className="hub-top">
-          <img className="hub-logo hub-logo-img" src="/logo.svg" alt="" width="68" height="68" />
-          <div>
-            <h1 className="hub-title">Al juego, juego</h1>
-            <p className="hub-sub">…y el que pierda paga el vino 🍷</p>
-            <p className="hub-lema">Más de 100 juegos para jugar con amigos</p>
-          </div>
-        </div>
+        <h1 className="cien-logo" aria-label="Los 100+ minijuegos">
+          <span className="cien-los" aria-hidden="true">LOS</span>
+          <span className="cien-num" aria-hidden="true"><i className="cien-uno" /><i className="cien-cero" /><i className="cien-cero amarillo" /><b>+</b></span>
+          <span className="cien-mini" aria-hidden="true">MINIJUEGOS</span>
+        </h1>
+        <p className="cien-lema">Ganar no es lo que importa.<br />Es a quién le ganas.</p>
 
         <div className="hub-search" role="search">
           <Icon name="search" size={22} className="hub-search-icon" />
@@ -347,7 +378,7 @@ export default function Home() {
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
             onKeyDown={onKeyDown}
-            placeholder="Buscar juego…"
+            placeholder="Buscar entre más de 100 juegos…"
             aria-label="Buscar juego"
             enterKeyHint="search"
             autoComplete="off"
@@ -447,7 +478,7 @@ export default function Home() {
               <span className="footer-logo footer-logo-img">
                 <img src="/logo.svg" alt="" width="40" height="40" />
               </span>
-              <h3>Al juego, juego</h3>
+              <h3>Los 100+ minijuegos</h3>
             </div>
             <p className="footer-text">
               Tu plataforma definitiva de minijuegos sociales y de mesa interactivos. Diseñada para jugar en grupo, ya sea en un solo dispositivo pasando el móvil o cada uno desde el suyo con salas online en tiempo real.
@@ -491,7 +522,7 @@ export default function Home() {
         </div>
 
         <div className="footer-bottom">
-          <p>© {new Date().getFullYear()} Al juego, juego · Hecho para jugar con amigos y familia · <Link to="/creditos" className="footer-legal">Créditos</Link> · <Link to="/privacidad" className="footer-legal">Privacidad y aviso legal</Link></p>
+          <p>© {new Date().getFullYear()} Los 100+ minijuegos · Hecho para jugar con amigos y familia · <Link to="/creditos" className="footer-legal">Créditos</Link> · <Link to="/privacidad" className="footer-legal">Privacidad y aviso legal</Link></p>
           <button
             type="button"
             className="footer-top-btn"
