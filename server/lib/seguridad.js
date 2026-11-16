@@ -66,6 +66,6 @@ export function limitePeticiones({ clave, maximo, ventanaMs = 60_000, mensaje = 
 // Peticiones que crean o guardan algo (salas, grupos, votos, resultados, copias…): más estrictas
 export const ES_ESCRITURA = (req) => req.method !== 'GET' && (
   /\/(crear|create)(\/|$)/.test(req.path) ||
-  /^\/(registros|valoraciones|metricas|perfil|reto|solo)(\/|$)/.test(req.path) ||
+  /^\/(registros|valoraciones|metricas|perfil|reto|solo|usuarios)(\/|$)/.test(req.path) ||
   /^\/social\/grupos(\/[A-Z0-9]+\/(preguntas|noches|unirse))?\/?$/i.test(req.path)
 );

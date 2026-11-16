@@ -21,7 +21,7 @@ export default function Privacidad() {
       <section className="est-tarjeta">
         <h2>👋 En pocas palabras</h2>
         <ul className="crd-lista">
-          <li>No hace falta registrarse ni dar tu correo: solo eliges un <b>nombre de jugador</b> (puede ser un apodo).</li>
+          <li>Puedes jugar <b>sin cuenta</b>, solo con un nick (puede ser un apodo), o crear una cuenta con tu <b>correo y una contraseña</b> para tener tus datos en cualquier móvil.</li>
           <li><b>No hay publicidad</b>, no vendemos ni cedemos datos y no usamos cookies de seguimiento.</li>
           <li>Guardamos lo justo para que funcionen los juegos: récords, grupos, retos… y puedes pedir que se borre cuando quieras.</li>
         </ul>
@@ -31,6 +31,7 @@ export default function Privacidad() {
         <h2>🗂️ Qué datos se guardan y para qué</h2>
         <ul className="crd-lista">
           <li><b>Tu nombre de jugador</b> (por ejemplo, «Ana#1234»), tu avatar y tu color: para que aparezcas en los récords, los podios y los grupos.</li>
+          <li><b>Si creas una cuenta</b>: tu <b>correo</b> (solo para entrar; no te enviaremos nada), tu <b>contraseña cifrada</b> (nunca se guarda tal cual: ni nosotros podemos verla) y una copia de lo que guardas en el navegador (favoritos, récords, logros, ajustes) para tenerlo en cualquier móvil.</li>
           <li><b>Resultados de las partidas</b>, el reto diario, los retos a amigos y tus logros: para los récords, el salón de la fama y las estadísticas.</li>
           <li><b>Grupos de amigos</b>: quién forma parte, la liga del grupo y las preguntas que escribáis. Las preguntas solo las ven los miembros del grupo.</li>
           <li><b>Valoraciones</b> 👍/👎 de los juegos.</li>
@@ -38,12 +39,14 @@ export default function Privacidad() {
           <li><b>Estadísticas de uso anónimas</b>: cuántas visitas hay al día y qué juegos se abren o se terminan. Para no contar dos veces a la misma persona en un día se usa una huella cifrada de la conexión que <b>cambia cada día</b>: no se guarda tu IP, no permite saber quién eres y no se puede seguir a nadie de un día para otro.</li>
           <li><b>Seguridad</b>: para frenar abusos, el servidor mira cuántas peticiones llegan de cada conexión en el último minuto. Se olvida enseguida y no se guarda.</li>
         </ul>
+        <p>Si olvidas la contraseña, escribe al contacto: como la web no envía correos, el administrador te dará una contraseña provisional para que la cambies.</p>
         <p>Los tratamos porque son necesarios para darte el servicio que usas (los juegos, los récords, los grupos) y, en el caso de las estadísticas y la seguridad, por el interés legítimo de que la web funcione bien y no se abuse de ella.</p>
       </section>
 
       <section className="est-tarjeta">
         <h2>📱 Lo que se guarda en tu móvil</h2>
-        <p>Esta web <b>no usa cookies</b>. Guarda en el almacenamiento de tu navegador lo necesario para funcionar: tu nombre de jugador, favoritos, últimos juegos, récords, logros y ajustes (letra, sonido, ronda de castigo…). No sirve para seguirte ni sale de tu móvil salvo que crees un código de «pasar a otro móvil». Puedes borrarlo cuando quieras desde los ajustes de tu navegador.</p>
+        <p>Si inicias sesión, se usa <b>una única cookie, la de la sesión</b> (para que sigas conectado), que es imprescindible para que funcione la cuenta: no sirve para seguirte ni para publicidad. Sin cuenta no se usa ninguna cookie.</p>
+        <p>Además, la web guarda en el almacenamiento de tu navegador lo necesario para funcionar: tu nombre de jugador, favoritos, últimos juegos, récords, logros y ajustes (letra, sonido, ronda de castigo…). No sale de tu móvil salvo que tengas cuenta (se copia en ella) o crees un código de «pasar a otro móvil». Puedes borrarlo cuando quieras desde los ajustes de tu navegador.</p>
       </section>
 
       <section className="est-tarjeta">
@@ -57,7 +60,7 @@ export default function Privacidad() {
 
       <section className="est-tarjeta">
         <h2>⏳ Cuánto tiempo y tus derechos</h2>
-        <p>Los datos se guardan mientras la web exista o hasta que pidas que se borren. Puedes pedir <b>ver, corregir o borrar</b> tus datos (por ejemplo, todo lo de tu nombre de jugador), u oponerte a su uso, escribiendo a <Correo />. Si crees que no se han atendido bien tus derechos, puedes reclamar ante la Agencia Española de Protección de Datos (aepd.es).</p>
+        <p>Los datos se guardan mientras la web exista o hasta que pidas que se borren. Si tienes cuenta, puedes <b>borrarla tú mismo</b> en ⚙️ Ajustes → Tu cuenta: se borran la cuenta y todo lo guardado con tu nick (récords, grupos, retos, valoraciones). También puedes pedir <b>ver, corregir o borrar</b> tus datos (por ejemplo, todo lo de tu nombre de jugador), u oponerte a su uso, escribiendo a <Correo />. Si crees que no se han atendido bien tus derechos, puedes reclamar ante la Agencia Española de Protección de Datos (aepd.es).</p>
         <p><b>Menores</b>: si tienes menos de 14 años, usa la web con permiso de tus padres o tutores y elige un apodo, no tu nombre completo.</p>
       </section>
 

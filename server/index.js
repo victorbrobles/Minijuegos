@@ -93,6 +93,8 @@ import retoRoutes from './routes/reto.js';
 import valoracionesRoutes from './routes/valoraciones.js';
 import metricasRoutes from './routes/metricas.js';
 import { cabecerasSeguridad, limitePeticiones, ES_ESCRITURA } from './lib/seguridad.js';
+import usuariosRoutes from './routes/usuarios.js';
+import { leerSesion, bloquearSiNoEs } from './lib/usuarios.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -120,6 +122,7 @@ app.use('/api', (req, res, next) => (ES_ESCRITURA(req) ? limiteEscritura(req, re
 app.use('/api/garabato', express.json({ limit: '300kb' }));
 // La copia del perfil (récords, favoritos, logros…) puede pasar de los 100 KB normales
 app.use('/api/perfil/copia', express.json({ limit: '1mb' }));
+app.use('/api/usuarios/datos', express.json({ limit: '1mb' }));
 app.use(express.json());
 
 // La web es pública: no hay contraseña de acceso (la parte de administración va con su código de 6 dígitos).
@@ -142,6 +145,17 @@ app.use(express.static(path.join(__dirname, '../client/dist'), {
   }
 }));
 
+// Cuenta con la sesión iniciada (si la hay) en req.usuario
+app.use('/api', leerSesion);
+app.use('/api/usuarios', usuariosRoutes);
+// Si alguien guarda algo «como» un Nick#número que tiene cuenta (grupos, sala del grupo, perfil, retos, votos…),
+// tiene que haber iniciado sesión con esa cuenta. Los invitados (nombres sin cuenta) siguen funcionando igual.
+app.use(['/api/social', '/api/perfil', '/api/reto', '/api/solo', '/api/valoraciones'], (req, res, next) => {
+  if (req.method === 'GET') return next();
+  const jugador = req.body?.jugador ?? req.body?.quien;
+  if (typeof jugador === 'string' && bloquearSiNoEs(req, res, jugador)) return undefined;
+  next();
+});
 app.use('/api/admin', adminRouter);
 app.use('/api/games', gamesRouter);
 app.use('/api/registros', registrosRoutes);

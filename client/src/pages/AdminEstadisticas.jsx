@@ -14,6 +14,43 @@ const PERIODOS = [[7, '7 días'], [30, '30 días'], [90, '3 meses'], [365, '1 a�
 const num = (n) => Number(n || 0).toLocaleString('es-ES');
 const diaCorto = (d) => new Date(`${d}T12:00:00`).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
 
+/* 👤 Cuentas: buscar a alguien y darle una contraseña provisional si ha olvidado la suya (no se envían correos) */
+function Cuentas() {
+  const [q, setQ] = useState('');
+  const [d, setD] = useState(null);
+  const [provisional, setProvisional] = useState(null);
+  const buscar = (texto) => fetch(`/api/usuarios/admin/buscar?q=${encodeURIComponent(texto)}`, { headers: adminHeaders() }).then((r) => r.json()).then(setD).catch(() => {});
+  useEffect(() => { buscar(''); }, []);
+  const restablecer = async (u) => {
+    if (!window.confirm(`¿Dar una contraseña provisional a ${u.jugador} (${u.email})? La actual dejará de funcionar.`)) return;
+    const r = await fetch('/api/usuarios/admin/restablecer', { method: 'POST', headers: { 'Content-Type': 'application/json', ...adminHeaders() }, body: JSON.stringify({ email: u.email }) }).then((x) => x.json());
+    setProvisional(r.error ? { error: r.error } : { ...r, email: u.email });
+  };
+  return (
+    <section className="ae-caja">
+      <h2>👤 Cuentas <small>{d?.total ?? '…'} en total</small></h2>
+      <form className="ae-buscar" onSubmit={(e) => { e.preventDefault(); buscar(q); }}>
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar por correo o nick" aria-label="Buscar cuenta" />
+        <button type="submit">Buscar</button>
+      </form>
+      {provisional && (
+        <p className={`ae-provisional${provisional.error ? ' mal' : ''}`}>
+          {provisional.error ? provisional.error : <>Contraseña provisional de <b>{provisional.jugador}</b>: <code>{provisional.provisional}</code>. Pásasela y dile que la cambie en ⚙️ Ajustes → Tu cuenta.</>}
+        </p>
+      )}
+      <ul className="ae-cuentas">
+        {(d?.usuarios || []).map((u) => (
+          <li key={u.email}>
+            <span><b>{u.jugador}</b><small>{u.email} · último acceso {u.acceso ? new Date(u.acceso).toLocaleDateString('es-ES') : '—'}</small></span>
+            <button type="button" onClick={() => restablecer(u)}>🔑 Restablecer</button>
+          </li>
+        ))}
+        {d && !d.usuarios?.length && <li className="ae-nota">No hay cuentas que coincidan.</li>}
+      </ul>
+    </section>
+  );
+}
+
 function Tarjeta({ icono, valor, texto, nota }) {
   return <div className="ae-tarjeta"><span>{icono}</span><b>{valor}</b><small>{texto}</small>{nota && <em>{nota}</em>}</div>;
 }
@@ -80,6 +117,8 @@ export default function AdminEstadisticas() {
             <Tarjeta icono="⬇️" valor={num(t.instalaciones)} texto="instalaciones" />
             <Tarjeta icono="🎲" valor={num(t.partidas)} texto="partidas terminadas" />
           </div>
+
+          <Cuentas />
 
           <section className="ae-caja">
             <h2>Personas por día</h2>

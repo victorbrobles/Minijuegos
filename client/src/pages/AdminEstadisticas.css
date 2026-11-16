@@ -42,3 +42,14 @@
 .ae-pct.medio { background: #fef9c3; color: #854d0e; }
 .ae-pct.mal { background: #fee2e2; color: #991b1b; }
 .ae-nota { margin: 0.7rem 0 0; color: #64748b; font-size: 0.8rem; line-height: 1.45; }
+/* Cuentas */
+.ae-buscar { display: flex; gap: 0.4rem; margin-bottom: 0.6rem; }
+.ae-buscar input { flex: 1; min-width: 0; padding: 0.6rem 0.8rem; border: 2px solid #e2e8f0; border-radius: 12px; font: inherit; color: #0f172a; }
+.ae-buscar button, .ae-cuentas button { padding: 0.5rem 0.8rem; border: none; border-radius: 12px; background: #7c3aed; color: #ffffff; font: inherit; font-size: 0.82rem; font-weight: 800; cursor: pointer; box-shadow: none; }
+.ae-cuentas { list-style: none; display: grid; gap: 0.35rem; margin: 0; padding: 0; max-height: 22rem; overflow-y: auto; }
+.ae-cuentas li { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.5rem 0.6rem; border-radius: 12px; background: #f8fafc; }
+.ae-cuentas li span { display: grid; min-width: 0; }
+.ae-cuentas li small { color: #64748b; font-size: 0.75rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ae-provisional { margin: 0 0 0.6rem; padding: 0.6rem 0.8rem; border-radius: 12px; background: #dcfce7; color: #14532d; font-size: 0.88rem; }
+.ae-provisional.mal { background: #fee2e2; color: #991b1b; }
+.ae-provisional code { padding: 0.1rem 0.4rem; border-radius: 6px; background: #ffffff; font-size: 1rem; font-weight: 900; user-select: all; }

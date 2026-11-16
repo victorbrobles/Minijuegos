@@ -35,6 +35,14 @@ npm run dev
   - `TURSO_AUTH_TOKEN` → el token de acceso de esa base de datos.
 - Al arrancar, el registro del servidor dice `[datos] Conectado a Turso…` si todo va bien.
 
+## Cuentas de usuario
+- Se puede jugar **con cuenta** (correo + contraseña + nick «Nick#1234») o **sin cuenta** (solo nick, como antes).
+- Servidor: `server/lib/usuarios.js` (contraseñas con scrypt, sesión en cookie firmada HttpOnly) y `server/routes/usuarios.js`.
+- Un «Nick#número» con cuenta solo lo puede usar quien haya iniciado sesión con ella (grupos, perfil, retos, votos…).
+  Al crear la cuenta se puede reclamar un «Nick#número» que se usaba sin cuenta y así se conservan sus récords.
+- Los datos del navegador (favoritos, récords, logros, ajustes) se sincronizan con la cuenta.
+- Contraseña olvidada: no se envían correos; el administrador da una provisional en `/admin/estadisticas` → Cuentas.
+
 ## Web pública, buscadores y textos legales
 - La web no tiene contraseña de acceso. La administración va con el código de 6 dígitos (ver más abajo).
 - Mientras no esté terminada, **no aparece en Google**: `client/index.html` lleva `<meta name="robots" content="noindex">`

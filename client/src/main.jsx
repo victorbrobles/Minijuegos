@@ -14,12 +14,14 @@ import { aplicarAjustes } from './lib/ajustes.js';
 import { autodescargarSiApp } from './lib/sinConexion.js';
 import './styles/accesibilidad.css';
 import { iniciarMetricas } from './lib/metricas.js';
+import { iniciarCuenta } from './lib/cuenta.js';
 
 // Accesibilidad (letra, contraste, animaciones) antes de pintar nada
 aplicarAjustes();
 instalarEfectos();
 instalarSalaViva();
 iniciarMetricas();
+iniciarCuenta(); // si hay sesión iniciada, entras directamente con tu nick
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

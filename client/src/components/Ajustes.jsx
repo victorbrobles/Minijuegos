@@ -6,8 +6,9 @@ import { createPortal } from 'react-dom';
 import { LETRAS, leerAjustes, guardarAjustes } from '../lib/ajustes.js';
 import { descargarTodo, descargadoEl, useEnLinea } from '../lib/sinConexion.js';
 import { crearCopia, miCopia, recuperarCopia } from '../lib/copiaPerfil.js';
-import { guardarIdentidad, ultimaIdentidad } from '../lib/identidad.js';
+import { guardarIdentidad, ultimaIdentidad, leerIdentidad, olvidarIdentidad } from '../lib/identidad.js';
 import { SeccionInstalar } from './Instalar.jsx';
+import { useCuenta, salir, cambiarPassword, borrarCuenta } from '../lib/cuenta.js';
 import './Ajustes.css';
 
 function Opcion({ activo, onClick, children }) {
@@ -15,6 +16,7 @@ function Opcion({ activo, onClick, children }) {
 }
 
 export function PanelAjustes({ onCerrar }) {
+  const { usuario } = useCuenta();
   const [a, setA] = useState(leerAjustes);
   const [desc, setDesc] = useState(null); // { hechos, total } | 'ok' | 'error'
   const enLinea = useEnLinea();
@@ -33,6 +35,7 @@ export function PanelAjustes({ onCerrar }) {
     <div className="rg-modal-fondo aj-fondo" onClick={onCerrar}>
       <div className="aj-panel" role="dialog" aria-modal="true" aria-label="Ajustes" onClick={(e) => e.stopPropagation()}>
         <header><h2>⚙️ Ajustes</h2><button type="button" className="aj-cerrar" onClick={onCerrar} aria-label="Cerrar">✕</button></header>
+        <SeccionCuenta onCerrar={onCerrar} />
 
         <section>
           <h3>🔠 Tamaño de letra</h3>
@@ -65,7 +68,7 @@ export function PanelAjustes({ onCerrar }) {
           </div>
         </section>
         <SeccionInstalar />
-        <PasarMovil />
+        {!usuario && <PasarMovil />}
         <section>
           <h3>📴 Jugar sin conexión</h3>
           <p className="aj-texto">Descarga todos los juegos en este dispositivo (unos 3 MB). Después podrás abrir sin internet los juegos de un solo móvil. Lo online (salas, récords compartidos) sigue necesitando conexión.</p>
@@ -81,6 +84,73 @@ export function PanelAjustes({ onCerrar }) {
         </section>
       </div>
     </div>
+  );
+}
+
+/* 👤 Tu cuenta: datos, cambiar contraseña, cerrar sesión y borrar la cuenta (o, sin cuenta, crearla) */
+function SeccionCuenta({ onCerrar }) {
+  const { usuario } = useCuenta();
+  const [abierto, setAbierto] = useState(null); // null | 'password' | 'borrar'
+  const [a, setA] = useState('');
+  const [b, setB] = useState('');
+  const [aviso, setAviso] = useState(null);
+  const cerrarFormulario = () => { setAbierto(null); setA(''); setB(''); };
+  if (!usuario) {
+    const yo = leerIdentidad();
+    const crear = () => {
+      // Se abre la entrada en «Crear cuenta» con tu nick actual: así conservas tus récords
+      try { sessionStorage.setItem('minijuegos_entrada_modo', 'registro'); } catch { /* nada */ }
+      onCerrar(); olvidarIdentidad();
+    };
+    return (
+      <section>
+        <h3>👤 Tu cuenta</h3>
+        <p className="aj-texto">Estás jugando sin cuenta{yo ? ` como ${yo.nombre}#${yo.tag}` : ''}. Crea una (correo y contraseña) para tener tus récords, favoritos y grupos en cualquier móvil y que nadie pueda usar tu nick.</p>
+        <div className="aj-opciones">
+          <button type="button" className="aj-descargar aj-instalar" onClick={crear}>✨ Crear cuenta {yo ? 'con mi nick' : ''}</button>
+          <button type="button" className="aj-opcion" onClick={() => { try { sessionStorage.setItem('minijuegos_entrada_modo', 'entrar'); } catch { /* nada */ } onCerrar(); olvidarIdentidad(); }}>🔑 Ya tengo cuenta</button>
+        </div>
+      </section>
+    );
+  }
+  const guardarPw = async (e) => {
+    e.preventDefault();
+    try { await cambiarPassword(a, b); setAviso({ ok: 'Contraseña cambiada. Se ha cerrado la sesión en tus otros móviles.' }); cerrarFormulario(); } catch (err) { setAviso({ error: err.message }); }
+  };
+  const borrar = async (e) => {
+    e.preventDefault();
+    if (!window.confirm('Se borrará tu cuenta y todo lo guardado con tu nick (récords, grupos, retos…). No se puede deshacer. ¿Seguro?')) return;
+    try { await borrarCuenta(a); onCerrar(); } catch (err) { setAviso({ error: err.message }); }
+  };
+  return (
+    <section>
+      <h3>👤 Tu cuenta</h3>
+      <div className="aj-cuenta">
+        <b>{usuario.nick}<small>#{usuario.tag}</small></b>
+        <span>{usuario.email}</span>
+        <em>✓ Tus favoritos, récords, logros y ajustes se guardan en tu cuenta</em>
+      </div>
+      <div className="aj-opciones">
+        <button type="button" className="aj-opcion" onClick={() => { setAviso(null); setAbierto(abierto === 'password' ? null : 'password'); }}>🔒 Cambiar contraseña</button>
+        <button type="button" className="aj-opcion" onClick={async () => { await salir(); onCerrar(); }}>🚪 Cerrar sesión</button>
+        <button type="button" className="aj-opcion aj-peligro" onClick={() => { setAviso(null); setAbierto(abierto === 'borrar' ? null : 'borrar'); }}>🗑️ Borrar cuenta</button>
+      </div>
+      {abierto === 'password' && (
+        <form className="aj-form" onSubmit={guardarPw}>
+          <input type="password" value={a} onChange={(e) => setA(e.target.value)} placeholder="Contraseña actual" autoComplete="current-password" required />
+          <input type="password" value={b} onChange={(e) => setB(e.target.value)} placeholder="Nueva (mín. 8 caracteres)" autoComplete="new-password" minLength={8} required />
+          <button type="submit">Guardar</button>
+        </form>
+      )}
+      {abierto === 'borrar' && (
+        <form className="aj-form" onSubmit={borrar}>
+          <input type="password" value={a} onChange={(e) => setA(e.target.value)} placeholder="Tu contraseña, para confirmar" autoComplete="current-password" required />
+          <button type="submit" className="aj-peligro">Borrar mi cuenta</button>
+        </form>
+      )}
+      {aviso?.error && <p className="aj-nota aj-error">{aviso.error}</p>}
+      {aviso?.ok && <p className="aj-nota aj-bien">✅ {aviso.ok}</p>}
+    </section>
   );
 }
 

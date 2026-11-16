@@ -10,13 +10,21 @@ const NO_SE_COPIA = new Set(['minigames-admin-token', 'minijuegos_visitante', MI
 
 export const miCopia = () => { try { return JSON.parse(localStorage.getItem(MI_COPIA) || 'null'); } catch { return null; } };
 
-function recopilar() {
+/** Lo que guarda este navegador y viaja con el perfil (copia o cuenta). */
+export function recopilar() {
   const datos = {};
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
     if (k && SE_COPIA(k) && !NO_SE_COPIA.has(k)) datos[k] = localStorage.getItem(k);
   }
   return datos;
+}
+
+/** Pone en este navegador unos datos guardados (de una copia o de la cuenta). */
+export function aplicarDatos(datos) {
+  const entradas = Object.entries(datos || {}).filter(([k, v]) => SE_COPIA(k) && !NO_SE_COPIA.has(k) && typeof v === 'string');
+  entradas.forEach(([k, v]) => { try { localStorage.setItem(k, v); } catch { /* nada */ } });
+  return entradas.length;
 }
 
 /** Crea (o actualiza) la copia de este móvil y devuelve su código. */
@@ -38,7 +46,5 @@ export async function recuperarCopia(codigo) {
   const r = await fetch(`/api/perfil/copia/${c}`);
   const d = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(d.error || 'No se pudo recuperar la copia.');
-  const entradas = Object.entries(d.datos || {}).filter(([k]) => SE_COPIA(k) && !NO_SE_COPIA.has(k));
-  entradas.forEach(([k, v]) => { try { localStorage.setItem(k, v); } catch { /* nada */ } });
-  return entradas.length;
+  return aplicarDatos(d.datos);
 }

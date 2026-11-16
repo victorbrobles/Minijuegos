@@ -27,9 +27,10 @@ if (!ids.length) { console.error('❌ No se pudo leer la lista de juegos'); proc
 const mal = [];
 // Portada (con la entrada de nombre)
 await pagina.goto(`${URL_BASE}/`);
+await pagina.getByRole('tab', { name: 'Sin cuenta' }).click(); // entra como invitado
 await pagina.locator('.idn-campo.nombre input').fill('Revision');
 await pagina.locator('.idn-campo.tag input').fill('0001');
-await pagina.getByRole('button', { name: 'Entrar' }).click();
+await pagina.getByRole('button', { name: 'Jugar sin cuenta' }).click();
 await pagina.waitForSelector('.home-carousel-item', { timeout: 15000 }).catch(() => mal.push('portada: no aparecen los juegos'));
 if (errores.length) mal.push(`portada: ${errores[0]}`);
 
