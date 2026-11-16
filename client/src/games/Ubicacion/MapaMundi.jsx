@@ -3,10 +3,10 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { PAISES, OCEANOS } from './etiquetas.js';
 
-// Mapa base de CARTO (datos de OpenStreetMap) SIN etiquetas: gratuito para uso no comercial citando la fuente.
-// Los nombres de países y océanos los pinta el juego encima, en español (ver etiquetas.js).
-const TESELAS = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png';
-const ATRIBUCION = '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>';
+// Mapa base de Esri «World Light Gray Base»: SIN etiquetas y sin clave de API (CARTO empezó a pedirla y mostraba
+// «API KEY REQUIRED»). Los nombres de países y océanos los pinta el juego encima, en español (ver etiquetas.js).
+const TESELAS = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}';
+const ATRIBUCION = 'Teselas &copy; <a href="https://www.esri.com" target="_blank" rel="noopener">Esri</a> &mdash; Esri, HERE, Garmin, &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>';
 const LIMITES_MUNDO = [[-85, -180], [85, 180]];
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -48,7 +48,7 @@ export default function MapaMundi({ marcadores = [], lineas = [], onClickMapa, o
 
     L.tileLayer(TESELAS, {
       maxZoom: 19,
-      subdomains: 'abcd',
+      maxNativeZoom: 16, // Esri tiene este mapa hasta el zoom 16; más cerca se amplían esas teselas
       noWrap: true,
       attribution: ATRIBUCION
     }).addTo(mapa);
