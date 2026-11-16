@@ -11,6 +11,7 @@ import { useRecientes } from '../lib/registros.js';
 import { useNoche, crearNoche, terminarNoche, avanzarNoche, saltarJuego, apuntarAMano, marcador } from '../lib/noche.js';
 import './Estadisticas.css';
 import './Noche.css';
+import { useVerOcultos, esOculto } from '../lib/ocultos.js';
 import { miniatura } from '../lib/portadas.js';
 
 const MEDALLAS = ['🥇', '🥈', '🥉'];
@@ -30,7 +31,8 @@ function Preparar() {
     if (x && !jugadores.some((j) => j.toLowerCase() === x.toLowerCase())) setJugadores([...jugadores, x]);
     setNuevo('');
   };
-  const disponibles = multijugador.filter((id) => cabenTodos(id, Math.max(2, n)) && (!busca || norm(metaDe(id).titulo).includes(norm(busca))));
+  const verOcultos = useVerOcultos();
+  const disponibles = multijugador.filter((id) => (verOcultos || !esOculto(id)) && cabenTodos(id, Math.max(2, n)) && (!busca || norm(metaDe(id).titulo).includes(norm(busca))));
   const alAzar = () => setJuegos([...disponibles].sort(() => Math.random() - 0.5).slice(0, 5));
   return (
     <>

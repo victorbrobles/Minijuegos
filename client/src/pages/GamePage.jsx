@@ -13,6 +13,7 @@ import Reacciones from '../components/Reacciones.jsx';
 import '../components/MenuJuego.css';
 import { AyudaContexto } from '../lib/ayuda.js';
 import { usePilotoGrupo } from '../lib/salaGrupo.js';
+import { esOculto, useAccesoOculto } from '../lib/ocultos.js';
 
 // Ayuda común (se descarga solo al abrirla)
 const AyudaJuego = lazy(() => import('../components/AyudaJuego.jsx'));
@@ -20,7 +21,9 @@ const BOTON_AYUDA = '.qq-btn-ayuda, [aria-label="Cómo jugar"], [title="Cómo ju
 
 export default function GamePage() {
   const { gameId } = useParams();
-  const Game = registry[gameId];
+  const acceso = useAccesoOculto();
+  const bloqueado = esOculto(gameId) && acceso !== 'si';
+  const Game = bloqueado ? null : registry[gameId];
   const m = metaDe(gameId);
   const noche = useNoche();
   const enNoche = noche && noche.juegos[noche.actual] === gameId;
@@ -63,7 +66,7 @@ export default function GamePage() {
   if (!Game) {
     return (
       <>
-        <p>Este juego no existe.</p>
+        <p>{!bloqueado ? 'Este juego no existe.' : acceso === 'comprobando' ? 'Comprobando…' : 'Este juego no está disponible.'}</p>
         <Link to="/" className="back"><Icon name="arrowLeft" size={20} strokeWidth={2.500} />Portada</Link>
       </>
     );

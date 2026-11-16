@@ -95,6 +95,7 @@ import metricasRoutes from './routes/metricas.js';
 import { cabecerasSeguridad, limitePeticiones, ES_ESCRITURA } from './lib/seguridad.js';
 import usuariosRoutes from './routes/usuarios.js';
 import { leerSesion, bloquearSiNoEs } from './lib/usuarios.js';
+import { JUEGOS_OCULTOS, soloConAcceso, puedeVerOcultos } from './lib/ocultos.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -156,6 +157,9 @@ app.use(['/api/social', '/api/perfil', '/api/reto', '/api/solo', '/api/valoracio
   if (typeof jugador === 'string' && bloquearSiNoEs(req, res, jugador)) return undefined;
   next();
 });
+// Juegos ocultos: sus datos solo para el administrador o quien esté con él en la sala de un grupo
+JUEGOS_OCULTOS.forEach((id) => app.use(`/api/${id}`, soloConAcceso));
+app.get('/api/ocultos', (req, res) => res.json({ success: true, permitido: puedeVerOcultos(req), juegos: JUEGOS_OCULTOS }));
 app.use('/api/admin', adminRouter);
 app.use('/api/games', gamesRouter);
 app.use('/api/registros', registrosRoutes);

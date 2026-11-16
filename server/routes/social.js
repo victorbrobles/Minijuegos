@@ -12,6 +12,7 @@
 import { puntosSeguros, textoSeguro } from '../lib/validar.js';
 import { JUEGOS_PREGUNTAS, preguntasDelGrupo } from '../lib/preguntasGrupo.js';
 import express from 'express';
+import { esAdmin } from '../lib/admin.js';
 import db from '../db.js';
 import { conVictorias } from '../../client/src/games/limites.js';
 
@@ -246,17 +247,32 @@ function comprobarMiembro(req, res) {
   if (!miembros.all(codigo).some((m) => m.jugador === jugador)) { res.status(403).json({ error: 'No eres de este grupo: únete primero.' }); return null; }
   return { codigo, jugador, s: salaGrupo(codigo) };
 }
+/* ───────── Juegos ocultos ─────────
+   Algunos juegos solo los ve el administrador… y quienes estén con él en la sala de un grupo en ese momento.
+   Cuando el administrador manda el latido de una sala (con su token), la sala queda «con administrador» un rato. */
+const ADMIN_PRESENTE_MS = 60 * 1000;
+export function accesoPorGrupo(jugador) {
+  if (!valido(jugador)) return false;
+  const ahora = Date.now();
+  return misGrupos.all(jugador).some((g) => {
+    const s = salasGrupo.get(g.codigo);
+    return s && s.admin && ahora - s.admin < ADMIN_PRESENTE_MS && s.presencia[jugador] && ahora - s.presencia[jugador] < ADMIN_PRESENTE_MS;
+  });
+}
+
 // Latido: estoy en la sala (o jugando un juego de la sala). Devuelve el estado.
 router.post('/grupos/:codigo/sala/latido', (req, res) => {
   const c = comprobarMiembro(req, res); if (!c) return;
   const nuevo = !c.s.presencia[c.jugador] || Date.now() - c.s.presencia[c.jugador] > VIVO_MS;
   c.s.presencia[c.jugador] = Date.now(); c.s.actualizado = Date.now();
+  if (esAdmin(req)) c.s.admin = Date.now(); // el administrador está en la sala: los juegos ocultos se ven en ella
   if (nuevo) c.s.cambios++;
   res.json(vistaSalaGrupo(c.codigo, c.s));
 });
 router.post('/grupos/:codigo/sala/salir', (req, res) => {
   const c = comprobarMiembro(req, res); if (!c) return;
   delete c.s.presencia[c.jugador]; c.s.cambios++;
+  if (esAdmin(req)) c.s.admin = 0; // el administrador se va: se acaban los juegos ocultos en esta sala
   if (c.s.anfitrion === c.jugador) c.s.anfitrion = null;
   res.json(vistaSalaGrupo(c.codigo, c.s));
 });

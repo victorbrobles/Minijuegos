@@ -4,6 +4,7 @@
 // las reacciones (/api/social/sala/<juego>/<código>).
 import { useEffect, useState } from 'react';
 import { nombreIdentidad } from './identidad.js';
+import { conCabeceras } from './ocultos.js';
 
 const RUTA = /^\/api\/([a-z0-9-]+)\/(?:[a-z-]+\/)?sala\/([A-Za-z0-9]{3,8})(?:\?|$)/;
 const EVENTO = 'minijuegos-sala-viva';
@@ -49,6 +50,7 @@ export function instalarSalaViva() {
   instalado = true;
   original = window.fetch.bind(window);
   window.fetch = async (entrada, opciones) => {
+    opciones = conCabeceras(entrada, opciones); // quién eres, para los juegos ocultos
     const res = await original(entrada, opciones);
     try {
       const url = typeof entrada === 'string' ? entrada : entrada?.url || '';

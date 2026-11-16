@@ -3,6 +3,7 @@ import { ChipIdentidad } from '../components/Identidad.jsx';
 import { BannerReto } from '../reto/Banner.jsx';
 import { Link } from 'react-router-dom';
 import Recomendador from '../components/Recomendador.jsx';
+import { useVerOcultos, esOculto } from '../lib/ocultos.js';
 import Instalar from '../components/Instalar.jsx';
 import BotonSonido from '../components/Sonido.jsx';
 import { useFavoritos, useJugados } from '../lib/favoritos.js';
@@ -209,16 +210,18 @@ export default function Home() {
   const favoritos = useFavoritos();
   const jugados = useJugados();
 
+  // Los juegos ocultos solo aparecen con el administrador (o estando con él en la sala del grupo)
+  const verOcultos = useVerOcultos();
   useEffect(() => {
     fetch('/api/games')
       .then((r) => {
         if (!r.ok) throw new Error();
         return r.json();
       })
-      .then(setGames)
+      .then((lista) => setGames(verOcultos ? lista : lista.filter((g) => !esOculto(g.id))))
       .catch(() => setError('No se pudo cargar el catálogo. ¿Está arrancado el servidor?'))
       .finally(() => setCargando(false));
-  }, []);
+  }, [verOcultos]);
 
   useEffect(() => {
     const onKey = (e) => {

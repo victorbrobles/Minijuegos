@@ -13,6 +13,7 @@ import { metaDe } from '../games/meta.js';
 import { limitesOnline } from '../games/limites.js';
 import registry from '../games/registry.js';
 import { miniatura } from '../lib/portadas.js';
+import { useVerOcultos, esOculto } from '../lib/ocultos.js';
 import '../components/SalaGrupo.css';
 
 const plano = (j) => partirNombre(j).nombre;
@@ -28,14 +29,15 @@ function Elegir({ conectados, onElegir }) {
   const [q, setQ] = useState('');
   const [todos, setTodos] = useState(false);
   const n = conectados.length;
-  const lista = useMemo(() => JUEGOS_GRUPO.map((id) => ({ id, m: metaDe(id), l: limitesOnline(id) }))
+  const verOcultos = useVerOcultos();
+  const lista = useMemo(() => JUEGOS_GRUPO.filter((id) => verOcultos || !esOculto(id)).map((id) => ({ id, m: metaDe(id), l: limitesOnline(id) }))
     .filter(({ m }) => !q || sinTildes(`${m.titulo} ${m.etiquetas}`).includes(sinTildes(q)))
     .filter(({ l }) => todos || (n >= l.min && n <= l.max) || n < 2)
     .sort((a, b) => {
       // Primero los que coinciden por el título; después, por orden alfabético
       const t = (x) => (q && sinTildes(x.m.titulo).includes(sinTildes(q)) ? 0 : 1);
       return t(a) - t(b) || a.m.titulo.localeCompare(b.m.titulo, 'es');
-    }), [q, todos, n]);
+    }), [q, todos, n, verOcultos]);
   return (
     <section className="sg-tarjeta">
       <h2>🎮 Elige el juego</h2>
