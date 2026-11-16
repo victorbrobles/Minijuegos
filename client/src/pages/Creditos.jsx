@@ -31,7 +31,7 @@ export default function Creditos() {
       <section className="est-tarjeta">
         <h2>🧩 Recursos de terceros</h2>
         <ul className="crd-lista">
-          <li><b>Mapas</b> (Test del viajero): teselas © <a href="https://www.esri.com" target="_blank" rel="noreferrer">Esri</a> (Esri, HERE, Garmin) · © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">colaboradores de OpenStreetMap</a>. Los nombres en español los añade el propio juego.</li>
+          <li><b>Mapas</b> (Test del viajero): imágenes de satélite y rótulos © <a href="https://www.esri.com" target="_blank" rel="noreferrer">Esri</a> (Maxar, Earthstar Geographics, HERE, Garmin) · © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">colaboradores de OpenStreetMap</a>. Los nombres en español los añade el propio juego.</li>
           <li><b>Fragmentos de canciones</b> (Afina ese oído, Luces, Cámara… ¡Música!): fragmentos de 30 segundos facilitados por la API pública de <a href="https://www.deezer.com" target="_blank" rel="noreferrer">Deezer</a>. No se descargan ni se guardan en esta web.</li>
           <li><b>Iconos de marcas</b> (Logo Mania): <a href="https://simpleicons.org" target="_blank" rel="noreferrer">Simple Icons</a> (CC0). Las marcas pertenecen a sus propietarios.</li>
           <li><b>Escudos</b> (Modo carrera, El club de los cuatro, 301 Goles): no se usan escudos reales; se dibujan con los colores y las siglas de cada club o selección.</li>

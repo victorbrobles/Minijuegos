@@ -13,7 +13,7 @@
   overflow: hidden;
   border: 4px solid #ffffff;
   border-radius: 24px;
-  background: #cfe3f5;
+  background: #0b1d33; /* mar oscuro mientras cargan las imágenes de satélite */
   box-shadow: 0 6px 0 rgba(0, 0, 0, 0.28), 0 18px 34px -16px rgba(0, 0, 0, 0.5);
   font-family: inherit;
 }
@@ -839,6 +839,6 @@
 /* Nombres en español sobre el mapa base */
 .ub-etiqueta { background: none !important; border: none !important; }
 .ub-etiqueta span { position: absolute; transform: translate(-50%, -50%); white-space: nowrap; font-family: Figtree, system-ui, sans-serif; font-weight: 800; letter-spacing: 0.02em; pointer-events: none;
-  text-shadow: 0 0 3px #ffffff, 0 0 3px #ffffff, 0 0 5px #ffffff; }
-.ub-etiqueta.pais span { font-size: 11px; color: #334155; text-transform: uppercase; }
-.ub-etiqueta.oceano span { font-size: 12px; color: #1d4ed8; font-style: italic; opacity: 0.75; }
+  text-shadow: 0 0 3px #000000, 0 0 3px #000000, 0 1px 5px rgba(0, 0, 0, 0.9); } /* legibles sobre el satélite */
+.ub-etiqueta.pais span { font-size: 11px; color: #ffffff; text-transform: uppercase; }
+.ub-etiqueta.oceano span { font-size: 12px; color: #bfdbfe; font-style: italic; opacity: 0.9; }

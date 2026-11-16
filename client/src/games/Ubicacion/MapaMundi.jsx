@@ -3,10 +3,16 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { PAISES, OCEANOS } from './etiquetas.js';
 
-// Mapa base de Esri «World Light Gray Base»: SIN etiquetas y sin clave de API (CARTO empezó a pedirla y mostraba
-// «API KEY REQUIRED»). Los nombres de países y océanos los pinta el juego encima, en español (ver etiquetas.js).
-const TESELAS = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}';
-const ATRIBUCION = 'Teselas &copy; <a href="https://www.esri.com" target="_blank" rel="noopener">Esri</a> &mdash; Esri, HERE, Garmin, &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>';
+// Mapa de satélite de Esri (gratis y sin clave de API) con dos capas transparentes encima:
+//  - carreteras y nombres de calles (a partir de zoom 6)
+//  - fronteras, ciudades y lugares (a partir de zoom 4; antes se ven los nombres de países en español del juego)
+const ESRI = 'https://server.arcgisonline.com/ArcGIS/rest/services';
+const SATELITE = `${ESRI}/World_Imagery/MapServer/tile/{z}/{y}/{x}`;
+const CALLES = `${ESRI}/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}`;
+const LUGARES = `${ESRI}/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}`;
+const ATRIBUCION = 'Imágenes &copy; <a href="https://www.esri.com" target="_blank" rel="noopener">Esri</a>, Maxar, Earthstar Geographics &mdash; Esri, HERE, Garmin, &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>';
+// Hasta este zoom se ven los nombres de países y océanos en español; a partir de ahí, los del mapa (ciudades…)
+const ZOOM_LUGARES = 4;
 const LIMITES_MUNDO = [[-85, -180], [85, 180]];
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -46,12 +52,9 @@ export default function MapaMundi({ marcadores = [], lineas = [], onClickMapa, o
       maxBoundsViscosity: 1
     });
 
-    L.tileLayer(TESELAS, {
-      maxZoom: 19,
-      maxNativeZoom: 16, // Esri tiene este mapa hasta el zoom 16; más cerca se amplían esas teselas
-      noWrap: true,
-      attribution: ATRIBUCION
-    }).addTo(mapa);
+    L.tileLayer(SATELITE, { maxZoom: 19, maxNativeZoom: 18, noWrap: true, attribution: ATRIBUCION }).addTo(mapa);
+    L.tileLayer(CALLES, { maxZoom: 19, maxNativeZoom: 18, minZoom: 6, noWrap: true }).addTo(mapa);
+    L.tileLayer(LUGARES, { maxZoom: 19, maxNativeZoom: 18, minZoom: ZOOM_LUGARES, noWrap: true }).addTo(mapa);
 
     // Nombres en español: cada etiqueta aparece a partir de su zoom mínimo
     mapa.createPane('etiquetas');
@@ -66,7 +69,8 @@ export default function MapaMundi({ marcadores = [], lineas = [], onClickMapa, o
     }));
     const pintarEtiquetas = () => {
       const z = mapa.getZoom();
-      etiquetas.forEach((e) => { if (z >= e.zmin) e.marca.addTo(mapa); else e.marca.remove(); });
+      // Al acercarse, mandan los nombres del propio mapa (ciudades, calles…) y se quitan los nuestros
+      etiquetas.forEach((e) => { if (z >= e.zmin && z < ZOOM_LUGARES) e.marca.addTo(mapa); else e.marca.remove(); });
     };
     mapa.on('zoomend', pintarEtiquetas);
     pintarEtiquetas();
