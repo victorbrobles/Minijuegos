@@ -123,12 +123,14 @@ app.use('/api/garabato', express.json({ limit: '300kb' }));
 app.use('/api/perfil/copia', express.json({ limit: '1mb' }));
 app.use(express.json());
 
-// Contraseña de acceso a la web: solo si se definen AUTH_USER y AUTH_PASSWORD (en Render, en las variables de
-// entorno). Sin ellas (p. ej. en localhost) la web queda abierta. No hay ninguna contraseña escrita en el código.
-const USUARIO = process.env.AUTH_USER;
+// Contraseña de acceso a la web: solo si se define AUTH_PASSWORD (en Render, en las variables de entorno).
+// Sin ella (p. ej. en localhost) la web queda abierta. No hay ninguna contraseña escrita en el código.
+// Basta con AUTH_PASSWORD: si no se define AUTH_USER, el usuario es «admin» (como siempre ha sido).
 const PASSWORD = process.env.AUTH_PASSWORD; // Evita el '#' si da problemas en el túnel
-const CON_CONTRASENA = Boolean(USUARIO && PASSWORD);
-if (!CON_CONTRASENA) console.warn('[acceso] Sin AUTH_USER/AUTH_PASSWORD: la web está abierta, sin contraseña.');
+const USUARIO = process.env.AUTH_USER || 'admin';
+const CON_CONTRASENA = Boolean(PASSWORD);
+if (CON_CONTRASENA) console.log(`[acceso] Web protegida con contraseña (usuario «${USUARIO}»).`);
+else console.warn(`[acceso] ${process.env.RENDER ? '⚠️ EN RENDER y s' : 'S'}in AUTH_PASSWORD: la web está abierta, sin contraseña.`);
 
 // Archivos de la app instalable (PWA): el navegador los pide sin la contraseña, así que van antes de la autenticación.
 // No contienen nada privado: manifiesto, iconos y service worker.
