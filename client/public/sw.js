@@ -8,7 +8,7 @@ const API = 'mj-api-v1';
 const MAX_API = 200;
 // Lo que nunca se sirve de la caché: salas online, social, registros, retos, administración, retos diarios.
 // (La lista de juegos, /api/games, sí: así la portada funciona sin conexión.)
-const EN_DIRECTO = /\/(online|sala|salas|social|registros|reto|retos|diario|admin)(\/|$)|\/api\/(grupos|social)/;
+const EN_DIRECTO = /\/(online|sala|salas|social|registros|reto|retos|diario|admin|copia|metricas)(\/|$)|\/api\/(grupos|social)/;
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(VERSION).then((c) => c.addAll(['/', '/manifest.webmanifest', '/icon-192.png'])).then(() => self.skipWaiting()));

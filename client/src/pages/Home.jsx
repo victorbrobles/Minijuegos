@@ -10,7 +10,8 @@ import './Estadisticas.css';
 import './Noche.css';
 import './Creditos.css';
 import './Portada.css';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useValoraciones, puntuacion } from '../lib/valoraciones.js';
 import { useNavigate } from 'react-router-dom';
 import GameCard from '../components/GameCard.jsx';
 import { useFiltros, cuantosFiltros, cumpleFiltros, PanelFiltros } from '../components/FiltrosJuegos.jsx';
@@ -264,6 +265,13 @@ export default function Home() {
 
   const hayBusqueda = busqueda.trim() !== '' || nFiltros > 0;
 
+  // 👍 Los mejor valorados: al menos 3 votos y ordenados sin premiar a los que tienen muy pocos
+  const valoraciones = useValoraciones();
+  const mejorValorados = useMemo(() => (valoraciones ? games
+    .filter((g) => { const v = valoraciones[g.id]; return v && v.si + v.no >= 3 && v.si > v.no; })
+    .sort((a, b) => puntuacion(valoraciones[b.id]) - puntuacion(valoraciones[a.id]))
+    .slice(0, 12) : []), [valoraciones, games]);
+
   const juegosPorCategoria = useMemo(() => {
     const grupos = {};
     CATEGORIAS_PORTADA.forEach((cat) => {
@@ -318,7 +326,7 @@ export default function Home() {
         </div>
 
         <div className="hub-top">
-          <span className="hub-logo"><Icon name="gamepad" size={34} strokeWidth={1.9} /></span>
+          <img className="hub-logo hub-logo-img" src="/logo.svg" alt="" width="68" height="68" />
           <div>
             <h1 className="hub-title">Al juego, juego</h1>
             <p className="hub-sub">…y el que pierda paga el vino 🍷</p>
@@ -400,6 +408,15 @@ export default function Home() {
           {CATEGORIAS_PORTADA.map((cat) => {
             const juegosCat = juegosPorCategoria[cat.id] || [];
             if (juegosCat.length === 0) return null;
+            // Justo después del Top 15: los mejor valorados por todos (si ya hay votos suficientes)
+            if (cat.id === 'favoritos' && mejorValorados.length >= 4) {
+              return (
+                <React.Fragment key={cat.id}>
+                  <FilaCarrusel cat={cat} juegos={juegosCat} />
+                  <FilaCarrusel cat={{ id: 'valorados', titulo: '👍 Los mejor valorados', desc: 'Lo que más gusta a los que juegan aquí' }} juegos={mejorValorados} />
+                </React.Fragment>
+              );
+            }
 
             return <FilaCarrusel key={cat.id} cat={cat} juegos={juegosCat} />;
           })}
@@ -423,8 +440,8 @@ export default function Home() {
         <div className="footer-content">
           <div className="footer-col about">
             <div className="footer-brand">
-              <span className="footer-logo">
-                <Icon name="gamepad" size={24} strokeWidth={2} />
+              <span className="footer-logo footer-logo-img">
+                <img src="/logo.svg" alt="" width="40" height="40" />
               </span>
               <h3>Al juego, juego</h3>
             </div>

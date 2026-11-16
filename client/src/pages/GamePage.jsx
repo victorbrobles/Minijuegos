@@ -4,6 +4,7 @@ import registry from '../games/registry.js';
 import Icon from '../components/Icon.jsx';
 import { metaDe } from '../games/meta.js';
 import { marcarJugado } from '../lib/favoritos.js';
+import { anotar } from '../lib/metricas.js';
 import { useNoche } from '../lib/noche.js';
 import { capturarInvitacion, leerInvitacion } from '../lib/invitacion.js';
 import '../pages/Noche.css';
@@ -45,7 +46,7 @@ export default function GamePage() {
   }, [gameId]);
 
   // «Seguir jugando» en la portada
-  useEffect(() => { if (Game) marcarJugado(gameId); }, [gameId, Game]);
+  useEffect(() => { if (Game) { marcarJugado(gameId); anotar('abrir', gameId); } }, [gameId, Game]);
 
   // Copia los colores del juego en <body> para que el fondo de la página
   // use exactamente los colores asignados al juego en meta.js.

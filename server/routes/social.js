@@ -9,6 +9,7 @@
 //   GET  /api/social/sala/:juego/:code?desde=       «sala viva»: marcador y reacciones de una sala online (modo tele)
 //   POST /api/social/sala/:juego/:code/estado       { nombre, jugadores: [{ nombre, puntos }], estado }
 //   POST /api/social/sala/:juego/:code/reaccion     { nombre, emoji }
+import { JUEGOS_PREGUNTAS, preguntasDelGrupo } from '../lib/preguntasGrupo.js';
 import express from 'express';
 import db from '../db.js';
 import { conVictorias } from '../../client/src/games/limites.js';
@@ -160,6 +161,47 @@ router.post('/grupos/:codigo/salir', (req, res) => {
   salir.run(String(req.params.codigo).toUpperCase(), String(req.body?.jugador || ''));
   res.json({ success: true });
 });
+/* ───────── Preguntas propias del grupo ───────── */
+router.get('/grupos/:codigo/preguntas', (req, res) => {
+  const codigo = String(req.params.codigo).toUpperCase();
+  if (!grupo.get(codigo)) return res.status(404).json({ error: 'Ese grupo no existe.' });
+  const preguntas = db.prepare('SELECT id, juego, texto, autor, creado FROM grupo_preguntas WHERE codigo = ? ORDER BY id DESC').all(codigo);
+  res.json({ success: true, preguntas, juegos: JUEGOS_PREGUNTAS });
+});
+router.post('/grupos/:codigo/preguntas', (req, res) => {
+  const codigo = String(req.params.codigo).toUpperCase();
+  const jugador = String(req.body?.jugador || '');
+  const juego = String(req.body?.juego || '');
+  const texto = String(req.body?.texto || '').replace(/\s+/g, ' ').trim().slice(0, 160);
+  if (!grupo.get(codigo)) return res.status(404).json({ error: 'Ese grupo no existe.' });
+  if (!miembros.all(codigo).some((m) => m.jugador === jugador)) return res.status(403).json({ error: 'Solo los del grupo pueden añadir preguntas.' });
+  if (!JUEGOS_PREGUNTAS[juego]) return res.status(400).json({ error: 'Juego no válido.' });
+  if (texto.length < 6) return res.status(400).json({ error: 'Escribe una pregunta un poco más larga.' });
+  const n = db.prepare('SELECT COUNT(*) AS n FROM grupo_preguntas WHERE codigo = ?').get(codigo).n;
+  if (n >= 400) return res.status(400).json({ error: 'El grupo ya tiene 400 preguntas: borra alguna antes.' });
+  if (db.prepare('SELECT 1 FROM grupo_preguntas WHERE codigo = ? AND juego = ? AND lower(texto) = lower(?)').get(codigo, juego, texto)) return res.status(400).json({ error: 'Esa pregunta ya está.' });
+  const r = db.prepare('INSERT INTO grupo_preguntas (codigo, juego, texto, autor, creado) VALUES (?, ?, ?, ?, ?)').run(codigo, juego, texto, jugador, Date.now());
+  res.json({ success: true, id: r.lastInsertRowid });
+});
+router.post('/grupos/:codigo/preguntas/:id/borrar', (req, res) => {
+  const codigo = String(req.params.codigo).toUpperCase();
+  const jugador = String(req.body?.jugador || '');
+  if (!miembros.all(codigo).some((m) => m.jugador === jugador)) return res.status(403).json({ error: 'Solo los del grupo pueden borrar preguntas.' });
+  db.prepare('DELETE FROM grupo_preguntas WHERE codigo = ? AND id = ?').run(codigo, Number(req.params.id));
+  res.json({ success: true });
+});
+// Para el selector de los juegos: tus grupos y cuántas preguntas tiene cada uno para ese juego
+router.get('/preguntas-grupo', (req, res) => {
+  const jugador = String(req.query.jugador || '');
+  const juego = String(req.query.juego || '');
+  if (!valido(jugador) || !JUEGOS_PREGUNTAS[juego]) return res.json({ success: true, grupos: [] });
+  const grupos = misGrupos.all(jugador).map((g) => ({ codigo: g.codigo, nombre: g.nombre, preguntas: preguntasDelGrupo(g.codigo, juego).length }));
+  res.json({ success: true, grupos });
+});
+router.get('/grupos/:codigo/preguntas/:juego/lista', (req, res) => {
+  res.json({ success: true, preguntas: preguntasDelGrupo(req.params.codigo, req.params.juego) });
+});
+
 router.post('/grupos/:codigo/noches', (req, res) => {
   const codigo = String(req.params.codigo).toUpperCase();
   if (!grupo.get(codigo)) return res.status(404).json({ error: 'Ese grupo no existe.' });

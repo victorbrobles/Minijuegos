@@ -24,6 +24,7 @@ import { limitesOnline, textoSala } from '../limites.js';
 import { ChipJugadores, QRSala } from '../../components/MenuJuego.jsx';
 import { codigoInvitado } from '../../lib/invitacion.js';
 import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { SelectorPreguntasGrupo, usePreguntasGrupo, cargarPreguntasGrupo } from '../../components/PreguntasGrupo.jsx';
 import { rondasPorDefecto } from '../rondas.js';
 
 const LIM_ON = limitesOnline('conoce');
@@ -49,6 +50,7 @@ export default function ConoceOnline({
   onAbrirAyuda
 }) {
   const [rondasSel, setRondasSel] = useState(rondasPorDefecto('conoce'));
+  const [pregGrupo, setPregGrupo] = usePreguntasGrupo('conoce');
   const navigate = useNavigate();
   const [vista, setVista] = useState('menu'); // 'menu' | 'online_menu' | 'crear' | 'unirse' | 'sala'
   const [nombre, setNombre] = useState(nombreIdentidad);
@@ -567,6 +569,7 @@ export default function ConoceOnline({
 
           {esAdmin && (
             <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
+              <SelectorPreguntasGrupo juego="conoce" valor={pregGrupo} onCambiar={setPregGrupo} />
               <SelectorRondas juegoId="conoce" valor={rondasSel} onCambiar={setRondasSel} numJugadores={sala.jugadores.length} />
             </div>
           )}
@@ -576,7 +579,7 @@ export default function ConoceOnline({
               className="big full qq-btn-principal"
               style={{ marginTop: '1rem' }}
               disabled={faltan > 0}
-              onClick={() => peticionPost(`sala/${sesion.code}/iniciar`, { rondas: rondasSel })}
+              onClick={() => peticionPost(`sala/${sesion.code}/iniciar`, { rondas: rondasSel, preguntasGrupo: pregGrupo })}
             >
               <Icon name="play" size={22} />
               {faltan > 0 ? `Esperando jugadores (mínimo ${LIM_ON.min})...` : '¡Iniciar juego!'}
@@ -1029,7 +1032,7 @@ export default function ConoceOnline({
 
           <div className="qqp-barra">
             {esAdmin && (
-              <BotonPrincipal onClick={() => peticionPost(`sala/${sesion.code}/iniciar`, { rondas: rondasSel })}>
+              <BotonPrincipal onClick={() => peticionPost(`sala/${sesion.code}/iniciar`, { rondas: rondasSel, preguntasGrupo: pregGrupo })}>
                 <Icon name="refresh" size={20} /> Jugar otra vez (mismos jugadores)
               </BotonPrincipal>
             )}

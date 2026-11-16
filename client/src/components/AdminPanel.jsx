@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import Icon from './Icon.jsx';
 import { activarAdmin, salirAdmin, useAdmin, comprobarSesionAdmin } from '../lib/admin.js';
 
@@ -38,6 +39,7 @@ export default function AdminPanel() {
           <div className="admin-text">
             <strong>Modo administrador activado</strong>
             <span>Ya puedes ver el contenido oculto.</span>
+            <Link to="/admin/estadisticas" className="admin-stats-link">📊 Estadísticas de uso</Link>
           </div>
           <button type="button" className="secondary" onClick={salirAdmin}>Salir</button>
         </div>

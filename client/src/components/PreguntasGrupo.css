@@ -1,0 +1,13 @@
+/* client/src/components/PreguntasGrupo.css */
+.pg-caja { display: grid; gap: 0.55rem; margin-top: 1.1rem; padding: 0.85rem; border-radius: 18px; background: linear-gradient(135deg, #f5f3ff, #fdf2f8); border: 2px solid #e9d5ff; text-align: left; }
+.pg-titulo { font-size: 0.8rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; color: #6d28d9; }
+.pg-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.pg-chip { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.45rem 0.8rem; border: 2px solid #e2e8f0; border-radius: 999px; background: #ffffff; color: #334155; font: inherit; font-size: 0.85rem; font-weight: 800; cursor: pointer; }
+.pg-chip em { display: grid; place-items: center; min-width: 1.35rem; height: 1.35rem; padding: 0 0.3rem; border-radius: 999px; background: #ede9fe; color: #6d28d9; font-style: normal; font-size: 0.72rem; }
+.pg-chip.activo { border-color: #7c3aed; background: #7c3aed; color: #ffffff; }
+.pg-chip.activo em { background: rgba(255, 255, 255, 0.25); color: #ffffff; }
+.pg-modos { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.pg-modos button { padding: 0.55rem 0.5rem; border: 2px solid #e2e8f0; border-radius: 14px; background: #ffffff; color: #475569; font: inherit; font-size: 0.8rem; font-weight: 800; cursor: pointer; }
+.pg-modos button.activo { border-color: #db2777; background: #fdf2f8; color: #9d174d; }
+.pg-pista { margin: 1rem 0 0; padding: 0.6rem 0.8rem; border-radius: 14px; background: #f8fafc; color: #64748b; font-size: 0.82rem; font-weight: 600; text-align: left; }
+.pg-pista a { color: #7c3aed; font-weight: 800; }

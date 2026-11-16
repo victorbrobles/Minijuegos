@@ -1,0 +1,38 @@
+/* client/src/components/FinPartida.css — tarjeta de fin de partida (valorar y ronda de castigo) */
+.fp-tarjeta { position: fixed; left: 50%; bottom: max(0.9rem, env(safe-area-inset-bottom)); z-index: 300; display: grid; gap: 0.55rem; width: min(calc(100% - 1.6rem), 380px);
+  padding: 0.8rem 0.85rem; border-radius: 22px; background: #ffffff; color: #0f172a; box-shadow: 0 18px 40px rgba(15, 23, 42, 0.35); transform: translateX(-50%); animation: fpEntra 0.35s cubic-bezier(.2,1.4,.4,1); }
+@keyframes fpEntra { from { opacity: 0; transform: translate(-50%, 30px); } }
+.fp-cerrar { position: absolute; top: -10px; right: -6px; display: grid; place-items: center; width: 28px; height: 28px; min-width: 0; padding: 0; line-height: 1; border: 2px solid #ffffff; border-radius: 50%; background: #475569; color: #ffffff; font-size: 0.75rem; cursor: pointer; box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3); }
+.fp-valorar { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; }
+.fp-valorar > span { font-size: 0.92rem; font-weight: 700; color: #334155; }
+.fp-valorar b { color: #0f172a; }
+.fp-valorar > div { display: flex; gap: 0.35rem; flex: none; }
+.fp-valorar button { display: grid; place-items: center; width: 2.6rem; height: 2.6rem; border: 2px solid #e2e8f0; border-radius: 14px; background: #f8fafc; font-size: 1.3rem; cursor: pointer; transition: transform 0.15s; }
+.fp-valorar button:hover { transform: scale(1.1); }
+.fp-valorar button.activo { border-color: #7c3aed; background: #f5f3ff; transform: scale(1.12); }
+.fp-castigo-btn { display: flex; align-items: center; gap: 0.5rem; width: 100%; padding: 0.7rem 0.9rem; border: none; border-radius: 16px; background: linear-gradient(135deg, #7c3aed, #db2777 60%, #f97316); color: #ffffff; font: inherit; font-size: 1.25rem; cursor: pointer; box-shadow: 0 4px 0 #831843; text-align: left; }
+.fp-castigo-btn span { font-size: 1rem; font-weight: 900; }
+.fp-castigo-btn small { margin-left: auto; font-size: 0.72rem; font-weight: 700; opacity: 0.9; }
+
+.fp-fondo { position: fixed; inset: 0; z-index: 400; display: grid; place-items: center; padding: 0.8rem; background: rgba(15, 10, 40, 0.75); backdrop-filter: blur(4px); }
+.fp-ruleta { display: grid; justify-items: center; gap: 0.6rem; width: min(100%, 400px); padding: 1.2rem 1.1rem 1.1rem; border-radius: 28px; text-align: center; color: #ffffff;
+  background: radial-gradient(120% 80% at 50% 0%, rgba(249, 115, 22, 0.35), transparent 60%), linear-gradient(160deg, #4c1d95, #831843); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5); animation: fpEntra2 0.3s ease-out; }
+@keyframes fpEntra2 { from { opacity: 0; transform: scale(0.94); } }
+.fp-sup { margin: 0; font-size: 0.78rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.08em; opacity: 0.85; color: #ffffff; }
+.fp-ruleta h3 { margin: 0; font-size: 1.35rem; color: #ffffff; background: none !important; -webkit-text-fill-color: #ffffff !important; }
+.fp-ruleta h3 b { color: #fde68a; -webkit-text-fill-color: #fde68a; }
+.fp-rueda-caja { position: relative; width: min(70vw, 250px); aspect-ratio: 1; margin: 0.3rem 0; }
+.fp-aguja { position: absolute; top: -14px; left: 50%; z-index: 2; transform: translateX(-50%); font-size: 1.8rem; color: #fde68a; text-shadow: 0 3px 6px rgba(0, 0, 0, 0.5); }
+.fp-rueda { width: 100%; height: 100%; border-radius: 50%; box-shadow: 0 0 0 6px rgba(255, 255, 255, 0.9), 0 12px 30px rgba(0, 0, 0, 0.45); transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 1); }
+.fp-castigo { display: grid; justify-items: center; gap: 0.2rem; min-height: 6.2rem; width: 100%; padding: 0.7rem; border-radius: 18px; background: rgba(255, 255, 255, 0.12); }
+.fp-castigo.visto { background: #ffffff; color: #0f172a; animation: fpPop 0.4s cubic-bezier(.2,1.6,.4,1); }
+@keyframes fpPop { from { transform: scale(0.85); } }
+.fp-castigo span { font-size: 2.2rem; line-height: 1.1; }
+.fp-castigo p { margin: 0; font-size: 1.05rem; font-weight: 800; line-height: 1.3; color: inherit; }
+.fp-girando { align-self: center; opacity: 0.8; }
+.fp-acciones { display: grid; grid-template-columns: 1fr 1.4fr; gap: 0.5rem; width: 100%; }
+.fp-acciones button { padding: 0.8rem; border-radius: 16px; font: inherit; font-weight: 900; cursor: pointer; }
+.fp-acciones button:disabled { opacity: 0.5; cursor: default; }
+.fp-sec { border: 2px solid rgba(255, 255, 255, 0.4); background: transparent; color: #ffffff; }
+.fp-pri { border: none; background: #fde68a; color: #78350f; box-shadow: 0 4px 0 #b45309; }
+html.sin-animaciones .fp-rueda { transition-duration: 0.01s; }

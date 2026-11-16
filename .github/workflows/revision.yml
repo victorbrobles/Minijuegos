@@ -1,0 +1,55 @@
+# Revisión automática: en cada subida a main (y en cada pull request) comprueba que la web compila,
+# que las hojas de estilo están bien cerradas, que las simulaciones de los juegos pasan y que los
+# 100 juegos arrancan sin errores en un navegador. Si algo falla, GitHub lo marca con una ❌ en el commit.
+name: Revisión
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: revision-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  revision:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Instalar dependencias
+        run: |
+          npm install --no-audit --no-fund
+          npm install --prefix server --no-audit --no-fund
+          npm install --prefix client --no-audit --no-fund
+
+      - name: Hojas de estilo bien cerradas
+        run: node scripts/revision/css.mjs
+
+      - name: Compilar la web
+        run: npm run build
+
+      - name: Simulaciones de los juegos
+        run: node scripts/revision/simulaciones.mjs
+
+      - name: Instalar el navegador de pruebas
+        run: |
+          npm install --no-save --no-audit --no-fund playwright@1.49.1
+          npx playwright install --with-deps chromium
+
+      - name: Los 100 juegos arrancan
+        run: |
+          DB_PATH=/tmp/revision.db PORT=3001 node server/index.js > /tmp/servidor.log 2>&1 &
+          for i in $(seq 1 30); do curl -s -o /dev/null -u admin:miniJuegos123 http://127.0.0.1:3001/api/games && break; sleep 1; done
+          node scripts/revision/arranque.mjs http://127.0.0.1:3001
+
+      - name: Registro del servidor (si algo ha fallado)
+        if: failure()
+        run: tail -n 100 /tmp/servidor.log || true

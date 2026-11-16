@@ -1,7 +1,8 @@
 // server/routes/conoce.js
 import express from 'express';
 import crypto from 'crypto';
-import { getPreguntaAleatoria } from '../data/seeds/conoce/conoceData.js';
+import { getPreguntaAleatoria, TODAS_LAS_PREGUNTAS } from '../data/seeds/conoce/conoceData.js';
+import { combinarPreguntas, leerEleccion, preguntasDelGrupo } from '../lib/preguntasGrupo.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
 import { totalRondas } from '../../client/src/games/rondas.js';
 import { sonRespuestasEquivalentes, formatearRespuesta, puntosPareja } from '../../client/src/games/Conoce/respuestas.js';
@@ -110,7 +111,8 @@ router.get('/sala/:code', (req, res) => {
 const iniciarRonda = (sala) => {
   if (sala.timer) clearInterval(sala.timer);
 
-  const pregunta = getPreguntaAleatoria(sala.preguntasUsadas);
+  // Con preguntas del grupo, salen en el orden ya preparado al empezar; si no, una al azar
+  const pregunta = sala.colaPreguntas?.length ? sala.colaPreguntas.shift() : getPreguntaAleatoria(sala.preguntasUsadas);
   sala.preguntaActual = pregunta;
   sala.preguntasUsadas.push(pregunta);
   sala.respuestas = {};
@@ -221,6 +223,8 @@ router.post('/sala/:code/iniciar', (req, res) => {
   sala.jugadores.forEach(j => { j.puntos = 0; });
   sala.rondaNum = 1;
   sala.preguntasUsadas = [];
+  const eleccion = leerEleccion(req.body?.preguntasGrupo);
+  sala.colaPreguntas = eleccion ? combinarPreguntas(TODAS_LAS_PREGUNTAS, preguntasDelGrupo(eleccion.codigo, 'conoce'), eleccion.modo) : null;
   // Antes de la primera ronda cada uno elige en secreto a su mejor amigo
   if (sala.timer) clearInterval(sala.timer);
   sala.amigos = {};

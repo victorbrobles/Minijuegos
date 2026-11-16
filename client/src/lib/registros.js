@@ -6,6 +6,7 @@ import { sonar } from './sonido.js';
 import { silenciarFeedback } from './efectos.js';
 import { comprobarLogros } from './logros.js';
 import { registrarEnNoche } from './noche.js';
+import { anotar } from './metricas.js';
 
 /**
  * Guarda una partida terminada. jugadores: [{ nombre, puntos (o null), gana }]. orden: 'desc' (más es mejor) o 'asc'.
@@ -15,6 +16,9 @@ export function registrarPartida(juego, jugadores, { orden = 'desc' } = {}) {
   if (!juego || !Array.isArray(jugadores) || !jugadores.length) return;
   try { registrarEnNoche(juego, jugadores, orden); } catch { /* la noche es un extra */ }
   try { sonidoFinal(jugadores); } catch { /* el sonido es un extra */ }
+  try { anotar('fin', juego); } catch { /* las métricas son un extra */ }
+  // Aviso para la tarjeta de fin de partida (valorar el juego y ronda de castigo)
+  try { window.dispatchEvent(new CustomEvent('mj-fin-partida', { detail: { juego, jugadores, orden } })); } catch { /* nada */ }
   try {
     fetch('/api/registros', {
       method: 'POST',

@@ -10,6 +10,7 @@ import { miniatura } from '../lib/portadas.js';
 import { precargarJuego } from '../games/registry.js';
 import { MODOS } from '../games/modos.js';
 import SalonFama from './SalonFama.jsx';
+import { useValoraciones, porcentaje, miVoto, votar } from '../lib/valoraciones.js';
 import './Ficha.css';
 
 // Ficha previa: jugadores, duración, modos, objetivo (de la ayuda) y tu récord
@@ -23,6 +24,9 @@ function FichaExtra({ id, m }) {
     return () => { vivo = false; };
   }, [id]);
   const modos = MODOS[id];
+  const val = useValoraciones()?.[id];
+  const pct = porcentaje(val);
+  const [mio, setMio] = useState(() => miVoto(id));
   let record = null;
   try { record = JSON.parse(localStorage.getItem(`minijuegos_record_${id}`)); } catch { /* nada */ }
   return (
@@ -31,9 +35,15 @@ function FichaExtra({ id, m }) {
         <span>⏱️ ~{m.duracion || 15} min</span>
         {modos.online && <span>🌐 Online</span>}
         {modos.local && <span>📱 Un solo móvil</span>}
+        {pct != null && <span className={`gm-val${pct >= 70 ? ' alta' : ''}`}>👍 {pct} % <small>({val.si + val.no})</small></span>}
       </div>
       {objetivo && <p className="gm-objetivo"><span>🎯</span><span>{negritas(objetivo)}</span></p>}
       {record?.valor != null && <p className="gm-record">🏆 Tu récord: <b>{Number(record.valor).toLocaleString('es-ES')}</b></p>}
+      <div className="gm-votar">
+        <span>{mio ? '¡Gracias por tu voto!' : '¿Te gusta este juego?'}</span>
+        <button type="button" className={mio === 1 ? 'activo' : ''} onClick={() => { votar(id, 1); setMio(1); }} aria-label="Me gusta">👍</button>
+        <button type="button" className={mio === -1 ? 'activo' : ''} onClick={() => { votar(id, -1); setMio(-1); }} aria-label="No me gusta">👎</button>
+      </div>
     </div>
   );
 }

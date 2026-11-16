@@ -36,7 +36,7 @@ function Entrada({ onListo }) {
   return (
     <div className="idn-fondo">
       <form className="idn-caja" onSubmit={entrar}>
-        <span className="idn-logo"><Icon name="gamepad" size={40} strokeWidth={1.9} /></span>
+        <img className="idn-logo idn-logo-img" src="/logo.svg" alt="Al juego, juego" width="72" height="72" />
         <h1>¿Quién juega?</h1>
         <p>Elige tu nombre y un tag de cuatro números. Así aparecerás en los récords y en los podios de cada juego.</p>
         {ultima && (
@@ -59,7 +59,36 @@ function Entrada({ onListo }) {
         {nombre.trim() && /^\d{4}$/.test(tag) && <p className="idn-vista">Te verán como <NombreTag texto={`${limpiarNombre(nombre)}#${tag}`} /></p>}
         {error && <p className="idn-error">{error}</p>}
         <button type="submit" className="big full qq-btn-principal"><Icon name="play" size={20} /> Entrar</button>
+        <RecuperarDesdeEntrada />
       </form>
+    </div>
+  );
+}
+
+/* «¿Vienes de otro móvil?»: recupera nombre, favoritos, récords… con el código de «Pasar a otro móvil» */
+function RecuperarDesdeEntrada() {
+  const [abierto, setAbierto] = useState(false);
+  const [codigo, setCodigo] = useState('');
+  const [estado, setEstado] = useState(null);
+  const recuperar = async () => {
+    setEstado('…');
+    try {
+      const { recuperarCopia } = await import('../lib/copiaPerfil.js');
+      await recuperarCopia(codigo);
+      // Se entra directamente con el nombre que tenías en el otro móvil
+      const u = ultimaIdentidad();
+      if (u?.nombre && u?.tag) guardarIdentidad(u.nombre, u.tag);
+      setEstado('✅ ¡Recuperado!');
+      setTimeout(() => window.location.reload(), 800);
+    } catch (e) { setEstado(e.message); }
+  };
+  if (!abierto) return <button type="button" className="idn-otro-movil" onClick={() => setAbierto(true)}>📲 ¿Vienes de otro móvil? Tengo un código</button>;
+  return (
+    <div className="idn-recuperar">
+      <input value={codigo} onChange={(e) => setCodigo(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6))} placeholder="ABC123" aria-label="Código para recuperar tu perfil" autoCapitalize="characters" autoComplete="off" spellCheck="false" autoFocus
+        onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (codigo.length === 6) recuperar(); } }} />
+      <button type="button" onClick={recuperar} disabled={codigo.length !== 6}>Recuperar</button>
+      {estado && <p>{estado}</p>}
     </div>
   );
 }

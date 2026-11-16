@@ -8,11 +8,13 @@ import { instalarSalaViva } from './lib/salaViva.js';
 import { aplicarAjustes } from './lib/ajustes.js';
 import { autodescargarSiApp } from './lib/sinConexion.js';
 import './styles/accesibilidad.css';
+import { iniciarMetricas } from './lib/metricas.js';
 
 // Accesibilidad (letra, contraste, animaciones) antes de pintar nada
 aplicarAjustes();
 instalarEfectos();
 instalarSalaViva();
+iniciarMetricas();
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

@@ -17,3 +17,13 @@
 .aj-progreso span { position: absolute; inset: 0 auto 0 0; background: linear-gradient(135deg, #0ea5e9, #6366f1); transition: width 0.2s; }
 .aj-progreso b { position: absolute; inset: 0; display: grid; place-items: center; color: #0f172a; }
 .aj-offline { position: fixed; z-index: 600; left: 50%; bottom: calc(0.8rem + env(safe-area-inset-bottom)); transform: translateX(-50%); width: max-content; max-width: calc(100vw - 1.4rem); margin: 0; padding: 0.6rem 1rem; border-radius: 16px; background: #0f172a; color: #ffffff; font-size: 0.82rem; font-weight: 700; text-align: center; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35); }
+/* Pasar a otro móvil */
+.aj-codigo { display: grid; justify-items: center; gap: 0.15rem; margin: 0 0 0.6rem; padding: 0.7rem; border-radius: 16px; background: linear-gradient(135deg, #f5f3ff, #fdf2f8); border: 2px dashed #c4b5fd; }
+.aj-codigo small { color: #64748b; font-size: 0.75rem; font-weight: 700; }
+.aj-codigo b { font-family: 'Bricolage Grotesque', monospace; font-size: 2rem; letter-spacing: 0.25em; color: #6d28d9; user-select: all; }
+.aj-recuperar { display: flex; gap: 0.4rem; margin-top: 0.6rem; }
+.aj-recuperar input { flex: 1; min-width: 0; padding: 0.65rem 0.8rem; border: 2px solid #c4b5fd; border-radius: 14px; font: inherit; font-size: 1.2rem; font-weight: 900; letter-spacing: 0.2em; text-transform: uppercase; color: #0f172a; background: #ffffff; }
+.aj-recuperar button { padding: 0 1rem; border: none; border-radius: 14px; background: #7c3aed; color: #ffffff; font: inherit; font-weight: 900; cursor: pointer; }
+.aj-recuperar button:disabled { opacity: 0.5; }
+.aj-error { color: #dc2626 !important; font-weight: 700; }
+.aj-bien { color: #15803d !important; font-weight: 700; }

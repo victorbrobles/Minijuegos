@@ -101,6 +101,9 @@
 .cat-famosos { --a1: #f472b6; --a2: #a21caf; }
 .cat-dos_jugadores { --a1: #22d3ee; --a2: #2563eb; }
 .cat-un_jugador { --a1: #f87171; --a2: #c2410c; }
+.cat-valorados { --a1: #86efac; --a2: #16a34a; }
+/* Enlace del panel de administrador a las estadísticas de uso */
+.admin-stats-link { display: inline-block; margin-top: 0.3rem; color: #6d28d9; font-weight: 900; text-decoration: none; }
 
 .home-view .home-categoria-bloque { margin: 0 0 2rem; padding: 0; border: 0; border-radius: 0; background: none; box-shadow: none; }
 .home-view .home-categoria-header { align-items: center; margin-bottom: 0.9rem; }
@@ -167,3 +170,8 @@
 .hub-head .hub-sub { font-style: italic; }
 .hub-head .hub-lema { margin: 0.3rem 0 0; display: inline-block; padding: 0.15rem 0.6rem; border-radius: 999px; background: rgba(255, 255, 255, 0.18); color: #ffffff; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.01em; }
 @media (max-width: 560px) { .hub-head .hub-lema { font-size: 0.72rem; } }
+
+/* Logo de los dos dados */
+.hub-head .hub-logo-img { padding: 0; background: none; border: 0; border-radius: 22%; box-shadow: 0 10px 18px -8px rgba(0, 0, 0, 0.5); object-fit: contain; }
+.footer-logo-img { padding: 0 !important; background: none !important; border: 0 !important; box-shadow: none !important; }
+.footer-logo-img img { display: block; width: 100%; height: 100%; border-radius: 22%; }

@@ -10,6 +10,7 @@ import './Conoce.css';
 import { centrarActivo } from '../../lib/centrarActivo.js';
 import { limitesLocal } from '../limites.js';
 import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { SelectorPreguntasGrupo, usePreguntasGrupo, cargarPreguntasGrupo } from '../../components/PreguntasGrupo.jsx';
 import { rondasPorDefecto, totalRondas } from '../rondas.js';
 import { avisarNombres } from '../../lib/nombres.js';
 
@@ -361,6 +362,8 @@ export default function ConoceLocal({ onVolver, onSalir, onExit, onAbrirAyuda })
     Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: i === 0 ? nombreIdentidad() : '' }))
   );
   const [rondasSel, setRondasSel] = useState(rondasPorDefecto('conoce'));
+  const [pregGrupo, setPregGrupo] = usePreguntasGrupo('conoce');
+  const colaGrupo = useRef([]);
   const MAX_RONDAS = totalRondas('conoce', rondasSel, listaConfig.length);
 
   const [jugadores, setJugadores] = useState([]);
@@ -429,6 +432,9 @@ export default function ConoceLocal({ onVolver, onSalir, onExit, onAbrirAyuda })
     setAmigos({});
     setTurnoIdx(0);
     setPaso('pasar_amigo');
+    // Se cargan mientras cada uno elige a su mejor amigo
+    colaGrupo.current = [];
+    cargarPreguntasGrupo('conoce', pregGrupo).then((l) => { colaGrupo.current = l; });
   };
 
   const elegirAmigo = (amigoId) => {
@@ -443,7 +449,10 @@ export default function ConoceLocal({ onVolver, onSalir, onExit, onAbrirAyuda })
   };
 
   const comenzarNuevaRonda = (jugs, rNum, yaUsadas) => {
-    const preg = getPreguntaAleatoria(yaUsadas);
+    // Preguntas del grupo: «solo» → siempre que queden; «mezcla» → una sí y otra no
+    const cola = colaGrupo.current;
+    const tocaGrupo = cola.length && (pregGrupo?.modo === 'solo' || rNum % 2 === 1);
+    const preg = tocaGrupo ? cola.shift() : getPreguntaAleatoria(yaUsadas);
     setPreguntaActual(preg);
     setUsadas([...yaUsadas, preg]);
     setRespuestas({});
@@ -694,6 +703,7 @@ export default function ConoceLocal({ onVolver, onSalir, onExit, onAbrirAyuda })
             </div>
             <RecientesJugadores usados={listaConfig.map((j) => j.nombre)} onPoner={(n) => setListaConfig((l) => ponerReciente(l, n))} />
 
+            <SelectorPreguntasGrupo juego="conoce" valor={pregGrupo} onCambiar={setPregGrupo} />
             <SelectorRondas juegoId="conoce" valor={rondasSel} onCambiar={setRondasSel} numJugadores={listaConfig.length} />
             <button
               type="button"

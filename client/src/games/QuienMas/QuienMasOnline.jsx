@@ -21,6 +21,7 @@ import { limitesOnline, textoSala } from '../limites.js';
 import { ChipJugadores, QRSala } from '../../components/MenuJuego.jsx';
 import { codigoInvitado } from '../../lib/invitacion.js';
 import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { SelectorPreguntasGrupo, usePreguntasGrupo, cargarPreguntasGrupo } from '../../components/PreguntasGrupo.jsx';
 import { rondasPorDefecto } from '../rondas.js';
 
 const LIM_ON = limitesOnline('quienmas');
@@ -47,6 +48,7 @@ export default function QuienMasOnline({
   onAbrirAyuda
 }) {
   const [rondasSel, setRondasSel] = useState(rondasPorDefecto('quienmas'));
+  const [pregGrupo, setPregGrupo] = usePreguntasGrupo('quienmas');
   const navigate = useNavigate();
   const esAdminGlobal = useAdmin();
 
@@ -239,7 +241,7 @@ export default function QuienMasOnline({
       await fetch(`/api/quienmas/online/sala/${sesion.code}/iniciar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...adminHeaders() },
-        body: JSON.stringify({ token: sesion.token, rondas: rondasSel })
+        body: JSON.stringify({ token: sesion.token, rondas: rondasSel, preguntasGrupo: pregGrupo })
       });
     } catch (err) {
       setErrorMsg(err.message);
@@ -688,6 +690,7 @@ export default function QuienMasOnline({
 
           {esAdmin && (
             <div className="panel qq-menu-panel" style={{ marginTop: '1rem' }}>
+              {sala.categoria !== 'picante' && <SelectorPreguntasGrupo juego="quienmas" valor={pregGrupo} onCambiar={setPregGrupo} />}
               <SelectorRondas juegoId="quienmas" valor={rondasSel} onCambiar={setRondasSel} numJugadores={sala.jugadores.length} />
             </div>
           )}

@@ -92,6 +92,8 @@ import ponordenRoutes from './routes/ponorden.js';
 import esconditeRoutes from './routes/escondite.js';
 import registrosRoutes from './routes/registros.js';
 import retoRoutes from './routes/reto.js';
+import valoracionesRoutes from './routes/valoraciones.js';
+import metricasRoutes from './routes/metricas.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -107,6 +109,8 @@ app.use(compression());
 app.use(cors());
 // Los dibujos de «Garabato Encadenado» pesan más que una acción normal
 app.use('/api/garabato', express.json({ limit: '300kb' }));
+// La copia del perfil (récords, favoritos, logros…) puede pasar de los 100 KB normales
+app.use('/api/perfil/copia', express.json({ limit: '1mb' }));
 app.use(express.json());
 
 // 2. Permitir peticiones OPTIONS (CORS preflight) antes de autenticar
@@ -123,7 +127,8 @@ const PASSWORD = process.env.AUTH_PASSWORD || 'miniJuegos123'; // Evita el '#' s
 
 // Archivos de la app instalable (PWA): el navegador los pide sin la contraseña, así que van antes de la autenticación.
 // No contienen nada privado: manifiesto, iconos y service worker.
-const PUBLICOS_PWA = ['/manifest.webmanifest', '/sw.js', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png'];
+const PUBLICOS_PWA = ['/manifest.webmanifest', '/sw.js', '/icon-192.png', '/icon-512.png', '/icon-maskable-512.png', '/apple-touch-icon.png',
+  '/favicon.svg', '/logo.svg', '/og-imagen.jpg'];
 app.get(PUBLICOS_PWA, (req, res) => {
   if (req.path === '/sw.js') res.set('Cache-Control', 'no-cache');
   res.sendFile(path.join(__dirname, '../client/dist', req.path));
@@ -153,6 +158,8 @@ app.use('/api/admin', adminRouter);
 app.use('/api/games', gamesRouter);
 app.use('/api/registros', registrosRoutes);
 app.use('/api/reto', retoRoutes);
+app.use('/api/valoraciones', valoracionesRoutes);
+app.use('/api/metricas', metricasRoutes);
 app.use('/api/siglas', siglasRouter);
 app.use('/api/quienesquien', quienEsQuienRouter);
 app.use('/api/trayectoria', trayectoriaRoutes);

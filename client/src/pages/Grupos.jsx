@@ -1,7 +1,7 @@
 // client/src/pages/Grupos.jsx
 // Grupos de amigos: /grupos (tus grupos, crear y unirse con código) y /grupo/<código> (ranking interno,
 // juegos favoritos del grupo, últimas partidas juntos e historial de Noches de juegos).
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Icon from '../components/Icon.jsx';
 import { EnlacePerfil } from '../components/Perfil.jsx';
@@ -126,6 +126,60 @@ export default function Grupos() {
   );
 }
 
+
+/* ✍️ Preguntas propias del grupo para «¿Quién es más…?» y «Conoce a tus amigos» */
+function PreguntasPropias({ codigo, yo }) {
+  const [juego, setJuego] = useState('quienmas');
+  const [texto, setTexto] = useState('');
+  const [error, setError] = useState('');
+  const [recarga, setRecarga] = useState(0);
+  const d = useJson(`/api/social/grupos/${codigo}/preguntas?r=${recarga}`);
+  // Si se llega con /grupo/XXXX#preguntas (desde un juego), se baja hasta aquí
+  useEffect(() => {
+    if (d && window.location.hash === '#preguntas') document.getElementById('preguntas')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [Boolean(d)]); // eslint-disable-line react-hooks/exhaustive-deps
+  if (!d || d.error) return null;
+  const lista = d.preguntas.filter((p) => p.juego === juego);
+  const info = d.juegos[juego];
+  const anadir = async (e) => {
+    e.preventDefault();
+    if (!texto.trim()) return;
+    const r = await post(`/api/social/grupos/${codigo}/preguntas`, { jugador: yo, juego, texto });
+    if (r.error) { setError(r.error); return; }
+    setTexto(''); setError(''); setRecarga((n) => n + 1);
+  };
+  const borrar = (id) => post(`/api/social/grupos/${codigo}/preguntas/${id}/borrar`, { jugador: yo }).then(() => setRecarga((n) => n + 1));
+  return (
+    <section className="est-tarjeta grp-preguntas" id="preguntas">
+      <h2>✍️ Vuestras preguntas</h2>
+      <p className="nch-nota">Preguntas con vuestras anécdotas y vuestra gente. Al jugar, elegid «Preguntas de vuestro grupo» en la configuración.</p>
+      <div className="grp-preg-pestanas" role="tablist">
+        {Object.entries(d.juegos).map(([id, j]) => (
+          <button key={id} type="button" role="tab" aria-selected={juego === id} className={juego === id ? 'activa' : ''} onClick={() => { setJuego(id); setError(''); }}>
+            {j.nombre} <em>{d.preguntas.filter((p) => p.juego === id).length}</em>
+          </button>
+        ))}
+      </div>
+      <form className="grp-preg-form" onSubmit={anadir}>
+        <input value={texto} onChange={(e) => setTexto(e.target.value)} maxLength={160} placeholder={`Ej.: ${info.ejemplo}`} aria-label="Nueva pregunta" />
+        <button type="submit" disabled={!texto.trim()}>Añadir</button>
+      </form>
+      {error && <p className="grp-preg-error">{error}</p>}
+      {lista.length ? (
+        <ul className="grp-preg-lista">
+          {lista.map((p) => (
+            <li key={p.id}>
+              <span>{p.texto}</span>
+              <small>{partirNombre(p.autor).nombre}</small>
+              <button type="button" onClick={() => borrar(p.id)} aria-label="Borrar pregunta" title="Borrar">✕</button>
+            </li>
+          ))}
+        </ul>
+      ) : <p className="nch-nota">Aún no hay ninguna. ¡Estrenad la lista!</p>}
+    </section>
+  );
+}
+
 export function GrupoDetalle() {
   const { codigo } = useParams();
   const yo = nombreCompleto();
@@ -140,7 +194,7 @@ export function GrupoDetalle() {
   const enlace = `${window.location.origin}/grupo/${d.codigo}`;
   const invitar = async () => {
     try {
-      if (navigator.share) await navigator.share({ title: d.nombre, text: `Únete a «${d.nombre}» en Minijuegos`, url: enlace });
+      if (navigator.share) await navigator.share({ title: d.nombre, text: `Únete a «${d.nombre}» en «Al juego, juego»`, url: enlace });
       else { await navigator.clipboard.writeText(enlace); setCopiado(true); setTimeout(() => setCopiado(false), 2000); }
     } catch { /* cancelado */ }
   };
@@ -163,6 +217,7 @@ export function GrupoDetalle() {
         </section>
       )}
       <Liga liga={d.liga} yo={yo} />
+      {dentro && <PreguntasPropias codigo={d.codigo} yo={yo} />}
       <section className="est-tarjeta">
         <h2>🏆 Ranking histórico <small className="nch-sub">{d.partidasJuntos} partidas juntos</small></h2>
         <ol className="nch-marcador">

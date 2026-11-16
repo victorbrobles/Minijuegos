@@ -5,6 +5,8 @@ import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { LETRAS, leerAjustes, guardarAjustes } from '../lib/ajustes.js';
 import { descargarTodo, descargadoEl, useEnLinea } from '../lib/sinConexion.js';
+import { crearCopia, miCopia, recuperarCopia } from '../lib/copiaPerfil.js';
+import { guardarIdentidad, ultimaIdentidad } from '../lib/identidad.js';
 import './Ajustes.css';
 
 function Opcion({ activo, onClick, children }) {
@@ -53,6 +55,16 @@ export function PanelAjustes({ onCerrar }) {
           </div>
         </section>
         <section>
+          <h3>😈 Ronda de castigo</h3>
+          <p className="aj-texto">Al acabar una partida en grupo, una ruleta elige un castigo para el que ha perdido.</p>
+          <div className="aj-opciones">
+            <Opcion activo={a.castigo === 'familiar'} onClick={() => cambiar('castigo', 'familiar')}>👨‍👩‍👧 Para todos</Opcion>
+            <Opcion activo={a.castigo === 'adultos'} onClick={() => cambiar('castigo', 'adultos')}>🍷 Para adultos</Opcion>
+            <Opcion activo={a.castigo === 'no'} onClick={() => cambiar('castigo', 'no')}>Desactivada</Opcion>
+          </div>
+        </section>
+        <PasarMovil />
+        <section>
           <h3>📴 Jugar sin conexión</h3>
           <p className="aj-texto">Descarga todos los juegos en este dispositivo (unos 3 MB). Después podrás abrir sin internet los juegos de un solo móvil. Lo online (salas, récords compartidos) sigue necesitando conexión.</p>
           {desc && typeof desc === 'object' ? (
@@ -67,6 +79,56 @@ export function PanelAjustes({ onCerrar }) {
         </section>
       </div>
     </div>
+  );
+}
+
+/* 📲 Pasar tu perfil (nombre, favoritos, récords, logros, ajustes) a otro móvil con un código */
+function PasarMovil() {
+  const [copia, setCopia] = useState(miCopia);
+  const [estado, setEstado] = useState(null); // null | 'guardando' | 'recuperando' | { error } | { ok }
+  const [codigo, setCodigo] = useState('');
+  const [abrirRecuperar, setAbrirRecuperar] = useState(false);
+  const guardar = async () => {
+    setEstado('guardando');
+    try { setCopia(await crearCopia()); setEstado(null); } catch (e) { setEstado({ error: e.message }); }
+  };
+  const recuperar = async (e) => {
+    e.preventDefault();
+    if (!window.confirm('Se sustituirá lo que hay en este móvil por la copia. ¿Seguimos?')) return;
+    setEstado('recuperando');
+    try {
+      const n = await recuperarCopia(codigo);
+      const u = ultimaIdentidad(); // pasas a ser tú (el nombre de la copia)
+      if (u?.nombre && u?.tag) guardarIdentidad(u.nombre, u.tag);
+      setEstado({ ok: n }); setTimeout(() => window.location.reload(), 1200);
+    } catch (err) { setEstado({ error: err.message }); }
+  };
+  return (
+    <section>
+      <h3>📲 Pasar a otro móvil</h3>
+      <p className="aj-texto">Guarda tu nombre, favoritos, récords, logros y ajustes con un código. En el otro móvil, pulsa «Tengo un código» y escríbelo.</p>
+      {copia && (
+        <div className="aj-codigo">
+          <small>Tu código</small>
+          <b>{copia.codigo}</b>
+          <small>Actualizado el {new Date(copia.fecha).toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })} · guárdalo bien</small>
+        </div>
+      )}
+      <div className="aj-opciones">
+        <button type="button" className="aj-descargar" onClick={guardar} disabled={estado === 'guardando'}>
+          {estado === 'guardando' ? 'Guardando…' : copia ? '🔄 Actualizar la copia' : '☁️ Crear mi código'}
+        </button>
+        <button type="button" className="aj-opcion" onClick={() => setAbrirRecuperar((v) => !v)} aria-expanded={abrirRecuperar}>🔑 Tengo un código</button>
+      </div>
+      {abrirRecuperar && (
+        <form className="aj-recuperar" onSubmit={recuperar}>
+          <input value={codigo} onChange={(e) => setCodigo(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6))} placeholder="ABC123" aria-label="Código de la copia" autoCapitalize="characters" autoComplete="off" spellCheck="false" />
+          <button type="submit" disabled={codigo.length !== 6 || estado === 'recuperando'}>{estado === 'recuperando' ? '…' : 'Recuperar'}</button>
+        </form>
+      )}
+      {estado?.error && <p className="aj-nota aj-error">{estado.error}</p>}
+      {estado?.ok != null && <p className="aj-nota aj-bien">✅ ¡Recuperado! Recargando…</p>}
+    </section>
   );
 }
 

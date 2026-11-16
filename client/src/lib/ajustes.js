@@ -3,7 +3,7 @@
 // Se aplican como clases en <html> (ver styles/accesibilidad.css) en cuanto carga la web.
 const CLAVE = 'minijuegos_ajustes';
 export const LETRAS = [['normal', 'Normal', '100%'], ['grande', 'Grande', '112.5%'], ['enorme', 'Muy grande', '125%']];
-export const PREDETERMINADOS = { letra: 'normal', contraste: false, animaciones: 'sistema' }; // animaciones: sistema | menos | todas
+export const PREDETERMINADOS = { letra: 'normal', contraste: false, animaciones: 'sistema', castigo: 'familiar' }; // animaciones: sistema | menos | todas · castigo: familiar | adultos | no
 
 export function leerAjustes() {
   try { return { ...PREDETERMINADOS, ...JSON.parse(localStorage.getItem(CLAVE) || '{}') }; } catch { return { ...PREDETERMINADOS }; }

@@ -4,6 +4,7 @@ import { esAdmin } from '../lib/admin.js';
 import preguntasNormalRaw from '../data/seeds/quienmas/preguntas.js';
 import preguntasPicanteRaw from '../data/seeds/quienmas/incomodas.js';
 import { barajar } from '../lib/barajar.js';
+import { combinarPreguntas, leerEleccion, preguntasDelGrupo } from '../lib/preguntasGrupo.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
 import { totalRondas } from '../../client/src/games/rondas.js';
 const LIM = limitesOnline('quienmas');
@@ -36,6 +37,13 @@ router.get('/preguntas', (req, res) => {
       total: preguntasPicante.length,
       preguntas: preguntasPicante
     });
+  }
+
+  // Preguntas del grupo (?grupo=CODIGO&modo=solo|mezcla): ya van barajadas y en orden
+  const eleccion = leerEleccion(req.query);
+  if (eleccion) {
+    const lista = combinarPreguntas(preguntasNormal, preguntasDelGrupo(eleccion.codigo, 'quienmas'), eleccion.modo);
+    return res.json({ categoria: 'grupo', ordenado: true, total: lista.length, preguntas: lista });
   }
 
   return res.json({
@@ -172,7 +180,8 @@ router.post('/online/sala/:code/iniciar', (req, res) => {
   if (sala.jugadores.length < LIM.min) return res.status(400).json({ error: `Se necesitan al menos ${LIM.min} jugadores.` });
 
   const lista = sala.categoria === 'picante' ? preguntasPicante : preguntasNormal;
-  const barajadas = barajar([...lista]);
+  const eleccion = sala.categoria === 'picante' ? null : leerEleccion(req.body?.preguntasGrupo);
+  const barajadas = eleccion ? combinarPreguntas(lista, preguntasDelGrupo(eleccion.codigo, 'quienmas'), eleccion.modo) : barajar([...lista]);
 
   if (!barajadas.length) return res.status(400).json({ error: 'No hay preguntas disponibles.' });
 

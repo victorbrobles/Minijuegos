@@ -30,3 +30,20 @@
 .cac-barra { display: flex; height: 0.7rem; border-radius: 999px; overflow: hidden; background: #e2e8f0; margin-bottom: 0.8rem; }
 .cac-barra i { display: block; height: 100%; }
 .grp-enlace { display: block; text-align: center; text-decoration: none; margin: 0 0 1rem; background: #ffffff; }
+
+/* ✍️ Preguntas propias del grupo */
+.grp-preg-pestanas { display: grid; grid-template-columns: 1fr 1fr; gap: 0.3rem; margin: 0.7rem 0; padding: 0.25rem; border-radius: 14px; background: #f1f5f9; }
+.grp-preg-pestanas button { box-shadow: none; display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem; padding: 0.55rem 0.4rem; border: none; border-radius: 11px; background: transparent; color: #64748b; font: inherit; font-size: 0.85rem; font-weight: 800; cursor: pointer; }
+.grp-preg-pestanas button.activa { background: #ffffff; color: #6d28d9; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12); }
+.grp-preg-pestanas em { display: grid; place-items: center; min-width: 1.3rem; height: 1.3rem; padding: 0 0.3rem; border-radius: 999px; background: #ede9fe; color: #6d28d9; font-style: normal; font-size: 0.7rem; }
+.grp-preg-form { display: flex; gap: 0.4rem; }
+.grp-preg-form input { flex: 1; min-width: 0; padding: 0.7rem 0.85rem; border: 2px solid #e2e8f0; border-radius: 14px; font: inherit; font-size: 0.92rem; color: #0f172a; background: #ffffff; }
+.grp-preg-form input:focus { outline: none; border-color: #7c3aed; }
+.grp-preg-form button { flex: none; padding: 0 1rem; border: none; border-radius: 14px; background: linear-gradient(135deg, #7c3aed, #db2777); color: #ffffff; font: inherit; font-weight: 900; cursor: pointer; }
+.grp-preg-form button:disabled { opacity: 0.5; cursor: default; }
+.grp-preg-error { margin: 0.4rem 0 0; color: #dc2626; font-size: 0.85rem; font-weight: 700; }
+.grp-preg-lista { list-style: none; display: grid; gap: 0.35rem; margin: 0.8rem 0 0; padding: 0; max-height: 22rem; overflow-y: auto; }
+.grp-preg-lista li { display: flex; align-items: center; gap: 0.5rem; padding: 0.55rem 0.4rem 0.55rem 0.75rem; border-radius: 12px; background: #f8fafc; }
+.grp-preg-lista li span { flex: 1; min-width: 0; font-weight: 700; color: #1e293b; font-size: 0.9rem; }
+.grp-preg-lista li small { flex: none; color: #94a3b8; font-size: 0.72rem; font-weight: 700; }
+.grp-preg-lista li button { flex: none; display: grid; place-items: center; width: 1.8rem; height: 1.8rem; min-width: 0; padding: 0; box-shadow: none; border: none; border-radius: 50%; background: #e2e8f0; color: #475569; cursor: pointer; }

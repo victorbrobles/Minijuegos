@@ -10,6 +10,7 @@ import Icon from '../../components/Icon.jsx';
 import { centrarActivo } from '../../lib/centrarActivo.js';
 import { limitesLocal } from '../limites.js';
 import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { SelectorPreguntasGrupo, usePreguntasGrupo, cargarPreguntasGrupo } from '../../components/PreguntasGrupo.jsx';
 import { rondasPorDefecto, totalRondas } from '../rondas.js';
 import { avisarNombres } from '../../lib/nombres.js';
 
@@ -154,6 +155,7 @@ export default function QuienMasLocal({ onVolver, onExit, onAbrirAyuda }) {
   const [listaConfig, setListaConfig] = useState(() => Array.from({ length: MIN_JUGADORES }, (_, i) => ({ id: i + 1, nombre: i === 0 ? nombreIdentidad() : '' })));
   const [rondasSel, setRondasSel] = useState(rondasPorDefecto('quienmas'));
   const [categoria, setCategoria] = useState('normal');
+  const [pregGrupo, setPregGrupo] = usePreguntasGrupo('quienmas');
   const [error, setError] = useState('');
 
   // Partida
@@ -230,10 +232,12 @@ export default function QuienMasLocal({ onVolver, onExit, onAbrirAyuda }) {
     setFase('cargando');
 
     try {
-      const res = await fetch(`/api/quienmas/preguntas?categoria=${categoriaActiva}`, { headers: adminHeaders() });
+      const conGrupo = pregGrupo && categoriaActiva !== 'picante' ? `&grupo=${pregGrupo.grupo}&modo=${pregGrupo.modo}` : '';
+      const res = await fetch(`/api/quienmas/preguntas?categoria=${categoriaActiva}${conGrupo}`, { headers: adminHeaders() });
       if (!res.ok) throw new Error('No se pudieron cargar las preguntas.');
       const data = await res.json();
-      const lista = [...(data.preguntas || [])].sort(() => Math.random() - 0.5).slice(0, totalRondas('quienmas', rondasSel));
+      // Con preguntas del grupo ya vienen barajadas y en orden (una vuestra, una normal…)
+      const lista = (data.ordenado ? [...(data.preguntas || [])] : [...(data.preguntas || [])].sort(() => Math.random() - 0.5)).slice(0, totalRondas('quienmas', rondasSel));
       if (lista.length === 0) throw new Error('La lista de preguntas está vacía.');
       setRonda(1);
       nuevaRonda(lista, nombresJugs);
@@ -442,6 +446,7 @@ export default function QuienMasLocal({ onVolver, onExit, onAbrirAyuda }) {
 
             {error && <p className="error" style={{ marginTop: '0.8rem' }}>{error}</p>}
 
+            {categoriaActiva !== 'picante' && <SelectorPreguntasGrupo juego="quienmas" valor={pregGrupo} onCambiar={setPregGrupo} />}
             <SelectorRondas juegoId="quienmas" valor={rondasSel} onCambiar={setRondasSel} />
             <button
               type="button"
