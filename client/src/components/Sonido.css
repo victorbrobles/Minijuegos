@@ -21,7 +21,7 @@
 .snd.en-portada .snd-btn { width: 2.3rem; height: 2.3rem; font-size: 1.05rem; background: rgba(255, 255, 255, 0.22); box-shadow: none; }
 .snd.en-portada .snd-panel { left: 0; right: auto; }
 .snd.en-portada .snd-panel { position: fixed; top: 5rem; left: 50%; right: auto; transform: translateX(-50%); animation: none; z-index: 90; }
-@media (max-width: 440px) { /* Durante la partida el botón baja a la esquina inferior derecha para no tapar la cabecera del juego */
+/* Durante la partida el botón baja a la esquina inferior derecha para no tapar la cabecera del juego */
 .game-shell:has(.qq-en-partida) .snd.en-juego { position: fixed; top: auto; right: 0.7rem; bottom: calc(0.8rem + env(safe-area-inset-bottom)); }
 .game-shell:has(.qq-en-partida) .snd.en-juego .snd-btn { width: 2.4rem; height: 2.4rem; font-size: 1.05rem; opacity: 0.9; }
 .game-shell:has(.qq-en-partida) .snd.en-juego .snd-panel { top: auto; bottom: calc(100% + 0.5rem); }
