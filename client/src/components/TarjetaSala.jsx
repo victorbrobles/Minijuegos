@@ -1,8 +1,9 @@
 // client/src/components/TarjetaSala.jsx
 // Sala de espera online: cada jugador es una tarjeta con su avatar de cuerpo entero CALENTANDO antes del partido
-// (5 ejercicios lentos: estiramiento lateral, círculos de brazos, brazo cruzado y cuello, pierna fuera, zancada lateral), su nombre debajo y, para el anfitrión, la ✕ para quitarlo.
+// (5 ejercicios lentos que se encadenan al azar: estiramiento lateral, círculos de brazos, brazo cruzado y cuello, pierna fuera,
+// zancada lateral), su nombre debajo y, para el anfitrión, la ✕ para quitarlo.
 // Las animaciones son CSS (TarjetaSala.css) y solo mueven piezas ya dibujadas; con «menos animaciones», quietos.
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AvatarSVG from './AvatarSVG.jsx';
 import { useJugadorCompleto } from '../lib/caras.js';
 import { usePerfiles } from '../lib/perfil.js';
@@ -10,10 +11,28 @@ import { leerAvatar, avatarDeNombre } from '../lib/avatarPartes.js';
 import './TarjetaSala.css';
 
 const BAILES = 5;
-function semilla(texto) {
-  let h = 2166136261;
-  for (const ch of String(texto)) { h ^= ch.codePointAt(0); h = Math.imul(h, 16777619); }
-  return h >>> 0;
+const azar = (min, max) => min + Math.random() * (max - min);
+/** Ejercicio y ritmo al azar; al acabar cada repetición (1 o 2 seguidas) pasa a otro ejercicio también al azar. */
+function useCalentamiento() {
+  const [paso, setPaso] = useState(() => ({ baile: Math.floor(Math.random() * BAILES), velocidad: azar(5.5, 7.5), retraso: 0, n: 0 }));
+  useEffect(() => {
+    // La primera vez empieza a mitad de la repetición para que no vayan todos a la vez
+    if (paso.n === 0 && paso.retraso === 0) {
+      const retraso = Math.random() * paso.velocidad;
+      setPaso((p) => ({ ...p, retraso }));
+      return undefined;
+    }
+    const restante = paso.velocidad * (paso.n === 0 ? 1 : 1 + Math.floor(Math.random() * 2)) - paso.retraso;
+    const t = setTimeout(() => {
+      setPaso((p) => {
+        let baile = Math.floor(Math.random() * (BAILES - 1));
+        if (baile >= p.baile) baile += 1; // siempre uno distinto al anterior
+        return { baile, velocidad: azar(5.5, 7.5), retraso: 0.0001, n: p.n + 1 };
+      });
+    }, restante * 1000);
+    return () => clearTimeout(t);
+  }, [paso]);
+  return paso;
 }
 
 export function TarjetaSala({ nombre, yo = false, anfitrion = false, indice = 0, children }) {
@@ -23,15 +42,12 @@ export function TarjetaSala({ nombre, yo = false, anfitrion = false, indice = 0,
   const inventado = avatarDeNombre(nombre);
   const a = propio || inventado.a;
   const fondo = propio ? perfil.color : inventado.color;
-  const estilo = useMemo(() => {
-    const h = semilla(nombre);
-    return { '--i': indice, '--retraso': `${-((h % 1000) / 1000) * 6}s`, '--velocidad': `${5.5 + ((h >> 10) % 7) / 4}s`, '--c': fondo };
-  }, [nombre, indice, fondo]);
-  const baile = semilla(`${nombre}*`) % BAILES;
+  const { baile, velocidad, retraso } = useCalentamiento();
+  const estilo = { '--i': indice, '--retraso': `${-retraso}s`, '--velocidad': `${velocidad}s`, '--c': fondo };
   return (
     <div className={`ts-tarjeta${yo ? ' yo' : ''}`} style={estilo}>
       <div className="ts-escenario">
-        <div className={`ts-personaje ts-baile-${baile}`}><AvatarSVG a={a} modo="cuerpo" tam={48} /></div>
+        <div className={`ts-personaje ts-baile-${baile}`}><AvatarSVG a={a} modo="cuerpo" tam={60} /></div>
       </div>
       <span className="ts-nombre">{anfitrion ? '👑 ' : ''}{nombre}{yo ? ' (tú)' : ''}</span>
       {children && <span className="ts-extra">{children}</span>}
@@ -66,7 +82,7 @@ export function RejillaSala({ jugadores, yoId, anfitrionId, max, renderExtra, qu
           </TarjetaSala>
         );
       })}
-      {(!max || jugadores.length < max) && <div className="ts-hueco"><b>+</b>Esperando…</div>}
+      {(!max || jugadores.length < max) && <div className="ts-hueco"><b>+</b>Esperando a más gente…</div>}
     </div>
   );
 }
