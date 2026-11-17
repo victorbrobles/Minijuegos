@@ -661,7 +661,7 @@ export default function CiegasLocal({ onVolver, onExit, onAbrirAyuda }) {
                     className="qq-jugador-badge"
                     style={{ background: colorJugador(idx) }}
                   >
-                    {idx + 1}
+                    <CaraJugador nombre={j.nombre} texto={idx + 1} />
                   </span>
                   <input
                     type="text"

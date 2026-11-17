@@ -9,6 +9,7 @@ import './QuienEsQuien.css';
 import { PantallaPasarMovil, PantallaTablero, BotonPrincipal, EnlaceSecundario, SelectorCategorias, colorJugador } from './TableroPartida.jsx';
 import { limitesLocal } from '../limites.js';
 import { avisarNombres } from '../../lib/nombres.js';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('quien-es-quien');
 
@@ -267,7 +268,7 @@ export default function QuienEsQuienLocal({ onVolver, onExit, onAbrirAyuda }) {
             <div className="qq-nombres-grid">
               {jugadores.map((j, idx) => (
                 <div key={j.id} className="qq-jugador-input-card">
-                  <span className="qq-jugador-badge">{idx + 1}</span>
+                  <span className="qq-jugador-badge"><CaraJugador nombre={j.nombre} texto={idx + 1} /></span>
                   <input
                     type="text"
                     value={j.nombre}

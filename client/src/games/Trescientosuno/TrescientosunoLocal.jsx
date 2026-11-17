@@ -638,7 +638,7 @@ export default function TrescientosunoLocal({ onVolver, onExit, onAbrirAyuda }) 
                     className="qq-jugador-badge"
                     style={{ background: colorJugador(idx) }}
                   >
-                    {j.id}
+                    <CaraJugador nombre={j.nombre} texto={j.id} />
                   </span>
                   <input
                     type="text"

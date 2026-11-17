@@ -12,6 +12,7 @@ import { limitesLocal } from '../limites.js';
 import { SelectorRondas } from '../../components/MenuJuego.jsx';
 import { rondasPorDefecto, totalRondas } from '../rondas.js';
 import { avisarNombres } from '../../lib/nombres.js';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('conecta');
 
@@ -242,7 +243,7 @@ export default function ConectaLocal({ onVolver, onExit, onAbrirAyuda }) {
                     className="qq-jugador-badge"
                     style={{ background: COLORES[idx % COLORES.length] }}
                   >
-                    {idx + 1}
+                    <CaraJugador nombre={j.nombre} texto={idx + 1} />
                   </span>
                   <input
                     type="text"
