@@ -1,7 +1,7 @@
 // client/src/lib/caras.js
 // ¿Quién es «Ana» en esta partida? Los juegos usan nombres sin número («Ana»); para enseñar su avatar hace falta su
-// identidad completa («Ana#1234»). Se busca en: la sala online en la que estás (cada móvil avisa de quién es),
-// tu propio nombre y los jugadores de tus grupos.
+// identidad completa («Ana#1234»). Se busca en la sala online en la que estás (cada móvil avisa de quién es) y en tu
+// propio nombre. En un solo móvil, los demás jugadores llevan un avatar inventado (CaraJugador).
 import { useSyncExternalStore } from 'react';
 import { nombreCompleto, nombreIdentidad } from './identidad.js';
 import { salaActual, EVENTO_SALA_VIVA } from './salaViva.js';
@@ -9,28 +9,9 @@ import { salaActual, EVENTO_SALA_VIVA } from './salaViva.js';
 const norm = (t) => String(t || '').trim().toLowerCase();
 let salaCaras = {};      // plano normalizado → completo (sala online actual)
 let salaClave = '';
-let conocidos = {};      // plano normalizado → completo (solo si no hay dos con el mismo nombre)
-let conocidosDe = '';
 let version = 0;
 const oyentes = new Set();
 const avisar = () => { version += 1; oyentes.forEach((f) => f()); };
-
-async function cargarConocidos() {
-  const yo = nombreCompleto();
-  if (!yo || conocidosDe === yo) return;
-  conocidosDe = yo;
-  try {
-    const d = await fetch(`/api/social/conocidos?jugador=${encodeURIComponent(yo)}`).then((r) => r.json());
-    const mapa = {}; const repetidos = new Set();
-    (d.jugadores || []).forEach((c) => {
-      const p = norm(c.replace(/#\d{4}$/, ''));
-      if (mapa[p] && mapa[p] !== c) repetidos.add(p); else mapa[p] = c;
-    });
-    repetidos.forEach((p) => delete mapa[p]);
-    conocidos = mapa;
-    avisar();
-  } catch { conocidosDe = ''; }
-}
 
 async function cargarSala() {
   const s = salaActual();
@@ -48,7 +29,7 @@ let temporizador = null;
 function suscribir(f) {
   oyentes.add(f);
   if (oyentes.size === 1) {
-    cargarConocidos(); cargarSala();
+    cargarSala();
     temporizador = setInterval(cargarSala, 8000);
     window.addEventListener(EVENTO_SALA_VIVA, cargarSala);
   }
@@ -66,7 +47,7 @@ export function resolverJugador(nombre) {
   const p = norm(n);
   if (salaCaras[p]) return salaCaras[p];
   if (p === norm(nombreIdentidad()) && nombreCompleto()) return nombreCompleto();
-  return conocidos[p] || null;
+  return null;
 }
 
 export function useJugadorCompleto(nombre) {

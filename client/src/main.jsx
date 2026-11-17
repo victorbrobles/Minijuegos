@@ -15,13 +15,18 @@ import { autodescargarSiApp } from './lib/sinConexion.js';
 import './styles/accesibilidad.css';
 import { iniciarMetricas } from './lib/metricas.js';
 import { iniciarCuenta } from './lib/cuenta.js';
+import { asegurarAvatar } from './lib/avatarPorDefecto.js';
 
 // Accesibilidad (letra, contraste, animaciones) antes de pintar nada
 aplicarAjustes();
 instalarEfectos();
 instalarSalaViva();
 iniciarMetricas();
-iniciarCuenta(); // si hay sesión iniciada, entras directamente con tu nick
+// Si hay sesión iniciada, entras directamente con tu nick. Y todo el mundo con avatar desde el principio.
+iniciarCuenta().finally(() => {
+  asegurarAvatar();
+  window.addEventListener('minijuegos-identidad', () => setTimeout(asegurarAvatar, 300));
+});
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>

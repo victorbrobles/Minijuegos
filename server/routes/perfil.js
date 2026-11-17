@@ -4,11 +4,11 @@
 //   POST /api/perfil { jugador, avatar, color }
 import express from 'express';
 import db from '../db.js';
-import { leerAvatar, textoAvatar } from '../../client/src/lib/avatarPartes.js';
+import { leerAvatar, textoAvatar, esAvatarAuto, COLORES_FONDO } from '../../client/src/lib/avatarPartes.js';
 
 export const AVATARES = ['😎', '🤓', '🥳', '😺', '🐶', '🦊', '🐼', '🐸', '🐵', '🦁', '🐯', '🐧', '🦄', '🐙', '🦖', '🐲', '👽', '🤖', '👻', '🎃',
   '🧙', '🥷', '🦸', '🧛', '🧑‍🚀', '🧑‍🍳', '⚽', '🏀', '🎸', '🎮', '🎲', '🃏', '♟️', '🚀', '🌵', '🍕', '🍩', '🌈', '🔥', '⭐'];
-export const COLORES = ['#ef4444', '#f97316', '#f59e0b', '#84cc16', '#22c55e', '#14b8a6', '#06b6d4', '#3b82f6', '#6366f1', '#8b5cf6', '#d946ef', '#ec4899', '#64748b', '#0f172a'];
+export const COLORES = COLORES_FONDO;
 
 db.exec(`CREATE TABLE IF NOT EXISTS perfiles (jugador TEXT PRIMARY KEY, avatar TEXT NOT NULL, color TEXT NOT NULL, actualizado INTEGER NOT NULL)`);
 const leer = db.prepare('SELECT avatar, color FROM perfiles WHERE jugador = ?');
@@ -28,7 +28,7 @@ router.post('/', (req, res) => {
   if (!valido(String(jugador || ''))) return res.status(400).json({ error: 'Jugador no válido.' });
   const dibujo = leerAvatar(avatar); // avatar dibujado (JSON con sus piezas) o, como antes, un emoji
   if ((!dibujo && !AVATARES.includes(avatar)) || !COLORES.includes(color)) return res.status(400).json({ error: 'Avatar o color no válido.' });
-  guardar.run(jugador, dibujo ? textoAvatar(dibujo) : avatar, color, Date.now());
+  guardar.run(jugador, dibujo ? textoAvatar(dibujo, { auto: esAvatarAuto(avatar) }) : avatar, color, Date.now());
   res.json({ success: true });
 });
 

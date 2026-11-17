@@ -8,7 +8,6 @@
 //   POST /api/social/grupos/:codigo/noches          { noche } guarda una Noche de juegos terminada
 //   GET  /api/social/sala/:juego/:code?desde=       «sala viva»: marcador y reacciones de una sala online (modo tele)
 //   POST /api/social/sala/:juego/:code/estado       { nombre, completo, jugadores: [{ nombre, puntos }], estado }
-//   GET  /api/social/conocidos?jugador=             jugadores de tus grupos (para sus avatares)
 //   POST /api/social/sala/:juego/:code/reaccion     { nombre, emoji }
 import { puntosSeguros, textoSeguro } from '../lib/validar.js';
 import { JUEGOS_PREGUNTAS, preguntasDelGrupo } from '../lib/preguntasGrupo.js';
@@ -322,14 +321,6 @@ const clave = (req) => `${String(req.params.juego).slice(0, 30)}:${String(req.pa
 const sala = (k) => { if (!salas.has(k)) salas.set(k, { jugadores: [], estado: '', reacciones: [], ultimoId: 0, presencia: {}, ultima: {}, actualizado: Date.now() }); return salas.get(k); };
 const limpio = (t, n) => String(t ?? '').replace(/\s+/g, ' ').trim().slice(0, n);
 
-// Jugadores de tus grupos («Ana#1234»…): para reconocer su avatar en las partidas en un solo móvil
-router.get('/conocidos', (req, res) => {
-  const j = String(req.query.jugador || '');
-  if (!valido(j)) return res.json({ success: true, jugadores: [] });
-  const todos = new Set();
-  misGrupos.all(j).forEach((g) => miembros.all(g.codigo).forEach((m) => todos.add(m.jugador)));
-  res.json({ success: true, jugadores: [...todos].filter(valido).slice(0, 300) });
-});
 router.get('/sala/:juego/:code', (req, res) => {
   const s = salas.get(clave(req));
   const desde = Number(req.query.desde) || 0;

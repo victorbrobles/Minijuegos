@@ -52,5 +52,31 @@ export function leerAvatar(texto) {
   } catch { return null; }
 }
 
-export const textoAvatar = (a) => JSON.stringify({ v: 2, ...validarAvatar(a) });
+/** Texto para guardar. `auto`: avatar asignado al azar (se puede regenerar), no elegido por el jugador. */
+export const textoAvatar = (a, { auto = false } = {}) => JSON.stringify({ v: 2, ...validarAvatar(a), ...(auto ? { auto: 1 } : {}) });
+export function esAvatarAuto(texto) {
+  try { return JSON.parse(texto)?.auto === 1; } catch { return false; }
+}
+
+/** Colores de fondo del avatar (los mismos que valida el servidor). */
+export const COLORES_FONDO = ['#ef4444', '#f97316', '#f59e0b', '#84cc16', '#22c55e', '#14b8a6', '#06b6d4', '#3b82f6', '#6366f1', '#8b5cf6', '#d946ef', '#ec4899', '#64748b', '#0f172a'];
+
+// Generador de números al azar «con semilla»: el mismo nombre da siempre el mismo avatar
+function azarDe(texto) {
+  let h = 2166136261;
+  for (const ch of String(texto)) { h ^= ch.codePointAt(0); h = Math.imul(h, 16777619); }
+  let t = h >>> 0;
+  return () => { t += 0x6D2B79F5; let r = Math.imul(t ^ (t >>> 15), 1 | t); r ^= r + Math.imul(r ^ (r >>> 7), 61 | r); return ((r ^ (r >>> 14)) >>> 0) / 4294967296; };
+}
+const cacheNombre = new Map();
+/** Avatar (y color) inventado para un nombre: siempre el mismo para el mismo nombre y distinto para cada nombre. */
+export function avatarDeNombre(nombre) {
+  const clave = String(nombre || '').trim().toLowerCase();
+  if (!cacheNombre.has(clave)) {
+    const azar = azarDe(clave);
+    const a = aleatorio(azar);
+    cacheNombre.set(clave, { a, color: COLORES_FONDO[Math.floor(azar() * COLORES_FONDO.length)] });
+  }
+  return cacheNombre.get(clave);
+}
 export const avatarAleatorio = (azar) => aleatorio(azar);
