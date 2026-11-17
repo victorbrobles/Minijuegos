@@ -31,7 +31,7 @@ export function TarjetaSala({ nombre, yo = false, anfitrion = false, indice = 0,
   return (
     <div className={`ts-tarjeta${yo ? ' yo' : ''}`} style={estilo}>
       <div className="ts-escenario">
-        <div className={`ts-personaje ts-baile-${baile}`}><AvatarSVG a={a} modo="cuerpo" tam={60} /></div>
+        <div className={`ts-personaje ts-baile-${baile}`}><AvatarSVG a={a} modo="cuerpo" tam={48} /></div>
       </div>
       <span className="ts-nombre">{anfitrion ? '👑 ' : ''}{nombre}{yo ? ' (tú)' : ''}</span>
       {children && <span className="ts-extra">{children}</span>}
@@ -66,7 +66,7 @@ export function RejillaSala({ jugadores, yoId, anfitrionId, max, renderExtra, qu
           </TarjetaSala>
         );
       })}
-      {(!max || jugadores.length < max) && <div className="ts-hueco"><b>+</b>Esperando a más gente…</div>}
+      {(!max || jugadores.length < max) && <div className="ts-hueco"><b>+</b>Esperando…</div>}
     </div>
   );
 }

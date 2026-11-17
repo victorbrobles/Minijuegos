@@ -1,13 +1,13 @@
 /* client/src/components/TarjetaSala.css — sala de espera online: los avatares calientan antes del partido */
 .ts-rejilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(58px, 1fr)); gap: 0.35rem; }
 .ts-tarjeta {
-  position: relative; display: grid; justify-items: center; padding: 0.2rem 0.1rem 0.25rem; border-radius: 11px;
+  position: relative; display: grid; justify-items: center; padding: 0.15rem 0.1rem 0.2rem; border-radius: 11px;
   background: linear-gradient(180deg, color-mix(in srgb, var(--c, #6366f1) 22%, #ffffff) 0%, color-mix(in srgb, var(--c, #6366f1) 8%, #ffffff) 62%, #e9dfcf 62.5%, #ddd0ba 100%);
   box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.06); color: #334155;
   animation: tsEntra 0.35s ease-out both; animation-delay: calc(var(--i) * 0.05s);
 }
 .ts-tarjeta.yo { box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--c, #6366f1) 70%, #ffffff); }
-.ts-escenario { display: flex; align-items: flex-end; height: 62px; }
+.ts-escenario { display: flex; align-items: flex-end; height: 50px; }
 .ts-personaje { display: block; line-height: 0; }
 .ts-personaje svg { overflow: visible; }
 .ts-nombre { max-width: 100%; margin-top: 0.1rem; overflow: hidden; font-size: 0.62rem; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
@@ -20,7 +20,7 @@
 .ts-extra button[class$="-quitar"]::after { content: '✕'; color: #475569; font-size: 0.6rem; font-weight: 900; }
 .ts-extra button[class$="-quitar"]:hover { background: #fee2e2; }
 .ts-extra button[class$="-quitar"]:hover::after { color: #b91c1c; }
-.ts-hueco { display: grid; place-items: center; align-content: center; gap: 0.2rem; min-height: 84px; padding: 0.3rem; border: 2px dashed #cbd5e1; border-radius: 11px; color: #94a3b8; font-size: 0.6rem; font-weight: 700; text-align: center; }
+.ts-hueco { display: grid; place-items: center; align-content: center; gap: 0.2rem; min-height: 0; padding: 0.3rem; border: 2px dashed #cbd5e1; border-radius: 11px; color: #94a3b8; font-size: 0.6rem; font-weight: 700; text-align: center; }
 .ts-hueco b { font-size: 1.2rem; color: #cbd5e1; line-height: 1; }
 @keyframes tsEntra { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
