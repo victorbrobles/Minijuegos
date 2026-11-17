@@ -5,6 +5,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { DURACION_S, volumenEn } from './audioPlayerCancion.js';
 import { centrarActivo } from '../../lib/centrarActivo.js';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 export const OPCIONES_RONDAS = [10, 15, 20];
 export const SEGUNDOS_RESPUESTA = 20;
@@ -172,7 +173,7 @@ export function Solucion({ titulo, artista, mensaje, sumas = {}, jugadores = [],
         <ul className="afp-sumas">
           {filas.map((j) => (
             <li key={j.id} style={{ '--c': colorJugador(j.id) }}>
-              <span className="afp-avatar">{inicial(j.nombre)}</span>
+              <span className="afp-avatar"><CaraJugador nombre={j.nombre} /></span>
               <span>{j.nombre}{j.id === yoId ? ' (tú)' : ''}</span>
               <strong className={sumas[j.id] >= 0 ? 'mas' : 'menos'}>{sumas[j.id] >= 0 ? '+' : ''}{sumas[j.id]}</strong>
             </li>
@@ -196,7 +197,7 @@ export function Clasificacion({ jugadores, yoId, titulo = 'Clasificación', subt
           return (
             <li key={j.id} className={lider ? 'lider' : ''} style={{ '--c': colorJugador(j.id) }}>
               <span className="afp-pos">{lider ? <Icon name="crown" size={18} /> : i + 1}</span>
-              <span className="afp-avatar">{inicial(j.nombre)}</span>
+              <span className="afp-avatar"><CaraJugador nombre={j.nombre} /></span>
               <span className="afp-ranking-nombre">{j.nombre}{j.id === yoId ? ' (tú)' : ''}</span>
               <strong>{j.puntos ?? 0}</strong>
             </li>
@@ -225,7 +226,7 @@ export function Podio({ jugadores, yoId }) {
           const puesto = top.indexOf(j);
           return (
             <div key={j.id} className={`afp-podio-col ${alturas[puesto]}`} style={{ '--c': colorJugador(j.id) }}>
-              <span className="afp-avatar grande">{inicial(j.nombre)}</span>
+              <span className="afp-avatar grande"><CaraJugador nombre={j.nombre} /></span>
               <span className="afp-podio-nombre">{j.nombre}{j.id === yoId ? ' (tú)' : ''}</span>
               <span className="afp-podio-pts">{j.puntos ?? 0} pts</span>
               <span className="afp-podio-base">{puesto + 1}</span>

@@ -11,6 +11,7 @@ import { limitesLocal } from '../limites.js';
 import { SelectorRondas } from '../../components/MenuJuego.jsx';
 import { rondasPorDefecto, totalRondas } from '../rondas.js';
 import { avisarNombres } from '../../lib/nombres.js';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('buscaminas');
 const TOTAL_CORRECTOS = 10;
@@ -69,7 +70,7 @@ export function BotonPortada({ onClick, texto = 'Portada' }) {
 export function Avatar({ nombre, color, grande = false }) {
   return (
     <span className={`qqp-avatar${grande ? ' grande' : ''}`} style={{ '--c': color }}>
-      {inicial(nombre)}
+      <CaraJugador nombre={nombre} />
     </span>
   );
 }

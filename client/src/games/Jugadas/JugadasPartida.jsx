@@ -5,12 +5,13 @@ import { useRegistrarPartida, ganadoresPorPuntos } from '../../lib/registros.js'
 import React, { useState, useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
 import './Jugadas.css';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 export const COLORES = ['#d97706', '#2563eb', '#dc2626', '#16a34a', '#9333ea', '#0d9488', '#ea580c', '#db2777', '#4f46e5', '#65a30d', '#0891b2', '#78716c'];
 export const colorDe = (id) => COLORES[((Number(id) || 1) - 1) % COLORES.length];
 const inicial = (n) => (n || '?').trim().charAt(0).toUpperCase();
 export function Avatar({ id, nombre }) {
-  return <span className="jgp-avatar" style={{ '--c': colorDe(id) }}>{inicial(nombre)}</span>;
+  return <span className="jgp-avatar" style={{ '--c': colorDe(id) }}><CaraJugador nombre={nombre} /></span>;
 }
 
 /* -------------------------------------------------- Utilidad de color texto */

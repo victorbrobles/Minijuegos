@@ -11,6 +11,7 @@ import { limitesLocal } from '../limites.js';
 import { SelectorRondas } from '../../components/MenuJuego.jsx';
 import { rondasPorDefecto, totalRondas } from '../rondas.js';
 import { avisarNombres } from '../../lib/nombres.js';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 const TIEMPO_TURNO = 90;
 const PREPARACION_S = 3;
@@ -68,7 +69,7 @@ export function BotonPortada({ onClick, texto = 'Portada' }) {
 export function Avatar({ nombre, color, grande = false }) {
   return (
     <span className={`qqp-avatar${grande ? ' grande' : ''}`} style={{ '--c': color }}>
-      {inicial(nombre)}
+      <CaraJugador nombre={nombre} />
     </span>
   );
 }
@@ -125,7 +126,7 @@ export function OrdenTurnos({ jugadores, activoId, puntosMap = null }) {
             style={{ '--c': colorJugador(indiceColor(j, i)) }}
             aria-current={esActivo ? 'step' : undefined}
           >
-            <span className="qqp-orden-avatar">{inicial(j.nombre)}</span>
+            <span className="qqp-orden-avatar"><CaraJugador nombre={j.nombre} /></span>
             <span className="qqp-orden-nombre">{j.nombre}</span>
             <span className="qqp-orden-pts">{pts}p</span>
           </li>

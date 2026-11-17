@@ -9,6 +9,7 @@ import { limitesOnline, textoSala } from '../limites.js';
 import { SelectorRondas } from '../../components/MenuJuego.jsx';
 import { rondasPorDefecto } from '../rondas.js';
 import { useAbrirAyuda } from '../../lib/ayuda.js';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 const LIM_ON = limitesOnline('pistas');
 
@@ -474,7 +475,7 @@ export default function PistasOnline({ onLocal, onSalir }) {
                     className={`ptp-jugador${haRespondido ? ' respondido' : ''}${j.id === yoId ? ' yo' : ''}${eliminadoSupervivencia ? ' eliminado' : ''}`}
                     style={{ '--c': colorJugador(j.id) }}
                   >
-                    <span className="ptp-jugador-avatar">{inicial(j.nombre)}</span>
+                    <span className="ptp-jugador-avatar"><CaraJugador nombre={j.nombre} /></span>
                     <span className="ptp-jugador-datos">
                       <span className="ptp-jugador-nombre">
                         {j.nombre}{j.id === yoId ? ' (tú)' : ''}
@@ -634,7 +635,7 @@ export default function PistasOnline({ onLocal, onSalir }) {
                 return (
                   <li key={j.id} className={esLider ? 'lider' : ''} style={{ '--c': colorJugador(j.id) }}>
                     <span className="ptp-ranking-pos">{esLider ? <Icon name="crown" size={18} /> : i + 1}</span>
-                    <span className="ptp-jugador-avatar">{inicial(j.nombre)}</span>
+                    <span className="ptp-jugador-avatar"><CaraJugador nombre={j.nombre} /></span>
                     <span className="ptp-ranking-nombre">
                       {j.nombre}{j.id === yoId ? ' (tú)' : ''}
                     </span>

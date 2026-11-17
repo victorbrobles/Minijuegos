@@ -23,6 +23,7 @@ import { codigoInvitado } from '../../lib/invitacion.js';
 import { SelectorRondas } from '../../components/MenuJuego.jsx';
 import { SelectorPreguntasGrupo, usePreguntasGrupo, cargarPreguntasGrupo } from '../../components/PreguntasGrupo.jsx';
 import { rondasPorDefecto } from '../rondas.js';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 const LIM_ON = limitesOnline('quienmas');
 
@@ -780,7 +781,7 @@ export default function QuienMasOnline({
                     style={{ '--c': colorJugador(indiceColor(j, idx)) }}
                     onClick={() => handleVotar(j.nombre)}
                   >
-                    <span className="qm-candidato-avatar">{inicial(j.nombre)}</span>
+                    <span className="qm-candidato-avatar"><CaraJugador nombre={j.nombre} /></span>
                     <span className="qm-candidato-nombre">
                       {j.nombre}
                       {j.id === yoId && <span className="qm-badge-tu">Tú</span>}

@@ -5,6 +5,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { centrarActivo } from '../../lib/centrarActivo.js';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 const COLORES = ['#3b82f6', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316'];
 export const colorJugador = (i) => COLORES[((i % COLORES.length) + COLORES.length) % COLORES.length];
@@ -53,7 +54,7 @@ function Cabecera({ onSalir, categoria, etiqueta, titulo, avatar, chips, childre
 function Avatar({ nombre, color, grande = false }) {
   return (
     <span className={`qqp-avatar${grande ? ' grande' : ''}`} style={{ '--c': color }}>
-      {inicial(nombre)}
+      <CaraJugador nombre={nombre} />
     </span>
   );
 }
@@ -74,7 +75,7 @@ export function OrdenTurnos({ jugadores, turnoIdx }) {
           style={{ '--c': colorJugador(indiceColor(j, i)) }}
           aria-current={i === turnoIdx ? 'step' : undefined}
         >
-          <span className="qqp-orden-avatar">{inicial(j.nombre)}</span>
+          <span className="qqp-orden-avatar"><CaraJugador nombre={j.nombre} /></span>
           <span className="qqp-orden-nombre">{j.nombre}</span>
         </li>
       ))}
@@ -206,7 +207,7 @@ export function PantallaTablero({ etiqueta, titulo, colorTitulo, rivales, catego
             <ul className="qqp-rivales">
               {rivales.map((j, i) => (
                 <li key={j.id} className="qqp-rival" style={{ '--c': colorJugador(indiceColor(j, i)) }}>
-                  <span className="qqp-rival-avatar">{inicial(j.nombre)}</span>
+                  <span className="qqp-rival-avatar"><CaraJugador nombre={j.nombre} /></span>
                   <span className="qqp-rival-datos">
                     <span className="qqp-rival-nombre">{j.nombre}</span>
                     <strong className="qqp-rival-tarjeta">{j.tarjeta}</strong>

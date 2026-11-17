@@ -3,7 +3,7 @@
 // cada juego: se observa la respuesta, se guarda el marcador y se comparte con el servidor para el modo tele y
 // las reacciones (/api/social/sala/<juego>/<código>).
 import { useEffect, useState } from 'react';
-import { nombreIdentidad } from './identidad.js';
+import { nombreIdentidad, nombreCompleto } from './identidad.js';
 import { conCabeceras } from './ocultos.js';
 
 const RUTA = /^\/api\/([a-z0-9-]+)\/(?:[a-z-]+\/)?sala\/([A-Za-z0-9]{3,8})(?:\?|$)/;
@@ -38,7 +38,7 @@ function anotar(code, datos, api) {
     ultimoEnvio = ahora;
     original(`/api/social/sala/${encodeURIComponent(juego)}/${actual.code}/estado`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nombre: nombreIdentidad(), jugadores, estado })
+      body: JSON.stringify({ nombre: nombreIdentidad(), completo: nombreCompleto(), jugadores, estado })
     }).catch(() => {});
   }
 }

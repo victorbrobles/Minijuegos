@@ -6,6 +6,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { AJUSTES, DIFICULTADES, OPCIONES_RONDAS } from './engine.js';
 import './Trayectoria.css';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 export const COLORES = ['#16a34a', '#2563eb', '#dc2626', '#f59e0b', '#9333ea', '#0d9488', '#ea580c', '#db2777', '#4f46e5', '#65a30d', '#0891b2', '#78716c', '#e11d48', '#7c3aed', '#0284c7'];
 export const colorDe = (id) => COLORES[((Number(id) || 1) - 1) % COLORES.length];
@@ -13,7 +14,7 @@ const inicial = (n) => (n || '?').trim().charAt(0).toUpperCase();
 const NOMBRE_DIF = { baja: 'Fácil', media: 'Media', alta: 'Difícil' };
 
 export function Avatar({ id, nombre, grande = false }) {
-  return <span className={`mcp-avatar${grande ? ' grande' : ''}`} style={{ '--c': colorDe(id) }}>{inicial(nombre)}</span>;
+  return <span className={`mcp-avatar${grande ? ' grande' : ''}`} style={{ '--c': colorDe(id) }}><CaraJugador nombre={nombre} /></span>;
 }
 
 /** Texto oscuro o claro según lo claro que sea el color de fondo. */

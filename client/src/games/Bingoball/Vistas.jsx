@@ -5,13 +5,14 @@ import React, { useEffect, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { AJUSTES } from './engine.js';
 import './Bingoball.css';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 export const COLORES = ['#2563eb', '#dc2626', '#16a34a', '#f59e0b', '#9333ea', '#0d9488', '#ea580c', '#db2777', '#4f46e5', '#65a30d', '#0891b2', '#78716c', '#e11d48', '#7c3aed', '#0284c7'];
 export const colorDe = (id) => COLORES[((Number(id) || 1) - 1) % COLORES.length];
 const inicial = (n) => (n || '?').trim().charAt(0).toUpperCase();
 
 export function Avatar({ id, nombre, grande = false }) {
-  return <span className={`bbp-avatar${grande ? ' grande' : ''}`} style={{ '--c': colorDe(id) }}>{inicial(nombre)}</span>;
+  return <span className={`bbp-avatar${grande ? ' grande' : ''}`} style={{ '--c': colorDe(id) }}><CaraJugador nombre={nombre} /></span>;
 }
 
 // Equipaciones para el cromo del futbolista (siempre la misma para el mismo nombre)

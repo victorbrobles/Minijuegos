@@ -10,6 +10,7 @@ import {
 } from './Pantallas.jsx';
 import './Colores.css';
 import { limitesLocal } from '../limites.js';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('colores');
 
@@ -170,7 +171,7 @@ export default function ColoresLocal({ onVolver, onExit, onAbrirAyuda }) {
         <section className="game clp-escena">
           {hero({ turnoId: jugador.id, listos: Object.keys(respuestas).map(Number) })}
           <div className="clp-tarjeta clp-pasa">
-            <span className="clp-pasa-avatar" style={{ '--c': colorJugador(jugador.id) }}>{inicial(jugador.nombre)}</span>
+            <span className="clp-pasa-avatar" style={{ '--c': colorJugador(jugador.id) }}><CaraJugador nombre={jugador.nombre} /></span>
             <p className="clp-etiqueta centrada">Pasa el móvil a</p>
             <h2 className="clp-pasa-nombre">{jugador.nombre}</h2>
             <p className="clp-texto">Responde en secreto: que nadie más mire. Tendrás {SEGUNDOS_RESPUESTA} segundos.</p>

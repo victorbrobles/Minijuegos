@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { LETRAS, PUNTOS, AJUSTES } from './engine.js';
 import './Descarte.css';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 export const COLORES = ['#e11d48', '#2563eb', '#16a34a', '#f59e0b', '#9333ea', '#0d9488', '#ea580c', '#db2777', '#4f46e5', '#65a30d', '#0891b2', '#78716c'];
 export const colorDe = (id) => COLORES[((Number(id) || 1) - 1) % COLORES.length];
@@ -13,7 +14,7 @@ const inicial = (n) => (n || '?').trim().charAt(0).toUpperCase();
 const ptos = (n) => `${n} ${n === 1 ? 'pto' : 'ptos'}`;
 
 export function Avatar({ id, nombre, grande = false }) {
-  return <span className={`dsp-avatar${grande ? ' grande' : ''}`} style={{ '--c': colorDe(id) }}>{inicial(nombre)}</span>;
+  return <span className={`dsp-avatar${grande ? ' grande' : ''}`} style={{ '--c': colorDe(id) }}><CaraJugador nombre={nombre} /></span>;
 }
 
 /** Segundos que quedan hasta `limite` (con el desfase del reloj del servidor). */

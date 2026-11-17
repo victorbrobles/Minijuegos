@@ -9,6 +9,7 @@ import { limitesLocal } from '../limites.js';
 import { SelectorRondas } from '../../components/MenuJuego.jsx';
 import { rondasPorDefecto, totalRondas } from '../rondas.js';
 import { useAbrirAyuda } from '../../lib/ayuda.js';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 const MAX_PISTAS = 6;
 const TIEMPO_PISTA_SEGUNDOS = 10;
@@ -517,7 +518,7 @@ export default function PistasLocal({ onVolver, onExit }) {
                     className={`ptp-jugador${haRespondido ? ' respondido' : ''}${sinVidas ? ' eliminado' : ''}`}
                     style={{ '--c': colorJugador(j.id) }}
                   >
-                    <span className="ptp-jugador-avatar">{inicial(j.nombre)}</span>
+                    <span className="ptp-jugador-avatar"><CaraJugador nombre={j.nombre} /></span>
                     <span className="ptp-jugador-datos">
                       <span className="ptp-jugador-nombre">{j.nombre}</span>
                       <span className="ptp-jugador-linea">
@@ -627,7 +628,7 @@ export default function PistasLocal({ onVolver, onExit }) {
                       style={{ '--c': colorJugador(j.id) }}
                       onClick={() => setJugadorSeleccionadoId(j.id)}
                     >
-                      <span className="ptp-quien-avatar">{inicial(j.nombre)}</span>
+                      <span className="ptp-quien-avatar"><CaraJugador nombre={j.nombre} /></span>
                       <span className="ptp-quien-nombre">{j.nombre}</span>
                     </button>
                   );
@@ -716,7 +717,7 @@ export default function PistasLocal({ onVolver, onExit }) {
                 return (
                   <li key={j.id} className={esLider ? 'lider' : ''} style={{ '--c': colorJugador(j.id) }}>
                     <span className="ptp-ranking-pos">{esLider ? <Icon name="crown" size={18} /> : i + 1}</span>
-                    <span className="ptp-jugador-avatar">{inicial(j.nombre)}</span>
+                    <span className="ptp-jugador-avatar"><CaraJugador nombre={j.nombre} /></span>
                     <span className="ptp-ranking-nombre">{j.nombre}</span>
                     <strong>{modo === 'estandar' ? `${pts} pts` : v > 0 ? '❤️'.repeat(v) : '💀 Eliminado'}</strong>
                   </li>

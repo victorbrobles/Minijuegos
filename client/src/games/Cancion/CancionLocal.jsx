@@ -11,6 +11,7 @@ import {
 } from './Pantallas.jsx';
 import './Cancion.css';
 import { limitesLocal } from '../limites.js';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('cancion');
 
@@ -296,7 +297,7 @@ export default function CancionLocal({ onVolver, onExit, onAbrirAyuda }) {
               <div className="afp-quien">
                 {disponibles.map((j) => (
                   <button key={j.id} type="button" className="afp-quien-btn" style={{ '--c': colorJugador(j.id) }} onClick={() => elegirJugador(j)}>
-                    <span className="afp-avatar">{inicial(j.nombre)}</span>
+                    <span className="afp-avatar"><CaraJugador nombre={j.nombre} /></span>
                     {j.nombre}
                   </button>
                 ))}

@@ -6,13 +6,14 @@ import React, { useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { AJUSTES } from './engine.js';
 import './Cuentas.css';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 export const COLORES = ['#ef4444', '#2563eb', '#16a34a', '#f59e0b', '#9333ea', '#ec4899', '#0d9488', '#ea580c'];
 export const colorDe = (id) => COLORES[((Number(id) || 1) - 1) % COLORES.length];
 const inicial = (n) => (n || '?').trim().charAt(0).toUpperCase();
 
 export function Avatar({ id, nombre, grande = false }) {
-  return <span className={`ctp-avatar${grande ? ' grande' : ''}`} style={{ '--c': colorDe(id) }}>{inicial(nombre)}</span>;
+  return <span className={`ctp-avatar${grande ? ' grande' : ''}`} style={{ '--c': colorDe(id) }}><CaraJugador nombre={nombre} /></span>;
 }
 
 const Vidas = ({ n }) => <span className="ctp-vidas" title={`${n} vida${n === 1 ? '' : 's'}`}>{Array.from({ length: AJUSTES.vidas }, (_, k) => (k < n ? '❤️' : '🖤')).join('')}</span>;

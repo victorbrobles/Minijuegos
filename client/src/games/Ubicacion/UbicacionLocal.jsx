@@ -11,6 +11,7 @@ import {
 } from './Pantallas.jsx';
 import './Ubicacion.css';
 import { limitesLocal } from '../limites.js';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('ubicacion');
 const SEGUNDOS_IMAGEN = 10;
@@ -297,7 +298,7 @@ export default function UbicacionLocal({ onVolver, onExit, onAbrirAyuda }) {
         <section className="game ubp-escena">
           {hero({ turnoId: jugadorActual.id })}
           <div className="ubp-tarjeta ubp-listo">
-            <span className="ubp-listo-avatar" style={{ '--c': jugadorActual.color }}>{inicial(jugadorActual.nombre)}</span>
+            <span className="ubp-listo-avatar" style={{ '--c': jugadorActual.color }}><CaraJugador nombre={jugadorActual.nombre} /></span>
             <p className="ubp-etiqueta">Pasa el móvil a</p>
             <h2 className="ubp-listo-nombre">{jugadorActual.nombre}</h2>
             <p className="ubp-texto">
@@ -323,7 +324,7 @@ export default function UbicacionLocal({ onVolver, onExit, onAbrirAyuda }) {
           {hero({ turnoId: jugadorActual.id })}
           <BarraTiempo segundos={tiempoTurno} total={SEGUNDOS_TURNO} />
           <div className="ubp-instruccion" style={{ '--c': jugadorActual.color }}>
-            <span className="ubp-avatar">{inicial(jugadorActual.nombre)}</span>
+            <span className="ubp-avatar"><CaraJugador nombre={jugadorActual.nombre} /></span>
             <p>
               {slotActivo
                 ? <>Toca el mapa para colocar <strong>{SLOTS.find((s) => s.id === slotActivo).glifo} {SLOTS.find((s) => s.id === slotActivo).nombre}</strong></>

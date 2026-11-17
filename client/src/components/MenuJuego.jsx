@@ -14,6 +14,7 @@ import { LIMITES, limitesLocal, limitesOnline, textoJugadores, rango } from '../
 import { errorNombres } from '../lib/nombres.js';
 import { opcionesRondas, textoOpcionRondas, rondasPorJugador, unidadRondas } from '../games/rondas.js';
 import './MenuJuego.css';
+import CaraJugador from './CaraJugador.jsx';
 
 export function BotonVolver({ onClick, texto = 'Volver' }) {
   return (
@@ -360,6 +361,7 @@ export function ListaSala({ jugadores = [], yoId, max, min, anfitrionId = 1, ren
       <div className="lb-lista qq-sala-lista">
         {jugadores.map((j) => (
           <div key={j.id} className={`lb-jug ${j.id === yoId ? 'yo' : ''}`}>
+            <span className="lb-jug-cara" aria-hidden="true"><CaraJugador nombre={j.nombre} /></span>
             <span className="lb-jug-nombre">
               {j.nombre}{j.id === yoId ? ' (tú)' : ''}{j.id === anfitrionId || j.esAdmin || j.admin ? ' 👑' : ''}
             </span>
@@ -475,7 +477,7 @@ export function SelectorJugadores({
                 return (
                   <div key={idx} className="qq-jugador-input-card">
                     <span className="qq-jugador-badge" style={{ background: COLORES_JUGADOR[idx % COLORES_JUGADOR.length] }}>
-                      {idx + 1}
+                      <CaraJugador nombre={valor} texto={idx + 1} />
                     </span>
                     <input
                       type="text"

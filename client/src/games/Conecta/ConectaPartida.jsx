@@ -4,6 +4,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { centrarActivo } from '../../lib/centrarActivo.js';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 // Colores de los grupos según el orden en que se resuelven
 export const COLORES_GRUPO = ['#f59e0b', '#22c55e', '#3b82f6', '#a855f7'];
@@ -61,7 +62,7 @@ function Marcador({ jugadores, turnoId, yoId }) {
           className={`cnp-jugador${j.id === turnoId ? ' activo' : ''}${j.eliminado ? ' eliminado' : ''}`}
           style={{ '--c': colorJugador(j.id) }}
         >
-          <span className="cnp-jugador-avatar">{inicial(j.nombre)}</span>
+          <span className="cnp-jugador-avatar"><CaraJugador nombre={j.nombre} /></span>
           <span className="cnp-jugador-datos">
             <span className="cnp-jugador-nombre">{j.nombre}{j.id === yoId ? ' (tú)' : ''}</span>
             <span className="cnp-jugador-linea">
@@ -290,7 +291,7 @@ export default function ConectaPartida({ partida, yoId = null, esAdmin, onAccion
             {ranking.map((j, i) => (
               <li key={j.id} className={max > 0 && j.puntos === max ? 'lider' : ''} style={{ '--c': colorJugador(j.id) }}>
                 <span className="cnp-ranking-pos">{max > 0 && j.puntos === max ? <Icon name="crown" size={18} /> : i + 1}</span>
-                <span className="cnp-jugador-avatar">{inicial(j.nombre)}</span>
+                <span className="cnp-jugador-avatar"><CaraJugador nombre={j.nombre} /></span>
                 <span className="cnp-ranking-nombre">{j.nombre}{j.id === yoId ? ' (tú)' : ''}</span>
                 <strong>{j.puntos} pts</strong>
               </li>
@@ -310,7 +311,7 @@ export default function ConectaPartida({ partida, yoId = null, esAdmin, onAccion
         {cabecera}
         <Aviso evento={partida.evento} />
         <div className="cnp-tarjeta cnp-listo">
-          <span className="cnp-listo-avatar" style={{ '--c': colorJugador(t.jugadorId) }}>{inicial(t.nombre)}</span>
+          <span className="cnp-listo-avatar" style={{ '--c': colorJugador(t.jugadorId) }}><CaraJugador nombre={t.nombre} /></span>
           <p className="cnp-etiqueta">{local ? 'Pasa el móvil a' : '¡Es tu turno!'}</p>
           <h2 className="cnp-listo-nombre">{t.nombre}</h2>
           {j && <Vidas n={j.vidas} />}
@@ -343,7 +344,7 @@ export default function ConectaPartida({ partida, yoId = null, esAdmin, onAccion
     };
     banner = (
       <div className="cnp-turno-de" style={{ '--c': colorJugador(t.jugadorId) }}>
-        <span className="cnp-jugador-avatar">{inicial(t.nombre)}</span>
+        <span className="cnp-jugador-avatar"><CaraJugador nombre={t.nombre} /></span>
         <div>
           <p className="cnp-etiqueta">Turno de {t.nombre}</p>
           <p className="cnp-turno-texto">{textos[t.paso]}</p>

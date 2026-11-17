@@ -5,13 +5,14 @@ import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { AJUSTES, OPCIONES_RONDAS } from './engine.js';
 import './Jugadores.css';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 export const COLORES = ['#ea580c', '#2563eb', '#16a34a', '#dc2626', '#9333ea', '#0d9488', '#f59e0b', '#db2777', '#4f46e5', '#65a30d', '#0891b2', '#78716c', '#e11d48', '#7c3aed', '#0284c7'];
 export const colorDe = (id) => COLORES[((Number(id) || 1) - 1) % COLORES.length];
 const inicial = (n) => (n || '?').trim().charAt(0).toUpperCase();
 
 export function Avatar({ id, nombre, grande = false }) {
-  return <span className={`cqp-avatar${grande ? ' grande' : ''}`} style={{ '--c': colorDe(id) }}>{inicial(nombre)}</span>;
+  return <span className={`cqp-avatar${grande ? ' grande' : ''}`} style={{ '--c': colorDe(id) }}><CaraJugador nombre={nombre} /></span>;
 }
 
 function useAhora(offset = 0, activo = true) {

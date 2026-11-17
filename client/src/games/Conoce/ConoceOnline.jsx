@@ -26,6 +26,7 @@ import { codigoInvitado } from '../../lib/invitacion.js';
 import { SelectorRondas } from '../../components/MenuJuego.jsx';
 import { SelectorPreguntasGrupo, usePreguntasGrupo, cargarPreguntasGrupo } from '../../components/PreguntasGrupo.jsx';
 import { rondasPorDefecto } from '../rondas.js';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 const LIM_ON = limitesOnline('conoce');
 
@@ -850,7 +851,7 @@ export default function ConoceOnline({
                       }}
                     >
                       <div className="cnc-revelacion-autor">
-                        <span className="cnc-revelacion-avatar">{inicial(item.nombre)}</span>
+                        <span className="cnc-revelacion-avatar"><CaraJugador nombre={item.nombre} /></span>
                         <div className="cnc-revelacion-textos">
                           <span className="cnc-revelacion-label">Respuesta sincera de</span>
                           <strong className="cnc-revelacion-nombre">{item.nombre}</strong>
@@ -881,7 +882,7 @@ export default function ConoceOnline({
                     className="cnc-revelacion-avatar"
                     style={{ '--c': colorJugador(indiceColor(yo, 0)) }}
                   >
-                    {inicial(yo?.nombre)}
+                    <CaraJugador nombre={yo?.nombre} />
                   </span>
                   <div className="cnc-desglose-jugador-titulos">
                     <strong>Tu desglose ({yo?.nombre})</strong>

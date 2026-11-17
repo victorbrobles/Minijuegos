@@ -7,6 +7,7 @@ import { BloqueConfig } from '../../components/MenuJuego.jsx';
 import { CATEGORIAS, ORDEN_CATEGORIAS, ESPECIALES, OPCIONES } from './engine.js';
 import './MusAvanzado.css';
 import CartaEspanola from '../../components/CartaEspanola.jsx';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 const HERO = { emoji: '🂡' };
 const nombreDe = (v, id) => v.jugadores.find((j) => j.id === id)?.nombre ?? '¿?';
@@ -129,7 +130,7 @@ function Mesa({ v }) {
           const fuera = !L.activos.includes(b.id);
           return (
             <li key={b.id} className={`${turno ? 'turno' : ''}${fuera ? ' retirado' : ''}${v.yo?.bando === b.id ? ' yo' : ''}`} style={{ '--c': colorBando(v, b.id) }}>
-              <span className="mav-asiento-avatares">{b.miembros.map((m) => <i key={m} style={{ background: colorDe(m) }}>{nombreDe(v, m).charAt(0).toUpperCase()}</i>)}</span>
+              <span className="mav-asiento-avatares">{b.miembros.map((m) => <i key={m} style={{ background: colorDe(m) }}><CaraJugador nombre={nombreDe(v, m)} /></i>)}</span>
               <span className="mav-asiento-nombre">{nombreBando(v, b.id)}{b.miembros.includes(v.mano) && <b className="mav-mano-m" title="Es mano">M</b>}</span>
               <span className="mav-asiento-puntos">{b.puntos}</span>
               {turno ? <span className="mav-voz habla">🗣️ Le toca</span> : voz ? <span className={`mav-voz ${voz.clase}`}>{voz.texto}</span> : <span className="mav-voz nada">—</span>}

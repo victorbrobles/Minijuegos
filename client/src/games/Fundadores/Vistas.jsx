@@ -7,6 +7,7 @@ import React, { useEffect, useState } from 'react';
 import Icon from './IconoF.jsx';
 import { ROLES, ROL, TIPOS, ORDEN_TIPOS, AJUSTES } from './engine.js';
 import './Fundadores.css';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 export const COLORES = ['#ef4444', '#2563eb', '#16a34a', '#f59e0b', '#9333ea', '#ec4899', '#0d9488', '#ea580c', '#475569'];
 export const colorDe = (id) => COLORES[((Number(id) || 1) - 1) % COLORES.length];
@@ -14,7 +15,7 @@ const inicial = (n) => (n || '?').trim().charAt(0).toUpperCase();
 const pl = (n, uno, varios) => `${n} ${n === 1 ? uno : varios}`;
 
 export function Avatar({ id, nombre, grande = false }) {
-  return <span className={`fdp-avatar${grande ? ' grande' : ''}`} style={{ '--c': colorDe(id) }}>{inicial(nombre)}</span>;
+  return <span className={`fdp-avatar${grande ? ' grande' : ''}`} style={{ '--c': colorDe(id) }}><CaraJugador nombre={nombre} /></span>;
 }
 
 function Monedas({ n, claro = false }) {
@@ -103,7 +104,7 @@ export function Hero({ v, onSalir, etiqueta, titulo, clase = '' }) {
                 className={`fdp-mini-rol${retirado ? ' retirado' : ''}${hecho ? ' hecho' : ''}${ahora ? ' ahora' : ''}${v.saboteado === r.id ? ' saboteado' : ''}${v.yo?.rol === r.id ? ' mio' : ''}`}>
                 <Icon name={r.icono} size={14} />
                 <i>{r.id}</i>
-                {dueno && !retirado && <b style={{ '--c': colorDe(dueno.id) }}>{inicial(dueno.nombre)}</b>}
+                {dueno && !retirado && <b style={{ '--c': colorDe(dueno.id) }}><CaraJugador nombre={dueno.nombre} /></b>}
               </span>
             );
           })}

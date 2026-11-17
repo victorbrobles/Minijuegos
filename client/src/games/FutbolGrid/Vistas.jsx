@@ -5,12 +5,13 @@ import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { AJUSTES, EQUIPOS } from './engine.js';
 import './FutbolGrid.css';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 const inicial = (n) => (n || '?').trim().charAt(0).toUpperCase();
 export const COLOR_EQUIPO = { X: '#2563eb', O: '#dc2626' };
 
 export function Avatar({ nombre, equipo }) {
-  return <span className="fgp-avatar" style={{ '--c': COLOR_EQUIPO[equipo] || '#64748b' }}>{inicial(nombre)}</span>;
+  return <span className="fgp-avatar" style={{ '--c': COLOR_EQUIPO[equipo] || '#64748b' }}><CaraJugador nombre={nombre} /></span>;
 }
 
 function useRestante(hasta, offset = 0) {

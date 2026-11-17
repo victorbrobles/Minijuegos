@@ -10,6 +10,7 @@ import { limitesLocal } from '../limites.js';
 import { SelectorRondas } from '../../components/MenuJuego.jsx';
 import { rondasPorDefecto, totalRondas } from '../rondas.js';
 import { avisarNombres } from '../../lib/nombres.js';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 const PALABRAS_BASE = [
   'PLAYA', 'FÚTBOL', 'PIZZA', 'VERANO', 'VIAJE', 'NOCHE', 'CINE', 'MÚSICA',
@@ -42,7 +43,7 @@ export function BotonPortada({ onClick, texto = 'Portada' }) {
 export function Avatar({ nombre, color, grande = false }) {
   return (
     <span className={`qqp-avatar${grande ? ' grande' : ''}`} style={{ '--c': color }}>
-      {inicial(nombre)}
+      <CaraJugador nombre={nombre} />
     </span>
   );
 }

@@ -8,6 +8,7 @@ import { metaDe } from '../games/meta.js';
 import { useLluviaReacciones, Globos } from '../components/Reacciones.jsx';
 import { fetchOriginal } from '../lib/salaViva.js';
 import './Tele.css';
+import CaraJugador from '../components/CaraJugador.jsx';
 
 const ESTADOS = { lobby: '⏳ Sala de espera', jugando: '🎮 En juego', fin: '🏁 Partida terminada' };
 const MEDALLAS = ['🥇', '🥈', '🥉'];
@@ -66,7 +67,7 @@ export default function Tele() {
               {tabla.map((j, i) => (
                 <li key={j.nombre} className={`${conPuntos && i === 0 && estado !== 'lobby' ? 'lider' : ''}${conectado(j.nombre) ? '' : ' desconectado'}`} style={{ animationDelay: `${i * 60}ms` }}>
                   <span className="tv-pos">{conPuntos && estado !== 'lobby' ? (MEDALLAS[i] || `${i + 1}.`) : '•'}</span>
-                  <span className="tv-ini">{j.nombre.slice(0, 1).toUpperCase()}</span>
+                  <span className="tv-ini"><CaraJugador nombre={j.nombre} /></span>
                   <b>{j.nombre}</b>
                   {conPuntos && <em>{j.puntos ?? '–'}</em>}
                 </li>

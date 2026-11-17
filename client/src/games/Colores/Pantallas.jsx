@@ -4,6 +4,7 @@
 import React, { useEffect, useRef } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { centrarActivo } from '../../lib/centrarActivo.js';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 export const PALETA = [
   { id: 'rojo', nombre: 'Rojo', hex: '#ef4444' },
@@ -180,7 +181,7 @@ export function ResultadoRonda({ resultado, yoId }) {
         <ul className="clp-respuestas">
           {filas.map((f) => (
             <li key={f.id} className={f.pleno ? 'pleno' : ''} style={{ '--c': colorJugador(f.id) }}>
-              <span className="clp-avatar">{inicial(f.jugador)}</span>
+              <span className="clp-avatar"><CaraJugador nombre={f.jugador} /></span>
               <span className="clp-respuesta-datos">
                 <strong>
                   {f.jugador}{f.id === yoId ? ' (tú)' : ''}
@@ -211,7 +212,7 @@ export function Clasificacion({ jugadores, sumadas = {}, yoId, titulo = 'Clasifi
           return (
             <li key={j.id} className={lider ? 'lider' : ''} style={{ '--c': colorJugador(j.id) }}>
               <span className="clp-pos">{lider ? <Icon name="crown" size={18} /> : i + 1}</span>
-              <span className="clp-avatar">{inicial(j.nombre)}</span>
+              <span className="clp-avatar"><CaraJugador nombre={j.nombre} /></span>
               <span className="clp-ranking-nombre">{j.nombre}{j.id === yoId ? ' (tú)' : ''}</span>
               {sumadas[j.id] != null && <small className="clp-delta">+{sumadas[j.id]}</small>}
               <strong>{j.puntos ?? 0}</strong>
@@ -242,7 +243,7 @@ export function Podio({ jugadores, yoId }) {
           const puesto = top.indexOf(j);
           return (
             <div key={j.id} className={`clp-podio-col ${alturas[puesto]}`} style={{ '--c': colorJugador(j.id) }}>
-              <span className="clp-avatar grande">{inicial(j.nombre)}</span>
+              <span className="clp-avatar grande"><CaraJugador nombre={j.nombre} /></span>
               <span className="clp-podio-nombre">{j.nombre}{j.id === yoId ? ' (tú)' : ''}</span>
               <span className="clp-podio-pts">{j.puntos ?? 0} pts</span>
               <span className="clp-podio-base">{puesto + 1}</span>

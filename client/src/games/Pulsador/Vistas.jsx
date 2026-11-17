@@ -7,6 +7,7 @@ import Icon from '../../components/Icon.jsx';
 import { OPCIONES_RONDAS } from './engine.js';
 import './Pulsador.css';
 import { metaDe } from '../meta.js';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 export const COLORES = ['#ef4444', '#2563eb', '#16a34a', '#f59e0b', '#9333ea', '#ec4899', '#0d9488', '#ea580c', '#475569', '#65a30d', '#6366f1', '#0ea5e9', '#e11d48', '#84cc16', '#a855f7'];
 export const colorDe = (id) => COLORES[((Number(id) || 1) - 1) % COLORES.length];
@@ -14,7 +15,7 @@ const inicial = (n) => (n || '?').trim().charAt(0).toUpperCase();
 const nombreDe = (v, id) => v.jugadores.find((j) => j.id === id)?.nombre ?? '¿?';
 
 export function Avatar({ id, nombre, grande = false }) {
-  return <span className={`pzp-avatar${grande ? ' grande' : ''}`} style={{ '--c': colorDe(id) }}>{inicial(nombre)}</span>;
+  return <span className={`pzp-avatar${grande ? ' grande' : ''}`} style={{ '--c': colorDe(id) }}><CaraJugador nombre={nombre} /></span>;
 }
 
 /** Milisegundos que faltan para `hasta` (hora del servidor; `offset` = servidor − cliente). */

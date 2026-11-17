@@ -13,6 +13,7 @@ import { SelectorRondas } from '../../components/MenuJuego.jsx';
 import { SelectorPreguntasGrupo, usePreguntasGrupo, cargarPreguntasGrupo } from '../../components/PreguntasGrupo.jsx';
 import { rondasPorDefecto, totalRondas } from '../rondas.js';
 import { avisarNombres } from '../../lib/nombres.js';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 const { min: MIN_JUGADORES, max: MAX_JUGADORES } = limitesLocal('quienmas');
 const TIEMPO_VOTO = 30;
@@ -53,7 +54,7 @@ export function BotonPortada({ onClick, texto = 'Portada' }) {
 export function Avatar({ nombre, color, grande = false }) {
   return (
     <span className={`qqp-avatar${grande ? ' grande' : ''}`} style={{ '--c': color }}>
-      {inicial(nombre)}
+      <CaraJugador nombre={nombre} />
     </span>
   );
 }
@@ -560,7 +561,7 @@ export default function QuienMasLocal({ onVolver, onExit, onAbrirAyuda }) {
                   style={{ '--c': colorJugador(idx) }}
                   onClick={() => votar(nombre)}
                 >
-                  <span className="qm-candidato-avatar">{inicial(nombre)}</span>
+                  <span className="qm-candidato-avatar"><CaraJugador nombre={nombre} /></span>
                   <span className="qm-candidato-nombre">
                     {nombre}
                     {nombre === jugadorTurno && <span className="qm-badge-tu">Tú</span>}

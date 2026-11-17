@@ -6,6 +6,7 @@ import { Hero, Cuenta, useRestante, Pildoras, PantallaFin, colorDe, AvisoTurno }
 import { BloqueConfig } from '../../components/MenuJuego.jsx';
 import { OPCIONES, categoriasPara } from './engine.js';
 import './Tablero.css';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 const HERO = { emoji: '🎯' };
 const nombreDe = (v, id) => v.jugadores.find((j) => j.id === id)?.nombre ?? '¿?';
@@ -57,7 +58,7 @@ function Categorias({ v, enviar, puedo }) {
           const c = e && catDe(v, e.cat);
           return (
             <span key={i} className={`tbx-hueco${c ? ' lleno' : ''}`} style={c ? { '--cat': c.color } : undefined}>
-              {c ? <><b>{c.emoji}</b><small>{c.nombre}</small><i style={{ background: colorDe(e.por) }}>{nombreDe(v, e.por).charAt(0)}</i></> : <small>{i + 1}</small>}
+              {c ? <><b>{c.emoji}</b><small>{c.nombre}</small><i style={{ background: colorDe(e.por) }}><CaraJugador nombre={nombreDe(v, e.por)} /></i></> : <small>{i + 1}</small>}
             </span>
           );
         })}
@@ -68,7 +69,7 @@ function Categorias({ v, enviar, puedo }) {
           <button key={c.id} type="button" className={`tbx-cat-op${c.por != null ? ' cogida' : ''}`} style={{ '--cat': c.color }}
             disabled={!puedo || c.por != null} onClick={() => enviar('categoria', { cat: c.id })}>
             <span>{c.emoji}</span><b>{c.nombre}</b>
-            {c.por != null && <i style={{ background: colorDe(c.por) }}>{nombreDe(v, c.por).charAt(0)}</i>}
+            {c.por != null && <i style={{ background: colorDe(c.por) }}><CaraJugador nombre={nombreDe(v, c.por)} /></i>}
           </button>
         ))}
       </div>

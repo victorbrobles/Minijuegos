@@ -7,6 +7,7 @@ import Icon from '../../components/Icon.jsx';
 import { FASES_INFO } from './LogosInfo.js';
 import { COLORES as PINCEL, GROSORES } from '../Garabato/engine.js';
 import './Logos.css';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 const LETRAS = ['A', 'B', 'C', 'D'];
 const DIFICULTAD = { 1: 'Fácil', 2: 'Media', 3: 'Difícil' };
@@ -15,7 +16,7 @@ export const colorDe = (id) => COLORES[((Number(id) || 1) - 1) % COLORES.length]
 const inicial = (n) => (n || '?').trim().charAt(0).toUpperCase();
 
 export function Avatar({ id, nombre, grande = false }) {
-  return <span className={`lgm-avatar${grande ? ' grande' : ''}`} style={{ '--c': colorDe(id) }}>{inicial(nombre)}</span>;
+  return <span className={`lgm-avatar${grande ? ' grande' : ''}`} style={{ '--c': colorDe(id) }}><CaraJugador nombre={nombre} /></span>;
 }
 
 /* ------------------------------------------------------------------ piezas */

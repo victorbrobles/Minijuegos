@@ -6,6 +6,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { formatearKm, formatearPuntos } from './geo.js';
 import { centrarActivo } from '../../lib/centrarActivo.js';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 export const inicial = (n = '?') => n.trim().charAt(0).toUpperCase() || '?';
 const urlWiki = (l) => (l?.wiki ? `https://en.wikipedia.org/wiki/${encodeURIComponent(l.wiki)}` : null);
@@ -151,7 +152,7 @@ export function TablaRonda({ lugar, filas, onEnfocar, yoId }) {
           <li key={f.id}>
             <button type="button" className={`ubp-fila${i === 0 && f.real ? ' mejor' : ''}`} style={{ '--c': f.color }} onClick={() => f.real && onEnfocar?.(f.real)} disabled={!f.real}>
               <span className="ubp-pos">{i === 0 && f.real ? '🎯' : i + 1}</span>
-              <span className="ubp-avatar">{inicial(f.nombre)}</span>
+              <span className="ubp-avatar"><CaraJugador nombre={f.nombre} /></span>
               <span className="ubp-fila-nombre">
                 {f.nombre}{f.id === yoId ? ' (tú)' : ''}
                 <small>{f.real ? `a ${formatearKm(f.km)}` : 'Sin marcador'}</small>
@@ -183,7 +184,7 @@ export function Clasificacion({ jugadores, sumadas = {}, yoId, titulo = 'Clasifi
           return (
             <li key={j.id} className={lider ? 'lider' : ''} style={{ '--c': j.color }}>
               <span className="ubp-pos">{lider ? <Icon name="crown" size={18} /> : i + 1}</span>
-              <span className="ubp-avatar">{inicial(j.nombre)}</span>
+              <span className="ubp-avatar"><CaraJugador nombre={j.nombre} /></span>
               <span className="ubp-ranking-nombre">{j.nombre}{j.id === yoId ? ' (tú)' : ''}</span>
               {sumadas[j.id] != null && <small className="ubp-delta">+{formatearPuntos(sumadas[j.id])}</small>}
               <strong>{formatearPuntos(j.puntos ?? 0)}</strong>
@@ -215,7 +216,7 @@ export function Podio({ jugadores, yoId }) {
           const puesto = top.indexOf(j);
           return (
             <div key={j.id} className={`ubp-podio-col ${alturas[puesto]}`} style={{ '--c': j.color }}>
-              <span className="ubp-avatar grande">{inicial(j.nombre)}</span>
+              <span className="ubp-avatar grande"><CaraJugador nombre={j.nombre} /></span>
               <span className="ubp-podio-nombre">{j.nombre}{j.id === yoId ? ' (tú)' : ''}</span>
               <span className="ubp-podio-pts">{formatearPuntos(j.puntos ?? 0)}</span>
               <span className="ubp-podio-base">{puesto + 1}</span>

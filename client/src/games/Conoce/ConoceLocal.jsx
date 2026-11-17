@@ -34,6 +34,7 @@ export const PALETA_RESPUESTAS = [
 
 // Comparación tolerante (Fútbol ~ Furbo), mayúsculas y puntos: lógica compartida con el servidor.
 import { normalizarRespuesta, sonRespuestasEquivalentes, agruparRespuestasUnicas, formatearRespuesta, puntosPareja } from './respuestas.js';
+import CaraJugador from '../../components/CaraJugador.jsx';
 export { normalizarRespuesta, sonRespuestasEquivalentes, agruparRespuestasUnicas, formatearRespuesta };
 
 /* ==========================================================================
@@ -54,7 +55,7 @@ export function BotonPortada({ onClick, texto = 'Portada' }) {
 export function Avatar({ nombre, color, grande = false }) {
   return (
     <span className={`qqp-avatar${grande ? ' grande' : ''}`} style={{ '--c': color }}>
-      {inicial(nombre)}
+      <CaraJugador nombre={nombre} />
     </span>
   );
 }
@@ -231,7 +232,7 @@ export function TableroEmparejarRespuestas({
                   className={`cnc-ficha-jugador ${seleccionado ? 'activa' : ''}`}
                   style={{ '--c': color }}
                 >
-                  <span className="cnc-ficha-avatar">{inicial(r.nombre)}</span>
+                  <span className="cnc-ficha-avatar"><CaraJugador nombre={r.nombre} /></span>
                   <span className="cnc-ficha-nombre">{r.nombre}</span>
                   <span className="cnc-ficha-grip" aria-hidden="true">⋮⋮</span>
                 </button>
@@ -318,7 +319,7 @@ export function TableroEmparejarRespuestas({
                         className={`cnc-ficha-asignada ${jugadorActivoId === r.id ? 'activa' : ''}`}
                         style={{ '--c': col }}
                       >
-                        <span className="cnc-ficha-avatar">{inicial(r.nombre)}</span>
+                        <span className="cnc-ficha-avatar"><CaraJugador nombre={r.nombre} /></span>
                         <span className="cnc-ficha-nombre">{r.nombre}</span>
                         <button
                           type="button"
@@ -1010,7 +1011,7 @@ export default function ConoceLocal({ onVolver, onSalir, onExit, onAbrirAyuda })
                   }}
                 >
                   <div className="cnc-revelacion-autor">
-                    <span className="cnc-revelacion-avatar">{inicial(j.nombre)}</span>
+                    <span className="cnc-revelacion-avatar"><CaraJugador nombre={j.nombre} /></span>
                     <div className="cnc-revelacion-textos">
                       <span className="cnc-revelacion-label">Respuesta sincera de</span>
                       <strong className="cnc-revelacion-nombre">{j.nombre}</strong>
@@ -1057,7 +1058,7 @@ export default function ConoceLocal({ onVolver, onSalir, onExit, onAbrirAyuda })
                 <div key={j.id} className="qqp-tarjeta cnc-desglose-jugador-card">
                   <div className="cnc-desglose-jugador-header">
                     <span className="cnc-revelacion-avatar" style={{ '--c': col }}>
-                      {inicial(j.nombre)}
+                      <CaraJugador nombre={j.nombre} />
                     </span>
                     <div className="cnc-desglose-jugador-titulos">
                       <strong>{j.nombre}</strong>

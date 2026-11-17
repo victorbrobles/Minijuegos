@@ -6,13 +6,14 @@ import Icon from '../../components/Icon.jsx';
 import { AJUSTES, OPCIONES_RONDAS } from './engine.js';
 import { Escudo as EscudoClub } from '../Trayectoria/Vistas.jsx';
 import './CuatroClubes.css';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 export const COLORES = ['#c026d3', '#2563eb', '#16a34a', '#dc2626', '#f59e0b', '#0d9488', '#ea580c', '#4f46e5', '#65a30d', '#0891b2'];
 export const colorDe = (id) => COLORES[((Number(id) || 1) - 1) % COLORES.length];
 const inicial = (n) => (n || '?').trim().charAt(0).toUpperCase();
 
 export function Avatar({ id, nombre, grande = false }) {
-  return <span className={`c4p-avatar${grande ? ' grande' : ''}`} style={{ '--c': colorDe(id) }}>{inicial(nombre)}</span>;
+  return <span className={`c4p-avatar${grande ? ' grande' : ''}`} style={{ '--c': colorDe(id) }}><CaraJugador nombre={nombre} /></span>;
 }
 
 const Escudo = ({ club }) => <EscudoClub club={{ nombre: club.nombre, logo: club.escudo, colores: club.colores, siglas: club.siglas }} />;

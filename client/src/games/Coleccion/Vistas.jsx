@@ -7,13 +7,14 @@ import Icon from '../../components/Icon.jsx';
 import InfoCarta from '../../components/InfoCarta.jsx';
 import { PALOS, PALO, COMODIN, ACCIONES, AJUSTES, textoEncargo, esColeccion } from './engine.js';
 import './Coleccion.css';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 export const COLORES = ['#ef4444', '#2563eb', '#16a34a', '#f59e0b', '#9333ea', '#ec4899'];
 export const colorDe = (id) => COLORES[((Number(id) || 1) - 1) % COLORES.length];
 const inicial = (n) => (n || '?').trim().charAt(0).toUpperCase();
 
 export function Avatar({ id, nombre, grande = false }) {
-  return <span className={`cxp-avatar${grande ? ' grande' : ''}`} style={{ '--c': colorDe(id) }}>{inicial(nombre)}</span>;
+  return <span className={`cxp-avatar${grande ? ' grande' : ''}`} style={{ '--c': colorDe(id) }}><CaraJugador nombre={nombre} /></span>;
 }
 
 /** Carta (de colección o de acción). */

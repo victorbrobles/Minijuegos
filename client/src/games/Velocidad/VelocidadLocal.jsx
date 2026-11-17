@@ -8,6 +8,7 @@ import { SelectorJugadores, BloqueConfig, SelectorRondas } from '../../component
 import { limitesLocal } from '../limites.js';
 import { rondasPorDefecto, totalRondas } from '../rondas.js';
 import { useAbrirAyuda } from '../../lib/ayuda.js';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 const TIEMPO_TURNO = 60;
 const TIEMPO_PREPARACION = 10;
@@ -354,7 +355,7 @@ export default function VelocidadLocal({ onVolver, onExit }) {
                     className={`ptp-jugador${j.jugo ? ' respondido' : ''}${esActual ? ' yo' : ''}`}
                     style={{ '--c': colorJugador(j.id) }}
                   >
-                    <span className="ptp-jugador-avatar">{inicial(j.nombre)}</span>
+                    <span className="ptp-jugador-avatar"><CaraJugador nombre={j.nombre} /></span>
                     <span className="ptp-jugador-datos">
                       <span className="ptp-jugador-nombre">{j.nombre}</span>
                       <span className="ptp-jugador-linea">
@@ -429,7 +430,7 @@ export default function VelocidadLocal({ onVolver, onExit }) {
                     className={`ptp-jugador${j.jugo ? ' respondido' : ''}${esActual ? ' yo' : ''}`}
                     style={{ '--c': colorJugador(j.id) }}
                   >
-                    <span className="ptp-jugador-avatar">{inicial(j.nombre)}</span>
+                    <span className="ptp-jugador-avatar"><CaraJugador nombre={j.nombre} /></span>
                     <span className="ptp-jugador-datos">
                       <span className="ptp-jugador-nombre">{j.nombre}</span>
                       <span className="ptp-jugador-linea">
@@ -564,7 +565,7 @@ export default function VelocidadLocal({ onVolver, onExit }) {
                 return (
                   <li key={j.id} className={esActual ? 'lider' : ''} style={{ '--c': colorJugador(j.id) }}>
                     <span className="ptp-ranking-pos">{j.jugo ? '✅' : i + 1}</span>
-                    <span className="ptp-jugador-avatar">{inicial(j.nombre)}</span>
+                    <span className="ptp-jugador-avatar"><CaraJugador nombre={j.nombre} /></span>
                     <span className="ptp-ranking-nombre">{j.nombre}</span>
                     <strong>{j.jugo ? `${j.aciertos} pts` : ronda > 1 ? `${j.aciertos} pts · pendiente` : 'Pendiente'}</strong>
                   </li>

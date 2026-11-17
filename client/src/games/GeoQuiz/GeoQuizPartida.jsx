@@ -5,6 +5,7 @@ import { useRegistrarPartida, ganadoresPorPuntos } from '../../lib/registros.js'
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../../components/Icon.jsx';
 import { centrarActivo } from '../../lib/centrarActivo.js';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 const COLORES_JUGADOR = ['#0ea5e9', '#ec4899', '#f59e0b', '#10b981', '#8b5cf6', '#ef4444', '#06b6d4', '#f97316', '#84cc16', '#6366f1', '#14b8a6', '#d946ef'];
 const colorJugador = (id) => COLORES_JUGADOR[(Number(id) - 1 + COLORES_JUGADOR.length * 10) % COLORES_JUGADOR.length];
@@ -50,7 +51,7 @@ function Marcador({ jugadores, turnoId, yoId, supervivencia, vidasMax }) {
     <ol className="gq-marcador" ref={ref} aria-label="Jugadores">
       {jugadores.map((j) => (
         <li key={j.id} className={`gq-jugador${j.id === turnoId ? ' activo' : ''}${j.eliminado ? ' eliminado' : ''}`} style={{ '--c': colorJugador(j.id) }}>
-          <span className="gq-avatar">{inicial(j.nombre)}</span>
+          <span className="gq-avatar"><CaraJugador nombre={j.nombre} /></span>
           <span className="gq-jugador-datos">
             <span className="gq-jugador-nombre">{j.nombre}{j.id === yoId ? ' (tú)' : ''}</span>
             <span className="gq-jugador-linea">
@@ -466,7 +467,7 @@ export default function GeoQuizPartida({ partida, yoId = null, esAdmin, onAccion
             {ranking.map((j, i) => (
               <li key={j.id} className={i === 0 && max > 0 ? 'lider' : ''} style={{ '--c': colorJugador(j.id) }}>
                 <span className="gq-ranking-pos">{i === 0 && max > 0 ? <Icon name="crown" size={18} /> : i + 1}</span>
-                <span className="gq-avatar">{inicial(j.nombre)}</span>
+                <span className="gq-avatar"><CaraJugador nombre={j.nombre} /></span>
                 <span className="gq-ranking-nombre">
                   {j.nombre}{j.id === yoId ? ' (tú)' : ''}
                   <small>{j.aciertos} aciertos · {j.fallos} fallos</small>
@@ -489,7 +490,7 @@ export default function GeoQuizPartida({ partida, yoId = null, esAdmin, onAccion
         {cabecera}
         <Aviso evento={partida.evento} />
         <div className="gq-tarjeta gq-listo">
-          <span className="gq-listo-avatar" style={{ '--c': colorJugador(t.jugadorId) }}>{inicial(t.nombre)}</span>
+          <span className="gq-listo-avatar" style={{ '--c': colorJugador(t.jugadorId) }}><CaraJugador nombre={t.nombre} /></span>
           <p className="gq-etiqueta">{puedo ? (local ? 'Pasa el móvil a' : '¡Es tu turno!') : 'Turno de'}</p>
           <h2 className="gq-listo-nombre">{t.nombre}</h2>
           {supervivencia && j && <Vidas n={j.vidas} max={partida.vidasMax} />}
@@ -522,7 +523,7 @@ export default function GeoQuizPartida({ partida, yoId = null, esAdmin, onAccion
         <Aviso evento={partida.evento} />
         {!puedo && (
           <div className="gq-turno-de" style={{ '--c': colorJugador(t.jugadorId) }}>
-            <span className="gq-avatar">{inicial(t.nombre)}</span>
+            <span className="gq-avatar"><CaraJugador nombre={t.nombre} /></span>
             <p><strong>{t.nombre}</strong> está respondiendo…</p>
           </div>
         )}

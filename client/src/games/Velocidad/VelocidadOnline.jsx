@@ -17,6 +17,7 @@ import { limitesOnline, textoSala } from '../limites.js';
 import { SelectorRondas } from '../../components/MenuJuego.jsx';
 import { rondasPorDefecto } from '../rondas.js';
 import { useAbrirAyuda } from '../../lib/ayuda.js';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 const LIM_ON = limitesOnline('velocidad');
 
@@ -548,7 +549,7 @@ export default function VelocidadOnline({ onLocal }) {
                     className={`ptp-jugador${j.jugo ? ' respondido' : ''}${j.id === yoId ? ' yo' : ''}`}
                     style={{ '--c': colorJugador(j.id) }}
                   >
-                    <span className="ptp-jugador-avatar">{inicial(j.nombre)}</span>
+                    <span className="ptp-jugador-avatar"><CaraJugador nombre={j.nombre} /></span>
                     <span className="ptp-jugador-datos">
                       <span className="ptp-jugador-nombre">{j.nombre}{j.id === yoId ? ' (tú)' : ''}</span>
                       <span className="ptp-jugador-linea">
@@ -633,7 +634,7 @@ export default function VelocidadOnline({ onLocal }) {
                     className={`ptp-jugador${j.jugo ? ' respondido' : ''}${j.id === yoId ? ' yo' : ''}`}
                     style={{ '--c': colorJugador(j.id) }}
                   >
-                    <span className="ptp-jugador-avatar">{inicial(j.nombre)}</span>
+                    <span className="ptp-jugador-avatar"><CaraJugador nombre={j.nombre} /></span>
                     <span className="ptp-jugador-datos">
                       <span className="ptp-jugador-nombre">{j.nombre}{j.id === yoId ? ' (tú)' : ''}</span>
                       <span className="ptp-jugador-linea">
@@ -794,7 +795,7 @@ export default function VelocidadOnline({ onLocal }) {
                 return (
                   <li key={j.id} className={esReciente ? 'lider' : ''} style={{ '--c': colorJugador(j.id) }}>
                     <span className="ptp-ranking-pos">{j.jugo ? '✅' : i + 1}</span>
-                    <span className="ptp-jugador-avatar">{inicial(j.nombre)}</span>
+                    <span className="ptp-jugador-avatar"><CaraJugador nombre={j.nombre} /></span>
                     <span className="ptp-ranking-nombre">
                       {j.nombre}{j.id === yoId ? ' (tú)' : ''}
                     </span>

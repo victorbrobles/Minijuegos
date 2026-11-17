@@ -8,6 +8,7 @@ import { BloqueConfig } from '../../components/MenuJuego.jsx';
 import { NOMBRE_LANCE, OPCIONES, jugadaDe } from './engine.js';
 import './Mus.css';
 import CartaEspanola from '../../components/CartaEspanola.jsx';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 /** Carta española (dibujo común con el Mus Avanzado): números 1-7, 10, 11 y 12. */
 export function CartaEsp({ c, sel = false, onClick, chica = false, oculta = false }) {
@@ -31,7 +32,7 @@ function Asiento({ v, j }) {
   return (
     <div className={`msp-asiento ${POS[r]}${turno ? ' turno' : ''}${nuestro ? ' nos' : ' ellos'}`}>
       <div className="msp-asiento-cab">
-        <span className="msp-avatar">{j.bot ? '🤖' : j.nombre.charAt(0).toUpperCase()}</span>
+        <span className="msp-avatar">{j.bot ? '🤖' : <CaraJugador nombre={j.nombre} />}</span>
         <span className="msp-asiento-nombre">{r === 0 ? 'Tú' : limpio(j.nombre)}</span>
         {v.mano === j.asiento && <b className="msp-mano" title="Es mano">M</b>}
       </div>
@@ -207,7 +208,7 @@ function Destape({ v, enviar, anfitrion }) {
             return (
               <div key={s} className="msp-destape-fila">
                 <div className="msp-destape-quien">
-                  <span className="msp-avatar">{j.bot ? '🤖' : j.nombre.charAt(0).toUpperCase()}</span>
+                  <span className="msp-avatar">{j.bot ? '🤖' : <CaraJugador nombre={j.nombre} />}</span>
                   <b>{nomDe(v, s)}</b>
                   {v.mano === s && <b className="msp-mano" title="Es mano">M</b>}
                 </div>

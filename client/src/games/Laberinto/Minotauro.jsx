@@ -7,6 +7,7 @@ import * as E from './minotauro.js';
 import { Cuenta, useRestante, Pildoras, colorDe, ModalSalir, TurnoDe, AvisoTurno } from '../Pulsador/Vistas.jsx';
 import { BloqueConfig, SelectorJugadores } from '../../components/MenuJuego.jsx';
 import { limitesLocal } from '../limites.js';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 const LIM_JUG = limitesLocal('minotauro');
 
@@ -204,7 +205,7 @@ export function Fin({ v, onSalir, children }) {
         <ul className="lbm-final">
           {f.tabla.map((t) => (
             <li key={t.id} className={f.ganadores.includes(t.id) ? 'gana' : ''}>
-              <span className="lbm-av" style={{ background: colorDe(t.id) }}>{t.nombre.charAt(0)}</span>
+              <span className="lbm-av" style={{ background: colorDe(t.id) }}><CaraJugador nombre={t.nombre} /></span>
               <b>{t.nombre}</b>
               <small>{t.rol === 'minotauro' ? '🐂 Minotauro' : t.final === 'escapado' ? '🚪 Escapó' : t.final === 'ayudante' ? '👹 Atrapado (ayudante)' : '🧭 Se quedó dentro'}</small>
               {f.ganadores.includes(t.id) && <em>🏆</em>}

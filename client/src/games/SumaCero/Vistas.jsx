@@ -7,6 +7,7 @@ import Icon from '../../components/Icon.jsx';
 import InfoCarta from '../../components/InfoCarta.jsx';
 import { ESPECIALES, AJUSTES } from './engine.js';
 import './SumaCero.css';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 export const COLORES = ['#ef4444', '#2563eb', '#16a34a', '#f59e0b', '#9333ea', '#ec4899'];
 export const colorDe = (id) => COLORES[((Number(id) || 1) - 1) % COLORES.length];
@@ -14,7 +15,7 @@ const inicial = (n) => (n || '?').trim().charAt(0).toUpperCase();
 const conSigno = (n) => (n > 0 ? `+${n}` : String(n));
 
 export function Avatar({ id, nombre, grande = false }) {
-  return <span className={`szp-avatar${grande ? ' grande' : ''}`} style={{ '--c': colorDe(id) }}>{inicial(nombre)}</span>;
+  return <span className={`szp-avatar${grande ? ' grande' : ''}`} style={{ '--c': colorDe(id) }}><CaraJugador nombre={nombre} /></span>;
 }
 
 export function Carta({ c, mini = false, nueva = false, sel = false, onClick, accion }) {
