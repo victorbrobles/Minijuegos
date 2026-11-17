@@ -44,7 +44,7 @@ export function Hero({ onSalir, ronda, total, jugadores = [], yoId, turnoId, con
             const listo = confirmados?.includes(j.id);
             return (
               <li key={j.id} className={`ubp-jugador${j.id === turnoId ? ' activo' : ''}${listo ? ' listo' : ''}`} style={{ '--c': j.color }}>
-                <span className="ubp-avatar">{listo ? '✓' : inicial(j.nombre)}</span>
+                <span className="ubp-avatar">{listo ? '✓' : <CaraJugador nombre={j.nombre} />}</span>
                 <span className="ubp-jugador-datos">
                   <span className="ubp-jugador-nombre">{j.nombre}{j.id === yoId ? ' (tú)' : ''}</span>
                   <strong>{formatearPuntos(j.puntos ?? 0)} pts</strong>

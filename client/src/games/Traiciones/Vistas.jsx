@@ -4,6 +4,7 @@
 // Reciben `v` (la vista del jugador que genera engine.vistaDe), `enviar(tipo, datos)` y
 // `offset` (= hora del servidor − hora del navegador, para que los temporizadores sean exactos).
 import { useRegistrarPartida, resultadoDesdeFin } from '../../lib/registros.js';
+import CaraJugador from '../../components/CaraJugador.jsx';
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from './IconoT.jsx';
 import { SALAS, SALA, ALAS, ROLES, AJUSTES } from './engine.js';
@@ -42,7 +43,7 @@ const OBJETIVO = {
 export function Avatar({ id, nombre, grande = false, muerto = false }) {
   return (
     <span className={`trp-avatar${grande ? ' grande' : ''}${muerto ? ' muerto' : ''}`} style={{ '--c': colorDe(id) }}>
-      {muerto ? <Icon name="skull" size={grande ? 22 : 15} /> : inicial(nombre)}
+      {muerto ? <Icon name="skull" size={grande ? 22 : 15} /> : <CaraJugador nombre={nombre} />}
     </span>
   );
 }

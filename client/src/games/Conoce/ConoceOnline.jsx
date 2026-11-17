@@ -553,6 +553,7 @@ export default function ConoceOnline({
             <div className="lb-lista qq-sala-lista">
               {sala.jugadores.map((j) => (
                 <div key={j.id} className={`lb-jug ${j.esTu ? 'yo' : ''}`}>
+                  <span className="lb-jug-cara" aria-hidden="true"><CaraJugador nombre={j.nombre} /></span>
                   <span className="lb-jug-nombre">
                     {j.nombre}{j.esTu ? ' (tú)' : ''}{j.esAdmin ? ' 👑' : ''}
                   </span>

@@ -4,6 +4,7 @@
 import React from 'react';
 import Icon from '../../components/Icon.jsx';
 import { ROLES, BANDOS } from './roles.js';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 export const inicial = (n = '?') => String(n).trim().charAt(0).toUpperCase() || '?';
 
@@ -78,7 +79,7 @@ export function Aldea({ jugadores, titulo = 'La aldea', compacta = false }) {
               style={{ '--c': colorJugador(j.id), '--rol': rol ? BANDOS[rol.bando].color : undefined }}
             >
               <span className="lbp-vecino-avatar">
-                {muerto ? (rol ? <Icon name={rol.icono} size={18} /> : '✝') : inicial(j.nombre)}
+                {muerto ? (rol ? <Icon name={rol.icono} size={18} /> : '✝') : <CaraJugador nombre={j.nombre} />}
                 {j.conectado === false && !muerto && <i className="lbp-desconectado" title="Sin conexión" />}
               </span>
               <span className="lbp-vecino-nombre">
@@ -97,7 +98,7 @@ export function Aldea({ jugadores, titulo = 'La aldea', compacta = false }) {
 export function PasaDispositivo({ id, nombre, etiqueta = 'Pasa el móvil a', emoji, texto, children }) {
   return (
     <div className="lbp-tarjeta lbp-pasa">
-      <span className="lbp-pasa-avatar" style={{ '--c': colorJugador(id) }}>{emoji || inicial(nombre)}</span>
+      <span className="lbp-pasa-avatar" style={{ '--c': colorJugador(id) }}>{emoji || <CaraJugador nombre={nombre} />}</span>
       <p className="lbp-etiqueta centrada">{etiqueta}</p>
       <h2 className="lbp-pasa-nombre">{nombre}</h2>
       {texto && <p className="lbp-texto">{texto}</p>}

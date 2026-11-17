@@ -113,7 +113,7 @@ export function OrdenTurnos({ jugadores, activoNombre, votaronMap = {}, puntosMa
             style={{ '--c': colorJugador(i) }}
             aria-current={esActivo ? 'step' : undefined}
           >
-            <span className="qqp-orden-avatar">{yaVoto ? '✓' : inicial(nombre)}</span>
+            <span className="qqp-orden-avatar">{yaVoto ? '✓' : <CaraJugador nombre={nombre} />}</span>
             <span className="qqp-orden-nombre">{nombre}</span>
             <span className="qqp-orden-pts">{pts}p</span>
           </li>
@@ -609,7 +609,7 @@ export default function QuienMasLocal({ onVolver, onExit, onAbrirAyuda }) {
                   const esMasVotado = !resultado.empate && nombre === resultado.ganador;
                   return (
                     <li key={nombre} className="qqp-rival" style={{ '--c': colorJugador(idx) }}>
-                      <span className="qqp-rival-avatar">{esMasVotado ? '👑' : inicial(nombre)}</span>
+                      <span className="qqp-rival-avatar">{esMasVotado ? '👑' : <CaraJugador nombre={nombre} />}</span>
                       <span className="qqp-rival-datos">
                         <span className="qqp-rival-nombre">
                           {esMasVotado ? '¡El más votado!' : 'Candidato'}

@@ -14,6 +14,7 @@ import {
 } from './Pantallas.jsx';
 import './Ubicacion.css';
 import { limitesOnline, textoSala } from '../limites.js';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 const LIM_ON = limitesOnline('ubicacion');
 
@@ -351,7 +352,7 @@ export default function UbicacionOnline({ onVolver, onSalir, onAbrirAyuda }) {
           <BarraTiempo segundos={ronda.segundosRestantesMapa} total={SEGUNDOS_TURNO} />
           {radar && <div className="ubp-radar" role="status">📡 ¡Radar! Se ven los marcadores sin confirmar</div>}
           <div className="ubp-instruccion" style={{ '--c': miColor }}>
-            <span className="ubp-avatar">{yaConfirmado ? '✓' : inicial(miJugador?.nombre)}</span>
+            <span className="ubp-avatar">{yaConfirmado ? '✓' : <CaraJugador nombre={miJugador?.nombre} />}</span>
             <p>
               {yaConfirmado
                 ? <>Marcador confirmado. Esperando al resto…</>

@@ -128,7 +128,7 @@ export function OrdenTurnos({ jugadores, activoId, eliminados = [], puntosMap = 
             style={{ '--c': colorJugador(indiceColor(j, i)) }}
             aria-current={esActivo ? 'step' : undefined}
           >
-            <span className="qqp-orden-avatar">{eliminado ? '💥' : inicial(j.nombre)}</span>
+            <span className="qqp-orden-avatar">{eliminado ? '💥' : <CaraJugador nombre={j.nombre} />}</span>
             <span className="qqp-orden-nombre">{j.nombre}</span>
             <span className="qqp-orden-pts">{pts}p</span>
           </li>

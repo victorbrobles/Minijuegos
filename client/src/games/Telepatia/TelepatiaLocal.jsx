@@ -94,7 +94,7 @@ export function OrdenTurnos({ jugadores, seleccionadosIds = [] }) {
             className={`qqp-orden-item${esActivo ? ' activo' : ''}`}
             style={{ '--c': colorJugador(indiceColor(j, i)) }}
           >
-            <span className="qqp-orden-avatar">{j.racha > 1 ? '🔥' : inicial(j.nombre)}</span>
+            <span className="qqp-orden-avatar">{j.racha > 1 ? '🔥' : <CaraJugador nombre={j.nombre} />}</span>
             <span className="qqp-orden-nombre">{j.nombre}</span>
             <span className="qqp-orden-pts">{j.puntos ?? 0}p</span>
           </li>
@@ -461,7 +461,7 @@ export default function TelepatiaLocal({ onVolver, onSalir, onExit, onAbrirAyuda
                     style={{ '--c': colorJugador(indiceColor(j, idx)) }}
                     onClick={() => toggleSeleccion(j.id)}
                   >
-                    <span className="tel-check-avatar">{sel ? '✓' : inicial(j.nombre)}</span>
+                    <span className="tel-check-avatar">{sel ? '✓' : <CaraJugador nombre={j.nombre} />}</span>
                     <span className="tel-check-nombre">{j.nombre}</span>
                   </button>
                 );

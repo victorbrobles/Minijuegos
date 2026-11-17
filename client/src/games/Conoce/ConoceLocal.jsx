@@ -112,7 +112,7 @@ export function OrdenTurnos({ jugadores, activoId, completadosCount = null }) {
             style={{ '--c': colorJugador(indiceColor(j, i)) }}
             aria-current={esActivo ? 'step' : undefined}
           >
-            <span className="qqp-orden-avatar">{listo ? '✓' : inicial(j.nombre)}</span>
+            <span className="qqp-orden-avatar">{listo ? '✓' : <CaraJugador nombre={j.nombre} />}</span>
             <span className="qqp-orden-nombre">{j.nombre}</span>
             <span className="qqp-orden-pts">{j.puntos ?? 0}p</span>
           </li>

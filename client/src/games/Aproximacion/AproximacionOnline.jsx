@@ -21,6 +21,7 @@ import { ChipJugadores, QRSala } from '../../components/MenuJuego.jsx';
 import { codigoInvitado } from '../../lib/invitacion.js';
 import { SelectorRondas } from '../../components/MenuJuego.jsx';
 import { rondasPorDefecto } from '../rondas.js';
+import CaraJugador from '../../components/CaraJugador.jsx';
 
 const LIM_ON = limitesOnline('aproximacion');
 
@@ -728,6 +729,7 @@ export default function AproximacionOnline({
             <div className="lb-lista qq-sala-lista">
               {sala.jugadores.map((j) => (
                 <div key={j.id} className={`lb-jug ${j.id === yoId ? 'yo' : ''}`}>
+                  <span className="lb-jug-cara" aria-hidden="true"><CaraJugador nombre={j.nombre} /></span>
                   <span className="lb-jug-nombre">
                     {j.nombre}{j.id === yoId ? ' (tú)' : ''}{j.id === 1 ? ' 👑' : ''}
                   </span>

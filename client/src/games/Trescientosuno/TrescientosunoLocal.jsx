@@ -159,7 +159,7 @@ export function OrdenTurnos({ jugadores, activoId, yoId = null, eventoResta = nu
             aria-current={esActivo ? 'step' : undefined}
           >
             <span className="qqp-orden-avatar">
-              {eliminado ? '💀' : plantado ? '🛑' : ganador ? '🏆' : inicial(j.nombre)}
+              {eliminado ? '💀' : plantado ? '🛑' : ganador ? '🏆' : <CaraJugador nombre={j.nombre} />}
             </span>
             <span className="qqp-orden-nombre">
               {j.nombre}{yoId && j.id === yoId ? ' (tú)' : ''}

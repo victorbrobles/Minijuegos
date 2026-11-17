@@ -676,6 +676,7 @@ export default function QuienMasOnline({
             <div className="lb-lista qq-sala-lista">
               {sala.jugadores.map((j) => (
                 <div key={j.id} className={`lb-jug ${j.id === yoId ? 'yo' : ''}`}>
+                  <span className="lb-jug-cara" aria-hidden="true"><CaraJugador nombre={j.nombre} /></span>
                   <span className="lb-jug-nombre">
                     {j.nombre}{j.id === yoId ? ' (tú)' : ''}{j.id === 1 ? ' 👑' : ''}
                   </span>
@@ -846,7 +847,7 @@ export default function QuienMasOnline({
                   const esMasVotado = !resultado.empate && j.nombre === resultado.ganador;
                   return (
                     <li key={j.id} className="qqp-rival" style={{ '--c': colorJugador(indiceColor(j, i)) }}>
-                      <span className="qqp-rival-avatar">{esMasVotado ? '👑' : inicial(j.nombre)}</span>
+                      <span className="qqp-rival-avatar">{esMasVotado ? '👑' : <CaraJugador nombre={j.nombre} />}</span>
                       <span className="qqp-rival-datos">
                         <span className="qqp-rival-nombre">
                           {esMasVotado ? '¡El más votado!' : 'Candidato'}

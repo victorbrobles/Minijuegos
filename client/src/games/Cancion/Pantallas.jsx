@@ -46,7 +46,7 @@ export function Hero({ onSalir, ronda, total, jugadores = [], yoId, turnoId }) {
         <ol className="afp-marcador" ref={ref} aria-label="Jugadores">
           {jugadores.map((j) => (
             <li key={j.id} className={`afp-jugador${j.id === turnoId ? ' activo' : ''}${j.bloqueado ? ' bloqueado' : ''}`} style={{ '--c': colorJugador(j.id) }}>
-              <span className="afp-avatar">{j.bloqueado ? '✗' : inicial(j.nombre)}</span>
+              <span className="afp-avatar">{j.bloqueado ? '✗' : <CaraJugador nombre={j.nombre} />}</span>
               <span className="afp-jugador-datos">
                 <span className="afp-jugador-nombre">{j.nombre}{j.id === yoId ? ' (tú)' : ''}</span>
                 <strong>{j.puntos ?? 0} pts</strong>
