@@ -4,6 +4,7 @@ import express from 'express';
 import { CATEGORIAS } from '../data/seeds/rapidfire/rapidfire.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
 import { totalRondas } from '../../client/src/games/rondas.js';
+import { rutaExpulsar } from '../lib/expulsar.js';
 const LIM = limitesOnline('rapidfire');
 
 const router = express.Router();
@@ -379,5 +380,7 @@ router.post('/online/sala/:code/finalizar', (req, res) => {
   sala.estado = 'final';
   res.json({ success: true });
 });
+
+rutaExpulsar(router, '/online/sala/:code/expulsar', { sala: (c) => salasOnline.get(c), esAnfitrion: (s, j) => s.adminToken === j.token });
 
 export default router;

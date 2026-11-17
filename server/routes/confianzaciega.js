@@ -5,6 +5,7 @@ import CATEGORIAS_NORMALES from '../data/seeds/confianzaciega/categorias.js';
 import CATEGORIAS_PICANTES from '../data/seeds/confianzaciega/personalizadas.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
 import { totalRondas } from '../../client/src/games/rondas.js';
+import { rutaExpulsar } from '../lib/expulsar.js';
 const LIM = limitesOnline('confianzaciega');
 
 const router = express.Router();
@@ -492,5 +493,7 @@ router.post('/online/sala/:code/salir', (req, res) => {
 
   res.json({ success: true });
 });
+
+rutaExpulsar(router, '/online/sala/:code/expulsar', { sala: (c) => salasOnline[c], esAnfitrion: (s, j) => s.adminToken === j.token });
 
 export default router;

@@ -3,6 +3,7 @@ import express from 'express';
 import { equiposData } from '../data/seeds/trescientosuno/index.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
 import { totalRondas } from '../../client/src/games/rondas.js';
+import { rutaExpulsar } from '../lib/expulsar.js';
 const LIM = limitesOnline('trescientosuno');
 
 const router = express.Router();
@@ -452,5 +453,7 @@ router.post('/online/sala/:code/salir', (req, res) => {
   }
   res.json({ success: true });
 });
+
+rutaExpulsar(router, '/online/sala/:code/expulsar', { sala: (c) => salasOnline.get(c), esAnfitrion: (s, j) => s.adminToken === j.token });
 
 export default router;

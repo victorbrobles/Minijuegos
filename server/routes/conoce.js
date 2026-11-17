@@ -6,6 +6,7 @@ import { combinarPreguntas, leerEleccion, preguntasDelGrupo } from '../lib/pregu
 import { limitesOnline } from '../../client/src/games/limites.js';
 import { totalRondas } from '../../client/src/games/rondas.js';
 import { sonRespuestasEquivalentes, formatearRespuesta, puntosPareja } from '../../client/src/games/Conoce/respuestas.js';
+import { rutaExpulsar } from '../lib/expulsar.js';
 const LIM = limitesOnline('conoce');
 
 const router = express.Router();
@@ -318,5 +319,7 @@ router.post('/sala/:code/salir', (req, res) => {
   }
   res.json({ success: true });
 });
+
+rutaExpulsar(router, '/sala/:code/expulsar', { sala: (c) => salas[c], esAnfitrion: (s, j) => Boolean(j.esAdmin) });
 
 export default router;

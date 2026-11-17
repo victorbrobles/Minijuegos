@@ -10,6 +10,7 @@ import { PantallaTablero, EnlaceSecundario, SelectorCategorias, colorJugador } f
 import { ChipJugadores, QRSala } from '../../components/MenuJuego.jsx';
 import { codigoInvitado } from '../../lib/invitacion.js';
 import CaraJugador from '../../components/CaraJugador.jsx';
+import { RejillaSala } from '../../components/TarjetaSala.jsx';
 
 const CLAVE_SESION_QQ = 'qq_online_session';
 
@@ -597,16 +598,7 @@ export default function QuienEsQuienOnline({
             <h3 className="qq-sala-titulo">
               <Icon name="users" size={20} /> Jugadores ({sala.jugadores.length})
             </h3>
-            <div className="lb-lista qq-sala-lista">
-              {sala.jugadores.map((j) => (
-                <div key={j.id} className={`lb-jug ${j.esTu ? 'yo' : ''}`}>
-                  <span className="lb-jug-cara" aria-hidden="true"><CaraJugador nombre={j.nombre} /></span>
-                  <span className="lb-jug-nombre">
-                    {j.nombre}{j.esTu ? ' (tú)' : ''}{j.id === 1 ? ' 👑' : ''}
-                  </span>
-                </div>
-              ))}
-            </div>
+            <RejillaSala jugadores={sala.jugadores} anfitrionId={1} quitar={sala?.esAdmin ? { url: `/api/quienesquien/sala/${sesion.code}/expulsar`, token: sesion.token } : undefined} />
           </div>
 
           {sala.esAdmin ? (

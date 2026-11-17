@@ -23,6 +23,7 @@ import { codigoInvitado } from '../../lib/invitacion.js';
 import { SelectorRondas } from '../../components/MenuJuego.jsx';
 import { rondasPorDefecto } from '../rondas.js';
 import CaraJugador from '../../components/CaraJugador.jsx';
+import { RejillaSala } from '../../components/TarjetaSala.jsx';
 
 const LIM_ON = limitesOnline('rankings');
 
@@ -680,16 +681,7 @@ export default function RankingsOnline({
             <h3 className="qq-sala-titulo">
               <Icon name="users" size={20} /> Jugadores ({sala.jugadores.length}/15)
             </h3>
-            <div className="lb-lista qq-sala-lista">
-              {sala.jugadores.map((j) => (
-                <div key={j.id} className={`lb-jug ${j.id === yoId ? 'yo' : ''}`}>
-                  <span className="lb-jug-cara" aria-hidden="true"><CaraJugador nombre={j.nombre} /></span>
-                  <span className="lb-jug-nombre">
-                    {j.nombre}{j.id === yoId ? ' (tú)' : ''}{j.id === 1 ? ' 👑' : ''}
-                  </span>
-                </div>
-              ))}
-            </div>
+            <RejillaSala jugadores={sala.jugadores} yoId={yoId} anfitrionId={1} quitar={esAdmin ? { url: `/api/rankings/online/sala/${sesion.code}/expulsar`, token: sesion.token } : undefined} />
             {sala.jugadores.length < LIM_ON.min && (
               <p className="hint" style={{ marginTop: '0.8rem' }}>
                 Se necesitan al menos {LIM_ON.min} jugadores para empezar la partida.

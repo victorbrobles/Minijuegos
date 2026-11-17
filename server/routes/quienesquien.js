@@ -5,6 +5,7 @@ import SEED_DATA from '../data/seeds/quienesquien/quienesquien.js';
 import { esAdmin } from '../lib/admin.js';
 import { validarCategoriaPersonalizada } from '../lib/listaPersonalizada.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
+import { rutaExpulsar } from '../lib/expulsar.js';
 const LIM = limitesOnline('quien-es-quien');
 
 const router = Router();
@@ -271,5 +272,7 @@ router.post('/sala/:code/salir', (req, res) => {
 
   res.json({ success: true });
 });
+
+rutaExpulsar(router, '/sala/:code/expulsar', { sala: (c) => salas[c], esAnfitrion: (s, j) => s.adminToken === j.token });
 
 export default router;

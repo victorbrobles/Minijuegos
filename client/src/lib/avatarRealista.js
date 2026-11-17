@@ -163,56 +163,63 @@ export function svgAvatar(a, { modo = 'cuerpo', fondo = null } = {}) {
   /* ───────── Cuerpo ───────── */
   const cuello = `<path d="M88 118 L88 152 Q100 158 112 152 L112 118 Z" fill="${fPiel}"/><path d="M88 128 Q100 144 112 128 L112 138 Q100 148 88 138 Z" fill="${sPiel}" opacity="0.45"/>`;
   const brazo = `<path d="M70 157 Q60 160 58 178 L54 246 Q54 257 60 257 Q66 257 66 246 L70 186 Z" fill="${fPiel}"/><ellipse cx="60" cy="262" rx="6.5" ry="9" fill="${piel}"/><path d="M56 262 Q60 270 64 262" stroke="${sPiel}" stroke-width="1.2" fill="none"/>`;
-  const brazos = ambos(brazo);
   const torso = `M72 154 Q100 146 128 154 Q134 158 134 172 L131 264 L69 264 L66 172 Q66 158 72 154 Z`;
-  const mangaCorta = (c) => ambos(`<path d="M72 154 Q59 158 56 180 L55 194 L69 196 L70 172 Z" fill="${c}"/><path d="M55.5 192 L69 194" stroke="${oscuro(ropa, 0.25)}" stroke-width="1.2"/>`);
-  const mangaLarga = (c, puno = oscuro(ropa, 0.12)) => ambos(`<path d="M72 154 Q59 158 56 180 L52 247 L67 249 L70 186 Z" fill="${c}"/><path d="M52.5 241 L67.5 243 L67 250 L52 248 Z" fill="${puno}"/><path d="M63 190 Q61 210 63 232" stroke="${oscuro(ropa, 0.2)}" stroke-width="1" fill="none" opacity="0.6"/>`);
+  // Las mangas van con cada brazo (piezas articuladas para poder animarlo): aquí solo la izquierda; la derecha es su espejo
+  const mangaCorta = (c) => `<path d="M72 154 Q59 158 56 180 L55 194 L69 196 L70 172 Z" fill="${c}"/><path d="M55.5 192 L69 194" stroke="${oscuro(ropa, 0.25)}" stroke-width="1.2"/>`;
+  const mangaLarga = (c, puno = oscuro(ropa, 0.12)) => `<path d="M72 154 Q59 158 56 180 L52 247 L67 249 L70 186 Z" fill="${c}"/><path d="M52.5 241 L67.5 243 L67 250 L52 248 Z" fill="${puno}"/><path d="M63 190 Q61 210 63 232" stroke="${oscuro(ropa, 0.2)}" stroke-width="1" fill="none" opacity="0.6"/>`;
   let arriba = '';
+  let manga = '';
   switch (a.arriba) {
     case 1: // camisa
-      arriba = `<path d="${torso}" fill="${fRopa}"/>${mangaLarga(fRopa)}<path d="M100 150 L100 264" stroke="${linea(ropa)}" stroke-width="1.2"/>${[172, 192, 212, 232, 252].map((y) => `<circle cx="103" cy="${y}" r="1.6" fill="${linea(ropa)}"/>`).join('')}<path d="M88 150 L100 166 L94 172 L84 156 Z M112 150 L100 166 L106 172 L116 156 Z" fill="${claro(ropa, 0.08)}" stroke="${linea(ropa)}" stroke-width="1"/>`; break;
+      manga = mangaLarga(fRopa); arriba = `<path d="${torso}" fill="${fRopa}"/><path d="M100 150 L100 264" stroke="${linea(ropa)}" stroke-width="1.2"/>${[172, 192, 212, 232, 252].map((y) => `<circle cx="103" cy="${y}" r="1.6" fill="${linea(ropa)}"/>`).join('')}<path d="M88 150 L100 166 L94 172 L84 156 Z M112 150 L100 166 L106 172 L116 156 Z" fill="${claro(ropa, 0.08)}" stroke="${linea(ropa)}" stroke-width="1"/>`; break;
     case 2: // sudadera
-      arriba = `<path d="M80 152 Q100 172 120 152 Q118 140 100 140 Q82 140 80 152 Z" fill="${oscuro(ropa, 0.18)}"/><path d="${torso}" fill="${fRopa}"/>${mangaLarga(fRopa)}<path d="M84 152 Q100 166 116 152" stroke="${oscuro(ropa, 0.25)}" stroke-width="3" fill="none"/><path d="M94 160 L93 184 M106 160 L107 184" stroke="${claro(ropa, 0.6)}" stroke-width="1.6" stroke-linecap="round"/><path d="M78 222 L122 222 L126 250 L74 250 Z" fill="${oscuro(ropa, 0.08)}" stroke="${linea(ropa)}" stroke-width="1"/><rect x="69" y="256" width="62" height="8" fill="${oscuro(ropa, 0.14)}"/>`; break;
+      manga = mangaLarga(fRopa); arriba = `<path d="M80 152 Q100 172 120 152 Q118 140 100 140 Q82 140 80 152 Z" fill="${oscuro(ropa, 0.18)}"/><path d="${torso}" fill="${fRopa}"/><path d="M84 152 Q100 166 116 152" stroke="${oscuro(ropa, 0.25)}" stroke-width="3" fill="none"/><path d="M94 160 L93 184 M106 160 L107 184" stroke="${claro(ropa, 0.6)}" stroke-width="1.6" stroke-linecap="round"/><path d="M78 222 L122 222 L126 250 L74 250 Z" fill="${oscuro(ropa, 0.08)}" stroke="${linea(ropa)}" stroke-width="1"/><rect x="69" y="256" width="62" height="8" fill="${oscuro(ropa, 0.14)}"/>`; break;
     case 3: { // chaqueta vaquera sobre camiseta blanca
       const vaq = ropa === COLORES_ROPA[0] ? '#7fa3cc' : ropa;
       const fVaq = vol('vaq', vaq, 0.18);
       arriba = `<path d="${torso}" fill="#f8fafc"/><path d="M88 151 Q100 166 112 151 Z" fill="${fPiel}"/>`
         + ambos(`<path d="M72 154 Q84 149 90 151 L95 264 L69 264 L66 172 Q66 158 72 154Z" fill="${fVaq}"/><path d="M90 151 L84 176 L95 190" stroke="${oscuro(vaq, 0.3)}" stroke-width="1.4" fill="${claro(vaq, 0.08)}"/><rect x="73" y="182" width="14" height="12" rx="2" fill="none" stroke="${claro(vaq, 0.45)}" stroke-width="1.2" stroke-dasharray="2 1.5"/><path d="M93 200 L94 262" stroke="${claro(vaq, 0.45)}" stroke-width="1.2" stroke-dasharray="2 1.5"/>`)
-        + mangaLarga(fVaq, oscuro(vaq, 0.15)); break;
+        ; manga = mangaLarga(fVaq, oscuro(vaq, 0.15)); break;
     }
     case 4: // jersey de cuello alto
-      arriba = `<path d="${torso}" fill="${fRopa}"/>${mangaLarga(fRopa)}<rect x="86" y="134" width="28" height="22" rx="6" fill="${fRopa}"/>${[140, 145, 150].map((y) => `<path d="M88 ${y} L112 ${y}" stroke="${oscuro(ropa, 0.16)}" stroke-width="1"/>`).join('')}<rect x="69" y="254" width="62" height="10" fill="${oscuro(ropa, 0.1)}"/>`; break;
+      manga = mangaLarga(fRopa); arriba = `<path d="${torso}" fill="${fRopa}"/><rect x="86" y="134" width="28" height="22" rx="6" fill="${fRopa}"/>${[140, 145, 150].map((y) => `<path d="M88 ${y} L112 ${y}" stroke="${oscuro(ropa, 0.16)}" stroke-width="1"/>`).join('')}<rect x="69" y="254" width="62" height="10" fill="${oscuro(ropa, 0.1)}"/>`; break;
     case 5: // top de tirantes
       arriba = `<path d="M70 172 Q100 182 130 172 L131 264 L69 264 L68 180 Z" fill="${fRopa}"/><path d="M80 154 L78 176 M120 154 L122 176" stroke="${ropa}" stroke-width="3.5" stroke-linecap="round"/>`; break;
     case 6: { // traje
-      arriba = `<path d="${torso}" fill="${fRopa}"/>${mangaLarga(fRopa, '#f8fafc')}<path d="M88 151 L100 192 L112 151 Z" fill="#f8fafc"/><path d="M98 156 L102 156 L104 186 L100 192 L96 186 Z" fill="#b91c1c"/>`
+      manga = mangaLarga(fRopa, '#f8fafc'); arriba = `<path d="${torso}" fill="${fRopa}"/><path d="M88 151 L100 192 L112 151 Z" fill="#f8fafc"/><path d="M98 156 L102 156 L104 186 L100 192 L96 186 Z" fill="#b91c1c"/>`
         + ambos(`<path d="M88 151 L100 192 L86 176 L82 158 Z" fill="${oscuro(ropa, 0.1)}" stroke="${linea(ropa)}" stroke-width="1"/>`) + `<circle cx="100" cy="214" r="1.8" fill="${linea(ropa)}"/><circle cx="100" cy="234" r="1.8" fill="${linea(ropa)}"/>`; break;
     }
     default: // camiseta
-      arriba = `<path d="${torso}" fill="${fRopa}"/>${mangaCorta(fRopa)}<path d="M88 151 Q100 166 112 151 Z" fill="${fPiel}"/><path d="M87 151 Q100 168 113 151" stroke="${oscuro(ropa, 0.2)}" stroke-width="2" fill="none"/>`;
+      manga = mangaCorta(fRopa); arriba = `<path d="${torso}" fill="${fRopa}"/><path d="M88 151 Q100 166 112 151 Z" fill="${fPiel}"/><path d="M87 151 Q100 168 113 151" stroke="${oscuro(ropa, 0.2)}" stroke-width="2" fill="none"/>`;
   }
   const arrugas = `<path d="M80 236 Q86 240 84 252 M120 230 Q114 238 117 252" stroke="${oscuro(ropa, 0.22)}" stroke-width="1" fill="none" opacity="0.5"/>`;
 
   /* ───────── Piernas, parte de abajo y calzado ───────── */
-  const piernasPiel = `<path d="M74 298 L97 298 L95 388 L79 388 Z" fill="${fPiel}"/><path d="M103 298 L126 298 L121 388 L105 388 Z" fill="${fPiel}"/>`;
-  const perneraI = `M68 262 L100 262 L98 390 L75 390 Q69 326 68 262 Z`;
-  const perneraD = `M100 262 L132 262 Q131 326 125 390 L102 390 Z`;
-  let abajo = '';
+  // Cada pierna (con su pernera y su zapato) es una pieza aparte; la cintura (o la falda) va encima
+  const pielI = `<path d="M74 298 L97 298 L95 388 L79 388 Z" fill="${fPiel}"/>`;
+  const pielD = `<path d="M103 298 L126 298 L121 388 L105 388 Z" fill="${fPiel}"/>`;
+  const perneraI = `<path d="M68 262 L100 262 L98 390 L75 390 Q69 326 68 262 Z" fill="${fPant}"/>`;
+  const perneraD = `<path d="M100 262 L132 262 Q131 326 125 390 L102 390 Z" fill="${fPant}"/>`;
+  const cinturilla = `<rect x="68" y="260" width="64" height="8" fill="${oscuro(pant, 0.12)}"/>`;
+  let piernaI; let piernaD; let cadera;
   switch (a.abajo) {
-    case 1: abajo = `<path d="${perneraI}" fill="${fPant}"/><path d="${perneraD}" fill="${fPant}"/><path d="M86 278 L87 388 M114 278 L113 388" stroke="${oscuro(pant, 0.2)}" stroke-width="1" opacity="0.7"/><rect x="68" y="260" width="64" height="8" fill="${oscuro(pant, 0.12)}"/>`; break;
-    case 2: abajo = `${piernasPiel}<path d="M68 262 L100 262 L98 316 L72 316 Q69 290 68 262 Z" fill="${fPant}"/><path d="M100 262 L132 262 Q131 290 128 316 L102 316 Z" fill="${fPant}"/><rect x="68" y="260" width="64" height="8" fill="${oscuro(pant, 0.12)}"/>`; break;
-    case 3: abajo = `${piernasPiel}<path d="M68 258 L132 258 L142 326 Q100 334 58 326 Z" fill="${fPant}"/><path d="M80 270 L74 324 M100 270 L100 330 M120 270 L126 324" stroke="${oscuro(pant, 0.18)}" stroke-width="1" opacity="0.6"/>`; break;
-    case 4: abajo = `<path d="${perneraI}" fill="${fPant}"/><path d="${perneraD}" fill="${fPant}"/><path d="M71 268 L77 388 M129 268 L123 388" stroke="#ffffff" stroke-width="3" opacity="0.9"/><rect x="68" y="260" width="64" height="8" fill="${oscuro(pant, 0.12)}"/>`; break;
-    default: abajo = `<path d="${perneraI}" fill="${fPant}"/><path d="${perneraD}" fill="${fPant}"/><path d="M100 268 L100 300" stroke="${oscuro(pant, 0.3)}" stroke-width="1.2"/><path d="M85 300 L86 386 M115 300 L114 386" stroke="${claro(pant, 0.3)}" stroke-width="1" opacity="0.6"/><rect x="68" y="260" width="64" height="8" fill="${oscuro(pant, 0.12)}"/><rect x="96" y="261" width="8" height="6" rx="1" fill="none" stroke="#c9a227" stroke-width="1.2"/>`;
+    case 1: piernaI = perneraI + `<path d="M86 278 L87 388" stroke="${oscuro(pant, 0.2)}" stroke-width="1" opacity="0.7"/>`; piernaD = perneraD + `<path d="M114 278 L113 388" stroke="${oscuro(pant, 0.2)}" stroke-width="1" opacity="0.7"/>`; cadera = cinturilla; break;
+    case 2: piernaI = pielI + `<path d="M68 262 L100 262 L98 316 L72 316 Q69 290 68 262 Z" fill="${fPant}"/>`; piernaD = pielD + `<path d="M100 262 L132 262 Q131 290 128 316 L102 316 Z" fill="${fPant}"/>`; cadera = cinturilla; break;
+    case 3: piernaI = pielI; piernaD = pielD; cadera = `<path d="M68 258 L132 258 L142 326 Q100 334 58 326 Z" fill="${fPant}"/><path d="M80 270 L74 324 M100 270 L100 330 M120 270 L126 324" stroke="${oscuro(pant, 0.18)}" stroke-width="1" opacity="0.6"/>`; break;
+    case 4: piernaI = perneraI + `<path d="M71 268 L77 388" stroke="#ffffff" stroke-width="3" opacity="0.9"/>`; piernaD = perneraD + `<path d="M129 268 L123 388" stroke="#ffffff" stroke-width="3" opacity="0.9"/>`; cadera = cinturilla; break;
+    default:
+      piernaI = perneraI + `<path d="M85 300 L86 386" stroke="${claro(pant, 0.3)}" stroke-width="1" opacity="0.6"/>`;
+      piernaD = perneraD + `<path d="M115 300 L114 386" stroke="${claro(pant, 0.3)}" stroke-width="1" opacity="0.6"/>`;
+      cadera = `<path d="M100 268 L100 300" stroke="${oscuro(pant, 0.3)}" stroke-width="1.2"/>${cinturilla}<rect x="96" y="261" width="8" height="6" rx="1" fill="none" stroke="#c9a227" stroke-width="1.2"/>`;
   }
-  const zapato = (c, suela, alto = 0) => ambos(`<path d="M75 ${384 - alto} L97 ${384 - alto} L98 398 Q98 405 92 405 L69 405 Q62 405 64 398 Q66 390 75 384 Z" fill="${c}"/><path d="M63 401 L98 401 L98 405 L66 405 Q62 405 63 401 Z" fill="${suela}"/>`);
-  let calzado;
+  const zapato = (c, suela, alto = 0, detalle = '') => `<path d="M75 ${384 - alto} L97 ${384 - alto} L98 398 Q98 405 92 405 L69 405 Q62 405 64 398 Q66 390 75 384 Z" fill="${c}"/><path d="M63 401 L98 401 L98 405 L66 405 Q62 405 63 401 Z" fill="${suela}"/>${detalle}`;
+  let calzado; // el izquierdo; el derecho es su espejo
   switch (a.calzado) {
-    case 1: calzado = zapato('#1f2937', '#f8fafc') + ambos(`<path d="M76 390 L88 389" stroke="#f8fafc" stroke-width="1.5"/>`); break;
+    case 1: calzado = zapato('#1f2937', '#f8fafc', 0, `<path d="M76 390 L88 389" stroke="#f8fafc" stroke-width="1.5"/>`); break;
     case 2: calzado = zapato('#7c4a24', '#3b2414', 26); break;
-    case 3: calzado = zapato('#111827', '#111827') + ambos(`<path d="M72 392 Q80 388 90 390" stroke="#4b5563" stroke-width="1" fill="none"/>`); break;
-    case 4: calzado = zapato(ropa, '#f8fafc') + ambos(`<path d="M78 389 L92 388" stroke="#f8fafc" stroke-width="1.6"/>`); break;
-    default: calzado = zapato('#f8fafc', '#cbd5e1') + ambos(`<path d="M76 390 L88 389 M72 395 L94 395" stroke="#cbd5e1" stroke-width="1.2"/>`);
+    case 3: calzado = zapato('#111827', '#111827', 0, `<path d="M72 392 Q80 388 90 390" stroke="#4b5563" stroke-width="1" fill="none"/>`); break;
+    case 4: calzado = zapato(ropa, '#f8fafc', 0, `<path d="M78 389 L92 388" stroke="#f8fafc" stroke-width="1.6"/>`); break;
+    default: calzado = zapato('#f8fafc', '#cbd5e1', 0, `<path d="M76 390 L88 389 M72 395 L94 395" stroke="#cbd5e1" stroke-width="1.2"/>`);
   }
 
   /* ───────── Complementos ───────── */
@@ -231,10 +238,13 @@ export function svgAvatar(a, { modo = 'cuerpo', fondo = null } = {}) {
 
   const cuerpo = modo === 'cuerpo';
   const sombraSuelo = cuerpo ? `<ellipse cx="100" cy="408" rx="46" ry="6" fill="#000000" opacity="0.15"/>` : '';
-  const contenido = [
-    sombraSuelo, peloDetras, cuerpo ? abajo : '', cuerpo ? calzado : '', brazos, cuello, arriba, cuerpo ? arrugas : '',
-    orejas, cara, mejillas, barba, boca, nariz, ojosSvg, cejas, gafas, peloDelante, extra
-  ].join('');
+  // Piezas articuladas (grupos con clase) para poder animarlas: piernas, cadera, tronco (con brazos y cabeza dentro)
+  const cabeza = `<g class="av-cabeza">${orejas}${cara}${mejillas}${barba}${boca}${nariz}<g class="av-ojos">${ojosSvg}</g>${cejas}${gafas}${peloDelante}${extra}</g>`;
+  const brazos = `<g class="av-brazo-i">${brazo}${manga}</g><g class="av-brazo-d">${espejo(brazo + manga)}</g>`;
+  const contenido = cuerpo
+    ? `${sombraSuelo}<g class="av-todo"><g class="av-pierna-i">${piernaI}${calzado}</g><g class="av-pierna-d">${piernaD}${espejo(calzado)}</g>`
+      + `<g class="av-tronco"><g class="av-cabeza-atras">${peloDetras}</g><g class="av-cadera">${cadera}</g>${brazos}${cuello}${arriba}${arrugas}${cabeza}</g></g>`
+    : `<g class="av-cabeza-atras">${peloDetras}</g>${brazos}${cuello}${arriba}${cabeza}`;
   const vb = cuerpo ? '0 0 200 420' : '42 22 116 116';
   const fondoSvg = fondo ? (cuerpo ? `<rect x="0" y="0" width="200" height="420" fill="${fondo}"/>` : `<circle cx="100" cy="80" r="58" fill="${fondo}"/>`) : '';
   const recorte = !cuerpo ? `<clipPath id="${id}rc"><circle cx="100" cy="80" r="58"/></clipPath>` : '';

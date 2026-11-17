@@ -5,6 +5,7 @@ import seed from '../data/seeds/rankings/rankings.seed.js';
 import { barajar } from '../lib/barajar.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
 import { totalRondas } from '../../client/src/games/rondas.js';
+import { rutaExpulsar } from '../lib/expulsar.js';
 const LIM = limitesOnline('rankings');
 
 const router = Router();
@@ -611,5 +612,7 @@ router.post('/online/sala/:code/finalizar', (req, res) => {
   sala.estado = 'final';
   res.json({ success: true });
 });
+
+rutaExpulsar(router, '/online/sala/:code/expulsar', { sala: (c) => salasOnline.get(c), esAnfitrion: (s, j) => s.adminToken === j.token });
 
 export default router;

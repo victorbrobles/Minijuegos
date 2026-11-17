@@ -21,6 +21,7 @@ import { codigoInvitado } from '../../lib/invitacion.js';
 import { SelectorRondas } from '../../components/MenuJuego.jsx';
 import { rondasPorDefecto } from '../rondas.js';
 import CaraJugador from '../../components/CaraJugador.jsx';
+import { RejillaSala } from '../../components/TarjetaSala.jsx';
 
 const LIM_ON = limitesOnline('telepatia');
 
@@ -504,16 +505,7 @@ export default function TelepatiaOnline({
             <h3 className="qq-sala-titulo">
               <Icon name="users" size={20} /> Jugadores ({sala.jugadores.length}/20)
             </h3>
-            <div className="lb-lista qq-sala-lista">
-              {sala.jugadores.map((j) => (
-                <div key={j.id} className={`lb-jug ${j.esTu ? 'yo' : ''}`}>
-                  <span className="lb-jug-cara" aria-hidden="true"><CaraJugador nombre={j.nombre} /></span>
-                  <span className="lb-jug-nombre">
-                    {j.nombre}{j.esTu ? ' (tú)' : ''}{j.esAdmin ? ' 👑' : ''}
-                  </span>
-                </div>
-              ))}
-            </div>
+            <RejillaSala jugadores={sala.jugadores} quitar={esAdmin ? { url: `/api/telepatia/sala/${sesion.code}/expulsar`, token: sesion.token } : undefined} />
             {faltan > 0 && (
               <p className="hint" style={{ marginTop: '0.8rem' }}>
                 Faltan al menos {faltan} jugador{faltan === 1 ? '' : 'es'} para poder empezar (mínimo {LIM_ON.min}).
