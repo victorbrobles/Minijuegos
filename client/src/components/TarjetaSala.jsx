@@ -31,7 +31,7 @@ export function TarjetaSala({ nombre, yo = false, anfitrion = false, indice = 0,
   return (
     <div className={`ts-tarjeta${yo ? ' yo' : ''}`} style={estilo}>
       <div className="ts-escenario">
-        <div className={`ts-personaje ts-baile-${baile}`}><AvatarSVG a={a} modo="cuerpo" tam={86} /></div>
+        <div className={`ts-personaje ts-baile-${baile}`}><AvatarSVG a={a} modo="cuerpo" tam={60} /></div>
       </div>
       <span className="ts-nombre">{anfitrion ? '👑 ' : ''}{nombre}{yo ? ' (tú)' : ''}</span>
       {children && <span className="ts-extra">{children}</span>}
