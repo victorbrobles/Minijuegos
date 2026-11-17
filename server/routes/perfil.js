@@ -4,7 +4,7 @@
 //   POST /api/perfil { jugador, avatar, color }
 import express from 'express';
 import db from '../db.js';
-import { leerAvatar } from '../../client/src/lib/avatarPartes.js';
+import { leerAvatar, textoAvatar } from '../../client/src/lib/avatarPartes.js';
 
 export const AVATARES = ['😎', '🤓', '🥳', '😺', '🐶', '🦊', '🐼', '🐸', '🐵', '🦁', '🐯', '🐧', '🦄', '🐙', '🦖', '🐲', '👽', '🤖', '👻', '🎃',
   '🧙', '🥷', '🦸', '🧛', '🧑‍🚀', '🧑‍🍳', '⚽', '🏀', '🎸', '🎮', '🎲', '🃏', '♟️', '🚀', '🌵', '🍕', '🍩', '🌈', '🔥', '⭐'];
@@ -28,7 +28,7 @@ router.post('/', (req, res) => {
   if (!valido(String(jugador || ''))) return res.status(400).json({ error: 'Jugador no válido.' });
   const dibujo = leerAvatar(avatar); // avatar dibujado (JSON con sus piezas) o, como antes, un emoji
   if ((!dibujo && !AVATARES.includes(avatar)) || !COLORES.includes(color)) return res.status(400).json({ error: 'Avatar o color no válido.' });
-  guardar.run(jugador, dibujo ? JSON.stringify(dibujo) : avatar, color, Date.now());
+  guardar.run(jugador, dibujo ? textoAvatar(dibujo) : avatar, color, Date.now());
   res.json({ success: true });
 });
 

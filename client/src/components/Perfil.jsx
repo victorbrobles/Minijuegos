@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 import { usePerfiles, cargarOpciones, guardarPerfil } from '../lib/perfil.js';
 import { partirNombre } from '../lib/identidad.js';
 import AvatarSVG from './AvatarSVG.jsx';
-import { PIEZAS, AVATAR_INICIAL, leerAvatar, textoAvatar, avatarAleatorio } from '../lib/avatarPartes.js';
+import { PIEZAS, PIEZAS_CARA, PIEZAS_ROPA, AVATAR_INICIAL, leerAvatar, textoAvatar, avatarAleatorio } from '../lib/avatarPartes.js';
 import './Perfil.css';
 
 export function AvatarJugador({ nombre, tam = 28, perfil: dado }) {
@@ -16,7 +16,7 @@ export function AvatarJugador({ nombre, tam = 28, perfil: dado }) {
   const ini = (partirNombre(nombre).nombre || '?').charAt(0).toUpperCase();
   const dibujo = leerAvatar(per?.avatar);
   if (dibujo) {
-    return <span className="pf-avatar dibujo" style={{ width: tam, height: tam }} aria-hidden="true"><AvatarSVG a={dibujo} fondo={per.color} tam={tam} /></span>;
+    return <span className="pf-avatar dibujo" style={{ width: tam, height: tam }} aria-hidden="true"><AvatarSVG a={dibujo} fondo={per.color} tam={tam} modo="cara" /></span>;
   }
   return (
     <span className="pf-avatar" style={{ '--c': per?.color || '#94a3b8', width: tam, height: tam, fontSize: tam * (per ? 0.58 : 0.46) }} aria-hidden="true">
@@ -35,44 +35,68 @@ export function EnlacePerfil({ nombre, children, tam = 22 }) {
   );
 }
 
+/** Escena con el avatar de cuerpo entero (editor y página de perfil). */
+export function EscenaAvatar({ a, fondo, alto = 230, titulo }) {
+  return <div className="pf-escena" style={{ '--c': fondo }}><AvatarSVG a={a} modo="cuerpo" tam={alto} titulo={titulo} /></div>;
+}
+
+const BLOQUES = [
+  { id: 'cara', nombre: 'Cara', emoji: '😀', piezas: PIEZAS_CARA },
+  { id: 'ropa', nombre: 'Ropa', emoji: '👕', piezas: PIEZAS_ROPA },
+  { id: 'fondo', nombre: 'Fondo', emoji: '🎨', piezas: [] }
+];
+
 export function EditarPerfil({ jugador, onCerrar }) {
   const actual = usePerfiles([jugador])[jugador];
   const [ops, setOps] = useState(null);
   const [a, setA] = useState(() => leerAvatar(actual?.avatar) || AVATAR_INICIAL);
   const [color, setColor] = useState(actual?.color || null);
+  const [bloque, setBloque] = useState('cara');
   const [pieza, setPieza] = useState('pelo');
   const [error, setError] = useState('');
   useEffect(() => { cargarOpciones().then((o) => { setOps(o); setColor((c) => c || o.colores[7]); }).catch(() => setError('Sin conexión.')); }, []);
   const guardar = async () => { try { await guardarPerfil(jugador, textoAvatar(a), color); onCerrar(); } catch (e) { setError(e.message); } };
+  const cambiarBloque = (b) => { setBloque(b.id); if (b.piezas.length) setPieza(b.piezas[b.id === 'cara' ? 1 : 0]); };
   const def = PIEZAS.find((p) => p.id === pieza);
   const fondo = color || '#6366f1';
+  const enRopa = PIEZAS_ROPA.includes(pieza);
+  const piezasBloque = BLOQUES.find((b) => b.id === bloque).piezas;
   return createPortal(
     <div className="rg-modal-fondo pf-fondo" onClick={onCerrar}>
       <div className="pf-modal pf-editor" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Tu avatar">
         <div className="pf-previa">
-          <span className="pf-previa-dibujo"><AvatarSVG a={a} fondo={fondo} tam={108} titulo="Tu avatar" /></span>
-          <b>{partirNombre(jugador).nombre}</b>
-          <button type="button" className="pf-azar" onClick={() => setA(avatarAleatorio())}>🎲 Aleatorio</button>
+          <EscenaAvatar a={a} fondo={fondo} titulo="Tu avatar" />
+          <div className="pf-previa-pie">
+            <b>{partirNombre(jugador).nombre}</b>
+            <button type="button" className="pf-azar" onClick={() => setA(avatarAleatorio())}>🎲 Aleatorio</button>
+          </div>
         </div>
-        <div className="pf-pestanas" role="tablist">
-          {PIEZAS.map((p) => (
-            <button key={p.id} type="button" role="tab" aria-selected={p.id === pieza} className={p.id === pieza ? 'sel' : ''} onClick={() => setPieza(p.id)}>
-              <span aria-hidden="true">{p.emoji}</span>{p.nombre}
+        <div className="pf-bloques" role="tablist">
+          {BLOQUES.map((b) => (
+            <button key={b.id} type="button" role="tab" aria-selected={b.id === bloque} className={b.id === bloque ? 'sel' : ''} onClick={() => cambiarBloque(b)}>
+              <span aria-hidden="true">{b.emoji}</span>{b.nombre}
             </button>
           ))}
-          <button type="button" role="tab" aria-selected={pieza === 'fondo'} className={pieza === 'fondo' ? 'sel' : ''} onClick={() => setPieza('fondo')}><span aria-hidden="true">🟣</span>Fondo</button>
         </div>
-        {pieza === 'fondo' ? (
+        {piezasBloque.length > 0 && (
+          <div className="pf-pestanas" role="tablist">
+            {piezasBloque.map((id) => {
+              const p = PIEZAS.find((x) => x.id === id);
+              return <button key={id} type="button" role="tab" aria-selected={id === pieza} className={id === pieza ? 'sel' : ''} onClick={() => setPieza(id)}>{p.nombre}</button>;
+            })}
+          </div>
+        )}
+        {bloque === 'fondo' ? (
           !ops ? <p className="pzp-nota">{error || 'Cargando…'}</p> : (
             <div className="pf-colores">{ops.colores.map((c) => <button key={c} type="button" aria-label={`Fondo ${c}`} className={c === color ? 'sel' : ''} style={{ '--c': c }} onClick={() => setColor(c)} />)}</div>
           )
         ) : def.colores ? (
           <div className="pf-colores">{def.colores.map((c, i) => <button key={c} type="button" aria-label={`${def.nombre} ${i + 1}`} className={i === a[pieza] ? 'sel' : ''} style={{ '--c': c }} onClick={() => setA({ ...a, [pieza]: i })} />)}</div>
         ) : (
-          <div className="pf-opciones">
+          <div className={`pf-opciones${enRopa ? ' ropa' : ''}`}>
             {def.opciones.map((nom, i) => (
               <button key={nom} type="button" className={i === a[pieza] ? 'sel' : ''} onClick={() => setA({ ...a, [pieza]: i })} title={nom}>
-                <AvatarSVG a={{ ...a, [pieza]: i }} fondo={fondo} tam={58} />
+                {enRopa ? <AvatarSVG a={{ ...a, [pieza]: i }} modo="cuerpo" tam={112} /> : <AvatarSVG a={{ ...a, [pieza]: i }} fondo={fondo} tam={58} />}
                 <small>{nom}</small>
               </button>
             ))}

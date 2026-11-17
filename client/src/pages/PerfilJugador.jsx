@@ -3,7 +3,9 @@
 import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Icon from '../components/Icon.jsx';
-import { AvatarJugador, EditarPerfil } from '../components/Perfil.jsx';
+import { AvatarJugador, EditarPerfil, EscenaAvatar } from '../components/Perfil.jsx';
+import { usePerfiles } from '../lib/perfil.js';
+import { leerAvatar } from '../lib/avatarPartes.js';
 import { Personales, useJson } from './Estadisticas.jsx';
 import { nombreCompleto, partirNombre } from '../lib/identidad.js';
 import { metaDe } from '../games/meta.js';
@@ -19,11 +21,13 @@ export default function PerfilJugador() {
   const [editar, setEditar] = useState(false);
   const esYo = nombre === nombreCompleto();
   const { nombre: visible, tag } = partirNombre(nombre);
+  const perfil = usePerfiles(valido ? [nombre] : [])[nombre];
+  const cuerpo = leerAvatar(perfil?.avatar);
   return (
     <div className="game-shell est-pagina">
       <Link to="/" className="back" aria-label="Volver a la portada"><Icon name="arrowLeft" size={20} strokeWidth={2.5} /><span>Portada</span></Link>
       <header className="pf-cab">
-        <AvatarJugador nombre={nombre} tam={64} />
+        {cuerpo ? <div className="pf-cab-escena"><EscenaAvatar a={cuerpo} fondo={perfil.color} alto={170} /></div> : <AvatarJugador nombre={nombre} tam={64} />}
         <div><p>Perfil de jugador</p><h1>{visible} <small>#{tag}</small></h1></div>
         {esYo && <button type="button" onClick={() => setEditar(true)}>✏️ Avatar</button>}
       </header>
