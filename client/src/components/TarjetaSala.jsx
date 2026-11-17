@@ -1,6 +1,6 @@
 // client/src/components/TarjetaSala.jsx
-// Sala de espera online: cada jugador es una tarjeta con su avatar de cuerpo entero BAILANDO (5 bailes distintos,
-// con movimientos de piernas, tronco, brazos y cabeza), su nombre debajo y, para el anfitrión, la ✕ para quitarlo.
+// Sala de espera online: cada jugador es una tarjeta con su avatar de cuerpo entero CALENTANDO antes del partido
+// (5 ejercicios lentos: estiramiento lateral, círculos de brazos, brazo cruzado y cuello, pierna fuera, zancada lateral), su nombre debajo y, para el anfitrión, la ✕ para quitarlo.
 // Las animaciones son CSS (TarjetaSala.css) y solo mueven piezas ya dibujadas; con «menos animaciones», quietos.
 import React, { useMemo, useState } from 'react';
 import AvatarSVG from './AvatarSVG.jsx';
@@ -25,13 +25,13 @@ export function TarjetaSala({ nombre, yo = false, anfitrion = false, indice = 0,
   const fondo = propio ? perfil.color : inventado.color;
   const estilo = useMemo(() => {
     const h = semilla(nombre);
-    return { '--i': indice, '--retraso': `${-((h % 1000) / 1000) * 2}s`, '--velocidad': `${1.7 + ((h >> 10) % 7) / 10}s`, '--c': fondo };
+    return { '--i': indice, '--retraso': `${-((h % 1000) / 1000) * 6}s`, '--velocidad': `${5.5 + ((h >> 10) % 7) / 4}s`, '--c': fondo };
   }, [nombre, indice, fondo]);
   const baile = semilla(`${nombre}*`) % BAILES;
   return (
     <div className={`ts-tarjeta${yo ? ' yo' : ''}`} style={estilo}>
       <div className="ts-escenario">
-        <div className={`ts-personaje ts-baile-${baile}`}><AvatarSVG a={a} modo="cuerpo" tam={128} /></div>
+        <div className={`ts-personaje ts-baile-${baile}`}><AvatarSVG a={a} modo="cuerpo" tam={86} /></div>
       </div>
       <span className="ts-nombre">{anfitrion ? '👑 ' : ''}{nombre}{yo ? ' (tú)' : ''}</span>
       {children && <span className="ts-extra">{children}</span>}

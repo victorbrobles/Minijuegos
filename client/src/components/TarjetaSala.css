@@ -1,34 +1,34 @@
-/* client/src/components/TarjetaSala.css — sala de espera online con los avatares bailando */
-.ts-rejilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(98px, 1fr)); gap: 0.55rem; }
+/* client/src/components/TarjetaSala.css — sala de espera online: los avatares calientan antes del partido */
+.ts-rejilla { display: grid; grid-template-columns: repeat(auto-fill, minmax(76px, 1fr)); gap: 0.45rem; }
 .ts-tarjeta {
-  position: relative; display: grid; justify-items: center; padding: 0.45rem 0.2rem 0.5rem; border-radius: 20px;
+  position: relative; display: grid; justify-items: center; padding: 0.3rem 0.15rem 0.35rem; border-radius: 14px;
   background: linear-gradient(180deg, color-mix(in srgb, var(--c, #6366f1) 22%, #ffffff) 0%, color-mix(in srgb, var(--c, #6366f1) 8%, #ffffff) 62%, #e9dfcf 62.5%, #ddd0ba 100%);
   box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.06); color: #334155;
-  animation: tsEntra 0.6s cubic-bezier(0.2, 1.4, 0.4, 1) both; animation-delay: calc(var(--i) * 0.1s);
+  animation: tsEntra 0.35s ease-out both; animation-delay: calc(var(--i) * 0.05s);
 }
 .ts-tarjeta.yo { box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--c, #6366f1) 70%, #ffffff); }
-.ts-escenario { display: flex; align-items: flex-end; height: 132px; }
+.ts-escenario { display: flex; align-items: flex-end; height: 88px; }
 .ts-personaje { display: block; line-height: 0; }
 .ts-personaje svg { overflow: visible; }
-.ts-nombre { max-width: 100%; margin-top: 0.25rem; overflow: hidden; font-size: 0.78rem; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.ts-nombre { max-width: 100%; margin-top: 0.15rem; overflow: hidden; font-size: 0.7rem; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
 .ts-extra { display: inline-flex; align-items: center; gap: 0.3rem; min-height: 0; font-size: 0.7rem; }
 /* El botón «Quitar» de cada juego pasa a ser una ✕ en la esquina */
 .ts-extra button[class$="-quitar"] {
-  position: absolute; top: 6px; right: 6px; z-index: 2; display: grid; place-items: center; width: 26px; height: 26px; min-width: 0; padding: 0;
+  position: absolute; top: 4px; right: 4px; z-index: 2; display: grid; place-items: center; width: 22px; height: 22px; min-width: 0; padding: 0;
   border: none; border-radius: 50%; background: rgba(15, 23, 42, 0.1); color: transparent; font-size: 0; box-shadow: none; cursor: pointer;
 }
-.ts-extra button[class$="-quitar"]::after { content: '✕'; color: #475569; font-size: 0.8rem; font-weight: 900; }
+.ts-extra button[class$="-quitar"]::after { content: '✕'; color: #475569; font-size: 0.7rem; font-weight: 900; }
 .ts-extra button[class$="-quitar"]:hover { background: #fee2e2; }
 .ts-extra button[class$="-quitar"]:hover::after { color: #b91c1c; }
-.ts-hueco { display: grid; place-items: center; align-content: center; gap: 0.2rem; min-height: 172px; padding: 0.5rem; border: 2px dashed #cbd5e1; border-radius: 20px; color: #94a3b8; font-size: 0.75rem; font-weight: 700; text-align: center; }
+.ts-hueco { display: grid; place-items: center; align-content: center; gap: 0.2rem; min-height: 118px; padding: 0.4rem; border: 2px dashed #cbd5e1; border-radius: 14px; color: #94a3b8; font-size: 0.68rem; font-weight: 700; text-align: center; }
 .ts-hueco b { font-size: 1.6rem; color: #cbd5e1; line-height: 1; }
-@keyframes tsEntra { from { opacity: 0; transform: translateY(14px) scale(0.85); } to { opacity: 1; transform: none; } }
+@keyframes tsEntra { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
 /* ───────── Piezas del avatar: puntos de giro (coordenadas del dibujo, 200×420) ───────── */
 .ts-personaje g[class^="av-"] {
   transform-box: view-box;
-  animation-duration: var(--velocidad, 2s); animation-delay: var(--retraso, 0s);
-  animation-iteration-count: infinite; animation-timing-function: cubic-bezier(0.7, 0, 0.2, 1);
+  animation-duration: var(--velocidad, 6s); animation-delay: var(--retraso, 0s);
+  animation-iteration-count: infinite;
 }
 .ts-personaje .av-todo { transform-origin: 100px 400px; }
 .ts-personaje .av-tronco { transform-origin: 100px 266px; }
@@ -40,85 +40,63 @@
 .ts-personaje .av-ojos { transform-origin: 100px 88px; animation: tsParpadeo 3.7s infinite !important; animation-delay: var(--retraso) !important; }
 @keyframes tsParpadeo { 0%, 90%, 100% { transform: scaleY(1); } 93% { transform: scaleY(0.1); } }
 
-/* ───────── Baile 0: «Disco» (un brazo al cielo y al suelo, el otro en la cadera) ───────── */
-.ts-baile-0 .av-todo { animation-name: d0-todo; }
-.ts-baile-0 .av-tronco { animation-name: d0-tronco; }
-.ts-baile-0 .av-cabeza, .ts-baile-0 .av-cabeza-atras { animation-name: d0-cabeza; }
-.ts-baile-0 .av-brazo-i { animation-name: d0-bi; }
-.ts-baile-0 .av-brazo-d { animation-name: d0-bd; }
-.ts-baile-0 .av-pierna-i { animation-name: d0-pi; }
-.ts-baile-0 .av-pierna-d { animation-name: d0-pd; }
-@keyframes d0-todo { 0%, 25%, 50%, 75%, 100% { transform: translateY(0); } 12%, 37%, 62%, 87% { transform: translateY(-7px); } }
-@keyframes d0-tronco { 0%, 50%, 100% { transform: rotate(-6deg); } 25%, 75% { transform: rotate(7deg); } }
-@keyframes d0-cabeza { 0%, 50%, 100% { transform: rotate(7deg); } 25%, 75% { transform: rotate(-9deg); } }
-@keyframes d0-bi { 0%, 100% { transform: rotate(28deg); } 50% { transform: rotate(18deg); } }
-@keyframes d0-bd { 0%, 100% { transform: rotate(-25deg); } 15%, 30% { transform: rotate(-160deg); } 45%, 55% { transform: rotate(-35deg); } 70%, 85% { transform: rotate(-160deg); } }
-@keyframes d0-pi { 0%, 50%, 100% { transform: rotate(0deg); } 25%, 75% { transform: rotate(16deg); } }
-@keyframes d0-pd { 0%, 50%, 100% { transform: rotate(-3deg); } 25%, 75% { transform: rotate(0deg); } }
+/* ───────── Calentamiento antes del partido: movimientos lentos, con pausas, sin saltos ─────────
+   Signo de los giros: positivo levanta el brazo/pierna izquierda (lado izquierdo del dibujo) hacia fuera; negativo, la derecha. */
+.ts-personaje g[class^="av-"] { animation-timing-function: ease-in-out; }
 
-/* ───────── Baile 1: «Robot» (movimientos secos, a golpes) ───────── */
-.ts-baile-1 g[class^="av-"] { animation-timing-function: steps(1, end); }
-.ts-baile-1 .av-todo { animation-name: d1-todo; }
-.ts-baile-1 .av-tronco { animation-name: d1-tronco; }
-.ts-baile-1 .av-cabeza, .ts-baile-1 .av-cabeza-atras { animation-name: d1-cabeza; }
-.ts-baile-1 .av-brazo-i { animation-name: d1-bi; }
-.ts-baile-1 .av-brazo-d { animation-name: d1-bd; }
-.ts-baile-1 .av-pierna-i { animation-name: d1-pi; }
-.ts-baile-1 .av-pierna-d { animation-name: d1-pd; }
-@keyframes d1-todo { 0%, 50% { transform: translateY(0); } 25%, 75% { transform: translateY(-5px); } }
-@keyframes d1-tronco { 0% { transform: rotate(0deg); } 25% { transform: rotate(5deg); } 50% { transform: rotate(0deg); } 75% { transform: rotate(-5deg); } }
-@keyframes d1-cabeza { 0% { transform: rotate(0deg); } 12% { transform: rotate(14deg); } 37% { transform: rotate(0deg); } 62% { transform: rotate(-14deg); } 87% { transform: rotate(0deg); } }
-@keyframes d1-bi { 0% { transform: rotate(90deg); } 25% { transform: rotate(0deg); } 50% { transform: rotate(90deg); } 75% { transform: rotate(160deg); } }
-@keyframes d1-bd { 0% { transform: rotate(0deg); } 25% { transform: rotate(-90deg); } 50% { transform: rotate(-160deg); } 75% { transform: rotate(-90deg); } }
-@keyframes d1-pi { 0%, 50%, 75% { transform: rotate(0deg); } 25% { transform: rotate(14deg); } }
-@keyframes d1-pd { 0%, 25%, 50% { transform: rotate(0deg); } 75% { transform: rotate(-14deg); } }
+/* 0 · Estiramiento lateral: un brazo por encima de la cabeza y el tronco se inclina hacia el otro lado */
+.ts-baile-0 .av-tronco { animation-name: e0-tronco; }
+.ts-baile-0 .av-cabeza, .ts-baile-0 .av-cabeza-atras { animation-name: e0-cabeza; }
+.ts-baile-0 .av-brazo-i { animation-name: e0-bi; }
+.ts-baile-0 .av-brazo-d { animation-name: e0-bd; }
+.ts-baile-0 .av-pierna-i { transform: rotate(6deg); }
+.ts-baile-0 .av-pierna-d { transform: rotate(-6deg); }
+@keyframes e0-tronco { 0%, 8%, 50%, 58%, 100% { transform: rotate(0deg); } 20%, 38% { transform: rotate(9deg); } 70%, 88% { transform: rotate(-9deg); } }
+@keyframes e0-cabeza { 0%, 8%, 50%, 58%, 100% { transform: rotate(0deg); } 20%, 38% { transform: rotate(5deg); } 70%, 88% { transform: rotate(-5deg); } }
+@keyframes e0-bi { 0%, 8%, 50%, 100% { transform: rotate(6deg); } 20%, 38% { transform: rotate(165deg); } 70%, 88% { transform: rotate(-12deg); } }
+@keyframes e0-bd { 0%, 50%, 58%, 100% { transform: rotate(-6deg); } 20%, 38% { transform: rotate(12deg); } 70%, 88% { transform: rotate(-165deg); } }
 
-/* ───────── Baile 2: «Saltos» (brazos arriba y piernas abiertas) ───────── */
-.ts-baile-2 .av-todo { animation-name: d2-todo; }
-.ts-baile-2 .av-cabeza, .ts-baile-2 .av-cabeza-atras { animation-name: d2-cabeza; }
-.ts-baile-2 .av-brazo-i { animation-name: d2-bi; }
-.ts-baile-2 .av-brazo-d { animation-name: d2-bd; }
-.ts-baile-2 .av-pierna-i { animation-name: d2-pi; }
-.ts-baile-2 .av-pierna-d { animation-name: d2-pd; }
-@keyframes d2-todo { 0%, 25%, 50%, 75%, 100% { transform: translateY(0) scale(1, 1); } 12%, 62% { transform: translateY(-20px) scale(0.98, 1.03); } 27%, 77% { transform: translateY(0) scale(1.03, 0.96); } }
-@keyframes d2-cabeza { 0%, 50%, 100% { transform: rotate(0deg); } 25% { transform: rotate(6deg); } 75% { transform: rotate(-6deg); } }
-@keyframes d2-bi { 0%, 50%, 100% { transform: rotate(8deg); } 12%, 25%, 62%, 75% { transform: rotate(168deg); } }
-@keyframes d2-bd { 0%, 50%, 100% { transform: rotate(-8deg); } 12%, 25%, 62%, 75% { transform: rotate(-168deg); } }
-@keyframes d2-pi { 0%, 50%, 100% { transform: rotate(0deg); } 12%, 25%, 62%, 75% { transform: rotate(17deg); } }
-@keyframes d2-pd { 0%, 50%, 100% { transform: rotate(0deg); } 12%, 25%, 62%, 75% { transform: rotate(-17deg); } }
+/* 1 · Círculos de brazos (molinos), primero hacia delante y luego hacia atrás */
+.ts-baile-1 .av-brazo-i { animation-name: e1-bi; animation-timing-function: linear; }
+.ts-baile-1 .av-brazo-d { animation-name: e1-bd; animation-timing-function: linear; }
+.ts-baile-1 .av-tronco { animation-name: e1-tronco; }
+.ts-baile-1 .av-pierna-i { transform: rotate(5deg); }
+.ts-baile-1 .av-pierna-d { transform: rotate(-5deg); }
+@keyframes e1-bi { 0% { transform: rotate(0deg); } 45%, 55% { transform: rotate(360deg); } 100% { transform: rotate(0deg); } }
+@keyframes e1-bd { 0% { transform: rotate(0deg); } 45%, 55% { transform: rotate(-360deg); } 100% { transform: rotate(0deg); } }
+@keyframes e1-tronco { 0%, 50%, 100% { transform: translateY(0); } 25%, 75% { transform: translateY(-2px); } }
 
-/* ───────── Baile 3: «Twist» (cadera y rodillas a un lado y a otro) ───────── */
-.ts-baile-3 g[class^="av-"] { animation-timing-function: ease-in-out; }
-.ts-baile-3 .av-todo { animation-name: d3-todo; }
-.ts-baile-3 .av-tronco { animation-name: d3-tronco; }
-.ts-baile-3 .av-cabeza, .ts-baile-3 .av-cabeza-atras { animation-name: d3-cabeza; }
-.ts-baile-3 .av-brazo-i { animation-name: d3-bi; }
-.ts-baile-3 .av-brazo-d { animation-name: d3-bd; }
-.ts-baile-3 .av-pierna-i { animation-name: d3-pi; }
-.ts-baile-3 .av-pierna-d { animation-name: d3-pd; }
-@keyframes d3-todo { 0%, 50%, 100% { transform: translateY(0) translateX(-3px); } 25% { transform: translateY(-6px); } 75% { transform: translateY(-6px) translateX(3px); } }
-@keyframes d3-tronco { 0%, 100% { transform: rotate(-11deg); } 50% { transform: rotate(11deg); } }
-@keyframes d3-cabeza { 0%, 100% { transform: rotate(10deg); } 50% { transform: rotate(-10deg); } }
-@keyframes d3-bi { 0%, 100% { transform: rotate(60deg); } 50% { transform: rotate(18deg); } }
-@keyframes d3-bd { 0%, 100% { transform: rotate(-18deg); } 50% { transform: rotate(-60deg); } }
-@keyframes d3-pi { 0%, 100% { transform: rotate(13deg); } 50% { transform: rotate(-5deg); } }
-@keyframes d3-pd { 0%, 100% { transform: rotate(5deg); } 50% { transform: rotate(-13deg); } }
+/* 2 · Brazo cruzado sobre el pecho (sujeto con el otro) y giro suave de cuello */
+.ts-baile-2 .av-brazo-i { animation-name: e2-bi; }
+.ts-baile-2 .av-brazo-d { animation-name: e2-bd; }
+.ts-baile-2 .av-cabeza, .ts-baile-2 .av-cabeza-atras { animation-name: e2-cabeza; }
+.ts-baile-2 .av-tronco { animation-name: e2-tronco; }
+@keyframes e2-bi { 0%, 6%, 50%, 100% { transform: rotate(4deg); } 18%, 40% { transform: rotate(-72deg); } 62%, 90% { transform: rotate(-48deg); } }
+@keyframes e2-bd { 0%, 50%, 56%, 100% { transform: rotate(-4deg); } 12%, 40% { transform: rotate(48deg); } 68%, 90% { transform: rotate(72deg); } }
+@keyframes e2-cabeza { 0%, 50%, 100% { transform: rotate(0deg); } 22%, 38% { transform: rotate(12deg); } 72%, 88% { transform: rotate(-12deg); } }
+@keyframes e2-tronco { 0%, 50%, 100% { transform: rotate(0deg); } 25%, 40% { transform: rotate(-3deg); } 75%, 90% { transform: rotate(3deg); } }
 
-/* ───────── Baile 4: «Fiesta» (brazos arriba agitándolos y patadas) ───────── */
-.ts-baile-4 .av-todo { animation-name: d4-todo; }
-.ts-baile-4 .av-tronco { animation-name: d4-tronco; }
-.ts-baile-4 .av-cabeza, .ts-baile-4 .av-cabeza-atras { animation-name: d4-cabeza; }
-.ts-baile-4 .av-brazo-i { animation-name: d4-bi; }
-.ts-baile-4 .av-brazo-d { animation-name: d4-bd; }
-.ts-baile-4 .av-pierna-i { animation-name: d4-pi; }
-.ts-baile-4 .av-pierna-d { animation-name: d4-pd; }
-@keyframes d4-todo { 0%, 50%, 100% { transform: translate(-4px, 0); } 25% { transform: translate(0, -9px); } 75% { transform: translate(4px, -9px); } }
-@keyframes d4-tronco { 0%, 100% { transform: rotate(-5deg); } 50% { transform: rotate(5deg); } }
-@keyframes d4-cabeza { 0%, 50%, 100% { transform: rotate(-12deg); } 25%, 75% { transform: rotate(12deg); } }
-@keyframes d4-bi { 0%, 50%, 100% { transform: rotate(140deg); } 25%, 75% { transform: rotate(175deg); } }
-@keyframes d4-bd { 0%, 50%, 100% { transform: rotate(-175deg); } 25%, 75% { transform: rotate(-140deg); } }
-@keyframes d4-pi { 0%, 40%, 60%, 100% { transform: rotate(0deg); } 20% { transform: rotate(26deg); } }
-@keyframes d4-pd { 0%, 40%, 60%, 100% { transform: rotate(0deg); } 80% { transform: rotate(-26deg); } }
+/* 3 · Balanceo de pierna hacia fuera, con los brazos abiertos para equilibrarse */
+.ts-baile-3 .av-pierna-i { animation-name: e3-pi; }
+.ts-baile-3 .av-pierna-d { animation-name: e3-pd; }
+.ts-baile-3 .av-tronco { animation-name: e3-tronco; }
+.ts-baile-3 .av-brazo-i { animation-name: e3-bi; }
+.ts-baile-3 .av-brazo-d { animation-name: e3-bd; }
+@keyframes e3-pi { 0%, 10%, 30%, 50%, 100% { transform: rotate(0deg); } 20% { transform: rotate(30deg); } 40% { transform: rotate(32deg); } }
+@keyframes e3-pd { 0%, 50%, 60%, 80%, 100% { transform: rotate(0deg); } 70% { transform: rotate(-30deg); } 90% { transform: rotate(-32deg); } }
+@keyframes e3-tronco { 0%, 50%, 100% { transform: rotate(0deg); } 20%, 40% { transform: rotate(-4deg); } 70%, 90% { transform: rotate(4deg); } }
+@keyframes e3-bi { 0%, 100% { transform: rotate(10deg); } 20%, 40%, 70%, 90% { transform: rotate(55deg); } }
+@keyframes e3-bd { 0%, 100% { transform: rotate(-10deg); } 20%, 40%, 70%, 90% { transform: rotate(-55deg); } }
+
+/* 4 · Zancada lateral: piernas abiertas, el cuerpo se desplaza a un lado y a otro; manos al frente */
+.ts-baile-4 .av-todo { animation-name: e4-todo; }
+.ts-baile-4 .av-pierna-i { animation-name: e4-pi; }
+.ts-baile-4 .av-pierna-d { animation-name: e4-pd; }
+.ts-baile-4 .av-brazo-i { transform: rotate(-38deg); }
+.ts-baile-4 .av-brazo-d { transform: rotate(38deg); }
+@keyframes e4-todo { 0%, 50%, 100% { transform: translate(0, 0); } 20%, 38% { transform: translate(-9px, 7px); } 70%, 88% { transform: translate(9px, 7px); } }
+@keyframes e4-pi { 0%, 50%, 100% { transform: rotate(18deg); } 20%, 38% { transform: rotate(8deg); } 70%, 88% { transform: rotate(30deg); } }
+@keyframes e4-pd { 0%, 50%, 100% { transform: rotate(-18deg); } 20%, 38% { transform: rotate(-30deg); } 70%, 88% { transform: rotate(-8deg); } }
 
 /* Quietos si se piden menos animaciones */
 html.sin-animaciones .ts-personaje g[class^="av-"], html.sin-animaciones .ts-tarjeta { animation: none !important; }
