@@ -1,0 +1,16 @@
+/* client/src/games/Artilleria/Artilleria.css */
+.ar-caja { margin: 0.4rem 0 0.8rem; }
+.ar-reloj { text-align: center; margin: 0.2rem 0 0; }
+.ar-vida { display: block; font-size: 0.65rem; font-weight: 800; }
+.ar-mandos { display: grid; gap: 0.5rem; margin-top: 0.6rem; padding: 0.7rem; border-radius: 18px; background: #ffffff; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12); }
+.ar-ajuste { display: flex; align-items: center; gap: 0.4rem; }
+.ar-ajuste span { flex: 1; font-weight: 700; color: #334155; }
+.ar-ajuste b { font-size: 1.15rem; color: #0f172a; }
+.ar-ajuste button { width: 2.8rem; height: 2.4rem; border: none; border-radius: 12px; background: #e2e8f0; color: #0f172a; font-size: 1.1rem; font-weight: 900; cursor: pointer; }
+.ar-armas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.35rem; }
+.ar-armas button { display: grid; justify-items: center; padding: 0.45rem 0.2rem; border: 3px solid transparent; border-radius: 14px; background: #f1f5f9; color: #0f172a; font: inherit; font-size: 0.75rem; font-weight: 800; cursor: pointer; }
+.ar-armas button.sel { border-color: #f97316; background: #fff7ed; }
+.ar-armas button small { color: #64748b; }
+.ar-armas button:disabled { opacity: 0.4; }
+.ar-fuego { background: linear-gradient(135deg, #f97316, #dc2626) !important; }
+.ar-ayuda { margin: 0; font-size: 0.75rem; color: #64748b; text-align: center; }

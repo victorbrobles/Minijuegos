@@ -1,0 +1,9 @@
+/* client/src/games/Chapas/Chapas.css */
+.ch-campo { position: relative; margin: 0.4rem 0 0.8rem; }
+.ch-ayuda { margin: 0.5rem 0 0; text-align: center; font-size: 0.8rem; font-weight: 700; color: #475569; }
+.ch-reloj { text-align: center; margin: 0.2rem 0 0; }
+.ch-marcador b { font-size: 1.6em; }
+.ch-eq { display: inline-block; margin-left: 0.25rem; padding: 0 0.35rem; border-radius: 999px; background: var(--c); color: #ffffff; font-size: 0.6rem; font-weight: 800; }
+.ch-gol { position: absolute; top: 40%; left: 50%; transform: translate(-50%, -50%); padding: 0.6rem 1.4rem; border-radius: 20px; background: var(--c); color: #ffffff; font-size: 2.2rem; font-weight: 900; text-align: center; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4); animation: chGol 0.5s cubic-bezier(0.2, 1.6, 0.4, 1); pointer-events: none; }
+.ch-gol small { display: block; font-size: 0.85rem; font-weight: 700; }
+@keyframes chGol { from { transform: translate(-50%, -50%) scale(0.3); } }

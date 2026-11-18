@@ -276,6 +276,77 @@ export default {
     puntos: [['🏁', 'Puesto en cada carrera', '10, 8, 6, 5, 4, 3, 2, 1']],
     gana: 'Quien más puntos sume. Sin rivales a mano, juega la **práctica contra bots**.'
   },
+  'chapas': {
+    objetivo: 'Fútbol de chapas: mete el balón en la portería rival lanzando tus chapas como un **tirachinas**.',
+    pasos: [
+      'Los jugadores se reparten en dos equipos (**rojos** y **azules**), con 3 chapas cada uno. Por turnos, cada equipo lanza **una** chapa.',
+      'Toca una de tus chapas, **arrastra hacia atrás** y suelta: cuanto más largo el arrastre, más fuerte sale (la flecha cambia de verde a rojo).',
+      'Las chapas y el balón rebotan entre sí y contra las bandas. Si el balón cruza la línea de una portería, es **gol** y se vuelve a colocar todo; saca quien encajó.',
+      'Tienes 30 segundos por tiro. Online, tu portería siempre se ve abajo.'
+    ],
+    secciones: [{ icono: '🎯', titulo: 'Trucos', color: 'verde', items: ['Usa una chapa para empujar el balón o para tapar el camino a tu portería.', 'Un tiro suave y bien colocado suele valer más que uno a lo bruto.'] }],
+    puntos: [['⚽', 'Cada gol', '1 para tu equipo']],
+    gana: 'El primer equipo en llegar a los goles pactados (2, 3 o 5).'
+  },
+  'artilleria': {
+    objetivo: 'Tanques sobre colinas: dispara por turnos y sé el **último tanque en pie**.',
+    pasos: [
+      '**Arrastra desde tu tanque** para apuntar: la dirección es el ángulo y la longitud, la fuerza. Afina con los botones ◀ ▶ y − +.',
+      'Mira el **viento** (arriba): empuja los proyectiles hacia un lado y cambia en cada turno.',
+      'Elige munición y pulsa **¡Fuego!** Las explosiones hacen **cráteres** en el terreno y quitan vida a los tanques cercanos (también al tuyo si disparas muy cerca).',
+      'Tienes 35 segundos por turno.'
+    ],
+    secciones: [{ icono: '💣', titulo: 'Munición', color: 'naranja', tabla: [['💣', '**Obús**: ilimitado'], ['💥', '**Megabomba**: explosión enorme (2 por partida)'], ['🎆', '**Triple**: tres proyectiles en abanico (2 por partida)']] }],
+    puntos: [['❤️', 'Vida de cada tanque', '100']],
+    gana: 'El último tanque con vida (o el que más vida tenga si se acaban los turnos).'
+  },
+  'curling': {
+    objetivo: 'Curling sobre hielo: deja tus piedras **lo más cerca posible del centro** de la diana.',
+    pasos: [
+      'Por turnos, cada jugador lanza sus piedras (4, 3 o 2 según cuántos seáis). En cada manga el orden rota: tirar el último es una ventaja.',
+      '**Desliza sobre el hielo** para apuntar y elige el **efecto**: la piedra se curva hacia ese lado cuando va frenando.',
+      '**Mantén pulsado LANZAR**: la barra de fuerza sube y baja. Suelta en el punto justo (la zona marcada en el centro deja la piedra cerca de la diana).',
+      'Puedes golpear las piedras de los rivales para sacarlas. Si una piedra no pasa la línea azul o se pasa de la roja del fondo, se retira.'
+    ],
+    secciones: [{ icono: '🎯', titulo: 'Puntuación de cada manga', color: 'azul', items: ['Solo puntúa quien tenga **la piedra más cercana** al centro.', 'Suma **un punto por cada piedra suya** que esté más cerca que la mejor piedra de cualquier rival (y dentro de la diana).'] }],
+    puntos: [['🥌', 'Cada piedra que puntúa', '1 punto']],
+    gana: 'Quien más puntos sume al acabar las mangas.'
+  },
+  'estelas': {
+    objetivo: 'Líneas de luz en **tiempo real**: no choques con nada y sé el último en pie.',
+    pasos: [
+      'Tu línea avanza sola y deja un **rastro** que no desaparece. Solo puedes girar 90° a izquierda o derecha (nunca dar media vuelta).',
+      '**Toca la mitad izquierda o derecha** de la pantalla para girar hacia ese lado, o **desliza** hacia la dirección a la que quieres ir. En ordenador: flechas (o A y D).',
+      'Si chocas con una pared, con tu rastro o con el de otro, quedas fuera de la ronda. Si dos chocáis de frente, caéis los dos.',
+      'Cada uno juega en su móvil a la vez. Sin rivales a mano, juega la **práctica contra bots**.'
+    ],
+    secciones: [{ icono: '💡', titulo: 'Trucos', color: 'cian', items: ['Encierra a los rivales con tu rastro para dejarles sin sitio.', 'No te metas en pasillos estrechos: es fácil quedarse sin salida.'] }],
+    puntos: [['⚡', 'Cada rival que cae mientras sigues vivo', '+1'], ['🏆', 'Ganar la ronda (último en pie)', '+2']],
+    gana: 'Quien más puntos sume al acabar las rondas.'
+  },
+  'draft': {
+    objetivo: 'Ficha famosos **sin saber qué criterio contará** y arma el mejor equipo.',
+    pasos: [
+      'En cada ronda sale una **categoría** (futbolistas, cine, música…) y una lista de famosos.',
+      'Se muestran **tres criterios posibles** (por ejemplo: los más mayores, los más altos, el nombre más largo). Solo uno contará, pero no se sabe cuál hasta el final.',
+      'Por turnos y en **serpiente** (1-2-3-3-2-1…), cada jugador ficha **3 famosos**. Tienes 25 segundos; si se acaba, fichas al azar.',
+      'Al final se desvela el criterio y se suman los datos de cada equipo (años, centímetros o letras).'
+    ],
+    secciones: [{ icono: '🧠', titulo: 'Estrategia', color: 'violeta', items: ['Busca famosos que sirvan para **varios criterios** a la vez.', 'Fíjate en lo que fichan los demás: a veces conviene quitarles el que necesitan.'] }],
+    puntos: [['🌟', 'Por cada rival al que superas en la ronda', '+1']],
+    gana: 'Quien más puntos sume al acabar las rondas.'
+  },
+  'emojis': {
+    objetivo: 'Adivina al famoso cuya **vida se cuenta en emojis**, con los menos emojis posibles.',
+    pasos: [
+      'Los emojis aparecen **de uno en uno** (cada 3,5 s), de la pista más vaga a la más clara.',
+      'Todos responden a la vez eligiendo entre **6 nombres**. Solo hay una oportunidad: si fallas, te quedas fuera de esa ronda.',
+      'Cuanto antes aciertes, más puntos: 5 con el primer emoji, 4 con el segundo… y 1 con todos.'
+    ],
+    secciones: [{ icono: '✏️', titulo: 'Modo autor', color: 'rosa', items: ['En cada ronda, un jugador elige un famoso entre tres y **escribe él los emojis** (de 2 a 6).', 'El autor gana **2 puntos por cada jugador que acierte**: le interesa ser claro, pero no demasiado pronto.'] }],
+    puntos: [['🤔', 'Acertar', '6 menos los emojis vistos (de 5 a 1)'], ['✏️', 'Autor, por cada acierto', '+2']],
+    gana: 'Quien más puntos sume al acabar las rondas.'
+  },
   'habilidad': {
     objetivo: '**30 minijuegos** de habilidad en 3D de un par de minutos: gana el más hábil.',
     pasos: [

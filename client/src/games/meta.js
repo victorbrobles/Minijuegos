@@ -170,7 +170,7 @@ export const META = {
     duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/hemeroteca.webp',
     icono: 'book',
-    colores: ['#a8a29e',  '#292524'],
+    colores: ['#a8a29e', '#292524'],
     etiquetas: 'hemeroteca titulares periodico noticias historia huecos pistas actualidad prensa',
     descripcion: 'Titulares históricos de periódico a los que les faltan palabras. Las pistas se destapan poco a poco (época, contexto, iniciales): cuanto antes completes el titular, más puntos.',
     categorias: ['famosos']
@@ -180,7 +180,7 @@ export const META = {
     duracion: 15, // minutos aproximados de una partida
     imagen: '/covers/acta.webp',
     icono: 'edit',
-    colores: ['#22c55e',  '#052e16'],
+    colores: ['#22c55e', '#052e16'],
     etiquetas: 'acta partido futbol historico resultado goleadores tarjetas estadio minutos final',
     descripcion: 'Un partido histórico contado con su acta incompleta: resultados parciales, minutos clave, tarjetas, estadio y goleadores. Adivina de qué partido se trata antes que nadie.',
     categorias: ['futbol']
@@ -190,7 +190,7 @@ export const META = {
     duracion: 25, // minutos aproximados de una partida
     imagen: '/covers/oncefantasma.webp',
     icono: 'soccer',
-    colores: ['#3b82f6',  '#0b1437'],
+    colores: ['#3b82f6', '#0b1437'],
     etiquetas: 'once alineacion titular final historica futbolistas dorsal posicion entrenador pistas mundial champions',
     descripcion: 'La alineación oculta de una final histórica: reconstruye el once a partir del dorsal, la posición, el club o el país y la trayectoria. Cada futbolista que descubres destapa una pista de otro compañero.',
     categorias: ['futbol']
@@ -200,7 +200,7 @@ export const META = {
     duracion: 20, // minutos aproximados de una partida
     imagen: '/covers/unapieza.webp',
     icono: 'box',
-    colores: ['#f59e0b',  '#78350f'],
+    colores: ['#f59e0b', '#78350f'],
     etiquetas: 'piezas tablero silueta figura encajar tetris puzle geometria turnos bloquear objetivo',
     descripcion: 'Un tablero compartido con una figura incompleta. Por turnos, cada jugador coloca una pieza geométrica (girándola o volteándola): cierra filas, cumple tu objetivo secreto, pon la última pieza o deja al siguiente sin sitio.',
     categorias: ['dos_jugadores']
@@ -1001,6 +1001,66 @@ export const META = {
     etiquetas: 'canicas carrera 3d kart derrape joystick atajos turbos objetos misil velocidad circuito vueltas online',
     descripcion: "Carreras de canicas en 3D al estilo kart: 3 vueltas por circuitos con atajos sin barandilla, saltos sobre el vacío y turbos. Derrapa en las curvas para cargar miniturbos y usa misiles, aceite o estrellas contra los rivales. ¡El primero en meta gana!",
     categorias: ['habilidad']
+  },
+  'chapas': {
+    titulo: 'Fútbol chapas',
+    duracion: 20, // minutos aproximados de una partida
+    imagen: '/covers/chapas.webp',
+    icono: 'soccer',
+    colores: ['#16a34a', '#1d4ed8'],
+    etiquetas: 'chapas futbol fútbol habilidad fisica tirachinas goles por turnos equipos online',
+    descripcion: "Fútbol de chapas en 2D: arrastra hacia atrás tu chapa como un tirachinas y suéltala para chutar. Rebotes, paredes y goles por equipos. ¡El primero en llegar a los goles pactados gana!",
+    categorias: ['habilidad', 'futbol']
+  },
+  'artilleria': {
+    titulo: 'Artillería',
+    duracion: 15, // minutos aproximados de una partida
+    imagen: '/covers/artilleria.webp',
+    icono: 'bomb',
+    colores: ['#65a30d', '#b45309'],
+    etiquetas: 'artilleria tanques disparos angulo fuerza viento crateres habilidad por turnos online',
+    descripcion: "Tanques sobre colinas: elige ángulo y fuerza, calcula el viento y dispara. Las explosiones hacen cráteres y quitan vida. Megabombas y disparo triple. Gana el último tanque en pie.",
+    categorias: ['habilidad', 'estrategia']
+  },
+  'curling': {
+    titulo: 'Curling',
+    duracion: 15, // minutos aproximados de una partida
+    imagen: '/covers/curling.webp',
+    icono: 'target',
+    colores: ['#0ea5e9', '#dc2626'],
+    etiquetas: 'curling hielo piedras diana efecto fuerza habilidad por turnos online',
+    descripcion: "Curling sobre hielo en 2D: apunta, elige el efecto y suelta la barra de fuerza en el punto justo. Acerca tus piedras al centro de la diana y saca las de los rivales.",
+    categorias: ['habilidad']
+  },
+  'estelas': {
+    titulo: 'Estelas',
+    duracion: 10, // minutos aproximados de una partida
+    imagen: '/covers/estelas.webp',
+    icono: 'zap',
+    colores: ['#0f172a', '#22d3ee'],
+    etiquetas: 'estelas lineas luz tiempo real reflejos habilidad supervivencia bots online',
+    descripcion: "Líneas de luz en tiempo real: avanzas sin parar dejando rastro y solo puedes girar. Quien choca con una pared o con cualquier rastro queda fuera. ¡El último en pie gana la ronda!",
+    categorias: ['habilidad']
+  },
+  'draft': {
+    titulo: 'El Draft de Estrellas',
+    duracion: 15, // minutos aproximados de una partida
+    imagen: '/covers/draft.webp',
+    icono: 'star',
+    colores: ['#7c3aed', '#f59e0b'],
+    etiquetas: 'draft famosos fichajes estrategia criterio oculto edad altura nombre online',
+    descripcion: "Ficha famosos por turnos sin saber qué contará: los más mayores, los más altos, el nombre más largo… Al final se desvela el criterio y se suman los datos de tu equipo. ¡Estrategia y cultura!",
+    categorias: ['famosos', 'estrategia']
+  },
+  'emojis': {
+    titulo: 'Biografía en emojis',
+    duracion: 10, // minutos aproximados de una partida
+    imagen: '/covers/emojis.webp',
+    icono: 'smile',
+    colores: ['#f59e0b', '#ec4899'],
+    etiquetas: 'emojis famosos adivinar biografia rapidez autor online',
+    descripcion: "La vida de un famoso contada en emojis que aparecen uno a uno. Cuanto antes aciertes, más puntos. En el modo autor, sois vosotros quienes la contáis en emojis.",
+    categorias: ['famosos', 'chill']
   },
   'habilidad': {
     titulo: 'Test de habilidad',
