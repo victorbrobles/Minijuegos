@@ -5,7 +5,7 @@ import { useEffect, useSyncExternalStore } from 'react';
 import { adminHeaders, useAdmin } from './admin.js';
 import { nombreCompleto } from './identidad.js';
 
-export const JUEGOS_OCULTOS = new Set(['cancion', 'adivina', 'rasgos', 'logos']);
+export const JUEGOS_OCULTOS = new Set(['cancion', 'adivina', 'rasgos']);
 export const esOculto = (id) => JUEGOS_OCULTOS.has(id);
 
 /** Añade a las peticiones a nuestra /api quién eres (X-Jugador) y, si lo eres, el token de administrador. */

@@ -5,7 +5,7 @@ import { esAdmin } from './admin.js';
 import { puedeActuarComo } from './usuarios.js';
 import { accesoPorGrupo } from '../routes/social.js';
 
-export const JUEGOS_OCULTOS = ['cancion', 'adivina', 'rasgos', 'logos'];
+export const JUEGOS_OCULTOS = ['cancion', 'adivina', 'rasgos'];
 
 export function jugadorDe(req) {
   try { return decodeURIComponent(String(req.get('x-jugador') || '')).slice(0, 25); } catch { return ''; }

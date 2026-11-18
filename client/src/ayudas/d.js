@@ -261,15 +261,17 @@ export default {
     gana: 'Quien termine con **menos golpes**.'
   },
   'canicas': {
-    objetivo: 'Guía tu canica **inclinando el móvil** por circuitos con atajos, turbos y objetos. ¡El primero en meta gana!',
+    objetivo: 'Carreras de canicas al estilo kart: **3 vueltas** a circuitos con atajos, saltos, turbos y objetos. ¡El primero en meta gana!',
     pasos: [
-      'Antes de cada carrera eliges **canica**. Cada una tiene una habilidad: velocidad punta, peso, salto, imán para objetos, atravesar rivales, turbos más largos, agarre o un objeto gratis cada 15 segundos.',
-      'Guía tu canica **inclinando el móvil** (📱 Inclinar; en iPhone hace falta https) o con el **joystick**. «Calibrar» toma como recto cómo tienes el móvil ahora.',
-      'Si te caes, vuelves un poco más atrás. El **minimapa** muestra a todos y cuánto queda.'
+      'Antes de cada carrera eliges **canica**. Cada una tiene su habilidad: más punta, más peso, salto, imán de objetos, atravesar rivales, turbos más largos, agarre total o un objeto gratis cada 12 segundos.',
+      'La canica **acelera sola**. Pon el dedo en la mitad izquierda: aparece un **joystick**; desliza a los lados para girar y hacia abajo para frenar (o ir marcha atrás). En ordenador: flechas, espacio para derrapar y E para el objeto.',
+      'Si entras muy deprisa en una curva, la canica **se va hacia fuera**: frena un poco o derrapa. Donde no hay barandilla (bordes rojos y blancos) puedes caerte.',
+      'Si te caes vuelves un poco más atrás. El **minimapa** muestra a todos y los caminos alternativos (en amarillo).'
     ],
     secciones: [
-      { icono: '🛤️', titulo: 'El circuito', color: 'naranja', items: ['Los **atajos** son más cortos pero estrechos y muchas veces sin barandilla.', 'Pasa por las **flechas naranjas** para coger turbo.', 'Pasa por las cajas ❓ para coger un objeto: quien va detrás recibe objetos mejores.'] },
-      { icono: '🎁', titulo: 'Objetos', color: 'violeta', tabla: [['🚀', '**Turbo**'], ['🛢️', '**Aceite**'], ['⚡', '**Rayo**'], ['🛡️', '**Escudo**'], ['🌀', '**Muelle**']] }
+      { icono: '🌀', titulo: 'Derrape y miniturbo', color: 'azul', items: ['Mantén **DERRAPE** mientras giras: la canica gira más cerrado y se desliza.', 'Cuanto más aguantes, más carga: **azul**, **naranja** y **morado**. Al soltar, miniturbo (más largo cuanto más carga).', 'Ir pegado detrás de otra canica un rato da **rebufo**: un turbo corto.'] },
+      { icono: '🛤️', titulo: 'El circuito', color: 'naranja', items: ['Cada circuito tiene **caminos alternativos**: atajos estrechos sin barandilla, rutas de turbos más largas y **saltos sobre el vacío** (las rampas azules te lanzan: entra recto).', 'Las **flechas naranjas** dan turbo y las cajas ❓ dan un objeto: quien va detrás recibe objetos mejores.'] },
+      { icono: '🎁', titulo: 'Objetos', color: 'violeta', tabla: [['🚀', '**Turbo** (o triple turbo)'], ['🎯', '**Misil**: persigue a quien va justo delante'], ['🛢️', '**Aceite**: quien lo pisa trompea'], ['⚡', '**Rayo**: frena a todos los de delante'], ['🛡️', '**Escudo**: para el próximo golpe'], ['🌀', '**Muelle**: gran salto'], ['⭐', '**Estrella**: invencible y más rápida']] }
     ],
     puntos: [['🏁', 'Puesto en cada carrera', '10, 8, 6, 5, 4, 3, 2, 1']],
     gana: 'Quien más puntos sume. Sin rivales a mano, juega la **práctica contra bots**.'

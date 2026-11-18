@@ -1,13 +1,13 @@
 // client/src/games/Canicas/engine.js
 // «Carrera de Canicas» online: elegir canica → cuenta atrás → carrera → podio (y otra carrera o el final).
 // Cada móvil simula su canica y se sincroniza ~8 veces por segundo (sincronizar): manda su posición y recibe la de
-// los demás, los rayos lanzados y las manchas de aceite. El servidor reparte los puntos por puesto.
+// los demás, los rayos y misiles lanzados y las manchas de aceite. El servidor reparte los puntos por puesto.
 import { IDS_CANICAS } from './canicas.js';
 
 export const SEG_ELEGIR = 25;
 export const SEG_CUENTA = 4;
-export const SEG_MAX = 240;
-export const SEG_TRAS_PRIMERO = 35;
+export const SEG_MAX = 360;
+export const SEG_TRAS_PRIMERO = 45;
 export const SEG_PODIO = 15;
 export const PUNTOS = [10, 8, 6, 5, 4, 3, 2, 1];
 export const OPCIONES_CARRERAS = [1, 3];
@@ -80,6 +80,10 @@ export function objeto(p, id, d, ahora = Date.now()) {
   if (p.fase !== 'carrera') return { ok: false, error: 'No hay carrera.' };
   const j = jug(p, id); if (!j) return { ok: false };
   if (d.objeto === 'rayo') { p.nEv += 1; p.eventos.push({ n: p.nEv, tipo: 'rayo', de: id, prog: j.s?.prog || 0, t: ahora }); }
+  if (d.objeto === 'misil') {
+    const a = Number(d.a);
+    if (p.jugadores.some((x) => x.id === a && x.id !== id && !x.fuera)) { p.nEv += 1; p.eventos.push({ n: p.nEv, tipo: 'misil', de: id, a, t: ahora }); }
+  }
   if (d.objeto === 'aceite' && Array.isArray(d.pos) && d.pos.length === 3) {
     p.nTr += 1; p.trampas.push({ id: p.nTr, pos: d.pos.map(Number), de: id, hasta: ahora + 40000 });
     if (p.trampas.length > 30) p.trampas.shift();

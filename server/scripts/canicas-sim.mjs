@@ -1,4 +1,5 @@
-// Prueba de «Carrera de Canicas»: en cada circuito, bots por el camino principal y por cada atajo llegan a la meta.
+// Prueba de «Carrera de Canicas»: en cada circuito, un bot por el camino principal y otro por cada camino alternativo
+// completan todas las vueltas.
 import assert from 'assert';
 import * as CANNON from 'cannon-es';
 import { IDS_CIRCUITOS, construirCircuito } from '../../client/src/games/Canicas/circuitos.js';
@@ -10,11 +11,11 @@ for (const id of IDS_CIRCUITOS) {
   const pruebas = [{ nombre: 'principal', atajos: c.ramas.map(() => false) }, ...c.ramas.map((r, i) => ({ nombre: r.nombre, atajos: c.ramas.map((_, j) => j === i) }))];
   for (const pr of pruebas) {
     const w = crearMundo(c, CANNON);
-    const k = crearCanica(w, 'garra', posSalida(c, 1));
-    const bot = crearBot(c); bot.atajos = pr.atajos; bot.error = 0;
+    const k = crearCanica(w, 'garra', posSalida(c, 1), { c, orden: 1 });
+    const bot = crearBot(c, Math.random, 1); bot.forzar = pr.atajos; bot.error = 0;
     let t = 0; let caidas = 0; let usado = false;
-    while (t < 240 && !k.terminada) {
-      controlar(k, dirBot(c, k, bot), t, DT);
+    while (t < 420 && !k.terminada) {
+      controlar(k, dirBot(c, k, bot, c.def.hielo), t, DT, c.def.hielo);
       paso(w, DT); t += DT;
       if (bot.rama !== null && bot.k > 10) usado = true;
       const ev = revisar(c, k, [], t); if (ev.caida) caidas++;
@@ -39,6 +40,10 @@ import * as E from '../../client/src/games/Canicas/engine.js';
   const r2 = E.sincronizar(p, 1, null, 0, p.inicio + 2100);
   assert.equal(r2.eventos.length, 1); assert.equal(r2.trampas.length, 1);
   E.accion(p, 1, { tipo: 'objeto', objeto: 'pisada', trampa: r2.trampas[0].id }, p.inicio + 2200);
+  E.accion(p, 3, { tipo: 'objeto', objeto: 'misil', a: 1 }, p.inicio + 2250);
+  E.accion(p, 3, { tipo: 'objeto', objeto: 'misil', a: 3 }, p.inicio + 2250); // a sí mismo: no vale
+  const misiles = E.sincronizar(p, 1, null, 1, p.inicio + 2260).eventos.filter((e) => e.tipo === 'misil');
+  assert.equal(misiles.length, 1); assert.equal(misiles[0].a, 1);
   assert.equal(E.sincronizar(p, 1, null, 1, p.inicio + 2300).trampas.length, 0);
   E.accion(p, 2, { tipo: 'llegada' }, p.inicio + 30000); E.accion(p, 1, { tipo: 'llegada' }, p.inicio + 31000);
   E.tick(p, p.inicio + 30000 + E.SEG_TRAS_PRIMERO * 1000 + 1);

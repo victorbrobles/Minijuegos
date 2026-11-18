@@ -998,8 +998,8 @@ export const META = {
     imagen: '/covers/carrera.webp',
     icono: 'car',
     colores: ['#8b5cf6', '#0f766e'],
-    etiquetas: 'canicas carrera 3d giroscopio inclinar atajos turbos objetos velocidad circuito online',
-    descripcion: "Carreras de canicas en 3D: inclina el móvil para guiar la tuya por circuitos con atajos, turbos y objetos contra los rivales. Cada canica tiene su habilidad. ¡El primero en llegar a meta gana!",
+    etiquetas: 'canicas carrera 3d kart derrape joystick atajos turbos objetos misil velocidad circuito vueltas online',
+    descripcion: "Carreras de canicas en 3D al estilo kart: 3 vueltas por circuitos con atajos sin barandilla, saltos sobre el vacío y turbos. Derrapa en las curvas para cargar miniturbos y usa misiles, aceite o estrellas contra los rivales. ¡El primero en meta gana!",
     categorias: ['habilidad']
   },
   'habilidad': {

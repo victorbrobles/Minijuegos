@@ -4,7 +4,7 @@
 .cn-caja { position: relative; border-radius: 22px; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35); user-select: none; -webkit-user-select: none; }
 .cn-escena { width: 100%; height: min(76vh, 680px); touch-action: none; }
 .cn-escena canvas { display: block; }
-.cn-arriba { position: absolute; top: 2.6rem; left: 0.6rem; display: grid; gap: 0.2rem; pointer-events: none; }
+.cn-arriba { position: absolute; top: 2.6rem; left: 0.6rem; display: grid; gap: 0.2rem; justify-items: start; pointer-events: none; }
 .cn-puesto { font-size: 2.2rem; font-weight: 900; color: #ffffff; line-height: 1; text-shadow: 0 2px 6px rgba(0, 0, 0, 0.5); }
 .cn-puesto small { font-size: 1rem; opacity: 0.8; }
 .cn-tiempo { padding: 0.15rem 0.5rem; border-radius: 999px; background: rgba(15, 23, 42, 0.6); color: #ffffff; font-weight: 800; font-size: 0.8rem; font-variant-numeric: tabular-nums; }
@@ -18,17 +18,28 @@
 .cn-aviso { position: absolute; top: 25%; left: 50%; transform: translateX(-50%); padding: 0.5rem 1rem; border-radius: 16px; background: rgba(255, 255, 255, 0.92); color: #0f172a; font-weight: 900; white-space: nowrap; pointer-events: none; }
 .cn-estados { position: absolute; top: 9rem; right: 0.6rem; font-size: 1.6rem; pointer-events: none; }
 .cn-meta { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); padding: 0.8rem 1.3rem; border-radius: 20px; background: rgba(15, 23, 42, 0.85); color: #facc15; font-size: 1.4rem; font-weight: 900; white-space: nowrap; pointer-events: none; }
-.cn-mandos { position: absolute; left: 0.6rem; right: 0.6rem; bottom: 0.6rem; display: flex; justify-content: space-between; align-items: flex-end; pointer-events: none; }
+.cn-mandos { position: absolute; left: 0; right: 0; bottom: 0; height: 46%; display: flex; justify-content: space-between; align-items: flex-end; pointer-events: none; }
 .cn-mandos > * { pointer-events: auto; }
-.cn-joy { position: relative; width: 8.2rem; height: 8.2rem; border-radius: 50%; background: rgba(255, 255, 255, 0.22); border: 3px solid rgba(255, 255, 255, 0.55); touch-action: none; }
-.cn-joy i { position: absolute; left: calc(50% - 1.6rem); top: calc(50% - 1.6rem); width: 3.2rem; height: 3.2rem; border-radius: 50%; background: rgba(255, 255, 255, 0.9); box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3); }
-.cn-calibrar { padding: 0.6rem 0.8rem; border: none; border-radius: 16px; background: rgba(255, 255, 255, 0.9); color: #0f172a; font: inherit; font-weight: 900; line-height: 1.1; cursor: pointer; }
-.cn-calibrar small { font-weight: 600; font-size: 0.65rem; color: #475569; }
-.cn-botones { display: grid; gap: 0.4rem; justify-items: end; }
-.cn-giro { padding: 0.4rem 0.7rem; border: none; border-radius: 999px; background: rgba(15, 23, 42, 0.75); color: #ffffff; font: inherit; font-size: 0.75rem; font-weight: 800; cursor: pointer; }
-.cn-salto, .cn-objeto { width: 4.2rem; height: 4.2rem; border: 3px solid rgba(255, 255, 255, 0.8); border-radius: 50%; background: rgba(15, 23, 42, 0.55); color: #ffffff; font-size: 2rem; cursor: pointer; }
+/* Zona del joystick: toda la mitad izquierda; el joystick aparece donde se pone el dedo */
+.cn-zona { position: relative; flex: 1; align-self: stretch; touch-action: none; -webkit-touch-callout: none; }
+.cn-zona-pista { position: absolute; left: 0.8rem; bottom: 0.7rem; padding: 0.25rem 0.6rem; border-radius: 999px; background: rgba(15, 23, 42, 0.45); color: rgba(255, 255, 255, 0.85); font-size: 0.68rem; font-weight: 700; pointer-events: none; }
+.cn-joy { position: absolute; left: 5.5rem; top: calc(100% - 5.5rem); width: 7.6rem; height: 7.6rem; margin: -3.8rem 0 0 -3.8rem; border-radius: 50%; background: rgba(255, 255, 255, 0.16); border: 3px solid rgba(255, 255, 255, 0.4); pointer-events: none; transition: opacity 0.15s; opacity: 0.55; }
+.cn-joy.activo { opacity: 1; background: rgba(255, 255, 255, 0.24); }
+.cn-joy i { position: absolute; left: calc(50% - 1.5rem); top: calc(50% - 1.5rem); width: 3rem; height: 3rem; border-radius: 50%; background: rgba(255, 255, 255, 0.92); box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3); }
+.cn-botones { display: grid; gap: 0.5rem; justify-items: end; padding: 0 0.6rem 0.6rem 0; touch-action: none; }
+.cn-fila { display: flex; gap: 0.5rem; align-items: flex-end; }
+.cn-salto, .cn-objeto { position: relative; width: 4.2rem; height: 4.2rem; border: 3px solid rgba(255, 255, 255, 0.8); border-radius: 50%; background: rgba(15, 23, 42, 0.55); color: #ffffff; font-size: 2rem; cursor: pointer; touch-action: none; }
+.cn-objeto sup { position: absolute; right: -0.2rem; top: -0.3rem; padding: 0 0.3rem; border-radius: 999px; background: #0f172a; font-size: 0.75rem; font-weight: 900; }
+.cn-objeto small { position: absolute; left: -0.5rem; bottom: -0.3rem; width: 1.8rem; height: 1.8rem; display: grid; place-items: center; border-radius: 50%; background: rgba(15, 23, 42, 0.8); font-size: 1rem; }
 .cn-objeto.lleno { background: radial-gradient(circle, #fde047, #f59e0b); border-color: #ffffff; animation: cnBrillo 1s ease-in-out infinite alternate; }
+.cn-objeto.ruleta { animation: none; filter: saturate(0.6); }
 .cn-salto:disabled, .cn-objeto:disabled { opacity: 0.5; }
+.cn-derrape { width: 5.6rem; height: 5.6rem; border: 3px solid rgba(255, 255, 255, 0.85); border-radius: 50%; background: rgba(15, 23, 42, 0.6); color: #ffffff; font: inherit; font-size: 0.72rem; font-weight: 900; letter-spacing: 0.04em; cursor: pointer; touch-action: none; -webkit-touch-callout: none; transition: background 0.1s, box-shadow 0.1s; }
+.cn-derrape:active { background: rgba(15, 23, 42, 0.85); }
+.cn-derrape.carga-1 { background: #0284c7; box-shadow: 0 0 18px #38bdf8; }
+.cn-derrape.carga-2 { background: #ea580c; box-shadow: 0 0 20px #fb923c; }
+.cn-derrape.carga-3 { background: #9333ea; box-shadow: 0 0 24px #c084fc; }
+.cn-vuelta { padding: 0.15rem 0.55rem; border-radius: 999px; background: rgba(250, 204, 21, 0.92); color: #0f172a; font-weight: 900; font-size: 0.8rem; }
 @keyframes cnBrillo { to { box-shadow: 0 0 22px #fde047; } }
 .cn-pie { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0.5rem 0; }
 .cn-pie span { padding: 0.25rem 0.6rem; border-radius: 999px; background: #ffffff; color: #0f172a; font-size: 0.75rem; font-weight: 800; box-shadow: inset 4px 0 0 var(--c); }
@@ -38,7 +49,7 @@
 .cn-elegir small { color: #64748b; font-size: 0.72rem; font-weight: 600; line-height: 1.25; }
 .cn-elegir em { font-style: normal; font-size: 0.7rem; font-weight: 800; color: #7c3aed; }
 .cn-bola { display: grid; place-items: center; width: 3.2rem; height: 3.2rem; border-radius: 50%; font-size: 1.4rem; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25); }
-.cn-circuitos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; margin-bottom: 0.8rem; }
+.cn-circuitos { display: grid; grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr)); gap: 0.4rem; margin-bottom: 0.8rem; }
 .cn-circuitos button { display: grid; justify-items: center; padding: 0.6rem 0.3rem; border: 3px solid transparent; border-radius: 16px; background: #f8fafc; color: #0f172a; font: inherit; font-size: 0.8rem; font-weight: 800; cursor: pointer; }
 .cn-circuitos button span { font-size: 1.8rem; }
 .cn-circuitos button small { color: #64748b; font-weight: 600; }

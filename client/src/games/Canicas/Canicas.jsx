@@ -116,10 +116,10 @@ function Practica({ onVolver, onExit, onAbrirAyuda }) {
     return (
       <section className="game qq-pantalla">
         <PanelMenu onVolver={onVolver} onAyuda={onAbrirAyuda}>
-          <Cabecera icono="car" titulo="Práctica contra bots" descripcion="Elige circuito, canica y rivales. ¡Prueba los atajos!" />
+          <Cabecera icono="car" titulo="Práctica contra bots" descripcion="Elige circuito, canica y rivales. Aprende las curvas, los derrapes y qué caminos te convienen." />
           <p className="pzp-etiqueta">Circuito</p>
           <div className="cn-circuitos">
-            {IDS_CIRCUITOS.map((id) => <button key={id} type="button" className={circuito === id ? 'sel' : ''} onClick={() => setCircuito(id)}><span>{CIRCUITOS[id].emoji}</span>{CIRCUITOS[id].nombre}<small>{CIRCUITOS[id].ramas.length} {CIRCUITOS[id].ramas.length === 1 ? 'atajo' : 'atajos'}</small></button>)}
+            {IDS_CIRCUITOS.map((id) => <button key={id} type="button" className={circuito === id ? 'sel' : ''} onClick={() => setCircuito(id)}><span>{CIRCUITOS[id].emoji}</span>{CIRCUITOS[id].nombre}<small>{CIRCUITOS[id].vueltas} vueltas · {CIRCUITOS[id].ramas.length} caminos</small></button>)}
           </div>
           <p className="pzp-etiqueta">Tu canica</p>
           <ElegirCanica valor={canica} onElegir={setCanica} />
@@ -169,7 +169,7 @@ const JUEGO = {
   Local: (props) => <Practica {...props} />,
   menuLocal: { icono: 'car', titulo: 'Práctica contra bots', texto: 'Tú solo contra canicas de la máquina' },
   textoEmpezar: '¡A la parrilla!',
-  notaSala: '🔮 Cada uno corre en su móvil. Inclínalo para guiar tu canica (o usa el joystick).',
+  notaSala: '🔮 Cada uno corre en su móvil: 3 vueltas, joystick para girar, derrape para los miniturbos y objetos para remontar.',
   ganador: (n) => (n.length > 1 ? `¡${n.join(' y ')} empatan en lo más alto!` : `¡${n[0]} es la canica más rápida!`),
   detalleFin: (j) => `${j.victorias} ${j.victorias === 1 ? 'victoria' : 'victorias'}`,
 };
