@@ -566,7 +566,43 @@
   {
     "id": "canicas",
     "name": "Carrera de Canicas",
-    "description": "Carreras de canicas en 3D: inclina el móvil para guiar la tuya por circuitos con atajos, turbos y objetos contra los rivales. Cada canica tiene su habilidad. ¡El primero en llegar a meta gana!",
+    "description": "Carreras de canicas en 3D al estilo kart: 3 vueltas por circuitos con atajos, saltos y turbos. Derrapa para cargar miniturbos y usa misiles, aceite o estrellas. ¡El primero en meta gana!",
+    "isNew": true
+  },
+  {
+    "id": "chapas",
+    "name": "Fútbol chapas",
+    "description": "Fútbol de chapas en 2D: arrastra hacia atrás tu chapa como un tirachinas y suéltala para chutar. Rebotes, paredes y goles por equipos. ¡El primero en llegar a los goles pactados gana!",
+    "isNew": true
+  },
+  {
+    "id": "artilleria",
+    "name": "Artillería",
+    "description": "Tanques sobre colinas: elige ángulo y fuerza, calcula el viento y dispara. Las explosiones hacen cráteres y quitan vida. Megabombas y disparo triple. Gana el último tanque en pie.",
+    "isNew": true
+  },
+  {
+    "id": "curling",
+    "name": "Curling",
+    "description": "Curling sobre hielo en 2D: apunta, elige el efecto y suelta la barra de fuerza en el punto justo. Acerca tus piedras al centro de la diana y saca las de los rivales.",
+    "isNew": true
+  },
+  {
+    "id": "estelas",
+    "name": "Estelas",
+    "description": "Líneas de luz en tiempo real: avanzas sin parar dejando rastro y solo puedes girar. Quien choca con una pared o con cualquier rastro queda fuera. ¡El último en pie gana la ronda!",
+    "isNew": true
+  },
+  {
+    "id": "draft",
+    "name": "El Draft de Estrellas",
+    "description": "Ficha famosos por turnos sin saber qué contará: los más mayores, los más altos, el nombre más largo… Al final se desvela el criterio y se suman los datos de tu equipo. ¡Estrategia y cultura!",
+    "isNew": true
+  },
+  {
+    "id": "emojis",
+    "name": "Biografía en emojis",
+    "description": "La vida de un famoso contada en emojis que aparecen uno a uno. Cuanto antes aciertes, más puntos. En el modo autor, sois vosotros quienes la contáis en emojis.",
     "isNew": true
   },
   {

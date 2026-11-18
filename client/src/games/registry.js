@@ -86,6 +86,12 @@ const Garabato = diferido(() => import('./Garabato/Garabato.jsx'));
 const Torre = diferido(() => import('./Torre/Torre.jsx'));
 const Minigolf = diferido(() => import('./Minigolf/Minigolf.jsx'));
 const Canicas = diferido(() => import('./Canicas/Canicas.jsx'));
+const Chapas = diferido(() => import('./Chapas/Chapas.jsx'));
+const Artilleria = diferido(() => import('./Artilleria/Artilleria.jsx'));
+const Curling = diferido(() => import('./Curling/Curling.jsx'));
+const Estelas = diferido(() => import('./Estelas/Estelas.jsx'));
+const Draft = diferido(() => import('./Draft/Draft.jsx'));
+const Emojis = diferido(() => import('./Emojis/Emojis.jsx'));
 const Habilidad = diferido(() => import('./Habilidad/Habilidad.jsx'));
 const ViaLibre = diferido(() => import('./ViaLibre/ViaLibre.jsx'));
 const Rascacielos = diferido(() => import('./Rascacielos/Rascacielos.jsx'));
@@ -204,6 +210,12 @@ const registry = {
   'torre': Torre,
   'minigolf': Minigolf,
   'canicas': Canicas,
+  'chapas': Chapas,
+  'artilleria': Artilleria,
+  'curling': Curling,
+  'estelas': Estelas,
+  'draft': Draft,
+  'emojis': Emojis,
   'habilidad': Habilidad,
   'vialibre': ViaLibre,
   'rascacielos': Rascacielos,
