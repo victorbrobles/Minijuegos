@@ -5,10 +5,12 @@
 import { useSyncExternalStore } from 'react';
 import { guardarIdentidad, olvidarIdentidad, leerIdentidad, textoIdentidad } from './identidad.js';
 import { aplicarDatos, recopilar } from './copiaPerfil.js';
+import { ponerAdmin } from './admin.js';
 
 let estado = { cargando: true, usuario: null };
 const oyentes = new Set();
-const poner = (n) => { estado = { ...estado, ...n }; oyentes.forEach((f) => f()); };
+// Sin cuenta (o con otra) no hay modo administrador: va ligado a la sesión de quien lo activó
+const poner = (n) => { if ('usuario' in n && estado.usuario?.email !== n.usuario?.email) ponerAdmin(false); estado = { ...estado, ...n }; oyentes.forEach((f) => f()); };
 
 export const useCuenta = () => useSyncExternalStore((f) => { oyentes.add(f); return () => oyentes.delete(f); }, () => estado);
 export const cuentaActual = () => estado.usuario;
@@ -73,7 +75,7 @@ function actividad() {
   if (ahora - ultimoLatido > 60 * 1000) {
     ultimoLatido = ahora;
     fetch('/api/usuarios/latido', { method: 'POST', credentials: 'same-origin' })
-      .then((r) => { if (r.status === 401) cerrarPorInactividad(); }).catch(() => {});
+      .then(async (r) => { if (r.status === 401) cerrarPorInactividad(); else if (r.ok) ponerAdmin((await r.json()).admin); }).catch(() => {});
   }
 }
 function vigilarInactividad() {
@@ -99,7 +101,7 @@ const entrarComo = (u) => {
 /** Al cargar la web: ¿hay sesión iniciada? Si la hay, entras directamente con tu nick. */
 export async function iniciarCuenta() {
   try {
-    const { usuario, caducada: cerradaPorServidor } = await pedir('/api/usuarios/yo');
+    const { usuario, admin, caducada: cerradaPorServidor } = await pedir('/api/usuarios/yo');
     // Al volver a abrir la app tras más de 15 minutos sin usarla, la sesión ya no vale
     const inactiva = usuario && leerUltima() && Date.now() - leerUltima() > INACTIVIDAD_MS;
     if (cerradaPorServidor || inactiva) {
@@ -110,6 +112,7 @@ export async function iniciarCuenta() {
       const primeraVez = !sessionStorage.getItem('minijuegos_cuenta_sync');
       if (primeraVez) { await bajarDatos(); try { sessionStorage.setItem('minijuegos_cuenta_sync', '1'); } catch { /* nada */ } }
       entrarComo(usuario);
+      ponerAdmin(admin);
       subirDatos();
       return;
     }

@@ -50,8 +50,10 @@ export const INACTIVIDAD_MS = 15 * 60 * 1000;
 const MARGEN_MS = 2 * 60 * 1000;
 const firmar = (s) => createHmac('sha256', secreto).update(s).digest('base64url');
 
-export function crearSesion(res, req, usuario) {
-  const datos = Buffer.from(JSON.stringify({ u: usuario.id, v: usuario.version, exp: Date.now() + DURACION_MS, ult: Date.now() })).toString('base64url');
+// `adm`: hasta cuándo vale el modo administrador en ESTA sesión (solo lo pone /api/admin/entrar). Va dentro de la
+// cookie firmada de la cuenta: es de quien lo activó y en este navegador; al cerrar la sesión desaparece con ella.
+export function crearSesion(res, req, usuario, { adm = 0 } = {}) {
+  const datos = Buffer.from(JSON.stringify({ u: usuario.id, v: usuario.version, exp: Date.now() + DURACION_MS, ult: Date.now(), ...(adm > Date.now() ? { adm } : {}) })).toString('base64url');
   res.cookie(COOKIE, `${datos}.${firmar(datos)}`, { httpOnly: true, sameSite: 'lax', secure: req.secure, maxAge: DURACION_MS, path: '/' });
 }
 export const cerrarSesion = (res) => res.clearCookie(COOKIE, { path: '/' });
@@ -68,7 +70,7 @@ function leerCookie(req, nombre) {
 const porId = db.prepare('SELECT id, email, jugador, version, creado FROM usuarios WHERE id = ?');
 /** Middleware: pone en req.usuario la cuenta con sesión iniciada (o null). */
 export function leerSesion(req, res, next) {
-  req.usuario = null;
+  req.usuario = null; req.admin = false; req.adminHasta = 0;
   const valor = leerCookie(req, COOKIE);
   if (valor) {
     const [datos, firma] = valor.split('.');
@@ -78,7 +80,10 @@ export function leerSesion(req, res, next) {
         const s = JSON.parse(Buffer.from(datos, 'base64url').toString());
         const inactiva = !s.ult || Date.now() - s.ult > INACTIVIDAD_MS + MARGEN_MS;
         const u = s.exp > Date.now() && !inactiva ? porId.get(s.u) : null;
-        if (u && u.version === s.v) req.usuario = u; // cambiar la contraseña invalida las sesiones antiguas
+        if (u && u.version === s.v) { // cambiar la contraseña invalida las sesiones antiguas
+          req.usuario = u;
+          if (s.adm > Date.now()) { req.admin = true; req.adminHasta = s.adm; }
+        }
         else if (inactiva) { req.sesionCaducada = true; cerrarSesion(res); }
       } catch { /* cookie rota */ }
     }

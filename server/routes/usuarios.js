@@ -39,13 +39,13 @@ function validarPassword(pw) {
   return null;
 }
 
-router.get('/yo', (req, res) => res.json({ success: true, usuario: publico(req.usuario), caducada: Boolean(req.sesionCaducada) }));
+router.get('/yo', (req, res) => res.json({ success: true, usuario: publico(req.usuario), admin: req.admin, caducada: Boolean(req.sesionCaducada) }));
 
 // Se está usando la app: la sesión sigue abierta otros 15 minutos
 router.post('/latido', (req, res) => {
   if (!req.usuario) return res.status(401).json({ error: 'La sesión se ha cerrado.', caducada: Boolean(req.sesionCaducada) });
-  crearSesion(res, req, req.usuario);
-  res.json({ success: true });
+  crearSesion(res, req, req.usuario, { adm: req.adminHasta }); // el modo administrador sigue si estaba activo
+  res.json({ success: true, admin: req.admin });
 });
 
 router.get('/libre', (req, res) => {
@@ -119,7 +119,7 @@ router.post('/password', (req, res) => {
   const mal = validarPassword(req.body?.nueva);
   if (mal) return res.status(400).json({ error: mal });
   db.prepare('UPDATE usuarios SET hash = ?, version = version + 1 WHERE id = ?').run(hashPassword(req.body.nueva), u.id);
-  crearSesion(res, req, { ...u, version: u.version + 1 }); // las demás sesiones abiertas se cierran
+  crearSesion(res, req, { ...u, version: u.version + 1 }, { adm: req.adminHasta }); // las demás sesiones abiertas se cierran
   res.json({ success: true });
 });
 

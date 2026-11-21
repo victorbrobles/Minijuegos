@@ -1625,3 +1625,4 @@ body:has(.home-view) {
 .lg-aviso b { display: block; font-size: 1.05rem; }
 .lg-aviso em { display: block; font-style: normal; font-size: 0.78rem; opacity: 0.9; }
 @keyframes lgEntra { from { opacity: 0; transform: translate(-50%, 30px) scale(0.9); } to { opacity: 1; transform: translate(-50%, 0); } }
+.admin-pagina { display: flex; justify-content: center; margin: 3rem auto; max-width: 520px; }

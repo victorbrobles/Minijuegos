@@ -1,4 +1,3 @@
-import { createHmac, timingSafeEqual } from 'node:crypto';
 import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { verificarCodigo, base32Decodificar } from './totp.js';
@@ -48,36 +47,10 @@ export function codigoCorrecto(codigo) {
   return true;
 }
 
-// --- Clave para firmar los tokens de sesión ---
-// Antes se generaba al azar y se guardaba en un fichero: en un servidor con disco efímero o de solo
-// lectura (Render, Railway, Fly, contenedores...) fallaba o cerraba la sesión en cada reinicio.
-// Ahora se deriva del secreto TOTP (o de ADMIN_TOKEN_SECRET si se define): es estable entre reinicios
-// y despliegues, no escribe nada en disco, y regenerar el MFA invalida todas las sesiones abiertas.
-const secreto = process.env.ADMIN_TOKEN_SECRET
-  ? Buffer.from(process.env.ADMIN_TOKEN_SECRET)
-  : createHmac('sha256', secretoTotp ?? 'admin-desactivado').update('minigames-admin-token-v1').digest();
+// --- Sesión de administrador ---
+// Ya no hay token aparte guardado en el navegador: el modo administrador va dentro de la cookie de sesión de la cuenta
+// (firmada y HttpOnly, ver server/lib/usuarios.js). Así solo lo tiene quien lo activó, en su sesión: otra cuenta (o la
+// misma en otro navegador) no lo ve, y al cerrar la sesión (a mano o por inactividad) se acaba también.
+export const DURACION_ADMIN_MS = 12 * 60 * 60 * 1000; // como mucho 12 horas seguidas
 
-const DURACION_MS = 12 * 60 * 60 * 1000; // la sesión de administrador dura 12 horas
-
-const firmar = (datos) => createHmac('sha256', secreto).update(datos).digest('base64url');
-
-export function crearToken() {
-  const datos = Buffer.from(JSON.stringify({ exp: Date.now() + DURACION_MS })).toString('base64url');
-  return `${datos}.${firmar(datos)}`;
-}
-
-export function tokenValido(token) {
-  if (!mfaConfigurado || typeof token !== 'string') return false;
-  const [datos, firma] = token.split('.');
-  if (!datos || !firma) return false;
-  const esperada = Buffer.from(firmar(datos));
-  const recibida = Buffer.from(firma);
-  if (esperada.length !== recibida.length || !timingSafeEqual(esperada, recibida)) return false;
-  try {
-    return JSON.parse(Buffer.from(datos, 'base64url').toString()).exp > Date.now();
-  } catch {
-    return false;
-  }
-}
-
-export const esAdmin = (req) => tokenValido(req.get('x-admin-token'));
+export const esAdmin = (req) => mfaConfigurado && req.admin === true && Boolean(req.usuario);

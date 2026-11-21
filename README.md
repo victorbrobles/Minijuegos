@@ -60,11 +60,14 @@ npm run dev
 - La comprobación se hace en el servidor e ignora mayúsculas, tildes, signos y palabras de relleno.
 
 ## Modo administrador y categorías ocultas
-- En la portada hay un campo **Modo administrador**: se introduce el código de 6 dígitos de tu app de autenticación
-  (MFA/TOTP: Google Authenticator, Authy, Microsoft Authenticator…). Si es válido, el servidor devuelve un token firmado
-  (caduca a las 12 h) y en *Quién es Quién* aparecen las categorías ocultas. Sin código, todo funciona como siempre.
+- En la portada no aparece nada: se entra en **`/admin`** (con la sesión de tu cuenta iniciada) y se introduce el código de
+  6 dígitos de tu app de autenticación (MFA/TOTP: Google Authenticator, Authy, Microsoft Authenticator…). Si es válido,
+  vuelves a la portada en modo administrador y abajo aparece el botón **Desactivar**.
+- El modo administrador va dentro de la cookie de sesión de esa cuenta (firmada y HttpOnly; caduca a las 12 h): solo lo
+  tiene quien lo activó y en ese navegador. Otra cuenta, o un invitado, nunca lo ve, y al cerrar la sesión (a mano o por
+  inactividad) se acaba también.
 - Las categorías ocultas se escriben en `server/data/quienesquien.admin.seed.js` (mismo formato que el seed normal).
-  Nunca se envían al navegador ni se reparten sin token de administrador, y "Todas las categorías" tampoco las mezcla.
+  Nunca se envían al navegador ni se reparten sin el modo administrador, y "Todas las categorías" tampoco las mezcla.
 - El secreto MFA está en `server/data/.admin-totp` (en `.gitignore`; también puede ir en la variable de entorno
   `ADMIN_TOTP_SECRET`). **No lo compartas ni lo subas a ningún repositorio**: quien tenga ese fichero puede generar códigos.
   Si el fichero no existe, el modo administrador queda desactivado y no se puede dar de alta desde la web.

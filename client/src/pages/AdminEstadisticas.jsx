@@ -92,7 +92,7 @@ export default function AdminEstadisticas() {
   if (!esAdmin) {
     return (
       <div className="game-shell ae-pagina">
-        <section className="ae-caja"><p>Esta página es solo para el administrador. Activa el modo administrador al final de la portada.</p><Link to="/">Ir a la portada</Link></section>
+        <section className="ae-caja"><p>Esta página es solo para el administrador. Activa antes el modo administrador.</p><Link to="/">Ir a la portada</Link></section>
       </div>
     );
   }

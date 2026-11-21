@@ -21,6 +21,7 @@ const Tele = lazy(() => import('./pages/Tele.jsx'));
 const Grupos = lazy(() => import('./pages/Grupos.jsx'));
 const GrupoDetalle = lazy(() => import('./pages/Grupos.jsx').then((m) => ({ default: m.GrupoDetalle })));
 const SalaGrupo = lazy(() => import('./pages/SalaGrupo.jsx'));
+const PaginaAdmin = lazy(() => import('./components/AdminPanel.jsx').then((m) => ({ default: m.PaginaAdmin })));
 const AdminEstadisticas = lazy(() => import('./pages/AdminEstadisticas.jsx'));
 const Privacidad = lazy(() => import('./pages/Privacidad.jsx'));
 const Cargando = () => <p className="loading">Cargando…</p>;
@@ -53,6 +54,7 @@ export default function App() {
           <Route path="/grupos" element={<Grupos />} />
           <Route path="/grupo/:codigo" element={<GrupoDetalle />} />
           <Route path="/grupo/:codigo/sala" element={<SalaGrupo />} />
+          <Route path="/admin" element={<PaginaAdmin />} />
           <Route path="/admin/estadisticas" element={<AdminEstadisticas />} />
           <Route path="/privacidad" element={<Privacidad />} />
           <Route path="*" element={<p>Página no encontrada.</p>} />

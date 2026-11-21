@@ -1,5 +1,6 @@
 import { Router } from 'express';
-import { codigoCorrecto, crearToken, esAdmin, mfaConfigurado } from '../lib/admin.js';
+import { codigoCorrecto, esAdmin, mfaConfigurado, DURACION_ADMIN_MS } from '../lib/admin.js';
+import { crearSesion } from '../lib/usuarios.js';
 
 const router = Router();
 
@@ -26,12 +27,14 @@ function anotarFallo(ip) {
   fallosGlobal.push(Date.now());
 }
 
-// POST /api/admin/login  { codigo }  ->  { token }
+// POST /api/admin/login  { codigo }  ->  { admin: true }
+// Hay que tener la sesión iniciada con una cuenta: el modo administrador se guarda en ESA sesión (cookie firmada).
 router.post('/login', async (req, res) => {
   try {
     if (!mfaConfigurado) {
       return res.status(503).json({ error: 'El modo administrador no está configurado en el servidor.' });
     }
+    if (!req.usuario) return res.status(403).json({ error: 'Inicia sesión con tu cuenta para activar el modo administrador.', necesitaSesion: true });
     const ip = req.ip;
     if (bloqueado(ip)) {
       return res.status(429).json({ error: 'Demasiados intentos. Prueba de nuevo en unos minutos.' });
@@ -42,14 +45,21 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Código incorrecto.' });
     }
     fallosIp.delete(ip);
-    res.json({ token: crearToken() });
+    crearSesion(res, req, req.usuario, { adm: Date.now() + DURACION_ADMIN_MS });
+    res.json({ admin: true });
   } catch (err) {
     console.error('[admin] Error en /login:', err);
     res.status(500).json({ error: 'Error interno al comprobar el código.' });
   }
 });
 
-// GET /api/admin/status  (cabecera X-Admin-Token)  ->  { admin: true|false, configurado: true|false }
-router.get('/status', (req, res) => res.json({ admin: esAdmin(req), configurado: mfaConfigurado }));
+// POST /api/admin/salir: desactiva el modo administrador sin cerrar la sesión de la cuenta
+router.post('/salir', (req, res) => {
+  if (req.usuario) crearSesion(res, req, req.usuario);
+  res.json({ admin: false });
+});
+
+// GET /api/admin/status  ->  { admin: true|false }
+router.get('/status', (req, res) => res.json({ admin: esAdmin(req) }));
 
 export default router;
