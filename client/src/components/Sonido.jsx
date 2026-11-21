@@ -1,7 +1,9 @@
 // client/src/components/Sonido.jsx
-// Botón 🔊 con el panel de ajustes de sonido y vibración.
-import { useEffect, useRef, useState } from 'react';
+// Botón 🔊 que abre (en una ventana propia, como Ajustes) los ajustes de sonido y vibración.
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { usePreferenciasSonido, guardarPreferencias, sonar, puedeVibrar } from '../lib/sonido.js';
+import './Ajustes.css';
 import './Sonido.css';
 
 function Interruptor({ activo, onCambio, children }) {
@@ -15,20 +17,20 @@ function Interruptor({ activo, onCambio, children }) {
 export default function BotonSonido({ clase = '' }) {
   const p = usePreferenciasSonido();
   const [abierto, setAbierto] = useState(false);
-  const ref = useRef(null);
   useEffect(() => {
     if (!abierto) return undefined;
-    const fuera = (e) => { if (ref.current && !ref.current.contains(e.target)) setAbierto(false); };
-    document.addEventListener('pointerdown', fuera);
-    return () => document.removeEventListener('pointerdown', fuera);
+    const tecla = (e) => { if (e.key === 'Escape') setAbierto(false); };
+    window.addEventListener('keydown', tecla);
+    return () => window.removeEventListener('keydown', tecla);
   }, [abierto]);
   const icono = !p.sonido || p.volumen === 0 ? '🔇' : p.volumen < 0.4 ? '🔈' : '🔊';
   return (
-    <div className={`snd ${clase}`} ref={ref}>
+    <div className={`snd ${clase}`}>
       <button type="button" className="snd-btn" aria-label="Sonido y vibración" aria-expanded={abierto} onClick={() => setAbierto(!abierto)}>{icono}</button>
-      {abierto && (
-        <div className="snd-panel" role="dialog" aria-label="Sonido y vibración">
-          <b>Sonido y vibración</b>
+      {abierto && createPortal(
+        <div className="rg-modal-fondo aj-fondo" onClick={() => setAbierto(false)}>
+        <div className="aj-panel snd-panel" role="dialog" aria-modal="true" aria-label="Sonido y vibración" onClick={(e) => e.stopPropagation()}>
+          <header><h2>🔊 Sonido y vibración</h2><button type="button" className="aj-cerrar" onClick={() => setAbierto(false)} aria-label="Cerrar">✕</button></header>
           <Interruptor activo={p.sonido} onCambio={(v) => { guardarPreferencias({ sonido: v }); if (v) setTimeout(() => sonar('acierto', { vibrar: false }), 30); }}>🔊 Efectos de sonido</Interruptor>
           <label className={`snd-vol${p.sonido ? '' : ' off'}`}>
             <span>Volumen</span>
@@ -45,6 +47,8 @@ export default function BotonSonido({ clase = '' }) {
             ))}
           </div>
         </div>
+        </div>,
+        document.body
       )}
     </div>
   );
