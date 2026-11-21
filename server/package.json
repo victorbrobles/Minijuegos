@@ -33,6 +33,7 @@
     "sync:musavanzado": "node scripts/sync-musavanzado.mjs"
   },
   "dependencies": {
+    "@libsql/client": "^0.15.15",
     "cannon-es": "^0.20.0",
     "compression": "^1.7.5",
     "express": "^4.19.2",

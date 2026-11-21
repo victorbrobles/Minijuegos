@@ -27,13 +27,21 @@ npm run dev
 ## Datos guardados (récords, grupos, retos…) y Turso
 - Lo que genera la gente (récords y salón de la fama, reto diario, grupos y su liga, preguntas de grupo, valoraciones,
   estadísticas de uso, retos a amigos, copias de «pasar a otro móvil») se guarda en SQLite con libSQL (`server/db.js`).
-- **En local**, en el archivo `server/data/minigames.db` (o el que diga `DB_PATH`).
-- **En Render (o cualquier servidor con disco temporal)**, en **Turso** (plan gratuito), para que no se pierda nada al
-  desplegar ni cuando el servidor se duerme. El servidor guarda una réplica local para leer rápido y las escrituras
-  van a Turso. Hay que definir dos variables de entorno:
+- **Siempre se lee y se escribe en un archivo SQLite local** (`server/data/minigames.db` o el que diga `DB_PATH`), con
+  WAL: es instantáneo, aguanta mucha gente a la vez y no depende de la red (`server/lib/replica.js`).
+- **Turso** (plan gratuito) guarda la copia permanente, para que no se pierda nada al desplegar ni cuando el servidor se
+  duerme. Cada cambio queda apuntado en un diario (`_cambios`) y se sube a Turso en lotes cada pocos segundos, en segundo
+  plano. **Si Turso se cae, la web sigue igual** y lo pendiente se sube cuando vuelve; al apagar el servidor
+  (despliegue) se sube lo pendiente antes de salir. Al arrancar con el disco vacío (Render) se descarga todo de Turso.
+  Variables de entorno:
   - `TURSO_DATABASE_URL` → la URL de la base de datos (empieza por `libsql://…`).
   - `TURSO_AUTH_TOKEN` → el token de acceso de esa base de datos.
-- Al arrancar, el registro del servidor dice `[datos] Conectado a Turso…` si todo va bien.
+- **Copias en fichero**: cada 6 horas, `server/data/copias/minigames-<fecha>.db` (se guardan las 8 últimas). Si el archivo
+  local aparece dañado al arrancar, se aparta y se recupera de Turso o de la última copia. Si Turso no responde al arrancar,
+  se trabaja en modo temporal sin subir nada (para no pisar lo que hay en Turso) y se recupera en el siguiente arranque.
+- En `/admin/estadisticas` (modo administrador) se ve el estado (Turso al día, cambios pendientes, copias) y se puede
+  **descargar una copia completa** en cualquier momento.
+- Si algo va mal, el registro del servidor lo dice con líneas `[datos] ⚠️ …`.
 
 ## Cuentas de usuario
 - Se puede jugar **con cuenta** (correo + contraseña + nick «Nick#1234») o **sin cuenta** (solo nick, como antes).

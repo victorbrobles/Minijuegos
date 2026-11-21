@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { codigoCorrecto, esAdmin, mfaConfigurado, DURACION_ADMIN_MS } from '../lib/admin.js';
 import { crearSesion } from '../lib/usuarios.js';
+import { estadoDatos, hacerCopia, subirAhora } from '../lib/replica.js';
 
 const router = Router();
 
@@ -61,5 +62,21 @@ router.post('/salir', (req, res) => {
 
 // GET /api/admin/status  ->  { admin: true|false }
 router.get('/status', (req, res) => res.json({ admin: esAdmin(req) }));
+
+// GET /api/admin/datos: cómo está la base de datos (copia en Turso, cambios pendientes, copias en fichero)
+router.get('/datos', async (req, res) => {
+  if (!esAdmin(req)) return res.status(403).json({ error: 'Solo para el administrador.' });
+  if (req.query.subir) await subirAhora();
+  const { archivo, ...resto } = estadoDatos; // la ruta del servidor no hace falta enseñarla
+  res.json({ success: true, ...resto });
+});
+
+// GET /api/admin/copia: guarda una copia completa ahora y la descarga (archivo SQLite)
+router.get('/copia', (req, res) => {
+  if (!esAdmin(req)) return res.status(403).json({ error: 'Solo para el administrador.' });
+  const ruta = hacerCopia();
+  if (!ruta) return res.status(500).json({ error: 'No se pudo guardar la copia.' });
+  res.download(ruta, ruta.split(/[\\/]/).pop());
+});
 
 export default router;

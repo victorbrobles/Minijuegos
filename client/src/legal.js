@@ -7,5 +7,5 @@ export const LEGAL = {
   // Correo para dudas, pedir que se borren datos o avisar de contenido que no debería estar
   contacto: 'victoor2114@gmail.com',
   // Fecha de la última actualización de estos textos
-  actualizado: '16 de noviembre de 2026'
+  actualizado: '21 de noviembre de 2026'
 };

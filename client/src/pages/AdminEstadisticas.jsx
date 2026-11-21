@@ -51,6 +51,34 @@ function Cuentas() {
   );
 }
 
+// Estado de la base de datos: copia en Turso, cambios aún sin subir y copias en fichero
+const fechaHora = (iso) => (iso ? new Date(iso).toLocaleString('es-ES', { dateStyle: 'short', timeStyle: 'short' }) : '—');
+function Datos() {
+  const [e, setE] = useState(null);
+  const cargar = (subir) => fetch(`/api/admin/datos${subir ? '?subir=1' : ''}`).then((r) => r.json()).then(setE).catch(() => setE({ error: 'No se pudo cargar.' }));
+  useEffect(() => { cargar(false); }, []);
+  const bien = e?.turso === 'ok' || e?.turso === 'sin configurar';
+  return (
+    <section className="ae-caja">
+      <h2>🗄️ Base de datos</h2>
+      {!e ? <p className="ae-nota">Cargando…</p> : e.error ? <p className="ae-nota">{e.error}</p> : (
+        <ul className="ae-datos">
+          <li><span>Copia en Turso</span><b className={bien ? 'bien' : 'mal'}>{e.turso === 'ok' ? '✅ al día' : e.turso === 'sin configurar' ? 'Sin configurar' : `⚠️ ${e.turso}`}</b></li>
+          <li><span>Cambios sin subir</span><b>{e.pendientes}</b></li>
+          <li><span>Última subida</span><b>{fechaHora(e.ultimaSubida)}</b></li>
+          {e.ultimoError && <li><span>Último error</span><b className="mal">{e.ultimoError}</b></li>}
+          <li><span>Datos cargados de</span><b>{e.origen}</b></li>
+          <li><span>Copias en el servidor</span><b>{e.copias?.length || 0} · última {fechaHora(e.ultimaCopia)}</b></li>
+        </ul>
+      )}
+      <div className="ae-datos-botones">
+        <button type="button" className="secondary" onClick={() => cargar(true)}>🔄 Subir ahora</button>
+        <a className="button" href="/api/admin/copia" download>⬇️ Descargar copia</a>
+      </div>
+    </section>
+  );
+}
+
 function Tarjeta({ icono, valor, texto, nota }) {
   return <div className="ae-tarjeta"><span>{icono}</span><b>{valor}</b><small>{texto}</small>{nota && <em>{nota}</em>}</div>;
 }
@@ -119,6 +147,7 @@ export default function AdminEstadisticas() {
           </div>
 
           <Cuentas />
+          <Datos />
 
           <section className="ae-caja">
             <h2>Personas por día</h2>

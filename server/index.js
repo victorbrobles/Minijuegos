@@ -14,6 +14,7 @@ import gamesRouter from './routes/games.js';
 import siglasRouter from './routes/siglas.js';
 import quienEsQuienRouter from './routes/quienesquien.js';
 import adminRouter from './routes/admin.js';
+import { arrancarCopias, cerrarDatos } from './lib/replica.js';
 import trayectoriaRoutes from './routes/trayectoria.js';
 import rasgosRouter from './routes/rasgos.js';
 import rankingsRouter from './routes/rankings.js';
@@ -262,6 +263,29 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
 
-app.listen(PORT, () => {
-  console.log(`Servidor activo en el puerto ${PORT}`);
+// Si algo falla dentro de una ruta (p. ej. el disco lleno), se responde con un error en JSON y el servidor sigue
+app.use((err, req, res, next) => {
+  if (res.headersSent) return next(err);
+  if (err?.type === 'entity.too.large') return res.status(413).json({ error: 'Los datos enviados son demasiado grandes.' });
+  if (err?.type === 'entity.parse.failed') return res.status(400).json({ error: 'Datos no válidos.' });
+  console.error(`[servidor] Error en ${req.method} ${req.path}:`, err?.message || err);
+  res.status(500).json({ error: 'Ha fallado algo en el servidor. Inténtalo de nuevo.' });
 });
+process.on('unhandledRejection', (motivo) => console.error('[servidor] Promesa sin capturar:', motivo?.message || motivo));
+
+const servidor = app.listen(PORT, () => {
+  console.log(`Servidor activo en el puerto ${PORT}`);
+  arrancarCopias(); // diario de cambios, subida a Turso en segundo plano y copias en fichero
+});
+
+// Apagado ordenado (despliegue, reinicio): se sube a Turso lo pendiente antes de salir
+let apagando = false;
+async function apagar(senal) {
+  if (apagando) return; apagando = true;
+  console.log(`[servidor] ${senal}: guardando datos antes de salir…`);
+  servidor.close();
+  await cerrarDatos();
+  process.exit(0);
+}
+process.on('SIGTERM', () => apagar('SIGTERM'));
+process.on('SIGINT', () => apagar('SIGINT'));
