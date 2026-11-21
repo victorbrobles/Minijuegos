@@ -1,27 +1,39 @@
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
+import './Ajustes.css';
 import Icon from './Icon.jsx';
 import { activarAdmin, salirAdmin, useAdmin, comprobarSesionAdmin } from '../lib/admin.js';
 import { useCuenta } from '../lib/cuenta.js';
 
-// Pie de la portada: solo aparece si ESTA sesión está en modo administrador, con el botón para desactivarlo.
-// Para activarlo hay que entrar en /admin (no hay ningún enlace en la web).
-export default function AdminPanel() {
+// Botón 🛡️ en la cabecera de la portada (junto a Grupos, sonido y ajustes): solo aparece si ESTA sesión está en modo
+// administrador y abre su panel. Para activarlo hay que entrar en /admin (no hay ningún enlace en la web).
+export default function BotonAdmin() {
   const esAdmin = useAdmin();
+  const [abierto, setAbierto] = useState(false);
   useEffect(() => { comprobarSesionAdmin(); }, []);
+  useEffect(() => {
+    if (!abierto) return undefined;
+    const tecla = (e) => { if (e.key === 'Escape') setAbierto(false); };
+    window.addEventListener('keydown', tecla);
+    return () => window.removeEventListener('keydown', tecla);
+  }, [abierto]);
   if (!esAdmin) return null;
   return (
-    <footer className="admin-foot">
-      <div className="admin-panel on">
-        <span className="admin-icon"><Icon name="shield" size={22} /></span>
-        <div className="admin-text">
-          <strong>Modo administrador activado</strong>
-          <span>Ya puedes ver el contenido oculto.</span>
-          <Link to="/admin/estadisticas" className="admin-stats-link">📊 Estadísticas de uso</Link>
-        </div>
-        <button type="button" className="secondary" onClick={salirAdmin}>Desactivar</button>
-      </div>
-    </footer>
+    <>
+      <button type="button" className="aj-boton adm-boton" onClick={() => setAbierto(true)} aria-label="Modo administrador" title="Modo administrador">🛡️</button>
+      {abierto && createPortal(
+        <div className="rg-modal-fondo aj-fondo" onClick={() => setAbierto(false)}>
+          <div className="aj-panel adm-modal" role="dialog" aria-modal="true" aria-label="Modo administrador" onClick={(e) => e.stopPropagation()}>
+            <header><h2>🛡️ Modo administrador</h2><button type="button" className="aj-cerrar" onClick={() => setAbierto(false)} aria-label="Cerrar">✕</button></header>
+            <p className="adm-estado"><span aria-hidden="true">✅</span> Activado: ya puedes ver el contenido oculto.</p>
+            <Link to="/admin/estadisticas" className="adm-opcion" onClick={() => setAbierto(false)}><span aria-hidden="true">📊</span><b>Estadísticas de uso</b><small>Visitas, juegos, cuentas y base de datos</small></Link>
+            <button type="button" className="adm-desactivar" onClick={() => { salirAdmin(); setAbierto(false); }}>Desactivar modo administrador</button>
+          </div>
+        </div>,
+        document.body
+      )}
+    </>
   );
 }
 

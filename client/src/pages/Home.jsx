@@ -20,7 +20,7 @@ import GameCard from '../components/GameCard.jsx';
 import { useFiltros, cuantosFiltros, cumpleFiltros, PanelFiltros } from '../components/FiltrosJuegos.jsx';
 import { BotonAjustes } from '../components/Ajustes.jsx';
 import Icon from '../components/Icon.jsx';
-import AdminPanel from '../components/AdminPanel.jsx';
+import BotonAdmin from '../components/AdminPanel.jsx';
 import { metaDe, TOP_CREADOR, CATEGORIAS_PORTADA as CATEGORIAS_EXPORTADAS } from '../games/meta.js';
 
 // Lista de categorías por defecto de respaldo
@@ -357,6 +357,7 @@ export default function Home() {
           <div className="hub-yo"><ChipIdentidad /></div>
           <nav className="hub-iconos" aria-label="Opciones">
             <Link to="/grupos" className="hub-grupos" aria-label="Grupos" title="Grupos"><span aria-hidden="true">👥</span><em>Grupos</em></Link>
+            <BotonAdmin />
             <BotonSonido clase="en-portada" />
             <BotonAjustes />
           </nav>
@@ -466,8 +467,6 @@ export default function Home() {
           <button type="button" className="secondary" onClick={() => { limpiar(); setFiltros({ ...filtros, jugadores: null, modo: 'todos', duracion: null, tipos: [], favoritos: false }); }}>Borrar búsqueda y filtros</button>
         </div>
       )}
-
-      <AdminPanel />
 
       {/* Pie de página con información y contacto */}
       <footer className="home-footer">
