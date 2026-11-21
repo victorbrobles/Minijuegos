@@ -1,6 +1,5 @@
 // client/src/games/Aproximacion/AproximacionLocal.jsx
 import { useRegistrarPartida, ganadoresPorPuntos } from '../../lib/registros.js';
-import { RecientesJugadores, ponerReciente } from '../../components/Recientes.jsx';
 import { nombreIdentidad } from '../../lib/identidad.js';
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +7,7 @@ import Icon from '../../components/Icon.jsx';
 import './Aproximacion.css';
 import { centrarActivo } from '../../lib/centrarActivo.js';
 import { limitesLocal } from '../limites.js';
-import { SelectorRondas } from '../../components/MenuJuego.jsx';
+import { SelectorRondas, SelectorJugadores } from '../../components/MenuJuego.jsx';
 import { rondasPorDefecto, totalRondas } from '../rondas.js';
 import { avisarNombres } from '../../lib/nombres.js';
 import CaraJugador from '../../components/CaraJugador.jsx';
@@ -592,109 +591,14 @@ export default function AproximacionLocal({ onVolver, onExit, onAbrirAyuda }) {
 
       {/* 1. CONFIGURACIÓN DE JUGADORES */}
       {fase === 'setup' && (
-        <section className="game">
-          <div className="panel qq-menu-panel">
-            <div className="qq-card-top">
-              <button type="button" className="qq-link-volver" onClick={onVolver}>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M19 12H5M12 19l-7-7 7-7" />
-                </svg>
-                <span>Volver</span>
-              </button>
-              <button
-                type="button"
-                className="qq-btn-ayuda"
-                onClick={onAbrirAyuda}
-                title="Cómo jugar"
-                aria-label="Cómo jugar"
-              >
-                ?
-              </button>
-            </div>
-
-            <div className="qq-config-header">
-              <div className="qq-hero-icono chico">
-                <Icon name="users" size={32} />
-              </div>
-              <div>
-                <h2 className="qq-config-titulo">Jugadores</h2>
-                <p className="qq-config-sub">
-                  Configura quiénes van a participar ({MIN_JUGADORES} a {MAX_JUGADORES} jugadores)
-                </p>
-              </div>
-            </div>
-
-            <div className="qq-selector-cantidad-box">
-              <label className="qq-label-destacado" htmlFor="num-jugadores-aprox">
-                Número de participantes
-              </label>
-              <div className="qq-stepper-row">
-                <button
-                  type="button"
-                  className="qq-stepper-btn"
-                  disabled={numJugadores <= MIN_JUGADORES}
-                  onClick={() => actualizarCantidadJugadores(numJugadores - 1)}
-                >
-                  &minus;
-                </button>
-                <select
-                  id="num-jugadores-aprox"
-                  className="qq-select-jugadores"
-                  value={numJugadores}
-                  onChange={(e) => actualizarCantidadJugadores(parseInt(e.target.value, 10))}
-                >
-                  {Array.from({ length: MAX_JUGADORES - MIN_JUGADORES + 1 }, (_, i) => (
-                    <option key={i + MIN_JUGADORES} value={i + MIN_JUGADORES}>
-                      {i + MIN_JUGADORES} {i + MIN_JUGADORES === 1 ? 'jugador' : 'jugadores'}
-                    </option>
-                  ))}
-                </select>
-                <button
-                  type="button"
-                  className="qq-stepper-btn"
-                  disabled={numJugadores >= MAX_JUGADORES}
-                  onClick={() => actualizarCantidadJugadores(numJugadores + 1)}
-                >
-                  +
-                </button>
-              </div>
-            </div>
-
-            <span className="qq-label-destacado" style={{ marginTop: '1.2rem', display: 'block' }}>
-              Nombres de los jugadores
-            </span>
-            <div className="qq-nombres-grid">
-              {jugadores.map((j, idx) => (
-                <div key={j.id} className="qq-jugador-input-card">
-                  <span
-                    className="qq-jugador-badge"
-                    style={{ background: colorJugador(idx) }}
-                  >
-                    <CaraJugador nombre={j.nombre} texto={idx + 1} />
-                  </span>
-                  <input
-                    type="text"
-                    value={j.nombre}
-                    onChange={(e) => handleNombreChange(idx, e.target.value)}
-                    placeholder={`Nombre del jugador ${j.id}`}
-                    maxLength={20}
-                  />
-                </div>
-              ))}
-            </div>
-            <RecientesJugadores usados={jugadores.map((j) => j.nombre)} onPoner={(n) => setJugadores((l) => ponerReciente(l, n))} />
-
-            <SelectorRondas juegoId="aproximacion" valor={rondasSel} onCambiar={setRondasSel} numJugadores={jugadores.length} />
-            <button
-              type="button"
-              className="big full qq-btn-principal"
-              style={{ marginTop: '1.5rem' }}
-              onClick={iniciarPartida}
-            >
-              <Icon name="play" size={22} /> Iniciar juego ({MAX_RONDAS} rondas)
-            </button>
-          </div>
-        </section>
+        <SelectorJugadores
+          onVolver={onVolver} onAyuda={onAbrirAyuda} min={MIN_JUGADORES} max={MAX_JUGADORES}
+          numJugadores={numJugadores} onCambiarNum={actualizarCantidadJugadores} nombres={jugadores} maxLength={20}
+          onNombre={(idx, valor) => handleNombreChange(idx, valor)}
+          onEmpezar={iniciarPartida} textoBoton={`Iniciar juego (${MAX_RONDAS} rondas)`} iconoBoton="play"
+        >
+          <SelectorRondas juegoId="aproximacion" valor={rondasSel} onCambiar={setRondasSel} numJugadores={jugadores.length} />
+        </SelectorJugadores>
       )}
 
       {/* 2. TURNO ACTIVO */}
