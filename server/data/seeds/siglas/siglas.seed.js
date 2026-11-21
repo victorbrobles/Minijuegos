@@ -5,7 +5,7 @@
 // se actualizan las que cambien y se eliminan las que quites. Es la fuente de verdad.
 // La comprobación ignora mayúsculas, tildes, signos y palabras de relleno (de, la, el, the, of...).
 
-export default {
+const BASE = {
   'Instituciones': [
     ['ONU', 'Organización de las Naciones Unidas', ['United Nations']],
     ['OTAN', 'Organización del Tratado del Atlántico Norte', ['North Atlantic Treaty Organization']],
@@ -323,3 +323,12 @@ export default {
     ['OMG', 'Oh My God', ['Oh Dios Mío']]
   ]
 };
+
+// Ampliación (siglasExtra.js): se añade a cada categoría; las siglas repetidas se ignoran
+import EXTRA from './siglasExtra.js';
+const vistas = new Set();
+const unir = (lista) => lista.filter(([sigla]) => { const k = sigla.toUpperCase(); if (vistas.has(k)) return false; vistas.add(k); return true; });
+const TODO = {};
+for (const [cat, lista] of Object.entries(BASE)) TODO[cat] = unir(lista);
+for (const [cat, lista] of Object.entries(EXTRA)) TODO[cat] = [...(TODO[cat] || []), ...unir(lista)];
+export default TODO;

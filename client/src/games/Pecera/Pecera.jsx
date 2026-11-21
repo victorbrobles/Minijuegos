@@ -4,12 +4,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, Barra, useRecord, barajar } from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, Barra, useRecord, barajar, barajarSinRepetir, marcarVisto } from '../../components/UnJugador.jsx';
 import RETOS from './retos.js';
 import './Pecera.css';
 import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'pecera';
+const idReto = (r) => r.criterio + r.items.map((x) => x[1]).join();
 const VIDAS = 3;
 const SEGUNDOS = 20;
 
@@ -36,6 +37,7 @@ export default function Pecera() {
   const finRef = useRef(0);
 
   const reto = mazo[indice];
+  useEffect(() => { if (reto?.criterio) marcarVisto('pecera', reto, idReto); }, [reto]);
 
   const arrancarReloj = () => {
     finRef.current = Date.now() + SEGUNDOS * 1000;
@@ -43,7 +45,7 @@ export default function Pecera() {
   };
 
   const empezar = () => {
-    setMazo(barajar(RETOS).map(prepararReto));
+    setMazo(barajarSinRepetir('pecera', RETOS, idReto).map(prepararReto));
     setIndice(0);
     setVidas(VIDAS);
     setPuntos(0);

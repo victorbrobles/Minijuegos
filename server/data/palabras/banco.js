@@ -2,6 +2,7 @@
 // Palabras objetivo (comunes y conocidas) para «Palabra oculta» y raíces de 7 letras para «Letras en cadena».
 // Sin tildes, en minúsculas (la ñ sí cuenta como letra). Todas están en el diccionario (lo comprueba la simulación).
 const lista = (s) => s.trim().split(/\s+/);
+import { PALABRAS_EXTRA, RAICES_EXTRA } from './bancoExtra.js';
 
 export const OBJETIVOS = {
   3: lista(`
@@ -94,3 +95,7 @@ export const RAICES = lista(`
   lacteos esquina pierna anillos mercado barrios calores sabores ternera piratas almacen
   ensalada tardes colores pensar escalar soltera templos tortilla domingo aceites
 `).filter((p) => p.length === 7);
+
+// Ampliación (bancoExtra.js): cada palabra va a su longitud; las raíces se añaden a la lista
+for (const p of PALABRAS_EXTRA) if (OBJETIVOS[p.length]) OBJETIVOS[p.length].push(p);
+RAICES.push(...RAICES_EXTRA.filter((r) => r.length === 7));

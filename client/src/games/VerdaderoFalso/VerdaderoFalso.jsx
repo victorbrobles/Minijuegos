@@ -4,7 +4,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Icon from '../../components/Icon.jsx';
-import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, useRecord, barajar } from '../../components/UnJugador.jsx';
+import { PortadaUnJugador, CabeceraPartida, FinUnJugador, ConfirmarSalida, useRecord, barajarSinRepetir, marcarVisto } from '../../components/UnJugador.jsx';
 import AFIRMACIONES from './afirmaciones.js';
 import './VerdaderoFalso.css';
 import { useAbrirAyuda } from '../../lib/ayuda.js';
@@ -29,9 +29,10 @@ export default function VerdaderoFalso() {
   const finRef = useRef(0);
 
   const actual = mazo[indice];
+  useEffect(() => { if (actual && fase === 'juego') marcarVisto('verdaderofalso', actual); }, [actual, fase]);
 
   const empezar = () => {
-    setMazo(barajar(AFIRMACIONES));
+    setMazo(barajarSinRepetir('verdaderofalso', AFIRMACIONES));
     setIndice(0);
     setAciertos(0);
     setFinal(null);
@@ -84,7 +85,7 @@ export default function VerdaderoFalso() {
     setDestello((d) => d + 1);
     if (navigator.vibrate) navigator.vibrate(8);
     if (indice + 1 >= mazo.length) {
-      setMazo(barajar(AFIRMACIONES));
+      setMazo(barajarSinRepetir('verdaderofalso', AFIRMACIONES));
       setIndice(0);
     } else {
       setIndice((i) => i + 1);

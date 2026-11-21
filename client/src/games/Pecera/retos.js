@@ -224,5 +224,6 @@ const BASE = [
 
 import EXTRA from './retosExtra.js';
 import EXTRA2 from './retosExtra2.js';
+import EXTRA3 from './retosExtra3.js';
 
-export default [...BASE, ...EXTRA, ...EXTRA2];
+export default [...BASE, ...EXTRA, ...EXTRA2, ...EXTRA3];

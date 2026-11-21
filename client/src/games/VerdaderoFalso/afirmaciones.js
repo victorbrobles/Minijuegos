@@ -1,7 +1,7 @@
 // client/src/games/VerdaderoFalso/afirmaciones.js
 // [afirmación, ¿es verdadera?, explicación breve]
 // Mezcla de mitos populares (falsos) y datos sorprendentes (verdaderos).
-export default [
+const BASE = [
   // Naturaleza y animales
   ['Los pulpos tienen tres corazones.', true, 'Dos bombean sangre a las branquias y uno al resto del cuerpo.'],
   ['Los murciélagos son ciegos.', false, 'Ven, y además muchos se orientan por ecolocalización.'],
@@ -262,3 +262,8 @@ export default [
   ['La bandera de Nepal no es rectangular.', true, 'Está formada por dos triángulos.'],
   ['Los países con más medallas olímpicas en total son EE. UU. y la Unión Soviética.', true, 'EE. UU. es primero con mucha diferencia.']
 ].filter((x, i, l) => l.findIndex((y) => y[0] === x[0]) === i);
+// Ampliación: se juntan y se quitan las repetidas (misma afirmación escrita casi igual)
+import EXTRA from './afirmacionesExtra.js';
+const clave = (t) => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-z0-9]/g, '');
+const vistas = new Set();
+export default [...BASE, ...EXTRA].filter(([t]) => { const k = clave(t); if (vistas.has(k)) return false; vistas.add(k); return true; });

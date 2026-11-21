@@ -5,6 +5,7 @@
 // Modo carrera, Cuatro clubes y Director Deportivo).
 import { PREGUNTAS, CATEGORIAS as CATS_TABLERO } from '../data/seeds/tablero/preguntas.js';
 import { TEMAS } from '../data/seeds/ordenar/temas.js';
+import { HITOS } from '../data/seeds/ordenar/cronologia.js';
 import { TODAS as CATEGORIAS_ESCONDITE } from '../data/seeds/escondite/index.js';
 import { FAMOSOS, PREGUNTAS_FAMOSO } from '../data/seeds/reto/famosos.js';
 import { PARTIDOS } from '../data/seeds/oncefantasma/onces.js';
@@ -41,7 +42,9 @@ const FRASE_TEMA = {
   hechos: (t) => t
 };
 export function cronologia() {
-  const items = TEMAS.filter((t) => FRASE_TEMA[t.id]).flatMap((t) => t.items.map(([texto, anio]) => ({ texto: FRASE_TEMA[t.id](texto), anio, emoji: t.emoji })));
+  const items = TEMAS.filter((t) => FRASE_TEMA[t.id]).flatMap((t) => t.items.map(([texto, anio]) => ({ texto: FRASE_TEMA[t.id](texto), anio, emoji: t.emoji })))
+    .concat(HITOS.map(([texto, anio, emoji]) => ({ texto, anio, emoji })))
+    .filter((x, i, l) => l.findIndex((y) => y.texto === x.texto) === i);
   return { cartas: barajar(items).slice(0, 80) };
 }
 

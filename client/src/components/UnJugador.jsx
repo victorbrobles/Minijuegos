@@ -186,3 +186,28 @@ export const barajar = (lista) => {
   }
   return a;
 };
+
+/* ───────── No repetir: lo que ya te ha salido va al final del mazo ─────────
+   Cada juego guarda en este móvil una huella corta de lo que ya has visto. Al barajar, primero sale lo que no has
+   visto nunca; cuando ya casi lo has visto todo, se empieza de nuevo. */
+const huella = (t) => { let h = 5381; const s = String(t); for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return (h >>> 0).toString(36); };
+const claveVistos = (juego) => `minijuegos_vistos_${juego}`;
+const idPorDefecto = (x) => (Array.isArray(x) ? x[0] : typeof x === 'object' && x ? (x.id ?? x.texto ?? x.criterio ?? JSON.stringify(x).slice(0, 120)) : x);
+function leerVistos(juego) { try { return new Set(JSON.parse(localStorage.getItem(claveVistos(juego))) || []); } catch { return new Set(); } }
+/** Baraja dejando al final lo ya visto en este móvil (y vuelve a empezar cuando queda poco por ver). */
+export function barajarSinRepetir(juego, lista, idDe = idPorDefecto) {
+  const vistos = leerVistos(juego);
+  const nuevos = lista.filter((x) => !vistos.has(huella(idDe(x))));
+  if (nuevos.length < Math.min(20, Math.ceil(lista.length / 5))) {
+    try { localStorage.removeItem(claveVistos(juego)); } catch { /* nada */ }
+    return barajar(lista);
+  }
+  return [...barajar(nuevos), ...barajar(lista.filter((x) => vistos.has(huella(idDe(x)))))];
+}
+/** Apunta que ya te ha salido. */
+export function marcarVisto(juego, item, idDe = idPorDefecto) {
+  try {
+    const vistos = leerVistos(juego); vistos.add(huella(idDe(item)));
+    localStorage.setItem(claveVistos(juego), JSON.stringify([...vistos].slice(-3000)));
+  } catch { /* sin almacenamiento */ }
+}
