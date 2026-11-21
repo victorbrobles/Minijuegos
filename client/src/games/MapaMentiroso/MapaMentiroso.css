@@ -5,13 +5,15 @@
 
 .mm-indicaciones ol {
   margin: 0;
-  padding-left: 1.4rem;
+  padding-left: 0;
+  list-style: none; /* sin números: se confundían con las casillas de cada indicación */
   font-family: 'Bricolage Grotesque', sans-serif;
   font-weight: 800;
   font-size: 1.1rem;
   line-height: 1.6;
 }
 
+.mm-indicaciones li::before { content: '▸ '; color: #94a3b8; }
 .mm-indicaciones li.invertida { color: #b91c1c; }
 .mm-indicaciones li em { font-family: inherit; font-size: 0.85rem; font-style: normal; }
 

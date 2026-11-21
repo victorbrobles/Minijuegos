@@ -91,17 +91,32 @@ export default function Manager() {
       <FinUnJugador icono="trophy" etiqueta={`${pos}.º de 20 · ${yo.g}G ${yo.e}E ${yo.p}P`} titulo={pos === 1 ? '¡Campeones de liga!' : pos <= 4 ? '¡A la Champions!' : pos <= 10 ? 'Temporada tranquila' : pos <= 17 ? 'Sufriendo hasta el final' : 'Descenso…'}
         puntos={yo.pts} unidad="puntos en liga" nuevoRecord={nuevoRecord} record={record} textoRecord={(r) => `${r.valor} puntos en liga`}
         exito={pos <= 10} onRepetir={empezar} onMenu={() => setFase('portada')}>
-        <table className="mg-tabla">
-          <tbody>
-            {tabla.map((x, i) => (i < 5 || x.yo || i === tabla.length - 1 ? (
-              <tr key={x.nombre} className={x.yo ? 'yo' : ''}><td>{i + 1}</td><td>{x.nombre}</td><td>{x.gf}:{x.gc}</td><td><b>{x.pts}</b></td></tr>
-            ) : null))}
-          </tbody>
-        </table>
-        <ul className="mg-plantilla">
-          {plantilla.map((j) => <li key={j.nombre}><span>{j.pos}</span><b>{j.nombre}</b><em>{j.m}</em></li>)}
-        </ul>
-        {mejor && <p className="uj-mini">⭐ Tu mejor jugador: {mejor.nombre} ({mejor.m}){ganga && ganga !== mejor ? ` · 💰 Mejor fichaje: ${ganga.nombre} (${ganga.m} por ${fmt(ganga.precio)})` : ''}</p>}
+        <div className="mg-resumen">
+          <h3 className="mg-subtitulo">🏆 Clasificación</h3>
+          <ol className="mg-tabla">
+            {tabla.map((x, i) => {
+              const ver = i < 5 || x.yo || i === tabla.length - 1;
+              const hueco = !ver && (i === 5 || (tabla[i - 1]?.yo && i < tabla.length - 1));
+              if (!ver) return hueco ? <li key={`h${i}`} className="mg-hueco">…</li> : null;
+              return (
+                <li key={x.nombre} className={x.yo ? 'yo' : ''}>
+                  <span className="mg-n">{i + 1}</span><span className="mg-equipo">{x.nombre}</span>
+                  <span className="mg-goles">{x.gf}:{x.gc}</span><b className="mg-pts">{x.pts}</b>
+                </li>
+              );
+            })}
+          </ol>
+          <h3 className="mg-subtitulo">👕 Tu once</h3>
+          <ul className="mg-plantilla">
+            {plantilla.map((j) => <li key={j.nombre} className={j.canterano ? 'cantera' : ''}><span className={`mg-pos ${j.pos}`}>{j.pos}</span><b>{j.nombre}</b><em>{j.m}</em></li>)}
+          </ul>
+          {mejor && (
+            <div className="mg-destacados">
+              <span>⭐ Mejor jugador<b>{mejor.nombre} ({mejor.m})</b></span>
+              {ganga && ganga !== mejor && <span>💰 Mejor fichaje<b>{ganga.nombre} ({ganga.m} por {fmt(ganga.precio)})</b></span>}
+            </div>
+          )}
+        </div>
         <RetoAmigo juego={ID} puntos={yo.pts} formato={(x) => `${x} puntos en liga`} />
         </FinUnJugador>
     );

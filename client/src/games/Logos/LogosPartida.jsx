@@ -144,7 +144,7 @@ function Logomaniaco({ ronda, ctx }) {
           {puedeEmpezar ? (
             <>
               <h2 className="lgm-titulo">{ctx.local ? `${activo}, ¿preparado?` : '¡Te toca!'}</h2>
-              <p className="lgm-texto">Cuando pulses, tendrás 25 segundos para decir {ronda.objetivo} marcas en voz alta. Sin repetir.</p>
+              <p className="lgm-texto">Cuando pulses, tendrás 35 segundos para decir {ronda.objetivo} marcas en voz alta. Sin repetir.</p>
               <button type="button" className="lgm-boton grande" onClick={() => accion({ tipo: 'empezar' })}><Icon name="play" size={20} /> ¡Empezar!</button>
             </>
           ) : (
@@ -322,7 +322,7 @@ function Pintor({ ronda, ctx }) {
         {soyPintor ? (
           <>
             <h2 className="lgm-titulo">¡Te toca pintar!</h2>
-            <p className="lgm-texto">Verás una marca: dibuja su logo para que la adivinen. Tienes <strong>60 segundos</strong> para colar todas las que puedas. Nada de escribir letras.</p>
+            <p className="lgm-texto">Verás una marca: dibuja su logo para que la adivinen. Tienes <strong>120 segundos</strong> para colar todas las que puedas. Nada de escribir letras.</p>
             <button type="button" className="lgm-boton grande" onClick={() => ctx.onAccion({ tipo: 'empezar' })}><Icon name="play" size={20} /> ¡Empezar!</button>
           </>
         ) : (

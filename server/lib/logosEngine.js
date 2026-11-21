@@ -21,15 +21,15 @@ const BANCOS = { logomaniaco: LOGOMANIACO, pintor: PINTOR, retrato: RETRATO, pas
 
 // Tiempos (ms)
 export const TIEMPO = {
-  logomaniaco: 25000,
-  pintor: 60000,
-  retrato: 45000,
-  pasaporte: 20000,
-  mentirosoResponder: 25000,
-  mentirosoVotar: 20000,
-  eslogan: 30000,
-  expertoElegir: 20000,
-  expertoPregunta: 25000
+  logomaniaco: 35000,
+  pintor: 120000,
+  retrato: 60000,
+  pasaporte: 30000,
+  mentirosoResponder: 40000,
+  mentirosoVotar: 30000,
+  eslogan: 45000,
+  expertoElegir: 30000,
+  expertoPregunta: 40000
 };
 // Cuántas marcas hay que decir en El Logomaníaco según la dificultad del requisito (1 fácil · 3 difícil)
 export const OBJETIVO_LOGOMANIACO = { 1: 5, 2: 4, 3: 3 };
@@ -160,6 +160,8 @@ function opcionesPais(correcto, trampa) {
 // ----------------------------------------------------------------- creación
 function totalDeFase(p) {
   const n = presentes(p).length;
+  // El pintor (dibujar) es una sola ronda por jugador, elija lo que elija el anfitrión
+  if (p.fase === 'pintor') return n;
   return n * (DURACIONES[p.config.duracion] || DURACIONES.normal);
 }
 

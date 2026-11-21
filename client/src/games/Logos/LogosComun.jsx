@@ -19,7 +19,8 @@ export function ConfigPartida({ config, onChange, numJugadores = null, local = f
   const todas = () => editable && onChange({ ...config, fases: [...disponibles] });
 
   const porJugador = { corto: 2, normal: 3, largo: 5 }[config.duracion] || 3;
-  const rondas = numJugadores ? numJugadores * porJugador * activas.length : null;
+  // El pintor siempre es una ronda por jugador
+  const rondas = numJugadores ? numJugadores * (porJugador * activas.filter((f) => f !== 'pintor').length + (activas.includes('pintor') ? 1 : 0)) : null;
 
   return (
     <div className="lgm-config">
@@ -54,7 +55,7 @@ export function ConfigPartida({ config, onChange, numJugadores = null, local = f
         ))}
       </div>
       <p className="hint small" style={{ margin: '0.5rem 0 0' }}>
-        {DURACIONES_INFO[config.duracion]?.detalle}
+        {DURACIONES_INFO[config.duracion]?.detalle}{activas.includes('pintor') ? ' (en El pintor, una por jugador)' : ''}
         {rondas ? ` · unas ${rondas} rondas en total con ${numJugadores} jugadores.` : '.'}
       </p>
     </div>

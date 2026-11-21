@@ -9,7 +9,7 @@ export const FASES_INFO = {
     resumen: 'Por turnos: di en voz alta tantas marcas que cumplan el requisito como pide, antes de que acabe el tiempo.',
     reglas: [
       'En tu turno sale un requisito (por ejemplo, «Logos con un animal» o «Marcas de coches alemanas») y cuántas marcas tienes que decir: <strong>5 si es fácil, 4 si es media y 3 si es difícil</strong>.',
-      'Al pulsar «¡Empezar!» tienes <strong>25 segundos</strong> para decirlas en voz alta.',
+      'Al pulsar «¡Empezar!» tienes <strong>35 segundos</strong> para decirlas en voz alta.',
       'Validan los demás: si lo consigues, alguien pulsa <strong>✅ Lo ha conseguido</strong> y sumas <strong>+2</strong>. Si repites o dices una que no vale, <strong>❌ Ha fallado</strong>.',
       'Si fallas o se acaba el tiempo, hay <strong>rebote</strong> para el siguiente jugador, y solo para él: si lo consigue, <strong>+1</strong>.'
     ]
@@ -18,10 +18,10 @@ export const FASES_INFO = {
     nombre: 'El pintor',
     emoji: '🎨',
     lema: 'Dibuja logos a contrarreloj',
-    resumen: 'Solo online. Uno dibuja logos durante 60 segundos y los demás escriben de qué marca son.',
+    resumen: 'Solo online. Uno dibuja logos durante 120 segundos y los demás escriben de qué marca son.',
     soloOnline: true,
     reglas: [
-      'Por turnos, un jugador ve una marca y dibuja su logo en su móvil. Tiene <strong>60 segundos</strong> para que le adivinen todos los que pueda.',
+      'Por turnos, un jugador ve una marca y dibuja su logo en su móvil. Tiene <strong>120 segundos</strong> para que le adivinen todos los que pueda. Cada jugador dibuja una sola vez.',
       'Los demás ven el dibujo en directo y escriben la marca en su pantalla.',
       'El primero que acierta suma <strong>+1</strong> y el pintor también <strong>+1</strong>; entonces sale otra marca.',
       'Si una marca es imposible, el pintor puede <strong>pasar</strong> (sin puntos). No vale escribir letras en el dibujo.'
@@ -34,7 +34,7 @@ export const FASES_INFO = {
     resumen: 'Todos a la vez: se describe un logo y cada uno escribe en su móvil de qué marca es.',
     reglas: [
       'Aparece la descripción de un logo, sin decir la marca.',
-      'Todos escribís en secreto de qué marca es. Tenéis <strong>45 segundos</strong>.',
+      'Todos escribís en secreto de qué marca es. Tenéis <strong>60 segundos</strong>.',
       'Cada acierto suma <strong>+2</strong>. Se perdonan tildes, mayúsculas y erratas pequeñas.'
     ]
   },
@@ -45,7 +45,7 @@ export const FASES_INFO = {
     resumen: 'Todos a la vez: sale una marca y elegís de qué país es entre cuatro.',
     reglas: [
       'Aparece una marca y cuatro países. Cuenta el país donde nació la marca.',
-      'Todos elegís en secreto. Tenéis <strong>20 segundos</strong>.',
+      'Todos elegís en secreto. Tenéis <strong>30 segundos</strong>.',
       'Cada acierto suma <strong>+1</strong>. ¡Ojo, que hay marcas que engañan!'
     ]
   },
@@ -68,7 +68,7 @@ export const FASES_INFO = {
     resumen: 'Todos a la vez: sale un eslogan y cada uno escribe en su móvil de qué marca es.',
     reglas: [
       'Aparece un eslogan publicitario (el nombre de la marca se tapa con «…»).',
-      'Todos escribís en secreto de qué marca es. Tenéis <strong>30 segundos</strong>.',
+      'Todos escribís en secreto de qué marca es. Tenéis <strong>45 segundos</strong>.',
       'Cada acierto suma <strong>+2</strong>. Se perdonan tildes, mayúsculas y erratas pequeñas.'
     ]
   },

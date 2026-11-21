@@ -167,8 +167,8 @@ export default {
   },
   'encadenada': {
     objetivo: 'Llega de una palabra a otra **cambiando una sola letra** en cada paso. Cada paso tiene que ser una palabra que exista.',
-    pasos: ['Ejemplo: **CASA → CAPA → COPA → COLA**.', 'Toca la letra que quieres cambiar y después la nueva letra en el teclado.', 'Son **6 retos**, cada vez más largos.'],
-    puntos: [['🥇', 'Oro: en el mínimo de pasos', 'Mejor'], ['🥈', 'Plata: con un paso más', 'Bien'], ['🥉', 'Bronce: con más pasos', 'Vale'], ['💡', 'Cada pista (te dice el siguiente cambio)', '-50']]
+    pasos: ['Ejemplo: **CASA → CAPA → COPA → COLA**.', 'Toca la letra que quieres cambiar y después la nueva letra en el teclado.', 'Los retos no se acaban y cada vez son más largos: la partida dura **hasta que te rindas**.', 'Tienes **una pista** por palabra.'],
+    puntos: [['🥇', 'Oro: en el mínimo de pasos', 'Mejor'], ['🥈', 'Plata: con un paso más', 'Bien'], ['🥉', 'Bronce: con más pasos', 'Vale'], ['💡', 'La pista (te dice el siguiente cambio; una por palabra)', '-50']]
   },
   'mapamentiroso': {
     objetivo: 'Memoriza las indicaciones y toca la **casilla** donde terminas.',

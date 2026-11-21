@@ -113,14 +113,26 @@
 .mg-pos.POR { background: #f59e0b; } .mg-pos.DEF { background: #2563eb; } .mg-pos.MED { background: #16a34a; } .mg-pos.DEL { background: #dc2626; }
 .mg-simulando span { display: block; font-size: 3rem; animation: mgBota 0.6s ease-in-out infinite alternate; }
 @keyframes mgBota { to { transform: translateY(-14px) rotate(40deg); } }
-.mg-tabla { width: 100%; margin: 0.6rem 0; border-collapse: collapse; font-size: 0.85rem; color: #334155; }
-.mg-tabla td { padding: 0.3rem 0.4rem; border-bottom: 1px solid #f1f5f9; text-align: left; }
-.mg-tabla tr.yo { background: #fef3c7; font-weight: 900; color: #0f172a; }
-.mg-plantilla { list-style: none; margin: 0.4rem 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 0.25rem; text-align: left; }
-.mg-plantilla li { display: flex; gap: 0.35rem; align-items: center; padding: 0.25rem 0.4rem; border-radius: 8px; background: #f8fafc; font-size: 0.78rem; }
-.mg-plantilla li span { color: #94a3b8; font-weight: 900; font-size: 0.68rem; }
-.mg-plantilla li b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.mg-plantilla li em { font-style: normal; font-weight: 900; color: #15803d; }
+.mg-resumen { width: 100%; max-width: 32rem; margin: 0.6rem auto 0; text-align: left; }
+.mg-subtitulo { margin: 0.9rem 0 0.4rem; font-size: 0.85rem; font-weight: 900; color: #334155; text-transform: uppercase; letter-spacing: 0.04em; }
+.mg-tabla { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.2rem; font-size: 0.86rem; color: #334155; }
+.mg-tabla li { display: grid; grid-template-columns: 1.8rem minmax(0, 1fr) auto 2.2rem; align-items: center; gap: 0.4rem; padding: 0.32rem 0.55rem; border-radius: 10px; background: #f8fafc; }
+.mg-tabla li.yo { background: #fef3c7; box-shadow: inset 0 0 0 2px #fcd34d; font-weight: 900; color: #0f172a; }
+.mg-tabla .mg-n { color: #94a3b8; font-weight: 900; }
+.mg-tabla .mg-equipo { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mg-tabla .mg-goles { color: #64748b; font-size: 0.78rem; font-variant-numeric: tabular-nums; }
+.mg-tabla .mg-pts { text-align: right; font-variant-numeric: tabular-nums; }
+.mg-tabla li.mg-hueco { display: block; padding: 0; background: none; text-align: center; color: #94a3b8; font-weight: 900; line-height: 0.8; }
+.mg-plantilla { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.3rem; }
+.mg-plantilla li { display: flex; min-width: 0; gap: 0.35rem; align-items: center; padding: 0.3rem 0.45rem; border-radius: 10px; background: #f8fafc; font-size: 0.8rem; }
+.mg-plantilla li.cantera { opacity: 0.6; }
+.mg-plantilla li .mg-pos { flex: none; padding: 0.05rem 0.3rem; font-size: 0.62rem; }
+.mg-plantilla li b { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #0f172a; }
+.mg-plantilla li em { flex: none; font-style: normal; font-weight: 900; color: #15803d; }
+.mg-destacados { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 0.35rem; margin-top: 0.6rem; }
+.mg-destacados span { display: grid; gap: 0.1rem; padding: 0.45rem 0.6rem; border-radius: 12px; background: #f0fdf4; color: #15803d; font-size: 0.75rem; font-weight: 800; }
+.mg-destacados b { color: #0f172a; font-size: 0.85rem; }
+@media (max-width: 360px) { .mg-plantilla { grid-template-columns: minmax(0, 1fr); } }
 
 /* ---------- Futbolista misterioso ---------- */
 .ms-intentos { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.45rem; }

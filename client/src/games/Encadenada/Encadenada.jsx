@@ -10,7 +10,9 @@ import './Encadenada.css';
 import { useAbrirAyuda } from '../../lib/ayuda.js';
 
 const ID = 'encadenada';
-const PASOS_RETOS = [3, 3, 4, 4, 5, 6];
+// Sin final: los retos se alargan poco a poco y la partida dura hasta que te rindas
+const PASOS_RETOS = [3, 3, 4, 4, 5, 5, 6];
+const pasosDe = (r) => PASOS_RETOS[r] ?? (5 + (r % 2));
 const LETRAS = 'QWERTYUIOPASDFGHJKLZXCVBNM'.split('');
 
 function medallaDe(pasos, optimo) {
@@ -39,7 +41,7 @@ export default function Encadenada() {
   const avisar = (texto, tipo = 'info') => setAviso((a) => ({ texto, tipo, clave: a.clave + 1 }));
 
   const prepararRonda = (r) => {
-    const nuevo = generarReto(PASOS_RETOS[r]);
+    const nuevo = generarReto(pasosDe(r));
     setRonda(r);
     setReto(nuevo);
     setCadena([nuevo.inicio]);
@@ -88,6 +90,7 @@ export default function Encadenada() {
   };
 
   const pista = () => {
+    if (pistas >= 1) { avisar('Solo hay una pista por palabra.'); return; }
     const camino = caminoMinimo(actual, reto.fin);
     if (!camino || camino.length < 2) { avisar('Desde aquí no hay camino: deshaz algún paso.', 'malo'); return; }
     setPistas((p) => p + 1);
@@ -103,7 +106,7 @@ export default function Encadenada() {
   };
 
   const siguiente = () => {
-    if (ronda + 1 >= PASOS_RETOS.length) {
+    if (ganados?.rendido) {
       setNuevoRecord(puntos > 0 && registrar(puntos));
       setFase('fin');
     } else prepararRonda(ronda + 1);
@@ -136,7 +139,7 @@ export default function Encadenada() {
       <div className="ec-contenedor">
         <FinUnJugador
           icono="letters"
-          etiqueta={`${PASOS_RETOS.length} retos completados`}
+          etiqueta={`${ronda} ${ronda === 1 ? 'reto completado' : 'retos completados'}`}
           titulo={puntos >= 1100 ? '¡Maestro de las palabras!' : puntos >= 800 ? '¡Muy bien encadenado!' : 'Fin de la partida'}
           puntos={puntos}
           unidad="puntos"
@@ -159,7 +162,7 @@ export default function Encadenada() {
       <section className="game uj-escena">
         <CabeceraPartida
           onSalir={() => setSalir(true)}
-          chips={[<><Icon name="flag" size={14} /> Reto {ronda + 1}/{PASOS_RETOS.length}</>, <><Icon name="star" size={14} /> {puntos}</>]}
+          chips={[<><Icon name="flag" size={14} /> Reto {ronda + 1}</>, <><Icon name="star" size={14} /> {puntos}</>]}
         >
           <div className="ec-objetivo">
             <span>{reto.inicio}</span>
@@ -195,7 +198,7 @@ export default function Encadenada() {
             <p className="uj-mini">Camino más corto: {reto.optimo.join(' → ')}</p>
             {!ganados.rendido && <p className="ec-ganados">+{ganados.total} puntos{pistas ? ` (con ${pistas} ${pistas === 1 ? 'pista' : 'pistas'})` : ''}</p>}
             <button type="button" className="uj-boton grande" onClick={siguiente}>
-              {ronda + 1 >= PASOS_RETOS.length ? <><Icon name="flagFinish" size={20} /> Ver resultado</> : <><Icon name="forward" size={20} /> Siguiente reto</>}
+              {ganados.rendido ? <><Icon name="flagFinish" size={20} /> Ver resultado</> : <><Icon name="forward" size={20} /> Siguiente reto</>}
             </button>
           </div>
         ) : (
@@ -208,7 +211,7 @@ export default function Encadenada() {
             </div>
             <div className="ec-controles">
               <button type="button" className="uj-boton secundario" onClick={deshacer} disabled={cadena.length < 2}><Icon name="refresh" size={16} /> Deshacer</button>
-              <button type="button" className="uj-boton secundario" onClick={pista}><Icon name="bulb" size={16} /> Pista</button>
+              <button type="button" className="uj-boton secundario" onClick={pista} disabled={pistas >= 1}><Icon name="bulb" size={16} /> {pistas >= 1 ? 'Pista usada' : 'Pista'}</button>
               <button type="button" className="uj-enlace ec-rendirse" onClick={rendirse}>Rendirse</button>
             </div>
           </>
