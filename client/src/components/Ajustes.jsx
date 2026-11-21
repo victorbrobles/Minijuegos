@@ -35,6 +35,7 @@ export function PanelAjustes({ onCerrar }) {
     <div className="rg-modal-fondo aj-fondo" onClick={onCerrar}>
       <div className="aj-panel" role="dialog" aria-modal="true" aria-label="Ajustes" onClick={(e) => e.stopPropagation()}>
         <header><h2>⚙️ Ajustes</h2><button type="button" className="aj-cerrar" onClick={onCerrar} aria-label="Cerrar">✕</button></header>
+        <BotonCerrarSesion onCerrar={onCerrar} />
         <SeccionCuenta onCerrar={onCerrar} />
 
         <section>
@@ -87,7 +88,25 @@ export function PanelAjustes({ onCerrar }) {
   );
 }
 
-/* 👤 Tu cuenta: datos, cambiar contraseña, cerrar sesión y borrar la cuenta (o, sin cuenta, crearla) */
+/* 🚪 Cerrar sesión (arriba del todo y en rojo). Sin cuenta, sale del jugador actual para entrar con otro. */
+function BotonCerrarSesion({ onCerrar }) {
+  const { usuario } = useCuenta();
+  const yo = leerIdentidad();
+  if (!usuario && !yo) return null;
+  const cerrar = async () => {
+    if (!window.confirm(usuario ? '¿Cerrar sesión en este dispositivo?' : '¿Salir y entrar con otro jugador?')) return;
+    if (usuario) await salir(); else olvidarIdentidad();
+    onCerrar();
+  };
+  return (
+    <button type="button" className="aj-salir" onClick={cerrar}>
+      <span className="aj-salir-icono" aria-hidden="true">🚪</span>
+      <span><b>Cerrar sesión</b><small>{usuario ? `${usuario.nick}#${usuario.tag}` : `${yo.nombre}#${yo.tag} · sin cuenta`}</small></span>
+    </button>
+  );
+}
+
+/* 👤 Tu cuenta: datos, cambiar contraseña y borrar la cuenta (o, sin cuenta, crearla) */
 function SeccionCuenta({ onCerrar }) {
   const { usuario } = useCuenta();
   const [abierto, setAbierto] = useState(null); // null | 'password' | 'borrar'
@@ -132,7 +151,6 @@ function SeccionCuenta({ onCerrar }) {
       </div>
       <div className="aj-opciones">
         <button type="button" className="aj-opcion" onClick={() => { setAviso(null); setAbierto(abierto === 'password' ? null : 'password'); }}>🔒 Cambiar contraseña</button>
-        <button type="button" className="aj-opcion" onClick={async () => { await salir(); onCerrar(); }}>🚪 Cerrar sesión</button>
         <button type="button" className="aj-opcion aj-peligro" onClick={() => { setAviso(null); setAbierto(abierto === 'borrar' ? null : 'borrar'); }}>🗑️ Borrar cuenta</button>
       </div>
       {abierto === 'password' && (

@@ -195,7 +195,7 @@ export function PuertaIdentidad({ children }) {
   return children;
 }
 
-/** Chip con la identidad y opción de cambiarla (portada). */
+/** Chip con la identidad (portada). Cerrar sesión o cambiar de jugador se hace desde Ajustes. */
 export function ChipIdentidad() {
   const yo = useIdentidad();
   const { usuario } = useCuenta();
@@ -207,7 +207,6 @@ export function ChipIdentidad() {
       {editar && <EditarPerfil jugador={textoIdentidad(yo)} onCerrar={() => setEditar(false)} />}
       <NombreTag texto={textoIdentidad(yo)} />
       {usuario && <span className="idn-verificado" title="Con cuenta">✓</span>}
-      <button type="button" onClick={() => (usuario ? (window.confirm('¿Cerrar sesión?') && salir()) : olvidarIdentidad())} title={usuario ? 'Cerrar sesión' : 'Cambiar de jugador'}>{usuario ? 'Salir' : 'Cambiar'}</button>
     </div>
   );
 }
