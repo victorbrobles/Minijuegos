@@ -14,7 +14,7 @@ import express from 'express';
 import { randomBytes } from 'node:crypto';
 import db from '../db.js';
 import { esAdmin } from '../lib/admin.js';
-import { hashPassword, passwordCorrecta, crearSesion, cerrarSesion, tieneCuenta } from '../lib/usuarios.js';
+import { hashPassword, passwordCorrecta, crearSesion, cerrarSesion, tieneCuenta, marcarDesconectado } from '../lib/usuarios.js';
 
 const router = express.Router();
 const EMAIL = /^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,24}$/;
@@ -90,7 +90,7 @@ router.post('/entrar', (req, res) => {
   res.json({ success: true, usuario: publico(u) });
 });
 
-router.post('/salir', (req, res) => { cerrarSesion(res); res.json({ success: true }); });
+router.post('/salir', (req, res) => { if (req.usuario) marcarDesconectado(req.usuario.jugador); cerrarSesion(res); res.json({ success: true }); });
 
 /* ───────── Datos del navegador (favoritos, récords, logros, ajustes…) que viajan con la cuenta ───────── */
 router.get('/datos', (req, res) => {
@@ -126,7 +126,7 @@ router.post('/password', (req, res) => {
 // Borrar la cuenta y lo guardado con su nombre (derecho de supresión)
 const BORRADOS = [
   ['registros_resultados', 'jugador'], ['perfiles', 'jugador'], ['grupo_miembros', 'jugador'], ['valoraciones', 'quien'],
-  ['diario_resultados', 'jugador'], ['retos_intentos', 'jugador'], ['retos_amigo_resultados', 'jugador'], ['grupo_preguntas', 'autor']
+  ['diario_resultados', 'jugador'], ['retos_intentos', 'jugador'], ['retos_amigo_resultados', 'jugador'], ['grupo_preguntas', 'autor'], ['grupo_activo', 'jugador'], ['grupo_expulsados', 'jugador']
 ];
 router.post('/borrar', (req, res) => {
   if (!req.usuario) return res.status(401).json({ error: 'Inicia sesión.' });

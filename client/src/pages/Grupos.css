@@ -47,3 +47,68 @@
 .grp-preg-lista li span { flex: 1; min-width: 0; font-weight: 700; color: #1e293b; font-size: 0.9rem; }
 .grp-preg-lista li small { flex: none; color: #94a3b8; font-size: 0.72rem; font-weight: 700; }
 .grp-preg-lista li button { flex: none; display: grid; place-items: center; width: 1.8rem; height: 1.8rem; min-width: 0; padding: 0; box-shadow: none; border: none; border-radius: 50%; background: #e2e8f0; color: #475569; cursor: pointer; }
+
+/* ───────── Grupos v2 ───────── */
+.grp-centro { text-align: center; display: grid; justify-items: center; gap: 0.6rem; }
+.grp-grande { font-size: 2.6rem; }
+.grp-inicio { display: grid; gap: 0.7rem; }
+.grp-gran-boton { display: grid; grid-template-columns: auto 1fr; column-gap: 0.85rem; align-items: center; width: 100%; padding: 1rem 1.1rem; border: none; border-radius: 22px; background: #ffffff; color: #0f172a; font: inherit; text-align: left; cursor: pointer; box-shadow: 0 6px 0 rgba(15, 23, 42, 0.18); }
+.grp-gran-boton > span { grid-row: span 2; display: grid; place-items: center; width: 3rem; height: 3rem; border-radius: 16px; font-size: 1.6rem; background: #f1f5f9; }
+.grp-gran-boton b { font-size: 1.1rem; font-weight: 900; }
+.grp-gran-boton small { color: #64748b; font-weight: 700; font-size: 0.82rem; }
+.grp-gran-boton.ver > span { background: linear-gradient(135deg, #0ea5e9, #6366f1); }
+.grp-gran-boton.crear > span { background: linear-gradient(135deg, #f59e0b, #ec4899); }
+.grp-gran-boton.unirse > span { background: linear-gradient(135deg, #22c55e, #14b8a6); }
+.grp-gran-boton.preguntas { margin-top: 0.4rem; }
+.grp-gran-boton.preguntas > span { background: linear-gradient(135deg, #7c3aed, #db2777); }
+.grp-gran-boton.abierto { box-shadow: 0 0 0 3px #a5b4fc; }
+.grp-form { margin: -0.2rem 0 0.2rem; }
+.grp-explica { margin-top: 0.3rem; text-align: center; color: rgba(255, 255, 255, 0.85) !important; }
+.grp-lista a.activo { background: #dcfce7; box-shadow: inset 0 0 0 2px #4ade80; }
+.grp-lista a.activo small { color: #15803d; }
+.grp-corona { margin-right: 0.35rem; }
+.grp-volver-inicio { width: 100%; margin-top: 0.6rem; padding: 0.8rem; border: 2px dashed rgba(255, 255, 255, 0.55); border-radius: 18px; background: transparent; color: #ffffff; font: inherit; font-weight: 800; cursor: pointer; box-shadow: none; }
+
+.grp-estado { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.8rem; }
+.grp-estado.activo { background: #f0fdf4 !important; box-shadow: inset 0 0 0 3px #4ade80; }
+.grp-estado-txt { display: grid; gap: 0.15rem; flex: 1 1 14rem; }
+.grp-estado-txt b { font-size: 1.05rem; color: #0f172a; }
+.grp-estado.activo .grp-estado-txt b { color: #15803d; }
+.grp-estado-txt small { color: #64748b; font-weight: 600; }
+.grp-estado-botones { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.grp-estado-botones button { padding: 0.6rem 1rem; font-size: 0.9rem; }
+.grp-activar { background: linear-gradient(135deg, #16a34a, #22c55e) !important; color: #ffffff !important; }
+.grp-desactivar { background: #ffffff !important; color: #15803d !important; box-shadow: inset 0 0 0 2px #86efac !important; }
+.grp-salir { background: #fef2f2 !important; color: #b91c1c !important; box-shadow: inset 0 0 0 2px #fecaca !important; }
+
+.grp-gente { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.4rem; }
+.grp-gente li { display: flex; align-items: center; gap: 0.65rem; padding: 0.5rem 0.6rem; border-radius: 14px; background: #f8fafc; }
+.grp-gente-nombre { flex: 1; min-width: 0; display: grid; }
+.grp-gente-nombre b { color: #0f172a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.grp-gente-nombre small { color: #64748b; font-weight: 700; font-size: 0.75rem; }
+.grp-gente li.online .grp-gente-nombre small { color: #15803d; }
+.grp-punto { flex: none; width: 0.8rem; height: 0.8rem; border-radius: 50%; background: #cbd5e1; }
+.grp-punto.on { background: #22c55e; box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25); }
+.grp-quitar { flex: none; display: grid; place-items: center; width: 2rem; height: 2rem; min-width: 0; padding: 0; border: none; border-radius: 50%; background: #fee2e2; color: #b91c1c; font: inherit; font-weight: 900; cursor: pointer; box-shadow: none; }
+.grp-expulsados { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; margin-top: 0.7rem; font-size: 0.85rem; color: #475569; }
+.grp-expulsados span { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.25rem 0.3rem 0.25rem 0.6rem; border-radius: 999px; background: #f1f5f9; font-weight: 700; }
+.grp-expulsados button { padding: 0.2rem 0.6rem; font-size: 0.75rem; box-shadow: none; }
+
+.grp-codigo-caja { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.grp-codigo-caja .grp-codigo { flex: 1 1 8rem; padding: 0.55rem 0.9rem; border-radius: 14px; background: #f1f5f9; font-size: 1.5rem; font-weight: 900; letter-spacing: 0.25em; text-align: center; }
+.grp-codigo-caja button { padding: 0.6rem 1rem; font-size: 0.9rem; }
+.grp-copiado { margin: 0.5rem 0 0; color: #15803d; font-weight: 800; font-size: 0.85rem; }
+.grp-seccion { margin: 1.4rem 0 0.6rem; color: #ffffff; font-size: 1.25rem; }
+.grp-sub { margin: 1rem 0 0.5rem; font-size: 0.95rem; color: #334155; }
+.grp-sub small { color: #94a3b8; }
+.grp-logros { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.grp-logros span { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.35rem 0.7rem; border-radius: 999px; background: #f1f5f9; color: #94a3b8; font-size: 0.8rem; font-weight: 800; filter: grayscale(1); opacity: 0.75; }
+.grp-logros span.ok { background: #fef3c7; color: #92400e; filter: none; opacity: 1; box-shadow: inset 0 0 0 2px #fcd34d; }
+.grp-logros i { font-style: normal; }
+
+.grp-confirmar { text-align: center; justify-items: center; }
+.grp-confirmar h2 { font-size: 1.15rem !important; }
+.grp-confirmar p { margin: 0; color: #475569; }
+.grp-confirmar-botones { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; }
+.grp-confirmar-botones button { padding: 0.6rem 1.2rem; }
+.grp-peligro { background: linear-gradient(135deg, #dc2626, #ef4444) !important; color: #ffffff !important; }

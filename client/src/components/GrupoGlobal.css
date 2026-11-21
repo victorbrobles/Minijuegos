@@ -1,0 +1,15 @@
+/* client/src/components/GrupoGlobal.css — avisos del grupo activo y de las salas online */
+.gg-aviso { position: fixed; left: 50%; bottom: max(1rem, env(safe-area-inset-bottom)); z-index: 2600; transform: translateX(-50%); display: flex; align-items: center; gap: 0.6rem; width: min(calc(100% - 2rem), 460px); padding: 0.7rem 0.75rem 0.7rem 0.9rem; border-radius: 18px; background: #0f172a; color: #f8fafc; box-shadow: 0 14px 40px rgba(0, 0, 0, 0.45); animation: ggEntra 0.3s ease-out; }
+.gg-aviso p { flex: 1; margin: 0; font-size: 0.9rem; font-weight: 700; line-height: 1.3; }
+.gg-aviso-emoji { font-size: 1.4rem; }
+.gg-entrar { padding: 0.5rem 1rem; border: none; border-radius: 999px; background: #22c55e; color: #052e16; font: inherit; font-weight: 900; cursor: pointer; box-shadow: none; }
+.gg-cerrar { width: 2rem; height: 2rem; padding: 0; border: none; border-radius: 50%; background: rgba(255, 255, 255, 0.12); color: #e2e8f0; font: inherit; font-weight: 900; cursor: pointer; box-shadow: none; }
+.gg-entrar { border: 2px solid #86efac; }
+@keyframes ggEntra { from { transform: translate(-50%, 120%); opacity: 0; } }
+.gg-bloqueo { text-align: center; justify-items: center; }
+.gg-bloqueo h2 { font-size: 1.15rem !important; }
+.gg-bloqueo p { margin: 0; color: #334155; font-size: 0.93rem; }
+.gg-bloqueo .gg-nota { color: #64748b; font-size: 0.85rem; }
+.gg-bloqueo-ico { font-size: 2.4rem; }
+.gg-bloqueo-botones { display: flex; flex-wrap: wrap; justify-content: center; gap: 0.5rem; }
+.gg-bloqueo-botones button { padding: 0.6rem 1.2rem; }

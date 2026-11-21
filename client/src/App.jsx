@@ -20,7 +20,6 @@ const Noche = lazy(() => import('./pages/Noche.jsx'));
 const Tele = lazy(() => import('./pages/Tele.jsx'));
 const Grupos = lazy(() => import('./pages/Grupos.jsx'));
 const GrupoDetalle = lazy(() => import('./pages/Grupos.jsx').then((m) => ({ default: m.GrupoDetalle })));
-const SalaGrupo = lazy(() => import('./pages/SalaGrupo.jsx'));
 const PaginaAdmin = lazy(() => import('./components/AdminPanel.jsx').then((m) => ({ default: m.PaginaAdmin })));
 const AdminEstadisticas = lazy(() => import('./pages/AdminEstadisticas.jsx'));
 const Privacidad = lazy(() => import('./pages/Privacidad.jsx'));
@@ -29,7 +28,8 @@ const Cargando = () => <p className="loading">Cargando…</p>;
 const PruebaHabilidad = import.meta.env.DEV ? lazy(() => import('./games/Habilidad/Prueba.jsx')) : null;
 import { PuertaIdentidad } from './components/Identidad.jsx';
 import AvisoLogros from './components/AvisoLogros.jsx';
-import SalaGrupoGlobal from './components/SalaGrupo.jsx';
+import GrupoGlobal from './components/GrupoGlobal.jsx';
+import './components/Ajustes.css';
 import { AvisoSinConexion } from './components/Ajustes.jsx';
 import FinPartida from './components/FinPartida.jsx';
 
@@ -53,7 +53,6 @@ export default function App() {
           {PruebaHabilidad && <Route path="/prueba-habilidad/:id" element={<Suspense fallback={null}><PruebaHabilidad /></Suspense>} />}
           <Route path="/grupos" element={<Grupos />} />
           <Route path="/grupo/:codigo" element={<GrupoDetalle />} />
-          <Route path="/grupo/:codigo/sala" element={<SalaGrupo />} />
           <Route path="/admin" element={<PaginaAdmin />} />
           <Route path="/admin/estadisticas" element={<AdminEstadisticas />} />
           <Route path="/privacidad" element={<Privacidad />} />
@@ -61,7 +60,7 @@ export default function App() {
         </Routes>
         </Suspense>
         <AvisoLogros />
-        <SalaGrupoGlobal />
+        <GrupoGlobal />
         <AvisoSinConexion />
         <FinPartida />
       </PuertaIdentidad>

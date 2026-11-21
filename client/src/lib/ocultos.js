@@ -3,6 +3,7 @@
 // El servidor decide (GET /api/ocultos); aquí se le dice quién pregunta y se ocultan los juegos en la web.
 import { useEffect, useSyncExternalStore } from 'react';
 import { adminHeaders, useAdmin } from './admin.js';
+import { grupoEnJuego } from './grupoActivo.js';
 import { nombreCompleto } from './identidad.js';
 
 export const JUEGOS_OCULTOS = new Set(['cancion', 'adivina', 'rasgos']);
@@ -22,14 +23,15 @@ export function conCabeceras(entrada, opciones) {
   } catch { return opciones; }
 }
 
-// ---------------------------------------------------------------- ¿Tengo acceso por estar con el admin en un grupo?
+// ---------------------------------------------------------------- ¿Tengo acceso por estar con el admin en tu grupo activo?
 const CADA_MS = 20000;
 let permitido = false;
 let comprobado = false; // ya se ha preguntado al servidor al menos una vez
 let temporizador = null;
 let usuarios = 0;
 const oyentes = new Set();
-const enSalaDeGrupo = () => { try { return Boolean(JSON.parse(localStorage.getItem('minijuegos_sala_grupo'))?.codigo); } catch { return false; } };
+// Solo se pregunta si tienes un grupo activo con más gente online (el administrador de la web podría estar en él)
+const enSalaDeGrupo = () => grupoEnJuego();
 async function consultar() {
   let nuevo = false;
   if (enSalaDeGrupo()) try { const r = await fetch('/api/ocultos'); nuevo = r.ok && Boolean((await r.json()).permitido); } catch { nuevo = permitido; }

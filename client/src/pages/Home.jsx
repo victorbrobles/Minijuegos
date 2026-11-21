@@ -21,6 +21,9 @@ import { useFiltros, cuantosFiltros, cumpleFiltros, PanelFiltros } from '../comp
 import { BotonAjustes } from '../components/Ajustes.jsx';
 import Icon from '../components/Icon.jsx';
 import BotonAdmin from '../components/AdminPanel.jsx';
+import { useGrupoActivo, grupoEnJuego } from '../lib/grupoActivo.js';
+import { useCuenta } from '../lib/cuenta.js';
+import { limitesLocal, limitesOnline } from '../games/limites.js';
 import { metaDe, TOP_CREADOR, CATEGORIAS_PORTADA as CATEGORIAS_EXPORTADAS } from '../games/meta.js';
 
 // Lista de categorías por defecto de respaldo
@@ -233,8 +236,14 @@ function FichasCayendo({ juegos }) {
   );
 }
 
+// Juegos de un solo jugador: no se ofrecen si estás con tu grupo activo y hay más miembros online
+const esDeUno = (id) => { try { return Math.max(limitesLocal(id).max, limitesOnline(id).max) <= 1; } catch { return false; } };
+
 export default function Home() {
-  const [games, setGames] = useState([]);
+  const [todos, setGames] = useState([]);
+  const grupo = useGrupoActivo();
+  const conGrupo = grupoEnJuego(grupo);
+  const games = useMemo(() => (conGrupo ? todos.filter((g) => !esDeUno(g.id)) : todos), [todos, conGrupo]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState('');
   const [busqueda, setBusqueda] = useState('');
@@ -242,6 +251,7 @@ export default function Home() {
   const navigate = useNavigate();
   const favoritos = useFavoritos();
   const jugados = useJugados();
+  const { usuario } = useCuenta();
 
   // Los juegos ocultos solo aparecen con el administrador (o estando con él en la sala del grupo)
   const verOcultos = useVerOcultos();
@@ -356,7 +366,12 @@ export default function Home() {
         <div className="hub-barra">
           <div className="hub-yo"><ChipIdentidad /></div>
           <nav className="hub-iconos" aria-label="Opciones">
-            <Link to="/grupos" className="hub-grupos" aria-label="Grupos" title="Grupos"><span aria-hidden="true">👥</span><em>Grupos</em></Link>
+            {usuario && (
+              <Link to="/grupos" className={`hub-grupos${grupo?.grupo ? ' activo' : ''}`} aria-label={grupo?.grupo ? `Grupos · activo: ${grupo.grupo.nombre}` : 'Grupos'} title={grupo?.grupo ? `Grupo activo: ${grupo.grupo.nombre}` : 'Grupos'}>
+                <span aria-hidden="true">👥</span><em>Grupos</em>
+                {conGrupo && <i className="hub-grupos-n">{grupo.participantes.length}</i>}
+              </Link>
+            )}
             <BotonAdmin />
             <BotonSonido clase="en-portada" />
             <BotonAjustes />

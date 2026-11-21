@@ -55,6 +55,7 @@ const firmar = (s) => createHmac('sha256', secreto).update(s).digest('base64url'
 export function crearSesion(res, req, usuario, { adm = 0 } = {}) {
   const datos = Buffer.from(JSON.stringify({ u: usuario.id, v: usuario.version, exp: Date.now() + DURACION_MS, ult: Date.now(), ...(adm > Date.now() ? { adm } : {}) })).toString('base64url');
   res.cookie(COOKIE, `${datos}.${firmar(datos)}`, { httpOnly: true, sameSite: 'lax', secure: req.secure, maxAge: DURACION_MS, path: '/' });
+  if (usuario.jugador) anotarPresencia(usuario.jugador, Date.now(), adm > Date.now()); // al entrar ya cuentas como online
 }
 export const cerrarSesion = (res) => res.clearCookie(COOKIE, { path: '/' });
 
@@ -68,6 +69,31 @@ function leerCookie(req, nombre) {
 }
 
 const porId = db.prepare('SELECT id, email, jugador, version, creado FROM usuarios WHERE id = ?');
+
+/* ───────── Quién está «online» (con la sesión iniciada) ─────────
+   Online = sesión abierta: se apunta con cada petición que trae una sesión válida, usando la hora de su último uso
+   real (`ult` de la cookie, que solo renueva /latido al tocar la app), no la hora de la petición. Así se deja de estar
+   online al cerrar sesión (POST /salir) o cuando la sesión caduca por inactividad, y no por bloquear el móvil. */
+const presencia = new Map(); // jugador → { ult, desde, admin }
+const LIMITE_ONLINE = () => INACTIVIDAD_MS + MARGEN_MS;
+function anotarPresencia(jugador, ult, admin) {
+  const ahora = Date.now();
+  const p = presencia.get(jugador);
+  if (p && ahora - p.ult <= LIMITE_ONLINE()) { p.ult = Math.max(p.ult, ult); p.admin = admin; return; }
+  presencia.set(jugador, { ult, desde: ahora, admin });
+}
+export const marcarDesconectado = (jugador) => presencia.delete(jugador);
+/** ¿Tiene ahora mismo la sesión iniciada? */
+export function estaOnline(jugador) {
+  const p = presencia.get(jugador);
+  if (!p) return false;
+  if (Date.now() - p.ult > LIMITE_ONLINE()) { presencia.delete(jugador); return false; }
+  return true;
+}
+/** Desde cuándo está online (para elegir el administrador temporal de un grupo) o null. */
+export const onlineDesde = (jugador) => (estaOnline(jugador) ? presencia.get(jugador).desde : null);
+/** ¿Está online con el modo administrador de la web activo? (juegos ocultos) */
+export const adminOnline = (jugador) => estaOnline(jugador) && Boolean(presencia.get(jugador).admin);
 /** Middleware: pone en req.usuario la cuenta con sesión iniciada (o null). */
 export function leerSesion(req, res, next) {
   req.usuario = null; req.admin = false; req.adminHasta = 0;
@@ -83,6 +109,7 @@ export function leerSesion(req, res, next) {
         if (u && u.version === s.v) { // cambiar la contraseña invalida las sesiones antiguas
           req.usuario = u;
           if (s.adm > Date.now()) { req.admin = true; req.adminHasta = s.adm; }
+          anotarPresencia(u.jugador, s.ult, req.admin);
         }
         else if (inactiva) { req.sesionCaducada = true; cerrarSesion(res); }
       } catch { /* cookie rota */ }

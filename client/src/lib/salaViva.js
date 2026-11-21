@@ -31,7 +31,8 @@ function anotar(code, datos, api) {
   if (!juego) return;
   const { jugadores, estado } = extraer(datos);
   const nuevo = !actual || actual.code !== code || actual.juego !== juego;
-  actual = { juego, api, code: code.toUpperCase(), jugadores, estado, visto: Date.now() };
+  const previo = nuevo ? {} : { creador: actual.creador, cerrada: actual.cerrada };
+  actual = { ...previo, juego, api, code: code.toUpperCase(), jugadores, estado, visto: Date.now() };
   if (nuevo) window.dispatchEvent(new Event(EVENTO));
   const ahora = Date.now();
   if (ahora - ultimoEnvio > 3000) {
@@ -39,6 +40,13 @@ function anotar(code, datos, api) {
     original(`/api/social/sala/${encodeURIComponent(juego)}/${actual.code}/estado`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ nombre: nombreIdentidad(), completo: nombreCompleto(), jugadores, estado })
+    }).then((r) => r.json()).then((d) => {
+      // Quién creó la sala y si la ha cerrado (al volver a la portada tras acabar): ver components/GrupoGlobal.jsx
+      if (actual && actual.code === code.toUpperCase() && d) {
+        const cerrada = Boolean(d.cerrada) && !actual.cerrada;
+        actual.creador = d.creador || null; actual.cerrada = Boolean(d.cerrada);
+        if (cerrada) window.dispatchEvent(new Event(EVENTO));
+      }
     }).catch(() => {});
   }
 }
@@ -77,5 +85,14 @@ export function useSalaViva(juego) {
 }
 /** Última sala online detectada (o null). */
 export const salaActual = () => actual;
+/** Sala online en la que estás ahora mismo (vista hace menos de `ms`), en cualquier juego. */
+export const salaReciente = (ms = 10000) => (actual && Date.now() - actual.visto < ms ? actual : null);
+/** Cierra la sala para todos (solo vale si la creaste tú). */
+export function cerrarSalaParaTodos(sala) {
+  if (!sala) return;
+  original(`/api/social/sala/${encodeURIComponent(sala.juego)}/${sala.code}/cerrar`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ completo: nombreCompleto() }), keepalive: true
+  }).catch(() => {});
+}
 export const EVENTO_SALA_VIVA = EVENTO;
 export const fetchOriginal = (...a) => (original || window.fetch)(...a);

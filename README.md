@@ -43,6 +43,24 @@ npm run dev
   **descargar una copia completa** en cualquier momento.
 - Si algo va mal, el registro del servidor lo dice con líneas `[datos] ⚠️ …`.
 
+## Grupos de amigos (con cuenta)
+- Solo con sesión iniciada (el botón 👥 de la portada no sale sin cuenta). `/grupos`: crear o unirse con código;
+  «Ver mis grupos» (👑 = eres el administrador, en verde el activo). `/grupo/<código>`: activar/desactivar, salir,
+  miembros (online = sesión iniciada; el administrador puede sacar a alguien y readmitirlo), código para copiar o
+  compartir (`/grupos?unirse=CÓDIGO`), estadísticas y, para el administrador, las preguntas propias del grupo.
+- Cada cuenta tiene como mucho **un grupo activo** (tabla `grupo_activo`). Con él activo, el botón 👥 se pone verde.
+- **Participantes** = miembros online con ese grupo activo. Con 2 o más:
+  - Solo el **administrador efectivo** (el creador, o si no está online, el participante que más lleva online) puede
+    crear partidas online; a los demás les sale un aviso. Unirse con código a otras partidas sí se puede.
+  - Cuando el administrador está en una sala online, los demás entran solos en ella (`components/GrupoGlobal.jsx` y el
+    piloto de `lib/grupoActivo.js`). Si están en otro juego, les sale un aviso con «Entrar». Si la partida ya ha
+    empezado, esperan a la siguiente. Si el administrador cierra la sala o sale del juego, vuelven a la portada.
+  - No se ofrecen los juegos de un solo jugador.
+- Servidor: `server/routes/social.js` (`/api/social/grupos…`, `/api/social/grupo-activo`) y la presencia en
+  `server/lib/usuarios.js` (`estaOnline`).
+- Cualquier sala online (con grupo o sin él): si quien la creó sale del juego con la partida terminada, la sala se
+  cierra y los demás vuelven a la portada (`/api/social/sala/:juego/:code/cerrar`).
+
 ## Cuentas de usuario
 - Se puede jugar **con cuenta** (correo + contraseña + nick «Nick#1234») o **sin cuenta** (solo nick, como antes).
 - Servidor: `server/lib/usuarios.js` (contraseñas con scrypt, sesión en cookie firmada HttpOnly) y `server/routes/usuarios.js`.

@@ -12,7 +12,7 @@ import BotonSonido from '../components/Sonido.jsx';
 import Reacciones from '../components/Reacciones.jsx';
 import '../components/MenuJuego.css';
 import { AyudaContexto } from '../lib/ayuda.js';
-import { usePilotoGrupo } from '../lib/salaGrupo.js';
+import { usePilotoGrupo } from '../lib/grupoActivo.js';
 import { esOculto, useAccesoOculto } from '../lib/ocultos.js';
 
 // Ayuda común (se descarga solo al abrirla)
@@ -30,7 +30,7 @@ export default function GamePage() {
 
   // Invitación a una sala por enlace/QR (?sala=CODIGO)
   // Cualquier botón «?» del juego abre la ayuda común (en vez de la ventana propia de cada juego)
-  // Abierto desde la sala del grupo: crea o entra en la partida sin teclear el código
+  // Grupo activo: te mete solo en la sala de espera del administrador del grupo
   // (cada navegación remonta el juego: así el grupo puede abrir otra partida del mismo juego)
   const { key: claveNavegacion } = useLocation();
   const avisoPiloto = usePilotoGrupo(gameId, claveNavegacion);
