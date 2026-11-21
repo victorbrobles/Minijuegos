@@ -3,7 +3,8 @@
 //   POST /api/usuarios/registro   { email, password, nick, tag? }  → si el «Nick#tag» ya existía sin cuenta, se reclama
 //   POST /api/usuarios/entrar     { email, password }
 //   POST /api/usuarios/salir
-//   GET  /api/usuarios/yo         → { usuario: { email, jugador, nick, tag } | null }
+//   GET  /api/usuarios/yo         → { usuario: { email, jugador, nick, tag } | null, caducada? }
+//   POST /api/usuarios/latido     → renueva la sesión (el móvil lo manda mientras se usa la app; 15 min sin usarla la cierran)
 //   GET  /api/usuarios/datos      → { datos }  ·  PUT /api/usuarios/datos { datos }
 //   POST /api/usuarios/password   { actual, nueva }
 //   POST /api/usuarios/borrar     { password }   (borra la cuenta y todo lo guardado con su nombre)
@@ -38,7 +39,14 @@ function validarPassword(pw) {
   return null;
 }
 
-router.get('/yo', (req, res) => res.json({ success: true, usuario: publico(req.usuario) }));
+router.get('/yo', (req, res) => res.json({ success: true, usuario: publico(req.usuario), caducada: Boolean(req.sesionCaducada) }));
+
+// Se está usando la app: la sesión sigue abierta otros 15 minutos
+router.post('/latido', (req, res) => {
+  if (!req.usuario) return res.status(401).json({ error: 'La sesión se ha cerrado.', caducada: Boolean(req.sesionCaducada) });
+  crearSesion(res, req, req.usuario);
+  res.json({ success: true });
+});
 
 router.get('/libre', (req, res) => {
   const j = String(req.query.jugador || '');

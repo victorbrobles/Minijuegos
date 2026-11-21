@@ -48,3 +48,5 @@
 .idn-pw button { position: absolute; top: 50%; right: 0.4rem; transform: translateY(-50%); display: grid; place-items: center; width: 2.2rem; height: 2.2rem; min-width: 0; padding: 0; border: none; border-radius: 10px; background: #f1f5f9; font-size: 1rem; cursor: pointer; box-shadow: none; }
 .idn-nota { margin: 0.2rem 0 0.6rem; color: #64748b; font-size: 0.8rem; font-weight: 600; text-align: left; }
 .idn-verificado { display: grid; place-items: center; flex: none; width: 1.1rem; height: 1.1rem; border-radius: 50%; background: #22c55e; color: #ffffff; font-size: 0.65rem; font-weight: 900; }
+
+.idn-aviso-sesion { margin: 0 0 0.6rem; padding: 0.6rem 0.8rem; border-radius: 14px; background: #fef3c7; color: #92400e; font-size: 0.85rem; font-weight: 700; text-align: center; }

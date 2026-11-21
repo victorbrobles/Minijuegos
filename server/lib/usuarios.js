@@ -43,11 +43,15 @@ if (!secreto) {
   secreto = db.prepare("SELECT valor FROM ajustes_servidor WHERE clave = 'sesion'").get().valor;
 }
 const COOKIE = 'mj_sesion';
-const DURACION_MS = 180 * 24 * 60 * 60 * 1000; // 6 meses
+const DURACION_MS = 180 * 24 * 60 * 60 * 1000; // 6 meses como máximo…
+// …pero la sesión se cierra tras 15 minutos sin usar la app. El móvil avisa de que se está usando (POST /latido) como
+// mucho una vez por minuto; damos 2 minutos de margen por si ese aviso se retrasa.
+export const INACTIVIDAD_MS = 15 * 60 * 1000;
+const MARGEN_MS = 2 * 60 * 1000;
 const firmar = (s) => createHmac('sha256', secreto).update(s).digest('base64url');
 
 export function crearSesion(res, req, usuario) {
-  const datos = Buffer.from(JSON.stringify({ u: usuario.id, v: usuario.version, exp: Date.now() + DURACION_MS })).toString('base64url');
+  const datos = Buffer.from(JSON.stringify({ u: usuario.id, v: usuario.version, exp: Date.now() + DURACION_MS, ult: Date.now() })).toString('base64url');
   res.cookie(COOKIE, `${datos}.${firmar(datos)}`, { httpOnly: true, sameSite: 'lax', secure: req.secure, maxAge: DURACION_MS, path: '/' });
 }
 export const cerrarSesion = (res) => res.clearCookie(COOKIE, { path: '/' });
@@ -72,8 +76,10 @@ export function leerSesion(req, res, next) {
     if (firma && esperada.length === firma.length && timingSafeEqual(Buffer.from(esperada), Buffer.from(firma))) {
       try {
         const s = JSON.parse(Buffer.from(datos, 'base64url').toString());
-        const u = s.exp > Date.now() ? porId.get(s.u) : null;
+        const inactiva = !s.ult || Date.now() - s.ult > INACTIVIDAD_MS + MARGEN_MS;
+        const u = s.exp > Date.now() && !inactiva ? porId.get(s.u) : null;
         if (u && u.version === s.v) req.usuario = u; // cambiar la contraseña invalida las sesiones antiguas
+        else if (inactiva) { req.sesionCaducada = true; cerrarSesion(res); }
       } catch { /* cookie rota */ }
     }
   }

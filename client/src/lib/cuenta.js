@@ -49,17 +49,64 @@ function empezarSincronizacion() {
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') subirDatos({ alSalir: true }); });
 }
 
+/* ───────── Inactividad: 15 minutos sin tocar la app cierran la sesión ───────── */
+export const INACTIVIDAD_MS = 15 * 60 * 1000;
+const ULTIMA = 'minijuegos_ultima_actividad';
+const AVISO = 'minijuegos_aviso_entrada';
+const leerUltima = () => { try { return Number(localStorage.getItem(ULTIMA)) || 0; } catch { return 0; } };
+const guardarUltima = (t) => { try { localStorage.setItem(ULTIMA, String(t)); } catch { /* nada */ } };
+let ultimoLatido = 0;
+let vigilando = false;
+
+/** Cierra la sesión por inactividad y vuelve a la pantalla de entrada (en «Iniciar sesión», con un aviso). */
+async function cerrarPorInactividad() {
+  if (!estado.usuario) return;
+  try { sessionStorage.setItem('minijuegos_entrada_modo', 'entrar'); sessionStorage.setItem(AVISO, 'inactividad'); } catch { /* nada */ }
+  await salir();
+}
+const caducada = () => estado.usuario && leerUltima() && Date.now() - leerUltima() > INACTIVIDAD_MS;
+function actividad() {
+  if (!estado.usuario) return;
+  if (caducada()) { cerrarPorInactividad(); return; } // vuelves tras más de 15 minutos: hay que entrar otra vez
+  const ahora = Date.now();
+  guardarUltima(ahora);
+  if (ahora - ultimoLatido > 60 * 1000) {
+    ultimoLatido = ahora;
+    fetch('/api/usuarios/latido', { method: 'POST', credentials: 'same-origin' })
+      .then((r) => { if (r.status === 401) cerrarPorInactividad(); }).catch(() => {});
+  }
+}
+function vigilarInactividad() {
+  if (vigilando) return;
+  vigilando = true;
+  ['pointerdown', 'keydown', 'wheel', 'touchstart'].forEach((ev) => window.addEventListener(ev, actividad, { capture: true, passive: true }));
+  setInterval(() => { if (caducada()) cerrarPorInactividad(); }, 20 * 1000);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && caducada()) cerrarPorInactividad(); });
+}
+/** Aviso para la pantalla de entrada («Tu sesión se cerró por inactividad»); se lee una sola vez. */
+export function avisoEntrada() {
+  try { const a = sessionStorage.getItem(AVISO); if (a) sessionStorage.removeItem(AVISO); return a; } catch { return null; }
+}
+
 const entrarComo = (u) => {
   guardarIdentidad(u.nick, u.tag);
+  guardarUltima(Date.now()); ultimoLatido = Date.now();
   poner({ usuario: u, cargando: false });
   empezarSincronizacion();
+  vigilarInactividad();
 };
 
 /** Al cargar la web: ¿hay sesión iniciada? Si la hay, entras directamente con tu nick. */
 export async function iniciarCuenta() {
   try {
-    const { usuario } = await pedir('/api/usuarios/yo');
-    if (usuario) {
+    const { usuario, caducada: cerradaPorServidor } = await pedir('/api/usuarios/yo');
+    // Al volver a abrir la app tras más de 15 minutos sin usarla, la sesión ya no vale
+    const inactiva = usuario && leerUltima() && Date.now() - leerUltima() > INACTIVIDAD_MS;
+    if (cerradaPorServidor || inactiva) {
+      try { sessionStorage.setItem(AVISO, 'inactividad'); } catch { /* nada */ }
+      if (inactiva) { try { await pedir('/api/usuarios/salir', { method: 'POST' }); } catch { /* nada */ } }
+    }
+    if (usuario && !inactiva) {
       const primeraVez = !sessionStorage.getItem('minijuegos_cuenta_sync');
       if (primeraVez) { await bajarDatos(); try { sessionStorage.setItem('minijuegos_cuenta_sync', '1'); } catch { /* nada */ } }
       entrarComo(usuario);

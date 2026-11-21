@@ -7,7 +7,7 @@ import { AvatarJugador, EditarPerfil } from './Perfil.jsx';
 import {
   useIdentidad, ultimaIdentidad, guardarIdentidad, olvidarIdentidad, tagAlAzar, limpiarNombre, partirNombre, textoIdentidad, MAX_NOMBRE
 } from '../lib/identidad.js';
-import { useCuenta, entrar, registrar, salir, nombreLibre } from '../lib/cuenta.js';
+import { useCuenta, entrar, registrar, salir, nombreLibre, avisoEntrada } from '../lib/cuenta.js';
 import './Identidad.css';
 
 /** «Ana#1234» con el nombre destacado y la etiqueta discreta. Sirve también para nombres sin etiqueta. */
@@ -58,6 +58,7 @@ function Entrada() {
   const [nombre, setNombre] = useState(ultima?.nombre || '');
   const [tag, setTag] = useState(ultima?.tag || tagAlAzar());
   const [error, setError] = useState('');
+  const [aviso] = useState(() => avisoEntrada());
   const [ocupado, setOcupado] = useState(false);
   const limpiarError = () => setError('');
   const cambiarModo = (m) => { setModo(m); setError(''); };
@@ -106,6 +107,7 @@ function Entrada() {
       <form className="idn-caja" onSubmit={enviar}>
         <img className="idn-logo idn-logo-img" src="/logo.svg" alt="Los 100+ minijuegos" width="72" height="72" />
         <h1>{modo === 'entrar' ? '¡Hola de nuevo!' : modo === 'registro' ? 'Crea tu cuenta' : '¿Quién juega?'}</h1>
+        {aviso === 'inactividad' && <p className="idn-aviso-sesion" role="status">🔒 Tu sesión se ha cerrado tras 15 minutos sin usar la app. Vuelve a iniciar sesión.</p>}
         <div className="idn-pestanas" role="tablist">
           <button type="button" role="tab" aria-selected={modo === 'entrar'} className={modo === 'entrar' ? 'activa' : ''} onClick={() => cambiarModo('entrar')}>Iniciar sesión</button>
           <button type="button" role="tab" aria-selected={modo === 'registro'} className={modo === 'registro' ? 'activa' : ''} onClick={() => cambiarModo('registro')}>Crear cuenta</button>
