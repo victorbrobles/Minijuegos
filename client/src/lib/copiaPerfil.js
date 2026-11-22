@@ -4,9 +4,14 @@
 const MI_COPIA = 'minijuegos_copia'; // { codigo, clave, fecha } de la copia de este móvil
 
 // Qué se copia: lo de la app y los récords. Lo que es de este móvil o de una partida en curso, no.
+import { leerIdentidad, textoIdentidad } from './identidad.js';
+
 const SE_COPIA = (k) => /^(minijuegos|minigames)[-_]/.test(k) || /^siglas-mejor-/.test(k) || k === 'test_velocidad_record';
 const NO_SE_COPIA = new Set(['minigames-admin-token', 'minijuegos_visitante', MI_COPIA, 'minijuegos_piloto', 'minijuegos_partida_grupo',
-  'minijuegos-sala-viva', 'minijuegos_invitacion', 'minijuegos_sin_conexion']);
+  'minijuegos-sala-viva', 'minijuegos_invitacion', 'minijuegos_sin_conexion', 'minijuegos_jugados']);
+// «Seguir jugando» de cada jugador: solo viaja (y solo se recupera) la lista de quien tiene la sesión
+const JUGADOS = 'minijuegos_jugados__';
+const deOtro = (k) => k.startsWith(JUGADOS) && k !== JUGADOS + textoIdentidad(leerIdentidad());
 
 export const miCopia = () => { try { return JSON.parse(localStorage.getItem(MI_COPIA) || 'null'); } catch { return null; } };
 
@@ -15,7 +20,7 @@ export function recopilar() {
   const datos = {};
   for (let i = 0; i < localStorage.length; i++) {
     const k = localStorage.key(i);
-    if (k && SE_COPIA(k) && !NO_SE_COPIA.has(k)) datos[k] = localStorage.getItem(k);
+    if (k && SE_COPIA(k) && !NO_SE_COPIA.has(k) && !deOtro(k)) datos[k] = localStorage.getItem(k);
   }
   return datos;
 }
