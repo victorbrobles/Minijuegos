@@ -1010,7 +1010,7 @@ export const META = {
     colores: ['#16a34a', '#1d4ed8'],
     etiquetas: 'chapas futbol fútbol habilidad fisica tirachinas goles por turnos equipos online',
     descripcion: "Fútbol de chapas en 2D: arrastra hacia atrás tu chapa como un tirachinas y suéltala para chutar. Rebotes, paredes y goles por equipos. ¡El primero en llegar a los goles pactados gana!",
-    categorias: ['habilidad', 'futbol']
+    categorias: ['habilidad']
   },
   'artilleria': {
     titulo: 'Artillería',
@@ -1020,7 +1020,7 @@ export const META = {
     colores: ['#65a30d', '#b45309'],
     etiquetas: 'artilleria tanques disparos angulo fuerza viento crateres habilidad por turnos online',
     descripcion: "Tanques sobre colinas: elige ángulo y fuerza, calcula el viento y dispara. Las explosiones hacen cráteres y quitan vida. Megabombas y disparo triple. Gana el último tanque en pie.",
-    categorias: ['habilidad', 'estrategia']
+    categorias: ['habilidad']
   },
   'curling': {
     titulo: 'Curling',
@@ -1050,7 +1050,7 @@ export const META = {
     colores: ['#7c3aed', '#f59e0b'],
     etiquetas: 'draft famosos fichajes estrategia criterio oculto edad altura nombre online',
     descripcion: "Ficha famosos por turnos sin saber qué contará: los más mayores, los más altos, el nombre más largo… Al final se desvela el criterio y se suman los datos de tu equipo. ¡Estrategia y cultura!",
-    categorias: ['famosos', 'estrategia']
+    categorias: ['famosos']
   },
   'emojis': {
     titulo: 'Biografía en emojis',
@@ -1060,7 +1060,7 @@ export const META = {
     colores: ['#f59e0b', '#ec4899'],
     etiquetas: 'emojis famosos adivinar biografia rapidez autor online',
     descripcion: "La vida de un famoso contada en emojis que aparecen uno a uno. Cuanto antes aciertes, más puntos. En el modo autor, sois vosotros quienes la contáis en emojis.",
-    categorias: ['famosos', 'chill']
+    categorias: ['famosos']
   },
   'habilidad': {
     titulo: 'Test de habilidad',
