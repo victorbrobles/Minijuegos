@@ -6,6 +6,7 @@ import { barajar } from '../lib/barajar.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
 import { totalRondas } from '../../client/src/games/rondas.js';
 import { rutaExpulsar, rutaSalir } from '../lib/expulsar.js';
+import { normalizar, buscarElemento } from '../lib/rankingRespuestas.js';
 const LIM = limitesOnline('rankings');
 
 const router = Router();
@@ -13,85 +14,7 @@ const ordenCategorias = Object.keys(seed);
 // Rondas: las elige el anfitrión al empezar (games/rondas.js)
 const maxRondasDe = (sala) => sala.maxRondas || totalRondas('rankings', null, sala.jugadores.length);
 
-const STOPWORDS = new Set([
-  'el', 'la', 'los', 'las', 'un', 'una', 'unos', 'unas',
-  'de', 'del', 'al', 'en', 'y', 'o', 'the', 'of', 'and',
-  'san', 'santa', 'rio', 'isla', 'islas', 'monte', 'mar',
-  'club', 'fc', 'cd', 'deportivo', 'real'
-]);
-
-function normalizar(texto) {
-  return String(texto ?? '')
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9\s]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-}
-
-function colapsarDuplicadas(texto) {
-  return texto.replace(/(.)\1+/g, '$1');
-}
-
-function distanciaLevenshtein(a, b) {
-  const m = a.length;
-  const n = b.length;
-  const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
-
-  for (let i = 0; i <= m; i++) dp[i][0] = i;
-  for (let j = 0; j <= n; j++) dp[0][j] = j;
-
-  for (let i = 1; i <= m; i++) {
-    for (let j = 1; j <= n; j++) {
-      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
-      dp[i][j] = Math.min(
-        dp[i - 1][j] + 1,
-        dp[i][j - 1] + 1,
-        dp[i - 1][j - 1] + cost
-      );
-    }
-  }
-  return dp[m][n];
-}
-
-function sonParecidas(strA, strB) {
-  const maxLen = Math.max(strA.length, strB.length);
-  if (maxLen === 0) return false;
-  const dist = distanciaLevenshtein(strA, strB);
-
-  if (maxLen <= 4) return dist <= 1;
-  if (maxLen <= 7) return dist <= 2;
-  return dist <= 3;
-}
-
-function esCoincidenciaDirecta(u, t) {
-  if (u === t) return true;
-  const uSinEspacios = u.replace(/\s+/g, '');
-  const tSinEspacios = t.replace(/\s+/g, '');
-  if (uSinEspacios === tSinEspacios) return true;
-  if (colapsarDuplicadas(uSinEspacios) === colapsarDuplicadas(tSinEspacios)) return true;
-  if (sonParecidas(u, t) || sonParecidas(uSinEspacios, tSinEspacios)) return true;
-  return false;
-}
-
-function esCoincidenciaPorContencion(u, t) {
-  if (!STOPWORDS.has(u) && u.length >= 4) {
-    if (t.includes(u)) return true;
-    if (t.length >= 4 && u.includes(t)) return true;
-  }
-  const palabrasT = t.split(' ').filter((w) => !STOPWORDS.has(w) && w.length >= 4);
-  const palabrasU = u.split(' ').filter((w) => !STOPWORDS.has(w) && w.length >= 4);
-
-  for (const pU of palabrasU) {
-    for (const pT of palabrasT) {
-      if (pU === pT || sonParecidas(pU, pT) || colapsarDuplicadas(pU) === colapsarDuplicadas(pT)) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
+// Cuándo vale una respuesta: ver lib/rankingRespuestas.js (nombre, alias, palabras clave o errata pequeña)
 
 // GET /api/rankings/categorias
 router.get('/categorias', (req, res) => {
@@ -158,40 +81,20 @@ router.post('/validar', (req, res) => {
     return res.json({ acierto: false, mensaje: 'Introduce una respuesta.' });
   }
 
-  for (const elem of ranking.elementos) {
-    const opciones = [elem.valor, ...(elem.alias ?? [])].map(normalizar);
-    if (opciones.some((opc) => esCoincidenciaDirecta(uNorm, opc))) {
-      if (!ocultasSet.has(elem.posicion)) {
-        return res.json({
-          acierto: false,
-          yaVisible: true,
-          mensaje: `"${elem.valor}" ya está descubierto en el ranking.`
-        });
-      }
+  const elem = buscarElemento(ranking.elementos, respuesta);
+  if (elem) {
+    if (!ocultasSet.has(elem.posicion)) {
       return res.json({
-        acierto: true,
-        posicion: elem.posicion,
-        valorReal: elem.valor
+        acierto: false,
+        yaVisible: true,
+        mensaje: `"${elem.valor}" ya está descubierto en el ranking.`
       });
     }
-  }
-
-  for (const elem of ranking.elementos) {
-    const opciones = [elem.valor, ...(elem.alias ?? [])].map(normalizar);
-    if (opciones.some((opc) => esCoincidenciaPorContencion(uNorm, opc))) {
-      if (!ocultasSet.has(elem.posicion)) {
-        return res.json({
-          acierto: false,
-          yaVisible: true,
-          mensaje: `"${elem.valor}" ya está descubierto en el ranking.`
-        });
-      }
-      return res.json({
-        acierto: true,
-        posicion: elem.posicion,
-        valorReal: elem.valor
-      });
-    }
+    return res.json({
+      acierto: true,
+      posicion: elem.posicion,
+      valorReal: elem.valor
+    });
   }
 
   res.json({
@@ -484,23 +387,7 @@ router.post('/online/sala/:code/validar', (req, res) => {
 
   let matchElem = null;
 
-  for (const elem of sala.ronda.elementosOriginales) {
-    const opciones = [elem.valor, ...(elem.alias ?? [])].map(normalizar);
-    if (opciones.some((opc) => esCoincidenciaDirecta(uNorm, opc))) {
-      matchElem = elem;
-      break;
-    }
-  }
-
-  if (!matchElem) {
-    for (const elem of sala.ronda.elementosOriginales) {
-      const opciones = [elem.valor, ...(elem.alias ?? [])].map(normalizar);
-      if (opciones.some((opc) => esCoincidenciaPorContencion(uNorm, opc))) {
-        matchElem = elem;
-        break;
-      }
-    }
-  }
+  matchElem = buscarElemento(sala.ronda.elementosOriginales, respuesta);
 
   if (matchElem) {
     if (!ocultasSet.has(matchElem.posicion)) {
