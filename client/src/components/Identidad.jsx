@@ -94,12 +94,13 @@ function Entrada() {
 
   const campoEmail = <label className="idn-campo-l"><span>Correo</span><input type="email" value={email} onChange={(e) => { setEmail(e.target.value); limpiarError(); }} autoComplete="email" placeholder="tu@correo.com" required autoFocus /></label>;
   const campoPw = (
-    <label className="idn-campo-l"><span>Contraseña{modo === 'registro' && ' (mín. 8 caracteres)'}</span>
+    <div className="idn-campo-l"><label htmlFor="idn-password">Contraseña{modo === 'registro' && ' (mín. 8 caracteres)'}</label>
       <span className="idn-pw">
-        <input type={verPw ? 'text' : 'password'} value={password} onChange={(e) => { setPassword(e.target.value); limpiarError(); }} autoComplete={modo === 'entrar' ? 'current-password' : 'new-password'} minLength={modo === 'registro' ? 8 : undefined} required />
-        <button type="button" onClick={() => setVerPw((v) => !v)} aria-label={verPw ? 'Ocultar contraseña' : 'Ver contraseña'}>{verPw ? '🙈' : '👁️'}</button>
+        <input id="idn-password" type={verPw ? 'text' : 'password'} value={password} onChange={(e) => { setPassword(e.target.value); limpiarError(); }} autoComplete={modo === 'entrar' ? 'current-password' : 'new-password'} minLength={modo === 'registro' ? 8 : undefined} required />
+        {/* Sin perder el foco del campo: si el teclado del móvil se cierra, la página se mueve y el toque no llega al botón */}
+        <button type="button" onPointerDown={(e) => e.preventDefault()} onMouseDown={(e) => e.preventDefault()} onClick={() => setVerPw((v) => !v)} aria-label={verPw ? 'Ocultar contraseña' : 'Ver contraseña'} aria-pressed={verPw}><span aria-hidden="true">{verPw ? '🙈' : '👁️'}</span></button>
       </span>
-    </label>
+    </div>
   );
 
   return (
