@@ -255,7 +255,7 @@ export function dirBot(c, k, bot, hielo = false, rec = 0) {
     let mejor = bot.k; let bd = Infinity;
     for (let j = bot.k; j < Math.min(R.length, bot.k + 40); j++) { const dd = R[j].p.distanceToSquared(p); if (dd < bd) { bd = dd; mejor = j; } }
     bot.k = mejor;
-    if (bd > 110) { bot.rama = null; return dirBot(c, k, bot, hielo, rec + 1); }
+    if (bd > 110) { bot.decidido[`${bot.rama}:${k.vuelta}`] = false; bot.rama = null; return dirBot(c, k, bot, hielo, rec + 1); } // se salió del camino: vuelve al principal y no reintenta esta vuelta
     objetivo = R[Math.min(R.length - 1, bot.k + Math.round(3 + vh * 0.3))].p;
     bot.anchoRama = r.ancho;
     curva = radioDe(R, Math.min(R.length - 1, bot.k + 2), Math.min(R.length - 1, bot.k + 16));
@@ -267,7 +267,7 @@ export function dirBot(c, k, bot, hielo = false, rec = 0) {
     if (ri >= 0) {
       const clave = `${ri}:${k.vuelta}`;
       if (!(clave in bot.decidido)) bot.decidido[clave] = bot.forzar ? Boolean(bot.forzar[ri]) : bot.azar() < 0.6 / (1 + (bot.evitar[ri] || 0) * 2);
-      if (bot.decidido[clave] && ((c.ramas[ri].i0 - i + N) % N) <= 1) { bot.rama = ri; bot.k = 0; return dirBot(c, k, bot, hielo, rec + 1); }
+      if (bot.decidido[clave] && rec < 2 && ((c.ramas[ri].i0 - i + N) % N) <= 1) { bot.rama = ri; bot.k = 0; return dirBot(c, k, bot, hielo, rec + 1); }
     }
     objetivo = M[(i + mira) % N].p;
     curva = radioDe(M, (i + 3) % N, (i + 18) % N) ;
