@@ -8,10 +8,10 @@ import { leerIdentidad, textoIdentidad } from './identidad.js';
 
 const SE_COPIA = (k) => /^(minijuegos|minigames)[-_]/.test(k) || /^siglas-mejor-/.test(k) || k === 'test_velocidad_record';
 const NO_SE_COPIA = new Set(['minigames-admin-token', 'minijuegos_visitante', MI_COPIA, 'minijuegos_piloto', 'minijuegos_partida_grupo',
-  'minijuegos-sala-viva', 'minijuegos_invitacion', 'minijuegos_sin_conexion', 'minijuegos_jugados']);
-// «Seguir jugando» de cada jugador: solo viaja (y solo se recupera) la lista de quien tiene la sesión
-const JUGADOS = 'minijuegos_jugados__';
-const deOtro = (k) => k.startsWith(JUGADOS) && k !== JUGADOS + textoIdentidad(leerIdentidad());
+  'minijuegos-sala-viva', 'minijuegos_invitacion', 'minijuegos_sin_conexion', 'minijuegos_jugados', 'minijuegos_favoritos']);
+// Favoritos y «Seguir jugando» de cada jugador: solo viajan las listas de quien tiene la sesión
+const POR_JUGADOR = ['minijuegos_jugados__', 'minijuegos_favoritos__'];
+const deOtro = (k) => POR_JUGADOR.some((p) => k.startsWith(p) && k !== p + textoIdentidad(leerIdentidad()));
 
 export const miCopia = () => { try { return JSON.parse(localStorage.getItem(MI_COPIA) || 'null'); } catch { return null; } };
 
