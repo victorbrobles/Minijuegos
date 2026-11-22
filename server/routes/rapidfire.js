@@ -4,7 +4,7 @@ import express from 'express';
 import { CATEGORIAS } from '../data/seeds/rapidfire/rapidfire.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
 import { totalRondas } from '../../client/src/games/rondas.js';
-import { rutaExpulsar } from '../lib/expulsar.js';
+import { rutaExpulsar, rutaSalir } from '../lib/expulsar.js';
 const LIM = limitesOnline('rapidfire');
 
 const router = express.Router();
@@ -381,6 +381,27 @@ router.post('/online/sala/:code/finalizar', (req, res) => {
   res.json({ success: true });
 });
 
+// Alguien se va: la partida sigue sin él (si tenía el turno, pasa al siguiente)
+rutaSalir(router, '/online/sala/:code/salir', {
+  sala: (c) => salasOnline.get(c), borrar: (c) => salasOnline.delete(c),
+  antes(sala, jugador) {
+    const r = sala.ronda; const ids = sala.jugadores.map((j) => j.id);
+    const siguiente = () => ids[(ids.indexOf(jugador.id) + 1) % ids.length];
+    if (sala.proximoInicialId === jugador.id) sala.proximoInicialId = siguiente();
+    if (!r || r.jugadorTurnoId !== jugador.id) return;
+    if (r.jugadorInicialRondaId === jugador.id) r.jugadorInicialRondaId = siguiente();
+    if (sala.estado === 'categorias') { r.jugadorTurnoId = siguiente(); return; }
+    if (sala.estado !== 'turno') return;
+    const otro = elegirSiguienteRebote(sala, jugador.id);
+    if (otro && otro !== jugador.id) {
+      const ahora = Date.now();
+      Object.assign(r, { jugadorTurnoId: otro, intento: r.intento + 1, motivo: 'rebote', finPrep: ahora + PREPARACION_S * 1000, finTurno: ahora + (PREPARACION_S + TIEMPO_S) * 1000, tiempoAgotadoProcesado: false });
+    } else {
+      if (!sala.proximoInicialId || sala.proximoInicialId === jugador.id) sala.proximoInicialId = siguiente();
+      r.ultimo = { tipo: 'rendido' }; sala.estado = 'puntuaciones';
+    }
+  }
+});
 rutaExpulsar(router, '/online/sala/:code/expulsar', { sala: (c) => salasOnline.get(c), esAnfitrion: (s, j) => s.adminToken === j.token });
 
 export default router;

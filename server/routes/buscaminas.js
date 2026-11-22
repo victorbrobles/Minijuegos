@@ -13,7 +13,7 @@ import gastronomia from '../data/seeds/buscaminas/gastronomia.js';
 import culturaPop from '../data/seeds/buscaminas/culturaPop.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
 import { totalRondas } from '../../client/src/games/rondas.js';
-import { rutaExpulsar } from '../lib/expulsar.js';
+import { rutaExpulsar, rutaSalir, quitarDeOrden } from '../lib/expulsar.js';
 const LIM = limitesOnline('buscaminas');
 
 const router = express.Router();
@@ -357,6 +357,18 @@ router.post('/online/sala/:code/finalizar', (req, res) => {
   res.json({ success: true });
 });
 
+// Alguien se va: la partida sigue sin él
+rutaSalir(router, '/online/sala/:code/salir', {
+  sala: (c) => salasOnline.get(c), borrar: (c) => salasOnline.delete(c),
+  despues(sala, jugador) {
+    const r = sala.ronda; if (!r || r.faseRonda !== 'jugando') return;
+    r.eliminadosRonda = r.eliminadosRonda.filter((id) => id !== jugador.id);
+    if (!quitarDeOrden(r, jugador.id)) return;
+    const vivos = r.ordenTurnos.filter((id) => !r.eliminadosRonda.includes(id));
+    if (!vivos.length) { r.motivoFinRonda = '¡Todos los jugadores han caído eliminados!'; r.faseRonda = 'ronda_fin'; return; }
+    while (r.eliminadosRonda.includes(r.ordenTurnos[r.indiceTurno])) r.indiceTurno = (r.indiceTurno + 1) % r.ordenTurnos.length;
+  }
+});
 rutaExpulsar(router, '/online/sala/:code/expulsar', { sala: (c) => salasOnline.get(c), esAnfitrion: (s, j) => s.adminToken === j.token });
 
 export default router;

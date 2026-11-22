@@ -1,8 +1,8 @@
 // client/src/components/GrupoGlobal.jsx
 // Lo que pasa «por detrás» en toda la web con las salas online y el grupo activo:
 //
-//  · Cualquier sala (con grupo o sin él): si quien la creó vuelve a la portada (o sale del juego) cuando la partida ya
-//    ha terminado, la sala se cierra y los demás vuelven solos a la portada.
+//  · Cualquier sala: quien deja el juego (portada u otro juego) sale de la sala y la partida sigue
+//    sin él; si era el anfitrión, el puesto pasa al siguiente jugador.
 //  · Grupo activo con 2 o más miembros online:
 //      - el administrador del grupo anuncia la sala online en la que está; si la cierra o sale del juego, se cierra;
 //      - los demás entran solos en su sala de espera (si están jugando a otra cosa, les sale un aviso con «Entrar»);
@@ -12,9 +12,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useGrupoActivo, grupoActivoAhora, grupoEnJuego, anunciarPartida, cerrarPartidaGrupo, entrarEnPartida, pilotoActivo, codigoEnPantalla, CREAR_PARTIDA } from '../lib/grupoActivo.js';
-import { salaReciente, cerrarSalaParaTodos, EVENTO_SALA_VIVA } from '../lib/salaViva.js';
+import { salaReciente, salirDeSala } from '../lib/salaViva.js';
 import { cuentaActual } from '../lib/cuenta.js';
-import { nombreCompleto, partirNombre } from '../lib/identidad.js';
+import { partirNombre } from '../lib/identidad.js';
 import { metaDe } from '../games/meta.js';
 import './GrupoGlobal.css';
 
@@ -30,38 +30,15 @@ export default function GrupoGlobal() {
   const ruta = useRef(pathname); ruta.current = pathname;
   const mem = useRef({ estuve: new Set(), descartado: new Set(), intento: {}, previa: null, ultimoAnuncio: 0, vistaSala: 0, salaAnterior: null });
 
-  // ── Cualquier sala: el creador sale del juego con la partida terminada → se cierra para todos
+  // ── Cualquier sala: quien deja el juego sale de su sala (la partida sigue sin él y, si era el anfitrión, pasa el
+  //    puesto al siguiente). Con grupo, si quien se va es el administrador del grupo, además se cierra para todos (abajo).
   const rutaAnterior = useRef(pathname);
   useEffect(() => {
     const antes = juegoDeRuta(rutaAnterior.current); const ahora = juegoDeRuta(pathname);
     rutaAnterior.current = pathname;
-    if (!antes || antes === ahora) return;
-    const sala = salaReciente(15000);
-    if (sala && sala.juego === antes && sala.estado === 'fin' && sala.creador && sala.creador === nombreCompleto()) cerrarSalaParaTodos(sala);
+    if (antes && antes !== ahora) salirDeSala(antes);
   }, [pathname]);
-  // (también si cierra o recarga la pestaña con la partida terminada)
-  useEffect(() => {
-    const fuera = () => {
-      const sala = salaReciente(15000);
-      if (sala && sala.juego === juegoDeRuta(ruta.current) && sala.estado === 'fin' && sala.creador && sala.creador === nombreCompleto()) cerrarSalaParaTodos(sala);
-    };
-    window.addEventListener('pagehide', fuera);
-    return () => window.removeEventListener('pagehide', fuera);
-  }, []);
-  // ── …y los demás, al enterarse, vuelven a la portada
-  useEffect(() => {
-    const revisar = () => {
-      const sala = salaReciente(15000);
-      if (!sala?.cerrada || juegoDeRuta(ruta.current) !== sala.juego || sala.creador === nombreCompleto()) return;
-      sala.cerrada = false; sala.visto = 0; // una sola vez
-      navigate('/');
-      setAviso({ tipo: 'info', texto: `${plano(sala.creador)} ha cerrado la sala.` });
-    };
-    window.addEventListener(EVENTO_SALA_VIVA, revisar);
-    const t = setInterval(revisar, 1500);
-    return () => { window.removeEventListener(EVENTO_SALA_VIVA, revisar); clearInterval(t); };
-  }, [navigate]);
-
+  // (al recargar la página no se sale: muchos juegos te devuelven a tu sala)
   // ── Grupo activo: el administrador anuncia su sala y los demás le siguen
   useEffect(() => {
     const paso = () => {

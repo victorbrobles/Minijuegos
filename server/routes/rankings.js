@@ -5,7 +5,7 @@ import seed from '../data/seeds/rankings/rankings.seed.js';
 import { barajar } from '../lib/barajar.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
 import { totalRondas } from '../../client/src/games/rondas.js';
-import { rutaExpulsar } from '../lib/expulsar.js';
+import { rutaExpulsar, rutaSalir } from '../lib/expulsar.js';
 const LIM = limitesOnline('rankings');
 
 const router = Router();
@@ -613,6 +613,15 @@ router.post('/online/sala/:code/finalizar', (req, res) => {
   res.json({ success: true });
 });
 
+// Alguien se va: la partida sigue sin él (si tenía el turno, pasa al siguiente)
+rutaSalir(router, '/online/sala/:code/salir', {
+  sala: (c) => salasOnline.get(c), borrar: (c) => salasOnline.delete(c),
+  antes(sala, jugador) {
+    const r = sala.ronda;
+    if (r && r.faseRonda === 'jugando' && r.jugadorTurnoId === jugador.id) pasarReboteOnline(sala, 'rebote');
+    if (sala.proximoInicialId === jugador.id) { const ids = sala.jugadores.map((j) => j.id); sala.proximoInicialId = ids[(ids.indexOf(jugador.id) + 1) % ids.length]; }
+  }
+});
 rutaExpulsar(router, '/online/sala/:code/expulsar', { sala: (c) => salasOnline.get(c), esAnfitrion: (s, j) => s.adminToken === j.token });
 
 export default router;

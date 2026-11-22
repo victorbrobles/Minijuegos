@@ -9,7 +9,7 @@ import culturapop from '../data/seeds/ciegas/culturapop.js';
 import geografia from '../data/seeds/ciegas/geografia.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
 import { totalRondas } from '../../client/src/games/rondas.js';
-import { rutaExpulsar } from '../lib/expulsar.js';
+import { rutaExpulsar, rutaSalir } from '../lib/expulsar.js';
 const LIM = limitesOnline('ciegas');
 
 const router = express.Router();
@@ -262,7 +262,12 @@ router.post('/online/sala/:code/votar', (req, res) => {
   const { prediccion } = req.body;
   sala.ronda.votos[jugador.id] = parseInt(prediccion, 10);
 
-  // Comprobar si ya votaron todos los demás jugadores
+  cerrarVotacion(sala);
+  res.json({ success: true });
+});
+
+// Si ya votaron todos los demás jugadores, se reparten los puntos
+function cerrarVotacion(sala) {
   const votantesNecesarios = sala.jugadores.length - 1;
   const votosEmitidos = Object.keys(sala.ronda.votos).length;
 
@@ -280,10 +285,18 @@ router.post('/online/sala/:code/votar', (req, res) => {
     sala.ronda.totalPuntosGanados = totalPuntos;
     sala.estado = 'resultados';
   }
+}
 
-  res.json({ success: true });
+// Alguien se va: la partida sigue sin él (si era quien armaba el top, esa ronda se da por terminada sin puntos)
+rutaSalir(router, '/online/sala/:code/salir', {
+  sala: (c) => salasCiegas.get(c), borrar: (c) => salasCiegas.delete(c),
+  despues(sala, jugador) {
+    if (!sala.ronda || !['armando_ranking', 'votando'].includes(sala.estado)) return;
+    delete sala.ronda.votos[jugador.id];
+    if (sala.jugadorActivoId === jugador.id) { sala.ronda.totalPuntosGanados = 0; sala.estado = 'resultados'; return; }
+    if (sala.estado === 'votando') cerrarVotacion(sala);
+  }
 });
-
 rutaExpulsar(router, '/online/sala/:code/expulsar', { sala: (c) => salasCiegas.get(c), esAnfitrion: (s, j) => s.adminToken === j.token });
 
 export default router;

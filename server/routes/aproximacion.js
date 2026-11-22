@@ -5,7 +5,7 @@ import { PREGUNTAS } from '../data/seeds/aproximacion/aproximacion.seed.js';
 import { barajar } from '../lib/barajar.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
 import { totalRondas } from '../../client/src/games/rondas.js';
-import { rutaExpulsar } from '../lib/expulsar.js';
+import { rutaExpulsar, rutaSalir } from '../lib/expulsar.js';
 const LIM = limitesOnline('aproximacion');
 
 const router = Router();
@@ -285,25 +285,29 @@ router.post('/online/sala/:code/responder', (req, res) => {
   if (sala.ronda.subTurnoIndex + 1 < sala.ronda.ordenTurnos.length) {
     sala.ronda.subTurnoIndex += 1;
   } else {
-    const idPrimero = sala.jugadores[sala.ronda.ordenTurnos[0]].id;
-    const otrasRespuestas = Object.entries(sala.ronda.decisiones).filter(
-      ([id, d]) => Number(id) !== idPrimero && d.tipo === 'propia'
-    );
-
-    if (otrasRespuestas.length === 0) {
-      if (sala.ronda.pregunta.manual) {
-        sala.ronda.faseRonda = 'introducir_real';
-      } else {
-        resolverPuntuacionesRonda(sala, sala.ronda.pregunta.respuesta);
-        sala.ronda.faseRonda = 'resultados';
-      }
-    } else {
-      sala.ronda.faseRonda = 'segunda_vuelta';
-    }
+    cerrarTurnos(sala);
   }
 
   res.json({ success: true });
 });
+
+// Todos han respondido: segunda oportunidad del primero (si alguien dijo otro número) o resultado
+function cerrarTurnos(sala) {
+  const idPrimero = sala.jugadores[sala.ronda.ordenTurnos[0]]?.id;
+  const otrasRespuestas = Object.entries(sala.ronda.decisiones).filter(
+    ([id, d]) => Number(id) !== idPrimero && d.tipo === 'propia'
+  );
+  if (idPrimero !== undefined && otrasRespuestas.length > 0) { sala.ronda.faseRonda = 'segunda_vuelta'; return; }
+  pasarAlResultado(sala);
+}
+function pasarAlResultado(sala) {
+  if (sala.ronda.pregunta.manual) {
+    sala.ronda.faseRonda = 'introducir_real';
+  } else {
+    resolverPuntuacionesRonda(sala, sala.ronda.pregunta.respuesta);
+    sala.ronda.faseRonda = 'resultados';
+  }
+}
 
 // POST /api/aproximacion/online/sala/:code/segunda-vuelta
 router.post('/online/sala/:code/segunda-vuelta', (req, res) => {
@@ -385,6 +389,23 @@ router.post('/online/sala/:code/finalizar', (req, res) => {
   res.json({ success: true });
 });
 
+// Alguien se va: la partida sigue sin él (los turnos son índices de sala.jugadores, se rehacen)
+rutaSalir(router, '/online/sala/:code/salir', {
+  sala: (c) => salasOnline.get(c), borrar: (c) => salasOnline.delete(c),
+  despues(sala, jugador, idx) {
+    if (sala.primerIndexInicial != null) sala.primerIndexInicial %= sala.jugadores.length;
+    const r = sala.ronda; if (!r || r.faseRonda === 'resultados') return;
+    const eraPrimero = r.ordenTurnos[0] === idx;
+    const k = r.ordenTurnos.indexOf(idx);
+    r.ordenTurnos = r.ordenTurnos.filter((i) => i !== idx).map((i) => (i > idx ? i - 1 : i));
+    delete r.decisiones[jugador.id];
+    Object.values(r.decisiones).forEach((d) => { if (d.confiaEnId === jugador.id) { d.confiaEnId = null; d.tipo = 'propia'; } });
+    if (r.faseRonda === 'turno') {
+      if (k !== -1 && k < r.subTurnoIndex) r.subTurnoIndex -= 1;
+      if (r.subTurnoIndex >= r.ordenTurnos.length) cerrarTurnos(sala);
+    } else if (r.faseRonda === 'segunda_vuelta' && eraPrimero) pasarAlResultado(sala);
+  }
+});
 rutaExpulsar(router, '/online/sala/:code/expulsar', { sala: (c) => salasOnline.get(c), esAnfitrion: (s, j) => s.adminToken === j.token });
 
 export default router;

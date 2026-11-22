@@ -7,6 +7,9 @@ import { nombreIdentidad, nombreCompleto } from './identidad.js';
 import { conCabeceras } from './ocultos.js';
 
 const RUTA = /^\/api\/([a-z0-9-]+)\/(?:[a-z-]+\/)?sala\/([A-Za-z0-9]{3,8})(?:\?|$)/;
+// Cualquier petición a una sala (GET o POST): de ahí sale tu credencial en ella para poder salir al dejar el juego
+const BASE_SALA = /^(\/api\/[a-z0-9-]+\/(?:[a-z-]+\/)?sala\/([A-Za-z0-9]{3,8}))(?:[/?]|$)/;
+let credencial = null; // { juego, base, code, token }
 const EVENTO = 'minijuegos-sala-viva';
 let actual = null; // { juego, code, jugadores, estado, visto }
 let ultimoEnvio = 0;
@@ -51,6 +54,25 @@ function anotar(code, datos, api) {
   }
 }
 
+function anotarCredencial(entrada, opciones) {
+  const juego = juegoDeLaPagina(); if (!juego) return;
+  const url = typeof entrada === 'string' ? entrada : entrada?.url || '';
+  const u = new URL(url, window.location.origin);
+  const m = BASE_SALA.exec(u.pathname); if (!m || /\/salir$/.test(u.pathname)) return;
+  let token = u.searchParams.get('token');
+  if (!token && typeof opciones?.body === 'string') { try { token = JSON.parse(opciones.body)?.token; } catch { /* nada */ } }
+  if (typeof token !== 'string' || !token) return;
+  credencial = { juego, base: m[1], code: m[2].toUpperCase(), token };
+}
+/** Al dejar un juego (portada, otro juego o cerrar la pestaña): sales de su sala online. Si eras el anfitrión, el
+ *  puesto pasa a otro jugador y la partida sigue sin ti (cada juego lo resuelve en su ruta «…/salir»). */
+export function salirDeSala(juego) {
+  const c = credencial;
+  if (!c || (juego && c.juego !== juego)) return;
+  credencial = null;
+  (original || window.fetch)(`${c.base}/salir`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: c.token }), keepalive: true }).catch(() => {});
+}
+
 let original = typeof window !== 'undefined' ? window.fetch.bind(window) : null;
 let instalado = false;
 export function instalarSalaViva() {
@@ -59,6 +81,7 @@ export function instalarSalaViva() {
   original = window.fetch.bind(window);
   window.fetch = async (entrada, opciones) => {
     opciones = conCabeceras(entrada, opciones); // quién eres, para los juegos ocultos
+    try { anotarCredencial(entrada, opciones); } catch { /* nada */ }
     const res = await original(entrada, opciones);
     try {
       const url = typeof entrada === 'string' ? entrada : entrada?.url || '';

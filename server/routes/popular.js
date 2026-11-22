@@ -6,7 +6,7 @@ import parte2 from '../data/seeds/popular/parte2.js';
 import parte3 from '../data/seeds/popular/parte3.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
 import { totalRondas } from '../../client/src/games/rondas.js';
-import { rutaExpulsar } from '../lib/expulsar.js';
+import { rutaExpulsar, rutaSalir, quitarDeOrden } from '../lib/expulsar.js';
 const LIM = limitesOnline('popular');
 
 const router = express.Router();
@@ -653,6 +653,11 @@ router.post('/online/sala/:code/finalizar', (req, res) => {
   res.json({ success: true });
 });
 
+// Alguien se va: la partida sigue sin él
+rutaSalir(router, '/online/sala/:code/salir', {
+  sala: (c) => salasOnline.get(c), borrar: (c) => salasOnline.delete(c),
+  despues(sala, jugador) { if (sala.ronda?.ordenTurnos) quitarDeOrden(sala.ronda, jugador.id); }
+});
 rutaExpulsar(router, '/online/sala/:code/expulsar', { sala: (c) => salasOnline.get(c), esAnfitrion: (s, j) => s.adminToken === j.token });
 
 export default router;
