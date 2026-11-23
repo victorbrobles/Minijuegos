@@ -99,7 +99,7 @@ function Saltar({ semilla, alTerminar }) {
     //  · pájaros a la altura de la cabeza al saltar: NO hay que saltar (y a veces vienen justo detrás de una valla).
     // Las combinaciones se van endureciendo: dobles, triples y valla + pájaro. Aguantar los 60 s es muy difícil.
     const VY = 9.2; const G = 34; const AIRE = (2 * VY) / G; // ~0,54 s en el aire, salto de ~1,25 m
-    const obs = []; let sigX = 20;
+    const obs = []; let sigX = 14;
     const ponerValla = (x, dif) => { const alto = r.entre(0.6, 0.78 + dif * 0.3); const o = valla(alto, r.de([0xdb2777, 0x0ea5e9, 0x16a34a, 0xf59e0b])); o.position.set(x, 0, 0); scene.add(o); obs.push({ o, x, abajo: 0, arriba: alto, ancho: 0.4 }); };
     const ponerPajaro = (x) => {
       const g = new THREE.Group(); const cuerpo = crea.esfera(0.24, 0x1f2937); cuerpo.scale.set(1.5, 0.9, 0.9); g.add(cuerpo);
@@ -109,7 +109,7 @@ function Saltar({ semilla, alTerminar }) {
     };
     const generar = (hasta, v, t) => {
       while (sigX < hasta) {
-        const dif = Math.min(1, t / 40); // 0 al principio → 1 a los 40 s
+        const dif = Math.min(1, 0.35 + t / 35); // ya exigente al empezar → al máximo a los 23 s
         const tipo = r();
         let x = sigX;
         if (tipo < 0.12 + dif * 0.18) {
@@ -124,11 +124,12 @@ function Saltar({ semilla, alTerminar }) {
           // …o un pájaro justo detrás: si saltas tarde, te lo comes
           if (r() < dif * 0.35) { x += v * r.entre(AIRE * 0.95, AIRE * 1.2); ponerPajaro(x); }
         }
-        sigX = x + v * r.entre(AIRE + 0.25 + (1 - dif) * 0.6, AIRE + 0.55 + (1 - dif) * 0.9);
+        // Sin tramos largos: la siguiente siempre llega enseguida (entre 0,8 y 1,2 s de carrera como mucho)
+        sigX = x + v * r.entre(AIRE + 0.18 + (1 - dif) * 0.25, AIRE + 0.4 + (1 - dif) * 0.3);
       }
     };
     const jugador = corredor(); jugador.rotation.y = Math.PI / 2; scene.add(jugador);
-    const st = { x: 0, y: 0, vy: 0, vel: 9, t: 0, fin: false, fase: 0 };
+    const st = { x: 0, y: 0, vy: 0, vel: 11, t: 0, fin: false, fase: 0 };
     const saltar = () => { if (st.fin || st.y > 0.02) return; st.vy = VY; sonar('toque', { minimo: 0 }); };
     const tecla = (e) => { if (e.key === ' ' || e.key === 'ArrowUp') { e.preventDefault(); saltar(); } };
     window.addEventListener('keydown', tecla);
@@ -138,7 +139,7 @@ function Saltar({ semilla, alTerminar }) {
       frame(dt, tt) {
         obs.forEach((o) => { if (o.alas) o.alas.forEach((a, k) => { a.rotation.x = Math.sin(tt * 14 + k * Math.PI) * 0.6; }); });
         if (!st.fin) {
-          st.t += dt; st.vel = Math.min(25, 9 + st.t * 0.4); st.x += st.vel * dt;
+          st.t += dt; st.vel = Math.min(27, 11 + st.t * 0.45); st.x += st.vel * dt;
           generar(st.x + 70, st.vel, st.t);
           for (let i = obs.length - 1; i >= 0; i--) if (obs[i].x < st.x - 15) { scene.remove(obs[i].o); obs.splice(i, 1); }
           st.vy -= G * dt; st.y += st.vy * dt; if (st.y <= 0) { st.y = 0; st.vy = 0; }
@@ -220,10 +221,10 @@ function Meteoritos({ semilla, alTerminar }) {
   return <div className="hb-caja"><div ref={ref} className="hb-lienzo" /><Hud izq={`☄️ ${t.toFixed(1).replace('.', ',')} s`} der="Arrastra para esquivar" /><Mensaje texto={msg} tipo="mal" /></div>;
 }
 
-/* ───────── Canasta (lanzamiento libre: todo depende de tu puntería) ───────── */
-// Desliza hacia arriba para tirar: la inclinación del gesto da la dirección y su largo, la fuerza. No hay línea de
-// trayectoria: hay que calcular. Cada canasta te lleva a otro sitio de la cancha (más cerca o más lejos, de frente o
-// desde la esquina). Detrás de la línea de 6,75 m vale 3. Sin tocar aro, +1. Tres seguidas: ¡en racha!, puntos dobles.
+/* ───────── Canasta (solo fuerza) ───────── */
+// Desliza hacia arriba para tirar: el tiro va siempre recto a la canasta (que no se mueve) y lo único que cuenta es la
+// FUERZA, según el largo del gesto. Si fallas, repites desde el mismo sitio; si entra, la bola aparece en otro sitio
+// (más cerca o más lejos), así que la fuerza necesaria cambia. Triple tras 6,75 m, +1 si es limpia, x2 en racha.
 function Canasta({ semilla, alTerminar }) {
   const ref = useRef(null); const [hud, setHud] = useState({ pts: 0, t: 45, racha: 0, triple: false, dist: 0 }); const [msg, setMsg] = useState(null);
   const [carga, setCarga] = useState(null); // { pot } mientras se arrastra (barra de fuerza)
@@ -278,9 +279,8 @@ function Canasta({ semilla, alTerminar }) {
     // Gesto → velocidad. Fuerza: largo del deslizamiento respecto a la pantalla. Dirección: su inclinación.
     const velDe = (dx, dy, rr) => {
       const pot = Math.min(1, Math.max(0, dy / (rr.height * 0.5)));
-      const lado = Math.atan2(dx, dy) * 0.35; // radianes hacia un lado
       const v0 = 5.5 + pot * 5; const elev = THREE.MathUtils.degToRad(62); // tiro con buena parábola (entra desde arriba)
-      const base = H.clone().sub(puesto.pos).setY(0).normalize(); const dir = base.applyAxisAngle(new THREE.Vector3(0, 1, 0), -lado);
+      const dir = H.clone().sub(puesto.pos).setY(0).normalize(); void dx; // siempre recto: solo cuenta la fuerza
       return { v: new THREE.Vector3(dir.x * Math.cos(elev) * v0, Math.sin(elev) * v0, dir.z * Math.cos(elev) * v0), pot };
     };
     const lanzar = (v) => {
@@ -315,8 +315,6 @@ function Canasta({ semilla, alTerminar }) {
       },
       frame(dt) {
         if (!st.fin) st.t += dt;
-        // La canasta se empieza a mover a mitad de partida
-        canasta.position.x = st.t > 22 ? Math.sin((st.t - 22) * 0.9) * 1.2 : 0; H.x = canasta.position.x;
         if (!st.mano && !st.fin) { st.enfriar -= dt; if (st.enfriar <= 0) enMano(); }
         for (let i = st.vuelo.length - 1; i >= 0; i--) {
           const b = st.vuelo[i]; b.tv += dt;
@@ -354,7 +352,7 @@ function Canasta({ semilla, alTerminar }) {
       <Hud izq={`🏀 ${hud.pts} pts`} centro={hud.racha >= 3 ? `🔥 ×2` : hud.triple ? '🎯 Triple' : `${hud.dist.toFixed(1).replace('.', ',')} m`} der={`⏱️ ${hud.t}s`} />
       <Mensaje texto={msg} />
       {carga && <div className="hb-fuerza"><i style={{ height: `${Math.round(carga.pot * 100)}%` }} /></div>}
-      <p className="hb-pista">Desliza hacia arriba: inclinación = dirección, largo = fuerza</p>
+      <p className="hb-pista">Desliza hacia arriba: cuanto más largo, más fuerte</p>
     </div>
   );
 }
@@ -411,6 +409,6 @@ export default [
   { id: 'parejas', nombre: 'Parejas', emoji: '🃏', como: 'Da la vuelta a las fichas de dos en dos y encuentra las 8 parejas lo más rápido posible.', mejor: 'menos', unidad: 's', peor: 114, duracion: 90, C: Parejas, formato: (v) => `${v.toFixed(1).replace('.', ',')} s` },
   { id: 'saltar', nombre: 'Salta obstáculos', emoji: '🏃', como: 'Corres solo y cada vez más rápido: toca la pantalla (o espacio) para saltar las vallas. El salto es corto: calcula el momento. ¡No saltes cuando venga un pájaro! Salen vallas dobles y triples y combinaciones con pájaros. Aguantar los 60 segundos es muy difícil.', mejor: 'mas', unidad: 'm', duracion: 60, C: Saltar },
   { id: 'meteoritos', nombre: 'Lluvia de meteoritos', emoji: '☄️', como: 'Arrastra el dedo a izquierda o derecha (en cualquier parte de la pantalla) para mover tu nave y esquivar los meteoritos. El círculo rojo marca dónde caen. Aguanta 45 segundos.', mejor: 'mas', unidad: 's', duracion: 45, C: Meteoritos, formato: (v) => `${v.toFixed(1).replace('.', ',')} s` },
-  { id: 'canasta', nombre: 'Canasta', emoji: '🏀', como: 'Desliza el dedo hacia arriba para tirar: la inclinación del gesto marca la dirección y su largo, la fuerza (sin línea de ayuda: hay que calcular). Cada canasta te lleva a otro sitio de la cancha. Canasta 2, triple 3, sin tocar aro +1 y tres seguidas: puntos dobles. A mitad de partida la canasta se mueve. 45 segundos.', mejor: 'mas', unidad: 'pts', duracion: 45, C: Canasta },
+  { id: 'canasta', nombre: 'Canasta', emoji: '🏀', como: 'Desliza el dedo hacia arriba para tirar: el tiro va recto a la canasta y solo cuenta la FUERZA (cuanto más largo el gesto, más fuerte). Si fallas, repites desde el mismo sitio; si encestas, la bola sale en otro sitio y la fuerza necesaria cambia. Canasta 2, triple 3, sin tocar aro +1 y tres seguidas: puntos dobles. 45 segundos.', mejor: 'mas', unidad: 'pts', duracion: 45, C: Canasta },
   { id: 'ritmo', nombre: 'Al ritmo', emoji: '🎵', como: 'Pulsa el botón del color justo cuando la bola llega al aro. En el momento exacto: +3; casi: +1; si pulsas sin nota, −1. Con racha de 10, punto extra.', mejor: 'mas', unidad: 'pts', duracion: 30, C: Ritmo }
 ];

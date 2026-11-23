@@ -348,10 +348,10 @@ export default {
     gana: 'Quien más puntos sume al acabar las rondas.'
   },
   'habilidad': {
-    objetivo: '**30 minijuegos** de habilidad en 3D de un par de minutos: gana el más hábil.',
+    objetivo: '**40 minijuegos** de habilidad en 3D de un par de minutos: gana el más hábil.',
     pasos: [
       'El anfitrión elige **cuántos** minijuegos se juegan y **cuáles**, en orden (los que no elija salen al azar).',
-      'Hay 30 para elegir: reflejos, puntería, memoria, precisión, ritmo, equilibrio…',
+      'Hay 40 para elegir: reflejos, puntería, memoria, precisión, ritmo, equilibrio…',
       'Cada minijuego dura como mucho un par de minutos y antes de empezar se explica cómo se juega.',
       'Al terminar cada minijuego se ve su **clasificación**.'
     ],

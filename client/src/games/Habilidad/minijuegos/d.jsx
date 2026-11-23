@@ -225,10 +225,11 @@ function Petanca({ semilla, alTerminar }) {
     const boliche = crea.esfera(0.18, 0xfacc15, { roughness: 0.3, emissive: 0xf59e0b, emissiveIntensity: 0.6 }); boliche.position.set(r.entre(-1.6, 1.6), 0.18, -r.entre(7, 11)); scene.add(boliche);
     const anilloB = new THREE.Mesh(new THREE.RingGeometry(0.25, 0.32, 32), new THREE.MeshBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.7, side: THREE.DoubleSide })); anilloB.rotation.x = -Math.PI / 2; anilloB.position.set(boliche.position.x, 0.01, boliche.position.z); scene.add(anilloB);
     const flecha = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.6, 12), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.85 })); flecha.rotation.x = -Math.PI / 2; flecha.visible = false; scene.add(flecha);
+    const SALIDA_Z = -1.4; // la bola sale aquí, bien dentro de la pantalla (por encima de los botones)
     const st = { bolas: [], actual: null, ini: null, quedan: 4, mejor: Infinity, fin: false, salida: 0 };
     // Encuadre: la pista entera (de la línea de tiro al fondo) cabe siempre en pantalla, también en vertical
-    ctx.encuadrar({ centro: [0, 0, -5.2], ancho: 7.8, alto: 15.5, desde: [0, 0.9, 0.62], margen: 1.04 });
-    const nueva = () => { const b = crea.esfera(0.32, 0x94a3b8, { metalness: 0.95, roughness: 0.18 }); b.position.set(st.salida, 0.32, 3); scene.add(b); st.actual = { m: b, v: new THREE.Vector3(), mueve: false }; };
+    ctx.encuadrar({ centro: [0, 0, -6.2], ancho: 7.8, alto: 14.5, desde: [0, 1, 0.55], margen: 1.1 });
+    const nueva = () => { const b = crea.esfera(0.32, 0x94a3b8, { metalness: 0.95, roughness: 0.18 }); b.position.set(st.salida, 0.32, SALIDA_Z); scene.add(b); st.actual = { m: b, v: new THREE.Vector3(), mueve: false }; };
     // Desde dónde se lanza: ◀ ▶ (o las flechas del teclado) mueven la bola por la línea de tiro antes de lanzar
     ctl.current.lado = (d) => { const a = st.actual; if (!a || a.mueve || st.fin) return; st.salida = Math.max(-2.6, Math.min(2.6, st.salida + d * 0.4)); a.m.position.x = st.salida; sonar('tic', { minimo: 0, vibrar: false }); };
     const tecla = (e) => { if (e.key === 'ArrowLeft') ctl.current.lado(-1); if (e.key === 'ArrowRight') ctl.current.lado(1); };
@@ -241,7 +242,7 @@ function Petanca({ semilla, alTerminar }) {
         if (!st.ini || !st.actual || st.actual.mueve) return; const dx = e.clientX - st.ini[0]; const dy = st.ini[1] - e.clientY;
         if (dy < 15) { flecha.visible = false; return; }
         const p = Math.min(1.4, Math.hypot(dx, dy) / 250); const ang = Math.atan2(dx * 0.6, dy);
-        flecha.visible = true; flecha.position.set(st.salida + Math.sin(ang) * (0.8 + p), 0.05, 3 - Math.cos(ang) * (0.8 + p)); flecha.rotation.set(-Math.PI / 2, 0, -ang); flecha.scale.set(1, 1 + p, 1);
+        flecha.visible = true; flecha.position.set(st.salida + Math.sin(ang) * (0.8 + p), 0.05, SALIDA_Z - Math.cos(ang) * (0.8 + p)); flecha.rotation.set(-Math.PI / 2, 0, -ang); flecha.scale.set(1, 1 + p, 1);
       },
       soltar(e) {
         flecha.visible = false;

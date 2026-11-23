@@ -1069,7 +1069,7 @@ export const META = {
     icono: 'gamepad',
     colores: ['#7c3aed', '#db2777'],
     etiquetas: 'habilidad minijuegos reflejos punteria memoria precision ritmo 3d test retos cortos online',
-    descripcion: "30 minijuegos de habilidad en 3D de un par de minutos: cruza la carretera, apila bloques, memoriza luces, frena al límite, clava cuchillos… El anfitrión elige cuáles y en qué orden; gana el más hábil.",
+    descripcion: "40 minijuegos de habilidad en 3D de un par de minutos: cruza la carretera, apila bloques, memoriza luces, frena al límite, clava cuchillos, penaltis, bolos, corta fruta… El anfitrión elige cuáles y en qué orden; gana el más hábil.",
     categorias: ['habilidad']
   },
   'vialibre': {
