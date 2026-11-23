@@ -1,6 +1,6 @@
 // client/src/games/Estelas/Estelas.jsx
-// «Estelas»: líneas de luz en tiempo real. Toca a la izquierda o a la derecha de la pantalla para girar (o desliza
-// hacia donde quieras ir; en ordenador, flechas). Online (el servidor manda) o práctica contra bots.
+// «Estelas»: motos de luz en tiempo real con movimiento libre: la moto gira hacia donde apuntas con el dedo (o el
+// cursor en ordenador; también ← →) y deja una estela que se va apagando. Online (el servidor manda) o práctica.
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import JuegoPulsador from '../Pulsador/JuegoPulsador.jsx';
 import { claveSesion } from '../Pulsador/PulsadorOnline.jsx';
@@ -18,76 +18,85 @@ export const NEON = ['#22d3ee', '#f472b6', '#facc15', '#4ade80', '#a78bfa', '#fb
 const API = '/api/estelas';
 
 /* ───────── Escena 3D: arena de neón ───────── */
-// Cada rastro es un muro de luz (una caja por casilla, en InstancedMesh por jugador); la cabeza es una moto de luz
-// con su propio brillo. Suelo de rejilla luminosa, bordes de neón y la ciudad de fondo.
-function montarArena(ctx, util) {
-  const { scene } = ctx; const { a3 } = util; const MAX = E.C * E.F;
+// Cada estela es un muro de luz hecho de tramos (InstancedMesh por jugador) que se apaga según su edad (mezcla
+// aditiva: cuanto más vieja, más oscura, hasta desaparecer). La moto brilla y lleva su propia luz.
+const MAX_TRAMOS = E.VIDA + 8;
+function montarArena(ctx) {
+  const { scene } = ctx;
   const suelo = new THREE.Mesh(new THREE.PlaneGeometry(E.C, E.F), new THREE.MeshStandardMaterial({ color: 0x020617, roughness: 0.25, metalness: 0.6 })); suelo.rotation.x = -Math.PI / 2; suelo.receiveShadow = true; scene.add(suelo);
   const pts = []; for (let x = 0; x <= E.C; x += 2) pts.push(x - E.C / 2, 0.01, -E.F / 2, x - E.C / 2, 0.01, E.F / 2); for (let y = 0; y <= E.F; y += 2) pts.push(-E.C / 2, 0.01, y - E.F / 2, E.C / 2, 0.01, y - E.F / 2);
   const rej = new THREE.BufferGeometry(); rej.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3)); scene.add(new THREE.LineSegments(rej, new THREE.LineBasicMaterial({ color: 0x1e3a8a, transparent: true, opacity: 0.55 })));
   const borde = crea.marco(E.C, E.F, 0x38bdf8, { grosor: 0.35, alto: 1.4, intensidad: 2.2 }); borde.position.y = 0.7; scene.add(borde);
   const afuera = crea.suelo(E.C + 80, E.F + 80, 0x0b1026, { celda: 4, contraste: 0.04 }); afuera.position.y = -0.05; scene.add(afuera);
-  // Ciudad de fondo: torres con ventanas que brillan
   for (let k = 0; k < 40; k++) { const h = 6 + Math.random() * 26; const ang = (k / 40) * Math.PI * 2; const d = 52 + Math.random() * 14; const t = crea.caja(4 + Math.random() * 4, h, 4 + Math.random() * 4, 0x0f172a, { emissive: [0x1d4ed8, 0x7c3aed, 0x0e7490][k % 3], emissiveIntensity: 0.35, roughness: 0.4 }); t.position.set(Math.cos(ang) * d, h / 2, Math.sin(ang) * d); scene.add(t); }
-  const capas = new Map(); const geoMuro = new THREE.BoxGeometry(0.92, 1.1, 0.92); const m4 = new THREE.Matrix4();
+  const capas = new Map(); const geoTramo = new THREE.BoxGeometry(1, 1.1, 0.5); const m4 = new THREE.Matrix4(); const q = new THREE.Quaternion(); const eje = new THREE.Vector3(0, 1, 0); const col = new THREE.Color();
   const capaDe = (j) => {
     let c = capas.get(j.id);
     if (!c) {
-      const col = new THREE.Color(NEON[j.color % NEON.length]);
-      const muro = new THREE.InstancedMesh(geoMuro, new THREE.MeshStandardMaterial({ color: col, emissive: col, emissiveIntensity: 1.3, roughness: 0.3, transparent: true, opacity: 0.92 }), MAX); muro.count = 0; scene.add(muro);
-      const moto = new THREE.Group(); const cuerpo = new THREE.Mesh(new THREE.CapsuleGeometry(0.42, 0.9, 6, 12), new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: col, emissiveIntensity: 2 })); cuerpo.rotation.x = Math.PI / 2; cuerpo.position.y = 0.6; moto.add(cuerpo);
-      const luz = new THREE.PointLight(col, 18, 10); luz.position.y = 1.4; moto.add(luz); scene.add(moto);
+      const neon = new THREE.Color(NEON[j.color % NEON.length]);
+      const muro = new THREE.InstancedMesh(geoTramo, new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false }), MAX_TRAMOS); muro.count = 0; muro.frustumCulled = false; scene.add(muro);
+      const moto = new THREE.Group(); const cuerpo = new THREE.Mesh(new THREE.CapsuleGeometry(0.42, 1, 6, 12), new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: neon, emissiveIntensity: 2 })); cuerpo.rotation.z = Math.PI / 2; cuerpo.position.y = 0.6; moto.add(cuerpo);
+      const luz = new THREE.PointLight(neon, 18, 10); luz.position.y = 1.4; moto.add(luz); scene.add(moto);
       const halo = new THREE.Mesh(new THREE.RingGeometry(0.9, 1.15, 24), new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide })); halo.rotation.x = -Math.PI / 2; halo.position.y = 0.05; moto.add(halo);
-      c = { muro, moto, halo, n: 0, ronda: null, muerto: false }; capas.set(j.id, c);
+      c = { muro, moto, halo, neon, muerto: false, pos: null }; capas.set(j.id, c);
     }
     return c;
   };
+  const mira = new THREE.Mesh(new THREE.RingGeometry(0.5, 0.75, 24), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.7, side: THREE.DoubleSide })); mira.rotation.x = -Math.PI / 2; mira.position.y = 0.05; mira.visible = false; scene.add(mira);
   ctx.encuadrar({ centro: [0, 0, 1.5], ancho: E.C + 2, alto: E.F * 0.82, desde: [0, 1, 0.55], margen: 1.02 });
-  return { ctx, a3, capas, capaDe, m4 };
+  return { ctx, capas, capaDe, m4, q, eje, col, mira };
 }
-function pintarArena(o, jugadores, miId, t) {
-  const vistos = new Set();
+const a3 = (x, y, h = 0) => new THREE.Vector3(x - E.C / 2, h, y - E.F / 2);
+function pintarArena(o, estado, miId, mira, t, dt) {
+  const { jugadores, paso } = estado; const vistos = new Set();
   jugadores.forEach((j) => {
-    const c = o.capaDe(j); vistos.add(j.id);
-    if (j.rastro.length < c.n) c.n = 0; // ronda nueva
-    for (let i = c.n; i < j.rastro.length; i++) { const [x, y] = j.rastro[i]; o.m4.makeTranslation(x + 0.5 - E.C / 2, 0.55, y + 0.5 - E.F / 2); c.muro.setMatrixAt(i, o.m4); }
-    c.n = j.rastro.length; c.muro.count = c.n; c.muro.instanceMatrix.needsUpdate = true;
-    c.muro.material.opacity = j.vivo ? 0.92 : 0.3; c.muro.material.emissiveIntensity = j.vivo ? 1.3 : 0.3;
-    const cab = j.rastro[j.rastro.length - 1]; const ant = j.rastro[j.rastro.length - 2];
-    c.moto.visible = Boolean(cab) && j.vivo;
-    if (cab) { c.moto.position.set(cab[0] + 0.5 - E.C / 2, 0, cab[1] + 0.5 - E.F / 2); if (ant) c.moto.rotation.y = Math.atan2(cab[0] - ant[0], cab[1] - ant[1]); }
+    const c = o.capaDe(j); vistos.add(j.id); const r = j.rastro || [];
+    // Tramos entre puntos seguidos; el brillo baja con la edad hasta apagarse
+    let n = 0;
+    for (let k = 1; k < r.length && n < MAX_TRAMOS; k++) {
+      const a = r[k - 1]; const b = r[k]; const dx = b[0] - a[0]; const dy = b[1] - a[1]; const largo = Math.hypot(dx, dy); if (largo < 0.01 || largo > 3) continue;
+      o.q.setFromAxisAngle(o.eje, -Math.atan2(dy, dx));
+      o.m4.compose(a3((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, 0.55), o.q, new THREE.Vector3(largo + 0.05, 1, 1));
+      c.muro.setMatrixAt(n, o.m4);
+      const vida = Math.max(0, 1 - (paso - b[2]) / E.VIDA); o.col.copy(c.neon).multiplyScalar(j.vivo ? 0.15 + vida * 1.1 : 0.12 * vida); c.muro.setColorAt(n, o.col); n++;
+    }
+    c.muro.count = n; c.muro.instanceMatrix.needsUpdate = true; if (c.muro.instanceColor) c.muro.instanceColor.needsUpdate = true;
+    // Moto (suavizada entre sincronizaciones)
+    c.moto.visible = j.vivo;
+    if (j.vivo) {
+      const dest = a3(j.x, j.y); if (!c.pos || c.pos.distanceTo(dest) > 4) c.pos = dest.clone(); else c.pos.lerp(dest, Math.min(1, (dt || 0.016) * 14));
+      c.moto.position.copy(c.pos); c.moto.rotation.y = -j.ang;
+    }
     c.halo.visible = j.id === miId; c.halo.scale.setScalar(1 + Math.sin(t * 6) * 0.12);
-    if (!j.vivo && !c.muerto && cab) { c.muerto = true; o.ctx.chispas(new THREE.Vector3(cab[0] - E.C / 2, 1, cab[1] - E.F / 2), new THREE.Color(NEON[j.color % NEON.length]).getHex(), 40, { fuerza: 8, tam: 0.25 }); o.ctx.temblor(0.4); }
+    if (!j.vivo && !c.muerto && c.pos) { c.muerto = true; o.ctx.chispas(c.pos.clone().setY(1), c.neon.getHex(), 40, { fuerza: 8, tam: 0.25 }); o.ctx.temblor(0.4); }
     if (j.vivo) c.muerto = false;
   });
   o.capas.forEach((c, id) => { if (!vistos.has(id)) { c.muro.count = 0; c.moto.visible = false; } });
+  o.mira.visible = Boolean(mira); if (mira) o.mira.position.copy(a3(mira[0], mira[1], 0.05));
 }
 
-/** Arena con los rastros. fuente() → { jugadores: [{ id, color, vivo, rastro }] } */
-function Tablero({ fuente, miId, onGiro, miDir }) {
-  const toque = useRef(null);
+/** Arena con las motos. fuente() → { paso, jugadores: [{ id, color, vivo, x, y, ang, rastro }] }. onApuntar(x, y) */
+function Tablero({ fuente, miId, onApuntar }) {
+  const mira = useRef(null); const abajo = useRef(false);
   const puntero = (tipo, x, y, e) => {
-    if (tipo === 'down') { toque.current = { x: e.clientX, y: e.clientY, mx: x }; return; }
-    if (tipo !== 'up' || !toque.current) return;
-    const dx = e.clientX - toque.current.x; const dy = e.clientY - toque.current.y;
-    const t = toque.current; toque.current = null;
-    const actual = miDir();
-    if (Math.hypot(dx, dy) > 24) onGiro(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 1 : 3) : (dy > 0 ? 2 : 0));
-    else onGiro(t.mx < E.C / 2 ? (actual + 3) % 4 : (actual + 1) % 4);
+    // Con ratón vale con mover el cursor; con el dedo, mientras toca la pantalla
+    if (tipo === 'down') abajo.current = true;
+    if (tipo === 'up') { abajo.current = false; return; }
+    if (tipo === 'move' && e.pointerType !== 'mouse' && !abajo.current) return;
+    mira.current = [x, y]; onApuntar(x, y);
   };
-  return <Lienzo3D ancho={E.C} alto={E.F} proporcion="5 / 6" opciones={{ cielo: [0x020617, 0x1e1b4b], sombras: false, exposicion: 1.1 }} montar={montarArena} dibujar={(o, t) => pintarArena(o, fuente().jugadores, miId, t)} onPuntero={puntero} />;
+  return <Lienzo3D ancho={E.C} alto={E.F} proporcion="5 / 6" opciones={{ cielo: [0x020617, 0x1e1b4b], sombras: false, exposicion: 1.1 }} montar={montarArena} dibujar={(o, t, util, dt) => pintarArena(o, fuente(), miId, mira.current, t, dt)} onPuntero={puntero} />;
 }
 
-function useTecladoGiros(onGiro, miDir) {
+/** En ordenador, también con las flechas ← → (giran mientras se mantienen). */
+function useTecladoGiro(onAng, miAng) {
   useEffect(() => {
-    const f = (e) => {
-      const m = { ArrowUp: 0, ArrowRight: 1, ArrowDown: 2, ArrowLeft: 3 }[e.key];
-      if (m !== undefined) { e.preventDefault(); onGiro(m); }
-      if (e.key === 'a' || e.key === 'A') onGiro((miDir() + 3) % 4);
-      if (e.key === 'd' || e.key === 'D') onGiro((miDir() + 1) % 4);
-    };
-    window.addEventListener('keydown', f);
-    return () => window.removeEventListener('keydown', f);
+    const giro = { d: 0 }; let t = null;
+    const aplicar = () => { if (giro.d) onAng(miAng() + giro.d * 1.2); };
+    const baja = (e) => { const d = { ArrowLeft: -1, ArrowRight: 1, a: -1, A: -1, d: 1, D: 1 }[e.key]; if (d) { e.preventDefault(); giro.d = d; aplicar(); if (!t) t = setInterval(aplicar, 60); } };
+    const sube = (e) => { if ({ ArrowLeft: 1, ArrowRight: 1, a: 1, A: 1, d: 1, D: 1 }[e.key]) { giro.d = 0; clearInterval(t); t = null; } };
+    window.addEventListener('keydown', baja); window.addEventListener('keyup', sube);
+    return () => { window.removeEventListener('keydown', baja); window.removeEventListener('keyup', sube); clearInterval(t); };
   });
 }
 
@@ -101,7 +110,7 @@ function Aviso({ s, ahora, nombres }) {
 /* ───────── Online ───────── */
 function PartidaOnline({ v, onSalir, sala }) {
   const espejo = useRef({ ronda: 0, paso: -1, fase: v.fase, inicio: v.inicio, jugadores: new Map() });
-  const giros = useRef([]);
+  const objetivo = useRef(null); // { mira: [x, y] } o { ang }
   const [ver, setVer] = useState(0);
   const base = useRef({ servidor: Date.now(), local: Date.now() });
   const token = useMemo(() => { try { return JSON.parse(sessionStorage.getItem(claveSesion('estelas')))?.token; } catch { return null; } }, []);
@@ -112,31 +121,32 @@ function PartidaOnline({ v, onSalir, sala }) {
     let vivo = true; let ocupado = false;
     const sync = async () => {
       if (ocupado) return; ocupado = true;
-      const e = espejo.current; const g = giros.current; giros.current = [];
+      const e = espejo.current; const o = objetivo.current;
       try {
-        const r = await fetch(`${API}/online/sala/${sala?.code}/sync`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, giros: g, desde: e.ronda ? e.paso : -1, ronda: e.ronda }) });
+        const r = await fetch(`${API}/online/sala/${sala?.code}/sync`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, ...(o || {}), desde: e.ronda ? e.paso : -1, ronda: e.ronda }) });
         const d = r.ok ? await r.json() : null;
         if (!vivo || !d || !d.jugadores) return;
         base.current = { servidor: d.ahora, local: Date.now() };
         if (d.ronda !== e.ronda) { e.jugadores = new Map(); e.ronda = d.ronda; muerto.current = false; }
         d.jugadores.forEach((j) => {
-          const prev = e.jugadores.get(j.id) || { rastro: [] };
-          const rastro = prev.rastro.slice(0, j.desde).concat(j.nuevos);
-          e.jugadores.set(j.id, { id: j.id, color: j.color, vivo: j.vivo, dir: j.dir, rastro });
+          // Se añaden los puntos nuevos y se quitan los que ya se han apagado
+          const prev = e.jugadores.get(j.id) || { rastro: [] }; const ult = prev.rastro.length ? prev.rastro[prev.rastro.length - 1][2] : -1;
+          const rastro = prev.rastro.concat(j.nuevos.filter((q) => q[2] > ult)).filter((q) => q[2] >= d.paso - E.VIDA);
+          e.jugadores.set(j.id, { id: j.id, color: j.color, vivo: j.vivo, x: j.x, y: j.y, ang: j.ang, rastro });
           if (j.id === miId && !j.vivo && !muerto.current && d.fase === 'jugando') { muerto.current = true; sonar('fallo'); vibrar([100, 50, 100]); }
         });
         Object.assign(e, { paso: d.paso, fase: d.fase, inicio: d.inicio, hasta: d.hasta, ultimoGanador: d.ultimoGanador });
         setVer((x) => x + 1);
-      } catch { giros.current = [...g, ...giros.current]; } finally { ocupado = false; }
+      } catch { /* se reintenta en la siguiente */ } finally { ocupado = false; }
     };
     sync();
     const i = setInterval(sync, 85);
     return () => { vivo = false; clearInterval(i); };
   }, [sala?.code, token, miId]);
 
-  const miDir = () => { const g = giros.current; if (g.length) return g[g.length - 1]; return espejo.current.jugadores.get(miId)?.dir ?? 0; };
-  const girar = (d) => { const a = miDir(); if (d === a || (d + 2) % 4 === a) return; giros.current.push(d); vibrar(8); };
-  useTecladoGiros(girar, miDir);
+  const apuntar = (x, y) => { objetivo.current = { mira: [x, y] }; };
+  const miAng = () => espejo.current.jugadores.get(miId)?.ang ?? 0;
+  useTecladoGiro((ang) => { objetivo.current = { ang }; }, miAng);
   const ahora = () => base.current.servidor + (Date.now() - base.current.local);
   const nombres = Object.fromEntries(v.jugadores.map((j) => [j.id, j.nombre]));
   const s = espejo.current;
@@ -147,10 +157,10 @@ function PartidaOnline({ v, onSalir, sala }) {
         titulo={<span className="es-yo" style={{ color: NEON[(v.jugadores.find((j) => j.id === miId)?.color || 0) % NEON.length] }}>Tú eres este color</span>}
         extra={(j) => <i className="es-punto" style={{ background: NEON[j.color % NEON.length], opacity: j.vivo ? 1 : 0.3 }} />} />
       <div className="es-caja">
-        <Tablero fuente={() => ({ jugadores: [...s.jugadores.values()] })} version={ver} miId={miId} onGiro={girar} miDir={miDir} />
+        <Tablero fuente={() => ({ paso: s.paso, jugadores: [...s.jugadores.values()] })} miId={miId} onApuntar={apuntar} />
         <Aviso s={s} ahora={ahora} nombres={nombres} />
       </div>
-      <p className="es-ayuda">Toca a la izquierda o a la derecha para girar · desliza para ir en esa dirección</p>
+      <p className="es-ayuda">Apunta con el dedo (o con el cursor) hacia donde quieras ir · ← → en el teclado</p>
     </>
   );
 }
@@ -181,9 +191,9 @@ function Practica({ onVolver, onExit, onAbrirAyuda }) {
     }, 40);
     return () => clearInterval(i);
   }, [paso]);
-  const miDir = () => { const j = p.current?.jugadores[0]; return j ? (j.cola.length ? j.cola[j.cola.length - 1] : j.dir) : 0; };
-  const girar = (d) => { if (p.current) { E.girar(p.current, 1, d); vibrar(8); } };
-  useTecladoGiros(girar, miDir);
+  const miAng = () => p.current?.jugadores[0]?.ang ?? 0;
+  const apuntar = (x, y) => { if (p.current) E.apuntar(p.current, 1, { mira: [x, y] }); };
+  useTecladoGiro((ang) => { if (p.current) E.apuntar(p.current, 1, { ang }); }, miAng);
 
   if (paso === 'config') {
     return (
@@ -223,10 +233,10 @@ function Practica({ onVolver, onExit, onAbrirAyuda }) {
       <Hero v={v} juego={JUEGO} onSalir={() => setPaso('config')} chip={`⚡ Ronda ${v.ronda}/${v.rondas}`} etiqueta="Práctica" titulo="Último en pie gana la ronda"
         extra={(j) => <i className="es-punto" style={{ background: NEON[j.color % NEON.length], opacity: j.vivo ? 1 : 0.3 }} />} />
       <div className="es-caja">
-        <Tablero fuente={() => ({ jugadores: q.jugadores.map((j) => ({ id: j.id, color: j.color, vivo: j.vivo, rastro: j.rastro })) })} version={ver} miId={1} onGiro={girar} miDir={miDir} />
+        <Tablero fuente={() => ({ paso: q.paso, jugadores: q.jugadores.filter((j) => !j.fuera) })} miId={1} onApuntar={apuntar} />
         <Aviso s={q} ahora={() => Date.now()} nombres={nombres} />
       </div>
-      <p className="es-ayuda">Toca a la izquierda o a la derecha para girar · desliza para ir en esa dirección</p>
+      <p className="es-ayuda">Apunta con el dedo (o con el cursor) hacia donde quieras ir · ← → en el teclado</p>
     </section>
   );
 }

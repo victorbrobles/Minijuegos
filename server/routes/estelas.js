@@ -1,6 +1,7 @@
 // server/routes/estelas.js
 // Salas online de «Estelas» (tiempo real). El servidor avanza la cuadrícula; POST /online/sala/:code/sync es la
-// sincronización rápida (~10 veces por segundo): recibe los giros y devuelve lo nuevo de cada rastro.
+// sincronización rápida (~12 veces por segundo): recibe hacia dónde apunta el jugador y devuelve las motos y lo nuevo
+// de cada estela.
 import express from 'express';
 import * as E from '../../client/src/games/Estelas/engine.js';
 import { montarSalas } from '../lib/salasJuego.js';
@@ -29,7 +30,8 @@ router.post('/online/sala/:code/sync', (req, res) => {
   const p = sala.partida;
   if (!p || sala.estado !== 'jugando') return res.json({ success: true, fase: 'sala' });
   const ahora = Date.now();
-  if (Array.isArray(req.body?.giros)) req.body.giros.slice(0, 3).forEach((d) => E.girar(p, j.id, d));
+  if (Array.isArray(req.body?.mira)) E.apuntar(p, j.id, { mira: req.body.mira.slice(0, 2) });
+  else if (req.body?.ang != null) E.apuntar(p, j.id, { ang: req.body.ang });
   E.tick(p, ahora);
   res.json({ success: true, yo: j.id, ...E.sincronizar(p, j.id, { desde: Number(req.body?.desde ?? -1), ronda: Number(req.body?.ronda) || 0 }, ahora) });
 });

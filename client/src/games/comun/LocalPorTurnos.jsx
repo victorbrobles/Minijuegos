@@ -10,6 +10,7 @@ import Icon from '../../components/Icon.jsx';
 import { SelectorJugadores } from '../../components/MenuJuego.jsx';
 import { TurnoDe, PantallaFin, ModalSalir, useLatido } from '../Pulsador/Vistas.jsx';
 import { limitesLocal } from '../limites.js';
+import { useVerJugadaFinal } from './verJugadaFinal.js';
 
 export default function LocalPorTurnos({ juego, E, onVolver, onExit, onAbrirAyuda }) {
   const LIM = limitesLocal(juego.id);
@@ -45,6 +46,7 @@ export default function LocalPorTurnos({ juego, E, onVolver, onExit, onAbrirAyud
   const tapado = quien != null && confirmado !== quien;
   useEffect(() => { if (p && E.pausar) E.pausar(p, tapado, Date.now()); }, [tapado, p]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (quien == null) setConfirmado(null); }, [quien]);
+  const retenerFin = useVerJugadaFinal(paso === 'juego' && p ? E.vistaDe(p, -1, Date.now()) : null);
 
   if (paso === 'config') {
     return (
@@ -75,7 +77,7 @@ export default function LocalPorTurnos({ juego, E, onVolver, onExit, onAbrirAyud
     </div>
   );
 
-  if (p.fase === 'fin') {
+  if (p.fase === 'fin' && !retenerFin) {
     const Fin = juego.Fin || PantallaFin;
     return envoltorio(
       <Fin v={E.vistaDe(p, -1, Date.now())} juego={juego} onSalir={salir}>
@@ -86,7 +88,7 @@ export default function LocalPorTurnos({ juego, E, onVolver, onExit, onAbrirAyud
       </Fin>
     );
   }
-  if (tapado) {
+  if (tapado && p.fase !== 'fin') {
     const v = E.vistaDe(p, -1, Date.now());
     return envoltorio(
       <TurnoDe v={v} id={quien} puedo local juego={juego} onSalir={salir} onListo={() => setConfirmado(quien)}

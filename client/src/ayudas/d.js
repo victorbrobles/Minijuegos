@@ -277,16 +277,17 @@ export default {
     gana: 'Quien más puntos sume. Sin rivales a mano, juega la **práctica contra bots**.'
   },
   'chapas': {
-    objetivo: 'Fútbol de chapas: mete el balón en la portería rival lanzando tus chapas como un **tirachinas**.',
+    objetivo: 'Fútbol de chapas, cada uno contra todos: mete el balón en las porterías de los demás lanzando tus chapas como un **tirachinas**.',
     pasos: [
-      'Los jugadores se reparten en dos equipos (**rojos** y **azules**), con 3 chapas cada uno. Por turnos, cada equipo lanza **una** chapa.',
-      'Toca una de tus chapas, **arrastra hacia atrás** y suelta: cuanto más largo el arrastre, más fuerte sale (la flecha cambia de verde a rojo).',
+      'Juego **individual** de 2 a 5 jugadores: cada uno tiene 3 chapas de su color y defiende su portería. Con 2 el campo es rectangular; con 3, 4 o 5 es un **triángulo, cuadrado o pentágono** con una portería por jugador.',
+      'Por turnos, cada jugador lanza **una** de sus chapas.',
+      'Toca una de tus chapas, **arrastra hacia atrás** y suelta: cuanto más largo el arrastre, más fuerte sale (la flecha cambia de verde a rojo; con un arrastre corto ya llegas al máximo).',
       'Las chapas y el balón rebotan entre sí y contra las bandas. Si el balón cruza la línea de una portería, es **gol** y se vuelve a colocar todo; saca quien encajó.',
-      'Tienes 30 segundos por tiro. Online, tu portería siempre se ve abajo.'
+      'Tienes 30 segundos por tiro. La cámara gira para que tu portería (o, en un solo móvil, la de quien tira) se vea siempre abajo.'
     ],
     secciones: [{ icono: '🎯', titulo: 'Trucos', color: 'verde', items: ['Usa una chapa para empujar el balón o para tapar el camino a tu portería.', 'Un tiro suave y bien colocado suele valer más que uno a lo bruto.'] }],
-    puntos: [['⚽', 'Cada gol', '1 para tu equipo']],
-    gana: 'El primer equipo en llegar a los goles pactados (2, 3 o 5).'
+    puntos: [['⚽', 'Gol en la portería de otro', '+1 para ti'], ['🙈', 'Gol en propia', '+1 para cada uno de los demás']],
+    gana: 'El primero en llegar a los goles pactados (2, 3 o 5).'
   },
   'artilleria': {
     objetivo: 'Tanques sobre colinas: dispara por turnos y sé el **último tanque en pie**.',
@@ -315,12 +316,12 @@ export default {
   'estelas': {
     objetivo: 'Líneas de luz en **tiempo real**: no choques con nada y sé el último en pie.',
     pasos: [
-      'Tu línea avanza sola y deja un **rastro** que no desaparece. Solo puedes girar 90° a izquierda o derecha (nunca dar media vuelta).',
-      '**Toca la mitad izquierda o derecha** de la pantalla para girar hacia ese lado, o **desliza** hacia la dirección a la que quieres ir. En ordenador: flechas (o A y D).',
-      'Si chocas con una pared, con tu rastro o con el de otro, quedas fuera de la ronda. Si dos chocáis de frente, caéis los dos.',
+      'Tu moto avanza sola y deja una **estela de luz que se va apagando** (dura unos 3,5 segundos).',
+      'Muévete **libremente**: la moto gira hacia donde apuntas con **el dedo** (mientras tocas la pantalla) o con **el cursor** en ordenador. También puedes girar con ← → (o A y D).',
+      'Si chocas con una pared, con tu estela o con la de otro, quedas fuera de la ronda. Si dos chocáis de frente, caéis los dos.',
       'Cada uno juega en su móvil a la vez. Sin rivales a mano, juega la **práctica contra bots**.'
     ],
-    secciones: [{ icono: '💡', titulo: 'Trucos', color: 'cian', items: ['Encierra a los rivales con tu rastro para dejarles sin sitio.', 'No te metas en pasillos estrechos: es fácil quedarse sin salida.'] }],
+    secciones: [{ icono: '💡', titulo: 'Trucos', color: 'cian', items: ['Cruza por delante de un rival para cortarle el paso con tu estela.', 'La moto no gira en seco: deja espacio para las curvas cerca de las paredes.'] }],
     puntos: [['⚡', 'Cada rival que cae mientras sigues vivo', '+1'], ['🏆', 'Ganar la ronda (último en pie)', '+2']],
     gana: 'Quien más puntos sume al acabar las rondas.'
   },

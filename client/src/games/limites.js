@@ -104,7 +104,7 @@ export const LIMITES = {
   torre: { min: 2, max: 6 },
   minigolf: { min: 1, max: 8 },
   canicas: { min: 1, max: 8, local: { min: 1, max: 1 }, online: { min: 2, max: 8 } },
-  chapas: { min: 2, max: 6 },
+  chapas: { min: 2, max: 5 },
   artilleria: { min: 2, max: 6 },
   curling: { min: 2, max: 6 },
   estelas: { min: 1, max: 8, local: { min: 1, max: 1 }, online: { min: 2, max: 8 } },

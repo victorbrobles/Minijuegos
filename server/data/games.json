@@ -572,7 +572,7 @@
   {
     "id": "chapas",
     "name": "Fútbol chapas",
-    "description": "Fútbol de chapas en 2D: arrastra hacia atrás tu chapa como un tirachinas y suéltala para chutar. Rebotes, paredes y goles por equipos. ¡El primero en llegar a los goles pactados gana!",
+    "description": "Fútbol de chapas en 3D, todos contra todos (2 a 5): arrastra hacia atrás tu chapa como un tirachinas y suéltala para chutar. Con más de 2, el campo tiene una portería por jugador. ¡El primero en llegar a los goles pactados gana!",
     "isNew": true
   },
   {
@@ -590,7 +590,7 @@
   {
     "id": "estelas",
     "name": "Estelas",
-    "description": "Líneas de luz en tiempo real: avanzas sin parar dejando rastro y solo puedes girar. Quien choca con una pared o con cualquier rastro queda fuera. ¡El último en pie gana la ronda!",
+    "description": "Motos de luz en tiempo real: muévete libremente con el dedo o el cursor dejando una estela que se va apagando. Quien choca con una pared o con una estela queda fuera. ¡El último en pie gana la ronda!",
     "isNew": true
   },
   {

@@ -9,6 +9,7 @@ import {
   MenuModoOnline, FormCrearSala, FormUnirseSala, CabeceraSala, ListaSala, EsperandoAnfitrion, BloqueConfig
 } from '../../components/MenuJuego.jsx';
 import { textoSala } from '../limites.js';
+import { useVerJugadaFinal } from '../comun/verJugadaFinal.js';
 
 export const claveSesion = (id) => `${id}_online_session`;
 
@@ -38,6 +39,8 @@ export default function PulsadorOnline({ juego, onVolver, onSalir, onAbrirAyuda,
   const [cargando, setCargando] = useState(false);
   const [sala, setSala] = useState(null);
   const [modal, setModal] = useState(null);
+  // La última jugada (la que gana la partida) se ve entera antes de la pantalla final
+  const retenerFin = useVerJugadaFinal(sala?.estado === 'jugando' ? sala?.vista : null);
   const [aviso, setAviso] = useState('');
   const [sinRed, setSinRed] = useState(false);
   const [offset, setOffset] = useState(0);
@@ -219,7 +222,7 @@ export default function PulsadorOnline({ juego, onVolver, onSalir, onAbrirAyuda,
 
       {sala.estado === 'jugando' && v && (
         <section className="game pzp-escena">
-          {v.fase !== 'fin' && juego.Partida ? (
+          {(v.fase !== 'fin' || retenerFin) && juego.Partida ? (
             <juego.Partida v={v} sala={sala} enviar={enviar} t0={t0} offset={offset} onSalir={() => setModal('partida')} />
           ) : v.fase === 'jugando' ? (
             <PantallaJuego key={v.ronda} v={v} juego={juego} t0={t0} offset={offset} enviar={enviar} onSalir={() => setModal('partida')} controles={sala.esAdmin} />

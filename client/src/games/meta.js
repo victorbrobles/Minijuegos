@@ -1008,8 +1008,8 @@ export const META = {
     imagen: '/covers/chapas.webp',
     icono: 'soccer',
     colores: ['#16a34a', '#1d4ed8'],
-    etiquetas: 'chapas futbol fútbol habilidad fisica tirachinas goles por turnos equipos online',
-    descripcion: "Fútbol de chapas en 2D: arrastra hacia atrás tu chapa como un tirachinas y suéltala para chutar. Rebotes, paredes y goles por equipos. ¡El primero en llegar a los goles pactados gana!",
+    etiquetas: 'chapas futbol fútbol habilidad fisica tirachinas goles por turnos individual todos contra todos online 3d',
+    descripcion: "Fútbol de chapas en 3D, todos contra todos (2 a 5): arrastra hacia atrás tu chapa como un tirachinas y suéltala para chutar. Con más de 2, el campo tiene una portería por jugador. ¡El primero en llegar a los goles pactados gana!",
     categorias: ['habilidad']
   },
   'artilleria': {
@@ -1039,7 +1039,7 @@ export const META = {
     icono: 'zap',
     colores: ['#0f172a', '#22d3ee'],
     etiquetas: 'estelas lineas luz tiempo real reflejos habilidad supervivencia bots online',
-    descripcion: "Líneas de luz en tiempo real: avanzas sin parar dejando rastro y solo puedes girar. Quien choca con una pared o con cualquier rastro queda fuera. ¡El último en pie gana la ronda!",
+    descripcion: "Motos de luz en tiempo real: muévete libremente con el dedo o el cursor dejando una estela que se va apagando. Quien choca con una pared o con una estela queda fuera. ¡El último en pie gana la ronda!",
     categorias: ['habilidad']
   },
   'draft': {
