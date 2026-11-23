@@ -9,22 +9,25 @@ export const COLORES_ROPA = ['#f8fafc', '#1f2937', '#64748b', '#b91c1c', '#ea580
 
 export const PIEZAS = [
   { id: 'piel', nombre: 'Piel', n: PIELES.length, colores: PIELES },
-  { id: 'pelo', nombre: 'Peinado', n: 12, opciones: ['Rapado', 'Corto', 'Raya al lado', 'Largo liso', 'Largo rizado', 'Media melena', 'Coleta', 'Moño', 'Afro', 'Trenzas', 'Calvo', 'Corto rizado'] },
+  { id: 'pelo', nombre: 'Peinado', n: 16, opciones: ['Rapado', 'Corto', 'Raya al lado', 'Largo liso', 'Largo rizado', 'Media melena', 'Coleta', 'Moño', 'Afro', 'Trenzas', 'Calvo', 'Corto rizado', 'De punta', 'Flequillo', 'Cresta', 'Dos coletas'] },
   { id: 'colorPelo', nombre: 'Color de pelo', n: COLORES_PELO.length, colores: COLORES_PELO },
-  { id: 'ojos', nombre: 'Ojos', n: 5, opciones: ['Normales', 'Grandes', 'Rasgados', 'Sonrientes', 'Con pestañas'] },
+  { id: 'ojos', nombre: 'Ojos', n: 6, opciones: ['Normales', 'Grandes', 'Rasgados', 'Sonrientes', 'Con pestañas', 'Adormilados'] },
   { id: 'colorOjos', nombre: 'Color de ojos', n: COLORES_OJOS.length, colores: COLORES_OJOS },
   { id: 'boca', nombre: 'Boca', n: 5, opciones: ['Sonrisa', 'Risa', 'Seria', 'Pícara', 'Sorpresa'] },
   { id: 'barba', nombre: 'Barba', n: 6, opciones: ['Sin barba', 'De tres días', 'Perilla', 'Bigote', 'Barba corta', 'Barba larga'] },
   { id: 'gafas', nombre: 'Gafas', n: 5, opciones: ['Sin gafas', 'Redondas', 'Rectangulares', 'De sol', 'De pasta'] },
-  { id: 'arriba', nombre: 'Parte de arriba', n: 7, opciones: ['Camiseta', 'Camisa', 'Sudadera', 'Chaqueta vaquera', 'Jersey de cuello alto', 'Top de tirantes', 'Traje'] },
+  { id: 'arriba', nombre: 'Parte de arriba', n: 10, opciones: ['Camiseta', 'Camisa', 'Sudadera', 'Chaqueta vaquera', 'Jersey de cuello alto', 'Top de tirantes', 'Traje', 'Vestido', 'Abrigo', 'Polo'] },
   { id: 'colorArriba', nombre: 'Color de arriba', n: COLORES_ROPA.length, colores: COLORES_ROPA },
   { id: 'abajo', nombre: 'Parte de abajo', n: 5, opciones: ['Vaqueros', 'Pantalón', 'Pantalón corto', 'Falda', 'Chándal'] },
   { id: 'colorAbajo', nombre: 'Color de abajo', n: COLORES_ROPA.length, colores: COLORES_ROPA },
   { id: 'calzado', nombre: 'Calzado', n: 5, opciones: ['Deportivas blancas', 'Deportivas negras', 'Botas', 'Zapatos', 'Zapatillas de color'] },
-  { id: 'extra', nombre: 'Complementos', n: 7, opciones: ['Nada', 'Gorra', 'Gorro de lana', 'Pendientes', 'Collar', 'Auriculares', 'Sombrero'] }
+  { id: 'extra', nombre: 'Complementos', n: 10, opciones: ['Nada', 'Gorra', 'Gorro de lana', 'Pendientes', 'Collar', 'Auriculares', 'Sombrero', 'Bufanda', 'Diadema', 'Pajarita'] },
+  // Piezas añadidas con los avatares 3D: los avatares guardados antes no las tienen y usan el valor `def`
+  { id: 'colorExtra', nombre: 'Color del complemento', n: COLORES_ROPA.length, colores: COLORES_ROPA, def: 3 },
+  { id: 'cuerpo', nombre: 'Cuerpo', n: 4, opciones: ['Delgado', 'Medio', 'Fuerte', 'Robusto'], def: 1 }
 ];
 
-export const AVATAR_INICIAL = { piel: 2, pelo: 1, colorPelo: 2, ojos: 0, colorOjos: 0, boca: 0, barba: 0, gafas: 0, arriba: 0, colorArriba: 8, abajo: 0, colorAbajo: 14, calzado: 0, extra: 0 };
+export const AVATAR_INICIAL = { piel: 2, pelo: 1, colorPelo: 2, ojos: 0, colorOjos: 0, boca: 0, barba: 0, gafas: 0, arriba: 0, colorArriba: 8, abajo: 0, colorAbajo: 14, calzado: 0, extra: 0, colorExtra: 3, cuerpo: 1 };
 
 /* ───────── utilidades de color ───────── */
 const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
@@ -35,7 +38,12 @@ const claro = (c, t) => mezclar(c, '#ffffff', t);
 
 let contador = 0;
 
-export function svgAvatar(a, { modo = 'cuerpo', fondo = null } = {}) {
+// El dibujo plano (mientras carga el 3D o si el móvil no puede con 3D) no tiene las opciones nuevas: usa la más parecida
+const PLANO = { pelo: { 12: 1, 13: 1, 14: 0, 15: 6 }, ojos: { 5: 0 }, arriba: { 7: 5, 8: 3, 9: 0 }, extra: { 7: 0, 8: 0, 9: 0 } };
+const aPlano = (a) => { const b = { ...a }; Object.entries(PLANO).forEach(([k, m]) => { if (m[b[k]] !== undefined) b[k] = m[b[k]]; }); return b; };
+
+export function svgAvatar(original, { modo = 'cuerpo', fondo = null } = {}) {
+  const a = aPlano(original);
   const id = `av${++contador}`;
   const piel = PIELES[a.piel] ?? PIELES[2];
   const pelo = COLORES_PELO[a.colorPelo] ?? COLORES_PELO[2];

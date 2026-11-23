@@ -42,7 +42,7 @@ export function EscenaAvatar({ a, fondo, alto = 230, titulo }) {
 
 const BLOQUES = [
   { id: 'cara', nombre: 'Cara', emoji: '😀', piezas: PIEZAS_CARA },
-  { id: 'ropa', nombre: 'Ropa', emoji: '👕', piezas: PIEZAS_ROPA },
+  { id: 'ropa', nombre: 'Cuerpo y ropa', emoji: '👕', piezas: PIEZAS_ROPA },
   { id: 'fondo', nombre: 'Fondo', emoji: '🎨', piezas: [] }
 ];
 

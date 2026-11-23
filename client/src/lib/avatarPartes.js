@@ -5,15 +5,16 @@ import { PIEZAS, AVATAR_INICIAL as INICIAL, avatarAleatorio as aleatorio } from 
 
 export { PIEZAS };
 export const AVATAR_INICIAL = { ...INICIAL };
-export const PIEZAS_CARA = ['piel', 'pelo', 'colorPelo', 'ojos', 'colorOjos', 'boca', 'barba', 'gafas', 'extra'];
-export const PIEZAS_ROPA = ['arriba', 'colorArriba', 'abajo', 'colorAbajo', 'calzado'];
+export const PIEZAS_CARA = ['piel', 'pelo', 'colorPelo', 'ojos', 'colorOjos', 'boca', 'barba', 'gafas', 'extra', 'colorExtra'];
+export const PIEZAS_ROPA = ['cuerpo', 'arriba', 'colorArriba', 'abajo', 'colorAbajo', 'calzado'];
 
 /** Devuelve el avatar limpio (solo piezas conocidas y dentro de rango) o null. */
 export function validarAvatar(a) {
   if (!a || typeof a !== 'object' || Array.isArray(a)) return null;
   const limpio = {};
   for (const p of PIEZAS) {
-    const v = a[p.id];
+    // Piezas nuevas que los avatares antiguos no tienen: su valor por defecto
+    const v = a[p.id] === undefined && p.def !== undefined ? p.def : a[p.id];
     if (!Number.isInteger(v) || v < 0 || v >= p.n) return null;
     limpio[p.id] = v;
   }

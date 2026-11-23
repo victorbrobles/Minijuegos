@@ -31,6 +31,10 @@
 .pf-avatar.dibujo { overflow: hidden; background: none; }
 .av-svg { display: inline-block; flex: none; line-height: 0; }
 .av-svg svg { display: block; width: 100%; height: 100%; }
+/* Avatar 3D (imagen ya dibujada): la cara va sobre su color en un círculo; el cuerpo, sin fondo */
+.av-3d img { display: block; width: 100%; height: 100%; object-fit: contain; -webkit-user-drag: none; user-select: none; }
+.av-3d.av-cara { border-radius: 50%; overflow: hidden; background: radial-gradient(circle at 50% 38%, color-mix(in srgb, var(--fondo, #6366f1) 55%, #ffffff) 0%, var(--fondo, #6366f1) 72%); }
+.av-3d.av-cara img { object-fit: cover; }
 .pf-editor { width: min(94vw, 480px); }
 .pf-escena {
   display: flex; justify-content: center; align-items: flex-end; width: 100%; padding: 0.6rem 0 0.3rem; border-radius: 22px; overflow: hidden;
