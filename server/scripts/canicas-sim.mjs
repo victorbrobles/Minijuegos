@@ -5,11 +5,30 @@ import * as CANNON from 'cannon-es';
 import { IDS_CIRCUITOS, construirCircuito } from '../../client/src/games/Canicas/circuitos.js';
 import { crearMundo, crearCanica, posSalida, controlar, revisar, crearBot, dirBot, paso } from '../../client/src/games/Canicas/fisica.js';
 
+import { spawn } from 'node:child_process';
+import os from 'node:os';
+import { fileURLToPath } from 'node:url';
+
 const DT = 1 / 60;
-for (const id of IDS_CIRCUITOS) {
+// Cada camino de cada circuito se prueba en un proceso aparte y en paralelo (la física es lenta: todos seguidos
+// superaban el tiempo límite de la revisión). Con «id:n» como argumento, solo se prueba ese camino.
+const solo = process.argv[2];
+if (!solo) {
+  const yo = fileURLToPath(import.meta.url); const max = Math.max(2, os.cpus().length); let fallos = 0;
+  const cola = IDS_CIRCUITOS.flatMap((id) => Array.from({ length: 1 + construirCircuito(id).ramas.length }, (_, n) => `${id}:${n}`));
+  const uno = () => new Promise((ok) => {
+    const id = cola.shift(); if (!id) { ok(); return; }
+    const p = spawn(process.execPath, [yo, id], { stdio: ['ignore', 'pipe', 'pipe'] }); let salida = '';
+    p.stdout.on('data', (d) => { salida += d; }); p.stderr.on('data', (d) => { salida += d; });
+    p.on('close', (codigo) => { process.stdout.write(salida); if (codigo !== 0) fallos++; uno().then(ok); });
+  });
+  await Promise.all(Array.from({ length: Math.min(max, cola.length) }, uno));
+  assert.equal(fallos, 0, 'algún circuito falla');
+}
+for (const id of solo ? [solo.split(':')[0]] : []) {
   const c = construirCircuito(id);
   const pruebas = [{ nombre: 'principal', atajos: c.ramas.map(() => false) }, ...c.ramas.map((r, i) => ({ nombre: r.nombre, atajos: c.ramas.map((_, j) => j === i) }))];
-  for (const pr of pruebas) {
+  for (const pr of pruebas.filter((_, n) => String(n) === solo.split(':')[1])) {
     const w = crearMundo(c, CANNON);
     const k = crearCanica(w, 'garra', posSalida(c, 1), { c, orden: 1 });
     const bot = crearBot(c, Math.random, 1); bot.forzar = pr.atajos; bot.error = 0;
@@ -26,7 +45,7 @@ for (const id of IDS_CIRCUITOS) {
 }
 // Motor online: elegir → cuenta → carrera → podio → fin, sincronización, rayos y aceite
 import * as E from '../../client/src/games/Canicas/engine.js';
-{
+if (!solo) {
   const jug = [{ id: 1, nombre: 'A' }, { id: 2, nombre: 'B' }, { id: 3, nombre: 'C' }];
   const p = E.crearPartida(jug, ['valle', 'canon', 'espiral'], { carreras: 3 }, 0);
   assert.equal(p.fase, 'elegir');
@@ -52,4 +71,4 @@ import * as E from '../../client/src/games/Canicas/engine.js';
   for (let k = 0; k < 2; k++) { E.forzar(p, 0); E.tick(p, p.inicio); E.forzar(p, 0); E.forzar(p, 0); }
   assert.equal(p.fase, 'fin'); assert.ok(p.fin.ganadores.length);
 }
-console.log('Carrera de Canicas: OK');
+if (!solo) console.log('Carrera de Canicas: OK');
