@@ -4,12 +4,12 @@ import * as E from '../../client/src/games/Habilidad/engine.js';
 import { IDS } from '../../client/src/games/Habilidad/catalogo.js';
 import fs from 'fs';
 
-assert.equal(IDS.length, 30, '30 minijuegos en el catálogo');
+assert.equal(IDS.length, 40, '40 minijuegos en el catálogo');
 // Cada minijuego del catálogo está definido en los archivos del cliente
-const fuentes = ['a', 'b', 'c', 'd', 'e', 'f'].map((k) => fs.readFileSync(new URL(`../../client/src/games/Habilidad/minijuegos/${k}.jsx`, import.meta.url), 'utf8')).join('\n');
+const fuentes = ['a', 'b', 'c', 'd', 'e', 'f', 'g'].map((k) => fs.readFileSync(new URL(`../../client/src/games/Habilidad/minijuegos/${k}.jsx`, import.meta.url), 'utf8')).join('\n');
 IDS.forEach((id) => assert.ok(fuentes.includes(`id: '${id}'`), `falta el minijuego ${id}`));
 assert.deepEqual(E.completarLista(['topos', 'semaforo', 'nada', 'topos'], 3).slice(0, 2), ['topos', 'semaforo']);
-assert.equal(E.completarLista([], 30).length, 30);
+assert.equal(E.completarLista([], 40).length, 40);
 const jug = (n) => Array.from({ length: n }, (_, i) => ({ id: i + 1, nombre: `J${i + 1}` }));
 {
   const p = E.crearPartida(jug(3), ['topos', 'semaforo'], { online: true }, 0);

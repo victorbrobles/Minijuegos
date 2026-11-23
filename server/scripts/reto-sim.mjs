@@ -12,7 +12,11 @@ for (const [k, t] of Object.entries(TIPOS)) {
     const d = t.generar();
     if (d.modo === 'quiz') {
       assert.ok(d.preguntas.length >= d.umbral, k);
-      d.preguntas.forEach((q) => { assert.ok(q.opciones.includes(q.correcta), `${k}: ${q.p}`); assert.equal(new Set(q.opciones).size, q.opciones.length, `${k}: opciones repetidas`); });
+      d.preguntas.forEach((q) => {
+        // Preguntas de respuesta escrita (banderas): sin opciones, con la respuesta y su imagen
+        if (q.escribir) { assert.ok(q.correcta && Array.isArray(q.alias), `${k}: ${q.p}`); if (q.imagen) assert.ok(/^\/banderas\/[a-z]{2}\.svg$/.test(q.imagen), q.imagen); return; }
+        assert.ok(q.opciones.includes(q.correcta), `${k}: ${q.p}`); assert.equal(new Set(q.opciones).size, q.opciones.length, `${k}: opciones repetidas`);
+      });
     }
     if (d.modo === 'ordenar') assert.equal(d.series.length, 2);
     if (d.modo === 'memoria') assert.ok(d.secuencia.length >= d.objetivo);
