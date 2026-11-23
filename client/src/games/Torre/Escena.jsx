@@ -8,6 +8,7 @@ import * as CANNON from 'cannon-es';
 import * as E from './engine.js';
 import { PIEZAS, PLATAFORMA, verticesCuna, CARAS_CUNA } from './piezas.js';
 import { colorDe } from '../Pulsador/Vistas.jsx';
+import { mejorarEscena, crea } from '../Habilidad/tres.js';
 import { sonar } from '../../lib/sonido.js';
 
 E.usarFisica(CANNON);
@@ -59,8 +60,7 @@ export default function Escena({ v, colocar, onAnimando, azimutRef }) {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     el.appendChild(renderer.domElement);
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x14213d);
-    scene.fog = new THREE.Fog(0x14213d, 22, 45);
+    mejorarEscena(renderer, scene, { cielo: [0x1e1b4b, 0x3b1d0f], niebla: [26, 60], exposicion: 1.1 });
     const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
     camera.position.set(7, 6, 9);
     const controls = new OrbitControls(camera, renderer.domElement);
@@ -73,7 +73,15 @@ export default function Escena({ v, colocar, onAnimando, azimutRef }) {
     Object.assign(sol.shadow.camera, { left: -8, right: 8, top: 14, bottom: -4, near: 1, far: 40 });
     scene.add(sol);
     // Mesa de madera y plataforma
-    const mesa = new THREE.Mesh(new THREE.CylinderGeometry(7, 7, 0.6, 48), new THREE.MeshStandardMaterial({ color: 0x8b5a2b, roughness: 0.8 }));
+    // Salón: suelo de tablas, alfombra, paredes con cuadros y una lámpara cálida sobre la mesa
+    const suelo = crea.suelo(80, 80, 0x7c4a1e, { celda: 1.2, contraste: 0.05 }); suelo.position.y = E.MESA_Y - 5; scene.add(suelo);
+    const alfombra = new THREE.Mesh(new THREE.CircleGeometry(11, 48), new THREE.MeshStandardMaterial({ color: 0x7f1d1d, roughness: 0.95 })); alfombra.rotation.x = -Math.PI / 2; alfombra.position.y = E.MESA_Y - 4.98; alfombra.receiveShadow = true; scene.add(alfombra);
+    const patas = new THREE.Mesh(new THREE.CylinderGeometry(0.8, 1.6, 4.4, 24), new THREE.MeshStandardMaterial({ color: 0x5b3412, roughness: 0.6 })); patas.position.y = E.MESA_Y - 2.8; patas.castShadow = true; scene.add(patas);
+    [[0, -28, 0], [-28, 0, Math.PI / 2], [28, 0, -Math.PI / 2]].forEach(([x, z, ry]) => { const p = new THREE.Mesh(new THREE.PlaneGeometry(56, 30), new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.9 })); p.position.set(x, E.MESA_Y + 10, z); p.rotation.y = ry; scene.add(p); });
+    [[-9, 0x0ea5e9], [0, 0xf59e0b], [9, 0xa855f7]].forEach(([x, c]) => { const marco = crea.caja(5, 3.6, 0.3, 0x78350f); marco.position.set(x, E.MESA_Y + 7, -27.7); scene.add(marco); const lienzo = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 2.8), new THREE.MeshStandardMaterial({ color: c, roughness: 0.6 })); lienzo.position.set(x, E.MESA_Y + 7, -27.5); scene.add(lienzo); });
+    const lampara = new THREE.Mesh(new THREE.ConeGeometry(1.6, 1.4, 32, 1, true), new THREE.MeshStandardMaterial({ color: 0xfde68a, emissive: 0xf59e0b, emissiveIntensity: 0.8, side: THREE.DoubleSide })); lampara.position.set(0, 16, 0); scene.add(lampara);
+    const calida = new THREE.PointLight(0xffd7a0, 60, 40, 1.6); calida.position.set(0, 15, 0); scene.add(calida);
+    const mesa = new THREE.Mesh(new THREE.CylinderGeometry(7, 7, 0.6, 48), new THREE.MeshStandardMaterial({ color: 0x8b5a2b, roughness: 0.45, metalness: 0.05 }));
     mesa.position.y = E.MESA_Y - 0.3; mesa.receiveShadow = true; scene.add(mesa);
     const base = new THREE.Mesh(new THREE.BoxGeometry(PLATAFORMA, 0.5, PLATAFORMA), new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.6 }));
     base.position.y = -0.25; base.receiveShadow = true; base.castShadow = true; scene.add(base);

@@ -4,6 +4,7 @@
 // minimapa y marcador. Sirve para online (rivales sincronizados) y para la práctica (rivales bot).
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { mejorarEscena } from '../Habilidad/tres.js';
 import * as CANNON from 'cannon-es';
 import { construirCircuito } from './circuitos.js';
 import { CANICAS, OBJETOS, sortearObjeto, IDS_OBJETOS } from './canicas.js';
@@ -229,7 +230,7 @@ export default function Carrera3D({ circuitoId, canica, orden = 0, rivales = [],
     renderer.shadowMap.enabled = true;
     el.appendChild(renderer.domElement);
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(c.def.cielo); scene.fog = new THREE.Fog(c.def.cielo, 70, 210);
+    { const base = new THREE.Color(c.def.cielo); const arriba = base.clone().offsetHSL(0, -0.05, 0.12); const abajo = base.clone().offsetHSL(0, 0.05, -0.08); mejorarEscena(renderer, scene, { cielo: [arriba.getHex(), abajo.getHex()], niebla: [80, 240], exposicion: c.def.lava ? 1.1 : 1.05 }); }
     const camera = new THREE.PerspectiveCamera(64, 1, 0.1, 500);
     scene.add(new THREE.HemisphereLight(0xffffff, 0x334155, c.def.lava ? 0.8 : 1.1));
     const sol = new THREE.DirectionalLight(c.def.lava ? 0xffb38a : 0xffffff, 1.3); sol.castShadow = true; sol.shadow.mapSize.set(1024, 1024);

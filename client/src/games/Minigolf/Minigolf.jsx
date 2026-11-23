@@ -3,6 +3,7 @@
 // Apuntar: arrastra el dedo hacia atrás desde cualquier punto de la escena (como un tirachinas) y suelta.
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { mejorarEscena, crea } from '../Habilidad/tres.js';
 import * as CANNON from 'cannon-es';
 import JuegoPulsador from '../Pulsador/JuegoPulsador.jsx';
 import LocalPorTurnos from '../comun/LocalPorTurnos.jsx';
@@ -96,15 +97,21 @@ function Juego3D({ v, enviar, local, yoId }) {
     renderer.shadowMap.enabled = true;
     el.appendChild(renderer.domElement);
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x7dd3fc);
-    scene.fog = new THREE.Fog(0x7dd3fc, 30, 70);
+    mejorarEscena(renderer, scene, { cielo: [0x38bdf8, 0xe0f2fe], niebla: [40, 110], exposicion: 1.05 });
     const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 200);
     scene.add(new THREE.HemisphereLight(0xffffff, 0x2f5d3a, 1.0));
     const sol = new THREE.DirectionalLight(0xffffff, 1.4); sol.position.set(10, 20, 6); sol.castShadow = true;
     sol.shadow.mapSize.set(1024, 1024); Object.assign(sol.shadow.camera, { left: -25, right: 25, top: 25, bottom: -25, near: 1, far: 80 });
     scene.add(sol, sol.target);
-    const cesped = new THREE.Mesh(new THREE.PlaneGeometry(400, 400), new THREE.MeshStandardMaterial({ color: 0x166534, roughness: 1 }));
-    cesped.rotation.x = -Math.PI / 2; cesped.position.y = -4; scene.add(cesped);
+    const cesped = crea.suelo(400, 400, 0x166534, { celda: 3, contraste: 0.05, lineas: false }); cesped.position.y = -4; scene.add(cesped);
+    // Parque alrededor del campo: árboles, rocas, flores y un lago
+    { const azar = (a, b) => a + Math.random() * (b - a);
+      for (let i = 0; i < 70; i++) { const ang = Math.random() * Math.PI * 2; const d = azar(28, 90); const x = Math.cos(ang) * d; const z = Math.sin(ang) * d;
+        const tronco = crea.cilindro(0.35, 0.5, 3, 0x78350f, 8); tronco.position.set(x, -2.5, z); scene.add(tronco);
+        const copa = new THREE.Mesh(new THREE.IcosahedronGeometry(azar(1.8, 3.2), 0), new THREE.MeshStandardMaterial({ color: [0x15803d, 0x16a34a, 0x4d7c0f][i % 3], roughness: 0.8, flatShading: true })); copa.position.set(x, azar(0.2, 1.4), z); copa.castShadow = true; scene.add(copa); }
+      for (let i = 0; i < 30; i++) { const ang = Math.random() * Math.PI * 2; const d = azar(25, 70); const roca = new THREE.Mesh(new THREE.DodecahedronGeometry(azar(0.6, 1.6), 0), new THREE.MeshStandardMaterial({ color: 0x78716c, roughness: 0.9, flatShading: true })); roca.position.set(Math.cos(ang) * d, -3.6, Math.sin(ang) * d); scene.add(roca); }
+      for (let i = 0; i < 120; i++) { const ang = Math.random() * Math.PI * 2; const d = azar(24, 60); const flor = new THREE.Mesh(new THREE.SphereGeometry(0.18, 6, 4), new THREE.MeshStandardMaterial({ color: [0xf472b6, 0xfacc15, 0xffffff, 0xa78bfa][i % 4] })); flor.position.set(Math.cos(ang) * d, -3.85, Math.sin(ang) * d); scene.add(flor); }
+      const lago = new THREE.Mesh(new THREE.CircleGeometry(14, 40), new THREE.MeshStandardMaterial({ color: 0x0ea5e9, roughness: 0.05, metalness: 0.3, transparent: true, opacity: 0.85 })); lago.rotation.x = -Math.PI / 2; lago.position.set(-45, -3.95, 30); scene.add(lago); }
     const bola = new THREE.Mesh(new THREE.SphereGeometry(RADIO, 24, 16), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 }));
     bola.castShadow = true; scene.add(bola);
     const flecha = new THREE.ArrowHelper(new THREE.Vector3(1, 0, 0), new THREE.Vector3(), 1, 0x22c55e, 0.35, 0.22); flecha.visible = false; scene.add(flecha);

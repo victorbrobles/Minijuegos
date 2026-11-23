@@ -43,6 +43,22 @@ function mapaEntorno(renderer) {
 }
 
 /**
+ * Aplica el aspecto de los minijuegos (tonos cinematográficos, color correcto, sombras suaves, reflejos de entorno,
+ * cielo en degradado y niebla a juego) a una escena ya creada por otro juego (Torre, Minigolf, Canicas…).
+ */
+export function mejorarEscena(renderer, scene, { cielo, niebla = null, exposicion = 1.05, reflejos = true } = {}) {
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = exposicion;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  if (cielo) {
+    const [arriba, abajo] = cielo.map((c) => new THREE.Color(c));
+    scene.background = texturaCielo(arriba, abajo);
+    if (niebla) scene.fog = new THREE.Fog(abajo, niebla[0], niebla[1]);
+  }
+  if (reflejos) { try { scene.environment = mapaEntorno(renderer); } catch { /* sin reflejos */ } }
+}
+
+/**
  * Monta una escena en `ref`. `crear(ctx)` prepara la escena y devuelve { frame(dt, t), toque(e, ctx), mover(e), soltar(e), fin() }.
  * ctx: { THREE, scene, camera, renderer, el, sol, encuadrar, aspecto, ancho, chispas, onda, temblor }
  * Opciones: fondo (color base del cielo), cielo: [arriba, abajo], niebla (distancia o false), sombras, exposicion.

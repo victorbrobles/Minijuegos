@@ -4,7 +4,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import JuegoPulsador from '../Pulsador/JuegoPulsador.jsx';
 import LocalPorTurnos from '../comun/LocalPorTurnos.jsx';
-import Lienzo2D, { useReloj } from '../comun/Lienzo2D.jsx';
+import { useReloj } from '../comun/Lienzo2D.jsx';
+import Lienzo3D from '../comun/Lienzo3D.jsx';
+import { THREE, crea } from '../Habilidad/tres.js';
 import { Hero, Pildoras, AvisoTurno, useLatido } from '../Pulsador/Vistas.jsx';
 import { BloqueConfig } from '../../components/MenuJuego.jsx';
 import { sonar, vibrar } from '../../lib/sonido.js';
@@ -41,26 +43,79 @@ function dibujarCampo(ctx, k, girar) {
   ctx.restore();
 }
 
-function dibujarCuerpos(ctx, k, pos, girar, sel) {
-  const tr = ([x, y]) => (girar ? [(E.W - x) * k, (E.H - y) * k] : [x * k, y * k]);
-  IDS.forEach((id, i) => {
-    if (id.startsWith('poste')) return;
-    const p = pos[i] || pos[id]; if (!p) return;
-    const [x, y] = tr(p);
-    if (id === 'balon') {
-      ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.beginPath(); ctx.arc(x + 1.5, y + 2, E.RB * k, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(x, y, E.RB * k, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#111827'; ctx.beginPath(); ctx.arc(x, y, E.RB * k * 0.42, 0, Math.PI * 2); ctx.fill();
-      return;
-    }
-    const eq = Number(id[1]);
-    ctx.fillStyle = 'rgba(0,0,0,0.3)'; ctx.beginPath(); ctx.arc(x + 2, y + 3, E.RC * k, 0, Math.PI * 2); ctx.fill();
-    const g = ctx.createRadialGradient(x - E.RC * k * 0.3, y - E.RC * k * 0.3, 1, x, y, E.RC * k);
-    g.addColorStop(0, '#ffffff'); g.addColorStop(0.25, COLOR[eq]); g.addColorStop(1, '#0f172a');
-    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, E.RC * k, 0, Math.PI * 2); ctx.fill();
-    ctx.strokeStyle = sel === id ? '#facc15' : 'rgba(255,255,255,0.8)'; ctx.lineWidth = sel === id ? 4 : 1.5;
-    ctx.beginPath(); ctx.arc(x, y, E.RC * k * (sel === id ? 1.15 : 0.72), 0, Math.PI * 2); ctx.stroke();
+/* ───────── Escena 3D ───────── */
+function texturaCampo() {
+  // Se dibuja el campo 2D (rayas y líneas) en una textura grande y se pone sobre el césped 3D
+  const k = 16; const c = document.createElement('canvas'); c.width = E.W * k; c.height = E.H * k; const x = c.getContext('2d');
+  dibujarCampo(x, k, false);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
+}
+function texturaBalon() {
+  const c = document.createElement('canvas'); c.width = 256; c.height = 128; const x = c.getContext('2d');
+  x.fillStyle = '#ffffff'; x.fillRect(0, 0, 256, 128); x.fillStyle = '#111827';
+  for (let i = 0; i < 9; i++) { const cx = (i * 61) % 256; const cy = 20 + ((i * 37) % 90); x.beginPath(); for (let k = 0; k < 5; k++) { const a = (k / 5) * Math.PI * 2 - Math.PI / 2; x.lineTo(cx + Math.cos(a) * 14, cy + Math.sin(a) * 14); } x.closePath(); x.fill(); }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+function montarEstadio(ctx, util, girar) {
+  const { scene } = ctx; const { a3 } = util;
+  const cesped = new THREE.Mesh(new THREE.PlaneGeometry(E.W, E.H), new THREE.MeshStandardMaterial({ map: texturaCampo(), roughness: 0.85 })); cesped.rotation.x = -Math.PI / 2; cesped.receiveShadow = true; scene.add(cesped);
+  const borde = crea.suelo(E.W + 30, E.H + 30, 0x14532d, { celda: 4, contraste: 0.04, lineas: false }); borde.position.y = -0.05; scene.add(borde);
+  // Vallas publicitarias alrededor del campo
+  const valla = (w, x, z, ry, txt, col) => { const v = crea.cartel(txt, w, 2.2, { fondo: col, color: '#ffffff', fuente: 'bold 34px sans-serif' }); v.position.set(x, 1.1, z); v.rotation.y = ry; scene.add(v); const tras = crea.caja(w, 2.2, 0.3, 0x0f172a); tras.position.set(x - Math.sin(ry) * 0.2, 1.1, z - Math.cos(ry) * 0.2); tras.rotation.y = ry; scene.add(tras); };
+  [[-1, 0], [1, Math.PI]].forEach(([s, ry], k) => valla(E.W + 6, 0, s * (E.H / 2 + 5), ry, k ? '⚽ FÚTBOL CHAPAS ⚽' : '🏆 LOS 100+ MINIJUEGOS', k ? '#1d4ed8' : '#dc2626'));
+  [[-1, Math.PI / 2], [1, -Math.PI / 2]].forEach(([s, ry]) => valla(E.H + 6, s * (E.W / 2 + 4), 0, ry, '⚽  GOL  ⚽  GOL  ⚽', '#15803d'));
+  // Grada con público a los lados
+  const publico = new THREE.InstancedMesh(new THREE.SphereGeometry(0.9, 8, 6), new THREE.MeshStandardMaterial({ roughness: 0.6 }), 1400);
+  { const m4 = new THREE.Matrix4(); const c = new THREE.Color(); let n = 0;
+    [-1, 1].forEach((s) => { for (let f = 0; f < 5; f++) { const esc = crea.caja(5, 2.4, E.H + 30, 0x1e293b); esc.position.set(s * (E.W / 2 + 9 + f * 4.2), 1.2 + f * 2.4, 0); scene.add(esc); for (let z = -E.H / 2 - 12; z < E.H / 2 + 12 && n < 1400; z += 2.1) { m4.makeTranslation(s * (E.W / 2 + 9 + f * 4.2) + (Math.random() - 0.5), 3.2 + f * 2.4, z); publico.setMatrixAt(n, m4); publico.setColorAt(n, c.setHex(s < 0 ? (Math.random() < 0.6 ? 0xef4444 : 0xffffff) : (Math.random() < 0.6 ? 0x2563eb : 0xffffff))); n++; } } });
+    publico.count = n; }
+  scene.add(publico);
+  // Torres de focos en las esquinas
+  [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(([sx, sz]) => {
+    const torre = crea.cilindro(0.6, 0.9, 34, 0x475569, 8); torre.position.set(sx * (E.W / 2 + 14), 17, sz * (E.H / 2 + 10)); scene.add(torre);
+    const panel = crea.caja(7, 4, 0.8, 0xffffff, { emissive: 0xffffff, emissiveIntensity: 1.6 }); panel.position.set(sx * (E.W / 2 + 14), 34, sz * (E.H / 2 + 10)); panel.lookAt(0, 0, 0); scene.add(panel);
   });
+  // Porterías con red (línea de fondo y = 0 arriba e y = H abajo)
+  [0, 1].forEach((lado) => {
+    const g = new THREE.Group(); const sz = lado ? 1 : -1; const PR = E.PORTERIA;
+    [-PR / 2, PR / 2].forEach((x) => { const p = crea.cilindro(0.45, 0.45, 4, 0xffffff, 12); p.position.set(x, 2, 0); g.add(p); });
+    const lar = crea.cilindro(0.45, 0.45, PR + 0.9, 0xffffff, 12); lar.rotation.z = Math.PI / 2; lar.position.y = 4; g.add(lar);
+    const pts = []; for (let x = -PR / 2; x <= PR / 2 + 1e-6; x += 1) pts.push(x, 0, 3.5 * sz, x, 4, 3.5 * sz, x, 4, 0, x, 4, 3.5 * sz); for (let y = 0; y <= 4; y += 1) pts.push(-PR / 2, y, 3.5 * sz, PR / 2, y, 3.5 * sz);
+    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
+    g.add(new THREE.LineSegments(geo, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.6 })));
+    g.position.copy(a3(E.W / 2, lado ? E.H : 0)); scene.add(g);
+  });
+  // Chapas: cilindro con borde blanco y escudo; balón con textura
+  const chapas = {}; const balon = new THREE.Mesh(new THREE.SphereGeometry(E.RB, 32, 20), new THREE.MeshStandardMaterial({ map: texturaBalon(), roughness: 0.4 })); balon.castShadow = true; scene.add(balon);
+  IDS.forEach((id) => {
+    if (id === 'balon' || id.startsWith('poste')) return;
+    const eq = Number(id[1]); const g = new THREE.Group();
+    const cuerpo = crea.cilindro(E.RC, E.RC * 1.04, 1.3, Number(COLOR[eq].replace('#', '0x')), 40, { roughness: 0.25, metalness: 0.3 }); cuerpo.position.y = 0.65; g.add(cuerpo);
+    const aro = new THREE.Mesh(new THREE.TorusGeometry(E.RC * 0.98, 0.22, 10, 40), new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 0.6, roughness: 0.2 })); aro.rotation.x = Math.PI / 2; aro.position.y = 1.3; g.add(aro);
+    const escudo = crea.cartel(eq ? '🔵' : '🔴', E.RC * 1.1, E.RC * 1.1, { fondo: null, fuente: '180px sans-serif' }); escudo.rotation.x = -Math.PI / 2; escudo.position.y = 1.33; g.add(escudo);
+    scene.add(g); chapas[id] = g;
+  });
+  const anillo = new THREE.Mesh(new THREE.RingGeometry(E.RC * 1.25, E.RC * 1.55, 40), new THREE.MeshBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.95, side: THREE.DoubleSide })); anillo.rotation.x = -Math.PI / 2; anillo.visible = false; scene.add(anillo);
+  const flecha = new THREE.Group(); const fMat = new THREE.MeshBasicMaterial({ color: 0x22c55e }); const asta = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.3, 1), fMat); asta.position.z = 0.5; flecha.add(asta); const punta = new THREE.Mesh(new THREE.ConeGeometry(1.4, 2.6, 16), fMat); punta.rotation.x = Math.PI / 2; flecha.add(punta); flecha.visible = false; scene.add(flecha);
+  ctx.encuadrar({ centro: [0, 0, 0], ancho: E.W + 6, alto: E.H * 0.82, desde: girar ? [0, 1, -0.62] : [0, 1, 0.62], margen: 1.02 });
+  return { chapas, balon, anillo, flecha, asta, punta, fMat, prev: {} };
+}
+function pintarEstadio(o, pos, sel, tiro, util) {
+  const { a3 } = util;
+  IDS.forEach((id, i) => {
+    if (id.startsWith('poste')) return; const p = pos[i] || pos[id]; if (!p) return;
+    const m = id === 'balon' ? o.balon : o.chapas[id]; if (!m) return;
+    const nuevo = a3(p[0], p[1], id === 'balon' ? E.RB : 0); const ant = o.prev[id];
+    if (id === 'balon' && ant) { const d = nuevo.clone().sub(ant); if (d.lengthSq() > 1e-6) { const eje = new THREE.Vector3(d.z, 0, -d.x).normalize(); o.balon.rotateOnWorldAxis(eje, d.length() / E.RB); } }
+    m.position.copy(nuevo); o.prev[id] = nuevo;
+  });
+  const s = sel && o.chapas[sel]; o.anillo.visible = Boolean(s); if (s) o.anillo.position.set(s.position.x, 0.06, s.position.z);
+  if (tiro?.fin) {
+    const dx = tiro.x0 - tiro.fin[0]; const dy = tiro.y0 - tiro.fin[1]; const fuerza = Math.min(1, (Math.hypot(dx, dy) * FUERZA) / E.VMAX);
+    const largo = 4 + Math.hypot(dx, dy) * 1.2; const ini = a3(tiro.x0, tiro.y0, 1); const ang = Math.atan2(dx, dy);
+    o.flecha.visible = true; o.flecha.position.copy(ini).add(new THREE.Vector3(Math.sin(ang) * (E.RC + largo), 0, Math.cos(ang) * (E.RC + largo))); o.flecha.rotation.set(0, ang + Math.PI, 0);
+    o.asta.scale.z = largo; o.asta.position.z = largo / 2; o.fMat.color.setHSL((120 - fuerza * 120) / 360, 0.9, 0.55);
+  } else o.flecha.visible = false;
 }
 
 function Campo({ v, enviar, local }) {
@@ -71,7 +126,7 @@ function Campo({ v, enviar, local }) {
   const [animando, setAnimando] = useState(false);
   const [gol, setGol] = useState(null);
   const tiro = useRef(null); // arrastre en curso
-  const [ver, setVer] = useState(0);
+  const [, setVer] = useState(0);
   const posiciones = useMemo(() => IDS.map((id) => v.posiciones[id]), [v.posiciones]);
 
   // Animar el último tiro (el mismo cálculo que hizo el servidor)
@@ -89,32 +144,6 @@ function Campo({ v, enviar, local }) {
     }, ms);
     return () => clearTimeout(t);
   }, [ultimoN]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const dibujar = (ctx, k) => {
-    dibujarCampo(ctx, k, girar);
-    if (anim.current) {
-      const f = Math.min(anim.current.frames.length - 1, Math.floor(((performance.now() - anim.current.t0) / 1000) * 30));
-      dibujarCuerpos(ctx, k, anim.current.frames[f], girar);
-      return f < anim.current.frames.length - 1;
-    }
-    dibujarCuerpos(ctx, k, posiciones, girar, tiro.current?.chapa);
-    const t = tiro.current;
-    if (t?.fin) {
-      const tr = (x, y) => (girar ? [(E.W - x) * k, (E.H - y) * k] : [x * k, y * k]);
-      const [cx, cy] = tr(t.x0, t.y0); const [fx, fy] = tr(t.fin[0], t.fin[1]);
-      const dx = t.x0 - t.fin[0]; const dy = t.y0 - t.fin[1];
-      const fuerza = Math.min(1, (Math.hypot(dx, dy) * FUERZA) / E.VMAX);
-      const [ax, ay] = tr(t.x0 + dx * 1.2, t.y0 + dy * 1.2);
-      ctx.strokeStyle = 'rgba(255,255,255,0.6)'; ctx.setLineDash([4, 4]); ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(fx, fy); ctx.stroke(); ctx.setLineDash([]);
-      ctx.strokeStyle = `hsl(${120 - fuerza * 120}, 90%, 55%)`; ctx.lineWidth = 5;
-      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(ax, ay); ctx.stroke();
-      const ang = Math.atan2(ay - cy, ax - cx);
-      ctx.fillStyle = ctx.strokeStyle; ctx.beginPath(); ctx.moveTo(ax + Math.cos(ang) * 10, ay + Math.sin(ang) * 10);
-      ctx.lineTo(ax + Math.cos(ang + 2.5) * 10, ay + Math.sin(ang + 2.5) * 10); ctx.lineTo(ax + Math.cos(ang - 2.5) * 10, ay + Math.sin(ang - 2.5) * 10); ctx.fill();
-    }
-    return false;
-  };
 
   const puntero = (tipo, x0, y0) => {
     if (!miTurno || animando) return;
@@ -135,7 +164,10 @@ function Campo({ v, enviar, local }) {
 
   return (
     <div className="ch-campo">
-      <Lienzo2D ancho={E.W} alto={E.H} dibujar={dibujar} version={`${ver}-${ultimoN}-${girar}`} onPuntero={puntero} />
+      <Lienzo3D key={girar ? 'g' : 'n'} ancho={E.W} alto={E.H} proporcion="3 / 4" opciones={{ cielo: [0x020617, 0x1e3a8a], exposicion: 1.1 }}
+        montar={(ctx, util) => montarEstadio(ctx, util, girar)}
+        dibujar={(o, t, util) => { const a = anim.current; let pos = posiciones; if (a) { const f = Math.min(a.frames.length - 1, Math.floor(((performance.now() - a.t0) / 1000) * 30)); pos = a.frames[f]; } pintarEstadio(o, pos, a ? null : tiro.current?.chapa, a ? null : tiro.current, util); }}
+        onPuntero={(tipo, x, y) => puntero(tipo, girar ? E.W - x : x, girar ? E.H - y : y)} />
       {gol != null && <div className="ch-gol" style={{ '--c': COLOR[gol] }}>¡GOOOL!<small>de los {NOMBRE_EQ[gol]}</small></div>}
       {miTurno && !animando && <p className="ch-ayuda">Toca una chapa {local ? `de los ${NOMBRE_EQ[v.turnoEquipo]}` : 'tuya'}, arrastra hacia atrás y suelta</p>}
     </div>

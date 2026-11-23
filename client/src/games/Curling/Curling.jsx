@@ -4,49 +4,89 @@
 import React, { useEffect, useRef, useState } from 'react';
 import JuegoPulsador from '../Pulsador/JuegoPulsador.jsx';
 import LocalPorTurnos from '../comun/LocalPorTurnos.jsx';
-import Lienzo2D, { useReloj } from '../comun/Lienzo2D.jsx';
+import { useReloj } from '../comun/Lienzo2D.jsx';
+import Lienzo3D from '../comun/Lienzo3D.jsx';
+import { THREE, crea } from '../Habilidad/tres.js';
 import { Hero, Pildoras, AvisoTurno, useLatido, colorDe } from '../Pulsador/Vistas.jsx';
 import { BloqueConfig } from '../../components/MenuJuego.jsx';
 import { sonar, vibrar } from '../../lib/sonido.js';
 import * as E from './engine.js';
 import './Curling.css';
 
-const Y0 = 80; const Y1 = 146; // tramo de pista que se ve
-const ALTO = Y1 - Y0;
-const sy = (y) => Y1 - y;
 const PERIODO = 1500; // ms de la barra de fuerza (ida y vuelta)
 
-function dibujarPista(ctx, k) {
-  ctx.fillStyle = '#f0f9ff'; ctx.fillRect(0, 0, E.W * k, ALTO * k);
-  const cx = E.CASA.x * k; const cy = sy(E.CASA.y) * k;
-  [[12, '#2563eb'], [8, '#ffffff'], [4, '#dc2626'], [1.4, '#ffffff']].forEach(([r, c]) => { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(cx, cy, r * k, 0, Math.PI * 2); ctx.fill(); });
-  ctx.strokeStyle = 'rgba(15,23,42,0.35)'; ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, ALTO * k); ctx.moveTo(0, cy); ctx.lineTo(E.W * k, cy); ctx.stroke();
-  ctx.strokeStyle = '#dc2626'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, sy(E.FONDO) * k); ctx.lineTo(E.W * k, sy(E.FONDO) * k); ctx.stroke();
-  ctx.strokeStyle = '#2563eb'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, sy(E.HOG) * k); ctx.lineTo(E.W * k, sy(E.HOG) * k); ctx.stroke();
-  ctx.fillStyle = '#94a3b8'; ctx.fillRect(0, 0, 0.6 * k, ALTO * k); ctx.fillRect(E.W * k - 0.6 * k, 0, 0.6 * k, ALTO * k);
+/* ───────── Escena 3D: pabellón de hielo ───────── */
+function texturaHielo() {
+  const k = 14; const c = document.createElement('canvas'); c.width = E.W * k; c.height = E.L * k; const x = c.getContext('2d');
+  const g = x.createLinearGradient(0, 0, 0, c.height); g.addColorStop(0, '#f8fdff'); g.addColorStop(1, '#e6f4fb'); x.fillStyle = g; x.fillRect(0, 0, c.width, c.height);
+  for (let i = 0; i < 9000; i++) { x.fillStyle = `rgba(148,163,184,${Math.random() * 0.12})`; x.fillRect(Math.random() * c.width, Math.random() * c.height, 1.5, 1.5); } // «pebble» del hielo
+  const Y = (y) => y * k; const X = (xx) => xx * k;
+  // Casa (anillos) en las dos puntas, como en una pista de verdad
+  [E.CASA.y, E.L - E.CASA.y].forEach((cy) => [[12, '#1d4ed8'], [8, '#f8fdff'], [4, '#dc2626'], [1.4, '#f8fdff']].forEach(([r, col]) => { x.fillStyle = col; x.beginPath(); x.arc(X(E.CASA.x), Y(cy), r * k, 0, Math.PI * 2); x.fill(); }));
+  x.strokeStyle = 'rgba(15,23,42,0.35)'; x.lineWidth = 3; x.beginPath(); x.moveTo(X(E.W / 2), 0); x.lineTo(X(E.W / 2), c.height); x.stroke();
+  [[E.HOG, '#1d4ed8', 8], [E.L - E.HOG, '#1d4ed8', 8], [E.FONDO, '#dc2626', 4], [E.CASA.y, '#0f172a', 2]].forEach(([y, col, w]) => { x.strokeStyle = col; x.lineWidth = w; x.beginPath(); x.moveTo(0, Y(y)); x.lineTo(c.width, Y(y)); x.stroke(); });
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
 }
-function piedra(ctx, k, x, y, color, brillo) {
-  if (y < Y0 - 2) return;
-  const px = x * k; const py = sy(y) * k; const r = E.R * k;
-  ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.beginPath(); ctx.arc(px + 1.5, py + 2, r, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = '#9ca3af'; ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI * 2); ctx.fill();
-  ctx.fillStyle = color; ctx.beginPath(); ctx.arc(px, py, r * 0.68, 0, Math.PI * 2); ctx.fill();
-  ctx.strokeStyle = brillo ? '#facc15' : '#1f2937'; ctx.lineWidth = brillo ? 3 : 1.2; ctx.beginPath(); ctx.arc(px, py, r, 0, Math.PI * 2); ctx.stroke();
+function piedraModelo(color) {
+  const g = new THREE.Group();
+  const granito = crea.cilindro(E.R, E.R * 0.92, 0.85, 0x6b7280, 40, { roughness: 0.45, metalness: 0.1 }); granito.position.y = 0.45; g.add(granito);
+  const banda = crea.cilindro(E.R * 1.01, E.R * 1.01, 0.22, 0x9ca3af, 40, { roughness: 0.3 }); banda.position.y = 0.45; g.add(banda);
+  const tapa = crea.cilindro(E.R * 0.7, E.R * 0.75, 0.12, 0x111827, 32); tapa.position.y = 0.92; g.add(tapa);
+  const mat = new THREE.MeshStandardMaterial({ color: new THREE.Color(color), roughness: 0.3, emissive: new THREE.Color(color), emissiveIntensity: 0.25 });
+  const asa = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.32, E.R * 1.3), mat); asa.position.set(0, 1.22, -0.15); g.add(asa);
+  const pie = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.4, 0.32), mat); pie.position.set(0, 1.0, 0.4); g.add(pie);
+  g.traverse((m) => { if (m.isMesh) m.castShadow = true; });
+  return g;
 }
-function minimapa(ctx, k, puntos) {
-  // Toda la pista en una tira a la izquierda: para seguir la piedra antes de que llegue a la casa
-  const h = ALTO * k * 0.9; const x0 = 0.9 * k; const y0 = ALTO * k * 0.05; const w = 2.2 * k;
-  ctx.fillStyle = 'rgba(15,23,42,0.12)'; ctx.fillRect(x0, y0, w, h);
-  ctx.fillStyle = 'rgba(37,99,235,0.5)'; ctx.fillRect(x0, y0 + h * (1 - Y1 / E.L), w, h * (ALTO / E.L));
-  puntos.forEach(([y, c]) => { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(x0 + w / 2, y0 + h * (1 - y / E.L), w * 0.45, 0, Math.PI * 2); ctx.fill(); });
+function montarPabellon(ctx, util) {
+  const { scene } = ctx; const { a3 } = util;
+  const hielo = new THREE.Mesh(new THREE.PlaneGeometry(E.W, E.L), new THREE.MeshStandardMaterial({ map: texturaHielo(), roughness: 0.12, metalness: 0.05, envMapIntensity: 1.2 })); hielo.rotation.x = -Math.PI / 2; hielo.receiveShadow = true; scene.add(hielo);
+  const suelo = crea.suelo(E.W + 60, E.L + 60, 0x1e293b, { celda: 4 }); suelo.position.y = -0.3; scene.add(suelo);
+  [-1, 1].forEach((s) => { const b = crea.caja(1, 1.2, E.L, 0x1e40af, { roughness: 0.4 }); b.position.set(s * (E.W / 2 + 0.5), 0.3, 0); scene.add(b); const neon = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.15, E.L), crea.neon(0x38bdf8, 1.6)); neon.position.set(s * (E.W / 2 + 0.5), 0.95, 0); scene.add(neon); });
+  const fondoB = crea.caja(E.W + 2, 1.2, 1, 0x1e40af); fondoB.position.set(0, 0.3, E.L / 2 + 0.5); scene.add(fondoB);
+  // Gradas y público a los lados, banderolas y focos
+  const publico = new THREE.InstancedMesh(new THREE.SphereGeometry(0.7, 8, 6), new THREE.MeshStandardMaterial({ roughness: 0.6 }), 1200);
+  { const m4 = new THREE.Matrix4(); const c = new THREE.Color(); let n = 0;
+    [-1, 1].forEach((s) => { for (let f = 0; f < 4; f++) { const esc = crea.caja(3.4, 1.8, E.L, 0x334155); esc.position.set(s * (E.W / 2 + 5 + f * 3), 0.9 + f * 1.8, 0); scene.add(esc); for (let z = -E.L / 2; z < E.L / 2 && n < 1200; z += 1.7) { m4.makeTranslation(s * (E.W / 2 + 5 + f * 3) + (Math.random() - 0.5) * 0.6, 2.4 + f * 1.8, z); publico.setMatrixAt(n, m4); publico.setColorAt(n, c.setHex([0xef4444, 0xffffff, 0x3b82f6, 0xfacc15, 0x22c55e][Math.floor(Math.random() * 5)])); n++; } } });
+    publico.count = n; }
+  scene.add(publico);
+  for (let z = -E.L / 2 + 10; z < E.L / 2; z += 22) { const luz = crea.caja(8, 0.4, 3, 0xffffff, { emissive: 0xffffff, emissiveIntensity: 1.4 }); luz.position.set(0, 22, z); scene.add(luz); }
+  const piedras = []; const pedir = (i, color) => { if (!piedras[i]) { piedras[i] = { m: piedraModelo(color), color }; scene.add(piedras[i].m); } else if (piedras[i].color !== color) { scene.remove(piedras[i].m); piedras[i] = { m: piedraModelo(color), color }; scene.add(piedras[i].m); } return piedras[i].m; };
+  const linea = new THREE.Mesh(new THREE.PlaneGeometry(0.18, 1), new THREE.MeshBasicMaterial({ color: 0x0f172a, transparent: true, opacity: 0.45 })); linea.rotation.x = -Math.PI / 2; linea.position.y = 0.02; scene.add(linea);
+  const diana = new THREE.Mesh(new THREE.RingGeometry(0.6, 0.95, 24), new THREE.MeshBasicMaterial({ color: 0xfacc15 })); diana.rotation.x = -Math.PI / 2; diana.position.y = 0.03; scene.add(diana);
+  const efectos = { 1: crea.texto('↻', { tam: 3, color: '#0f172a' }), '-1': crea.texto('↺', { tam: 3, color: '#0f172a' }) }; Object.values(efectos).forEach((e) => scene.add(e));
+  const cam = { p: a3(E.W / 2, E.HOG - 22, 15), mira: a3(E.CASA.x, E.CASA.y, 0) };
+  return { ctx, piedras, pedir, linea, diana, efectos, cam };
+}
+function pintarPabellon(o, lista, apunta, util, dt) {
+  const { a3 } = util;
+  lista.forEach(([x, y, color], i) => { const m = o.pedir(i, color); m.visible = y > -5; m.position.copy(a3(x, y)); m.rotation.y += i === 0 && apunta?.anim ? dt * 2 : 0; });
+  o.piedras.forEach((p, i) => { if (i >= lista.length) p.m.visible = false; });
+  // Línea de puntería hasta la casa
+  const ver = Boolean(apunta?.mio);
+  o.linea.visible = ver; o.diana.visible = ver; Object.entries(o.efectos).forEach(([k, e]) => { e.visible = ver && String(apunta?.efecto) === k; });
+  if (ver) {
+    const rad = (apunta.ang * Math.PI) / 180; const xCasa = E.SALIDA.x + Math.tan(rad) * (E.CASA.y - E.SALIDA.y); const yIni = E.HOG - 20;
+    const xIni = E.SALIDA.x + Math.tan(rad) * (yIni - E.SALIDA.y);
+    const a = a3(xIni, yIni, 0.02); const b = a3(xCasa, E.CASA.y, 0.02); const mid = a.clone().add(b).multiplyScalar(0.5); const largo = a.distanceTo(b);
+    o.linea.position.set(mid.x, 0.02, mid.z); o.linea.scale.y = largo; o.linea.rotation.z = Math.atan2(b.x - a.x, b.z - a.z);
+    o.diana.position.set(b.x, 0.03, b.z);
+    if (apunta.efecto) o.efectos[String(apunta.efecto)].position.set(b.x + apunta.efecto * 3, 2.5, b.z - 4);
+  }
+  // Cámara: detrás de la piedra mientras viaja; si no, mirando la casa
+  const cam = o.ctx.camera; const k = o.ctx.ancho(0.6); let destP; let destM;
+  if (apunta?.anim && lista.length) { const [x, y] = lista[0]; const yc = Math.min(y, E.CASA.y - 6); destP = a3(E.W / 2, yc - 16 * k, 8 + 3 * k); destM = a3(x * 0.3 + E.W / 2 * 0.7, Math.min(E.CASA.y, y + 14), 0); }
+  else { destP = a3(E.W / 2, E.HOG - 8 - 10 * k, 13 + 6 * k); destM = a3(E.CASA.x, E.CASA.y - 2, 0); }
+  const s = 1 - Math.exp(-(dt || 0.016) * 3); o.cam.p.lerp(destP, s); o.cam.mira.lerp(destM, s);
+  cam.position.copy(o.cam.p); cam.lookAt(o.cam.mira);
 }
 
 function Pista({ v, enviar, local }) {
   const miTurno = v.fase === 'turno' && (local || v.turno === v.yo?.id);
   const [ang, setAng] = useState(0);
   const [efecto, setEfecto] = useState(0);
-  const [ver, setVer] = useState(0);
+  const angRef = useRef(0); angRef.current = ang; const efectoRef = useRef(0); efectoRef.current = efecto;
+  const [, setVer] = useState(0);
   const [animando, setAnimando] = useState(false);
   const anim = useRef(null);
   const carga = useRef(null);
@@ -63,29 +103,6 @@ function Pista({ v, enviar, local }) {
     return () => clearTimeout(t);
   }, [ultimoN]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const dibujar = (ctx, k) => {
-    dibujarPista(ctx, k);
-    const a = anim.current;
-    if (a) {
-      const f = Math.min(a.frames.length - 1, Math.floor(((performance.now() - a.t0) / 1000) * 40));
-      const fr = a.frames[f];
-      a.ids.forEach((s, i) => piedra(ctx, k, fr[i][0], fr[i][1], colorDe(s.de), i === 0));
-      minimapa(ctx, k, [[fr[0][1], colorDe(a.ids[0].de)]]);
-      return f < a.frames.length - 1;
-    }
-    v.piedras.forEach((s) => piedra(ctx, k, s.x, s.y, colorDe(s.de)));
-    if (miTurno) {
-      // Línea de puntería hasta la casa (recta: el efecto la curvará)
-      const rad = (ang * Math.PI) / 180;
-      const xCasa = E.SALIDA.x + Math.tan(rad) * (E.CASA.y - E.SALIDA.y);
-      ctx.strokeStyle = 'rgba(15,23,42,0.55)'; ctx.setLineDash([5, 5]); ctx.lineWidth = 2;
-      const xBase = E.SALIDA.x + Math.tan(rad) * (Y0 - E.SALIDA.y);
-      ctx.beginPath(); ctx.moveTo(xBase * k, ALTO * k); ctx.lineTo(xCasa * k, sy(E.CASA.y) * k); ctx.stroke(); ctx.setLineDash([]);
-      ctx.fillStyle = '#facc15'; ctx.beginPath(); ctx.arc(xCasa * k, sy(E.CASA.y) * k, 0.8 * k, 0, Math.PI * 2); ctx.fill();
-      if (efecto) { ctx.fillStyle = '#0f172a'; ctx.font = `800 ${Math.round(2.6 * k)}px sans-serif`; ctx.textAlign = 'center'; ctx.fillText(efecto > 0 ? '↻' : '↺', xCasa * k + efecto * 3 * k, sy(E.CASA.y + 6) * k); }
-    }
-    return false;
-  };
   const puntero = (tipo, x) => {
     if (!miTurno || animando || tipo === 'up') return;
     if (tipo === 'down' || tipo === 'move') {
@@ -111,7 +128,14 @@ function Pista({ v, enviar, local }) {
 
   return (
     <div className="cu-caja">
-      <Lienzo2D ancho={E.W} alto={ALTO} dibujar={dibujar} version={`${ver}-${ultimoN}-${ang}-${efecto}`} onPuntero={puntero} altoMax={460} />
+      <Lienzo3D ancho={E.W} alto={E.L} opciones={{ cielo: [0x0f172a, 0x1e3a8a], exposicion: 1.1 }} montar={montarPabellon}
+        dibujar={(o, t, util, dt) => {
+          const a = anim.current; let lista;
+          if (a) { const f = Math.min(a.frames.length - 1, Math.floor(((performance.now() - a.t0) / 1000) * 40)); lista = a.ids.map((s, i) => [a.frames[f][i][0], a.frames[f][i][1], colorDe(s.de)]); }
+          else lista = v.piedras.map((s) => [s.x, s.y, colorDe(s.de)]);
+          pintarPabellon(o, lista, { anim: Boolean(a), mio: miTurno && !a, ang: angRef.current, efecto: efectoRef.current }, util, dt);
+        }}
+        onPuntero={puntero} />
       {miTurno && !animando && (
         <div className="cu-mandos">
           <p className="cu-ayuda">Desliza sobre el hielo para apuntar · ángulo {ang > 0 ? '+' : ''}{ang}°</p>

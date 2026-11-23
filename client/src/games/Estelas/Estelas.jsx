@@ -4,7 +4,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import JuegoPulsador from '../Pulsador/JuegoPulsador.jsx';
 import { claveSesion } from '../Pulsador/PulsadorOnline.jsx';
-import Lienzo2D from '../comun/Lienzo2D.jsx';
+import Lienzo3D from '../comun/Lienzo3D.jsx';
+import { THREE, crea } from '../Habilidad/tres.js';
 import { Hero, Pildoras, useLatido } from '../Pulsador/Vistas.jsx';
 import { BloqueConfig, PanelMenu, Cabecera } from '../../components/MenuJuego.jsx';
 import Icon from '../../components/Icon.jsx';
@@ -16,31 +17,55 @@ import './Estelas.css';
 export const NEON = ['#22d3ee', '#f472b6', '#facc15', '#4ade80', '#a78bfa', '#fb923c', '#f87171', '#e2e8f0'];
 const API = '/api/estelas';
 
-/** Dibuja la cuadrícula con los rastros. fuente() → { jugadores: [{ id, color, vivo, rastro }] } */
-function Tablero({ fuente, version, miId, onGiro, miDir }) {
-  const toque = useRef(null);
-  const dibujar = (ctx, k) => {
-    const s = fuente();
-    ctx.fillStyle = '#020617'; ctx.fillRect(0, 0, E.C * k, E.F * k);
-    ctx.strokeStyle = 'rgba(148,163,184,0.08)'; ctx.lineWidth = 1;
-    for (let x = 0; x <= E.C; x += 4) { ctx.beginPath(); ctx.moveTo(x * k, 0); ctx.lineTo(x * k, E.F * k); ctx.stroke(); }
-    for (let y = 0; y <= E.F; y += 4) { ctx.beginPath(); ctx.moveTo(0, y * k); ctx.lineTo(E.C * k, y * k); ctx.stroke(); }
-    s.jugadores.forEach((j) => {
-      const c = NEON[j.color % NEON.length];
-      ctx.globalAlpha = j.vivo ? 1 : 0.35;
-      ctx.fillStyle = c;
-      j.rastro.forEach(([x, y]) => ctx.fillRect(x * k + 0.5, y * k + 0.5, k - 1, k - 1));
-      const cab = j.rastro[j.rastro.length - 1];
-      if (cab && j.vivo) {
-        ctx.shadowColor = c; ctx.shadowBlur = 12; ctx.fillStyle = '#ffffff';
-        ctx.fillRect(cab[0] * k - 1, cab[1] * k - 1, k + 2, k + 2); ctx.shadowBlur = 0;
-        if (j.id === miId) { ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2; ctx.strokeRect(cab[0] * k - 4, cab[1] * k - 4, k + 8, k + 8); }
-      }
-      ctx.globalAlpha = 1;
-    });
-    ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 3; ctx.strokeRect(1.5, 1.5, E.C * k - 3, E.F * k - 3);
-    return false;
+/* ───────── Escena 3D: arena de neón ───────── */
+// Cada rastro es un muro de luz (una caja por casilla, en InstancedMesh por jugador); la cabeza es una moto de luz
+// con su propio brillo. Suelo de rejilla luminosa, bordes de neón y la ciudad de fondo.
+function montarArena(ctx, util) {
+  const { scene } = ctx; const { a3 } = util; const MAX = E.C * E.F;
+  const suelo = new THREE.Mesh(new THREE.PlaneGeometry(E.C, E.F), new THREE.MeshStandardMaterial({ color: 0x020617, roughness: 0.25, metalness: 0.6 })); suelo.rotation.x = -Math.PI / 2; suelo.receiveShadow = true; scene.add(suelo);
+  const pts = []; for (let x = 0; x <= E.C; x += 2) pts.push(x - E.C / 2, 0.01, -E.F / 2, x - E.C / 2, 0.01, E.F / 2); for (let y = 0; y <= E.F; y += 2) pts.push(-E.C / 2, 0.01, y - E.F / 2, E.C / 2, 0.01, y - E.F / 2);
+  const rej = new THREE.BufferGeometry(); rej.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3)); scene.add(new THREE.LineSegments(rej, new THREE.LineBasicMaterial({ color: 0x1e3a8a, transparent: true, opacity: 0.55 })));
+  const borde = crea.marco(E.C, E.F, 0x38bdf8, { grosor: 0.35, alto: 1.4, intensidad: 2.2 }); borde.position.y = 0.7; scene.add(borde);
+  const afuera = crea.suelo(E.C + 80, E.F + 80, 0x0b1026, { celda: 4, contraste: 0.04 }); afuera.position.y = -0.05; scene.add(afuera);
+  // Ciudad de fondo: torres con ventanas que brillan
+  for (let k = 0; k < 40; k++) { const h = 6 + Math.random() * 26; const ang = (k / 40) * Math.PI * 2; const d = 52 + Math.random() * 14; const t = crea.caja(4 + Math.random() * 4, h, 4 + Math.random() * 4, 0x0f172a, { emissive: [0x1d4ed8, 0x7c3aed, 0x0e7490][k % 3], emissiveIntensity: 0.35, roughness: 0.4 }); t.position.set(Math.cos(ang) * d, h / 2, Math.sin(ang) * d); scene.add(t); }
+  const capas = new Map(); const geoMuro = new THREE.BoxGeometry(0.92, 1.1, 0.92); const m4 = new THREE.Matrix4();
+  const capaDe = (j) => {
+    let c = capas.get(j.id);
+    if (!c) {
+      const col = new THREE.Color(NEON[j.color % NEON.length]);
+      const muro = new THREE.InstancedMesh(geoMuro, new THREE.MeshStandardMaterial({ color: col, emissive: col, emissiveIntensity: 1.3, roughness: 0.3, transparent: true, opacity: 0.92 }), MAX); muro.count = 0; scene.add(muro);
+      const moto = new THREE.Group(); const cuerpo = new THREE.Mesh(new THREE.CapsuleGeometry(0.42, 0.9, 6, 12), new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: col, emissiveIntensity: 2 })); cuerpo.rotation.x = Math.PI / 2; cuerpo.position.y = 0.6; moto.add(cuerpo);
+      const luz = new THREE.PointLight(col, 18, 10); luz.position.y = 1.4; moto.add(luz); scene.add(moto);
+      const halo = new THREE.Mesh(new THREE.RingGeometry(0.9, 1.15, 24), new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide })); halo.rotation.x = -Math.PI / 2; halo.position.y = 0.05; moto.add(halo);
+      c = { muro, moto, halo, n: 0, ronda: null, muerto: false }; capas.set(j.id, c);
+    }
+    return c;
   };
+  ctx.encuadrar({ centro: [0, 0, 1.5], ancho: E.C + 2, alto: E.F * 0.82, desde: [0, 1, 0.55], margen: 1.02 });
+  return { ctx, a3, capas, capaDe, m4 };
+}
+function pintarArena(o, jugadores, miId, t) {
+  const vistos = new Set();
+  jugadores.forEach((j) => {
+    const c = o.capaDe(j); vistos.add(j.id);
+    if (j.rastro.length < c.n) c.n = 0; // ronda nueva
+    for (let i = c.n; i < j.rastro.length; i++) { const [x, y] = j.rastro[i]; o.m4.makeTranslation(x + 0.5 - E.C / 2, 0.55, y + 0.5 - E.F / 2); c.muro.setMatrixAt(i, o.m4); }
+    c.n = j.rastro.length; c.muro.count = c.n; c.muro.instanceMatrix.needsUpdate = true;
+    c.muro.material.opacity = j.vivo ? 0.92 : 0.3; c.muro.material.emissiveIntensity = j.vivo ? 1.3 : 0.3;
+    const cab = j.rastro[j.rastro.length - 1]; const ant = j.rastro[j.rastro.length - 2];
+    c.moto.visible = Boolean(cab) && j.vivo;
+    if (cab) { c.moto.position.set(cab[0] + 0.5 - E.C / 2, 0, cab[1] + 0.5 - E.F / 2); if (ant) c.moto.rotation.y = Math.atan2(cab[0] - ant[0], cab[1] - ant[1]); }
+    c.halo.visible = j.id === miId; c.halo.scale.setScalar(1 + Math.sin(t * 6) * 0.12);
+    if (!j.vivo && !c.muerto && cab) { c.muerto = true; o.ctx.chispas(new THREE.Vector3(cab[0] - E.C / 2, 1, cab[1] - E.F / 2), new THREE.Color(NEON[j.color % NEON.length]).getHex(), 40, { fuerza: 8, tam: 0.25 }); o.ctx.temblor(0.4); }
+    if (j.vivo) c.muerto = false;
+  });
+  o.capas.forEach((c, id) => { if (!vistos.has(id)) { c.muro.count = 0; c.moto.visible = false; } });
+}
+
+/** Arena con los rastros. fuente() → { jugadores: [{ id, color, vivo, rastro }] } */
+function Tablero({ fuente, miId, onGiro, miDir }) {
+  const toque = useRef(null);
   const puntero = (tipo, x, y, e) => {
     if (tipo === 'down') { toque.current = { x: e.clientX, y: e.clientY, mx: x }; return; }
     if (tipo !== 'up' || !toque.current) return;
@@ -50,7 +75,7 @@ function Tablero({ fuente, version, miId, onGiro, miDir }) {
     if (Math.hypot(dx, dy) > 24) onGiro(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 1 : 3) : (dy > 0 ? 2 : 0));
     else onGiro(t.mx < E.C / 2 ? (actual + 3) % 4 : (actual + 1) % 4);
   };
-  return <Lienzo2D ancho={E.C} alto={E.F} dibujar={dibujar} version={version} onPuntero={puntero} />;
+  return <Lienzo3D ancho={E.C} alto={E.F} proporcion="5 / 6" opciones={{ cielo: [0x020617, 0x1e1b4b], sombras: false, exposicion: 1.1 }} montar={montarArena} dibujar={(o, t) => pintarArena(o, fuente().jugadores, miId, t)} onPuntero={puntero} />;
 }
 
 function useTecladoGiros(onGiro, miDir) {
