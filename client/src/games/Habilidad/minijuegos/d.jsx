@@ -226,6 +226,8 @@ function Petanca({ semilla, alTerminar }) {
     const anilloB = new THREE.Mesh(new THREE.RingGeometry(0.25, 0.32, 32), new THREE.MeshBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.7, side: THREE.DoubleSide })); anilloB.rotation.x = -Math.PI / 2; anilloB.position.set(boliche.position.x, 0.01, boliche.position.z); scene.add(anilloB);
     const flecha = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.6, 12), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.85 })); flecha.rotation.x = -Math.PI / 2; flecha.visible = false; scene.add(flecha);
     const st = { bolas: [], actual: null, ini: null, quedan: 4, mejor: Infinity, fin: false, salida: 0 };
+    // Encuadre: la pista entera (de la línea de tiro al fondo) cabe siempre en pantalla, también en vertical
+    ctx.encuadrar({ centro: [0, 0, -5.2], ancho: 7.8, alto: 15.5, desde: [0, 0.9, 0.62], margen: 1.04 });
     const nueva = () => { const b = crea.esfera(0.32, 0x94a3b8, { metalness: 0.95, roughness: 0.18 }); b.position.set(st.salida, 0.32, 3); scene.add(b); st.actual = { m: b, v: new THREE.Vector3(), mueve: false }; };
     // Desde dónde se lanza: ◀ ▶ (o las flechas del teclado) mueven la bola por la línea de tiro antes de lanzar
     ctl.current.lado = (d) => { const a = st.actual; if (!a || a.mueve || st.fin) return; st.salida = Math.max(-2.6, Math.min(2.6, st.salida + d * 0.4)); a.m.position.x = st.salida; sonar('tic', { minimo: 0, vibrar: false }); };
@@ -248,16 +250,15 @@ function Petanca({ semilla, alTerminar }) {
         st.actual.v.set((dx / Math.hypot(dx, dy)) * v * 0.6, 0, -v); st.actual.mueve = true; sonar('toque', { minimo: 0 });
       },
       frame(dt) {
-        const k = ctx.ancho(0.85);
-        camera.position.set(0, 4.5 * Math.sqrt(k), 7 * k); camera.lookAt(0, 0, -4.5);
         const a = st.actual; if (!a || !a.mueve) return;
         const vel = a.v.length(); const nv = Math.max(0, vel - 4.5 * dt);
         if (vel > 0) a.v.multiplyScalar(nv / vel);
         a.m.position.addScaledVector(a.v, dt); a.m.rotation.x -= a.v.z * dt * 3;
         st.bolas.forEach((b) => { const d = b.m.position.distanceTo(a.m.position); if (d < 0.64 && d > 0) { const n = a.m.position.clone().sub(b.m.position).setY(0).normalize(); const vn = a.v.dot(n); if (vn < 0) { a.v.addScaledVector(n, -vn * 1.6); sonar('tic', { minimo: 0, vibrar: false }); } } });
         if (Math.abs(a.m.position.x) > 3.2) { a.v.x *= -0.5; a.m.position.x = Math.sign(a.m.position.x) * 3.2; }
-        if (nv === 0 || a.m.position.z < -13.8) {
-          a.mueve = false; const fuera = a.m.position.z < -13.8; const d = Math.round(Math.hypot(a.m.position.x - boliche.position.x, a.m.position.z - boliche.position.z) * 100);
+        if (a.m.position.z < -13.6) { a.v.z = Math.abs(a.v.z) * 0.4; a.m.position.z = -13.6; sonar('tic', { minimo: 0, vibrar: false }); }
+        if (nv === 0) {
+          a.mueve = false; const fuera = false; const d = Math.round(Math.hypot(a.m.position.x - boliche.position.x, a.m.position.z - boliche.position.z) * 100);
           st.mejor = Math.min(st.mejor, fuera ? 9999 : d); st.quedan--; st.bolas.push(a);
           if (!fuera && d < 40) { ctx.chispas(a.m.position.clone().setY(0.4), 0xfacc15, 24); ctx.onda(new THREE.Vector3(boliche.position.x, 0.02, boliche.position.z), 0xfacc15); }
           setMsg(fuera ? 'Fuera de la pista' : `A ${d} cm del boliche`); sonar(d < 30 ? 'victoria' : 'carta');

@@ -108,3 +108,5 @@
 @media (max-width: 480px) { .hb-sel-grid button small { -webkit-line-clamp: 2; } .hb-sel-titulo h3 { font-size: 1.3rem; } }
 .hb-botones.lados { justify-content: space-between; pointer-events: none; }
 .hb-botones.lados .hb-boton { flex: 0 0 4.4rem; pointer-events: auto; }
+.hb-fuerza { position: absolute; right: 0.8rem; top: 22%; bottom: 22%; width: 0.9rem; border-radius: 999px; background: rgba(15, 23, 42, 0.55); border: 1px solid rgba(255, 255, 255, 0.35); overflow: hidden; pointer-events: none; display: flex; align-items: flex-end; }
+.hb-fuerza i { display: block; width: 100%; background: linear-gradient(0deg, #22c55e, #facc15 60%, #ef4444); border-radius: 999px; }

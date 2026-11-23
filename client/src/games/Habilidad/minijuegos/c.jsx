@@ -94,36 +94,57 @@ function Saltar({ semilla, alTerminar }) {
     for (let k = 0; k < LARGO / 10; k++) { const linea = crea.caja(0.12, 0.012, 3, 0xffffff); linea.position.set(k * 10, 0.006, 0); scene.add(linea); }
     // Grada al fondo
     for (let x = -10; x < LARGO; x += 6) { const g = crea.caja(6, 1.6, 2, r.de([0x1e3a8a, 0x1d4ed8, 0x2563eb])); g.position.set(x, 0.5, -6); scene.add(g); }
-    // Vallas: se colocan sobre la marcha según la velocidad. Cada vez más juntas, más altas y con dobles y triples
-    // seguidas (hay que caer y volver a saltar al instante). Llegar al final de los 60 s es muy difícil.
-    const AIRE = (2 * 10.5) / 28; // segundos en el aire de un salto
-    const obs = []; let sigX = 18;
-    const ponerValla = (x, dif) => { const alto = r.entre(0.55, 0.85 + dif * 0.35); const o = valla(alto, r.de([0xdb2777, 0x0ea5e9, 0x16a34a, 0xf59e0b])); o.position.set(x, 0, 0); scene.add(o); obs.push({ o, x, alto, ancho: 0.4 }); };
+    // Obstáculos generados sobre la marcha según la velocidad (cada vez más rápida):
+    //  · vallas: hay que saltarlas (el salto es corto, así que hay que calcular bien el momento);
+    //  · pájaros a la altura de la cabeza al saltar: NO hay que saltar (y a veces vienen justo detrás de una valla).
+    // Las combinaciones se van endureciendo: dobles, triples y valla + pájaro. Aguantar los 60 s es muy difícil.
+    const VY = 9.2; const G = 34; const AIRE = (2 * VY) / G; // ~0,54 s en el aire, salto de ~1,25 m
+    const obs = []; let sigX = 20;
+    const ponerValla = (x, dif) => { const alto = r.entre(0.6, 0.78 + dif * 0.3); const o = valla(alto, r.de([0xdb2777, 0x0ea5e9, 0x16a34a, 0xf59e0b])); o.position.set(x, 0, 0); scene.add(o); obs.push({ o, x, abajo: 0, arriba: alto, ancho: 0.4 }); };
+    const ponerPajaro = (x) => {
+      const g = new THREE.Group(); const cuerpo = crea.esfera(0.24, 0x1f2937); cuerpo.scale.set(1.5, 0.9, 0.9); g.add(cuerpo);
+      const pico = crea.cilindro(0, 0.08, 0.22, 0xf59e0b, 8); pico.rotation.z = Math.PI / 2; pico.position.x = -0.42; g.add(pico);
+      const alas = [-1, 1].map((s2) => { const a = crea.caja(0.36, 0.04, 0.5, 0x374151); a.position.set(0, 0.05, s2 * 0.32); g.add(a); return a; });
+      const y = r.entre(2.0, 2.25); g.position.set(x, y, 0); scene.add(g); obs.push({ o: g, x, abajo: y - 0.22, arriba: y + 0.22, ancho: 0.6, alas, pajaro: true });
+    };
     const generar = (hasta, v, t) => {
       while (sigX < hasta) {
-        const dif = Math.min(1, t / 50); // 0 al principio → 1 a los 50 s
-        ponerValla(sigX, dif);
-        // Serie de vallas casi seguidas: la siguiente justo donde se aterriza
-        const serie = r() < dif * 0.55 ? r.entero(1, dif > 0.7 ? 2 : 1) : 0;
+        const dif = Math.min(1, t / 40); // 0 al principio → 1 a los 40 s
+        const tipo = r();
         let x = sigX;
-        for (let i = 0; i < serie; i++) { x += v * (AIRE + r.entre(0.08, 0.2)); ponerValla(x, dif); }
-        // Hueco hasta la siguiente: entre 1,6 s y 0,95 s de carrera según avanza la partida
-        sigX = x + v * r.entre(AIRE + 0.2 + (1 - dif) * 0.9, AIRE + 0.5 + (1 - dif) * 1.2);
+        if (tipo < 0.12 + dif * 0.18) {
+          // Pájaro: hay que quedarse en el suelo (a veces con una valla justo antes o después)
+          ponerPajaro(x);
+          if (r() < 0.25 + dif * 0.45) { x += v * r.entre(AIRE * 0.75, AIRE * 1.1); ponerValla(x, dif); }
+        } else {
+          ponerValla(x, dif);
+          // Serie: la siguiente valla justo donde se aterriza (hay que volver a saltar al instante)
+          const serie = r() < 0.2 + dif * 0.6 ? r.entero(1, dif > 0.5 ? 3 : 1) : 0;
+          for (let k = 0; k < serie; k++) { x += v * (AIRE + r.entre(0.05, 0.16)); ponerValla(x, dif); }
+          // …o un pájaro justo detrás: si saltas tarde, te lo comes
+          if (r() < dif * 0.35) { x += v * r.entre(AIRE * 0.95, AIRE * 1.2); ponerPajaro(x); }
+        }
+        sigX = x + v * r.entre(AIRE + 0.25 + (1 - dif) * 0.6, AIRE + 0.55 + (1 - dif) * 0.9);
       }
     };
     const jugador = corredor(); jugador.rotation.y = Math.PI / 2; scene.add(jugador);
-    const st = { x: 0, y: 0, vy: 0, vel: 7, t: 0, fin: false, fase: 0 };
-    const saltar = () => { if (st.fin || st.y > 0.02) return; st.vy = 10.5; sonar('toque', { minimo: 0 }); };
+    const st = { x: 0, y: 0, vy: 0, vel: 9, t: 0, fin: false, fase: 0 };
+    const saltar = () => { if (st.fin || st.y > 0.02) return; st.vy = VY; sonar('toque', { minimo: 0 }); };
+    const tecla = (e) => { if (e.key === ' ' || e.key === 'ArrowUp') { e.preventDefault(); saltar(); } };
+    window.addEventListener('keydown', tecla);
     return {
+      fin: () => window.removeEventListener('keydown', tecla),
       toque: saltar,
-      frame(dt) {
+      frame(dt, tt) {
+        obs.forEach((o) => { if (o.alas) o.alas.forEach((a, k) => { a.rotation.x = Math.sin(tt * 14 + k * Math.PI) * 0.6; }); });
         if (!st.fin) {
-          st.t += dt; st.vel = Math.min(21, 7 + st.t * 0.26); st.x += st.vel * dt;
+          st.t += dt; st.vel = Math.min(25, 9 + st.t * 0.4); st.x += st.vel * dt;
           generar(st.x + 70, st.vel, st.t);
           for (let i = obs.length - 1; i >= 0; i--) if (obs[i].x < st.x - 15) { scene.remove(obs[i].o); obs.splice(i, 1); }
-          st.vy -= 28 * dt; st.y += st.vy * dt; if (st.y <= 0) { st.y = 0; st.vy = 0; }
-          const choque = obs.find((o) => Math.abs(o.x - st.x) < o.ancho / 2 + 0.28 && st.y < o.alto - 0.08);
-          if (choque) { st.fin = true; vibrar(150); sonar('fallo'); ctx.temblor(0.5); ctx.chispas(new THREE.Vector3(st.x + 0.3, choque.alto, 0), 0xffffff, 24); choque.o.rotation.z = -1.2; jugador.rotation.z = 1.2; setMsg('💥 ¡Choque!'); setTimeout(() => alTerminar(Math.floor(st.x)), 900); }
+          st.vy -= G * dt; st.y += st.vy * dt; if (st.y <= 0) { st.y = 0; st.vy = 0; }
+          // El corredor ocupa de st.y a st.y + 1,7 m
+          const choque = obs.find((o) => Math.abs(o.x - st.x) < o.ancho / 2 + 0.25 && st.y < o.arriba - 0.03 && st.y + 1.7 > o.abajo);
+          if (choque) { st.fin = true; vibrar(150); sonar('fallo'); ctx.temblor(0.5); ctx.chispas(new THREE.Vector3(st.x + 0.3, choque.arriba, 0), 0xffffff, 24); choque.o.rotation.z = -1.2; jugador.rotation.z = 1.2; setMsg('💥 ¡Choque!'); setTimeout(() => alTerminar(Math.floor(st.x)), 900); }
           if (st.t >= 60) { st.fin = true; alTerminar(Math.floor(st.x)); }
           st.fase += st.vel * dt * 1.6;
         }
@@ -139,7 +160,7 @@ function Saltar({ semilla, alTerminar }) {
       }
     };
   }, { cielo: [0x38bdf8, 0xfef3c7], niebla: 70 });
-  return <div className="hb-caja"><div ref={ref} className="hb-lienzo" /><Hud izq={`🏃 ${m} m`} der="Toca para saltar" /><Mensaje texto={msg} tipo="mal" /></div>;
+  return <div className="hb-caja"><div ref={ref} className="hb-lienzo" /><Hud izq={`🏃 ${m} m`} der="Salta vallas · no saltes pájaros" /><Mensaje texto={msg} tipo="mal" /></div>;
 }
 
 /* ───────── Lluvia de meteoritos ───────── */
@@ -199,98 +220,143 @@ function Meteoritos({ semilla, alTerminar }) {
   return <div className="hb-caja"><div ref={ref} className="hb-lienzo" /><Hud izq={`☄️ ${t.toFixed(1).replace('.', ',')} s`} der="Arrastra para esquivar" /><Mensaje texto={msg} tipo="mal" /></div>;
 }
 
-/* ───────── Canasta (tirachinas con trayectoria) ───────── */
-// Arrastra el dedo hacia ABAJO (como estirar un tirachinas): cuanto más largo, más fuerte; hacia los lados apuntas.
-// Mientras apuntas se ve el principio de la trayectoria. Al soltar, lanza.
+/* ───────── Canasta (lanzamiento libre: todo depende de tu puntería) ───────── */
+// Desliza hacia arriba para tirar: la inclinación del gesto da la dirección y su largo, la fuerza. No hay línea de
+// trayectoria: hay que calcular. Cada canasta te lleva a otro sitio de la cancha (más cerca o más lejos, de frente o
+// desde la esquina). Detrás de la línea de 6,75 m vale 3. Sin tocar aro, +1. Tres seguidas: ¡en racha!, puntos dobles.
 function Canasta({ semilla, alTerminar }) {
-  const ref = useRef(null); const [hud, setHud] = useState({ n: 0, t: 45, racha: 0 }); const [msg, setMsg] = useState(null);
+  const ref = useRef(null); const [hud, setHud] = useState({ pts: 0, t: 45, racha: 0, triple: false, dist: 0 }); const [msg, setMsg] = useState(null);
+  const [carga, setCarga] = useState(null); // { pot } mientras se arrastra (barra de fuerza)
   useEscena(ref, (ctx) => {
-    const { scene, camera } = ctx; const r = rng(semilla);
-    const parquet = crea.suelo(16, 18, 0xd97706, { celda: 0.7, contraste: 0.05 }); parquet.position.set(0, 0, -3); scene.add(parquet);
-    const linea = new THREE.Mesh(new THREE.RingGeometry(3.1, 3.2, 48, 1, 0, Math.PI), new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide })); linea.rotation.x = -Math.PI / 2; linea.position.set(0, 0.01, -6); scene.add(linea);
-    const pared = crea.caja(16, 9, 0.4, 0x1e3a8a, { roughness: 0.8 }); pared.position.set(0, 4.5, -8.2); scene.add(pared);
+    const { scene, camera } = ctx; const r = rng(semilla); const TIEMPO = 45; const G = 9.8;
+    const H = new THREE.Vector3(0, 3.05, 0); // centro del aro
+    // Pabellón: parqué, líneas, zona, pared con público y focos
+    const parquet = crea.suelo(18, 16, 0xd97706, { celda: 0.6, contraste: 0.05 }); parquet.position.set(0, 0, 5); scene.add(parquet);
+    const blanco = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide });
+    const arco = new THREE.Mesh(new THREE.RingGeometry(6.7, 6.8, 80, 1, 0, Math.PI), blanco); arco.rotation.x = -Math.PI / 2; arco.rotation.z = Math.PI; arco.position.set(0, 0.012, 0); scene.add(arco);
+    const zona = new THREE.Mesh(new THREE.PlaneGeometry(4.9, 5.8), new THREE.MeshStandardMaterial({ color: 0x1d4ed8, roughness: 0.7 })); zona.rotation.x = -Math.PI / 2; zona.position.set(0, 0.008, 2.9); scene.add(zona);
+    const tiro = new THREE.Mesh(new THREE.RingGeometry(1.75, 1.85, 48, 1, 0, Math.PI), blanco); tiro.rotation.x = -Math.PI / 2; tiro.position.set(0, 0.014, 5.8); scene.add(tiro);
+    const fondo = crea.caja(30, 12, 0.4, 0x0f172a); fondo.position.set(0, 6, -3.2); scene.add(fondo);
+    const publico = new THREE.InstancedMesh(new THREE.SphereGeometry(0.15, 8, 6), new THREE.MeshStandardMaterial({ roughness: 0.6 }), 900);
+    { const m4 = new THREE.Matrix4(); const c = new THREE.Color(); let n = 0; for (let f = 0; f < 10; f++) for (let x = -13; x <= 13 && n < 900; x += 0.42) { m4.makeTranslation(x + r.entre(-0.08, 0.08), 1.4 + f * 0.48, -2.9); publico.setMatrixAt(n, m4); publico.setColorAt(n, c.setHex(r.de([0xef4444, 0x3b82f6, 0xfacc15, 0xffffff, 0x22c55e, 0xf97316]))); n++; } publico.count = n; }
+    scene.add(publico);
+    [-7, 7].forEach((x) => { const l = new THREE.SpotLight(0xffffff, 50, 30, 0.5, 0.5); l.position.set(x, 11, 6); l.target.position.set(0, 2, 0); scene.add(l, l.target); });
+    // Canasta: poste, brazo, tablero con cuadro, aro y red
     const canasta = new THREE.Group();
-    const poste = crea.cilindro(0.1, 0.12, 3.6, 0x334155, 12); poste.position.set(0, -1.6, -1.3); canasta.add(poste);
-    const brazo = crea.caja(0.14, 0.14, 0.9, 0x334155); brazo.position.set(0, 0.1, -0.95); canasta.add(brazo);
-    const tablero = crea.caja(2, 1.3, 0.08, 0xf8fafc, { roughness: 0.1, transparent: true, opacity: 0.92 }); tablero.position.set(0, 0.62, -0.55); canasta.add(tablero);
-    const cuadro = crea.marco(0.62, 0.48, 0xef4444, { intensidad: 0.3, grosor: 0.04 }); cuadro.rotation.x = Math.PI / 2; cuadro.position.set(0, 0.4, -0.5); canasta.add(cuadro);
-    const aro = new THREE.Mesh(new THREE.TorusGeometry(0.46, 0.035, 10, 40), mat(0xf97316, { metalness: 0.5, roughness: 0.3 })); aro.rotation.x = Math.PI / 2; aro.castShadow = true; canasta.add(aro);
-    const red = new THREE.Mesh(new THREE.CylinderGeometry(0.46, 0.3, 0.55, 16, 3, true), new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.8 })); red.position.y = -0.28; canasta.add(red);
-    const AROY = 3.05; const AROZ = -5.2;
-    canasta.position.set(0, AROY, AROZ); scene.add(canasta);
-    const TIEMPO = 45;
-    // Puntos de la trayectoria
-    const puntos = Array.from({ length: 14 }, (_, i) => { const p = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 1 - i * 0.06 })); p.visible = false; scene.add(p); return p; });
-    const G = 12;
-    // La bola preparada sale cada vez en un sitio distinto (altura, lado y distancia al azar)
-    const nuevaBola = () => {
-      const m = crea.esfera(0.24, 0xea580c, { roughness: 0.6 }); const inicio = new THREE.Vector3(r.entre(-1.3, 1.3), r.entre(1.2, 2.1), r.entre(1.1, 2.2));
-      m.position.copy(inicio); scene.add(m); const sombra = crea.sombraSuave(0.35); sombra.position.set(inicio.x, 0.012, inicio.z); scene.add(sombra);
-      ctx.onda(new THREE.Vector3(inicio.x, 0.02, inicio.z), 0xffffff, { radio: 0.8 });
-      return { m, sombra, inicio, p: inicio.clone(), v: new THREE.Vector3(), tv: 0, encestado: false, tocoAro: false };
+    const poste = crea.cilindro(0.12, 0.14, 3.9, 0x334155, 12); poste.position.set(0, -1.1, -1.5); canasta.add(poste);
+    const brazo = crea.caja(0.14, 0.14, 1.1, 0x334155); brazo.position.set(0, 0.7, -1); canasta.add(brazo);
+    const tablero = crea.caja(1.8, 1.05, 0.06, 0xf8fafc, { roughness: 0.1, transparent: true, opacity: 0.9 }); tablero.position.set(0, 0.55, -0.42); canasta.add(tablero);
+    const cuadro = crea.marco(0.59, 0.45, 0xef4444, { intensidad: 0.4, grosor: 0.05 }); cuadro.rotation.x = Math.PI / 2; cuadro.position.set(0, 0.33, -0.38); canasta.add(cuadro);
+    const aro = new THREE.Mesh(new THREE.TorusGeometry(0.23, 0.02, 10, 40), new THREE.MeshStandardMaterial({ color: 0xf97316, metalness: 0.5, roughness: 0.3, emissive: 0x7c2d12, emissiveIntensity: 0.3 })); aro.rotation.x = Math.PI / 2; canasta.add(aro);
+    const red = new THREE.Mesh(new THREE.CylinderGeometry(0.23, 0.15, 0.42, 16, 3, true), new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.85 })); red.position.y = -0.21; canasta.add(red);
+    canasta.position.copy(H); scene.add(canasta);
+    const R_ARO = 0.23; const R_BOLA = 0.12; const TABLERO_Z = H.z - 0.39;
+    // Sitios de tiro: distancia (m) y ángulo respecto al frente de la canasta
+    const puesto = { d: 3.2, ang: 0, pos: new THREE.Vector3() };
+    const nuevoPuesto = (primero) => {
+      if (primero) { puesto.d = 3.2; puesto.ang = 0; } else {
+        let d; let a; do { d = r.entre(2.8, 7.6); a = r.entre(-1.15, 1.15); } while (Math.abs(d - puesto.d) < 0.8 && Math.abs(a - puesto.ang) < 0.3);
+        puesto.d = d; puesto.ang = a;
+      }
+      puesto.pos.set(Math.sin(puesto.ang) * puesto.d, 0, Math.cos(puesto.ang) * puesto.d);
+      marca.position.set(puesto.pos.x, 0.02, puesto.pos.z); ctx.onda(marca.position.clone(), 0xfacc15, { radio: 1 });
+      setHud((h) => ({ ...h, triple: puesto.d > 6.75, dist: puesto.d }));
     };
-    const st = { t: 0, n: 0, racha: 0, lista: nuevaBola(), vuelo: [], ini: null, apunta: null, fin: false };
-    const velDesde = (dx, dy, rr) => {
-      // dy > 0: arrastre hacia abajo. Potencia según la longitud (relativa a la pantalla), dirección según dx.
-      const pot = Math.min(1, Math.max(0, dy / (rr.height * 0.38)));
-      const lado = Math.max(-1, Math.min(1, -dx / (rr.width * 0.5)));
-      const v0 = 6 + pot * 6.5; const ang = THREE.MathUtils.degToRad(52);
-      return new THREE.Vector3(lado * 3.2, Math.sin(ang) * v0, -Math.cos(ang) * v0);
+    const marca = new THREE.Mesh(new THREE.RingGeometry(0.32, 0.4, 32), new THREE.MeshBasicMaterial({ color: 0xfacc15, side: THREE.DoubleSide })); marca.rotation.x = -Math.PI / 2; scene.add(marca);
+    // Bolas: la de la mano y las que vuelan
+    const texBalon = (() => { const c = document.createElement('canvas'); c.width = 128; c.height = 64; const x = c.getContext('2d'); x.fillStyle = '#ea580c'; x.fillRect(0, 0, 128, 64); x.strokeStyle = '#1c1917'; x.lineWidth = 3; [[0, 32, 128, 32], [64, 0, 64, 64]].forEach(([a, b, cc, d]) => { x.beginPath(); x.moveTo(a, b); x.lineTo(cc, d); x.stroke(); }); x.beginPath(); x.arc(0, 32, 30, -1.2, 1.2); x.stroke(); x.beginPath(); x.arc(128, 32, 30, Math.PI - 1.2, Math.PI + 1.2); x.stroke(); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })();
+    const matBalon = new THREE.MeshStandardMaterial({ map: texBalon, roughness: 0.65 });
+    const matFuego = new THREE.MeshStandardMaterial({ map: texBalon, roughness: 0.4, emissive: 0xf97316, emissiveIntensity: 0.9 });
+    const balon = () => { const m = new THREE.Mesh(new THREE.SphereGeometry(R_BOLA, 24, 16), matBalon); m.castShadow = true; scene.add(m); return m; };
+    const st = { t: 0, pts: 0, racha: 0, mano: null, vuelo: [], ini: null, fin: false, enfriar: 0 };
+    const salida = () => { const dir = H.clone().sub(puesto.pos).setY(0).normalize(); return puesto.pos.clone().addScaledVector(dir, 0.35).setY(2.05); };
+    const enMano = () => { st.mano = balon(); st.mano.material = st.racha >= 3 ? matFuego : matBalon; st.mano.position.copy(salida()); };
+    nuevoPuesto(true); enMano();
+    const cam = { p: new THREE.Vector3(), mira: new THREE.Vector3() };
+    const camDestino = () => { const dir = puesto.pos.clone().setY(0).normalize(); const k = ctx.ancho(0.75); return { p: puesto.pos.clone().addScaledVector(dir, 3.4 * k).setY(3.1 + 0.4 * k), mira: H.clone().setY(2.2) }; };
+    { const d = camDestino(); cam.p.copy(d.p); cam.mira.copy(d.mira); }
+    // Gesto → velocidad. Fuerza: largo del deslizamiento respecto a la pantalla. Dirección: su inclinación.
+    const velDe = (dx, dy, rr) => {
+      const pot = Math.min(1, Math.max(0, dy / (rr.height * 0.5)));
+      const lado = Math.atan2(dx, dy) * 0.35; // radianes hacia un lado
+      const v0 = 5.5 + pot * 5; const elev = THREE.MathUtils.degToRad(62); // tiro con buena parábola (entra desde arriba)
+      const base = H.clone().sub(puesto.pos).setY(0).normalize(); const dir = base.applyAxisAngle(new THREE.Vector3(0, 1, 0), -lado);
+      return { v: new THREE.Vector3(dir.x * Math.cos(elev) * v0, Math.sin(elev) * v0, dir.z * Math.cos(elev) * v0), pot };
     };
-    const quitar = (b) => { scene.remove(b.m); scene.remove(b.sombra); };
-    const k = () => ctx.ancho(0.75);
+    const lanzar = (v) => {
+      const b = { m: st.mano, p: st.mano.position.clone(), v, tv: 0, aro: false, dentro: false, fuego: st.racha >= 3 };
+      st.vuelo.push(b); st.mano = null; st.enfriar = 0.35; sonar('toque', { minimo: 0 });
+    };
+    const anotar = (b) => {
+      const triple = puesto.d > 6.75; let p = triple ? 3 : 2; const limpia = !b.aro; if (limpia) p += 1;
+      if (b.fuego) p *= 2;
+      st.pts += p; st.racha += 1; sonar('victoria'); red.scale.y = 1.5;
+      ctx.chispas(H.clone(), b.fuego ? 0xf97316 : 0xfacc15, b.fuego ? 50 : 28, { fuerza: 4 });
+      setMsg(`${triple ? '🎯 ¡Triple!' : '🏀 ¡Canasta!'}${limpia ? ' Limpia' : ''} +${p}${b.fuego ? ' 🔥' : ''}`); setTimeout(() => setMsg(null), 800);
+      if (st.racha === 3) { setMsg('🔥 ¡En racha! Puntos dobles'); setTimeout(() => setMsg(null), 900); }
+      nuevoPuesto(false);
+    };
     return {
-      toque(e) { if (!st.fin) st.ini = [e.clientX, e.clientY]; },
+      toque(e) { if (!st.fin && st.mano) st.ini = [e.clientX, e.clientY]; },
       mover(e) {
-        if (!st.ini || st.fin) return; const rr = ctx.el.getBoundingClientRect(); const b = st.lista; const I = b.inicio;
-        const dx = e.clientX - st.ini[0]; const dy = e.clientY - st.ini[1];
-        if (dy < 12) { st.apunta = null; puntos.forEach((p) => { p.visible = false; }); b.m.position.copy(I); return; }
-        st.apunta = velDesde(dx, dy, rr);
-        // Se enseña solo el principio de la curva (lo justo para apuntar)
-        puntos.forEach((p, i) => { const tt = (i + 1) * 0.045; p.position.set(I.x + st.apunta.x * tt, I.y + st.apunta.y * tt - 0.5 * G * tt * tt, I.z + st.apunta.z * tt); p.visible = true; });
-        b.m.position.set(I.x - dx * 0.002, I.y - Math.min(0.4, dy * 0.0015), I.z + Math.min(0.5, dy * 0.002));
+        if (!st.ini || !st.mano) return; const rr = ctx.el.getBoundingClientRect();
+        const dx = e.clientX - st.ini[0]; const dy = st.ini[1] - e.clientY;
+        if (dy < 10) { setCarga(null); return; }
+        const { pot } = velDe(dx, dy, rr); setCarga({ pot });
+        st.mano.position.copy(salida()).add(new THREE.Vector3(0, -0.25 * pot, 0));
       },
-      soltar() {
-        puntos.forEach((p) => { p.visible = false; });
-        if (!st.ini) return; st.ini = null; const b = st.lista;
-        if (!st.apunta || st.fin) { b.m.position.copy(b.inicio); return; }
-        // Sale la bola y aparece la siguiente al momento (no hay que esperar a que caiga)
-        b.v.copy(st.apunta); b.p.copy(b.inicio); st.apunta = null; st.vuelo.push(b); sonar('toque', { minimo: 0 });
-        st.lista = nuevaBola();
+      soltar(e) {
+        setCarga(null);
+        if (!st.ini || !st.mano) { st.ini = null; return; }
+        const rr = ctx.el.getBoundingClientRect(); const dx = e.clientX - st.ini[0]; const dy = st.ini[1] - e.clientY; st.ini = null;
+        st.mano.position.copy(salida());
+        if (dy < 25 || st.fin) return;
+        lanzar(velDe(dx, dy, rr).v);
       },
       frame(dt) {
         if (!st.fin) st.t += dt;
-        canasta.position.x = st.t > 12 ? Math.sin((st.t - 12) * 1.1) * 1.6 : 0;
-        const c = canasta.position;
+        // La canasta se empieza a mover a mitad de partida
+        canasta.position.x = st.t > 22 ? Math.sin((st.t - 22) * 0.9) * 1.2 : 0; H.x = canasta.position.x;
+        if (!st.mano && !st.fin) { st.enfriar -= dt; if (st.enfriar <= 0) enMano(); }
         for (let i = st.vuelo.length - 1; i >= 0; i--) {
-          const b = st.vuelo[i];
-          b.tv += dt; const yAntes = b.p.y;
-          b.v.y -= G * dt; b.p.addScaledVector(b.v, dt); b.m.rotation.x -= dt * 10;
-          // Rebote en el aro (contra el tubo del aro)
-          const dxz = Math.hypot(b.p.x - c.x, b.p.z - c.z); const dAro = Math.hypot(dxz - 0.46, b.p.y - c.y);
-          if (dAro < 0.27 && !b.encestado) {
-            const n = new THREE.Vector3(b.p.x - c.x, 0, b.p.z - c.z).normalize().multiplyScalar(dxz > 0.46 ? 1 : -1); n.y = (b.p.y - c.y) / Math.max(0.01, dAro); n.normalize();
-            const vn = b.v.dot(n); if (vn < 0) { b.v.addScaledVector(n, -1.6 * vn); b.v.multiplyScalar(0.75); b.tocoAro = true; sonar('tic', { minimo: 0, vibrar: false }); }
+          const b = st.vuelo[i]; b.tv += dt;
+          for (let k = 0; k < 3; k++) { // subpasos: colisiones más fiables
+            const h = dt / 3; const yAntes = b.p.y;
+            b.v.y -= G * h; b.p.addScaledVector(b.v, h);
+            // Aro (toro): distancia al anillo
+            const dxz = Math.hypot(b.p.x - H.x, b.p.z - H.z); const dAro = Math.hypot(dxz - R_ARO, b.p.y - H.y);
+            if (dAro < R_BOLA + 0.02) {
+              const n = new THREE.Vector3(b.p.x - H.x, 0, b.p.z - H.z).normalize().multiplyScalar(dxz > R_ARO ? 1 : -1); n.y = (b.p.y - H.y) / Math.max(0.01, dAro); n.normalize();
+              const vn = b.v.dot(n); if (vn < 0) { b.v.addScaledVector(n, -1.55 * vn); b.v.multiplyScalar(0.8); b.aro = true; sonar('tic', { minimo: 0, vibrar: false }); }
+              b.p.copy(new THREE.Vector3(H.x, H.y, H.z).add(new THREE.Vector3((b.p.x - H.x) / dxz * R_ARO, 0, (b.p.z - H.z) / dxz * R_ARO)).addScaledVector(n, R_BOLA + 0.021));
+            }
+            // Tablero
+            if (b.v.z < 0 && b.p.z - R_BOLA < TABLERO_Z && b.p.z > TABLERO_Z - 0.2 && Math.abs(b.p.x - H.x) < 0.9 && b.p.y > H.y + 0.02 && b.p.y < H.y + 1.08) { b.v.z = -b.v.z * 0.6; b.p.z = TABLERO_Z + R_BOLA; b.aro = b.aro || false; sonar('tic', { minimo: 0, vibrar: false }); }
+            // Canasta: cruza la altura del aro hacia abajo por dentro
+            if (!b.dentro && yAntes > H.y && b.p.y <= H.y && b.v.y < 0 && Math.hypot(b.p.x - H.x, b.p.z - H.z) < R_ARO - R_BOLA * 0.6) { b.dentro = true; if (!st.fin) anotar(b); b.v.x *= 0.3; b.v.z *= 0.3; }
+            // Suelo
+            if (b.p.y < R_BOLA) { b.p.y = R_BOLA; b.v.y = Math.abs(b.v.y) * 0.55; b.v.x *= 0.8; b.v.z *= 0.8; }
           }
-          // Rebote en el tablero
-          if (b.p.z < c.z - 0.47 && b.p.z > c.z - 0.75 && Math.abs(b.p.x - c.x) < 1 && b.p.y > c.y - 0.05 && b.p.y < c.y + 1.3 && b.v.z < 0) { b.v.z = -b.v.z * 0.55; b.p.z = c.z - 0.47; sonar('tic', { minimo: 0, vibrar: false }); }
-          // Canasta: cruza la altura del aro bajando y por dentro
-          if (!b.encestado && yAntes > c.y && b.p.y <= c.y && b.v.y < 0 && dxz < 0.4 && !st.fin) {
-            b.encestado = true; st.n++; st.racha++; sonar('victoria'); ctx.chispas(new THREE.Vector3(c.x, c.y, c.z), 0xfacc15, 30, { fuerza: 4 });
-            red.scale.y = 1.4; setMsg(b.tocoAro ? '🏀 ¡Canasta!' : st.racha > 1 ? `🔥 ¡Limpia! ×${st.racha}` : '✨ ¡Limpia!'); setTimeout(() => setMsg(null), 650);
-          }
-          if (b.p.y < 0.24) { b.p.y = 0.24; b.v.y = Math.abs(b.v.y) * 0.45; b.v.x *= 0.8; b.v.z *= 0.8; }
-          b.m.position.copy(b.p); b.sombra.position.set(b.p.x, 0.012, b.p.z); b.sombra.scale.setScalar(Math.max(0.4, 1.4 - b.p.y * 0.2));
-          if (b.tv > 2.6) { if (!b.encestado) st.racha = 0; quitar(b); st.vuelo.splice(i, 1); }
+          b.m.position.copy(b.p); b.m.rotation.x -= dt * 9;
+          if (b.tv > 2.8) { if (!b.dentro && !st.fin) st.racha = 0; scene.remove(b.m); st.vuelo.splice(i, 1); }
         }
         red.scale.y += (1 - red.scale.y) * Math.min(1, dt * 6);
-        const kk = k(); camera.position.set(0, 2.2 + kk * 0.5, 5.4 * kk); camera.lookAt(0, 2.2, -3.5);
-        if (!st.fin && st.t >= TIEMPO) { st.fin = true; alTerminar(st.n); }
-        setHud((h) => (h.n !== st.n || h.t !== Math.ceil(TIEMPO - st.t) || h.racha !== st.racha ? { n: st.n, t: Math.max(0, Math.ceil(TIEMPO - st.t)), racha: st.racha } : h));
+        const d = camDestino(); const s2 = 1 - Math.exp(-dt * 3); cam.p.lerp(d.p, s2); cam.mira.lerp(d.mira, s2);
+        camera.position.copy(cam.p); camera.lookAt(cam.mira);
+        if (!st.fin && st.t >= TIEMPO) { st.fin = true; alTerminar(st.pts); }
+        setHud((h) => (h.pts !== st.pts || h.t !== Math.ceil(TIEMPO - st.t) || h.racha !== st.racha ? { ...h, pts: st.pts, t: Math.max(0, Math.ceil(TIEMPO - st.t)), racha: st.racha } : h));
       }
     };
-  }, { cielo: [0x1e40af, 0x0f172a], niebla: 40 });
-  return <div className="hb-caja"><div ref={ref} className="hb-lienzo" /><Hud izq={`🏀 ${hud.n} canastas`} centro={hud.racha > 1 ? `🔥 ×${hud.racha}` : null} der={`⏱️ ${hud.t}s`} /><Mensaje texto={msg} /><p className="hb-pista">Arrastra hacia abajo para tensar y suelta para lanzar</p></div>;
+  }, { cielo: [0x0f172a, 0x020617], niebla: 45, exposicion: 1.15 });
+  return (
+    <div className="hb-caja">
+      <div ref={ref} className="hb-lienzo" />
+      <Hud izq={`🏀 ${hud.pts} pts`} centro={hud.racha >= 3 ? `🔥 ×2` : hud.triple ? '🎯 Triple' : `${hud.dist.toFixed(1).replace('.', ',')} m`} der={`⏱️ ${hud.t}s`} />
+      <Mensaje texto={msg} />
+      {carga && <div className="hb-fuerza"><i style={{ height: `${Math.round(carga.pot * 100)}%` }} /></div>}
+      <p className="hb-pista">Desliza hacia arriba: inclinación = dirección, largo = fuerza</p>
+    </div>
+  );
 }
 
 /* ───────── Al ritmo ───────── */
@@ -343,8 +409,8 @@ function Ritmo({ semilla, alTerminar }) {
 
 export default [
   { id: 'parejas', nombre: 'Parejas', emoji: '🃏', como: 'Da la vuelta a las fichas de dos en dos y encuentra las 8 parejas lo más rápido posible.', mejor: 'menos', unidad: 's', peor: 114, duracion: 90, C: Parejas, formato: (v) => `${v.toFixed(1).replace('.', ',')} s` },
-  { id: 'saltar', nombre: 'Salta obstáculos', emoji: '🏃', como: 'Corres solo y cada vez más rápido: toca la pantalla para saltar las vallas. Cada vez salen más juntas y más altas, y luego dobles y triples. Llega lo más lejos posible: aguantar los 60 segundos es muy difícil.', mejor: 'mas', unidad: 'm', duracion: 60, C: Saltar },
+  { id: 'saltar', nombre: 'Salta obstáculos', emoji: '🏃', como: 'Corres solo y cada vez más rápido: toca la pantalla (o espacio) para saltar las vallas. El salto es corto: calcula el momento. ¡No saltes cuando venga un pájaro! Salen vallas dobles y triples y combinaciones con pájaros. Aguantar los 60 segundos es muy difícil.', mejor: 'mas', unidad: 'm', duracion: 60, C: Saltar },
   { id: 'meteoritos', nombre: 'Lluvia de meteoritos', emoji: '☄️', como: 'Arrastra el dedo a izquierda o derecha (en cualquier parte de la pantalla) para mover tu nave y esquivar los meteoritos. El círculo rojo marca dónde caen. Aguanta 45 segundos.', mejor: 'mas', unidad: 's', duracion: 45, C: Meteoritos, formato: (v) => `${v.toFixed(1).replace('.', ',')} s` },
-  { id: 'canasta', nombre: 'Canasta', emoji: '🏀', como: 'Como un tirachinas: arrastra el dedo hacia abajo para tensar (más largo, más fuerte) y hacia los lados para apuntar. Verás por dónde irá la bola. Suelta para lanzar: la siguiente bola sale al momento, cada vez en un sitio distinto. A los 12 segundos la canasta empieza a moverse. 45 segundos.', mejor: 'mas', unidad: 'canastas', duracion: 45, C: Canasta },
+  { id: 'canasta', nombre: 'Canasta', emoji: '🏀', como: 'Desliza el dedo hacia arriba para tirar: la inclinación del gesto marca la dirección y su largo, la fuerza (sin línea de ayuda: hay que calcular). Cada canasta te lleva a otro sitio de la cancha. Canasta 2, triple 3, sin tocar aro +1 y tres seguidas: puntos dobles. A mitad de partida la canasta se mueve. 45 segundos.', mejor: 'mas', unidad: 'pts', duracion: 45, C: Canasta },
   { id: 'ritmo', nombre: 'Al ritmo', emoji: '🎵', como: 'Pulsa el botón del color justo cuando la bola llega al aro. En el momento exacto: +3; casi: +1; si pulsas sin nota, −1. Con racha de 10, punto extra.', mejor: 'mas', unidad: 'pts', duracion: 30, C: Ritmo }
 ];
