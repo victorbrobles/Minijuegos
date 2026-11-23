@@ -40,8 +40,10 @@ export function campo(n = 2) {
     const c = [W / 2, H / 2];
     return { W, H, centro: c, n: 2, lados: [lado([0, H], [W, H], 0, ...c), lado([W, 0], [0, 0], 1, ...c), lado([0, 0], [0, H], null, ...c), lado([W, H], [W, 0], null, ...c)] };
   }
-  const v = POLIGONOS[n]; let cx = 0; let cy = 0; v.forEach(([x, y]) => { cx += x / n; cy += y / n; });
-  return { W: 100, H: 100, centro: [cx, cy], n, lados: v.map((p, i) => lado(v[(i - 1 + n) % n], p, i, cx, cy)) };
+  // Polígonos de POLIGONOS (caja de 100) agrandados un 30 % para que haya sitio para todas las chapas
+  const v = POLIGONOS[n].map(([x, y]) => [Math.round((65 + (x - 50) * 1.3) * 1000) / 1000, Math.round((65 + (y - 50) * 1.3) * 1000) / 1000]);
+  let cx = 0; let cy = 0; v.forEach(([x, y]) => { cx += x / n; cy += y / n; });
+  return { W: 130, H: 130, centro: [cx, cy], n, lados: v.map((p, i) => lado(v[(i - 1 + n) % n], p, i, cx, cy)) };
 }
 const ladoDe = (cp, i) => cp.lados.find((l) => l.dueno === i);
 
@@ -50,7 +52,7 @@ export function colocacion(n = 2) {
   const cp = campo(n); const c = [{ id: 'balon', x: cp.centro[0], y: cp.centro[1], r: RB, m: 0.45 }];
   for (let i = 0; i < Math.max(2, n); i++) {
     const l = ladoDe(cp, i); const [mx, my] = l.medio; const [nx, ny] = l.n; const [tx, ty] = l.t;
-    const prof = n <= 2 ? [13, 30] : n === 3 ? [8, 13] : [8, 15]; const ancho = n <= 2 ? 15 : n === 3 ? 8 : 9;
+    const prof = n <= 2 ? [13, 30] : n === 3 ? [10, 18] : [10, 20]; const ancho = n <= 2 ? 15 : n === 3 ? 11 : 12;
     [[0, prof[0]], [-ancho, prof[1]], [ancho, prof[1]]].forEach(([s, d], k) => c.push({ id: `e${i}c${k}`, x: mx + nx * d + tx * s, y: my + ny * d + ty * s, r: RC, m: 1 }));
   }
   let k = 0;

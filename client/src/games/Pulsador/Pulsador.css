@@ -285,7 +285,7 @@
   cursor: pointer;
 }
 .pzp-pildora:disabled { cursor: default; opacity: 0.6; }
-.pzp-pildora.activo { border-color: transparent !important; background: linear-gradient(135deg, var(--pz1), var(--pz2)) !important; color: #ffffff !important; opacity: 1; }
+.pzp-pildora.activo { border-color: transparent !important; background: linear-gradient(135deg, var(--pz1, #22d3ee), var(--pz2, #4f46e5)) !important; color: #ffffff !important; opacity: 1; }
 
 /* ---------- Sala de espera, ayuda, modales, avisos ---------- */
 .pzp-sala-extra { display: inline-flex; align-items: center; gap: 0.5rem; margin-left: auto; }

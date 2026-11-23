@@ -1029,7 +1029,7 @@ export const META = {
     icono: 'target',
     colores: ['#0ea5e9', '#dc2626'],
     etiquetas: 'curling hielo piedras diana efecto fuerza habilidad por turnos online',
-    descripcion: "Curling sobre hielo en 2D: apunta, elige el efecto y suelta la barra de fuerza en el punto justo. Acerca tus piedras al centro de la diana y saca las de los rivales.",
+    descripcion: "Curling sobre hielo en 3D: apunta, elige el efecto, clava la fuerza y frota la pantalla para barrer mientras la piedra desliza. Hielo distinto en cada manga, piedra pesada para sacar rivales y doble premio en el botón.",
     categorias: ['habilidad']
   },
   'estelas': {

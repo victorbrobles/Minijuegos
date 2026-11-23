@@ -8,26 +8,30 @@
 const r3 = (v) => Math.round(v * 1000) / 1000;
 
 /**
- * Simula hasta que todo se para (o hasta `pasosMax` fotogramas de 1/60 s).
+ * Simulación paso a paso (un fotograma de 1/60 s por llamada a `paso()`), para poder reaccionar mientras ocurre (el
+ * barrido del curling). `simular` la usa para hacerlo todo de golpe, así que las dos dan exactamente lo mismo.
  * opciones: roce (deceleración por segundo), rebote (entre discos), sub (subpasos), cadaFrame (guardar cada n),
  *   paredes(cuerpos) → choques con los bordes; evento(cuerpos) → algo que corta la simulación (gol, fuera…)
- *   fuerza(cuerpo, dt) → fuerza extra (efecto del curling)
+ *   fuerza(cuerpo, dt, f) → fuerza extra (efecto del curling); roceDe(cuerpo, f) → roce propio de un cuerpo
+ *   (f es el número de fotograma, desde 1)
  */
-export function simular(cuerposIniciales, { roce = 20, rebote = 0.9, sub = 4, cadaFrame = 2, pasosMax = 900, paredes, evento, fuerza, roceDe } = {}) {
+export function crearSimulacion(cuerposIniciales, { roce = 20, rebote = 0.9, sub = 4, cadaFrame = 2, pasosMax = 900, paredes, evento, fuerza, roceDe } = {}) {
   const cs = cuerposIniciales.map((c) => ({ ...c }));
   const frames = [cs.map((c) => [r3(c.x), r3(c.y)])];
   const dt = 1 / 60 / sub;
-  let fin = null;
-  for (let f = 1; f <= pasosMax && !fin; f++) {
-    for (let s = 0; s < sub && !fin; s++) {
+  const s = { cs, frames, f: 1, fin: null, acabado: false };
+  s.paso = () => {
+    if (s.acabado) return false;
+    const f = s.f;
+    for (let k = 0; k < sub && !s.fin; k++) {
       // Movimiento y roce
       for (const c of cs) {
         if (c.m === Infinity || c.fuera) continue;
-        if (fuerza) fuerza(c, dt);
+        if (fuerza) fuerza(c, dt, f);
         const v = Math.sqrt(c.vx * c.vx + c.vy * c.vy);
         if (v > 0) {
-          const baja = (roceDe ? roceDe(c) : roce) * dt;
-          if (v <= baja) { c.vx = 0; c.vy = 0; } else { const k = (v - baja) / v; c.vx *= k; c.vy *= k; }
+          const baja = (roceDe ? roceDe(c, f) : roce) * dt;
+          if (v <= baja) { c.vx = 0; c.vy = 0; } else { const q = (v - baja) / v; c.vx *= q; c.vy *= q; }
         }
         c.x += c.vx * dt; c.y += c.vy * dt;
       }
@@ -54,14 +58,25 @@ export function simular(cuerposIniciales, { roce = 20, rebote = 0.9, sub = 4, ca
         }
       }
       if (paredes) paredes(cs);
-      if (evento) fin = evento(cs) || null;
+      if (evento) s.fin = evento(cs) || null;
     }
-    if (f % cadaFrame === 0 || fin) frames.push(cs.map((c) => [r3(c.x), r3(c.y)]));
-    if (!fin && cs.every((c) => c.m === Infinity || c.fuera || (c.vx === 0 && c.vy === 0))) break;
-  }
-  frames.push(cs.map((c) => [r3(c.x), r3(c.y)]));
-  cs.forEach((c) => { c.vx = 0; c.vy = 0; c.x = r3(c.x); c.y = r3(c.y); });
-  return { cuerpos: cs, frames, evento: fin };
+    if (f % cadaFrame === 0 || s.fin) frames.push(cs.map((c) => [r3(c.x), r3(c.y)]));
+    s.f += 1;
+    if (s.fin || s.f > pasosMax || cs.every((c) => c.m === Infinity || c.fuera || (c.vx === 0 && c.vy === 0))) {
+      s.acabado = true;
+      frames.push(cs.map((c) => [r3(c.x), r3(c.y)]));
+      cs.forEach((c) => { c.vx = 0; c.vy = 0; c.x = r3(c.x); c.y = r3(c.y); });
+    }
+    return !s.acabado;
+  };
+  return s;
+}
+
+/** Simula hasta que todo se para (o hasta `pasosMax` fotogramas de 1/60 s). Mismas opciones que crearSimulacion. */
+export function simular(cuerposIniciales, opciones = {}) {
+  const s = crearSimulacion(cuerposIniciales, opciones);
+  while (s.paso()) { /* sigue */ }
+  return { cuerpos: s.cs, frames: s.frames, evento: s.fin };
 }
 
 /** Rebote contra un borde recto: devuelve la componente de velocidad invertida y amortiguada. */

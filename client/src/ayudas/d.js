@@ -302,15 +302,18 @@ export default {
     gana: 'El último tanque con vida (o el que más vida tenga si se acaban los turnos).'
   },
   'curling': {
-    objetivo: 'Curling sobre hielo: deja tus piedras **lo más cerca posible del centro** de la diana.',
+    objetivo: 'Curling sobre hielo: deja tus piedras **lo más cerca posible del centro** de la diana… y saca las de los rivales.',
     pasos: [
       'Por turnos, cada jugador lanza sus piedras (4, 3 o 2 según cuántos seáis). En cada manga el orden rota: tirar el último es una ventaja.',
-      '**Desliza sobre el hielo** para apuntar y elige el **efecto**: la piedra se curva hacia ese lado cuando va frenando.',
-      '**Mantén pulsado LANZAR**: la barra de fuerza sube y baja. Suelta en el punto justo (la zona marcada en el centro deja la piedra cerca de la diana).',
-      'Puedes golpear las piedras de los rivales para sacarlas. Si una piedra no pasa la línea azul o se pasa de la roja del fondo, se retira.'
+      '**Desliza sobre el hielo** para apuntar (la guía solo marca el primer tramo) y elige el **efecto**: la piedra se curva hacia ese lado cuando va frenando.',
+      '**Mantén pulsado LANZAR**: la barra de fuerza sube y baja deprisa. Suelta en el punto justo.',
+      '🧹 **Mientras la piedra desliza, frota la pantalla para barrer** (en ordenador: arrastra con el ratón o pulsa espacio). Cuanto más rápido frotas, más barres: la piedra **frena menos y se curva menos**. Tira un poco corto y llévala barriendo hasta el centro.',
+      'El **hielo cambia en cada manga**: ⚡ rápido (corre y se curva más), ❄️ normal o 🐢 lento.',
+      '💥 Cada jugador tiene **una piedra pesada por manga**: pesa más del doble y es ideal para sacar piedras de la diana.',
+      'Si una piedra no pasa la línea azul o se pasa de la roja del fondo, se retira.'
     ],
-    secciones: [{ icono: '🎯', titulo: 'Puntuación de cada manga', color: 'azul', items: ['Solo puntúa quien tenga **la piedra más cercana** al centro.', 'Suma **un punto por cada piedra suya** que esté más cerca que la mejor piedra de cualquier rival (y dentro de la diana).'] }],
-    puntos: [['🥌', 'Cada piedra que puntúa', '1 punto']],
+    secciones: [{ icono: '🎯', titulo: 'Puntuación de cada manga', color: 'azul', items: ['Solo puntúa quien tenga **la piedra más cercana** al centro.', 'Suma **un punto por cada piedra suya** que esté más cerca que la mejor piedra de cualquier rival (y dentro de la diana).', 'Una piedra que puntúa **en el botón** (el puntito central) **vale doble**.'] }],
+    puntos: [['🥌', 'Cada piedra que puntúa', '1 punto'], ['🎯', 'Piedra que puntúa en el botón', '2 puntos']],
     gana: 'Quien más puntos sume al acabar las mangas.'
   },
   'estelas': {

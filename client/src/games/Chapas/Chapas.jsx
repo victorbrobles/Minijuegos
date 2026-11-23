@@ -94,8 +94,7 @@ function montarEstadio(ctx, util, n) {
   });
   const anillo = new THREE.Mesh(new THREE.RingGeometry(E.RC * 1.25, E.RC * 1.55, 40), new THREE.MeshBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.95, side: THREE.DoubleSide })); anillo.rotation.x = -Math.PI / 2; anillo.visible = false; scene.add(anillo);
   const flecha = new THREE.Group(); const fMat = new THREE.MeshBasicMaterial({ color: 0x22c55e }); const asta = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.3, 1), fMat); asta.position.z = 0.5; flecha.add(asta); const punta = new THREE.Mesh(new THREE.ConeGeometry(1.4, 2.6, 16), fMat); punta.rotation.x = Math.PI / 2; flecha.add(punta); flecha.visible = false; scene.add(flecha);
-  const tamano = Math.max(cp.W, cp.H);
-  return { ctx, cp, ids, chapas, balon, anillo, flecha, asta, fMat, prev: {}, giro: null, tamano };
+  return { ctx, cp, ids, chapas, balon, anillo, flecha, asta, fMat, prev: {}, giro: null };
 }
 function pintarEstadio(o, pos, sel, tiro, util, abajo, dt) {
   const { a3 } = util;
@@ -122,7 +121,12 @@ function pintarEstadio(o, pos, sel, tiro, util, abajo, dt) {
   if (Math.abs(dif) > 0.002 || !o.encuadrado) {
     o.giro += dif * Math.min(1, (dt || 0.016) * 3.5); o.encuadrado = true;
     const c = a3(o.cp.centro[0], o.cp.centro[1]);
-    o.ctx.encuadrar({ centro: [c.x, 0, c.z], ancho: o.tamano + 6, alto: o.tamano * 0.82, desde: [Math.sin(o.giro) * 0.62, 1, Math.cos(o.giro) * 0.62], margen: 1.04 });
+    // Medidas reales del campo vistas desde esta cámara (ancho a lo largo de la pantalla y fondo hacia delante)
+    const sg = Math.sin(o.giro); const cg = Math.cos(o.giro); let x0 = Infinity; let x1 = -Infinity; let z0 = Infinity; let z1 = -Infinity;
+    o.cp.lados.forEach(({ a }) => { const dx = a[0] - o.cp.centro[0]; const dz = a[1] - o.cp.centro[1]; const u = dx * cg - dz * sg; const w = dx * sg + dz * cg; x0 = Math.min(x0, u); x1 = Math.max(x1, u); z0 = Math.min(z0, w); z1 = Math.max(z1, w); });
+    // Se centra en el campo (no en el centro del polígono) para aprovechar toda la pantalla
+    const cu = (x0 + x1) / 2; const cw = (z0 + z1) / 2 + (z1 - z0) * 0.04; /* un poco hacia la cámara: la perspectiva agranda lo cercano */ const cx = c.x + cu * cg + cw * sg; const cz = c.z - cu * sg + cw * cg;
+    o.ctx.encuadrar({ centro: [cx, 0, cz], ancho: x1 - x0 + 6, alto: (z1 - z0) * 0.85 + 9, desde: [sg * 0.62, 1, cg * 0.62], margen: 1.07 });
   }
 }
 
