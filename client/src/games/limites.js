@@ -109,6 +109,7 @@ export const LIMITES = {
   curling: { min: 2, max: 6 },
   estelas: { min: 1, max: 8, local: { min: 1, max: 1 }, online: { min: 2, max: 8 } },
   draft: { min: 2, max: 6 },
+  conocerse: { min: 4, max: 20 },
   emojis: { min: 2, max: 12 },
   habilidad: { min: 1, max: 12 },
   vialibre: { min: 1, max: 1 },

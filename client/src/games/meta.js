@@ -1052,6 +1052,16 @@ export const META = {
     descripcion: "Ficha famosos por turnos sin saber qué contará: los más mayores, los más altos, el nombre más largo… Al final se desvela el criterio y se suman los datos de tu equipo. ¡Estrategia y cultura!",
     categorias: ['famosos']
   },
+  'conocerse': {
+    titulo: 'Qué malo es conocerse',
+    duracion: 25, // minutos aproximados de una partida
+    imagen: '/covers/conocerse.webp',
+    icono: 'laugh',
+    colores: ['#fb7185', '#9f1239'],
+    etiquetas: 'conocerse amigos preguntas personales responder votar adivinar risas fiesta grupo',
+    descripcion: "Preguntas entre amigos: cada ronda una pregunta va para uno («Laura, si fueras un animal, ¿qué serías?») y los demás responden por él. Luego todos eligen la respuesta buena sin saber de quién es… ¿quién os conoce de verdad?",
+    categorias: ['chill']
+  },
   'emojis': {
     titulo: 'Biografía en emojis',
     duracion: 10, // minutos aproximados de una partida

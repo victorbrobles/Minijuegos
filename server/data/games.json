@@ -600,6 +600,12 @@
     "isNew": true
   },
   {
+    "id": "conocerse",
+    "name": "Qué malo es conocerse",
+    "description": "Preguntas entre amigos: cada ronda una pregunta va para uno («Laura, si fueras un animal, ¿qué serías?») y los demás responden por él. Luego todos eligen la respuesta buena sin saber de quién es… ¿quién os conoce de verdad?",
+    "isNew": true
+  },
+  {
     "id": "emojis",
     "name": "Biografía en emojis",
     "description": "La vida de un famoso contada en emojis que aparecen uno a uno. Cuanto antes aciertes, más puntos. En el modo autor, sois vosotros quienes la contáis en emojis.",

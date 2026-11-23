@@ -92,6 +92,7 @@ const Curling = diferido(() => import('./Curling/Curling.jsx'));
 const Estelas = diferido(() => import('./Estelas/Estelas.jsx'));
 const Draft = diferido(() => import('./Draft/Draft.jsx'));
 const Emojis = diferido(() => import('./Emojis/Emojis.jsx'));
+const Conocerse = diferido(() => import('./Conocerse/Conocerse.jsx'));
 const Habilidad = diferido(() => import('./Habilidad/Habilidad.jsx'));
 const ViaLibre = diferido(() => import('./ViaLibre/ViaLibre.jsx'));
 const Rascacielos = diferido(() => import('./Rascacielos/Rascacielos.jsx'));
@@ -216,6 +217,7 @@ const registry = {
   'estelas': Estelas,
   'draft': Draft,
   'emojis': Emojis,
+  'conocerse': Conocerse,
   'habilidad': Habilidad,
   'vialibre': ViaLibre,
   'rascacielos': Rascacielos,

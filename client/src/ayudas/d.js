@@ -340,6 +340,26 @@ export default {
     puntos: [['🌟', 'Por cada rival al que superas en la ronda', '+1']],
     gana: 'Quien más puntos sume al acabar las rondas.'
   },
+  'conocerse': {
+    objetivo: 'Preguntas entre amigos: demuestra **cuánto conoces a los demás**… y descubre cuánto te conocen a ti.',
+    pasos: [
+      'Por turnos, cada ronda hay una **pregunta dirigida a un jugador**, el protagonista: «Laura, si fueras un animal, ¿qué animal serías?».',
+      'Los **demás escriben en secreto** lo que creen que contestaría el protagonista. Él no responde.',
+      'Cuando todos han respondido, salen **todas las respuestas mezcladas y sin autor**. Cada jugador (el protagonista también) **elige la que cree buena**. El protagonista elige la que más se acerca a la verdad.',
+      'Después llega el **desglose**: de quién era cada respuesta y quién la eligió, con la elegida por el protagonista bien marcada.',
+      'Por último, la pantalla de **puntos** de la ronda.',
+      'Se juegan **Jugadores ×3, ×4 o ×5** rondas: cada jugador será el protagonista 3, 4 o 5 veces. El protagonista puede **cambiar la pregunta** mientras nadie haya respondido.'
+    ],
+    secciones: [{ icono: '💡', titulo: 'Trucos', color: 'rosa', items: ['Responde lo que diría él o ella, no lo que dirías tú.', 'Una respuesta creíble puede llevarse votos aunque no sea la buena.', 'Votarte a ti mismo es arriesgado: si no es la buena, pierdes un punto.'] }],
+    puntos: [
+      ['🎯', 'Tu respuesta es la que elige el protagonista', '+3'],
+      ['✅', 'Eliges la misma que el protagonista (también si es la tuya)', '+1'],
+      ['🃏', 'Tu respuesta no es la buena pero la votan otros', '+1 por voto'],
+      ['🙈', 'Te votas a ti y no era la buena', '−1'],
+      ['👑', 'El protagonista', 'no suma esa ronda']
+    ],
+    gana: 'Quien más puntos sume al acabar todas las rondas.'
+  },
   'emojis': {
     objetivo: 'Adivina al famoso cuya **vida se cuenta en emojis**, con los menos emojis posibles.',
     pasos: [

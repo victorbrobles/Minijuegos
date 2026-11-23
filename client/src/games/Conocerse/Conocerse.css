@@ -1,0 +1,53 @@
+/* client/src/games/Conocerse/Conocerse.css
+   «Qué malo es conocerse»: clases cmc- y la paleta de las pantallas comunes pzp-. */
+.pzp-contenedor.conocerse { --pz0: #ffe4e6; --pz1: #fb7185; --pz2: #e11d48; --pz3: #4c0519; }
+
+.cmc-pregunta { border-top: 6px solid var(--c, #e11d48); }
+.cmc-pregunta-cab { display: flex; align-items: center; gap: 0.6rem; }
+.cmc-pregunta-cab > div { display: grid; gap: 0.15rem; }
+.cmc-pregunta-cab small { font-size: 0.78rem; color: #64748b; }
+.cmc-tema { justify-self: start; padding: 0.15rem 0.55rem; border-radius: 999px; background: #ffe4e6; color: #9f1239; font-size: 0.72rem; font-weight: 900; }
+.cmc-pregunta h2 { margin: 0.7rem 0 0.1rem; font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.45rem; line-height: 1.2; color: #0f172a; }
+.cmc-pregunta.pequena h2 { font-size: 1.1rem; margin-top: 0.5rem; }
+.cmc-sobre-ti { display: grid; gap: 0.5rem; text-align: center; }
+.cmc-grande { margin: 0; font-size: 1.3rem; font-weight: 900; color: #9f1239; }
+.cmc-textarea { min-height: 5.5rem; resize: vertical; font-size: 1.05rem; }
+.cmc-mi-respuesta { margin: 0.2rem 0 0.4rem; font-size: 1.15rem; font-weight: 800; color: #0f172a; }
+.cmc-mi-respuesta b { display: inline-grid; place-items: center; width: 1.6rem; height: 1.6rem; margin-right: 0.3rem; border-radius: 8px; background: #e11d48; color: #ffffff; font-size: 0.9rem; }
+.cmc-listos { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.5rem; }
+.cmc-listos span { padding: 0.25rem 0.6rem; border-radius: 999px; background: #f1f5f9; color: #64748b; font-size: 0.8rem; font-weight: 800; }
+.cmc-listos span.si { background: #dcfce7; color: #166534; }
+.cmc-instruccion { margin: 0.6rem 0 0.4rem; text-align: center; font-weight: 900; color: #ffffff; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35); }
+.cmc-opciones { display: grid; gap: 0.5rem; }
+.cmc-opcion { display: flex; align-items: center; gap: 0.7rem; width: 100%; padding: 0.85rem 0.9rem; border: 3px solid transparent; border-radius: 18px; background: #ffffff; color: #0f172a; font: inherit; text-align: left; cursor: pointer; box-shadow: 0 4px 0 rgba(15, 23, 42, 0.12); transition: transform 0.1s, border-color 0.15s; }
+.cmc-opcion:active { transform: translateY(2px); }
+.cmc-opcion.sel { border-color: #e11d48; background: #fff1f2; box-shadow: 0 0 0 4px rgba(225, 29, 72, 0.18); }
+.cmc-opcion.mia { background: #f8fafc; }
+.cmc-letra { flex: 0 0 auto; display: inline-grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 12px; background: linear-gradient(135deg, #fb7185, #e11d48); color: #ffffff; font-weight: 900; }
+.cmc-texto { display: grid; gap: 0.15rem; font-size: 1.05rem; font-weight: 800; overflow-wrap: anywhere; }
+.cmc-texto small { font-size: 0.72rem; font-weight: 700; color: #94a3b8; }
+.cmc-desglose { position: relative; display: grid; gap: 0.45rem; }
+.cmc-desglose.correcta { border: 3px solid #f59e0b; background: linear-gradient(160deg, #fffbeb, #ffffff); box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2), 0 8px 22px rgba(0, 0, 0, 0.12); }
+.cmc-sello { justify-self: start; padding: 0.2rem 0.65rem; border-radius: 999px; background: #f59e0b; color: #ffffff; font-size: 0.78rem; font-weight: 900; }
+.cmc-desglose-texto { display: flex; align-items: center; gap: 0.6rem; margin: 0; font-size: 1.1rem; font-weight: 800; color: #0f172a; overflow-wrap: anywhere; }
+.cmc-autor { display: flex; align-items: center; gap: 0.4rem; margin: 0; font-size: 0.85rem; color: #475569; }
+.cmc-votantes { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.cmc-votantes span { padding: 0.2rem 0.55rem; border-radius: 999px; border: 2px solid var(--c); color: #0f172a; font-size: 0.76rem; font-weight: 800; }
+.cmc-votantes span.prota { background: #fef3c7; border-color: #f59e0b; }
+.cmc-votantes span.propio { border-style: dashed; }
+.cmc-votantes em { font-size: 0.8rem; color: #94a3b8; }
+.cmc-puntos { display: grid; gap: 0.4rem; margin: 0.4rem 0 0; padding: 0; list-style: none; }
+.cmc-puntos li { display: flex; align-items: center; gap: 0.55rem; padding: 0.5rem 0.6rem; border-radius: 14px; background: #f8fafc; }
+.cmc-puntos li.sube { background: #f0fdf4; }
+.cmc-puntos li.baja { background: #fef2f2; }
+.cmc-puntos-nombre { flex: 1; display: grid; gap: 0.1rem; min-width: 0; }
+.cmc-puntos-nombre small { font-size: 0.72rem; color: #64748b; line-height: 1.25; }
+.cmc-delta { min-width: 2.2rem; text-align: center; font-size: 1.1rem; font-weight: 900; color: #64748b; }
+.cmc-puntos li.sube .cmc-delta { color: #16a34a; }
+.cmc-puntos li.baja .cmc-delta { color: #dc2626; }
+.cmc-total { min-width: 2.2rem; padding: 0.2rem 0.4rem; border-radius: 10px; background: #0f172a; color: #ffffff; text-align: center; }
+.cmc-premios { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: 0.6rem; text-align: center; }
+.cmc-premios div { display: grid; gap: 0.15rem; }
+.cmc-premios span { font-size: 1.8rem; }
+.cmc-premios small { font-size: 0.75rem; color: #64748b; font-weight: 800; }
+.cmc-premios strong { font-size: 1rem; color: #0f172a; }
