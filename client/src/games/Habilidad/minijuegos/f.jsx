@@ -94,16 +94,23 @@ function Serpiente({ semilla, alTerminar }) {
       if (st.fin || opuesta(d, ult) || (d[0] === ult[0] && d[1] === ult[1])) return;
       if (st.cola.length < 3) st.cola.push(d); sonar('toque', { minimo: 0, vibrar: false });
     };
-    ctx.encuadrar({ centro: [0, 0, 1.2], ancho: N + 1, alto: N + 3.4, desde: [0, 1, 0.3] });
+    ctx.encuadrar({ centro: [0, 0, 0.5], ancho: N + 1, alto: N + 2, desde: [0, 1, 0.3] });
+    // En ordenador, también con las flechas del teclado
+    const teclaS = (e) => { const d = { ArrowUp: 'arriba', ArrowDown: 'abajo', ArrowLeft: 'izq', ArrowRight: 'der' }[e.key]; if (d) { e.preventDefault(); ctl.current.dir(d); } };
+    window.addEventListener('keydown', teclaS);
     const acabar = () => { st.fin = true; vibrar(150); sonar('fallo'); ctx.temblor(0.4); ctx.chispas(cabeza.position.clone(), 0x4ade80, 40, { fuerza: 5 }); setMsg('💥 ¡Chocaste!'); setTimeout(() => alTerminar(st.cuerpo.length), 900); };
     return {
-      toque(e) { st.ini = [e.clientX, e.clientY]; },
-      mover(e) {
-        if (!st.ini) return; const dx = e.clientX - st.ini[0]; const dy = e.clientY - st.ini[1];
-        if (Math.hypot(dx, dy) < 22) return;
-        ctl.current.dir(Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'der' : 'izq') : (dy > 0 ? 'abajo' : 'arriba')); st.ini = [e.clientX, e.clientY];
+      fin: () => window.removeEventListener('keydown', teclaS),
+      // Toca la pantalla: si la serpiente va en horizontal, gira hacia arriba o hacia abajo según toques por encima o
+      // por debajo de su cabeza; si va en vertical, hacia la izquierda o la derecha según el lado de la cabeza
+      toque(e) {
+        if (st.fin) return;
+        const rr = ctx.el.getBoundingClientRect(); const p = cabeza.position.clone().project(ctx.camera);
+        const hx = rr.left + (p.x + 1) / 2 * rr.width; const hy = rr.top + (1 - p.y) / 2 * rr.height;
+        const ult = st.cola.length ? st.cola.at(-1) : st.dir;
+        if (ult[1] === 0) ctl.current.dir(e.clientY < hy ? 'arriba' : 'abajo');
+        else ctl.current.dir(e.clientX < hx ? 'izq' : 'der');
       },
-      soltar() { st.ini = null; },
       frame(dt, t) {
         manzana.position.set(pos(st.comida[0]), 0.45 + Math.sin(t * 4) * 0.08, pos(st.comida[1])); manzana.rotation.y = t * 1.5; brillo.position.copy(manzana.position).setY(1);
         if (st.fin) return; st.t += dt; st.paso += dt;
@@ -127,11 +134,10 @@ function Serpiente({ semilla, alTerminar }) {
       }
     };
   }, { cielo: [0x052e16, 0x020617], niebla: false });
-  const B = (n, txt) => <Boton onPulsar={() => ctl.current.dir?.(n)}>{txt}</Boton>;
   return (
     <div className="hb-caja">
       <div ref={ref} className="hb-lienzo" /><Hud izq={`🐍 Largo ${hud.largo}`} der={`⏱️ ${hud.t}s`} /><Mensaje texto={msg} tipo="mal" />
-      <Botones>{B('izq', '◀')}{B('arriba', '▲')}{B('abajo', '▼')}{B('der', '▶')}</Botones>
+      <p className="hb-pista">Toca a un lado de la cabeza para girar hacia allí</p>
     </div>
   );
 }
@@ -175,7 +181,11 @@ function Sprint({ alTerminar }) {
       if (st.fin) return; st.empezado = true;
       if (k !== st.ultimo) { st.v = Math.min(12, st.v + 0.9); st.ultimo = k; sonar('tic', { minimo: 0, vibrar: false }); } else { st.v *= 0.6; setMsg('¡Alterna!'); setTimeout(() => setMsg(null), 300); }
     };
+    // En ordenador: flechas ← → del teclado (mantener pulsada no cuenta)
+    const teclaP = (e) => { const k = { ArrowLeft: 0, ArrowRight: 1 }[e.key]; if (k === undefined) return; e.preventDefault(); if (!e.repeat) ctl.current.pie(k); };
+    window.addEventListener('keydown', teclaP);
     return {
+      fin: () => window.removeEventListener('keydown', teclaP),
       frame(dt) {
         if (st.empezado && !st.fin) {
           st.t += dt; st.v = Math.max(0, st.v - 3.2 * dt); st.z -= st.v * dt; st.fase += st.v * dt * 1.6;
@@ -210,6 +220,8 @@ function Cambio({ semilla, alTerminar }) {
     const tapete = crea.caja(9, 0.04, 6, 0x312e81, { roughness: 0.95 }); tapete.position.y = 0.02; scene.add(tapete);
     const huecos = Array.from({ length: 15 }, (_, i) => [(i % 5 - 2) * 1.7, (Math.floor(i / 5) - 1) * 1.8]);
     huecos.forEach(([x, z]) => { const p = new THREE.Mesh(new THREE.RingGeometry(0.55, 0.62, 32), new THREE.MeshBasicMaterial({ color: 0x6366f1, transparent: true, opacity: 0.5 })); p.rotation.x = -Math.PI / 2; p.position.set(x, 0.05, z); scene.add(p); });
+    // Discos invisibles en cada sitio: para poder tocar un sitio vacío (donde ha desaparecido una figura)
+    const discos = huecos.map(([x, z]) => { const d = new THREE.Mesh(new THREE.CircleGeometry(0.8, 24), new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, depthWrite: false })); d.rotation.x = -Math.PI / 2; d.position.set(x, 0.06, z); d.userData.sitio = [x, z]; scene.add(d); return d; });
     // Tapa alta que cubre la mesa entera
     const tapa = new THREE.Group(); const caja = crea.caja(9.8, 1.8, 6.8, 0x1e293b, { roughness: 0.3, metalness: 0.4 }); tapa.add(caja);
     const marcoT = crea.marco(9.8, 6.8, 0xa855f7, { intensidad: 1.6 }); marcoT.position.y = 0.9; tapa.add(marcoT);
@@ -230,12 +242,15 @@ function Cambio({ semilla, alTerminar }) {
     return {
       toque(e) {
         if (st.fase !== 'elegir' || st.fin) return;
-        const t = tocado(ctx, e, st.objs.map((o) => o.m)); if (!t) return;
-        const bien = t.obj === st.cambiado;
-        if (bien) { st.ok++; sonar('acierto'); setMsg('✅ ¡Ese!'); ctx.chispas(t.obj.position.clone().setY(0.8), 0x4ade80, 30, { fuerza: 5 }); }
-        else { sonar('fallo'); setMsg('❌ Era el que brilla'); }
-        st.cambiado.material = new THREE.MeshStandardMaterial({ color: st.cambiado.material.color, emissive: 0xffffff, emissiveIntensity: 0.5 });
-        ctx.onda(st.cambiado.position.clone().setY(0.06), bien ? 0x4ade80 : 0xffffff);
+        // Se toca una figura o un sitio (vacío o no): vale si es donde ha habido el cambio
+        const t = tocado(ctx, e, [...st.objs.map((o) => o.m), ...discos]); if (!t) return;
+        const o = st.objs.find((q) => q.m === t.obj); const [x, z] = o ? [o.x, o.z] : t.obj.userData.sitio;
+        const c = st.cambiado; const bien = x === c.x && z === c.z;
+        const que = { color: 'cambió de color', aparece: 'apareció', desaparece: 'desapareció' }[c.tipo];
+        if (bien) { st.ok++; sonar('acierto'); setMsg(`✅ ¡Sí! ${c.tipo === 'desaparece' ? 'Aquí había una' : `Esa ${que}`}`); ctx.chispas(new THREE.Vector3(c.x, 0.8, c.z), 0x4ade80, 30, { fuerza: 5 }); }
+        else { sonar('fallo'); setMsg(`❌ La que ${que} está marcada`); }
+        // Se señala el sitio del cambio
+        ctx.onda(new THREE.Vector3(c.x, 0.07, c.z), bien ? 0x4ade80 : 0xfacc15, { radio: 2.2 }); ctx.onda(new THREE.Vector3(c.x, 0.07, c.z), bien ? 0x4ade80 : 0xfacc15, { radio: 1.4 });
         st.fase = 'pausa'; setHud({ ronda: Math.min(6, st.ronda + 2), ok: st.ok, txt: '' });
         setTimeout(() => { setMsg(null); st.ronda++; if (st.ronda >= 6) { st.fin = true; alTerminar(st.ok); } else { montar(); setHud((h) => ({ ...h, txt: 'Memoriza la mesa' })); } }, 1300);
       },
@@ -246,10 +261,20 @@ function Cambio({ semilla, alTerminar }) {
           tapa.position.y = Math.max(0.92, tapa.position.y - dt * 32);
           if (tapa.position.y <= 0.93) {
             ver(false); ctx.temblor(0.15);
-            const o = r.de(st.objs);
-            if (r() < 0.5) { let c; do { c = r.de(COLS); } while (c === o.c); o.c = c; o.m.material = new THREE.MeshStandardMaterial({ color: c, roughness: 0.38 }); }
-            else { scene.remove(o.m); let f; do { f = r.entero(0, 3); } while (f === o.f); o.f = f; o.m = figura(f, o.c); o.m.position.set(o.x, altura(f), o.z); o.m.visible = false; scene.add(o.m); }
-            st.cambiado = o.m; st.t = 0; st.fase = 'tapado';
+            // Lo que cambia: una figura cambia de color, aparece una nueva o desaparece una (nada más: mismo brillo y forma)
+            const libres = huecos.filter(([x, z]) => !st.objs.some((o) => o.x === x && o.z === z));
+            const tipo = r.de(libres.length ? ['color', 'aparece', 'desaparece'] : ['color', 'desaparece']);
+            if (tipo === 'color') {
+              const o = r.de(st.objs); let c; do { c = r.de(COLS); } while (c === o.c); o.c = c;
+              const rot = o.m.rotation.y; scene.remove(o.m); o.m = figura(o.f, c); o.m.position.set(o.x, altura(o.f), o.z); o.m.rotation.y = rot; o.m.visible = false; scene.add(o.m);
+              st.cambiado = { tipo, x: o.x, z: o.z };
+            } else if (tipo === 'aparece') {
+              const [x, z] = r.de(libres); const f = r.entero(0, 3); const c = r.de(COLS); const m = figura(f, c); m.position.set(x, altura(f), z); m.rotation.y = r() * 3; m.visible = false; scene.add(m);
+              st.objs.push({ m, f, c, x, z }); st.cambiado = { tipo, x, z };
+            } else {
+              const o = r.de(st.objs); scene.remove(o.m); st.objs = st.objs.filter((q) => q !== o); st.cambiado = { tipo, x: o.x, z: o.z };
+            }
+            st.t = 0; st.fase = 'tapado';
           }
         }
         if (st.fase === 'tapado' && st.t > 0.7) { ver(true); st.fase = 'destapar'; }
@@ -328,8 +353,8 @@ function Cuchillos({ semilla, alTerminar }) {
 
 export default [
   { id: 'ascensor', nombre: 'Ascensor exacto', emoji: '🛗', como: 'El ascensor sube y baja: toca para pararlo justo a la altura de la planta verde. Ocho viajes, cada vez más rápido.', mejor: 'mas', unidad: 'pts', duracion: 60, C: Ascensor },
-  { id: 'serpiente', nombre: 'Serpiente', emoji: '🐍', como: 'Desliza el dedo hacia donde quieras ir (o usa las flechas) para comer manzanas sin chocar con las paredes ni contigo. 60 segundos.', mejor: 'mas', unidad: 'de largo', duracion: 60, C: Serpiente },
-  { id: 'sprint', nombre: 'Sprint 100 m', emoji: '🏃‍♂️', como: 'Pulsa los dos botones alternando, lo más rápido que puedas, para correr 100 metros. Si repites pie, frenas.', mejor: 'menos', unidad: 's', peor: 40, duracion: 40, C: Sprint, formato: (v) => `${v.toFixed(2).replace('.', ',')} s` },
-  { id: 'cambio', nombre: '¿Qué ha cambiado?', emoji: '👀', como: 'Memoriza la mesa. Se tapa un momento y algo cambia de color o de forma: tócalo. Seis rondas.', mejor: 'mas', unidad: 'aciertos', duracion: 75, C: Cambio },
+  { id: 'serpiente', nombre: 'Serpiente', emoji: '🐍', como: 'Toca la pantalla para girar: si la serpiente va en horizontal, toca por encima o por debajo de la cabeza para subir o bajar; si va en vertical, a su izquierda o a su derecha. Come manzanas sin chocar con las paredes ni contigo. 60 segundos como máximo.', mejor: 'mas', unidad: 'de largo', duracion: 60, C: Serpiente },
+  { id: 'sprint', nombre: 'Sprint 100 m', emoji: '🏃‍♂️', como: 'Pulsa los dos botones alternando (en ordenador, las flechas ← y → del teclado), lo más rápido que puedas, para correr 100 metros. Si repites pie, frenas.', mejor: 'menos', unidad: 's', peor: 40, duracion: 40, C: Sprint, formato: (v) => `${v.toFixed(2).replace('.', ',')} s` },
+  { id: 'cambio', nombre: '¿Qué ha cambiado?', emoji: '👀', como: 'Memoriza la mesa. Se tapa un momento y algo cambia: una figura cambia de color, aparece una nueva o desaparece una. Toca la figura (o el sitio vacío, si ha desaparecido). Seis rondas.', mejor: 'mas', unidad: 'aciertos', duracion: 75, C: Cambio },
   { id: 'cuchillos', nombre: 'Clava cuchillos', emoji: '🔪', como: 'Toca para lanzar cuchillos al tronco que gira. Si chocas con otro cuchillo, se acaba. Cuatro niveles, cada vez más rápidos.', mejor: 'mas', unidad: 'cuchillos', duracion: 60, C: Cuchillos }
 ];

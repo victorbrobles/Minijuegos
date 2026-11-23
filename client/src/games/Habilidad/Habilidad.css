@@ -106,3 +106,5 @@
 .hb-sel-cab, .hb-sel-acc, .hb-sel-pie { flex: none; }
 .hb-sel-grid { min-height: 0; }
 @media (max-width: 480px) { .hb-sel-grid button small { -webkit-line-clamp: 2; } .hb-sel-titulo h3 { font-size: 1.3rem; } }
+.hb-botones.lados { justify-content: space-between; pointer-events: none; }
+.hb-botones.lados .hb-boton { flex: 0 0 4.4rem; pointer-events: auto; }

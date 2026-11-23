@@ -11,7 +11,7 @@ export function Hud({ izq, der, centro }) {
     </div>
   );
 }
-export function Botones({ children }) { return <div className="hb-botones">{children}</div>; }
+export function Botones({ children, lados }) { return <div className={`hb-botones${lados ? " lados" : ""}`}>{children}</div>; }
 export function Boton({ onPulsar, children, ancho, color }) {
   return (
     <button type="button" className={`hb-boton${ancho ? ' ancho' : ''}`} style={color ? { background: color } : undefined}

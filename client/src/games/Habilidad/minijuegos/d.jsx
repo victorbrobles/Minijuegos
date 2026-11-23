@@ -1,7 +1,7 @@
 // Minijuegos (4/6): corte perfecto, círculo perfecto, del 1 al 16, frena al límite y petanca.
 import React, { useRef, useState } from 'react';
 import { useEscena, rng, crea, tocado, enSuelo, THREE, mat } from '../tres.js';
-import { Hud, Mensaje } from '../comun.jsx';
+import { Hud, Mensaje, Botones, Boton } from '../comun.jsx';
 import { sonar, vibrar } from '../../../lib/sonido.js';
 
 /* ───────── Corte perfecto ───────── */
@@ -40,7 +40,7 @@ function Corte({ semilla, alTerminar }) {
       st.piezas.forEach((p) => scene.remove(p)); st.piezas = []; if (st.tronco) scene.remove(st.tronco);
       st.L = r.entre(3, 6); st.c = r.entre(-1, 1);
       st.tronco = tronco(st.L); st.tronco.position.set(st.c, 0, 0); scene.add(st.tronco);
-      st.x = st.c - st.L / 2; st.dir = 1; st.vel = 2.6 + st.ronda * 0.45; st.fase = 'corta';
+      st.x = st.c - st.L / 2; st.dir = 1; st.vel = 2.6 + st.ronda * 0.32; st.fase = 'corta';
     };
     nuevo();
     ctx.encuadrar({ centro: [0, 0.5, 0], ancho: 8, alto: 4.4, desde: [0, 0.35, 1] });
@@ -54,8 +54,8 @@ function Corte({ semilla, alTerminar }) {
         scene.remove(st.tronco); st.tronco = null;
         [[izq, st.c - st.L / 2 + izq / 2, -1], [der, st.x + der / 2, 1]].forEach(([l, cx, s]) => { if (l <= 0.01) return; const p = tronco(l); p.position.set(cx, 0, 0); p.userData.s = s; scene.add(p); st.piezas.push(p); });
         setMsg(err < 1 ? '🎯 ¡Perfecto!' : `${err.toFixed(1)} % desviado`);
-        const media = st.errores.reduce((a, b) => a + b, 0) / st.errores.length; setHud({ ronda: Math.min(6, st.errores.length + 1), media });
-        setTimeout(() => { setMsg(null); st.ronda++; if (st.ronda >= 6) { st.fin = true; alTerminar(Math.round(media * 10) / 10); } else nuevo(); }, 1300);
+        const media = st.errores.reduce((a, b) => a + b, 0) / st.errores.length; setHud({ ronda: Math.min(10, st.errores.length + 1), media });
+        setTimeout(() => { setMsg(null); st.ronda++; if (st.ronda >= 10) { st.fin = true; alTerminar(Math.round(media * 10) / 10); } else nuevo(); }, 1300);
       },
       frame(dt) {
         if (st.fase === 'corta') { st.x += st.dir * st.vel * dt; const a = st.c - st.L / 2; const b = st.c + st.L / 2; if (st.x > b) { st.x = b; st.dir = -1; } if (st.x < a) { st.x = a; st.dir = 1; } }
@@ -64,7 +64,7 @@ function Corte({ semilla, alTerminar }) {
       }
     };
   }, { cielo: [0x57534e, 0x1c1917], niebla: 40 });
-  return <div className="hb-caja"><div ref={ref} className="hb-lienzo" /><Hud izq={`🪚 Tronco ${hud.ronda}/6`} der={hud.media != null ? `Desvío medio ${hud.media.toFixed(1)} %` : 'Corta justo por la mitad'} /><Mensaje texto={msg} /></div>;
+  return <div className="hb-caja"><div ref={ref} className="hb-lienzo" /><Hud izq={`🪚 Tronco ${hud.ronda}/10`} der={hud.media != null ? `Desvío medio ${hud.media.toFixed(1)} %` : 'Corta justo por la mitad'} /><Mensaje texto={msg} /></div>;
 }
 
 /* ───────── Círculo perfecto ───────── */
@@ -105,12 +105,12 @@ function Circulo({ alTerminar }) {
           if (v > 90) ctx.chispas(new THREE.Vector3(cx, 0.3, cz), 0x4ade80, 36, { fuerza: 5 });
         }
         setMsg(v ? `⭕ ${v.toFixed(1)} % redondo` : 'Eso no es un círculo 😅'); sonar(v > 90 ? 'victoria' : 'acierto');
-        setHud({ intento: Math.min(3, st.intento + 1), mejor: st.mejor });
-        if (st.intento >= 3) { st.fin = true; setTimeout(() => alTerminar(st.mejor), 1300); }
+        setHud({ intento: Math.min(5, st.intento + 1), mejor: st.mejor });
+        if (st.intento >= 5) { st.fin = true; setTimeout(() => alTerminar(st.mejor), 1300); }
       }
     };
   }, { cielo: [0x334155, 0x0f172a], niebla: false });
-  return <div className="hb-caja"><div ref={ref} className="hb-lienzo" /><Hud izq={`⭕ Intento ${hud.intento}/3`} der={hud.mejor != null ? `Mejor: ${hud.mejor.toFixed(1)} %` : 'Dibuja un círculo con el dedo'} /><Mensaje texto={msg} /></div>;
+  return <div className="hb-caja"><div ref={ref} className="hb-lienzo" /><Hud izq={`⭕ Intento ${hud.intento}/5`} der={hud.mejor != null ? `Mejor: ${hud.mejor.toFixed(1)} %` : 'Dibuja un círculo con el dedo'} /><Mensaje texto={msg} /></div>;
 }
 
 /* ───────── Del 1 al 16 ───────── */
@@ -179,7 +179,8 @@ function Frenada({ semilla, alTerminar }) {
     for (let i = 0; i < 16; i++) { const a = crea.esfera(r.entre(0.6, 1.2), r.de([0x15803d, 0x166534, 0x22c55e])); a.position.set(r.de([-1, 1]) * r.entre(5, 9), 0.6, r.entre(-45, 5)); scene.add(a); }
     const coche = deportivo(); scene.add(coche);
     const marcas = [];
-    const velocidades = [r.entre(13, 16), r.entre(16, 19), r.entre(19, 22)];
+    const velocidades = [r.entre(12, 14), r.entre(14, 16), r.entre(15, 17), r.entre(17, 19), r.entre(19, 21), r.entre(20, 23)];
+    const MURO = LINEA - 2.0; // cara del muro
     const st = { i: 0, z: 0, v: 0, frenando: false, fase: 'corre', res: [], fin: false, marca: 0 };
     const empezar = () => { st.z = 0; st.v = velocidades[st.i]; st.frenando = false; st.fase = 'corre'; coche.rotation.y = 0; marcas.forEach((m) => scene.remove(m)); marcas.length = 0; coche.userData.luces.forEach((l) => { l.material.emissiveIntensity = 0.2; }); };
     empezar();
@@ -192,7 +193,9 @@ function Frenada({ semilla, alTerminar }) {
             if (st.marca <= 0 && st.v > 0) { st.marca = 0.03; [-0.86, 0.86].forEach((x) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(0.22, 0.5), new THREE.MeshBasicMaterial({ color: 0x0a0a0a, transparent: true, opacity: 0.6 })); m.rotation.x = -Math.PI / 2; m.position.set(x, 0.012, st.z + 1); scene.add(m); marcas.push(m); }); }
           }
           st.z -= st.v * dt; const frente = st.z - 1.5;
-          if (frente < LINEA) { st.fase = 'fin'; coche.rotation.y = 0.4; vibrar(150); sonar('fallo'); ctx.temblor(0.5); ctx.chispas(new THREE.Vector3(0, 0.8, st.z - 1.5), 0xfacc15, 30); st.res.push(1000); setMsg('💥 ¡Te pasaste! +10 m'); siguiente(); }
+          // Pasarse de la línea castiga: 10 m más lo que te pases; si llegas al muro, choque y 20 m
+          if (frente <= MURO) { st.z = MURO + 1.5; st.fase = 'fin'; coche.rotation.y = 0.5; vibrar(250); sonar('fallo'); ctx.temblor(0.8); ctx.chispas(new THREE.Vector3(0, 0.8, MURO), 0xfacc15, 50, { fuerza: 6 }); st.res.push(2000); setMsg('💥 ¡Contra el muro! +20 m'); siguiente(); }
+          else if (st.v === 0 && frente < LINEA) { st.fase = 'fin'; const pasado = Math.round((LINEA - frente) * 100); vibrar(120); sonar('fallo'); ctx.temblor(0.3); st.res.push(1000 + pasado); setMsg(`🚫 Te pasaste ${pasado} cm: +10 m`); siguiente(); }
           else if (st.v === 0) { st.fase = 'fin'; const cm = Math.round((frente - LINEA) * 100); st.res.push(cm); sonar(cm < 50 ? 'victoria' : 'acierto'); if (cm < 50) ctx.chispas(new THREE.Vector3(0, 0.5, LINEA), 0x4ade80, 30); setMsg(cm < 20 ? `🎯 ¡A ${cm} cm!` : `A ${cm} cm de la línea`); siguiente(); }
           coche.position.z = st.z; coche.position.y = st.frenando && st.v > 0 ? -0.03 : 0; coche.rotation.x = st.frenando && st.v > 0 ? 0.03 : 0;
         }
@@ -202,16 +205,16 @@ function Frenada({ semilla, alTerminar }) {
       }
     };
     function siguiente() {
-      setHud({ intento: Math.min(3, st.res.length + 1), total: st.res.reduce((a, b) => a + b, 0) });
-      setTimeout(() => { setMsg(null); st.i++; if (st.i >= 3) { st.fin = true; alTerminar(st.res.reduce((a, b) => a + b, 0)); } else empezar(); }, 1500);
+      setHud({ intento: Math.min(6, st.res.length + 1), total: st.res.reduce((a, b) => a + b, 0) });
+      setTimeout(() => { setMsg(null); st.i++; if (st.i >= 6) { st.fin = true; alTerminar(st.res.reduce((a, b) => a + b, 0)); } else empezar(); }, 1500);
     }
   }, { cielo: [0x60a5fa, 0xfef3c7], niebla: 70 });
-  return <div className="hb-caja"><div ref={ref} className="hb-lienzo" /><Hud izq={`🚗 Intento ${hud.intento}/3`} der={`Total ${(hud.total / 100).toFixed(2).replace('.', ',')} m`} /><Mensaje texto={msg} /><p className="hb-pista">Toca para frenar: para lo más cerca posible de la línea de cuadros</p></div>;
+  return <div className="hb-caja"><div ref={ref} className="hb-lienzo" /><Hud izq={`🚗 Intento ${hud.intento}/6`} der={`Total ${(hud.total / 100).toFixed(2).replace('.', ',')} m`} /><Mensaje texto={msg} /><p className="hb-pista">Toca para frenar: para lo más cerca posible de la línea de cuadros</p></div>;
 }
 
 /* ───────── Petanca ───────── */
 function Petanca({ semilla, alTerminar }) {
-  const ref = useRef(null); const [hud, setHud] = useState({ quedan: 4, mejor: null }); const [msg, setMsg] = useState(null);
+  const ref = useRef(null); const ctl = useRef({}); const [hud, setHud] = useState({ quedan: 4, mejor: null }); const [msg, setMsg] = useState(null);
   useEscena(ref, (ctx) => {
     const { scene, camera } = ctx; const r = rng(semilla);
     const pista = crea.suelo(7, 18, 0xd6c49b, { celda: 0.4, contraste: 0.03, lineas: false }); pista.position.set(0, 0, -5); scene.add(pista);
@@ -222,16 +225,21 @@ function Petanca({ semilla, alTerminar }) {
     const boliche = crea.esfera(0.18, 0xfacc15, { roughness: 0.3, emissive: 0xf59e0b, emissiveIntensity: 0.6 }); boliche.position.set(r.entre(-1.6, 1.6), 0.18, -r.entre(7, 11)); scene.add(boliche);
     const anilloB = new THREE.Mesh(new THREE.RingGeometry(0.25, 0.32, 32), new THREE.MeshBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.7, side: THREE.DoubleSide })); anilloB.rotation.x = -Math.PI / 2; anilloB.position.set(boliche.position.x, 0.01, boliche.position.z); scene.add(anilloB);
     const flecha = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.6, 12), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.85 })); flecha.rotation.x = -Math.PI / 2; flecha.visible = false; scene.add(flecha);
-    const st = { bolas: [], actual: null, ini: null, quedan: 4, mejor: Infinity, fin: false };
-    const nueva = () => { const b = crea.esfera(0.32, 0x94a3b8, { metalness: 0.95, roughness: 0.18 }); b.position.set(0, 0.32, 3); scene.add(b); st.actual = { m: b, v: new THREE.Vector3(), mueve: false }; };
+    const st = { bolas: [], actual: null, ini: null, quedan: 4, mejor: Infinity, fin: false, salida: 0 };
+    const nueva = () => { const b = crea.esfera(0.32, 0x94a3b8, { metalness: 0.95, roughness: 0.18 }); b.position.set(st.salida, 0.32, 3); scene.add(b); st.actual = { m: b, v: new THREE.Vector3(), mueve: false }; };
+    // Desde dónde se lanza: ◀ ▶ (o las flechas del teclado) mueven la bola por la línea de tiro antes de lanzar
+    ctl.current.lado = (d) => { const a = st.actual; if (!a || a.mueve || st.fin) return; st.salida = Math.max(-2.6, Math.min(2.6, st.salida + d * 0.4)); a.m.position.x = st.salida; sonar('tic', { minimo: 0, vibrar: false }); };
+    const tecla = (e) => { if (e.key === 'ArrowLeft') ctl.current.lado(-1); if (e.key === 'ArrowRight') ctl.current.lado(1); };
+    window.addEventListener('keydown', tecla);
     nueva();
     return {
+      fin: () => window.removeEventListener('keydown', tecla),
       toque(e) { if (st.actual && !st.actual.mueve && !st.fin) st.ini = [e.clientX, e.clientY]; },
       mover(e) {
         if (!st.ini || !st.actual || st.actual.mueve) return; const dx = e.clientX - st.ini[0]; const dy = st.ini[1] - e.clientY;
         if (dy < 15) { flecha.visible = false; return; }
         const p = Math.min(1.4, Math.hypot(dx, dy) / 250); const ang = Math.atan2(dx * 0.6, dy);
-        flecha.visible = true; flecha.position.set(Math.sin(ang) * (0.8 + p), 0.05, 3 - Math.cos(ang) * (0.8 + p)); flecha.rotation.set(-Math.PI / 2, 0, -ang); flecha.scale.set(1, 1 + p, 1);
+        flecha.visible = true; flecha.position.set(st.salida + Math.sin(ang) * (0.8 + p), 0.05, 3 - Math.cos(ang) * (0.8 + p)); flecha.rotation.set(-Math.PI / 2, 0, -ang); flecha.scale.set(1, 1 + p, 1);
       },
       soltar(e) {
         flecha.visible = false;
@@ -260,13 +268,13 @@ function Petanca({ semilla, alTerminar }) {
       }
     };
   }, { cielo: [0x7dd3fc, 0xfef9c3], niebla: 50 });
-  return <div className="hb-caja"><div ref={ref} className="hb-lienzo" /><Hud izq={`🟡 Quedan ${hud.quedan} bolas`} der={hud.mejor != null && hud.mejor < 9999 ? `Mejor: ${hud.mejor} cm` : 'Acércate al boliche'} /><Mensaje texto={msg} /><p className="hb-pista">Desliza hacia arriba para lanzar (más largo, más fuerte)</p></div>;
+  return <div className="hb-caja"><div ref={ref} className="hb-lienzo" /><Hud izq={`🟡 Quedan ${hud.quedan} bolas`} der={hud.mejor != null && hud.mejor < 9999 ? `Mejor: ${hud.mejor} cm` : 'Acércate al boliche'} /><Mensaje texto={msg} /><p className="hb-pista" style={{ bottom: '5rem' }}>◀ ▶ elige el sitio · desliza hacia arriba para lanzar</p><Botones lados><Boton onPulsar={() => ctl.current.lado?.(-1)}>◀</Boton><Boton onPulsar={() => ctl.current.lado?.(1)}>▶</Boton></Botones></div>;
 }
 
 export default [
-  { id: 'corte', nombre: 'Corte perfecto', emoji: '🪚', como: 'La sierra recorre el tronco de lado a lado: toca para cortarlo justo por la mitad. Seis troncos, cada vez más rápido.', mejor: 'menos', unidad: '%', peor: 50, duracion: 60, C: Corte, formato: (v) => `${v.toFixed(1).replace('.', ',')} % de desvío` },
-  { id: 'circulo', nombre: 'Círculo perfecto', emoji: '⭕', como: 'Dibuja con el dedo el círculo más perfecto que puedas, de una vez y cerrándolo. Tres intentos: cuenta el mejor.', mejor: 'mas', unidad: '%', duracion: 60, C: Circulo, formato: (v) => `${v.toFixed(1).replace('.', ',')} %` },
+  { id: 'corte', nombre: 'Corte perfecto', emoji: '🪚', como: 'La sierra recorre el tronco de lado a lado: toca para cortarlo justo por la mitad. Diez troncos, cada vez más rápido.', mejor: 'menos', unidad: '%', peor: 50, duracion: 90, C: Corte, formato: (v) => `${v.toFixed(1).replace('.', ',')} % de desvío` },
+  { id: 'circulo', nombre: 'Círculo perfecto', emoji: '⭕', como: 'Dibuja con el dedo el círculo más perfecto que puedas, de una vez y cerrándolo. Cinco intentos: cuenta el mejor.', mejor: 'mas', unidad: '%', duracion: 90, C: Circulo, formato: (v) => `${v.toFixed(1).replace('.', ',')} %` },
   { id: 'numeros', nombre: 'Del 1 al 16', emoji: '🔢', como: 'Toca los números del 1 al 16 en orden lo más rápido posible. Cada fallo suma 1 segundo.', mejor: 'menos', unidad: 's', peor: 92, duracion: 60, C: Numeros, formato: (v) => `${v.toFixed(1).replace('.', ',')} s` },
-  { id: 'frenada', nombre: 'Frena al límite', emoji: '🚗', como: 'El coche va derecho a un muro. Toca para frenar y para lo más cerca posible de la línea de cuadros sin pasarte. Tres intentos, cada vez más rápido.', mejor: 'menos', unidad: 'cm', peor: 3000, duracion: 40, C: Frenada, formato: (v) => `${(v / 100).toFixed(2).replace('.', ',')} m` },
-  { id: 'petanca', nombre: 'Petanca', emoji: '🟡', como: 'Desliza hacia arriba para lanzar la bola (verás la flecha de dirección) y déjala lo más cerca posible del boliche amarillo. Cuatro bolas: cuenta la mejor.', mejor: 'menos', unidad: 'cm', peor: 1000, duracion: 60, C: Petanca, formato: (v) => `${Math.round(v)} cm` }
+  { id: 'frenada', nombre: 'Frena al límite', emoji: '🚗', como: 'El coche va derecho a un muro. Toca para frenar y para lo más cerca posible de la línea de cuadros sin pasarte. Si te pasas, +10 m de castigo; si chocas contra el muro, +20 m. Seis intentos, cada vez más rápido.', mejor: 'menos', unidad: 'cm', peor: 12000, duracion: 75, C: Frenada, formato: (v) => `${(v / 100).toFixed(2).replace('.', ',')} m` },
+  { id: 'petanca', nombre: 'Petanca', emoji: '🟡', como: 'Elige desde dónde lanzas con ◀ ▶ y desliza hacia arriba para lanzar la bola (verás la flecha de dirección) y déjala lo más cerca posible del boliche amarillo. Cuatro bolas: cuenta la mejor.', mejor: 'menos', unidad: 'cm', peor: 1000, duracion: 60, C: Petanca, formato: (v) => `${Math.round(v)} cm` }
 ];

@@ -241,7 +241,7 @@ export function marcador({ tam = 1.2, color = '#ffffff', fondo = 'rgba(15,23,42,
   const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true })); s.scale.set(tam * (ancho / 160), tam, 1);
   let ult = null;
   s.poner = (str, col = color) => {
-    if (str === ult) return; ult = str;
+    const clave = `${str}|${col}`; if (clave === ult) return; ult = clave; // (misma palabra con otro color también se repinta)
     x.clearRect(0, 0, ancho, 160); if (fondo) { x.fillStyle = fondo; x.beginPath(); x.roundRect?.(6, 6, ancho - 12, 148, 36); x.fill(); }
     x.fillStyle = col; x.font = 'bold 110px monospace'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(str, ancho / 2, 88); tex.needsUpdate = true;
   };

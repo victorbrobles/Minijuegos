@@ -87,14 +87,30 @@ function Saltar({ semilla, alTerminar }) {
   const ref = useRef(null); const [m, setM] = useState(0); const [msg, setMsg] = useState(null);
   useEscena(ref, (ctx) => {
     const { scene, camera } = ctx; const r = rng(semilla);
-    const pista = crea.caja(800, 0.3, 3, 0xc2410c, { roughness: 0.85 }); pista.position.set(390, -0.15, 0); scene.add(pista);
-    [-1.45, 1.45].forEach((z) => { const l = crea.caja(800, 0.02, 0.08, 0xffffff); l.position.set(390, 0.01, z); scene.add(l); });
-    const cesped = crea.suelo(820, 60, 0x15803d, { celda: 2, contraste: 0.04, lineas: false }); cesped.position.set(390, -0.29, 0); scene.add(cesped);
-    for (let k = 0; k < 80; k++) { const linea = crea.caja(0.12, 0.012, 3, 0xffffff); linea.position.set(k * 10, 0.006, 0); scene.add(linea); }
+    const LARGO = 1300;
+    const pista = crea.caja(LARGO, 0.3, 3, 0xc2410c, { roughness: 0.85 }); pista.position.set(LARGO / 2 - 10, -0.15, 0); scene.add(pista);
+    [-1.45, 1.45].forEach((z) => { const l = crea.caja(LARGO, 0.02, 0.08, 0xffffff); l.position.set(LARGO / 2 - 10, 0.01, z); scene.add(l); });
+    const cesped = crea.suelo(LARGO + 20, 60, 0x15803d, { celda: 2, contraste: 0.04, lineas: false }); cesped.position.set(LARGO / 2 - 10, -0.29, 0); scene.add(cesped);
+    for (let k = 0; k < LARGO / 10; k++) { const linea = crea.caja(0.12, 0.012, 3, 0xffffff); linea.position.set(k * 10, 0.006, 0); scene.add(linea); }
     // Grada al fondo
-    for (let x = -10; x < 800; x += 6) { const g = crea.caja(6, 1.6, 2, r.de([0x1e3a8a, 0x1d4ed8, 0x2563eb])); g.position.set(x, 0.5, -6); scene.add(g); }
-    const obs = []; let x = 16;
-    for (let i = 0; i < 70; i++) { const alto = r.entre(0.55, 1.12); const o = valla(alto, r.de([0xdb2777, 0x0ea5e9, 0x16a34a, 0xf59e0b])); o.position.set(x, 0, 0); scene.add(o); obs.push({ o, x, alto, ancho: 0.4 }); x += r.entre(7, 12) + i * 0.08; }
+    for (let x = -10; x < LARGO; x += 6) { const g = crea.caja(6, 1.6, 2, r.de([0x1e3a8a, 0x1d4ed8, 0x2563eb])); g.position.set(x, 0.5, -6); scene.add(g); }
+    // Vallas: se colocan sobre la marcha según la velocidad. Cada vez más juntas, más altas y con dobles y triples
+    // seguidas (hay que caer y volver a saltar al instante). Llegar al final de los 60 s es muy difícil.
+    const AIRE = (2 * 10.5) / 28; // segundos en el aire de un salto
+    const obs = []; let sigX = 18;
+    const ponerValla = (x, dif) => { const alto = r.entre(0.55, 0.85 + dif * 0.35); const o = valla(alto, r.de([0xdb2777, 0x0ea5e9, 0x16a34a, 0xf59e0b])); o.position.set(x, 0, 0); scene.add(o); obs.push({ o, x, alto, ancho: 0.4 }); };
+    const generar = (hasta, v, t) => {
+      while (sigX < hasta) {
+        const dif = Math.min(1, t / 50); // 0 al principio → 1 a los 50 s
+        ponerValla(sigX, dif);
+        // Serie de vallas casi seguidas: la siguiente justo donde se aterriza
+        const serie = r() < dif * 0.55 ? r.entero(1, dif > 0.7 ? 2 : 1) : 0;
+        let x = sigX;
+        for (let i = 0; i < serie; i++) { x += v * (AIRE + r.entre(0.08, 0.2)); ponerValla(x, dif); }
+        // Hueco hasta la siguiente: entre 1,6 s y 0,95 s de carrera según avanza la partida
+        sigX = x + v * r.entre(AIRE + 0.2 + (1 - dif) * 0.9, AIRE + 0.5 + (1 - dif) * 1.2);
+      }
+    };
     const jugador = corredor(); jugador.rotation.y = Math.PI / 2; scene.add(jugador);
     const st = { x: 0, y: 0, vy: 0, vel: 7, t: 0, fin: false, fase: 0 };
     const saltar = () => { if (st.fin || st.y > 0.02) return; st.vy = 10.5; sonar('toque', { minimo: 0 }); };
@@ -102,7 +118,9 @@ function Saltar({ semilla, alTerminar }) {
       toque: saltar,
       frame(dt) {
         if (!st.fin) {
-          st.t += dt; st.vel = Math.min(15, 7 + st.t * 0.15); st.x += st.vel * dt;
+          st.t += dt; st.vel = Math.min(21, 7 + st.t * 0.26); st.x += st.vel * dt;
+          generar(st.x + 70, st.vel, st.t);
+          for (let i = obs.length - 1; i >= 0; i--) if (obs[i].x < st.x - 15) { scene.remove(obs[i].o); obs.splice(i, 1); }
           st.vy -= 28 * dt; st.y += st.vy * dt; if (st.y <= 0) { st.y = 0; st.vy = 0; }
           const choque = obs.find((o) => Math.abs(o.x - st.x) < o.ancho / 2 + 0.28 && st.y < o.alto - 0.08);
           if (choque) { st.fin = true; vibrar(150); sonar('fallo'); ctx.temblor(0.5); ctx.chispas(new THREE.Vector3(st.x + 0.3, choque.alto, 0), 0xffffff, 24); choque.o.rotation.z = -1.2; jugador.rotation.z = 1.2; setMsg('💥 ¡Choque!'); setTimeout(() => alTerminar(Math.floor(st.x)), 900); }
@@ -184,10 +202,10 @@ function Meteoritos({ semilla, alTerminar }) {
 /* ───────── Canasta (tirachinas con trayectoria) ───────── */
 // Arrastra el dedo hacia ABAJO (como estirar un tirachinas): cuanto más largo, más fuerte; hacia los lados apuntas.
 // Mientras apuntas se ve el principio de la trayectoria. Al soltar, lanza.
-function Canasta({ alTerminar }) {
-  const ref = useRef(null); const [hud, setHud] = useState({ n: 0, t: 30, racha: 0 }); const [msg, setMsg] = useState(null);
+function Canasta({ semilla, alTerminar }) {
+  const ref = useRef(null); const [hud, setHud] = useState({ n: 0, t: 45, racha: 0 }); const [msg, setMsg] = useState(null);
   useEscena(ref, (ctx) => {
-    const { scene, camera } = ctx;
+    const { scene, camera } = ctx; const r = rng(semilla);
     const parquet = crea.suelo(16, 18, 0xd97706, { celda: 0.7, contraste: 0.05 }); parquet.position.set(0, 0, -3); scene.add(parquet);
     const linea = new THREE.Mesh(new THREE.RingGeometry(3.1, 3.2, 48, 1, 0, Math.PI), new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide })); linea.rotation.x = -Math.PI / 2; linea.position.set(0, 0.01, -6); scene.add(linea);
     const pared = crea.caja(16, 9, 0.4, 0x1e3a8a, { roughness: 0.8 }); pared.position.set(0, 4.5, -8.2); scene.add(pared);
@@ -200,69 +218,75 @@ function Canasta({ alTerminar }) {
     const red = new THREE.Mesh(new THREE.CylinderGeometry(0.46, 0.3, 0.55, 16, 3, true), new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.8 })); red.position.y = -0.28; canasta.add(red);
     const AROY = 3.05; const AROZ = -5.2;
     canasta.position.set(0, AROY, AROZ); scene.add(canasta);
-    const bola = crea.esfera(0.24, 0xea580c, { roughness: 0.6 }); scene.add(bola);
-    const sombraBola = crea.sombraSuave(0.35); sombraBola.position.y = 0.012; scene.add(sombraBola);
+    const TIEMPO = 45;
     // Puntos de la trayectoria
     const puntos = Array.from({ length: 14 }, (_, i) => { const p = new THREE.Mesh(new THREE.SphereGeometry(0.06, 8, 6), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 1 - i * 0.06 })); p.visible = false; scene.add(p); return p; });
-    const INICIO = new THREE.Vector3(0, 1.2, 2.2); const G = 12;
-    const st = { t: 0, n: 0, racha: 0, vuelo: false, p: INICIO.clone(), v: new THREE.Vector3(), ini: null, apunta: null, tv: 0, fin: false, encestado: false, tocoAro: false };
-    bola.position.copy(st.p);
+    const G = 12;
+    // La bola preparada sale cada vez en un sitio distinto (altura, lado y distancia al azar)
+    const nuevaBola = () => {
+      const m = crea.esfera(0.24, 0xea580c, { roughness: 0.6 }); const inicio = new THREE.Vector3(r.entre(-1.3, 1.3), r.entre(1.2, 2.1), r.entre(1.1, 2.2));
+      m.position.copy(inicio); scene.add(m); const sombra = crea.sombraSuave(0.35); sombra.position.set(inicio.x, 0.012, inicio.z); scene.add(sombra);
+      ctx.onda(new THREE.Vector3(inicio.x, 0.02, inicio.z), 0xffffff, { radio: 0.8 });
+      return { m, sombra, inicio, p: inicio.clone(), v: new THREE.Vector3(), tv: 0, encestado: false, tocoAro: false };
+    };
+    const st = { t: 0, n: 0, racha: 0, lista: nuevaBola(), vuelo: [], ini: null, apunta: null, fin: false };
     const velDesde = (dx, dy, rr) => {
       // dy > 0: arrastre hacia abajo. Potencia según la longitud (relativa a la pantalla), dirección según dx.
       const pot = Math.min(1, Math.max(0, dy / (rr.height * 0.38)));
       const lado = Math.max(-1, Math.min(1, -dx / (rr.width * 0.5)));
-      const v0 = 6.5 + pot * 5.5; const ang = THREE.MathUtils.degToRad(52);
+      const v0 = 6 + pot * 6.5; const ang = THREE.MathUtils.degToRad(52);
       return new THREE.Vector3(lado * 3.2, Math.sin(ang) * v0, -Math.cos(ang) * v0);
     };
-    const reset = () => { st.vuelo = false; st.p.copy(INICIO); bola.position.copy(st.p); st.encestado = false; st.tocoAro = false; };
+    const quitar = (b) => { scene.remove(b.m); scene.remove(b.sombra); };
     const k = () => ctx.ancho(0.75);
     return {
-      toque(e) { if (!st.vuelo && !st.fin) st.ini = [e.clientX, e.clientY]; },
+      toque(e) { if (!st.fin) st.ini = [e.clientX, e.clientY]; },
       mover(e) {
-        if (!st.ini || st.vuelo) return; const rr = ctx.el.getBoundingClientRect();
+        if (!st.ini || st.fin) return; const rr = ctx.el.getBoundingClientRect(); const b = st.lista; const I = b.inicio;
         const dx = e.clientX - st.ini[0]; const dy = e.clientY - st.ini[1];
-        if (dy < 12) { st.apunta = null; puntos.forEach((p) => { p.visible = false; }); return; }
+        if (dy < 12) { st.apunta = null; puntos.forEach((p) => { p.visible = false; }); b.m.position.copy(I); return; }
         st.apunta = velDesde(dx, dy, rr);
         // Se enseña solo el principio de la curva (lo justo para apuntar)
-        puntos.forEach((p, i) => { const tt = (i + 1) * 0.045; p.position.set(INICIO.x + st.apunta.x * tt, INICIO.y + st.apunta.y * tt - 0.5 * G * tt * tt, INICIO.z + st.apunta.z * tt); p.visible = true; });
-        bola.position.set(INICIO.x - dx * 0.002, INICIO.y - Math.min(0.4, dy * 0.0015), INICIO.z + Math.min(0.5, dy * 0.002));
+        puntos.forEach((p, i) => { const tt = (i + 1) * 0.045; p.position.set(I.x + st.apunta.x * tt, I.y + st.apunta.y * tt - 0.5 * G * tt * tt, I.z + st.apunta.z * tt); p.visible = true; });
+        b.m.position.set(I.x - dx * 0.002, I.y - Math.min(0.4, dy * 0.0015), I.z + Math.min(0.5, dy * 0.002));
       },
       soltar() {
         puntos.forEach((p) => { p.visible = false; });
-        if (!st.ini || st.vuelo) { st.ini = null; return; } st.ini = null;
-        if (!st.apunta) { bola.position.copy(INICIO); return; }
-        st.v.copy(st.apunta); st.apunta = null; st.p.copy(INICIO); st.vuelo = true; st.tv = 0; sonar('toque', { minimo: 0 });
+        if (!st.ini) return; st.ini = null; const b = st.lista;
+        if (!st.apunta || st.fin) { b.m.position.copy(b.inicio); return; }
+        // Sale la bola y aparece la siguiente al momento (no hay que esperar a que caiga)
+        b.v.copy(st.apunta); b.p.copy(b.inicio); st.apunta = null; st.vuelo.push(b); sonar('toque', { minimo: 0 });
+        st.lista = nuevaBola();
       },
-      frame(dt, tt) {
+      frame(dt) {
         if (!st.fin) st.t += dt;
-        canasta.position.x = st.t > 10 ? Math.sin((st.t - 10) * 1.1) * 1.6 : 0;
-        if (st.vuelo) {
-          st.tv += dt; const yAntes = st.p.y;
-          st.v.y -= G * dt; st.p.addScaledVector(st.v, dt); bola.rotation.x -= dt * 10;
-          const c = canasta.position;
+        canasta.position.x = st.t > 12 ? Math.sin((st.t - 12) * 1.1) * 1.6 : 0;
+        const c = canasta.position;
+        for (let i = st.vuelo.length - 1; i >= 0; i--) {
+          const b = st.vuelo[i];
+          b.tv += dt; const yAntes = b.p.y;
+          b.v.y -= G * dt; b.p.addScaledVector(b.v, dt); b.m.rotation.x -= dt * 10;
           // Rebote en el aro (contra el tubo del aro)
-          const dxz = Math.hypot(st.p.x - c.x, st.p.z - c.z); const dAro = Math.hypot(dxz - 0.46, st.p.y - c.y);
-          if (dAro < 0.27 && !st.encestado) {
-            const n = new THREE.Vector3(st.p.x - c.x, 0, st.p.z - c.z).normalize().multiplyScalar(dxz > 0.46 ? 1 : -1); n.y = (st.p.y - c.y) / Math.max(0.01, dAro); n.normalize();
-            const vn = st.v.dot(n); if (vn < 0) { st.v.addScaledVector(n, -1.6 * vn); st.v.multiplyScalar(0.75); st.tocoAro = true; sonar('tic', { minimo: 0, vibrar: false }); }
+          const dxz = Math.hypot(b.p.x - c.x, b.p.z - c.z); const dAro = Math.hypot(dxz - 0.46, b.p.y - c.y);
+          if (dAro < 0.27 && !b.encestado) {
+            const n = new THREE.Vector3(b.p.x - c.x, 0, b.p.z - c.z).normalize().multiplyScalar(dxz > 0.46 ? 1 : -1); n.y = (b.p.y - c.y) / Math.max(0.01, dAro); n.normalize();
+            const vn = b.v.dot(n); if (vn < 0) { b.v.addScaledVector(n, -1.6 * vn); b.v.multiplyScalar(0.75); b.tocoAro = true; sonar('tic', { minimo: 0, vibrar: false }); }
           }
           // Rebote en el tablero
-          if (st.p.z < c.z - 0.47 && st.p.z > c.z - 0.75 && Math.abs(st.p.x - c.x) < 1 && st.p.y > c.y - 0.05 && st.p.y < c.y + 1.3 && st.v.z < 0) { st.v.z = -st.v.z * 0.55; st.p.z = c.z - 0.47; sonar('tic', { minimo: 0, vibrar: false }); }
+          if (b.p.z < c.z - 0.47 && b.p.z > c.z - 0.75 && Math.abs(b.p.x - c.x) < 1 && b.p.y > c.y - 0.05 && b.p.y < c.y + 1.3 && b.v.z < 0) { b.v.z = -b.v.z * 0.55; b.p.z = c.z - 0.47; sonar('tic', { minimo: 0, vibrar: false }); }
           // Canasta: cruza la altura del aro bajando y por dentro
-          if (!st.encestado && yAntes > c.y && st.p.y <= c.y && st.v.y < 0 && dxz < 0.4) {
-            st.encestado = true; st.n++; st.racha++; sonar('victoria'); ctx.chispas(new THREE.Vector3(c.x, c.y, c.z), 0xfacc15, 30, { fuerza: 4 });
-            red.scale.y = 1.4; setMsg(st.tocoAro ? '🏀 ¡Canasta!' : st.racha > 1 ? `🔥 ¡Limpia! ×${st.racha}` : '✨ ¡Limpia!'); setTimeout(() => setMsg(null), 650);
+          if (!b.encestado && yAntes > c.y && b.p.y <= c.y && b.v.y < 0 && dxz < 0.4 && !st.fin) {
+            b.encestado = true; st.n++; st.racha++; sonar('victoria'); ctx.chispas(new THREE.Vector3(c.x, c.y, c.z), 0xfacc15, 30, { fuerza: 4 });
+            red.scale.y = 1.4; setMsg(b.tocoAro ? '🏀 ¡Canasta!' : st.racha > 1 ? `🔥 ¡Limpia! ×${st.racha}` : '✨ ¡Limpia!'); setTimeout(() => setMsg(null), 650);
           }
-          if (st.p.y < 0.24) { st.p.y = 0.24; st.v.y = Math.abs(st.v.y) * 0.45; st.v.x *= 0.8; st.v.z *= 0.8; }
-          bola.position.copy(st.p);
-          if (st.tv > 2.6) { if (!st.encestado) st.racha = 0; reset(); }
+          if (b.p.y < 0.24) { b.p.y = 0.24; b.v.y = Math.abs(b.v.y) * 0.45; b.v.x *= 0.8; b.v.z *= 0.8; }
+          b.m.position.copy(b.p); b.sombra.position.set(b.p.x, 0.012, b.p.z); b.sombra.scale.setScalar(Math.max(0.4, 1.4 - b.p.y * 0.2));
+          if (b.tv > 2.6) { if (!b.encestado) st.racha = 0; quitar(b); st.vuelo.splice(i, 1); }
         }
         red.scale.y += (1 - red.scale.y) * Math.min(1, dt * 6);
-        sombraBola.position.set(bola.position.x, 0.012, bola.position.z); sombraBola.scale.setScalar(Math.max(0.4, 1.4 - bola.position.y * 0.2));
-        const kk = k(); camera.position.set(0, 2.2 + kk * 0.5, 5.2 * kk); camera.lookAt(0, 2.2, -3.5);
-        void tt;
-        if (!st.fin && st.t >= 30) { st.fin = true; alTerminar(st.n); }
-        setHud((h) => (h.n !== st.n || h.t !== Math.ceil(30 - st.t) || h.racha !== st.racha ? { n: st.n, t: Math.max(0, Math.ceil(30 - st.t)), racha: st.racha } : h));
+        const kk = k(); camera.position.set(0, 2.2 + kk * 0.5, 5.4 * kk); camera.lookAt(0, 2.2, -3.5);
+        if (!st.fin && st.t >= TIEMPO) { st.fin = true; alTerminar(st.n); }
+        setHud((h) => (h.n !== st.n || h.t !== Math.ceil(TIEMPO - st.t) || h.racha !== st.racha ? { n: st.n, t: Math.max(0, Math.ceil(TIEMPO - st.t)), racha: st.racha } : h));
       }
     };
   }, { cielo: [0x1e40af, 0x0f172a], niebla: 40 });
@@ -319,8 +343,8 @@ function Ritmo({ semilla, alTerminar }) {
 
 export default [
   { id: 'parejas', nombre: 'Parejas', emoji: '🃏', como: 'Da la vuelta a las fichas de dos en dos y encuentra las 8 parejas lo más rápido posible.', mejor: 'menos', unidad: 's', peor: 114, duracion: 90, C: Parejas, formato: (v) => `${v.toFixed(1).replace('.', ',')} s` },
-  { id: 'saltar', nombre: 'Salta obstáculos', emoji: '🏃', como: 'Corres solo y cada vez más rápido: toca la pantalla para saltar las vallas. Llega lo más lejos posible.', mejor: 'mas', unidad: 'm', duracion: 60, C: Saltar },
+  { id: 'saltar', nombre: 'Salta obstáculos', emoji: '🏃', como: 'Corres solo y cada vez más rápido: toca la pantalla para saltar las vallas. Cada vez salen más juntas y más altas, y luego dobles y triples. Llega lo más lejos posible: aguantar los 60 segundos es muy difícil.', mejor: 'mas', unidad: 'm', duracion: 60, C: Saltar },
   { id: 'meteoritos', nombre: 'Lluvia de meteoritos', emoji: '☄️', como: 'Arrastra el dedo a izquierda o derecha (en cualquier parte de la pantalla) para mover tu nave y esquivar los meteoritos. El círculo rojo marca dónde caen. Aguanta 45 segundos.', mejor: 'mas', unidad: 's', duracion: 45, C: Meteoritos, formato: (v) => `${v.toFixed(1).replace('.', ',')} s` },
-  { id: 'canasta', nombre: 'Canasta', emoji: '🏀', como: 'Como un tirachinas: arrastra el dedo hacia abajo para tensar (más largo, más fuerte) y hacia los lados para apuntar. Verás por dónde irá la bola. Suelta para lanzar. A los 10 segundos la canasta empieza a moverse.', mejor: 'mas', unidad: 'canastas', duracion: 30, C: Canasta },
+  { id: 'canasta', nombre: 'Canasta', emoji: '🏀', como: 'Como un tirachinas: arrastra el dedo hacia abajo para tensar (más largo, más fuerte) y hacia los lados para apuntar. Verás por dónde irá la bola. Suelta para lanzar: la siguiente bola sale al momento, cada vez en un sitio distinto. A los 12 segundos la canasta empieza a moverse. 45 segundos.', mejor: 'mas', unidad: 'canastas', duracion: 45, C: Canasta },
   { id: 'ritmo', nombre: 'Al ritmo', emoji: '🎵', como: 'Pulsa el botón del color justo cuando la bola llega al aro. En el momento exacto: +3; casi: +1; si pulsas sin nota, −1. Con racha de 10, punto extra.', mejor: 'mas', unidad: 'pts', duracion: 30, C: Ritmo }
 ];

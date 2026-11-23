@@ -21,7 +21,7 @@ function Stroop({ semilla, alTerminar }) {
     // Orbes de colores flotando alrededor (decoración)
     const orbes = TINTAS.map(([, c], k) => { const o = crea.esfera(0.22, new THREE.Color(c).getHex(), { emissive: new THREE.Color(c), emissiveIntensity: 1.2 }); o.userData.a = (k / 4) * Math.PI * 2; scene.add(o); return o; });
     const st = { t: 0, pts: 0, palabra: 0, tinta: 1, fin: false, golpe: 0 };
-    const nueva = () => { st.palabra = r.entero(0, 3); do { st.tinta = r.entero(0, 3); } while (r() < 0.75 && st.tinta === st.palabra); cartel.poner(TINTAS[st.palabra][0], TINTAS[st.tinta][1]); st.golpe = 1; };
+    const nueva = () => { const antes = `${st.palabra}${st.tinta}`; do { st.palabra = r.entero(0, 3); do { st.tinta = r.entero(0, 3); } while (r() < 0.75 && st.tinta === st.palabra); } while (`${st.palabra}${st.tinta}` === antes); cartel.poner(TINTAS[st.palabra][0], TINTAS[st.tinta][1]); st.golpe = 1; };
     nueva();
     ctl.current.elegir = (k) => {
       if (st.fin) return;
@@ -50,69 +50,87 @@ function Stroop({ semilla, alTerminar }) {
   );
 }
 
-/* ───────── Encaja la pieza ───────── */
-const FORMAS = [[[0, 0], [1, 0], [2, 0], [0, 1]], [[0, 0], [1, 0], [2, 0], [1, 1]], [[0, 0], [1, 0], [1, 1], [2, 1]], [[0, 0], [1, 0], [2, 0], [3, 0]], [[0, 0], [1, 0], [0, 1], [0, 2], [1, 2]], [[0, 0], [1, 0], [2, 0], [1, 1], [1, 2]]];
+/* ───────── Encaja la pieza (sin fin) ───────── */
+// Piezas de 4, 5 y 6 casillas, ninguna simétrica del todo (así siempre hay que girarla)
+const FORMAS = [
+  [[0, 0], [1, 0], [2, 0], [0, 1]], [[0, 0], [1, 0], [2, 0], [1, 1]], [[0, 0], [1, 0], [1, 1], [2, 1]], [[0, 0], [1, 0], [2, 0], [3, 0]],
+  [[0, 0], [1, 0], [0, 1], [0, 2], [1, 2]], [[0, 0], [1, 0], [2, 0], [1, 1], [1, 2]], [[0, 0], [1, 0], [2, 0], [2, 1], [2, 2]],
+  [[0, 0], [1, 0], [1, 1], [2, 1], [2, 2]], [[0, 0], [1, 0], [2, 0], [3, 0], [1, 1]], [[0, 0], [0, 1], [1, 1], [2, 1], [3, 1]],
+  [[0, 0], [1, 0], [1, 1], [2, 1], [3, 1]], [[1, 0], [2, 0], [0, 1], [1, 1], [1, 2]], [[0, 0], [1, 0], [2, 0], [0, 1], [2, 1]],
+  [[0, 0], [1, 0], [2, 0], [3, 0], [0, 1], [3, 1]], [[0, 0], [1, 0], [1, 1], [2, 1], [2, 2], [3, 2]], [[0, 0], [1, 0], [2, 0], [1, 1], [1, 2], [2, 2]],
+  [[0, 1], [1, 1], [2, 1], [2, 0], [3, 0], [3, 1]], [[0, 0], [0, 1], [1, 1], [1, 2], [2, 2], [3, 2]]
+];
 const rotar = (celdas, k) => { let c = celdas; for (let i = 0; i < ((k % 4) + 4) % 4; i++) c = c.map(([x, y]) => [-y, x]); const mx = Math.min(...c.map((p) => p[0])); const my = Math.min(...c.map((p) => p[1])); return c.map(([x, y]) => [x - mx, y - my]); };
 const clave = (c) => c.map(([x, y]) => `${x},${y}`).sort().join('|');
 /** Centra unas celdas: cada una con su posición respecto al centro de su caja. */
 const centradas = (c) => { const ox = Math.max(...c.map((p) => p[0])) / 2; const oy = Math.max(...c.map((p) => p[1])) / 2; return c.map(([x, y]) => [x - ox, y - oy]); };
 function Encajar({ semilla, alTerminar }) {
-  const ref = useRef(null); const ctl = useRef({}); const [hud, setHud] = useState({ n: 1, ok: 0 }); const [msg, setMsg] = useState(null);
+  const ref = useRef(null); const ctl = useRef({}); const [hud, setHud] = useState({ ok: 0, vel: 1 }); const [msg, setMsg] = useState(null);
   useEscena(ref, (ctx) => {
-    const { scene, camera } = ctx; const r = rng(semilla); const MURO = -16;
+    const { scene, camera } = ctx; const r = rng(semilla); const LEJOS = -34; const PIEZA_Z = 0;
     // Túnel de neón
-    const suelo = crea.suelo(9, 60, 0x1e1b4b, { celda: 1, contraste: 0.06 }); suelo.position.set(0, -2.6, -10); scene.add(suelo);
+    const suelo = crea.suelo(9, 90, 0x1e1b4b, { celda: 1, contraste: 0.06 }); suelo.position.set(0, -2.6, -30); scene.add(suelo);
     const lineas = [];
-    for (let z = 10; z > -30; z -= 4) { const l = crea.marco(9, 4.6, 0x22d3ee, { intensidad: 1.2, grosor: 0.05 }); l.rotation.x = Math.PI / 2; l.position.set(0, -0.3, z); scene.add(l); lineas.push(l); }
-    [-4.5, 4.5].forEach((x) => { const b = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 60), crea.neon(0xec4899, 1.8)); b.position.set(x, -2.55, -10); scene.add(b); });
+    for (let z = 10; z > -50; z -= 4) { const l = crea.marco(9, 4.6, 0x22d3ee, { intensidad: 1.2, grosor: 0.05 }); l.rotation.x = Math.PI / 2; l.position.set(0, -0.3, z); scene.add(l); lineas.push(l); }
+    [-4.5, 4.5].forEach((x) => { const b = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 90), crea.neon(0xec4899, 1.8)); b.position.set(x, -2.55, -30); scene.add(b); });
     const matPieza = new THREE.MeshStandardMaterial({ color: 0x22d3ee, emissive: 0x0891b2, emissiveIntensity: 0.6, roughness: 0.2, metalness: 0.2, transparent: true, opacity: 0.72 });
     const geoCelda = crea.caja(0.9, 0.9, 0.9, 0).geometry;
-    const st = { i: 0, ok: 0, z: 6, rot: 0, pieza: null, muro: null, forma: null, objetivo: null, fin: false, pausa: 0, giro: 0, paso: false, bien: false };
+    const pieza = new THREE.Group(); pieza.position.set(0, -0.5, PIEZA_Z); scene.add(pieza);
+    const st = { ok: 0, rot: 0, forma: null, objetivo: null, muro: null, fin: false, giro: 0, vel: 9, pasando: [] };
     const ponCeldas = () => {
-      const g = st.pieza; while (g.children.length) g.remove(g.children[0]);
-      centradas(rotar(st.forma, st.rot)).forEach(([x, y]) => { const b = new THREE.Mesh(geoCelda, matPieza); b.castShadow = true; b.position.set(x, y, 0); g.add(b); });
+      while (pieza.children.length) pieza.remove(pieza.children[0]);
+      centradas(rotar(st.forma, st.rot)).forEach(([x, y]) => { const b = new THREE.Mesh(geoCelda, matPieza); b.castShadow = true; b.position.set(x, y, 0); pieza.add(b); });
     };
-    const montar = () => {
-      if (st.pieza) scene.remove(st.pieza); if (st.muro) scene.remove(st.muro);
-      st.forma = r.de(FORMAS); st.objetivo = rotar(st.forma, r.entero(0, 3)); do { st.rot = r.entero(0, 3); } while (clave(rotar(st.forma, st.rot)) === clave(st.objetivo));
+    // Muro nuevo al fondo con el hueco de una pieza nueva (en otra postura)
+    const nuevoMuro = () => {
+      st.forma = r.de(FORMAS); st.objetivo = rotar(st.forma, r.entero(0, 3));
+      do { st.rot = r.entero(0, 3); } while (clave(rotar(st.forma, st.rot)) === clave(st.objetivo));
       const muro = new THREE.Group(); const hueco = centradas(st.objetivo); const libre = new Set(hueco.map(([x, y]) => `${x},${y}`));
       const fx = hueco[0][0] % 1; const fy = hueco[0][1] % 1; // desplazamiento de media celda
-      const colMuro = r.de([0xf97316, 0xe11d48, 0x7c3aed, 0x0d9488]);
+      const colMuro = r.de([0xf97316, 0xe11d48, 0x7c3aed, 0x0d9488, 0x2563eb]);
       for (let ix = -4; ix <= 4; ix++) for (let iy = -1; iy <= 4; iy++) {
         const x = ix + fx; const y = iy + fy; if (libre.has(`${x},${y}`)) continue;
         const cerca = hueco.some(([hx, hy]) => Math.abs(hx - x) + Math.abs(hy - y) === 1);
         const b = crea.caja(0.98, 0.98, 0.8, cerca ? 0xfde68a : colMuro, cerca ? { emissive: 0xf59e0b, emissiveIntensity: 0.5 } : undefined); b.position.set(x, y, 0); muro.add(b);
       }
-      muro.position.set(0, -0.5, MURO); scene.add(muro); st.muro = muro;
-      st.pieza = new THREE.Group(); scene.add(st.pieza); st.z = 6; st.giro = 0; st.paso = false; ponCeldas();
+      muro.position.set(0, -0.5, LEJOS); scene.add(muro); st.muro = muro;
+      ponCeldas(); st.giro = 0;
     };
-    montar();
-    ctl.current.girar = (k) => { if (st.fin || st.pausa > 0 || st.paso) return; st.rot = (st.rot + k + 4) % 4; ponCeldas(); st.giro = -k * Math.PI / 2; sonar('toque', { minimo: 0 }); };
+    nuevoMuro();
+    ctl.current.girar = (k) => { if (st.fin) return; st.rot = (st.rot + k + 4) % 4; ponCeldas(); st.giro = -k * Math.PI / 2; sonar('toque', { minimo: 0 }); };
+    const tecla = (e) => { if (e.key === 'ArrowLeft') ctl.current.girar(1); if (e.key === 'ArrowRight') ctl.current.girar(-1); };
+    window.addEventListener('keydown', tecla);
     return {
+      fin: () => window.removeEventListener('keydown', tecla),
       frame(dt) {
         const k = ctx.ancho(0.75);
-        camera.position.set(0, 2.4 + 0.5 * k, st.z + 6.5 * k); camera.lookAt(0, 0.2, MURO);
-        lineas.forEach((l) => { l.position.z += dt * 14; if (l.position.z > st.z + 8) l.position.z -= 40; });
+        camera.position.set(0, 2.4 + 0.5 * k, PIEZA_Z + 6.5 * k); camera.lookAt(0, 0.2, LEJOS * 0.55);
+        lineas.forEach((l) => { l.position.z += dt * st.vel * 1.4; if (l.position.z > 12) l.position.z -= 60; });
+        // Los muros ya superados siguen su camino y desaparecen
+        for (let i = st.pasando.length - 1; i >= 0; i--) { const m = st.pasando[i]; m.position.z += st.vel * dt; if (m.position.z > 14) { scene.remove(m); st.pasando.splice(i, 1); } }
         if (st.fin) return;
-        st.giro *= Math.pow(0.0005, dt); st.pieza.rotation.z = st.giro;
-        if (st.pausa > 0) {
-          st.pausa -= dt; if (st.bien) { st.z -= 14 * dt; st.pieza.position.set(0, -0.5, st.z); }
-          if (st.pausa <= 0) { st.i++; if (st.i >= 10) { st.fin = true; alTerminar(st.ok); return; } montar(); setHud({ n: st.i + 1, ok: st.ok }); }
-          return;
-        }
-        st.z -= (4.5 + st.i * 1.1) * dt; st.pieza.position.set(0, -0.5, st.z);
-        if (st.z <= MURO + 0.9) {
-          const bien = clave(rotar(st.forma, st.rot)) === clave(st.objetivo); st.bien = bien;
-          if (bien) { st.ok++; sonar('acierto'); setMsg('✅ ¡Encaja!'); ctx.chispas(new THREE.Vector3(0, 0, MURO), 0x22d3ee, 40, { fuerza: 6 }); st.muro.children.forEach((b) => { b.material = crea.neon(0x22c55e, 0.6); }); }
-          else { sonar('fallo'); vibrar(100); ctx.temblor(0.5); setMsg('💥 ¡No cabe!'); ctx.chispas(new THREE.Vector3(0, -0.5, MURO + 1), 0xf97316, 40, { fuerza: 6 }); st.pieza.visible = false; }
-          st.pausa = 1; setHud({ n: st.i + 1, ok: st.ok }); setTimeout(() => setMsg(null), 850);
+        st.giro *= Math.pow(0.0005, dt); pieza.rotation.z = st.giro;
+        st.muro.position.z += st.vel * dt;
+        if (st.muro.position.z >= PIEZA_Z - 0.4) {
+          if (clave(rotar(st.forma, st.rot)) === clave(st.objetivo)) {
+            // ¡Encaja! El muro pasa, sale otra pieza y aparece el siguiente hueco; cada vez más deprisa
+            st.ok++; st.vel = Math.min(30, 9 + st.ok * 0.9); sonar('acierto', { vibrar: false });
+            ctx.chispas(new THREE.Vector3(0, 0, PIEZA_Z), 0x22d3ee, 30, { fuerza: 6 });
+            st.muro.children.forEach((b) => { b.material = crea.neon(0x22c55e, 0.6); }); st.pasando.push(st.muro);
+            setHud({ ok: st.ok, vel: Math.round(st.vel / 9 * 10) / 10 }); if (st.ok % 5 === 0) { setMsg(`🔥 ¡${st.ok} seguidas!`); setTimeout(() => setMsg(null), 700); }
+            nuevoMuro();
+          } else {
+            st.fin = true; sonar('fallo'); vibrar(150); ctx.temblor(0.6); pieza.visible = false; st.muro.position.z = PIEZA_Z - 0.4;
+            ctx.chispas(new THREE.Vector3(0, -0.5, PIEZA_Z), 0xf97316, 50, { fuerza: 7 }); setMsg('💥 ¡No cabe!');
+            setTimeout(() => alTerminar(st.ok), 1000);
+          }
         }
       }
     };
-  }, { cielo: [0x0f0a2e, 0x1e1b4b], niebla: 45 });
+  }, { cielo: [0x0f0a2e, 0x1e1b4b], niebla: 55 });
   return (
     <div className="hb-caja">
-      <div ref={ref} className="hb-lienzo" /><Hud izq={`🧩 Pieza ${Math.min(10, hud.n)}/10`} der={`✅ ${hud.ok}`} /><Mensaje texto={msg} />
+      <div ref={ref} className="hb-lienzo" /><Hud izq={`🧩 ${hud.ok} muros`} der={`⚡ ×${hud.vel.toFixed(1).replace('.', ',')}`} /><Mensaje texto={msg} />
       <Botones><Boton ancho onPulsar={() => ctl.current.girar?.(1)}>⟲ Girar</Boton><Boton ancho onPulsar={() => ctl.current.girar?.(-1)}>Girar ⟳</Boton></Botones>
     </div>
   );
@@ -174,7 +192,7 @@ function Pesca({ semilla, alTerminar }) {
           st.y += 12 * dt;
           if (st.y >= 0.3) {
             st.y = 0.3; st.baja = 0;
-            if (st.preso) { scene.remove(st.preso.m); st.n += st.preso.oro ? 3 : 1; sonar('acierto'); ctx.chispas(new THREE.Vector3(st.x + 1.3, 0.4, 0), st.preso.oro ? 0xfacc15 : 0x7dd3fc, 22); setMsg(st.preso.oro ? '🐠 ¡Dorado! +3' : '🐟 +1'); setTimeout(() => setMsg(null), 500); st.preso = null; }
+            if (st.preso) { scene.remove(st.preso.m); peces.splice(peces.indexOf(st.preso), 1); st.n += st.preso.oro ? 3 : 1; sonar('acierto'); ctx.chispas(new THREE.Vector3(st.x + 1.3, 0.4, 0), st.preso.oro ? 0xfacc15 : 0x7dd3fc, 22); setMsg(st.preso.oro ? '🐠 ¡Dorado! +3' : '🐟 +1'); setTimeout(() => setMsg(null), 500); st.preso = null; }
           }
         }
         const hx = st.x + 1.3;
@@ -204,22 +222,29 @@ const mat2 = (c) => new THREE.MeshStandardMaterial({ color: c, metalness: 0.8, r
 function Trileros({ semilla, alTerminar }) {
   const ref = useRef(null); const [hud, setHud] = useState({ ronda: 1, ok: 0, txt: 'Mira dónde está la bola' }); const [msg, setMsg] = useState(null);
   useEscena(ref, (ctx) => {
-    const { scene } = ctx; const r = rng(semilla); const X = [-2.5, 0, 2.5];
+    const { scene } = ctx; const r = rng(semilla); const RONDAS = 10;
+    // Vasos en juego: 3 al principio, 4 desde la ronda 4 y 5 desde la 7
+    const cuantos = (ronda) => (ronda < 3 ? 3 : ronda < 6 ? 4 : 5);
+    const posiciones = (n) => Array.from({ length: n }, (_, i) => (i - (n - 1) / 2) * 2.15);
     const suelo = crea.suelo(40, 40, 0x292524, { celda: 1.5, contraste: 0.04 }); suelo.position.y = -1.6; scene.add(suelo);
-    const mesa = crea.caja(10, 0.3, 5.4, 0x15803d, { roughness: 0.95 }); mesa.position.y = -0.15; scene.add(mesa);
-    const madera = crea.caja(10.8, 0.4, 6.2, 0x78350f, { roughness: 0.5 }); madera.position.y = -0.3; scene.add(madera);
-    const oro = crea.marco(10.3, 5.7, 0xfacc15, { intensidad: 0.5, grosor: 0.1 }); oro.position.y = 0.02; scene.add(oro);
+    const mesa = crea.caja(11.6, 0.3, 5.4, 0x15803d, { roughness: 0.95 }); mesa.position.y = -0.15; scene.add(mesa);
+    const madera = crea.caja(12.4, 0.4, 6.2, 0x78350f, { roughness: 0.5 }); madera.position.y = -0.3; scene.add(madera);
+    const oro = crea.marco(11.9, 5.7, 0xfacc15, { intensidad: 0.5, grosor: 0.1 }); oro.position.y = 0.02; scene.add(oro);
     const foco = new THREE.SpotLight(0xfff7e0, 60, 20, 0.6, 0.5); foco.position.set(0, 8, 2); foco.target.position.set(0, 0, 0); scene.add(foco, foco.target);
-    const vasos = X.map((x) => { const v = vasoModelo(); v.position.set(x, 0, 0); scene.add(v); return { m: v, pos: x }; });
+    const todos = Array.from({ length: 5 }, () => { const v = vasoModelo(); scene.add(v); return { m: v, pos: 0 }; });
+    let vasos = todos.slice(0, 3);
     const bola = crea.esfera(0.32, 0xfacc15, { metalness: 0.6, roughness: 0.15, emissive: 0xb45309, emissiveIntensity: 0.4 }); bola.position.y = 0.32; scene.add(bola);
     const st = { ronda: 0, ok: 0, con: 0, fase: 'mostrar', t: 0, swaps: [], si: 0, prog: 0, fin: false, elegido: -1 };
     const preparar = () => {
-      st.con = r.entero(0, 2); st.fase = 'mostrar'; st.t = 0; st.elegido = -1;
-      const n = 3 + st.ronda * 2; st.swaps = Array.from({ length: n }, () => { const a = r.entero(0, 2); let b; do { b = r.entero(0, 2); } while (b === a); return [a, b]; });
+      const nv = cuantos(st.ronda); vasos = todos.slice(0, nv); const X = posiciones(nv);
+      todos.forEach((v, i) => { v.m.visible = i < nv; v.pos = X[i] ?? 0; v.m.position.set(v.pos, 0, 0); delete v.base; });
+      st.con = r.entero(0, nv - 1); st.fase = 'mostrar'; st.t = 0; st.elegido = -1;
+      // Cada ronda, más cambios y más rápidos (de 4 a 22)
+      const n = 4 + st.ronda * 2; st.swaps = Array.from({ length: n }, () => { const a = r.entero(0, nv - 1); let b; do { b = r.entero(0, nv - 1); } while (b === a); return [a, b]; });
       st.si = 0; st.prog = 0; setHud({ ronda: st.ronda + 1, ok: st.ok, txt: 'Mira dónde está la bola' });
     };
     preparar();
-    ctx.encuadrar({ centro: [0, 0.4, 0.2], ancho: 8.6, alto: 5, desde: [0, 0.85, 0.85] });
+    ctx.encuadrar({ centro: [0, 0.4, 0.2], ancho: 11, alto: 5, desde: [0, 0.85, 0.85] });
     const elegibles = () => vasos.map((v) => v.m);
     return {
       toque(e) {
@@ -238,7 +263,7 @@ function Trileros({ semilla, alTerminar }) {
           if (st.t > 1.8) { st.fase = 'mezclar'; st.t = 0; setHud((h) => ({ ...h, txt: 'Mezclando…' })); }
         }
         if (st.fase === 'mezclar') {
-          const dur = Math.max(0.17, 0.45 - st.ronda * 0.05); st.prog += dt / dur;
+          const dur = Math.max(0.12, 0.4 - st.ronda * 0.03); st.prog += dt / dur;
           const [a, b] = st.swaps[st.si]; const va = vasos[a]; const vb = vasos[b];
           if (va.base === undefined) { va.base = va.pos; vb.base = vb.pos; }
           const u = Math.min(1, st.prog); const s = u * u * (3 - 2 * u);
@@ -250,7 +275,7 @@ function Trileros({ semilla, alTerminar }) {
         if (st.fase === 'revelar') {
           const sube = Math.min(1, st.t * 4);
           vasos.forEach((v, k) => { const arriba = k === st.con || k === st.elegido; v.m.position.y = arriba ? sube * 1.6 : 0; v.m.rotation.z = arriba ? sube * 0.15 : 0; });
-          if (st.t > 1.4) { setMsg(null); vasos.forEach((v) => { v.m.position.y = 0; v.m.rotation.z = 0; }); st.ronda++; if (st.ronda >= 6) { st.fin = true; alTerminar(st.ok); st.fase = 'fin'; } else preparar(); }
+          if (st.t > 1.4) { setMsg(null); vasos.forEach((v) => { v.m.position.y = 0; v.m.rotation.z = 0; }); st.ronda++; if (st.ronda >= RONDAS) { st.fin = true; alTerminar(st.ok); st.fase = 'fin'; } else preparar(); }
         }
         // La bola va debajo de su vaso y solo se ve cuando está levantado
         const vc = vasos[st.con].m; bola.position.set(vc.position.x, 0.32, vc.position.z);
@@ -258,7 +283,7 @@ function Trileros({ semilla, alTerminar }) {
       }
     };
   }, { cielo: [0x1c1917, 0x0c0a09], niebla: 40, exposicion: 1.15 });
-  return <div className="hb-caja"><div ref={ref} className="hb-lienzo" /><Hud izq={`🥤 Ronda ${hud.ronda}/6 · ✅ ${hud.ok}`} der={hud.txt} /><Mensaje texto={msg} /></div>;
+  return <div className="hb-caja"><div ref={ref} className="hb-lienzo" /><Hud izq={`🥤 Ronda ${hud.ronda}/10 · ✅ ${hud.ok}`} der={hud.txt} /><Mensaje texto={msg} /></div>;
 }
 
 /* ───────── Dedo veloz ───────── */
@@ -302,8 +327,8 @@ function Veloz({ alTerminar }) {
 
 export default [
   { id: 'stroop', nombre: 'Colores traicioneros', emoji: '🎨', como: 'Sale el nombre de un color pintado de otro color. Toca el color de la TINTA, no lo que pone. +1 si aciertas, −1 si fallas. 30 segundos.', mejor: 'mas', unidad: 'pts', duracion: 30, C: Stroop },
-  { id: 'encajar', nombre: 'Encaja la pieza', emoji: '🧩', como: 'La pieza avanza hacia un muro con un hueco. Gírala (⟲ ⟳) para que pase justo por el hueco. Diez piezas, cada vez más rápidas.', mejor: 'mas', unidad: 'piezas', duracion: 60, C: Encajar },
+  { id: 'encajar', nombre: 'Encaja la pieza', emoji: '🧩', como: 'Se te acercan muros con un hueco: gira la pieza (⟲ ⟳ o las flechas) para que pase justo por él. Cada muro superado trae una pieza nueva y más velocidad. Sin fin: se acaba al primer fallo.', mejor: 'mas', unidad: 'muros', duracion: 240, C: Encajar },
   { id: 'pesca', nombre: 'Pesca rápida', emoji: '🎣', como: 'La barca va de lado a lado: toca para echar el anzuelo justo cuando pase un pez. Los dorados valen 3. 40 segundos.', mejor: 'mas', unidad: 'peces', duracion: 40, C: Pesca },
-  { id: 'trileros', nombre: 'Trileros', emoji: '🥤', como: 'Fíjate en qué vaso está la bola. Se mezclan cada vez más rápido: después, toca el vaso correcto. Seis rondas.', mejor: 'mas', unidad: 'aciertos', duracion: 75, C: Trileros },
+  { id: 'trileros', nombre: 'Trileros', emoji: '🥤', como: 'Fíjate en qué vaso está la bola. Se mezclan cada vez más rápido y más veces, y van saliendo más vasos (hasta 5): después, toca el vaso correcto. Diez rondas.', mejor: 'mas', unidad: 'aciertos', duracion: 150, C: Trileros },
   { id: 'veloz', nombre: 'Dedo veloz', emoji: '👆', como: 'Toca la pantalla lo más rápido que puedas durante 10 segundos para inflar el globo.', mejor: 'mas', unidad: 'toques', duracion: 25, C: Veloz }
 ];

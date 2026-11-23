@@ -10,10 +10,14 @@ function Mantener({ ctl, k, children }) {
 }
 
 /* ───────── Para en 10 segundos ───────── */
-function Diez({ alTerminar }) {
-  const ref = useRef(null); const [hud, setHud] = useState({ intento: 1, error: 0 }); const [msg, setMsg] = useState(null);
+const RONDAS_DIEZ = 5;
+function Diez({ semilla, alTerminar }) {
+  const ref = useRef(null); const [hud, setHud] = useState({ intento: 1, error: 0, meta: null }); const [msg, setMsg] = useState(null);
   useEscena(ref, (ctx) => {
-    const { scene } = ctx;
+    const { scene } = ctx; const r = rng(semilla);
+    // Cinco rondas, cada una con un tiempo objetivo distinto (la esfera da una vuelta cada 15 s)
+    const metas = r.barajar([4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]).slice(0, RONDAS_DIEZ);
+    const VUELTA = 15;
     const reloj = new THREE.Group(); scene.add(reloj);
     const caja = crea.cilindro(2.9, 2.9, 0.6, 0x1e293b, 64, { metalness: 0.6, roughness: 0.25 }); caja.rotation.x = Math.PI / 2; reloj.add(caja);
     const bisel = new THREE.Mesh(new THREE.TorusGeometry(2.8, 0.16, 16, 80), mat(0xe2e8f0, { metalness: 0.9, roughness: 0.15 })); bisel.position.z = 0.32; reloj.add(bisel);
@@ -23,38 +27,42 @@ function Diez({ alTerminar }) {
       const t = crea.caja(k % 5 === 0 ? 0.07 : 0.03, largo, 0.02, k % 5 === 0 ? 0x0f172a : 0x94a3b8); t.position.set(Math.sin(a) * (2.35 - largo / 2), Math.cos(a) * (2.35 - largo / 2), 0.35); t.rotation.z = -a; reloj.add(t);
     }
     const corona = crea.cilindro(0.3, 0.3, 0.4, 0xcbd5e1, 24, { metalness: 0.9, roughness: 0.2 }); corona.position.set(0, 3.15, 0); reloj.add(corona);
+    const marca = crea.caja(0.16, 0.5, 0.04, 0x22c55e, { emissive: 0x22c55e, emissiveIntensity: 0.8 }); marca.geometry.translate(0, 2.05, 0); marca.position.z = 0.37; reloj.add(marca);
     const aguja = crea.caja(0.1, 2.2, 0.06, 0xef4444); aguja.geometry.translate(0, 0.9, 0); aguja.position.z = 0.42; reloj.add(aguja);
     const centro = crea.cilindro(0.16, 0.16, 0.1, 0x0f172a, 20); centro.rotation.x = Math.PI / 2; centro.position.z = 0.45; reloj.add(centro);
     const tapa = crea.cilindro(2.62, 2.62, 0.08, 0x0f172a, 64, { metalness: 0.4, roughness: 0.3 }); tapa.rotation.x = Math.PI / 2; tapa.position.z = 0.5; tapa.visible = false; reloj.add(tapa);
     const interroga = crea.cartel('?', 2.4, 2.4, { fondo: null, color: '#a78bfa', fuente: 'bold 200px sans-serif' }); interroga.position.z = 0.56; interroga.visible = false; reloj.add(interroga);
     const m = marcador({ tam: 1.05 }); m.position.set(0, -3.9, 0); scene.add(m);
     const st = { t: 0, corriendo: true, intento: 0, errores: [], fin: false };
+    const meta = () => metas[st.errores.length];
+    const ponerMeta = () => { marca.rotation.z = -(meta() / VUELTA) * Math.PI * 2; setHud((h) => ({ ...h, meta: meta() })); };
+    ponerMeta();
     ctx.encuadrar({ centro: [0, -0.4, 0], ancho: 6.6, alto: 8.4, desde: [0, 0.02, 1] });
     return {
       toque() {
         if (st.fin || !st.corriendo) return;
-        st.corriendo = false; const err = Math.abs(st.t - 10); st.errores.push(Math.round(err * 1000));
-        tapa.visible = false; interroga.visible = false; aguja.visible = true; aguja.rotation.z = -(st.t / 10) * Math.PI * 2;
+        st.corriendo = false; const err = Math.abs(st.t - meta()); st.errores.push(Math.round(err * 1000));
+        tapa.visible = false; interroga.visible = false; aguja.visible = true; aguja.rotation.z = -(st.t / VUELTA) * Math.PI * 2;
         m.poner(`${st.t.toFixed(2)} s`, err < 0.1 ? '#4ade80' : '#fde047'); sonar(err < 0.1 ? 'victoria' : 'acierto');
         if (err < 0.15) ctx.chispas(new THREE.Vector3(0, 0, 0.8), 0x4ade80, 30, { fuerza: 5 });
         setMsg(err < 0.05 ? '🎯 ¡Clavado!' : `Error: ${err.toFixed(2)} s`);
-        setHud({ intento: st.errores.length + 1, error: st.errores.reduce((a, b) => a + b, 0) });
+        setHud((h) => ({ ...h, intento: st.errores.length + 1, error: st.errores.reduce((a, b) => a + b, 0) }));
         setTimeout(() => {
           setMsg(null);
-          if (st.errores.length >= 3) { st.fin = true; alTerminar(st.errores.reduce((a, b) => a + b, 0)); return; }
-          st.t = 0; st.corriendo = true;
+          if (st.errores.length >= RONDAS_DIEZ) { st.fin = true; alTerminar(st.errores.reduce((a, b) => a + b, 0)); return; }
+          st.t = 0; st.corriendo = true; ponerMeta();
         }, 1600);
       },
       frame(dt, t) {
         reloj.rotation.y = Math.sin(t * 0.6) * 0.08;
         if (!st.corriendo) return;
-        st.t += dt; aguja.rotation.z = -(st.t / 10) * Math.PI * 2;
+        st.t += dt; aguja.rotation.z = -(st.t / VUELTA) * Math.PI * 2;
         const oculto = st.t >= 3; aguja.visible = !oculto; tapa.visible = oculto; interroga.visible = oculto; m.poner(oculto ? '?? s' : `${st.t.toFixed(2)} s`);
-        if (st.t > 20) { st.corriendo = false; st.errores.push(10000); if (st.errores.length >= 3) { st.fin = true; alTerminar(st.errores.reduce((a, b) => a + b, 0)); } else { st.t = 0; st.corriendo = true; } }
+        if (st.t > meta() + 10) { st.corriendo = false; st.errores.push(10000); if (st.errores.length >= RONDAS_DIEZ) { st.fin = true; alTerminar(st.errores.reduce((a, b) => a + b, 0)); } else { st.t = 0; st.corriendo = true; ponerMeta(); } }
       }
     };
   }, { cielo: [0x312e81, 0x0f172a], niebla: false });
-  return <div className="hb-caja"><div ref={ref} className="hb-lienzo" /><Hud izq={`⏱️ Intento ${Math.min(3, hud.intento)}/3`} der={`Error total: ${(hud.error / 1000).toFixed(2)} s`} /><Mensaje texto={msg} /></div>;
+  return <div className="hb-caja"><div ref={ref} className="hb-lienzo" /><Hud izq={`⏱️ Ronda ${Math.min(RONDAS_DIEZ, hud.intento)}/${RONDAS_DIEZ}`} centro={hud.meta ? `🎯 ${hud.meta} s` : null} der={`Error: ${(hud.error / 1000).toFixed(2)} s`} /><Mensaje texto={msg} /></div>;
 }
 
 /* ───────── Equilibrista ───────── */
@@ -104,9 +112,9 @@ function Equilibrio({ semilla, alTerminar }) {
 
 /* ───────── Laberinto ───────── */
 function Laberinto({ semilla, alTerminar }) {
-  const ref = useRef(null); const [t, setT] = useState(0); const [joy, setJoy] = useState(null);
+  const ref = useRef(null); const ctl = useRef({}); const [t, setT] = useState(0);
   useEscena(ref, (ctx) => {
-    const { scene } = ctx; const r = rng(semilla); const N = 7; const S = 1.5;
+    const { scene } = ctx; const r = rng(semilla); const N = 11; const S = 1.1; const RB = 0.24;
     // Laberinto por búsqueda en profundidad
     const muro = Array.from({ length: N * N }, () => ({ n: true, e: true, s: true, o: true })); const vis = new Set([0]); const pila = [0];
     while (pila.length) {
@@ -134,36 +142,42 @@ function Laberinto({ semilla, alTerminar }) {
     const meta = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.55, 0.05, 32), crea.neon(0x22c55e, 1.6)); meta.position.set(cx(N - 1), 0.03, cx(N - 1)); scene.add(meta);
     const haz = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.55, 3, 24, 1, true), new THREE.MeshBasicMaterial({ color: 0x4ade80, transparent: true, opacity: 0.22, side: THREE.DoubleSide, depthWrite: false })); haz.position.set(meta.position.x, 1.5, meta.position.z); scene.add(haz);
     const salida = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.04, 32), crea.neon(0xfacc15, 0.8)); salida.position.set(cx(0), 0.02, cx(0)); scene.add(salida);
-    const bola = crea.esfera(0.32, 0xe2e8f0, { metalness: 0.9, roughness: 0.12 }); bola.position.set(cx(0), 0.32, cx(0)); scene.add(bola);
+    const bola = crea.esfera(RB, 0xe2e8f0, { metalness: 0.9, roughness: 0.12 }); bola.position.set(cx(0), RB, cx(0)); scene.add(bola);
     const luzBola = new THREE.PointLight(0xfde68a, 3, 3); scene.add(luzBola);
-    const st = { t: 0, x: cx(0), z: cx(0), dx: 0, dz: 0, inicio: null, fin: false };
-    const choca = (x, z) => rects.some(([a, b, c, d]) => { const px = Math.max(a, Math.min(x, c)); const pz = Math.max(b, Math.min(z, d)); return (x - px) ** 2 + (z - pz) ** 2 < 0.3 * 0.3; });
+    const st = { t: 0, x: cx(0), z: cx(0), fin: false };
+    const choca = (x, z) => rects.some(([a, b, c, d]) => { const px = Math.max(a, Math.min(x, c)); const pz = Math.max(b, Math.min(z, d)); return (x - px) ** 2 + (z - pz) ** 2 < RB * RB; });
+    // Flechas del teclado (en ordenador), igual que mantener pulsados los botones
+    const TECLAS = { ArrowUp: 'arriba', ArrowDown: 'abajo', ArrowLeft: 'izq', ArrowRight: 'der' };
+    const tecla = (v) => (e) => { const k = TECLAS[e.key]; if (k) { e.preventDefault(); ctl.current[k] = v; } };
+    const baja = tecla(true); const sube = tecla(false);
+    window.addEventListener('keydown', baja); window.addEventListener('keyup', sube);
     // Vista cenital (algo inclinada) que encaja el laberinto entero en cualquier pantalla
-    ctx.encuadrar({ centro: [0, 0, 0.15], ancho: N * S + 0.8, alto: N * S + 0.8, desde: [0, 1, 0.22], margen: 1.04 });
+    // Vista cenital que encaja el laberinto entero y deja sitio debajo para las flechas
+    ctx.encuadrar({ centro: [0, 0, 1.6], ancho: N * S + 0.8, alto: N * S + 4.4, desde: [0, 1, 0.12], margen: 1.03 });
     return {
-      toque(e) { const rr = ctx.el.getBoundingClientRect(); st.inicio = [e.clientX, e.clientY]; setJoy({ x: e.clientX - rr.left, y: e.clientY - rr.top, dx: 0, dy: 0 }); },
-      mover(e) {
-        if (!st.inicio) return; const dx = (e.clientX - st.inicio[0]) / 50; const dz = (e.clientY - st.inicio[1]) / 50; const l = Math.hypot(dx, dz);
-        st.dx = l > 1 ? dx / l : dx; st.dz = l > 1 ? dz / l : dz; setJoy((j) => (j ? { ...j, dx: st.dx * 36, dy: st.dz * 36 } : j));
-      },
-      soltar() { st.inicio = null; st.dx = 0; st.dz = 0; setJoy(null); },
+      fin() { window.removeEventListener('keydown', baja); window.removeEventListener('keyup', sube); },
       frame(dt, tt) {
         meta.material.emissiveIntensity = 1.2 + Math.sin(tt * 4) * 0.5; haz.rotation.y += dt;
         if (st.fin) return;
-        st.t += dt; const v = 4.2 * dt;
-        const nx = st.x + st.dx * v; if (!choca(nx, st.z)) st.x = nx;
-        const nz = st.z + st.dz * v; if (!choca(st.x, nz)) st.z = nz;
-        bola.position.set(st.x, 0.32, st.z); bola.rotation.x += st.dz * v / 0.32; bola.rotation.z -= st.dx * v / 0.32; luzBola.position.set(st.x, 0.9, st.z);
+        const c = ctl.current; let dx = (c.der ? 1 : 0) - (c.izq ? 1 : 0); let dz = (c.abajo ? 1 : 0) - (c.arriba ? 1 : 0);
+        if (dx && dz) { dx *= Math.SQRT1_2; dz *= Math.SQRT1_2; }
+        st.t += dt; const v = 3.2 * dt;
+        // (en pasos cortos para no atravesar paredes)
+        for (let i = 0; i < 3; i++) {
+          const nx = st.x + dx * v / 3; if (!choca(nx, st.z)) st.x = nx;
+          const nz = st.z + dz * v / 3; if (!choca(st.x, nz)) st.z = nz;
+        }
+        bola.position.set(st.x, RB, st.z); bola.rotation.x += dz * v / RB; bola.rotation.z -= dx * v / RB; luzBola.position.set(st.x, 0.9, st.z);
         if (Math.hypot(st.x - cx(N - 1), st.z - cx(N - 1)) < 0.5) { st.fin = true; sonar('victoria'); ctx.chispas(new THREE.Vector3(st.x, 0.5, st.z), 0x4ade80, 40, { fuerza: 5 }); alTerminar(Math.round(st.t * 10) / 10); }
-        if (st.t >= 90) { st.fin = true; alTerminar(90); }
+        if (st.t >= 120) { st.fin = true; alTerminar(120); }
         setT((x) => (Math.floor(x) !== Math.floor(st.t) ? st.t : x));
       }
     };
   }, { cielo: [0x1e1b4b, 0x050314], niebla: false });
   return (
     <div className="hb-caja">
-      <div ref={ref} className="hb-lienzo" /><Hud izq={`🌀 ${Math.floor(t)} s`} der="Arrastra para guiar la bola" />
-      {joy && <div className="hb-joy" style={{ left: joy.x, top: joy.y }}><i style={{ transform: `translate(${joy.dx}px, ${joy.dy}px)` }} /></div>}
+      <div ref={ref} className="hb-lienzo" /><Hud izq={`🌀 ${Math.floor(t)} s`} der="Mantén pulsadas las flechas" />
+      <Botones><Mantener ctl={ctl} k="izq">◀</Mantener><Mantener ctl={ctl} k="arriba">▲</Mantener><Mantener ctl={ctl} k="abajo">▼</Mantener><Mantener ctl={ctl} k="der">▶</Mantener></Botones>
     </div>
   );
 }
@@ -298,9 +312,9 @@ function Contar({ semilla, alTerminar }) {
 }
 
 export default [
-  { id: 'diez', nombre: 'Para en 10 segundos', emoji: '⏱️', como: 'El reloj arranca y a los 3 segundos se tapa. Toca cuando creas que van exactamente 10 segundos. Tres intentos: cuenta el error total.', mejor: 'menos', unidad: 's', peor: 30000, duracion: 75, C: Diez, formato: (v) => `${(v / 1000).toFixed(2).replace('.', ',')} s de error` },
+  { id: 'diez', nombre: 'Para en 10 segundos', emoji: '⏱️', como: 'Cinco rondas, cada una con un tiempo distinto (marcado en verde). El reloj arranca y a los 3 segundos se tapa: toca cuando creas que ha pasado justo ese tiempo. Cuenta el error total.', mejor: 'menos', unidad: 's', peor: 50000, duracion: 130, C: Diez, formato: (v) => `${(v / 1000).toFixed(2).replace('.', ',')} s de error` },
   { id: 'equilibrio', nombre: 'Equilibrista', emoji: '⚖️', como: 'Mantén pulsado para inclinar la tabla y que la bola no se caiga. El viento (arriba verás hacia dónde sopla) es cada vez más fuerte. Aguanta hasta 40 segundos.', mejor: 'mas', unidad: 's', duracion: 40, C: Equilibrio, formato: (v) => `${v.toFixed(1).replace('.', ',')} s` },
-  { id: 'laberinto', nombre: 'Laberinto', emoji: '🌀', como: 'Arrastra el dedo por la pantalla, como un joystick, para guiar la bola hasta la salida verde lo antes posible.', mejor: 'menos', unidad: 's', peor: 90, duracion: 90, C: Laberinto, formato: (v) => `${v.toFixed(1).replace('.', ',')} s` },
+  { id: 'laberinto', nombre: 'Laberinto', emoji: '🌀', como: 'Mantén pulsadas las flechas (o las del teclado) para mover la bola por el laberinto hasta la salida verde lo antes posible.', mejor: 'menos', unidad: 's', peor: 120, duracion: 120, C: Laberinto, formato: (v) => `${v.toFixed(1).replace('.', ',')} s` },
   { id: 'topos', nombre: 'Topos', emoji: '🔨', como: 'Toca los topos que asoman (+1). Los dorados valen +3. ¡Ojo con las bombas (−3)! 30 segundos.', mejor: 'mas', unidad: 'pts', duracion: 30, C: Topos },
   { id: 'contar', nombre: '¿Cuántos hay?', emoji: '🔢', como: 'Unas figuras aparecen un momento sobre la mesa. Cuando se tapen, responde la pregunta. Cuanto antes contestes, más puntos.', mejor: 'mas', unidad: 'pts', duracion: 75, C: Contar }
 ];

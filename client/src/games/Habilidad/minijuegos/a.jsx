@@ -66,28 +66,34 @@ function Cruzar({ semilla, alTerminar }) {
     const mover = (dc, dx) => {
       if (st.fin) return; st.carril = Math.max(0, st.carril + dc); st.x = Math.max(-5, Math.min(5, st.x + dx)); st.salto = 1;
       if (st.carril > st.max) { st.max = st.carril; if (st.max % 10 === 0) { ctx.chispas(new THREE.Vector3(st.x, 0.6, -st.carril), 0x22c55e, 16); sonar('acierto', { minimo: 0 }); } }
-      pollo.rotation.y = dx < 0 ? Math.PI / 2 : dx > 0 ? -Math.PI / 2 : 0;
+      pollo.rotation.y = dx < 0 ? Math.PI / 2 : dx > 0 ? -Math.PI / 2 : dc < 0 ? Math.PI : 0;
       sonar('toque', { minimo: 0 });
     };
     ctl.current = { mover };
+    // En ordenador, también con las flechas del teclado
+    const tecla = (e) => { const m = { ArrowUp: [1, 0], ArrowDown: [-1, 0], ArrowLeft: [0, -1], ArrowRight: [0, 1] }[e.key]; if (m) { e.preventDefault(); mover(...m); } };
+    window.addEventListener('keydown', tecla);
+    const cam = { x: 1.6, z: 5 };
     return {
+      fin: () => window.removeEventListener('keydown', tecla),
       toque: () => mover(1, 0),
       frame(dt) {
         if (!st.fin) st.t += dt;
         coches.forEach((k) => { k.m.position.x += k.c.dir * k.c.vel * dt; if (k.m.position.x > 11) k.m.position.x -= 22; if (k.m.position.x < -11) k.m.position.x += 22; });
         st.salto = Math.max(0, st.salto - dt * 6);
         pollo.position.x += (st.x - pollo.position.x) * 0.4; pollo.position.z += (-st.carril - pollo.position.z) * 0.4;
-        if (!st.fin) { pollo.position.y = Math.sin(st.salto * Math.PI) * 0.45; const sq = 1 - Math.sin(st.salto * Math.PI) * 0.15; pollo.scale.set(1, 1 / sq, 1); }
+        if (!st.fin) { pollo.position.y = Math.sin(st.salto * Math.PI) * 0.28; const sq = 1 - Math.sin(st.salto * Math.PI) * 0.08; pollo.scale.set(1, 1 / sq, 1); }
         if (!st.fin) {
           const golpe = coches.some((k) => k.carril === st.carril && Math.abs(k.m.position.x - st.x) < k.largo / 2 + 0.3);
           if (golpe) acabar();
           if (st.t >= 60) { st.fin = true; alTerminar(st.max); }
         }
         // Cámara: más alta y lejos si la pantalla es estrecha (móvil en vertical)
-        const k = ctx.ancho(0.9);
-        camera.position.x += (pollo.position.x * 0.3 + 1.6 * k - camera.position.x) * 0.1; camera.position.y = 6.5 * Math.sqrt(k);
-        camera.position.z += (pollo.position.z + 5 * k - camera.position.z) * 0.1;
-        camera.lookAt(pollo.position.x * 0.3, 0, pollo.position.z - 2.5);
+        // (cámara suave: sigue al pollo sin sacudidas a cada paso)
+        const k = ctx.ancho(0.9); const suave = 1 - Math.exp(-dt * 2.5);
+        cam.x += (st.x * 0.15 + 1.6 * k - cam.x) * suave; cam.z += (-st.carril + 5 * k - cam.z) * suave;
+        camera.position.set(cam.x, 6.5 * Math.sqrt(k), cam.z);
+        camera.lookAt(cam.x - 1.6 * k, 0, cam.z - 5 * k - 2.5);
         ctx.seguirSol(pollo.position.x, pollo.position.z);
         setHud((h) => (h.carril !== st.max || h.t !== Math.ceil(60 - st.t) ? { carril: st.max, t: Math.max(0, Math.ceil(60 - st.t)) } : h));
       }
@@ -98,7 +104,7 @@ function Cruzar({ semilla, alTerminar }) {
       <div ref={ref} className="hb-lienzo" />
       <Hud izq={`🐔 ${hud.carril} carriles`} der={`⏱️ ${hud.t}s`} />
       <Mensaje texto={msg} tipo="mal" />
-      <Botones><Boton onPulsar={() => ctl.current.mover?.(0, -1)}>◀</Boton><Boton ancho onPulsar={() => ctl.current.mover?.(1, 0)}>▲ Avanzar</Boton><Boton onPulsar={() => ctl.current.mover?.(0, 1)}>▶</Boton></Botones>
+      <Botones><Boton onPulsar={() => ctl.current.mover?.(0, -1)}>◀</Boton><Boton onPulsar={() => ctl.current.mover?.(-1, 0)}>▼</Boton><Boton onPulsar={() => ctl.current.mover?.(1, 0)}>▲</Boton><Boton onPulsar={() => ctl.current.mover?.(0, 1)}>▶</Boton></Botones>
     </div>
   );
 }
@@ -305,7 +311,7 @@ function Diana({ semilla, alTerminar }) {
 }
 
 export default [
-  { id: 'cruzar', nombre: 'Cruza la carretera', emoji: '🐔', como: 'Toca la pantalla (o ▲) para avanzar y ◀ ▶ para apartarte. Cruza todos los carriles que puedas sin que te pille un coche.', mejor: 'mas', unidad: 'carriles', duracion: 60, C: Cruzar },
+  { id: 'cruzar', nombre: 'Cruza la carretera', emoji: '🐔', como: 'Toca la pantalla (o ▲) para avanzar, ▼ para retroceder y ◀ ▶ para apartarte (en ordenador, también con las flechas). Cruza todos los carriles que puedas sin que te pille un coche.', mejor: 'mas', unidad: 'carriles', duracion: 60, C: Cruzar },
   { id: 'apilar', nombre: 'Torre perfecta', emoji: '🧱', como: 'El bloque va y viene: toca para soltarlo encima de la torre. Lo que sobresale se cae. Si lo clavas, no pierdes nada.', mejor: 'mas', unidad: 'pisos', duracion: 90, C: Apilar },
   { id: 'secuencia', nombre: 'Memoria de luces', emoji: '💡', como: 'Mira el orden en que se encienden las baldosas y repítelo. Cada ronda, una luz más.', mejor: 'mas', unidad: 'luces', duracion: 120, C: Secuencia },
   { id: 'semaforo', nombre: 'Semáforo', emoji: '🚦', como: 'Toca en cuanto se ponga verde. Cinco rondas. Si tocas antes de tiempo, +1000 ms.', mejor: 'menos', unidad: 'ms', peor: 1000, duracion: 40, C: Semaforo, formato: (v) => `${Math.round(v)} ms` },
