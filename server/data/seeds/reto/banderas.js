@@ -1,4 +1,5 @@
-// server/data/seeds/reto/banderas.js — países con su código ISO (la bandera se forma con el emoji) y continente
+// server/data/seeds/reto/banderas.js — países con su código ISO y continente. La bandera es una imagen SVG local
+// (client/public/banderas/<iso>.svg, de country-flag-icons, licencia MIT): el emoji no se ve en Windows.
 const P = (iso, nombre, cont) => ({ iso, nombre, cont });
 export const PAISES = [
   P('ES', 'España', 'eu'), P('PT', 'Portugal', 'eu'), P('FR', 'Francia', 'eu'), P('IT', 'Italia', 'eu'), P('DE', 'Alemania', 'eu'), P('GB', 'Reino Unido', 'eu'),
@@ -16,4 +17,11 @@ export const PAISES = [
   P('VN', 'Vietnam', 'as'), P('ID', 'Indonesia', 'as'), P('PH', 'Filipinas', 'as'), P('TR', 'Turquía', 'as'), P('IL', 'Israel', 'as'), P('SA', 'Arabia Saudí', 'as'),
   P('QA', 'Catar', 'as'), P('IR', 'Irán', 'as'), P('AU', 'Australia', 'oc'), P('NZ', 'Nueva Zelanda', 'oc')
 ];
+export const imagenBandera = (iso) => `/banderas/${iso.toLowerCase()}.svg`;
+// Otras formas válidas de escribir algunos países (las tildes y mayúsculas ya dan igual)
+export const ALIAS_PAIS = {
+  'Estados Unidos': ['eeuu', 'ee uu', 'usa', 'eua'], 'Reino Unido': ['gran bretana', 'uk'], 'Países Bajos': ['holanda'],
+  'República Checa': ['chequia'], 'Corea del Sur': ['corea'], 'Arabia Saudí': ['arabia saudita', 'arabia'], 'Catar': ['qatar'],
+  'Kenia': ['kenya'], 'Rumanía': ['rumania'], 'Filipinas': ['philippines'], 'Nueva Zelanda': ['nueva zelandia']
+};
 export const bandera = (iso) => String.fromCodePoint(...[...iso].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65));

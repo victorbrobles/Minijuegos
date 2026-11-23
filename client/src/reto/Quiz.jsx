@@ -1,9 +1,25 @@
-// client/src/reto/Quiz.jsx — reto diario de preguntas con opciones (cultura, fútbol, pareja, intruso)
+// client/src/reto/Quiz.jsx — reto diario de preguntas con opciones (cultura, fútbol, pareja, intruso) o de respuesta
+// escrita (banderas: { escribir: true, correcta, alias }), con imagen opcional ({ imagen })
 import React, { useEffect, useRef, useState } from 'react';
 import Icon from '../components/Icon.jsx';
 import { Barra } from '../components/UnJugador.jsx';
 
 const LETRAS = ['A', 'B', 'C', 'D', 'E'];
+const normal = (t) => String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, ' ').trim();
+function distancia(a, b) {
+  let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    const cur = [i];
+    for (let j = 1; j <= b.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    prev = cur;
+  }
+  return prev[b.length];
+}
+/** Respuesta escrita: vale el nombre o un alias, sin tildes ni mayúsculas, con una errata en nombres de 6 letras o más. */
+function vale(escrito, q) {
+  const u = normal(escrito); if (!u) return false;
+  return [q.correcta, ...(q.alias || [])].map(normal).some((t) => t === u || (t.length >= 6 && u[0] === t[0] && distancia(u, t) <= 1));
+}
 
 export default function Quiz({ datos, onFin }) {
   const { preguntas, segundos, umbral } = datos;
@@ -28,17 +44,20 @@ export default function Quiz({ datos, onFin }) {
     return () => clearInterval(t);
   }, [elegida, i]);
 
+  const [texto, setTexto] = useState('');
   const responder = (o) => {
     if (elegida !== null) return;
     setElegida(o);
     if (o === q.correcta) setAciertos((a) => a + 1);
   };
+  // Escrita: si vale, cuenta como la respuesta correcta
+  const comprobar = (e) => { e.preventDefault(); if (!texto.trim()) return; responder(vale(texto, q) ? q.correcta : texto.trim()); };
   const siguiente = () => {
     if (i + 1 >= preguntas.length) {
       onFin(aciertos >= umbral, aciertos, `${aciertos} de ${preguntas.length} aciertos`);
       return;
     }
-    setI(i + 1); setElegida(null);
+    setI(i + 1); setElegida(null); setTexto('');
   };
   const quedanPorFallar = preguntas.length - umbral - (i + (elegida !== null ? 1 : 0) - aciertos);
 
@@ -52,8 +71,15 @@ export default function Quiz({ datos, onFin }) {
       <div className="uj-tarjeta rto-pregunta">
         {q.etiqueta && <span className="rto-etiqueta">{q.etiqueta}</span>}
         {q.grande && <div className="rto-grande">{q.grande}</div>}
+        {q.imagen && <img className="rto-imagen" src={q.imagen} alt="" draggable="false" />}
         <h2>{q.p}</h2>
-        <div className="rto-opciones">
+        {q.escribir && (
+          <form className="rto-escribir" onSubmit={comprobar}>
+            <input value={texto} onChange={(e) => setTexto(e.target.value)} disabled={elegida !== null} placeholder="Escribe el país" autoComplete="off" autoCapitalize="words" autoFocus key={i} />
+            <button type="submit" className="uj-boton" disabled={elegida !== null || !texto.trim()}>Comprobar</button>
+          </form>
+        )}
+        {!q.escribir && <div className="rto-opciones">
           {q.opciones.map((o, k) => {
             const clase = elegida === null ? '' : o === q.correcta ? ' bien' : o === elegida ? ' mal' : ' apagada';
             return (
@@ -62,7 +88,7 @@ export default function Quiz({ datos, onFin }) {
               </button>
             );
           })}
-        </div>
+        </div>}
         {elegida !== null && (
           <p className={`rto-veredicto ${elegida === q.correcta ? 'bien' : 'mal'}`}>
             {elegida === q.correcta ? '¡Correcto!' : elegida === '' ? `Se acabó el tiempo. Era «${q.correcta}».` : `No. Era «${q.correcta}».`}

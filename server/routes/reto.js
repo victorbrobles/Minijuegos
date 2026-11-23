@@ -128,6 +128,7 @@ const tipoDe = (fecha) => ROTACION[Math.floor(Date.parse(`${fecha}T12:00:00Z`) /
 
 const leerReto = db.prepare('SELECT * FROM retos_diarios WHERE fecha = ?');
 const guardarReto = db.prepare('INSERT OR IGNORE INTO retos_diarios (fecha, tipo, datos) VALUES (?, ?, ?)');
+const rehacerReto = db.prepare('UPDATE retos_diarios SET datos = ? WHERE fecha = ?');
 const leerIntento = db.prepare('SELECT estado, puntos, resumen, inicio, fin FROM retos_intentos WHERE fecha = ? AND jugador = ?');
 const crearIntento = db.prepare("INSERT OR IGNORE INTO retos_intentos (fecha, jugador, estado, inicio) VALUES (?, ?, 'jugando', ?)");
 const cerrarIntento = db.prepare("UPDATE retos_intentos SET estado = ?, puntos = ?, resumen = ?, fin = ? WHERE fecha = ? AND jugador = ? AND estado = 'jugando'");
@@ -140,6 +141,10 @@ export function retoDe(fecha) {
     const tipo = tipoDe(fecha);
     guardarReto.run(fecha, tipo, JSON.stringify(TIPOS[tipo].generar()));
     fila = leerReto.get(fecha);
+  }
+  // Retos de banderas guardados con el formato antiguo (emoji, que no se ve en Windows, y opciones): se rehacen
+  if (fila.tipo === 'banderas' && !JSON.parse(fila.datos).preguntas?.[0]?.imagen) {
+    rehacerReto.run(JSON.stringify(TIPOS.banderas.generar()), fecha); fila = leerReto.get(fecha);
   }
   const t = TIPOS[fila.tipo];
   return { fecha, tipo: fila.tipo, titulo: t.titulo, emoji: t.emoji, tema: t.tema, descripcion: t.descripcion, datos: JSON.parse(fila.datos) };

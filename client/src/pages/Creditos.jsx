@@ -52,6 +52,7 @@ export default function Creditos() {
           <li><b>Mapas</b>: <a href="https://leafletjs.com" target="_blank" rel="noreferrer">Leaflet</a>.</li>
           <li><b>Partidas online</b>: <a href="https://socket.io" target="_blank" rel="noreferrer">Socket.IO</a> y <a href="https://expressjs.com" target="_blank" rel="noreferrer">Express</a>.</li>
           <li><b>Datos</b>: <a href="https://github.com/tursodatabase/libsql" target="_blank" rel="noreferrer">libSQL</a> (SQLite) y <a href="https://turso.tech" target="_blank" rel="noreferrer">Turso</a>.</li>
+          <li><b>Banderas del reto diario</b>: <a href="https://gitlab.com/catamphetamine/country-flag-icons" target="_blank" rel="noreferrer">country-flag-icons</a> (MIT), guardadas en la propia web.</li>
           <li><b>Imágenes y códigos QR</b>: <a href="https://sharp.pixelplumbing.com" target="_blank" rel="noreferrer">sharp</a> y <a href="https://github.com/soldair/node-qrcode" target="_blank" rel="noreferrer">node-qrcode</a>.</li>
         </ul>
       </section>

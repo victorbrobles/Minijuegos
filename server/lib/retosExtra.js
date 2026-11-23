@@ -4,7 +4,7 @@
 // en client/src/reto/.
 import { PREGUNTAS } from '../data/seeds/tablero/preguntas.js';
 import { FAMOSOS, PREGUNTAS_FAMOSO } from '../data/seeds/reto/famosos.js';
-import { PAISES, bandera } from '../data/seeds/reto/banderas.js';
+import { PAISES, imagenBandera, ALIAS_PAIS } from '../data/seeds/reto/banderas.js';
 import FRASES1 from '../data/seeds/frasescelebres/parte1.js';
 import FRASES2 from '../data/seeds/frasescelebres/parte2.js';
 import FRASES3 from '../data/seeds/frasescelebres/parte3.js';
@@ -84,11 +84,10 @@ export const TIPOS_EXTRA = {
   },
   banderas: {
     titulo: 'Banderas', emoji: '🚩', tema: 'Geografía',
-    descripcion: 'Ocho banderas: ¿de qué país son? Las opciones son del mismo continente. 10 segundos por bandera. Necesitas 6 aciertos.',
-    generar: () => quiz(barajar(PAISES).slice(0, 8).map((x) => {
-      const otras = barajar(PAISES.filter((y) => y.cont === x.cont && y.iso !== x.iso)).slice(0, 3).map((y) => y.nombre);
-      return { p: '¿De qué país es esta bandera?', grande: bandera(x.iso), opciones: barajar([x.nombre, ...otras]), correcta: x.nombre, etiqueta: '🚩 Banderas' };
-    }), 10, 6)
+    descripcion: 'Ocho banderas: escribe de qué país son (sin opciones; las tildes dan igual). 20 segundos por bandera. Necesitas 5 aciertos.',
+    generar: () => quiz(barajar(PAISES).slice(0, 8).map((x) => ({
+      p: '¿De qué país es esta bandera?', imagen: imagenBandera(x.iso), escribir: true, correcta: x.nombre, alias: ALIAS_PAIS[x.nombre] || [], etiqueta: '🚩 Banderas'
+    })), 20, 5)
   },
   capitales: {
     titulo: 'Capitales', emoji: '🏛️', tema: 'Geografía',
