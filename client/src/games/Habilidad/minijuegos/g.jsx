@@ -329,66 +329,134 @@ function Bolos({ alTerminar }) {
 }
 
 /* ───────── 7. Penaltis ───────── */
+// Estadio de noche: césped a rayas, portería con red, grada llena y focos. El portero elige lado AL AZAR (izquierda,
+// centro o derecha, un tercio cada uno). Si acierta el lado, se estira hasta el balón: solo entra muy pegado al palo.
+// El tiro tiene un pequeño error (más cuanto más ajustado y fuerte), así que apurar el palo también se paga.
+function porteroModelo() {
+  const g = new THREE.Group(); const cuerpo = new THREE.Group(); g.add(cuerpo); // cuerpo gira al tirarse
+  const camiseta = crea.caja(0.62, 0.7, 0.32, 0xf97316); camiseta.position.y = 1.2; cuerpo.add(camiseta);
+  const dorsal = crea.cartel('1', 0.3, 0.3, { fondo: null, color: '#ffffff', fuente: 'bold 220px sans-serif' }); dorsal.position.set(0, 1.25, 0.17); cuerpo.add(dorsal);
+  const pantalon = crea.caja(0.6, 0.3, 0.3, 0x111827); pantalon.position.y = 0.72; cuerpo.add(pantalon);
+  const cabeza = crea.esfera(0.17, 0xe0ac69); cabeza.position.y = 1.72; cuerpo.add(cabeza);
+  const pelo = crea.esfera(0.175, 0x1f2937); pelo.scale.set(1, 0.6, 1); pelo.position.y = 1.8; cuerpo.add(pelo);
+  const pierna = (x) => { const p = new THREE.Group(); const m = crea.caja(0.18, 0.62, 0.2, 0xf97316); m.position.y = -0.31; p.add(m); const media = crea.caja(0.19, 0.22, 0.21, 0xffffff); media.position.y = -0.5; p.add(media); const bota = crea.caja(0.2, 0.1, 0.3, 0x111827); bota.position.set(0, -0.64, 0.05); p.add(bota); p.position.set(x, 0.62, 0); cuerpo.add(p); return p; };
+  const brazo = (x) => { const b = new THREE.Group(); const m = crea.caja(0.15, 0.62, 0.15, 0xf97316); m.position.y = -0.3; b.add(m); const guante = crea.caja(0.2, 0.22, 0.12, 0x84cc16); guante.position.y = -0.66; b.add(guante); b.position.set(x, 1.5, 0); cuerpo.add(b); return b; };
+  g.userData = { cuerpo, piernas: [pierna(-0.15), pierna(0.15)], brazos: [brazo(-0.4), brazo(0.4)] };
+  return g;
+}
 function Penaltis({ semilla, alTerminar }) {
-  const ref = useRef(null); const [hud, setHud] = useState({ tiro: 1, goles: 0 }); const [msg, setMsg] = useState(null);
+  const ref = useRef(null); const [hud, setHud] = useState({ tiro: 1, goles: 0, marcador: [] }); const [msg, setMsg] = useState(null);
   useEscena(ref, (ctx) => {
     const { scene, camera } = ctx; const r = rng(semilla); const AN = 7.32; const AL = 2.44; const PZ = -11;
-    const cesped = crea.suelo(40, 30, 0x15803d, { celda: 1.5, contraste: 0.07, lineas: false }); cesped.position.set(0, 0, -6); scene.add(cesped);
+    // Césped a rayas y líneas
+    for (let k = -6; k < 8; k++) { const f = new THREE.Mesh(new THREE.PlaneGeometry(40, 2), new THREE.MeshStandardMaterial({ color: k % 2 ? 0x15803d : 0x16a34a, roughness: 0.9 })); f.rotation.x = -Math.PI / 2; f.position.set(0, 0, PZ + 4 + k * 2); f.receiveShadow = true; scene.add(f); }
     const blanco = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    const area = new THREE.Mesh(new THREE.PlaneGeometry(16.5, 0.1), blanco); area.rotation.x = -Math.PI / 2; area.position.set(0, 0.01, PZ + 5.5); scene.add(area);
-    const punto = new THREE.Mesh(new THREE.CircleGeometry(0.12, 16), blanco); punto.rotation.x = -Math.PI / 2; punto.position.set(0, 0.012, 0); scene.add(punto);
-    const marco = new THREE.Group(); [-AN / 2, AN / 2].forEach((x) => { const p = crea.cilindro(0.06, 0.06, AL, 0xffffff, 12); p.position.set(x, AL / 2, 0); marco.add(p); }); const lar = crea.cilindro(0.06, 0.06, AN, 0xffffff, 12); lar.rotation.z = Math.PI / 2; lar.position.y = AL; marco.add(lar);
-    const red = new THREE.Mesh(new THREE.BoxGeometry(AN, AL, 1.6), new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: true, transparent: true, opacity: 0.35 })); red.position.set(0, AL / 2, -0.8); marco.add(red);
-    marco.position.z = PZ; scene.add(marco);
-    const grada = new THREE.InstancedMesh(new THREE.SphereGeometry(0.25, 8, 6), new THREE.MeshStandardMaterial(), 700);
-    { const m4 = new THREE.Matrix4(); const c = new THREE.Color(); let n = 0; for (let f = 0; f < 7; f++) for (let x = -20; x < 20 && n < 700; x += 0.6) { m4.makeTranslation(x, 1 + f * 0.7, PZ - 6 - f * 0.6); grada.setMatrixAt(n, m4); grada.setColorAt(n, c.setHex(r.de([0xffffff, 0xdc2626, 0x1d4ed8, 0xfacc15]))); n++; } grada.count = n; }
+    const linea = (w, d, x, z) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d), blanco); m.rotation.x = -Math.PI / 2; m.position.set(x, 0.01, z); scene.add(m); };
+    linea(40, 0.1, 0, PZ); linea(40.32, 0.1, 0, PZ + 16.5); [-20.16, 20.16].forEach((x) => linea(0.1, 16.5, x, PZ + 8.25));
+    linea(18.3, 0.1, 0, PZ + 5.5); [-9.15, 9.15].forEach((x) => linea(0.1, 5.5, x, PZ + 2.75));
+    const punto = new THREE.Mesh(new THREE.CircleGeometry(0.13, 20), blanco); punto.rotation.x = -Math.PI / 2; punto.position.set(0, 0.012, 0); scene.add(punto);
+    // Portería con profundidad y red de verdad (rejilla de líneas)
+    const porteria = new THREE.Group(); const metal = { roughness: 0.25, metalness: 0.2 };
+    [-AN / 2, AN / 2].forEach((x) => { const p = crea.cilindro(0.065, 0.065, AL, 0xffffff, 14, metal); p.position.set(x, AL / 2, 0); porteria.add(p); const pt = crea.cilindro(0.03, 0.03, AL, 0xe5e7eb, 8); pt.position.set(x, AL / 2, -2); porteria.add(pt); });
+    const lar = crea.cilindro(0.065, 0.065, AN + 0.13, 0xffffff, 14, metal); lar.rotation.z = Math.PI / 2; lar.position.y = AL; porteria.add(lar);
+    const red = new THREE.Group();
+    const rejilla = (w, h) => { const pts = []; for (let x = 0; x <= w + 1e-6; x += 0.2) pts.push(x - w / 2, -h / 2, 0, x - w / 2, h / 2, 0); for (let y = 0; y <= h + 1e-6; y += 0.2) pts.push(-w / 2, y - h / 2, 0, w / 2, y - h / 2, 0); const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3)); return new THREE.LineSegments(g, new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.55 })); };
+    const fondoRed = rejilla(AN, AL); fondoRed.position.set(0, AL / 2, -2); red.add(fondoRed);
+    const techo = rejilla(AN, 2); techo.rotation.x = Math.PI / 2; techo.position.set(0, AL, -1); red.add(techo);
+    [-AN / 2, AN / 2].forEach((x) => { const lado = rejilla(2, AL); lado.rotation.y = Math.PI / 2; lado.position.set(x, AL / 2, -1); red.add(lado); });
+    porteria.add(red); porteria.position.z = PZ; scene.add(porteria);
+    // Grada con público, vallas publicitarias y torres de focos
+    const grada = new THREE.Group();
+    for (let f = 0; f < 6; f++) { const esc = crea.caja(60, 0.8, 1.6, 0x1e293b); esc.position.set(0, 0.6 + f * 0.8, PZ - 6 - f * 1.4); grada.add(esc); }
     scene.add(grada);
-    const portero = new THREE.Group(); const cuerpoP = crea.caja(0.6, 1.1, 0.35, 0x22c55e); cuerpoP.position.y = 1.15; portero.add(cuerpoP);
-    const cabeza = crea.esfera(0.17, 0xf1c27d); cabeza.position.y = 1.85; portero.add(cabeza);
-    [-1, 1].forEach((s) => { const b = crea.caja(0.14, 0.7, 0.14, 0x22c55e); b.position.set(s * 0.42, 1.4, 0); b.rotation.z = s * 0.5; portero.add(b); const guante = crea.esfera(0.11, 0xfacc15); guante.position.set(s * 0.6, 1.75, 0); portero.add(guante); });
-    const piernas = crea.caja(0.5, 0.6, 0.3, 0x111827); piernas.position.y = 0.3; portero.add(piernas);
-    portero.position.z = PZ + 0.3; scene.add(portero);
+    const publico = new THREE.InstancedMesh(new THREE.SphereGeometry(0.24, 8, 6), new THREE.MeshStandardMaterial({ roughness: 0.6 }), 1300);
+    { const m4 = new THREE.Matrix4(); const c = new THREE.Color(); let n = 0; for (let f = 0; f < 6; f++) for (let x = -28; x < 28 && n < 1300; x += 0.52) { m4.makeTranslation(x + r.entre(-0.1, 0.1), 1.3 + f * 0.8, PZ - 6 - f * 1.4); publico.setMatrixAt(n, m4); publico.setColorAt(n, c.setHex(r() < 0.55 ? r.de([0xdc2626, 0xffffff]) : r.de([0x1d4ed8, 0xfacc15, 0x111827]))); n++; } publico.count = n; }
+    scene.add(publico);
+    const anuncios = ['⚽ MINIJUEGOS', '🏆 ¡GOOOL!', '🔥 PENALTIS', '🥅 TEST DE HABILIDAD'];
+    for (let k = -3; k <= 3; k++) { const v = crea.cartel(anuncios[(k + 3) % 4], 5.6, 0.7, { fondo: k % 2 ? '#1d4ed8' : '#dc2626', color: '#ffffff', fuente: 'bold 22px sans-serif' }); v.position.set(k * 5.8, 0.36, PZ - 3.4); scene.add(v); }
+    [-14, 14].forEach((x) => {
+      const torre = crea.cilindro(0.15, 0.25, 14, 0x475569, 8); torre.position.set(x, 7, PZ - 4); scene.add(torre);
+      const panel = crea.caja(2.2, 1.2, 0.2, 0xf8fafc, { emissive: 0xffffff, emissiveIntensity: 1.4 }); panel.position.set(x, 14, PZ - 3.9); panel.rotation.x = 0.4; scene.add(panel);
+      const foco = new THREE.SpotLight(0xffffff, 120, 50, 0.6, 0.5); foco.position.set(x, 14, PZ - 3.5); foco.target.position.set(0, 0, PZ + 4); scene.add(foco, foco.target);
+    });
+    const portero = porteroModelo(); portero.position.z = PZ + 0.35; scene.add(portero);
     const balon = new THREE.Mesh(new THREE.SphereGeometry(0.11, 24, 16), new THREE.MeshStandardMaterial({ map: texturaBalon(), roughness: 0.45 })); balon.castShadow = true; scene.add(balon);
-    const mira = new THREE.Mesh(new THREE.RingGeometry(0.16, 0.22, 24), new THREE.MeshBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.9 })); mira.visible = false; scene.add(mira);
-    const st = { tiro: 0, goles: 0, vuela: false, t: 0, desde: new THREE.Vector3(0, 0.11, 0), a: new THREE.Vector3(), dur: 0.6, ini: null, fin: false, salto: null };
+    const sombra = crea.sombraSuave(0.18, 0.5); sombra.position.y = 0.012; scene.add(sombra);
+    const estela = Array.from({ length: 10 }, (_, k) => { const m = new THREE.Mesh(new THREE.SphereGeometry(0.09 - k * 0.006, 8, 6), new THREE.MeshBasicMaterial({ color: 0xfde68a, transparent: true, opacity: 0.45 - k * 0.04 })); m.visible = false; scene.add(m); return m; });
+    // Mira en la portería mientras se apunta
+    const mira = new THREE.Group(); const aroM = new THREE.Mesh(new THREE.RingGeometry(0.2, 0.26, 32), new THREE.MeshBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.95 })); mira.add(aroM);
+    [[0.45, 0.04], [0.04, 0.45]].forEach(([w, h]) => { const c = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: 0xfacc15 })); mira.add(c); });
+    mira.visible = false; scene.add(mira);
+    const st = { tiro: 0, goles: 0, marcador: [], vuela: false, t: 0, desde: new THREE.Vector3(0, 0.11, 0), a: new THREE.Vector3(), dur: 0.55, ini: null, fin: false, salto: null, hist: [] };
     balon.position.copy(st.desde);
-    // Del gesto al punto de la portería: horizontal según la inclinación, altura según el largo
-    const objetivo = (dx, dy, rr) => new THREE.Vector3(Math.atan2(dx, dy) * 9.5, Math.max(0.15, Math.min(3.4, (dy / (rr.height * 0.55)) * 3.3)), PZ);
-    const k = () => ctx.ancho(0.75);
+    const objetivo = (dx, dy, rr) => new THREE.Vector3(Math.max(-5, Math.min(5, Math.atan2(dx, dy) * 9.5)), Math.max(0.15, Math.min(3.4, (dy / (rr.height * 0.55)) * 3.3)), PZ);
     return {
       toque(e) { if (!st.vuela && !st.fin) st.ini = [e.clientX, e.clientY]; },
-      mover(e) { if (!st.ini) return; const rr = ctx.el.getBoundingClientRect(); const dx = e.clientX - st.ini[0]; const dy = st.ini[1] - e.clientY; if (dy < 15) { mira.visible = false; return; } const o = objetivo(dx, dy, rr); mira.visible = true; mira.position.set(o.x, o.y, PZ + 0.05); },
+      mover(e) { if (!st.ini) return; const rr = ctx.el.getBoundingClientRect(); const dx = e.clientX - st.ini[0]; const dy = st.ini[1] - e.clientY; if (dy < 15) { mira.visible = false; return; } const o = objetivo(dx, dy, rr); mira.visible = true; mira.position.set(o.x, o.y, PZ + 0.06); },
       soltar(e) {
         mira.visible = false; if (!st.ini || st.vuela) { st.ini = null; return; }
         const rr = ctx.el.getBoundingClientRect(); const dx = e.clientX - st.ini[0]; const dy = st.ini[1] - e.clientY; st.ini = null; if (dy < 30) return;
-        st.a.copy(objetivo(dx, dy, rr)); st.vuela = true; st.t = 0; st.dur = 0.55; sonar('toque', { minimo: 0 });
-        // El portero se tira: cada vez acierta más el lado (y llega más lejos)
-        const lista = Math.min(0.8, 0.45 + st.tiro * 0.04); const adivina = r() < lista; const alcance = 2.3 + Math.min(0.8, st.tiro * 0.09);
-        // Si adivina, se tira hacia el balón (hasta donde llega); si no, a un lado al azar o se queda en el centro
-        const x = adivina ? Math.sign(st.a.x || 1) * Math.min(alcance, Math.abs(st.a.x)) : r.de([-1, 0, 1]) * alcance;
-        st.salto = { x, y: adivina ? Math.min(0.9, Math.max(0.2, st.a.y - 1.1)) : 0.3, alcance };
+        const o = objetivo(dx, dy, rr);
+        // Error del tiro: cuanto más ajustado al palo y más alto, más se puede ir
+        const riesgo = 0.1 + Math.max(0, Math.abs(o.x) - 1.8) * 0.18 + Math.max(0, o.y - 1.6) * 0.12;
+        o.x += r.entre(-1, 1) * riesgo; o.y += r.entre(-1, 1) * riesgo * 0.7;
+        st.a.copy(o); st.vuela = true; st.t = 0; sonar('toque', { minimo: 0 });
+        // El portero elige lado al azar (un tercio cada uno); si acierta, se estira hacia el balón
+        const lado = r.de([-1, 0, 1]); const ladoTiro = Math.abs(o.x) < 1.1 ? 0 : Math.sign(o.x);
+        const alcance = 2.9 + Math.min(0.5, st.tiro * 0.05);
+        const x = lado === 0 ? 0 : lado === ladoTiro ? lado * Math.min(alcance, Math.abs(o.x)) : lado * alcance;
+        st.salto = { lado, acierta: lado === ladoTiro, x, y: lado === 0 ? 0.45 : Math.min(0.8, Math.max(0.15, o.y - 1)) };
       },
-      frame(dt) {
+      frame(dt, tt) {
+        const { cuerpo, brazos, piernas } = portero.userData;
         if (st.vuela) {
           st.t += dt; const u = Math.min(1, st.t / st.dur);
-          balon.position.set(st.desde.x + (st.a.x - st.desde.x) * u, st.desde.y + (st.a.y - st.desde.y) * u + Math.sin(u * Math.PI) * 0.4, st.desde.z + (st.a.z - st.desde.z) * u);
-          balon.rotation.x -= dt * 20;
-          const s = Math.min(1, st.t / 0.35); portero.position.x = st.salto.x * s; portero.position.y = st.salto.y * Math.sin(s * Math.PI * 0.5); portero.rotation.z = -Math.sign(st.salto.x) * s * 1.1;
+          balon.position.set(st.desde.x + (st.a.x - st.desde.x) * u, st.desde.y + (st.a.y - st.desde.y) * u + Math.sin(u * Math.PI) * 0.35, st.desde.z + (st.a.z - st.desde.z) * u);
+          balon.rotation.x -= dt * 25; st.hist.unshift(balon.position.clone()); st.hist.length = Math.min(st.hist.length, 20);
+          estela.forEach((m, k) => { const p = st.hist[k * 2]; m.visible = Boolean(p); if (p) m.position.copy(p); });
+          // Estirada: se tira hacia el lado elegido (o salta en el centro con los brazos arriba)
+          const s = Math.min(1, st.t / 0.32); const sal = st.salto;
+          portero.position.x = sal.x * s; portero.position.y = sal.y * Math.sin(s * Math.PI * 0.55);
+          cuerpo.rotation.z = sal.lado ? -sal.lado * s * 1.3 : 0;
+          brazos.forEach((b, k) => { b.rotation.z = sal.lado ? (k ? -1 : 1) * -2.6 * s : (k ? 1 : -1) * 2.8 * s; });
+          piernas.forEach((p, k) => { p.rotation.z = (k ? -1 : 1) * 0.3 * s; });
           if (u >= 1) {
-            st.vuela = false; const dentro = Math.abs(st.a.x) < AN / 2 - 0.12 && st.a.y < AL - 0.08;
-            // ¿Lo para? Alcance del portero desde su posición final (tumbado, con brazos)
-            const px = portero.position.x; const parado = dentro && Math.abs(st.a.x - px) < 1.0 && st.a.y < 1.95 + st.salto.y;
-            const gol = dentro && !parado; if (gol) st.goles++; st.tiro++;
-            if (gol) { sonar('victoria'); ctx.chispas(st.a.clone(), 0xfacc15, 30); red.scale.z = 1.25; setMsg('⚽ ¡GOL!'); } else { sonar('fallo'); setMsg(parado ? '🧤 ¡Parada!' : '❌ Fuera'); }
-            setHud({ tiro: Math.min(10, st.tiro + 1), goles: st.goles });
-            setTimeout(() => { setMsg(null); red.scale.z = 1; portero.position.set(0, 0, PZ + 0.3); portero.rotation.z = 0; balon.position.copy(st.desde); if (st.tiro >= 10) { st.fin = true; alTerminar(st.goles); } }, 1200);
+            st.vuela = false; estela.forEach((m) => { m.visible = false; }); st.hist = [];
+            const dentro = Math.abs(st.a.x) < AN / 2 - 0.12 && st.a.y < AL - 0.08 && st.a.y > 0;
+            const px = portero.position.x;
+            // En el centro tapa mucho; tirado a un lado, para lo que le llega a los brazos (y con los pies, lo raso cerca del centro)
+            const parado = dentro && (sal.lado === 0 ? Math.abs(st.a.x) < 1.5 && st.a.y < 2.35 : Math.abs(st.a.x - px) < 1.05 && st.a.y < 1.9 + sal.y || (Math.abs(st.a.x) < 0.7 && st.a.y < 0.5));
+            const gol = dentro && !parado; if (gol) st.goles++; st.tiro++; st.marcador.push(gol);
+            if (gol) { sonar('victoria'); ctx.chispas(st.a.clone(), 0xfacc15, 40, { fuerza: 5 }); ctx.chispas(st.a.clone(), 0xffffff, 20); fondoRed.position.z = -2.35; ctx.temblor(0.2); setMsg('⚽ ¡GOOOL!'); }
+            else if (parado) { sonar('fallo'); ctx.chispas(st.a.clone(), 0x84cc16, 20); setMsg('🧤 ¡Paradón!'); }
+            else { sonar('fallo'); setMsg(st.a.y >= AL - 0.08 ? '⬆️ ¡Por encima!' : '↔️ ¡Fuera!'); }
+            setHud({ tiro: Math.min(10, st.tiro + 1), goles: st.goles, marcador: [...st.marcador] });
+            setTimeout(() => {
+              setMsg(null); fondoRed.position.z = -2; portero.position.set(0, 0, PZ + 0.35); cuerpo.rotation.z = 0; brazos.forEach((b) => { b.rotation.z = 0; }); piernas.forEach((p) => { p.rotation.z = 0; });
+              balon.position.copy(st.desde); if (st.tiro >= 10) { st.fin = true; alTerminar(st.goles); }
+            }, 1300);
           }
-        } else if (!st.fin) portero.position.x = Math.sin(performance.now() / 400) * 0.5;
-        const kk = k(); camera.position.set(0, 1.5 + 0.3 * kk, 3.2 * kk + 0.8); camera.lookAt(0, 1.1, PZ);
+        } else if (!st.fin) {
+          // Espera moviéndose de lado a lado, con los brazos abiertos
+          portero.position.x = Math.sin(tt * 2.2) * 0.45; portero.position.y = Math.abs(Math.sin(tt * 4.4)) * 0.05;
+          brazos.forEach((b, k) => { b.rotation.z = (k ? 1 : -1) * 0.55; });
+        }
+        fondoRed.position.z += (-2 - fondoRed.position.z) * Math.min(1, dt * 4);
+        sombra.position.set(balon.position.x, 0.012, balon.position.z); sombra.scale.setScalar(Math.max(0.4, 1.2 - balon.position.y * 0.3));
+        mira.rotation.z += dt * 1.5;
+        const k = ctx.ancho(0.75); camera.position.set(0, 1.35 + 0.35 * k, 3 * k + 0.9); camera.lookAt(0, 1.2, PZ);
       }
     };
-  }, { cielo: [0x0c4a6e, 0x082f49], niebla: 50, exposicion: 1.1 });
-  return <div className="hb-caja"><div ref={ref} className="hb-lienzo" /><Hud izq={`⚽ Tiro ${hud.tiro}/10`} der={`${hud.goles} goles`} /><Mensaje texto={msg} /><p className="hb-pista">Desliza hacia arriba: inclinación = lado, largo = altura</p></div>;
+  }, { cielo: [0x020617, 0x0c4a6e], niebla: 70, exposicion: 1.15 });
+  return (
+    <div className="hb-caja">
+      <div ref={ref} className="hb-lienzo" />
+      <Hud izq={`⚽ Tiro ${hud.tiro}/10`} der={`${hud.goles} goles`} />
+      <div className="hb-tanda">{Array.from({ length: 10 }, (_, k) => <i key={k} className={hud.marcador[k] === undefined ? '' : hud.marcador[k] ? 'si' : 'no'} />)}</div>
+      <Mensaje texto={msg} />
+      <p className="hb-pista">Desliza hacia arriba: inclinación = lado, largo = altura</p>
+    </div>
+  );
 }
 
 /* ───────── 8. Corta fruta ───────── */
@@ -539,7 +607,7 @@ export default [
   { id: 'vaso', nombre: 'Llena el vaso', emoji: '🥛', como: 'Mantén pulsado para servir y suelta para que el vaso quede justo en la línea roja (ojo: lo que está cayendo también entra). Cinco vasos, cada vez más deprisa. Si rebosa, +50.', mejor: 'menos', unidad: '%', peor: 250, duracion: 75, C: Vaso, formato: (v) => `${v.toFixed(1).replace('.', ',')} % de error` },
   { id: 'ladrillos', nombre: 'Rompe ladrillos', emoji: '🧱', como: 'Mueve la pala arrastrando y no dejes caer la bola. Cada ladrillo da puntos (los de arriba, más). Tres vidas y 60 segundos; si rompes el muro, sale otro más rápido.', mejor: 'mas', unidad: 'pts', duracion: 60, C: Ladrillos },
   { id: 'bolos', nombre: 'Bolos', emoji: '🎳', como: 'Arrastra para colocar la bola y desliza hacia arriba para lanzarla: la inclinación y la rapidez del gesto cuentan. La bola se abre un poco hacia un lado y pierde fuerza con cada bolo: para hacer pleno hay que entrar justo en el hueco entre el primero y el segundo. Cinco tiradas.', mejor: 'mas', unidad: 'bolos', duracion: 75, C: Bolos },
-  { id: 'penaltis', nombre: 'Penaltis', emoji: '🥅', como: 'Desliza hacia arriba para chutar: la inclinación decide el lado y el largo, la altura (verás la mira). Si el portero adivina el lado, lo para salvo que lo pegues mucho al palo. Cada vez adivina más. Diez penaltis.', mejor: 'mas', unidad: 'goles', duracion: 90, C: Penaltis },
+  { id: 'penaltis', nombre: 'Penaltis', emoji: '🥅', como: 'Desliza hacia arriba para chutar: la inclinación decide el lado y el largo, la altura (verás la mira). El portero se tira a un lado al azar (o se queda en el centro): si acierta, lo para salvo que lo pegues mucho al palo. Cuanto más ajustado y alto, más fácil que se vaya fuera. Diez penaltis.', mejor: 'mas', unidad: 'goles', duracion: 90, C: Penaltis },
   { id: 'fruta', nombre: 'Corta fruta', emoji: '🍉', como: 'Desliza el dedo para cortar la fruta que salta (la uva vale 2 y los combos suman). Si cortas una bomba, −5. 40 segundos.', mejor: 'mas', unidad: 'pts', duracion: 40, C: Fruta },
   { id: 'orbita', nombre: 'Órbita', emoji: '🪐', como: 'Tu nave gira alrededor del planeta. Toca para cambiar entre la órbita de dentro y la de fuera y esquiva las rocas. Cada vez va más rápido.', mejor: 'mas', unidad: 'rocas', duracion: 120, C: Orbita },
   { id: 'martillo', nombre: 'Martillo de feria', emoji: '🔨', como: 'La aguja sube y baja sin parar: toca cuando esté arriba del todo para golpear con toda la fuerza y hacer sonar la campana. Un poco antes o después ya pierde mucho. Cinco golpes, cada vez más rápidos.', mejor: 'mas', unidad: 'pts', duracion: 60, C: Martillo }
