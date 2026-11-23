@@ -163,7 +163,6 @@ function Puntos({ v, enviar, puedeSeguir }) {
     .sort((a, b) => (a.id === v.protagonista) - (b.id === v.protagonista) || b.delta - a.delta || b.puntos - a.puntos);
   // Agrupa los motivos repetidos (varios votos «engañados» = una línea con su total)
   const agrupar = (ms) => Object.values(ms.reduce((acc, [m, p]) => { acc[m] = acc[m] || { m, p: 0, n: 0 }; acc[m].p += p; acc[m].n += 1; return acc; }, {}));
-  const ultima = v.ronda >= v.rondas;
   return (
     <>
       <div className="pzp-tarjeta">
@@ -183,8 +182,43 @@ function Puntos({ v, enviar, puedeSeguir }) {
         </ul>
       </div>
       <div className="pzp-barra estatica">
-        {puedeSeguir ? <button type="button" className="pzp-boton grande" onClick={() => enviar('siguiente')}><Icon name="play" size={20} /> {ultima ? 'Ver el resultado final' : 'Siguiente pregunta'}</button>
-          : <p className="pzp-esperando">⏳ El anfitrión pasará a la siguiente pregunta…</p>}
+        {puedeSeguir ? <button type="button" className="pzp-boton grande" onClick={() => enviar('siguiente')}><Icon name="play" size={20} /> Ver la clasificación</button>
+          : <p className="pzp-esperando">⏳ El anfitrión pasará a la clasificación…</p>}
+      </div>
+    </>
+  );
+}
+
+/** Clasificación tras cada ronda: puntos totales de cada uno; desde aquí se pasa a la siguiente ronda. */
+function Clasificacion({ v, enviar, puedeSeguir }) {
+  const pts = v.resultado?.puntos || {};
+  const lista = v.jugadores.filter((j) => !j.fuera).sort((a, b) => b.puntos - a.puntos);
+  let puesto = 0; let previo = null;
+  const ultima = v.ronda >= v.rondas;
+  return (
+    <>
+      <div className="pzp-tarjeta">
+        <p className="pzp-etiqueta">Clasificación tras la pregunta {v.ronda} de {v.rondas}</p>
+        <ol className="cmc-clasif">
+          {lista.map((j, i) => {
+            if (j.puntos !== previo) { puesto = i + 1; previo = j.puntos; }
+            const d = pts[j.id]?.total ?? 0;
+            return (
+              <li key={j.id} className={puesto === 1 ? 'lider' : ''}>
+                <span className="cmc-puesto">{puesto === 1 ? '👑' : puesto}</span>
+                <Avatar id={j.id} nombre={j.nombre} />
+                <b className="cmc-clasif-nombre">{j.nombre}{j.id === v.yo?.id ? ' (tú)' : ''}</b>
+                {d !== 0 && <span className={`cmc-clasif-d ${d > 0 ? 'sube' : 'baja'}`}>{d > 0 ? '+' : ''}{d}</span>}
+                <strong className="cmc-total">{j.puntos}</strong>
+              </li>
+            );
+          })}
+        </ol>
+        <p className="pzp-nota">{ultima ? '¡Era la última pregunta!' : `Quedan ${v.rondas - v.ronda} ${v.rondas - v.ronda === 1 ? 'pregunta' : 'preguntas'}.`}</p>
+      </div>
+      <div className="pzp-barra estatica">
+        {puedeSeguir ? <button type="button" className="pzp-boton grande" onClick={() => enviar('siguiente')}><Icon name="play" size={20} /> {ultima ? 'Ver el resultado final' : 'Siguiente ronda'}</button>
+          : <p className="pzp-esperando">⏳ El anfitrión pasará a la siguiente ronda…</p>}
       </div>
     </>
   );
@@ -193,10 +227,10 @@ function Puntos({ v, enviar, puedeSeguir }) {
 /** Partida (todo salvo el final). */
 export function Partida({ v, enviar, onSalir, local = false, puedeSeguir = true, admin = false }) {
   const prota = nombreDe(v, v.protagonista);
-  const titulo = { responder: v.yo?.protagonista ? 'Hablan de ti…' : `¿Qué diría ${prota}?`, elegir: v.yo?.protagonista ? '¿Cuál es la buena?' : `¿Qué elegirá ${prota}?`, desglose: 'El desglose', puntos: 'Puntos' }[v.fase];
+  const titulo = { responder: v.yo?.protagonista ? 'Hablan de ti…' : `¿Qué diría ${prota}?`, elegir: v.yo?.protagonista ? '¿Cuál es la buena?' : `¿Qué elegirá ${prota}?`, desglose: 'El desglose', puntos: 'Puntos', clasificacion: 'Clasificación' }[v.fase];
   // En el desglose el marcador aún no enseña los puntos de la ronda: se ven en su pantalla aparte
   const vHero = v.fase === 'desglose' && v.resultado ? { ...v, jugadores: v.jugadores.map((j) => ({ ...j, puntos: j.puntos - (v.resultado.puntos?.[j.id]?.total ?? 0) })) } : v;
-  const etiqueta = { responder: 'Respuestas secretas', elegir: 'Respuestas anónimas', desglose: `Pregunta ${v.ronda} de ${v.rondas}`, puntos: `Pregunta ${v.ronda} de ${v.rondas}` }[v.fase];
+  const etiqueta = { responder: 'Respuestas secretas', elegir: 'Respuestas anónimas', desglose: `Pregunta ${v.ronda} de ${v.rondas}`, puntos: `Pregunta ${v.ronda} de ${v.rondas}`, clasificacion: `Pregunta ${v.ronda} de ${v.rondas}` }[v.fase];
   return (
     <>
       <Hero v={vHero} juego={HERO} onSalir={onSalir} chip={`🙈 ${v.ronda}/${v.rondas}`} etiqueta={etiqueta} titulo={titulo} turno={v.protagonista} />
@@ -209,6 +243,7 @@ export function Partida({ v, enviar, onSalir, local = false, puedeSeguir = true,
       {v.fase === 'elegir' && v.yo && <Elegir key={`${v.ronda}-${v.yo.id}`} v={v} enviar={enviar} local={local} />}
       {v.fase === 'desglose' && <Desglose v={v} enviar={enviar} puedeSeguir={puedeSeguir} />}
       {v.fase === 'puntos' && <Puntos v={v} enviar={enviar} puedeSeguir={puedeSeguir} />}
+      {v.fase === 'clasificacion' && <Clasificacion v={v} enviar={enviar} puedeSeguir={puedeSeguir} />}
       {admin && (v.fase === 'responder' || v.fase === 'elegir') && (
         <div className="pzp-barra estatica">
           <button type="button" className="pzp-enlace" onClick={() => enviar('forzar')}><Icon name="forward" size={15} /> {v.fase === 'responder' ? 'Cerrar respuestas y elegir' : 'Cerrar la elección'}</button>

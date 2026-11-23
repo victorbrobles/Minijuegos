@@ -44,13 +44,14 @@ const nombres = (n) => Array.from({ length: n }, (_, i) => ({ id: i + 1, nombre:
   assert.ok(d.respuestas.find((x) => x.autor === 4).correcta);
   assert.deepEqual(p.jugadores.map((j) => j.puntos), [0, 2, -1, 3]); // 2 acierta +1 y le votan +1; 3 se vota −1; 4 elegida +3
   E.siguiente(p); assert.equal(p.fase, 'puntos');
+  E.siguiente(p); assert.equal(p.fase, 'clasificacion');
   E.siguiente(p); assert.equal(p.fase, 'responder'); assert.equal(p.protagonista, 2);
   // Forzar sin respuestas: ronda sin puntos
   E.forzar(p); assert.equal(p.fase, 'desglose'); assert.ok(p.resultado.anulada);
-  E.siguiente(p); E.siguiente(p); assert.equal(p.protagonista, 3);
+  E.siguiente(p); E.siguiente(p); E.siguiente(p); assert.equal(p.protagonista, 3);
   // Se va el protagonista: ronda anulada
   E.responder(p, 1, 'a'); E.abandonar(p, 3); assert.equal(p.fase, 'desglose'); assert.ok(p.resultado.seFue);
-  E.siguiente(p); E.siguiente(p); assert.equal(p.protagonista, 4);
+  E.siguiente(p); E.siguiente(p); E.siguiente(p); assert.equal(p.protagonista, 4);
   // Al siguiente turno de J3 se le salta
   let vistos = [];
   while (p.fase !== 'fin') { if (p.fase === 'responder') { vistos.push(p.protagonista); E.forzar(p); } else E.siguiente(p); }

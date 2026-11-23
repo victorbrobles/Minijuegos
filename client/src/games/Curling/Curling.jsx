@@ -1,7 +1,7 @@
 // client/src/games/Curling/Curling.jsx
 // «Curling»: desliza sobre el hielo para apuntar, elige el efecto (y si quieres, la piedra pesada) y mantén pulsado
 // «LANZAR»: la barra de fuerza sube y baja; suelta en el punto justo. Mientras la piedra desliza, FROTA la pantalla
-// para barrer: llega más lejos y se curva menos. El hielo cambia cada manga. Online o en un solo móvil por turnos.
+// para barrer: llega más lejos y se curva menos. Cada manga, un mapa distinto. Online o en un solo móvil por turnos.
 import React, { useEffect, useRef, useState } from 'react';
 import JuegoPulsador from '../Pulsador/JuegoPulsador.jsx';
 import LocalPorTurnos from '../comun/LocalPorTurnos.jsx';
@@ -17,15 +17,16 @@ import './Curling.css';
 const PERIODO = 1100; // ms de la barra de fuerza (ida y vuelta)
 
 /* ───────── Escena 3D: pabellón de hielo ───────── */
-function texturaHielo() {
+function texturaHielo(m) {
   const k = 14; const c = document.createElement('canvas'); c.width = E.W * k; c.height = E.L * k; const x = c.getContext('2d');
   const g = x.createLinearGradient(0, 0, 0, c.height); g.addColorStop(0, '#f8fdff'); g.addColorStop(1, '#e6f4fb'); x.fillStyle = g; x.fillRect(0, 0, c.width, c.height);
   for (let i = 0; i < 9000; i++) { x.fillStyle = `rgba(148,163,184,${Math.random() * 0.12})`; x.fillRect(Math.random() * c.width, Math.random() * c.height, 1.5, 1.5); } // «pebble» del hielo
   const Y = (y) => y * k; const X = (xx) => xx * k;
   // Casa (anillos) en las dos puntas, como en una pista de verdad
-  [E.CASA.y, E.L - E.CASA.y].forEach((cy) => [[12, '#1d4ed8'], [8, '#f8fdff'], [4, '#dc2626'], [1.4, '#f8fdff']].forEach(([r, col]) => { x.fillStyle = col; x.beginPath(); x.arc(X(E.CASA.x), Y(cy), r * k, 0, Math.PI * 2); x.fill(); }));
+  [m.CASA.y].forEach((cy) => [[12, '#1d4ed8'], [8, '#f8fdff'], [4, '#dc2626'], [1.4, '#f8fdff']].forEach(([r, col]) => { x.fillStyle = col; x.beginPath(); x.arc(X(E.CASA.x), Y(cy), r * k, 0, Math.PI * 2); x.fill(); }));
   x.strokeStyle = 'rgba(15,23,42,0.35)'; x.lineWidth = 3; x.beginPath(); x.moveTo(X(E.W / 2), 0); x.lineTo(X(E.W / 2), c.height); x.stroke();
-  [[E.HOG, '#1d4ed8', 8], [E.L - E.HOG, '#1d4ed8', 8], [E.FONDO, '#dc2626', 4], [E.CASA.y, '#0f172a', 2]].forEach(([y, col, w]) => { x.strokeStyle = col; x.lineWidth = w; x.beginPath(); x.moveTo(0, Y(y)); x.lineTo(c.width, Y(y)); x.stroke(); });
+  // Zona de salida, línea de juego (azul), línea de la casa y línea roja del fondo (pasarla no elimina: el fondo es una pared)
+  [[E.SALIDA.y + 4, '#94a3b8', 3], [m.HOG, '#1d4ed8', 8], [m.FONDO, '#dc2626', 4], [m.CASA.y, '#0f172a', 2]].forEach(([y, col, w]) => { x.strokeStyle = col; x.lineWidth = w; x.beginPath(); x.moveTo(0, Y(y)); x.lineTo(c.width, Y(y)); x.stroke(); });
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
 }
 function piedraModelo(color, pesada) {
@@ -52,9 +53,9 @@ function barrenderoModelo() {
   g.traverse((m) => { if (m.isMesh) m.castShadow = true; });
   return { g, ropa, escoba };
 }
-function montarPabellon(ctx, util) {
+function montarPabellon(ctx, util, m) {
   const { scene } = ctx; const { a3 } = util;
-  const hielo = new THREE.Mesh(new THREE.PlaneGeometry(E.W, E.L), new THREE.MeshStandardMaterial({ map: texturaHielo(), roughness: 0.12, metalness: 0.05, envMapIntensity: 1.2 })); hielo.rotation.x = -Math.PI / 2; hielo.receiveShadow = true; scene.add(hielo);
+  const hielo = new THREE.Mesh(new THREE.PlaneGeometry(E.W, E.L), new THREE.MeshStandardMaterial({ map: texturaHielo(m), roughness: 0.12, metalness: 0.05, envMapIntensity: 1.2 })); hielo.rotation.x = -Math.PI / 2; hielo.receiveShadow = true; scene.add(hielo);
   const suelo = crea.suelo(E.W + 60, E.L + 60, 0x1e293b, { celda: 4 }); suelo.position.y = -0.3; scene.add(suelo);
   [-1, 1].forEach((s) => { const b = crea.caja(1, 1.2, E.L, 0x1e40af, { roughness: 0.4 }); b.position.set(s * (E.W / 2 + 0.5), 0.3, 0); scene.add(b); const neon = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.15, E.L), crea.neon(0x38bdf8, 1.6)); neon.position.set(s * (E.W / 2 + 0.5), 0.95, 0); scene.add(neon); });
   const fondoB = crea.caja(E.W + 2, 1.2, 1, 0x1e40af); fondoB.position.set(0, 0.3, E.L / 2 + 0.5); scene.add(fondoB);
@@ -75,8 +76,16 @@ function montarPabellon(ctx, util) {
   const diana = new THREE.Mesh(new THREE.RingGeometry(0.6, 0.95, 24), new THREE.MeshBasicMaterial({ color: 0xfacc15 })); diana.rotation.x = -Math.PI / 2; diana.position.y = 0.03; scene.add(diana);
   const efectos = { 1: crea.texto('↺', { tam: 3, color: '#0f172a' }), '-1': crea.texto('↻', { tam: 3, color: '#0f172a' }) }; // +x = izquierda en pantalla Object.values(efectos).forEach((e) => scene.add(e));
   const barrenderos = [barrenderoModelo(), barrenderoModelo()]; barrenderos.forEach((b) => { b.g.visible = false; scene.add(b.g); });
-  const cam = { p: a3(E.W / 2, E.HOG - 22, 15), mira: a3(E.CASA.x, E.CASA.y, 0) };
-  return { ctx, piedras, pedir, linea, diana, efectos, barrenderos, cam, chispa: 0 };
+  // Pilares del mapa (fijos)
+  m.obst.forEach(([x, y, r]) => {
+    const pilar = crea.cilindro(r, r * 1.08, 3.2, 0x7c3aed, 32, { roughness: 0.35, metalness: 0.2 }); pilar.position.copy(a3(x, y, 1.6)); scene.add(pilar);
+    const aro = new THREE.Mesh(new THREE.TorusGeometry(r * 1.02, 0.12, 8, 32), crea.neon(0xf0abfc, 1.6)); aro.rotation.x = Math.PI / 2; aro.position.copy(a3(x, y, 3.2)); scene.add(aro);
+  });
+  // Dónde se pararía la piedra si dejas de barrer (para ver lo que hace el barrido)
+  const proy = new THREE.Mesh(new THREE.RingGeometry(1.1, 1.6, 32), new THREE.MeshBasicMaterial({ color: 0xf97316, transparent: true, opacity: 0.85 })); proy.rotation.x = -Math.PI / 2; proy.visible = false; scene.add(proy);
+  const proyTxt = crea.texto('sin barrer', { tam: 2.2, color: '#c2410c', ancho: 640 }); proyTxt.visible = false; scene.add(proyTxt);
+  const cam = { p: a3(E.W / 2, m.HOG - 22, 15), mira: a3(m.CASA.x, m.CASA.y, 0) };
+  return { ctx, m, piedras, pedir, linea, diana, efectos, barrenderos, proy, proyTxt, cam, chispa: 0 };
 }
 // lista: [[x, y, color, pesada], …] (la primera es la que se mueve si hay tiro); apunta: { anim, mio, ang, efecto, barre, color }
 function pintarPabellon(o, lista, apunta, util, dt, t) {
@@ -87,13 +96,15 @@ function pintarPabellon(o, lista, apunta, util, dt, t) {
   const ver = Boolean(apunta?.mio);
   o.linea.visible = ver; o.diana.visible = ver; Object.entries(o.efectos).forEach(([k, e]) => { e.visible = ver && String(apunta?.efecto) === k; });
   if (ver) {
-    const rad = (apunta.ang * Math.PI) / 180; const yFin = E.HOG + 6; const yIni = E.HOG - 26;
+    const rad = (apunta.ang * Math.PI) / 180; const yFin = o.m.HOG + 6; const yIni = o.m.HOG - 26;
     const xIni = E.SALIDA.x + Math.tan(rad) * (yIni - E.SALIDA.y); const xFin = E.SALIDA.x + Math.tan(rad) * (yFin - E.SALIDA.y);
     const a = a3(xIni, yIni, 0.02); const b = a3(xFin, yFin, 0.02); const mid = a.clone().add(b).multiplyScalar(0.5); const largo = a.distanceTo(b);
     o.linea.position.set(mid.x, 0.02, mid.z); o.linea.scale.y = largo; o.linea.rotation.z = Math.atan2(b.x - a.x, b.z - a.z);
     o.diana.position.set(b.x, 0.03, b.z);
     if (apunta.efecto) o.efectos[String(apunta.efecto)].position.set(b.x + apunta.efecto * 3, 2.5, b.z - 2);
   }
+  o.proy.visible = Boolean(apunta?.proy); o.proyTxt.visible = o.proy.visible;
+  if (apunta?.proy) { const [px, py] = apunta.proy; o.proy.position.copy(a3(px, py, 0.04)); o.proyTxt.position.copy(a3(px, py, 2.2)); }
   // Barrenderos delante de la piedra que desliza
   const moviendo = apunta?.barre != null && lista.length && lista[0][1] > -5;
   o.barrenderos.forEach((b, i) => {
@@ -111,19 +122,19 @@ function pintarPabellon(o, lista, apunta, util, dt, t) {
   }
   // Cámara: detrás de la piedra mientras viaja; si no, mirando la casa
   const cam = o.ctx.camera; const k = o.ctx.ancho(0.6); let destP; let destM;
-  if (apunta?.anim && lista.length) { const [x, y] = lista[0]; const yc = Math.min(y, E.CASA.y - 6); destP = a3(E.W / 2, yc - 16 * k, 8 + 3 * k); destM = a3(x * 0.3 + E.W / 2 * 0.7, Math.min(E.CASA.y, y + 14), 0); }
-  else { destP = a3(E.W / 2, E.HOG - 8 - 10 * k, 13 + 6 * k); destM = a3(E.CASA.x, E.CASA.y - 2, 0); }
+  if (apunta?.anim && lista.length) { const [x, y] = lista[0]; const yc = Math.min(y, o.m.CASA.y - 6); destP = a3(E.W / 2, yc - 16 * k, 8 + 3 * k); destM = a3(x * 0.3 + E.W / 2 * 0.7, Math.min(o.m.CASA.y, y + 14), 0); }
+  else { destP = a3(E.W / 2, o.m.HOG - 8 - 10 * k, 13 + 6 * k); destM = a3(o.m.CASA.x, o.m.CASA.y - 2, 0); }
   const s = 1 - Math.exp(-(dt || 0.016) * 3); o.cam.p.lerp(destP, s); o.cam.mira.lerp(destM, s);
   cam.position.copy(o.cam.p); cam.lookAt(o.cam.mira);
 }
 
 const FPS_SIM = 120; // fotogramas de simulación por segundo real (la piedra se ve a doble velocidad)
-const nivelDe = (e) => (e > 260 ? 3 : e > 150 ? 2 : e > 55 ? 1 : 0);
+const nivelDe = (e) => (e > 200 ? 3 : e > 110 ? 2 : e > 40 ? 1 : 0);
 
 function Pista({ v, enviar, local }) {
   const miTurno = v.fase === 'turno' && (local || v.turno === v.yo?.id);
   const tirador = v.jugadores.find((j) => j.id === v.turno);
-  const hielo = E.HIELOS.find((h) => h.id === v.hielo) || E.HIELOS[1];
+  const hielo = E.mapaDe(v.hielo);
   const [ang, setAng] = useState(0);
   const [efecto, setEfecto] = useState(0);
   const [pesada, setPesada] = useState(false);
@@ -157,7 +168,7 @@ function Pista({ v, enviar, local }) {
   const puntero = (tipo, x) => {
     if (!miTurno || ocupado || tipo === 'up') return;
     if (tipo === 'down' || tipo === 'move') {
-      const a = (Math.atan((x - E.SALIDA.x) / (E.CASA.y - E.SALIDA.y)) * 180) / Math.PI;
+      const a = (Math.atan((x - E.SALIDA.x) / (hielo.CASA.y - E.SALIDA.y)) * 180) / Math.PI;
       setAng(Math.max(-10, Math.min(10, Math.round(a * 10) / 10))); setVer((n) => n + 1);
     }
   };
@@ -214,12 +225,12 @@ function Pista({ v, enviar, local }) {
 
   return (
     <div className="cu-caja" onPointerDown={frotar} onPointerMove={frotar} onPointerUp={soltarDedo} onPointerCancel={soltarDedo}>
-      <Lienzo3D ancho={E.W} alto={E.L} opciones={{ cielo: [0x0f172a, 0x1e3a8a], exposicion: 1.1 }} montar={montarPabellon}
+      <Lienzo3D key={hielo.id} ancho={E.W} alto={E.L} opciones={{ cielo: [0x0f172a, 0x1e3a8a], exposicion: 1.1 }} montar={(ctx, util) => montarPabellon(ctx, util, hielo)}
         dibujar={(o, t, util, dt) => {
           // Energía del barrido: sube al frotar y se va gastando
           energia.current *= Math.exp(-(dt || 0.016) * 5); nivel.current = nivelDe(energia.current);
           if (medidor.current) medidor.current.dataset.n = String(nivel.current);
-          const a = anim.current; const vv = vivo.current; let lista; let barre = null; let color = null;
+          const a = anim.current; const vv = vivo.current; let lista; let barre = null; let color = null; let proy = null;
           if (vv) {
             if (!vv.hecho) {
               const objetivo = Math.floor(((performance.now() - vv.t0) / 1000) * FPS_SIM);
@@ -229,28 +240,32 @@ function Pista({ v, enviar, local }) {
                 while (vv.barrido.length <= slot) vv.barrido.push(nivel.current);
                 vv.sim.paso(); k += 1;
               }
-              if (vv.sim.acabado) { vv.hecho = true; E.cerrarLanzamiento(vv.sim.cs); terminarVivo(); }
+              if (vv.sim.acabado) { vv.hecho = true; E.cerrarLanzamiento(vv.sim.cs, v.hielo); terminarVivo(); }
             }
-            lista = vv.sim.cs.map((c) => [c.x, c.fuera ? -10 : c.y, colorDe(c.de), c.pesada]);
+            lista = vv.sim.cs.filter((c) => !c.obst).map((c) => [c.x, c.fuera ? -10 : c.y, colorDe(c.de), c.pesada]);
             barre = vv.hecho ? null : nivel.current; color = colorDe(vv.de);
+            // Dónde se pararía sin barrer más (sin contar el efecto): ves cómo avanza al barrer
+            const c0 = vv.sim.cs[0]; const vel = Math.hypot(c0.vx, c0.vy);
+            if (!vv.hecho && vel > 1) { const dd = (vel * vel) / (2 * hielo.roce); proy = [Math.max(1, Math.min(E.W - 1, c0.x + (c0.vx / vel) * dd)), Math.min(E.L - 1, c0.y + (c0.vy / vel) * dd)]; }
           } else if (a) {
             const f = Math.min(a.frames.length - 1, Math.floor(((performance.now() - a.t0) / 1000) * 40));
             lista = a.ids.map((s, i) => [a.frames[f][i][0], a.frames[f][i][1], colorDe(s.de), s.pesada]);
             barre = f < a.frames.length - 1 ? E.barridoEn(a.barrido, f * 3) : null; color = colorDe(a.ids[0].de);
           } else lista = v.piedras.map((s) => [s.x, s.y, colorDe(s.de), s.pesada]);
-          pintarPabellon(o, lista, { anim: Boolean(a || vv), mio: miTurno && !a && !vv, ang: angRef.current, efecto: efectoRef.current, barre, color }, util, dt, t);
+          pintarPabellon(o, lista, { anim: Boolean(a || vv), mio: miTurno && !a && !vv, ang: angRef.current, efecto: efectoRef.current, barre, color, proy }, util, dt, t);
         }}
         onPuntero={puntero} />
       {enVivo && (
         <div className="cu-barrer" ref={medidor} data-n="0">
           <b>🧹 ¡Frota la pantalla para barrer!</b>
           <span className="cu-escoba"><i /><i /><i /></span>
-          <small>Barrer = llega más lejos y se curva menos · en ordenador: arrastra o pulsa espacio</small>
+          <small>Barrer = llega más lejos y se curva menos (mira el aro naranja «sin barrer» avanzar) · en ordenador: arrastra o pulsa espacio</small>
         </div>
       )}
       {miTurno && !ocupado && (
         <div className="cu-mandos">
-          <p className="cu-ayuda">Desliza sobre el hielo para apuntar · {ang > 0 ? '+' : ''}{ang}° · <span className={`cu-hielo cu-hielo-${hielo.id}`}>{hielo.emoji} {hielo.nombre}</span></p>
+          <p className="cu-mapa"><b>{hielo.emoji} {hielo.nombre}</b> {hielo.pista}</p>
+          <p className="cu-ayuda">Desliza sobre el hielo para apuntar · {ang > 0 ? '+' : ''}{ang}°</p>
           <div className="cu-efecto">
             {/* La cámara mira la pista desde atrás: la x del juego crece hacia la izquierda de la pantalla */}
             {[[1, '↺ Izquierda'], [0, '· Recta'], [-1, 'Derecha ↻']].map(([e, t]) => <button key={e} type="button" className={efecto === e ? 'sel' : ''} onClick={() => setEfecto(e)}>{t}</button>)}

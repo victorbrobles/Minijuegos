@@ -307,10 +307,11 @@ export default {
       'Por turnos, cada jugador lanza sus piedras (4, 3 o 2 según cuántos seáis). En cada manga el orden rota: tirar el último es una ventaja.',
       '**Desliza sobre el hielo** para apuntar (la guía solo marca el primer tramo) y elige el **efecto**: la piedra se curva hacia ese lado cuando va frenando.',
       '**Mantén pulsado LANZAR**: la barra de fuerza sube y baja deprisa. Suelta en el punto justo.',
-      '🧹 **Mientras la piedra desliza, frota la pantalla para barrer** (en ordenador: arrastra con el ratón o pulsa espacio). Cuanto más rápido frotas, más barres: la piedra **frena menos y se curva menos**. Tira un poco corto y llévala barriendo hasta el centro.',
-      'El **hielo cambia en cada manga**: ⚡ rápido (corre y se curva más), ❄️ normal o 🐢 lento.',
+      '🧹 **Mientras la piedra desliza, frota la pantalla para barrer** (en ordenador: arrastra con el ratón o pulsa espacio). Cuanto más rápido frotas, más barres: la piedra **frena menos y se curva menos**. Tira un poco corto y llévala barriendo hasta el centro: el aro naranja «sin barrer» te marca dónde se pararía si dejas de barrer.',
+      '🗺️ **Cada manga se juega en un mapa distinto**: la casa más cerca o más lejos, hielo pulido que apenas frena, hielo pegajoso o con arena que frena muchísimo, o pilares en medio que hay que rodear con efecto. La fuerza buena cambia en cada mapa.',
+      'Las bandas y el fondo son **paredes**: la piedra rebota y se queda donde pare (pasar la línea roja no la elimina).',
       '💥 Cada jugador tiene **una piedra pesada por manga**: pesa más del doble y es ideal para sacar piedras de la diana.',
-      'Si una piedra no pasa la línea azul o se pasa de la roja del fondo, se retira.'
+      'Si una piedra no pasa la línea azul (y no ha tocado otra), se retira.'
     ],
     secciones: [{ icono: '🎯', titulo: 'Puntuación de cada manga', color: 'azul', items: ['Solo puntúa quien tenga **la piedra más cercana** al centro.', 'Suma **un punto por cada piedra suya** que esté más cerca que la mejor piedra de cualquier rival (y dentro de la diana).', 'Una piedra que puntúa **en el botón** (el puntito central) **vale doble**.'] }],
     puntos: [['🥌', 'Cada piedra que puntúa', '1 punto'], ['🎯', 'Piedra que puntúa en el botón', '2 puntos']],
@@ -347,7 +348,7 @@ export default {
       'Los **demás escriben en secreto** lo que creen que contestaría el protagonista. Él no responde.',
       'Cuando todos han respondido, salen **todas las respuestas mezcladas y sin autor**. Cada jugador (el protagonista también) **elige la que cree buena**. El protagonista elige la que más se acerca a la verdad.',
       'Después llega el **desglose**: de quién era cada respuesta y quién la eligió, con la elegida por el protagonista bien marcada.',
-      'Por último, la pantalla de **puntos** de la ronda.',
+      'Después, la pantalla de **puntos** de la ronda y, por último, la **clasificación** con los puntos totales de cada uno. Desde ahí se pasa a la siguiente ronda.',
       'Se juegan **Jugadores ×3, ×4 o ×5** rondas: cada jugador será el protagonista 3, 4 o 5 veces. El protagonista puede **cambiar la pregunta** mientras nadie haya respondido.'
     ],
     secciones: [{ icono: '💡', titulo: 'Trucos', color: 'rosa', items: ['Responde lo que diría él o ella, no lo que dirías tú.', 'Una respuesta creíble puede llevarse votos aunque no sea la buena.', 'Votarte a ti mismo es arriesgado: si no es la buena, pierdes un punto.'] }],

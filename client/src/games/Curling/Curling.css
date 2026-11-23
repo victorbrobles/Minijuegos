@@ -27,3 +27,5 @@
 .cu-barrer[data-n='1'] .cu-escoba i:nth-child(1), .cu-barrer[data-n='2'] .cu-escoba i:nth-child(-n+2), .cu-barrer[data-n='3'] .cu-escoba i { background: #0ea5e9; transform: scaleY(1.25); }
 .cu-barrer[data-n='3'] .cu-escoba i { background: #22c55e; }
 .cu-barrer[data-n='3'] { box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12), inset 0 0 0 3px #22c55e; }
+.cu-mapa { margin: 0; padding: 0.45rem 0.7rem; border-radius: 12px; background: #e0f2fe; color: #075985; font-size: 0.8rem; font-weight: 700; text-align: center; }
+.cu-mapa b { display: block; font-size: 0.95rem; color: #0c4a6e; }

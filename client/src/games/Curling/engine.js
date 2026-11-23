@@ -2,7 +2,8 @@
 // «Curling»: motor puro (salas online en server/routes/curling.js y modo un móvil).
 // Pista de hielo con la diana («casa») al fondo. Por turnos, cada jugador lanza sus piedras: apunta, elige el efecto
 // (la piedra se curva al frenar), para la barra de fuerza y, mientras la piedra desliza, BARRE frotando la pantalla:
-// barrer hace que frene menos y se curve menos. El hielo cambia en cada manga (rápido, normal o lento) y cada jugador
+// barrer hace que frene menos y se curve menos. Cada manga se juega en un MAPA distinto (la casa más cerca o más lejos,
+// hielo que frena más o menos, pilares en medio…), así que la fuerza buena cambia de una manga a otra. Cada jugador
 // tiene una «piedra pesada» por manga para sacar piedras. Puntúa quien tenga la piedra más cerca del centro: un punto
 // por cada piedra suya más cerca que la mejor de cualquier rival; la que se queda en el botón (el centro) vale doble.
 //
@@ -11,11 +12,12 @@
 import { simular, crearSimulacion } from '../comun/fisica2d.js';
 
 export const W = 34;
+const E0 = 17; // centro de la pista
 export const L = 150;
 export const CASA = { x: W / 2, y: 125, r: 12 };
 export const ANILLOS = [12, 8, 4, 1.4];
-export const HOG = 92; // la piedra tiene que pasar esta línea
-export const FONDO = 139; // pasada esta línea, fuera
+export const HOG = 92; // la piedra tiene que pasar esta línea (en el mapa clásico; cada mapa tiene la suya)
+export const FONDO = 139; // línea roja del fondo (solo marca: las bandas y el fondo son paredes y la piedra rebota)
 export const R = 1.45;
 export const SALIDA = { x: W / 2, y: 8 };
 export const OPCIONES_MANGAS = [2, 3, 4];
@@ -23,23 +25,46 @@ export const SEG_TURNO = 45;
 export const BOTON = 1.4; // radio del botón (centro de la diana): una piedra con el centro dentro vale doble
 export const BARRIDO_FRAMES = 12; // fotogramas de simulación (1/60 s) por cada valor del barrido
 export const BARRIDO_MAX = 3;
+export const BARRIDO_ROCE = 0.15; // roce que quita cada nivel de barrido
 const BARRIDO_LARGO = 500;
 const PESO_PESADA = 2.2;
-/** Hielos posibles: cuanto más rápido, menos roce y más se curva la piedra. */
-export const HIELOS = [
-  { id: 'rapido', nombre: 'Hielo rápido', emoji: '⚡', roce: 2.25, curva: 1.3 },
-  { id: 'normal', nombre: 'Hielo normal', emoji: '❄️', roce: 2.6, curva: 1 },
-  { id: 'lento', nombre: 'Hielo lento', emoji: '🐢', roce: 3.0, curva: 0.8 }
+/**
+ * Mapas: cada manga se juega en uno distinto. casa = y del centro de la diana (más cerca o más lejos), roce = cuánto
+ * frena el hielo, curva = cuánto se curva con efecto, obst = pilares fijos [x, y, radio] que hay que esquivar.
+ * Fuerza aproximada para dejarla en el centro sin barrer: corta 27, rápida 22, clásica 45, pilares 41, muralla 43,
+ * larga 60, pegajosa 63, desierto 68.
+ */
+export const MAPAS = [
+  { id: 'clasica', nombre: 'Pista clásica', emoji: '❄️', pista: 'Hielo normal, la casa al fondo', casa: 125, roce: 2.6, curva: 1, obst: [] },
+  { id: 'corta', nombre: 'Pista corta', emoji: '📏', pista: 'La casa está muy cerca: ¡flojito!', casa: 96, roce: 2.6, curva: 1, obst: [] },
+  { id: 'rapida', nombre: 'Hielo pulido', emoji: '⚡', pista: 'Apenas frena y se curva mucho', casa: 118, roce: 1.9, curva: 1.4, obst: [] },
+  { id: 'pilares', nombre: 'Los pilares', emoji: '🏛️', pista: 'Dos pilares en el centro: rodéalos con efecto', casa: 120, roce: 2.6, curva: 1.15, obst: [[E0 - 4.2, 84, 1.6], [E0 + 4.2, 84, 1.6]] },
+  { id: 'muralla', nombre: 'La muralla', emoji: '🧱', pista: 'Un bloque tapa el centro: entra curvando', casa: 112, roce: 2.9, curva: 1.2, obst: [[E0, 80, 3.2]] },
+  { id: 'larga', nombre: 'Pista larga', emoji: '🔭', pista: 'La casa está lejísimos y el hielo frena', casa: 130, roce: 3.2, curva: 0.9, obst: [] },
+  { id: 'pegajosa', nombre: 'Hielo pegajoso', emoji: '🍯', pista: 'Frena muchísimo: tira fuerte', casa: 125, roce: 3.4, curva: 0.8, obst: [] },
+  { id: 'desierto', nombre: 'Hielo arenoso', emoji: '🏜️', pista: 'Hay arena en el hielo: hace falta mucha fuerza', casa: 105, roce: 4.5, curva: 0.7, obst: [] }
 ];
-const hieloDe = (id) => HIELOS.find((h) => h.id === id) || HIELOS[1];
+export const HIELOS = MAPAS;
+/** Datos de un mapa: casa (x, y, r), línea de juego (hog), línea del fondo y obstáculos. */
+export function mapaDe(id) {
+  const m = MAPAS.find((x) => x.id === id) || MAPAS[0];
+  return { ...m, CASA: { x: W / 2, y: m.casa, r: 12 }, HOG: m.casa - 33, FONDO: m.casa + 14 };
+}
+const hieloDe = mapaDe;
 
 const jug = (p, id) => p.jugadores.find((j) => j.id === id);
 const activos = (p) => p.jugadores.filter((j) => !j.fuera);
 
+// Las bandas y el fondo son paredes: la piedra rebota (y pierde algo de velocidad)
+const REBOTE_PARED = 0.5; // bandas
+const REBOTE_FONDO = 0.3; // el fondo amortigua más
 function paredes(cs) {
   for (const c of cs) {
-    if (c.fuera) continue;
-    if (c.x < c.r || c.x > W - c.r || c.y > FONDO + c.r) { c.fuera = true; c.vx = 0; c.vy = 0; }
+    if (c.fuera || c.m === Infinity) continue;
+    if (c.x < c.r) { c.x = c.r; if (c.vx < 0) c.vx = -c.vx * REBOTE_PARED; }
+    else if (c.x > W - c.r) { c.x = W - c.r; if (c.vx > 0) c.vx = -c.vx * REBOTE_PARED; }
+    if (c.y > L - c.r) { c.y = L - c.r; if (c.vy > 0) c.vy = -c.vy * REBOTE_FONDO; }
+    else if (c.y < c.r) { c.y = c.r; if (c.vy < 0) c.vy = -c.vy * REBOTE_PARED; }
   }
 }
 
@@ -58,7 +83,8 @@ export const limpiarBarrido = (b) => (Array.isArray(b) ? b.slice(0, BARRIDO_LARG
 export function crearLanzamiento(piedras, tiro, de, hielo) {
   const h = hieloDe(hielo);
   const cs = [{ id: 'nueva', de, x: SALIDA.x, y: SALIDA.y, vx: tiro.vx, vy: tiro.vy, r: R, m: tiro.pesada ? PESO_PESADA : 1, pesada: Boolean(tiro.pesada) },
-    ...piedras.map((s) => ({ ...s, vx: 0, vy: 0, r: R, m: s.pesada ? PESO_PESADA : 1 }))];
+    ...piedras.map((s) => ({ ...s, vx: 0, vy: 0, r: R, m: s.pesada ? PESO_PESADA : 1 })),
+    ...h.obst.map(([x, y, r], i) => ({ id: `obst${i}`, obst: true, x, y, vx: 0, vy: 0, r, m: Infinity }))];
   const efecto = tiro.efecto || 0;
   const barrido = tiro.barrido || [];
   const fuerza = (c, dt, f) => {
@@ -70,34 +96,36 @@ export function crearLanzamiento(piedras, tiro, de, hielo) {
     const px = c.vy / v; const py = -c.vx / v; // perpendicular (hacia la derecha de la marcha)
     c.vx += px * a * dt; c.vy += py * a * dt;
   };
-  // Barrer reduce el roce de la piedra lanzada (hasta un 24 %)
-  const roceDe = (c, f) => (c.id === 'nueva' ? h.roce * (1 - 0.08 * barridoEn(barrido, f)) : h.roce);
+  // Barrer reduce el roce de la piedra lanzada (hasta un 45 %, se nota: puede alargarla más de media casa)
+  const roceDe = (c, f) => (c.id === 'nueva' ? h.roce * (1 - BARRIDO_ROCE * barridoEn(barrido, f)) : h.roce);
   return crearSimulacion(cs, { roce: h.roce, roceDe, rebote: 0.85, paredes, fuerza, pasosMax: 60 * 16, cadaFrame: 3 });
 }
 /** Reglas al acabar el lanzamiento: si la lanzada no pasa la línea de juego (y no ha tocado nada), se retira. */
-export function cerrarLanzamiento(cs) {
+export function cerrarLanzamiento(cs, hielo) {
   const nueva = cs[0];
-  if (!nueva.fuera && nueva.y < HOG && !nueva.toco) nueva.fuera = true;
+  if (!nueva.fuera && nueva.y < mapaDe(hielo).HOG && !nueva.toco) nueva.fuera = true;
 }
 /** Simula un lanzamiento entero. Mismo resultado en todos lados. */
 export function simularLanzamiento(piedras, tiro, de, hielo) {
   const s = crearLanzamiento(piedras, tiro, de, hielo);
   while (s.paso()) { /* sigue */ }
-  cerrarLanzamiento(s.cs);
-  return { cuerpos: s.cs, frames: s.frames };
+  cerrarLanzamiento(s.cs, hielo);
+  // Los pilares no son piedras: fuera de la lista (sí van en los fotogramas, al final, y no se mueven)
+  return { cuerpos: s.cs.filter((c) => !c.obst), frames: s.frames };
 }
 void simular;
 
-export const distancia = (s) => Math.sqrt((s.x - CASA.x) * (s.x - CASA.x) + (s.y - CASA.y) * (s.y - CASA.y));
+export const distancia = (s, casa = CASA) => Math.sqrt((s.x - casa.x) * (s.x - casa.x) + (s.y - casa.y) * (s.y - casa.y));
 
 /** Puntos de la manga: { ganador, puntos } */
-export function puntuarManga(piedras) {
-  const en = piedras.filter((s) => distancia(s) <= CASA.r + R).sort((a, b) => distancia(a) - distancia(b));
+export function puntuarManga(piedras, hielo) {
+  const casa = mapaDe(hielo).CASA; const distancia2 = (s) => distancia(s, casa);
+  const en = piedras.filter((s) => distancia2(s) <= casa.r + R).sort((a, b) => distancia2(a) - distancia2(b));
   if (!en.length) return { ganador: null, puntos: 0, boton: 0 };
   const g = en[0].de;
   const mejorRival = en.find((s) => s.de !== g);
-  const valen = en.filter((s) => s.de === g && (!mejorRival || distancia(s) < distancia(mejorRival)));
-  const boton = valen.filter((s) => distancia(s) <= BOTON).length;
+  const valen = en.filter((s) => s.de === g && (!mejorRival || distancia2(s) < distancia2(mejorRival)));
+  const boton = valen.filter((s) => distancia2(s) <= BOTON).length;
   return { ganador: g, puntos: valen.length + boton, boton };
 }
 
@@ -107,7 +135,9 @@ export function crearPartida(jugadores, items = [], reglas = {}, ahora = Date.no
   const p = {
     fase: 'turno', manga: 1, mangas, porJugador, n: 0, piedras: [], lanzadas: 0, contador: 0,
     jugadores: jugadores.map((j) => ({ id: j.id, nombre: j.nombre, puntos: 0, fuera: false })),
-    orden: [], ultimo: null, resumen: null, fin: null, limite: 0, hielo: 'normal', pesadas: {}
+    orden: [], ultimo: null, resumen: null, fin: null, limite: 0, hielo: 'clasica', pesadas: {},
+    // Un mapa distinto en cada manga (orden al azar)
+    mapas: barajarMapas()
   };
   prepararManga(p, ahora, 0);
   return p;
@@ -120,10 +150,15 @@ function prepararManga(p, ahora, espera) {
   p.orden = [];
   for (let r = 0; r < p.porJugador; r++) p.orden.push(...base);
   p.lanzadas = 0; p.piedras = [];
-  // El hielo cambia en cada manga (la primera, normal) y cada jugador recupera su piedra pesada
-  p.hielo = p.manga === 1 ? 'normal' : HIELOS[Math.floor(Math.random() * HIELOS.length)].id;
+  // Cada manga, un mapa distinto; cada jugador recupera su piedra pesada
+  p.hielo = p.mapas[(p.manga - 1) % p.mapas.length];
   p.pesadas = {};
   p.limite = ahora + espera + SEG_TURNO * 1000;
+}
+function barajarMapas() {
+  const ids = MAPAS.map((m) => m.id);
+  for (let i = ids.length - 1; i > 0; i--) { const k = Math.floor(Math.random() * (i + 1)); [ids[i], ids[k]] = [ids[k], ids[i]]; }
+  return ids;
 }
 export const turnoDe = (p) => p.orden[p.lanzadas] ?? null;
 /** El tiro a partir de lo que elige el jugador (ángulo en grados, fuerza 0-100…). Igual en el móvil y en el servidor. */
@@ -154,7 +189,7 @@ export function lanzar(p, id, d, ahora = Date.now()) {
 }
 
 function cerrarManga(p, ahora, espera = 0) {
-  const res = puntuarManga(p.piedras);
+  const res = puntuarManga(p.piedras, p.hielo);
   if (res.ganador != null) { const g = jug(p, res.ganador); if (g) g.puntos += res.puntos; }
   p.resumen = { manga: p.manga, ...res, nombre: res.ganador != null ? jug(p, res.ganador)?.nombre : null, piedras: p.piedras, hasta: ahora + espera + 5000 };
   p.fase = 'manga';

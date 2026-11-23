@@ -7,6 +7,7 @@
 //     La que elige Laura es la «correcta».
 //  3. desglose: de quién era cada respuesta, quién la votó y cuál marcó Laura.
 //  4. puntos: el resumen de la ronda.
+//  5. clasificacion: los puntos totales de cada jugador; desde aquí se pasa a la siguiente ronda.
 // Puntos: el protagonista no suma nada esa ronda · el autor de la respuesta que elige el protagonista, +3 · quien vota
 // la correcta, +1 (también su autor si se votó) · una respuesta que no es la correcta gana +1 por cada voto ajeno ·
 // votarte a ti mismo sin que sea la correcta resta 1.
@@ -132,10 +133,11 @@ function cerrarRonda(p) {
   p.fase = 'desglose';
 }
 
-/** desglose → puntos → siguiente ronda (o final). */
+/** desglose → puntos → clasificación → siguiente ronda (o final). */
 export function siguiente(p) {
   if (p.fase === 'desglose') { p.fase = 'puntos'; return { ok: true }; }
-  if (p.fase === 'puntos') { empezarRonda(p); return { ok: true }; }
+  if (p.fase === 'puntos') { p.fase = 'clasificacion'; return { ok: true }; }
+  if (p.fase === 'clasificacion') { empezarRonda(p); return { ok: true }; }
   return { ok: false, error: 'Ahora no.' };
 }
 
@@ -193,7 +195,7 @@ export function accion(p, id, d, { esAdmin = false } = {}) {
 
 export function vistaDe(p, id) {
   const yo = jug(p, id);
-  const publico = p.fase === 'desglose' || p.fase === 'puntos' || p.fase === 'fin';
+  const publico = p.fase === 'desglose' || p.fase === 'puntos' || p.fase === 'clasificacion' || p.fase === 'fin';
   const letra = (a) => String.fromCharCode(65 + p.orden.indexOf(a));
   const prota = jug(p, p.protagonista);
   return {
