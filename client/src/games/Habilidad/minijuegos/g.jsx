@@ -21,10 +21,10 @@ const texturaBalon = () => {
 };
 
 /* ───────── 1. Toques ───────── */
-function Toques({ alTerminar }) {
+function Toques({ semilla, alTerminar }) {
   const ref = useRef(null); const [n, setN] = useState(0); const [msg, setMsg] = useState(null);
   useEscena(ref, (ctx) => {
-    const { scene } = ctx;
+    const { scene } = ctx; const r = rng(semilla);
     const cesped = crea.suelo(30, 20, 0x16a34a, { celda: 1.5, contraste: 0.06, lineas: false }); cesped.position.set(0, 0, -4); scene.add(cesped);
     const porteria = new THREE.Group(); [-2.4, 2.4].forEach((x) => { const p = crea.cilindro(0.08, 0.08, 2.4, 0xffffff, 10); p.position.set(x, 1.2, 0); porteria.add(p); }); const lar = crea.cilindro(0.08, 0.08, 4.9, 0xffffff, 10); lar.rotation.z = Math.PI / 2; lar.position.y = 2.4; porteria.add(lar); porteria.position.z = -7; scene.add(porteria);
     const balon = new THREE.Mesh(new THREE.SphereGeometry(0.42, 32, 20), new THREE.MeshStandardMaterial({ map: texturaBalon(), roughness: 0.45 })); balon.castShadow = true; scene.add(balon);
@@ -38,13 +38,16 @@ function Toques({ alTerminar }) {
         if (st.fin) return; const t = tocado(ctx, e, [balon]); if (!t) return;
         const q = enPlano(ctx, e); const off = q ? Math.max(-1, Math.min(1, (st.p.x - q.x) / 0.8)) : 0;
         st.esperando = false; st.n++; setN(st.n);
-        st.v.set(off * 3.2, 9.5 + Math.min(3, st.n * 0.04), 0); sonar('toque', { minimo: 0, vibrar: false }); vibrar(8);
+        // Cada vez más difícil: el bote se desvía más al azar y la zona donde vale tocar encoge
+        const desvio = r.entre(-1, 1) * Math.min(2.6, st.n * 0.06);
+        st.v.set(off * 3.2 + desvio, 9.5 + Math.min(3, st.n * 0.04), 0);
+        zona.scale.setScalar(Math.max(0.55, 1 - st.n * 0.012)); sonar('toque', { minimo: 0, vibrar: false }); vibrar(8);
         ctx.onda(st.p.clone().setZ(0.3), 0xffffff, { radio: 1.4, eje: 'z' });
         if (st.n % 10 === 0) { ctx.chispas(st.p.clone(), 0xfacc15, 24); setMsg(`🔥 ${st.n}`); setTimeout(() => setMsg(null), 600); }
       },
       frame(dt) {
         if (!st.fin && !st.esperando) {
-          st.t += dt; const g = 15 + Math.min(10, st.n * 0.25);
+          st.t += dt; const g = 15 + Math.min(16, st.n * 0.35);
           st.v.y -= g * dt; st.p.addScaledVector(st.v, dt);
           if (Math.abs(st.p.x) > 3.3) { st.p.x = Math.sign(st.p.x) * 3.3; st.v.x *= -0.8; }
           if (st.p.y < 0.42) { st.fin = true; st.p.y = 0.42; sonar('fallo'); vibrar(120); ctx.temblor(0.25); setMsg('💥 ¡Se cayó!'); setTimeout(() => alTerminar(st.n), 900); }
@@ -73,13 +76,16 @@ function Vuelo({ semilla, alTerminar }) {
     scene.add(avion);
     const torres = []; let sigX = 12;
     const ponerTorre = (dif) => {
-      const hueco = Math.max(2.3, 3.6 - dif * 1.3); const yc = r.entre(1.4 + hueco / 2, ALTO - 0.6 - hueco / 2);
+      const hueco = Math.max(1.85, 3.6 - dif * 1.75); const yc = r.entre(1.4 + hueco / 2, ALTO - 0.6 - hueco / 2);
       const g = new THREE.Group(); const col = r.de([0x6366f1, 0x0ea5e9, 0x14b8a6, 0xa855f7]);
       const abajo = crea.caja(1.2, yc - hueco / 2, 1.2, col); abajo.position.y = (yc - hueco / 2) / 2; g.add(abajo);
       const arriba = crea.caja(1.2, ALTO + 6 - (yc + hueco / 2), 1.2, col); arriba.position.y = yc + hueco / 2 + (ALTO + 6 - (yc + hueco / 2)) / 2; g.add(arriba);
       [yc - hueco / 2, yc + hueco / 2].forEach((y) => { const b = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.12, 1.3), crea.neon(0xfde047, 1)); b.position.y = y; g.add(b); });
-      g.position.x = sigX; scene.add(g); torres.push({ g, x: sigX, yc, hueco, pasada: false });
-      sigX += Math.max(4.6, 7 - dif * 2.4) + r.entre(0, 1.2);
+      g.position.x = sigX; scene.add(g);
+      // Desde la mitad, algunas torres suben y bajan
+      const mueve = dif > 0.35 && r() < dif * 0.7 ? { amp: r.entre(0.5, 0.6 + dif * 0.9), fase: r.entre(0, 6), vel: r.entre(1, 1.6 + dif) } : null;
+      torres.push({ g, x: sigX, yc, yc0: yc, hueco, pasada: false, mueve });
+      sigX += Math.max(3.8, 7 - dif * 3.2) + r.entre(0, 1.2 * (1 - dif * 0.6));
     };
     for (let i = 0; i < 60; i++) { const n = crea.esfera(r.entre(0.6, 1.2), 0xffffff, { roughness: 1 }); n.scale.set(1.6, 0.7, 1); n.position.set(r.entre(0, 1500), r.entre(5, 11), r.entre(-8, -4)); scene.add(n); }
     const st = { x: 0, y: 4, vy: 0, n: 0, fin: false, t: 0, empezado: false };
@@ -88,7 +94,8 @@ function Vuelo({ semilla, alTerminar }) {
       frame(dt) {
         helice.rotation.x += dt * 40;
         if (!st.fin && st.empezado) {
-          st.t += dt; const dif = Math.min(1, st.t / 45); const vel = 4.2 + dif * 2.6;
+          st.t += dt; const dif = Math.min(1, st.n / 30); const vel = 4.2 + dif * 3.6;
+          torres.forEach((o) => { if (!o.mueve) return; const yc = o.yc0 + Math.sin(st.t * o.mueve.vel + o.mueve.fase) * o.mueve.amp; o.g.position.y = yc - o.yc0; o.yc = Math.max(1.4 + o.hueco / 2 - 0.4, Math.min(ALTO - 0.6 - o.hueco / 2 + 0.4, yc)); });
           st.x += vel * dt; st.vy -= 17 * dt; st.y += st.vy * dt;
           while (sigX < st.x + 30) ponerTorre(dif);
           const choque = st.y < 0.25 || st.y > ALTO + 0.4 || torres.some((o) => Math.abs(o.x - st.x) < 0.6 + 0.4 && Math.abs(st.y - o.yc) > o.hueco / 2 - 0.18);
@@ -118,9 +125,10 @@ function Anillos({ semilla, alTerminar }) {
       const g = new THREE.Group();
       COL4.forEach((c, i) => { const arco = new THREE.Mesh(new THREE.TorusGeometry(R, 0.17, 10, 40, Math.PI / 2 - 0.04), crea.neon(c, 0.9)); arco.rotation.z = (i * Math.PI) / 2 + 0.02; g.add(arco); });
       g.position.y = sigY; scene.add(g);
-      const vel = (r() < 0.5 ? -1 : 1) * (0.9 + Math.min(1.6, k * 0.12));
+      const vel = (r() < 0.5 ? -1 : 1) * (0.8 + Math.min(2.8, k * 0.2));
+      const ritmo = k > 4 ? { amp: Math.min(1.4, (k - 4) * 0.12), f: r.entre(1, 2.2) } : null; // acelera y frena
       const cambio = new THREE.Mesh(new THREE.OctahedronGeometry(0.28), new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xffffff, emissiveIntensity: 0.5 })); cambio.position.y = sigY + SEP / 2; scene.add(cambio);
-      anillos.push({ g, y: sigY, vel, cruces: 0, cambio, cogido: false }); sigY += SEP;
+      anillos.push({ g, y: sigY, vel, ritmo, cruces: 0, cambio, cogido: false }); sigY += Math.max(5.2, SEP - k * 0.12);
     };
     for (let i = 0; i < 4; i++) ponerAnillo(i);
     const st = { y: 2, vy: 0, color: 0, n: 0, fin: false, camY: 3, empezado: false, t: 0 };
@@ -131,7 +139,7 @@ function Anillos({ semilla, alTerminar }) {
     return {
       toque() { if (st.fin) return; st.empezado = true; st.vy = 6.8; sonar('toque', { minimo: 0, vibrar: false }); },
       frame(dt) {
-        anillos.forEach((o) => { o.g.rotation.z += o.vel * dt; o.cambio.rotation.y += dt * 3; });
+        anillos.forEach((o) => { const v = o.ritmo ? o.vel * (1 + Math.sin(performance.now() / 1000 * o.ritmo.f) * o.ritmo.amp) : o.vel; o.g.rotation.z += v * dt; o.cambio.rotation.y += dt * 3; });
         if (st.fin) return;
         if (st.empezado) {
           st.t += dt; const yA = st.y; st.vy -= 16 * dt; st.y += st.vy * dt;
@@ -270,7 +278,7 @@ function Bolos({ alTerminar }) {
     const colocar = () => { bolos.forEach((b) => scene.remove(b.m)); bolos = POS.map(([x, z]) => { const m = new THREE.Mesh(geoBolo, matBolo); m.castShadow = true; const banda = crea.cilindro(0.062, 0.062, 0.04, 0xef4444, 16); banda.position.y = 0.6; m.add(banda); m.position.set(x, 0, z); scene.add(m); return { m, v: new THREE.Vector2(), caido: false, inc: 0, dir: 0 }; }); };
     colocar();
     const bola = crea.esfera(0.21, 0x7c3aed, { metalness: 0.3, roughness: 0.15 }); scene.add(bola);
-    const st = { tirada: 0, total: 0, rodando: false, b: new THREE.Vector3(0, 0.21, 1), v: new THREE.Vector3(), x0: 0, ini: null, fin: false, t: 0, curva: 0 };
+    const st = { efecto: 0, tirada: 0, total: 0, rodando: false, b: new THREE.Vector3(0, 0.21, 1), v: new THREE.Vector3(), x0: 0, ini: null, fin: false, t: 0, curva: 0 };
     bola.position.copy(st.b);
     return {
       toque(e) { if (!st.rodando && !st.fin) st.ini = [e.clientX, e.clientY, performance.now()]; },
@@ -280,21 +288,28 @@ function Bolos({ alTerminar }) {
         const dy = st.ini[1] - e.clientY; const dx = e.clientX - st.ini[0]; const ms = Math.max(60, performance.now() - st.ini[2]); st.ini = null;
         if (dy < 40) return;
         const vel = Math.min(16, Math.max(6, (dy / ms) * 9)); const ang = Math.atan2(dx, dy) * 0.25;
-        st.v.set(Math.sin(ang) * vel, 0, -Math.cos(ang) * vel); st.rodando = true; st.t = 0; sonar('toque', { minimo: 0 });
+        st.v.set(Math.sin(ang) * vel, 0, -Math.cos(ang) * vel); st.rodando = true; st.t = 0; st.efecto = (Math.random() < 0.5 ? -1 : 1) * (0.06 + Math.random() * 0.12); sonar('toque', { minimo: 0 });
       },
       frame(dt) {
         if (st.rodando) {
           st.t += dt; st.b.addScaledVector(st.v, dt); bola.rotation.x -= st.v.z * dt / 0.21;
-          if (Math.abs(st.b.x) > 1.05 && st.b.z > -L + 0.5) { st.v.x = 0; st.b.x = Math.sign(st.b.x) * 1.1; } // canal
+          // La pista no es perfecta: la bola se va abriendo hacia un lado (distinto en cada tirada)
+          st.v.x += st.efecto * dt;
+          if (Math.abs(st.b.x) > 1.05 && st.b.z > -L + 0.5) { st.v.x = 0; st.efecto = 0; st.b.x = Math.sign(st.b.x) * 1.1; } // canal
           bolos.forEach((p) => {
             if (p.caido) return; const d = Math.hypot(p.m.position.x - st.b.x, p.m.position.z - st.b.z);
-            if (d < 0.32) { p.caido = true; p.v.set((p.m.position.x - st.b.x) * 6 + st.v.x * 0.3, (p.m.position.z - st.b.z) * 4 + st.v.z * 0.35); sonar('tic', { minimo: 0, vibrar: false }); }
+            if (d < 0.3) {
+              p.caido = true; p.v.set((p.m.position.x - st.b.x) * 6 + st.v.x * 0.3, (p.m.position.z - st.b.z) * 4 + st.v.z * 0.3); sonar('tic', { minimo: 0, vibrar: false });
+              // La bola se desvía y pierde fuerza con cada bolo que tumba
+              st.v.x += (st.b.x - p.m.position.x) * 4; st.v.multiplyScalar(0.82);
+            }
           });
           // Los bolos que caen tiran a los de al lado
           bolos.forEach((p) => {
             if (!p.caido || p.v.length() < 0.5) return;
-            p.m.position.x += p.v.x * dt; p.m.position.z += p.v.y * dt; p.v.multiplyScalar(Math.pow(0.15, dt));
-            bolos.forEach((q) => { if (q.caido || q === p) return; if (Math.hypot(q.m.position.x - p.m.position.x, q.m.position.z - p.m.position.z) < 0.3) { q.caido = true; q.v.set(p.v.x * 0.7 + (q.m.position.x - p.m.position.x) * 3, p.v.y * 0.7); } });
+            p.m.position.x += p.v.x * dt; p.m.position.z += p.v.y * dt; p.v.multiplyScalar(Math.pow(0.04, dt));
+            // Un bolo solo tira a otro si va con fuerza y le da de lleno
+            bolos.forEach((q) => { if (q.caido || q === p || p.v.length() < 2.2) return; if (Math.hypot(q.m.position.x - p.m.position.x, q.m.position.z - p.m.position.z) < 0.24) { q.caido = true; q.v.set(p.v.x * 0.5 + (q.m.position.x - p.m.position.x) * 2, p.v.y * 0.5); } });
           });
           bolos.forEach((p) => { if (p.caido && p.inc < 1.5) { p.inc = Math.min(1.5, p.inc + dt * 6); p.m.rotation.set(Math.cos(Math.atan2(p.v.x, -p.v.y)) * -p.inc, 0, Math.sin(Math.atan2(p.v.x, -p.v.y)) * -p.inc); p.m.position.y = 0.08 * p.inc; } });
           if (st.b.z < -L - 1.4 || st.t > 4) {
@@ -348,9 +363,10 @@ function Penaltis({ semilla, alTerminar }) {
         const rr = ctx.el.getBoundingClientRect(); const dx = e.clientX - st.ini[0]; const dy = st.ini[1] - e.clientY; st.ini = null; if (dy < 30) return;
         st.a.copy(objetivo(dx, dy, rr)); st.vuela = true; st.t = 0; st.dur = 0.55; sonar('toque', { minimo: 0 });
         // El portero se tira: cada vez acierta más el lado (y llega más lejos)
-        const lista = Math.min(0.75, 0.25 + st.tiro * 0.06); const adivina = r() < lista;
-        const lado = adivina ? Math.sign(st.a.x || 1) : r.de([-1, 0, 1]); const alcance = 1.2 + Math.min(1.6, st.tiro * 0.14);
-        st.salto = { x: lado * alcance, y: adivina && st.a.y > 1.4 ? 0.8 : 0.3, alcance };
+        const lista = Math.min(0.8, 0.45 + st.tiro * 0.04); const adivina = r() < lista; const alcance = 2.3 + Math.min(0.8, st.tiro * 0.09);
+        // Si adivina, se tira hacia el balón (hasta donde llega); si no, a un lado al azar o se queda en el centro
+        const x = adivina ? Math.sign(st.a.x || 1) * Math.min(alcance, Math.abs(st.a.x)) : r.de([-1, 0, 1]) * alcance;
+        st.salto = { x, y: adivina ? Math.min(0.9, Math.max(0.2, st.a.y - 1.1)) : 0.3, alcance };
       },
       frame(dt) {
         if (st.vuela) {
@@ -361,7 +377,7 @@ function Penaltis({ semilla, alTerminar }) {
           if (u >= 1) {
             st.vuela = false; const dentro = Math.abs(st.a.x) < AN / 2 - 0.12 && st.a.y < AL - 0.08;
             // ¿Lo para? Alcance del portero desde su posición final (tumbado, con brazos)
-            const px = portero.position.x; const parado = dentro && Math.abs(st.a.x - px) < 1.05 && st.a.y < 1.9 + st.salto.y;
+            const px = portero.position.x; const parado = dentro && Math.abs(st.a.x - px) < 1.0 && st.a.y < 1.95 + st.salto.y;
             const gol = dentro && !parado; if (gol) st.goles++; st.tiro++;
             if (gol) { sonar('victoria'); ctx.chispas(st.a.clone(), 0xfacc15, 30); red.scale.z = 1.25; setMsg('⚽ ¡GOL!'); } else { sonar('fallo'); setMsg(parado ? '🧤 ¡Parada!' : '❌ Fuera'); }
             setHud({ tiro: Math.min(10, st.tiro + 1), goles: st.goles });
@@ -494,17 +510,17 @@ function Martillo({ alTerminar }) {
     return {
       toque() {
         if (st.fase !== 'oscila' || st.fin) return;
-        st.fase = 'sube'; const v = st.valor; st.vy = Math.sqrt(2 * 20 * (ALTO - 0.4) * Math.max(0.05, v)) ; st.y = 0; st.res = Math.round(v * 100);
+        st.fase = 'sube'; const v = Math.pow(st.valor, 1.6); st.vy = Math.sqrt(2 * 20 * (ALTO - 0.4) * Math.max(0.05, Math.min(1, v / 0.96))); st.y = 0; st.res = Math.round(v * 100);
         sonar('toque', { minimo: 0 }); ctx.temblor(0.25); ctx.chispas(new THREE.Vector3(0, 0.75, 0.3), 0xfacc15, 14);
       },
       frame(dt) {
-        if (st.fase === 'oscila') { st.t += dt * (2.2 + st.golpe * 0.7); st.valor = (1 - Math.cos(st.t)) / 2; aguja.position.y = -2 + st.valor * 4; }
+        if (st.fase === 'oscila') { st.t += dt * (0.9 + st.golpe * 0.25); const f = st.t % 1; st.valor = f < 0.5 ? f * 2 : 2 - f * 2; aguja.position.y = -2 + st.valor * 4; } // ida y vuelta a velocidad constante
         if (st.fase === 'sube') {
           st.vy -= 20 * dt; st.y += st.vy * dt;
           if (st.y >= ALTO - 0.4) { st.y = ALTO - 0.4; st.vy = -2; if (!st.tocoCampana) { st.tocoCampana = true; sonar('victoria'); ctx.chispas(campana.position.clone(), 0xfacc15, 40, { fuerza: 5 }); campana.scale.setScalar(1.25); } }
           if (st.vy < 0 && st.y <= 0) {
             st.y = 0; st.fase = 'hecho'; st.total += st.res; st.golpe++;
-            setMsg(st.res >= 98 ? `🔔 ¡CAMPANA! ${st.res}` : `💪 ${st.res}`); if (st.res < 98) sonar('acierto');
+            setMsg(st.res >= 96 ? `🔔 ¡CAMPANA! ${st.res}` : `💪 ${st.res}`); if (st.res < 96) sonar('acierto');
             setHud({ golpe: Math.min(5, st.golpe + 1), total: st.total });
             setTimeout(() => { setMsg(null); campana.scale.set(1, 0.75, 1); st.tocoCampana = false; if (st.golpe >= 5) { st.fin = true; alTerminar(st.total); } else { st.fase = 'oscila'; st.t = 0; } }, 1100);
           }
@@ -517,14 +533,14 @@ function Martillo({ alTerminar }) {
 }
 
 export default [
-  { id: 'toques', nombre: 'Toques', emoji: '⚽', como: 'Toca el balón para darle y que no caiga al suelo. Si lo tocas por un lado, sale hacia el otro. Cada vez cae más deprisa: cuenta los toques seguidos.', mejor: 'mas', unidad: 'toques', duracion: 90, C: Toques },
-  { id: 'vuelo', nombre: 'Vuelo', emoji: '✈️', como: 'Toca para que la avioneta suba y pasa por los huecos de las torres sin chocar. Cada vez más rápido y con huecos más estrechos.', mejor: 'mas', unidad: 'torres', duracion: 120, C: Vuelo },
-  { id: 'anillos', nombre: 'Anillos de colores', emoji: '🎡', como: 'Toca para saltar hacia arriba. Los anillos giran: solo puedes cruzarlos por el trozo de TU color. Los rombos blancos te cambian de color.', mejor: 'mas', unidad: 'anillos', duracion: 120, C: Anillos },
+  { id: 'toques', nombre: 'Toques', emoji: '⚽', como: 'Toca el balón para darle y que no caiga al suelo. Si lo tocas por un lado, sale hacia el otro. Con cada toque cae más deprisa, se desvía más y hay que acertarle más de lleno: cuenta los toques seguidos.', mejor: 'mas', unidad: 'toques', duracion: 90, C: Toques },
+  { id: 'vuelo', nombre: 'Vuelo', emoji: '✈️', como: 'Toca para que la avioneta suba y pasa por los huecos de las torres sin chocar. Con cada torre va más rápido, los huecos se estrechan, las torres se juntan y algunas empiezan a moverse.', mejor: 'mas', unidad: 'torres', duracion: 120, C: Vuelo },
+  { id: 'anillos', nombre: 'Anillos de colores', emoji: '🎡', como: 'Toca para saltar hacia arriba. Los anillos giran: solo puedes cruzarlos por el trozo de TU color. Los rombos blancos te cambian de color. Cada anillo gira más rápido, están más juntos y, luego, aceleran y frenan.', mejor: 'mas', unidad: 'anillos', duracion: 120, C: Anillos },
   { id: 'vaso', nombre: 'Llena el vaso', emoji: '🥛', como: 'Mantén pulsado para servir y suelta para que el vaso quede justo en la línea roja (ojo: lo que está cayendo también entra). Cinco vasos, cada vez más deprisa. Si rebosa, +50.', mejor: 'menos', unidad: '%', peor: 250, duracion: 75, C: Vaso, formato: (v) => `${v.toFixed(1).replace('.', ',')} % de error` },
   { id: 'ladrillos', nombre: 'Rompe ladrillos', emoji: '🧱', como: 'Mueve la pala arrastrando y no dejes caer la bola. Cada ladrillo da puntos (los de arriba, más). Tres vidas y 60 segundos; si rompes el muro, sale otro más rápido.', mejor: 'mas', unidad: 'pts', duracion: 60, C: Ladrillos },
-  { id: 'bolos', nombre: 'Bolos', emoji: '🎳', como: 'Arrastra para colocar la bola y desliza hacia arriba para lanzarla: la inclinación y la rapidez del gesto cuentan. Cinco tiradas: suma los bolos tirados.', mejor: 'mas', unidad: 'bolos', duracion: 75, C: Bolos },
-  { id: 'penaltis', nombre: 'Penaltis', emoji: '🥅', como: 'Desliza hacia arriba para chutar: la inclinación decide el lado y el largo, la altura (verás la mira). El portero cada vez adivina más. Diez penaltis.', mejor: 'mas', unidad: 'goles', duracion: 90, C: Penaltis },
+  { id: 'bolos', nombre: 'Bolos', emoji: '🎳', como: 'Arrastra para colocar la bola y desliza hacia arriba para lanzarla: la inclinación y la rapidez del gesto cuentan. La bola se abre un poco hacia un lado y pierde fuerza con cada bolo: para hacer pleno hay que entrar justo en el hueco entre el primero y el segundo. Cinco tiradas.', mejor: 'mas', unidad: 'bolos', duracion: 75, C: Bolos },
+  { id: 'penaltis', nombre: 'Penaltis', emoji: '🥅', como: 'Desliza hacia arriba para chutar: la inclinación decide el lado y el largo, la altura (verás la mira). Si el portero adivina el lado, lo para salvo que lo pegues mucho al palo. Cada vez adivina más. Diez penaltis.', mejor: 'mas', unidad: 'goles', duracion: 90, C: Penaltis },
   { id: 'fruta', nombre: 'Corta fruta', emoji: '🍉', como: 'Desliza el dedo para cortar la fruta que salta (la uva vale 2 y los combos suman). Si cortas una bomba, −5. 40 segundos.', mejor: 'mas', unidad: 'pts', duracion: 40, C: Fruta },
   { id: 'orbita', nombre: 'Órbita', emoji: '🪐', como: 'Tu nave gira alrededor del planeta. Toca para cambiar entre la órbita de dentro y la de fuera y esquiva las rocas. Cada vez va más rápido.', mejor: 'mas', unidad: 'rocas', duracion: 120, C: Orbita },
-  { id: 'martillo', nombre: 'Martillo de feria', emoji: '🔨', como: 'La aguja sube y baja: toca cuando esté arriba del todo para golpear con toda la fuerza y hacer sonar la campana. Cinco golpes, cada vez más rápidos.', mejor: 'mas', unidad: 'pts', duracion: 60, C: Martillo }
+  { id: 'martillo', nombre: 'Martillo de feria', emoji: '🔨', como: 'La aguja sube y baja sin parar: toca cuando esté arriba del todo para golpear con toda la fuerza y hacer sonar la campana. Un poco antes o después ya pierde mucho. Cinco golpes, cada vez más rápidos.', mejor: 'mas', unidad: 'pts', duracion: 60, C: Martillo }
 ];
