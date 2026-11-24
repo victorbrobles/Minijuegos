@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import './Ajustes.css';
 import Icon from './Icon.jsx';
-import { activarAdmin, salirAdmin, useAdmin, comprobarSesionAdmin } from '../lib/admin.js';
+import { activarAdmin, salirAdmin, useAdmin, useAdminComprobado, comprobarSesionAdmin } from '../lib/admin.js';
 import { useCuenta } from '../lib/cuenta.js';
 
 // Botón 🛡️ en la cabecera de la portada (junto a Grupos, sonido y ajustes): solo aparece si ESTA sesión está en modo
@@ -40,14 +40,16 @@ export default function BotonAdmin() {
 
 // Página /admin: código de 6 dígitos de la app de autenticación. Si es correcto, vuelve a la portada en modo admin.
 export function PaginaAdmin() {
-  const esAdmin = useAdmin();
+  const esAdmin = useAdminComprobado();
   const { usuario } = useCuenta();
   const navegar = useNavigate();
   const [codigo, setCodigo] = useState('');
   const [error, setError] = useState('');
   const [cargando, setCargando] = useState(false);
 
-  if (esAdmin) return <Navigate to="/" replace />;
+  // Ya en modo administrador: directamente al panel de control
+  if (esAdmin) return <Navigate to="/admin/panel" replace />;
+  if (esAdmin === null) return <div className="admin-pagina"><p className="loading">Comprobando…</p></div>;
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -57,7 +59,7 @@ export function PaginaAdmin() {
     try {
       const ok = await activarAdmin(codigo);
       setCodigo('');
-      if (ok) navegar('/', { replace: true });
+      if (ok) navegar('/admin/panel', { replace: true });
       else setError('Código incorrecto.');
     } catch (err) {
       setError(err.message);

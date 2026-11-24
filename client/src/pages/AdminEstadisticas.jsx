@@ -4,7 +4,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Icon from '../components/Icon.jsx';
-import { adminHeaders, useAdmin } from '../lib/admin.js';
+import { adminHeaders, useAdminComprobado } from '../lib/admin.js';
 import { metaDe } from '../games/meta.js';
 import { miniatura } from '../lib/portadas.js';
 import { useValoraciones, porcentaje } from '../lib/valoraciones.js';
@@ -84,7 +84,7 @@ function Tarjeta({ icono, valor, texto, nota }) {
 }
 
 export default function AdminEstadisticas() {
-  const esAdmin = useAdmin();
+  const esAdmin = useAdminComprobado();
   const [dias, setDias] = useState(30);
   const [d, setD] = useState(null);
   const [orden, setOrden] = useState('aperturas');
@@ -117,10 +117,11 @@ export default function AdminEstadisticas() {
     valor: porcentaje(valoraciones?.[j.juego])
   })).sort((a, b) => (orden === 'acaba' ? (a.acaba ?? 101) - (b.acaba ?? 101) : orden === 'valor' ? (b.valor ?? -1) - (a.valor ?? -1) : b[orden] - a[orden])), [d, valoraciones, orden]);
 
+  if (esAdmin === null) return <div className="game-shell ae-pagina"><p className="loading">Comprobando…</p></div>;
   if (!esAdmin) {
     return (
       <div className="game-shell ae-pagina">
-        <section className="ae-caja"><p>Esta página es solo para el administrador. Activa antes el modo administrador.</p><Link to="/">Ir a la portada</Link></section>
+        <section className="ae-caja"><p>Esta página es solo para el administrador. Activa antes el modo administrador.</p><Link to="/admin">Activar el modo administrador</Link></section>
       </div>
     );
   }

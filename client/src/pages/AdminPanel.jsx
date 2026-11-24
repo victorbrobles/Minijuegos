@@ -5,7 +5,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import Icon from '../components/Icon.jsx';
-import { useAdmin } from '../lib/admin.js';
+import { useAdminComprobado } from '../lib/admin.js';
 import { TOP_CREADOR, metaDe } from '../games/meta.js';
 import { miniatura as miniDe } from '../lib/portadas.js';
 
@@ -548,11 +548,12 @@ const PESTANAS = [
 const CLAVE_PESTANA = 'minijuegos-admin-pestana';
 
 export default function AdminPanel() {
-  const esAdmin = useAdmin();
+  const esAdmin = useAdminComprobado();
   const [pestana, setPestana] = useState(() => { try { return sessionStorage.getItem(CLAVE_PESTANA) || 'salas'; } catch { return 'salas'; } });
   useEffect(() => { try { sessionStorage.setItem(CLAVE_PESTANA, pestana); } catch { /* nada */ } }, [pestana]);
   const [nuevos, setNuevos] = useState(0);
   useEffect(() => { if (esAdmin) pedir('/reportes?estado=nuevo').then((d) => setNuevos(d.nuevos)).catch(() => {}); }, [esAdmin, pestana]);
+  if (esAdmin === null) return <div className="ae-pagina ap-pagina"><p className="loading">Comprobando…</p></div>;
   if (!esAdmin) return <Navigate to="/admin" replace />;
   const Actual = (PESTANAS.find((p) => p[0] === pestana) || PESTANAS[0])[3];
   return (

@@ -1,10 +1,12 @@
-import { useSyncExternalStore } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
 
 // Modo administrador. Se activa en /admin con el código de 6 dígitos de la app de autenticación y el servidor lo guarda
 // dentro de la cookie de sesión de la cuenta (firmada y HttpOnly): solo lo tiene quien lo activó, en su sesión, y se
 // acaba al cerrarla. Aquí solo se refleja si está activo; el navegador no guarda ningún token ni el secreto.
 const oyentes = new Set();
 let activo = false;
+let comprobado = false; // ¿ya ha contestado el servidor si esta sesión está en modo administrador?
+const avisar = () => oyentes.forEach((f) => f());
 export function ponerAdmin(valor) {
   const nuevo = Boolean(valor);
   if (nuevo === activo) return;
@@ -34,7 +36,7 @@ export async function activarAdmin(codigo) {
   let datos = null;
   try { datos = await res.json(); } catch { /* la respuesta no era JSON */ }
 
-  if (res.ok && datos?.admin) { ponerAdmin(true); return true; }
+  if (res.ok && datos?.admin) { comprobado = true; ponerAdmin(true); avisar(); return true; }
   if (res.status === 401 && datos?.error) return false;
   if (res.status === 403) throw new Error(datos?.error ?? 'Inicia sesión con tu cuenta.');
   if (res.status === 429) throw new Error(datos?.error ?? 'Demasiados intentos. Espera unos minutos.');
@@ -53,6 +55,7 @@ export async function comprobarSesionAdmin() {
     const res = await fetch('/api/admin/status', { credentials: 'same-origin' });
     if (res.ok) ponerAdmin((await res.json()).admin);
   } catch { /* sin servidor: se mantiene */ }
+  if (!comprobado) { comprobado = true; avisar(); }
 }
 
 export function useAdmin() {
@@ -60,4 +63,15 @@ export function useAdmin() {
     (f) => { oyentes.add(f); return () => oyentes.delete(f); },
     () => activo
   );
+}
+
+/**
+ * Como useAdmin, pero al entrar directamente en una página de administrador (o al recargarla) pregunta antes al
+ * servidor: devuelve null mientras comprueba, y luego true o false.
+ */
+export function useAdminComprobado() {
+  const a = useAdmin();
+  const c = useSyncExternalStore((f) => { oyentes.add(f); return () => oyentes.delete(f); }, () => comprobado);
+  useEffect(() => { if (!comprobado) comprobarSesionAdmin(); }, []);
+  return c ? a : null;
 }
