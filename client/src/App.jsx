@@ -22,6 +22,7 @@ const Grupos = lazy(() => import('./pages/Grupos.jsx'));
 const GrupoDetalle = lazy(() => import('./pages/Grupos.jsx').then((m) => ({ default: m.GrupoDetalle })));
 const PaginaAdmin = lazy(() => import('./components/AdminPanel.jsx').then((m) => ({ default: m.PaginaAdmin })));
 const AdminEstadisticas = lazy(() => import('./pages/AdminEstadisticas.jsx'));
+const AdminPanelPagina = lazy(() => import('./pages/AdminPanel.jsx'));
 const Privacidad = lazy(() => import('./pages/Privacidad.jsx'));
 const Cargando = () => <p className="loading">Cargando…</p>;
 // Solo en desarrollo: probar los minijuegos del Test de habilidad uno a uno
@@ -55,6 +56,7 @@ export default function App() {
           <Route path="/grupo/:codigo" element={<GrupoDetalle />} />
           <Route path="/admin" element={<PaginaAdmin />} />
           <Route path="/admin/estadisticas" element={<AdminEstadisticas />} />
+          <Route path="/admin/panel" element={<AdminPanelPagina />} />
           <Route path="/privacidad" element={<Privacidad />} />
           <Route path="*" element={<p>Página no encontrada.</p>} />
         </Routes>

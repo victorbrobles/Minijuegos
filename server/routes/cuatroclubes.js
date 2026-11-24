@@ -7,6 +7,7 @@ import * as E from '../cuatroclubes/engine.js';
 import { RETOS, NOMBRES_BASE } from '../data/seeds/cuatroclubes/index.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
 
+import { exponerSalas } from '../lib/registroSalas.js';
 const barajar = (a) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
 function elegirRetos(sala) {
   const n = sala.config.rondas;
@@ -235,4 +236,6 @@ router.post('/online/sala/:code/salir', (req, res) => {
   res.json({ success: true });
 });
 
+// Panel de administración («Salas en directo»): ver y cerrar estas salas
+exponerSalas(router, salas);
 export default router;

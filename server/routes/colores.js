@@ -8,6 +8,7 @@ import parte4 from '../data/seeds/colores/parte4.js';
 import parte5 from '../data/seeds/colores/parte5.js';
 import parte6 from '../data/seeds/colores/parte6.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
+import { exponerSalas } from '../lib/registroSalas.js';
 const LIM = limitesOnline('colores');
 
 const router = express.Router();
@@ -367,4 +368,6 @@ router.post('/online/sala/:code/salir', (req, res) => {
   res.json({ success: true });
 });
 
+// Panel de administración («Salas en directo»): ver y cerrar estas salas
+exponerSalas(router, salasOnline);
 export default router;

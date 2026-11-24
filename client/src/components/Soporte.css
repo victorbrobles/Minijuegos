@@ -1,0 +1,53 @@
+/* Botón «Avisar de un fallo», anuncio de la portada y pantalla de mantenimiento */
+.sop-boton {
+  display: block; margin: 28px auto 8px; padding: 8px 16px; border: 0; border-radius: 999px;
+  background: rgba(255, 255, 255, .55); color: var(--ink-soft, #5b5588); font: 600 .85rem/1.2 inherit; cursor: pointer;
+}
+.sop-boton:hover, .sop-boton:focus-visible { background: #fff; color: var(--ink, #1f1a47); }
+
+.sop-fondo { z-index: 1000; }
+.sop-modal {
+  width: min(460px, calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow: auto; padding: 18px 18px 20px;
+  border-radius: var(--radius, 24px); background: var(--surface, #fff); color: var(--ink, #1f1a47); box-shadow: var(--shadow, 0 10px 24px -8px rgba(60, 40, 140, .35));
+  display: flex; flex-direction: column; gap: 12px; text-align: left;
+}
+.sop-modal header { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.sop-modal h2, .sop-mant h2 { margin: 0; font-size: 1.25rem; color: var(--ink, #1f1a47); background: none !important; -webkit-text-fill-color: currentColor !important; }
+.sop-x { box-shadow: none; border: 0; background: none; font-size: 1.2rem; cursor: pointer; color: inherit; padding: 4px 8px; }
+.sop-tipos { display: grid; gap: 6px; }
+.sop-tipos button {
+  display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 14px; border: 2px solid #e4e0f5;
+  background: #faf9ff; color: inherit; font: 600 .95rem/1.2 inherit; cursor: pointer; text-align: left;
+}
+.sop-tipos button.activo { border-color: var(--violet, #7c4dff); background: #f0ebff; }
+.sop-modal textarea {
+  width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 14px; border: 2px solid #e4e0f5; resize: vertical;
+  font: 400 1rem/1.4 inherit; color: inherit; background: #fff;
+}
+.sop-modal textarea:focus { outline: none; border-color: var(--violet, #7c4dff); }
+.sop-nota { color: var(--ink-soft, #5b5588); font-size: .8rem; }
+.sop-error { margin: 0; color: #c62828; font-weight: 600; }
+.sop-gracias { margin: 8px 0; font-size: 1.05rem; font-weight: 600; }
+.sop-enviar {
+  padding: 12px; border: 0; border-radius: 14px; background: var(--violet, #7c4dff); color: #fff; font: 700 1rem/1 inherit; cursor: pointer;
+}
+.sop-enviar:disabled { opacity: .5; cursor: default; }
+
+.sop-anuncio {
+  display: flex; align-items: center; gap: 10px; margin: 0 0 14px; padding: 12px 14px; border-radius: 18px;
+  background: #fff; color: var(--ink, #1f1a47); box-shadow: var(--shadow, 0 10px 24px -8px rgba(60, 40, 140, .35)); border-left: 6px solid #4d7cff;
+}
+.sop-anuncio.aviso { border-left-color: #ff9f1c; background: #fff8ec; }
+.sop-anuncio.novedad { border-left-color: var(--pink, #ff4d8d); background: #fff2f7; }
+.sop-anuncio p { flex: 1; margin: 0; font-weight: 600; line-height: 1.35; overflow-wrap: anywhere; }
+.sop-anuncio a { color: var(--violet, #7c4dff); white-space: nowrap; }
+.sop-anuncio-ico { font-size: 1.4rem; }
+.sop-anuncio button { box-shadow: none; border: 0; background: none; color: var(--ink-soft, #5b5588); font-size: 1rem; cursor: pointer; padding: 4px 6px; }
+
+.sop-mant {
+  max-width: 460px; margin: 40px auto; padding: 28px 20px; border-radius: var(--radius, 24px); background: #fff;
+  box-shadow: var(--shadow, 0 10px 24px -8px rgba(60, 40, 140, .35)); text-align: center; display: flex; flex-direction: column; align-items: center; gap: 12px;
+}
+.sop-mant > span { font-size: 3rem; }
+.sop-mant h2 { font-size: 1.4rem; }
+.sop-mant p { margin: 0; color: var(--ink-soft, #5b5588); }

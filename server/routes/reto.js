@@ -124,7 +124,7 @@ const ROTACION = [
   'seleccionar', 'intruso', 'reflejos', 'frases', 'anagramas', 'historia', 'parejas', 'trayectoria', 'masmenos', 'siglas',
   'crimen', 'ciencia', 'aproximar', 'datosobra', 'secuencias', 'verdadero', 'acta', 'capitales', 'once', 'musica'
 ];
-const tipoDe = (fecha) => ROTACION[Math.floor(Date.parse(`${fecha}T12:00:00Z`) / 86400000) % ROTACION.length];
+export const tipoDe = (fecha) => ROTACION[Math.floor(Date.parse(`${fecha}T12:00:00Z`) / 86400000) % ROTACION.length];
 
 const leerReto = db.prepare('SELECT * FROM retos_diarios WHERE fecha = ?');
 const guardarReto = db.prepare('INSERT OR IGNORE INTO retos_diarios (fecha, tipo, datos) VALUES (?, ?, ?)');
@@ -153,6 +153,27 @@ export function retoDe(fecha) {
 const jugadorValido = (j) => /^.{1,15}#\d{4}$/.test(String(j || ''));
 // Un intento que se empezó y no se terminó (se cerró la página) cuenta como fallado
 const comoFallado = (i) => (i && i.estado === 'jugando' ? { ...i, estado: 'fallado', abandonado: true } : i);
+
+/* ───────── Panel de administración: ver los próximos retos y cambiar el de un día ───────── */
+export const TIPOS_RETO = () => Object.entries(TIPOS).map(([id, t]) => ({ id, titulo: t.titulo, emoji: t.emoji, tema: t.tema }));
+/** Próximos `dias` retos: tipo previsto y si ya está generado (con sus intentos). */
+export function proximosRetos(dias = 8) {
+  const hoy = fechaHoy();
+  return Array.from({ length: dias }, (_, i) => {
+    const f = new Date(Date.parse(`${hoy}T12:00:00Z`) + i * 86400000).toISOString().slice(0, 10);
+    const fila = leerReto.get(f);
+    const tipo = fila?.tipo || tipoDe(f);
+    const st = estadisticas.get(f);
+    return { fecha: f, tipo, titulo: TIPOS[tipo]?.titulo, emoji: TIPOS[tipo]?.emoji, generado: Boolean(fila), intentos: st.intentos || 0, superados: st.superados || 0 };
+  });
+}
+/** Rehace el reto de un día (mismo tipo o el que se elija). Los intentos ya hechos se conservan. */
+export function cambiarReto(fecha, tipo) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(fecha)) || fecha < fechaHoy()) return { ok: false, error: 'Fecha no válida.' };
+  const t = tipo && TIPOS[tipo] ? tipo : (leerReto.get(fecha)?.tipo || tipoDe(fecha));
+  db.prepare('INSERT INTO retos_diarios (fecha, tipo, datos) VALUES (?, ?, ?) ON CONFLICT(fecha) DO UPDATE SET tipo = excluded.tipo, datos = excluded.datos').run(fecha, t, JSON.stringify(TIPOS[t].generar()));
+  return { ok: true, tipo: t };
+}
 
 const router = express.Router();
 

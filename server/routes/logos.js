@@ -5,6 +5,7 @@ import express from 'express';
 import crypto from 'node:crypto';
 import { crearPartida, aplicar, vista, tick, marcarAusente, limpiarConfig } from '../lib/logosEngine.js';
 import { limitesOnline, limitesLocal } from '../../client/src/games/limites.js';
+import { exponerSalas } from '../lib/registroSalas.js';
 const LIM = limitesOnline('logos');
 const LIM_LOCAL = limitesLocal('logos');
 
@@ -237,4 +238,6 @@ router.post('/online/sala/:code/salir', (req, res) => {
   res.json({ success: true });
 });
 
+// Panel de administración («Salas en directo»): ver y cerrar estas salas
+exponerSalas(router, salas);
 export default router;

@@ -5,6 +5,7 @@ import { PREGUNTAS_NORMALES, PREGUNTAS_ESPECIALES } from '../data/seeds/velocida
 import { barajar } from '../lib/barajar.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
 import { totalRondas } from '../../client/src/games/rondas.js';
+import { exponerSalas } from '../lib/registroSalas.js';
 const LIM = limitesOnline('velocidad');
 
 const router = Router();
@@ -440,4 +441,6 @@ router.post('/online/sala/:code/salir', (req, res) => {
   res.json({ success: true });
 });
 
+// Panel de administración («Salas en directo»): ver y cerrar estas salas
+exponerSalas(router, salasOnline);
 export default router;

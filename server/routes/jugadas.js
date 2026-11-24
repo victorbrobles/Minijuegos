@@ -5,6 +5,7 @@ import crypto from 'node:crypto';
 import { crearPartida, aplicar, vista, tick, marcarAusente } from '../lib/jugadasEngine.js';
 import { limitesOnline, limitesLocal } from '../../client/src/games/limites.js';
 import { totalRondas } from '../../client/src/games/rondas.js';
+import { exponerSalas } from '../lib/registroSalas.js';
 const LIM = limitesOnline('jugadas');
 const LIM_LOCAL = limitesLocal('jugadas');
 
@@ -231,4 +232,6 @@ router.post('/online/sala/:code/salir', (req, res) => {
   res.json({ success: true });
 });
 
+// Panel de administración («Salas en directo»): ver y cerrar estas salas
+exponerSalas(router, salas);
 export default router;

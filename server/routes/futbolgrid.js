@@ -8,6 +8,7 @@ import { GRIDS_JUGABLES } from '../data/seeds/futbolgrid/index.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
 import { totalRondas } from '../../client/src/games/rondas.js';
 
+import { exponerSalas } from '../lib/registroSalas.js';
 function elegirGrid(sala) {
   let libres = GRIDS_JUGABLES.filter((g) => !sala.usados.has(g.id));
   if (!libres.length) { sala.usados.clear(); libres = GRIDS_JUGABLES; }
@@ -245,4 +246,6 @@ router.post('/online/sala/:code/salir', (req, res) => {
   res.json({ success: true });
 });
 
+// Panel de administración («Salas en directo»): ver y cerrar estas salas
+exponerSalas(router, salas);
 export default router;

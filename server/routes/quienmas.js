@@ -9,6 +9,7 @@ import { combinarPreguntas, leerEleccion, preguntasDelGrupo } from '../lib/pregu
 import { limitesOnline } from '../../client/src/games/limites.js';
 import { totalRondas } from '../../client/src/games/rondas.js';
 import { rutaExpulsar } from '../lib/expulsar.js';
+import { exponerSalas } from '../lib/registroSalas.js';
 const LIM = limitesOnline('quienmas');
 
 const router = express.Router();
@@ -361,4 +362,6 @@ router.post('/online/sala/:code/salir', (req, res) => {
 
 rutaExpulsar(router, '/online/sala/:code/expulsar', { sala: (c) => salasOnline[c], esAnfitrion: (s, j) => s.adminToken === j.token });
 
+// Panel de administración («Salas en directo»): ver y cerrar estas salas
+exponerSalas(router, salasOnline);
 export default router;

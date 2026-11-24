@@ -6,6 +6,7 @@ import { esAdmin } from '../lib/admin.js';
 import { validarCategoriaPersonalizada } from '../lib/listaPersonalizada.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
 import { rutaExpulsar } from '../lib/expulsar.js';
+import { exponerSalas } from '../lib/registroSalas.js';
 const LIM = limitesOnline('quien-es-quien');
 
 const router = Router();
@@ -275,4 +276,6 @@ router.post('/sala/:code/salir', (req, res) => {
 
 rutaExpulsar(router, '/sala/:code/expulsar', { sala: (c) => salas[c], esAnfitrion: (s, j) => s.adminToken === j.token });
 
+// Panel de administración («Salas en directo»): ver y cerrar estas salas
+exponerSalas(router, salas);
 export default router;

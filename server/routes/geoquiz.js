@@ -6,6 +6,7 @@ import express from 'express';
 import CATEGORIAS from '../data/seeds/geoquiz/index.js';
 import * as E from '../geoquiz/engine.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
+import { exponerSalas } from '../lib/registroSalas.js';
 const LIM = limitesOnline('geoquiz');
 
 const router = express.Router();
@@ -226,4 +227,6 @@ router.post('/online/sala/:code/salir', (req, res) => {
   res.json({ success: true });
 });
 
+// Panel de administración («Salas en directo»): ver y cerrar estas salas
+exponerSalas(router, salas);
 export default router;

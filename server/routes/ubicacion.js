@@ -4,6 +4,7 @@ import { Router } from 'express';
 import { LUGARES } from '../data/seeds/ubicacion/ubicacion.seed.js';
 import { barajar } from '../lib/barajar.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
+import { exponerSalas } from '../lib/registroSalas.js';
 const LIM = limitesOnline('ubicacion');
 
 const router = Router();
@@ -341,4 +342,6 @@ router.post('/online/sala/:code/salir', (req, res) => {
   res.json({ success: true });
 });
 
+// Panel de administración («Salas en directo»): ver y cerrar estas salas
+exponerSalas(router, salasOnline);
 export default router;

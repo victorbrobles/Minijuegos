@@ -27,6 +27,7 @@ export default function BotonAdmin() {
           <div className="aj-panel adm-modal" role="dialog" aria-modal="true" aria-label="Modo administrador" onClick={(e) => e.stopPropagation()}>
             <header><h2>🛡️ Modo administrador</h2><button type="button" className="aj-cerrar" onClick={() => setAbierto(false)} aria-label="Cerrar">✕</button></header>
             <p className="adm-estado"><span aria-hidden="true">✅</span> Activado: ya puedes ver el contenido oculto.</p>
+            <Link to="/admin/panel" className="adm-opcion" onClick={() => setAbierto(false)}><span aria-hidden="true">🛠️</span><b>Panel de control</b><small>Salas en directo, buzón, errores, juegos, anuncio, moderación, cuentas, servidor y reto</small></Link>
             <Link to="/admin/estadisticas" className="adm-opcion" onClick={() => setAbierto(false)}><span aria-hidden="true">📊</span><b>Estadísticas de uso</b><small>Visitas, juegos, cuentas y base de datos</small></Link>
             <button type="button" className="adm-desactivar" onClick={() => { salirAdmin(); setAbierto(false); }}>Desactivar modo administrador</button>
           </div>

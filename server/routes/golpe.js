@@ -6,6 +6,7 @@ import express from 'express';
 import * as E from '../golpe/engine.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
 
+import { exponerSalas } from '../lib/registroSalas.js';
 const router = express.Router();
 const salas = {};
 const { min: MIN, max: MAX } = limitesOnline('golpe');
@@ -220,4 +221,6 @@ router.post('/online/sala/:code/salir', (req, res) => {
   res.json({ success: true });
 });
 
+// Panel de administración («Salas en directo»): ver y cerrar estas salas
+exponerSalas(router, salas);
 export default router;

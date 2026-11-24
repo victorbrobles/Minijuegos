@@ -1,0 +1,124 @@
+/* client/src/pages/AdminPanel.css — panel de control del administrador (usa también AdminEstadisticas.css) */
+.ap-pagina { max-width: 1100px; margin: 0 auto; }
+.ap-cab-enlace { padding: 0.5rem 0.9rem; border-radius: 12px; background: rgba(255, 255, 255, 0.2); color: #ffffff; font-weight: 800; font-size: 0.85rem; text-decoration: none; }
+.ap-cab-enlace:hover { background: rgba(255, 255, 255, 0.32); }
+
+.ap-pestanas { display: flex; gap: 0.35rem; overflow-x: auto; padding: 0.3rem; border-radius: 18px; background: rgba(255, 255, 255, 0.6); scrollbar-width: thin; }
+.ap-pestanas button { flex: none; display: flex; align-items: center; gap: 0.35rem; padding: 0.55rem 0.8rem; border: none; border-radius: 13px; background: transparent; color: #334155; font: inherit; font-size: 0.86rem; font-weight: 800; cursor: pointer; box-shadow: none; white-space: nowrap; }
+.ap-pestanas button.activo { background: #7c3aed; color: #ffffff; }
+.ap-pestanas em { min-width: 1.2rem; padding: 0 0.3rem; border-radius: 999px; background: #ef4444; color: #ffffff; font-size: 0.72rem; font-style: normal; line-height: 1.2rem; text-align: center; }
+
+.ap-aviso { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin: 0 0 0.7rem; padding: 0.55rem 0.8rem; border-radius: 12px; background: #dcfce7; color: #14532d; font-size: 0.88rem; font-weight: 700; }
+.ap-aviso.mal { background: #fee2e2; color: #991b1b; }
+.ap-aviso button { border: none; background: none; color: inherit; cursor: pointer; box-shadow: none; padding: 0 0.2rem; }
+
+.ap-csv { margin-left: auto; padding: 0.3rem 0.65rem; border-radius: 10px; background: #f1f5f9; color: #334155; font-size: 0.78rem; font-weight: 800; text-decoration: none; }
+.ap-csv:hover { background: #e2e8f0; }
+
+.ap-botones { display: flex; flex-wrap: wrap; align-items: center; gap: 0.35rem; }
+.ae-cuentas li span.ap-botones { display: flex; flex: none; }
+.ap-botones button, .ap-fila button, .ap-form button, .ap-secundario, .ap-boton-enlace, .ap-nicks button {
+  padding: 0.45rem 0.75rem; border: none; border-radius: 11px; background: #ede9fe; color: #5b21b6; font: inherit; font-size: 0.8rem; font-weight: 800; cursor: pointer; box-shadow: none; text-decoration: none; white-space: nowrap;
+}
+.ap-botones button:hover, .ap-fila button:hover, .ap-secundario:hover, .ap-boton-enlace:hover { background: #ddd6fe; }
+.ap-botones button.principal, .ap-form button.principal, .ae-caja > button.principal { background: #7c3aed; color: #ffffff; }
+.ae-caja > button.principal { margin-top: 0.6rem; padding: 0.55rem 0.9rem; border: none; border-radius: 12px; font: inherit; font-weight: 800; cursor: pointer; box-shadow: none; }
+.ap-botones button.peligro, .ae-cuentas button.peligro { background: #fee2e2; color: #b91c1c; }
+.ap-botones button:disabled, .ap-fila button:disabled, .ap-form button:disabled { opacity: 0.5; cursor: default; }
+.ap-secundario { margin: 0.6rem 0 0; }
+
+.ap-fila { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 0.5rem; margin: 0.6rem 0; }
+.ap-fila input, .ap-fila select, .ap-form textarea, .ap-form select, .ap-form input, .ap-area, .ap-filtro, .ap-tabla-juegos select, .ap-retos select {
+  min-width: 0; padding: 0.5rem 0.7rem; border: 2px solid #e2e8f0; border-radius: 11px; background: #ffffff; color: #0f172a; font: inherit; font-size: 0.86rem;
+}
+.ap-fila input { flex: 1 1 10rem; }
+.ap-area { display: block; width: 100%; box-sizing: border-box; resize: vertical; }
+.ap-filtro { flex: 0 1 12rem; }
+.ap-form { display: grid; gap: 0.6rem; margin-top: 0.8rem; }
+.ap-form label { display: grid; gap: 0.25rem; color: #475569; font-size: 0.8rem; font-weight: 800; }
+.ap-form textarea { width: 100%; box-sizing: border-box; resize: vertical; }
+.ap-form .ap-fila { margin: 0; }
+.ap-form .ap-fila label { flex: 1 1 9rem; }
+.ap-form > button { justify-self: start; padding: 0.6rem 1rem; }
+.ap-actual { margin-bottom: 0.4rem; box-shadow: none; border: 1px solid #e2e8f0; }
+.ap-actual small { color: #64748b; font-weight: 600; }
+
+/* Salas en directo */
+.ap-salas { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 0.7rem; }
+.ap-sala { display: grid; gap: 0.5rem; align-content: start; padding: 0.75rem; border-radius: 16px; background: #f8fafc; border: 1px solid #e2e8f0; }
+.ap-sala header { display: flex; align-items: center; gap: 0.55rem; }
+.ap-sala header img { flex: none; width: 2.4rem; height: 2.4rem; border-radius: 10px; object-fit: cover; background: #e2e8f0; }
+.ap-sala header span { display: grid; min-width: 0; }
+.ap-sala header small { color: #64748b; font-size: 0.75rem; }
+.ap-sala ul { list-style: none; display: grid; gap: 0.25rem; margin: 0; padding: 0; }
+.ap-sala li { display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; padding: 0.3rem 0.5rem; border-radius: 10px; background: #ffffff; font-size: 0.86rem; font-weight: 700; }
+.ap-sala li button { padding: 0.2rem 0.55rem; border: none; border-radius: 8px; background: #fee2e2; color: #b91c1c; font: inherit; font-size: 0.74rem; font-weight: 800; cursor: pointer; box-shadow: none; }
+.ap-pruebas { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; margin: 0 0 0.7rem; padding: 0.6rem 0.8rem; border-radius: 12px; background: #fef9c3; color: #713f12; font-size: 0.84rem; }
+.ap-pruebas a { padding: 0.2rem 0.55rem; border-radius: 8px; background: #ffffff; color: #92400e; font-weight: 800; text-decoration: none; }
+
+/* Buzón y errores */
+.ap-lista { list-style: none; display: grid; gap: 0.5rem; margin: 0.7rem 0 0; padding: 0; }
+.ap-reporte { display: grid; gap: 0.35rem; padding: 0.7rem 0.8rem; border-radius: 14px; background: #f8fafc; border-left: 5px solid #7c3aed; }
+.ap-reporte.visto { border-left-color: #94a3b8; }
+.ap-reporte.resuelto { border-left-color: #22c55e; opacity: 0.8; }
+.ap-reporte p { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-weight: 600; }
+.ap-meta { color: #475569; font-size: 0.8rem; }
+.ap-meta a { color: #6d28d9; }
+.ap-nav { color: #94a3b8; font-size: 0.72rem; overflow-wrap: anywhere; }
+.ap-error { border-radius: 14px; background: #f8fafc; overflow: hidden; }
+.ap-error-cab { display: flex; align-items: center; gap: 0.6rem; width: 100%; padding: 0.6rem 0.8rem; border: none; background: none; color: #0f172a; font: inherit; text-align: left; cursor: pointer; box-shadow: none; }
+.ap-error-cab em { flex: none; min-width: 2.6rem; padding: 0.15rem 0.4rem; border-radius: 999px; background: #fee2e2; color: #b91c1c; font-style: normal; font-weight: 900; font-size: 0.8rem; text-align: center; }
+.ap-error-cab span { display: grid; min-width: 0; }
+.ap-error-cab b { overflow-wrap: anywhere; font-size: 0.88rem; }
+.ap-error-cab small { color: #64748b; font-size: 0.75rem; }
+.ap-error-det { display: grid; gap: 0.4rem; padding: 0 0.8rem 0.8rem; }
+.ap-error-det pre { margin: 0; max-height: 14rem; overflow: auto; padding: 0.6rem; border-radius: 10px; background: #0f172a; color: #e2e8f0; font-size: 0.72rem; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; }
+.ap-error-det small { color: #64748b; font-size: 0.72rem; overflow-wrap: anywhere; }
+
+/* Juegos y Top */
+.ap-tabla-juegos select { padding: 0.25rem 0.4rem; font-size: 0.78rem; }
+.ap-tabla-juegos tr.ap-mantenimiento td { background: #fff7ed; }
+.ap-tabla-juegos tr.ap-oculto td { background: #f1f5f9; color: #64748b; }
+.ap-top { display: grid; gap: 0.3rem; margin: 0; padding: 0 0 0 1.6rem; }
+.ap-top li { padding: 0.15rem 0; font-weight: 800; color: #6d28d9; }
+.ap-top li > * { vertical-align: middle; }
+.ap-top img { width: 1.8rem; height: 1.8rem; margin-right: 0.45rem; border-radius: 7px; object-fit: cover; background: #e2e8f0; }
+.ap-top span { display: inline-block; min-width: 11rem; margin-right: 0.4rem; color: #0f172a; }
+.ap-top button { margin-left: 0.2rem; padding: 0.15rem 0.45rem; border: none; border-radius: 7px; background: #f1f5f9; color: #334155; font: inherit; font-size: 0.75rem; cursor: pointer; box-shadow: none; }
+.ap-top button:disabled { opacity: 0.35; cursor: default; }
+@media (max-width: 520px) { .ap-top span { min-width: 0; width: calc(100% - 9.5rem); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } }
+
+/* Moderación */
+.ap-nicks { list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr)); gap: 0.35rem; margin: 0; padding: 0; max-height: 24rem; overflow-y: auto; }
+.ap-nicks li { display: flex; align-items: center; justify-content: space-between; gap: 0.4rem; padding: 0.4rem 0.55rem; border-radius: 11px; background: #f8fafc; font-weight: 700; font-size: 0.85rem; }
+.ap-nicks li.bloq { background: #fee2e2; }
+.ap-nicks li span { display: grid; min-width: 0; overflow-wrap: anywhere; }
+.ap-nicks li small { color: #64748b; font-size: 0.72rem; font-weight: 600; }
+.ap-nicks button { padding: 0.25rem 0.5rem; font-size: 0.74rem; }
+.ae-cuentas li.ap-bloq { background: #fee2e2; }
+
+/* Servidor */
+.ap-datos { list-style: none; display: grid; gap: 0.3rem; margin: 0 0 0.7rem; padding: 0; }
+.ap-datos li { display: flex; justify-content: space-between; gap: 0.6rem; padding: 0.4rem 0.6rem; border-radius: 10px; background: #f8fafc; font-size: 0.86rem; }
+.ap-datos span { color: #64748b; font-weight: 700; }
+.ap-datos b { text-align: right; overflow-wrap: anywhere; }
+.ap-datos b.ok { color: #15803d; }
+.ap-datos b.mal { color: #b91c1c; }
+
+/* Reto diario */
+.ap-retos { list-style: none; display: grid; gap: 0.4rem; margin: 0; padding: 0; }
+.ap-retos li { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; padding: 0.55rem 0.7rem; border-radius: 13px; background: #f8fafc; }
+.ap-retos li.hoy { background: #ede9fe; }
+.ap-reto-dia { display: flex; align-items: center; gap: 0.35rem; min-width: 7.5rem; text-transform: capitalize; }
+.ap-reto-dia em { padding: 0.05rem 0.4rem; border-radius: 6px; background: #7c3aed; color: #ffffff; font-size: 0.66rem; font-style: normal; font-weight: 900; }
+.ap-reto-tipo { display: grid; flex: 1 1 10rem; font-weight: 800; }
+.ap-reto-tipo small { color: #64748b; font-size: 0.74rem; font-weight: 600; }
+.ap-retos select { max-width: 13rem; }
+.ap-tabla-juegos select { width: auto; min-width: 8.6rem; }
+.ap-fila select { flex: 1 1 12rem; width: auto; }
+.ap-fila > button { flex: none; }
+.ap-retos select { width: auto; }
+.ae-orden .ap-filtro { width: auto; }
+/* En móvil, la tabla ancha se desplaza dentro de su caja sin ensanchar la página */
+.ap-pagina > * { min-width: 0; }
+.ap-pagina .ae-caja h2 { flex-wrap: wrap; }

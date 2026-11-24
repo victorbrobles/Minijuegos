@@ -24,6 +24,8 @@ import BotonAdmin from '../components/AdminPanel.jsx';
 import { useGrupoActivo, grupoEnJuego } from '../lib/grupoActivo.js';
 import { useCuenta } from '../lib/cuenta.js';
 import { limitesLocal, limitesOnline } from '../games/limites.js';
+import { AnuncioPortada } from '../components/Soporte.jsx';
+import { usePortada } from '../lib/soporte.js';
 import { metaDe, TOP_CREADOR, CATEGORIAS_PORTADA as CATEGORIAS_EXPORTADAS } from '../games/meta.js';
 
 // Lista de categorías por defecto de respaldo
@@ -255,6 +257,8 @@ export default function Home() {
 
   // Los juegos ocultos solo aparecen con el administrador (o estando con él en la sala del grupo)
   const verOcultos = useVerOcultos();
+  // Top del Creador fijado desde el panel de administración (si no, el de serie)
+  const topPanel = usePortada()?.top;
   useEffect(() => {
     fetch('/api/games')
       .then((r) => {
@@ -341,10 +345,13 @@ export default function Home() {
       });
     });
 
-    // El top del creador va en su orden
-    if (grupos.favoritos) grupos.favoritos.sort((a, b) => TOP_CREADOR.indexOf(a.id) - TOP_CREADOR.indexOf(b.id));
+    // El top del creador va en su orden (el del panel de administración sustituye al de serie)
+    if (grupos.favoritos) {
+      if (topPanel?.length) grupos.favoritos = topPanel.map((id) => games.find((g) => g.id === id)).filter(Boolean);
+      else grupos.favoritos.sort((a, b) => TOP_CREADOR.indexOf(a.id) - TOP_CREADOR.indexOf(b.id));
+    }
     return grupos;
-  }, [games]);
+  }, [games, topPanel]);
 
   function onKeyDown(e) {
     if (e.key === 'Escape') {
@@ -419,6 +426,7 @@ export default function Home() {
         )}
       </header>
 
+      {!hayBusqueda && <AnuncioPortada />}
       {!hayBusqueda && (
         <div className="home-accesos">
           <BannerReto />

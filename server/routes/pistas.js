@@ -5,6 +5,7 @@ import { PISTAS_SEED } from '../data/seeds/pistas/pistas.seed.js';
 import { barajar } from '../lib/barajar.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
 import { totalRondas } from '../../client/src/games/rondas.js';
+import { exponerSalas } from '../lib/registroSalas.js';
 const LIM = limitesOnline('pistas');
 
 const router = Router();
@@ -498,4 +499,6 @@ setInterval(() => {
   });
 }, 10 * 60 * 1000).unref();
 
+// Panel de administración («Salas en directo»): ver y cerrar estas salas
+exponerSalas(router, salasOnline);
 export default router;

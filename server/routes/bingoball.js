@@ -8,6 +8,7 @@ import { GRUPOS_BINGOS } from '../data/seeds/bingoball/bingoballData.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
 import { totalRondas } from '../../client/src/games/rondas.js';
 
+import { exponerSalas } from '../lib/registroSalas.js';
 const bingoDeGrupo = (grupoId) => {
   const grupo = GRUPOS_BINGOS.find((g) => g.id === grupoId) || GRUPOS_BINGOS[0];
   return grupo.bingos[Math.floor(Math.random() * grupo.bingos.length)];
@@ -246,4 +247,6 @@ router.post('/online/sala/:code/salir', (req, res) => {
   res.json({ success: true });
 });
 
+// Panel de administración («Salas en directo»): ver y cerrar estas salas
+exponerSalas(router, salas);
 export default router;

@@ -12,6 +12,7 @@
 //   prepararItems(sala) -> Promise<items>,  // ítems de la partida (con la solución dentro)
 // }
 import { randomUUID } from 'node:crypto';
+import { exponerSalas } from './registroSalas.js';
 import * as E from '../pulsador/engine.js';
 
 export const MIN = 2;
@@ -243,6 +244,41 @@ export function montarSalas(router, opciones) {
     res.json({ success: true });
   });
 
+  // Panel de administración: ver estas salas y actuar sobre ellas (lib/registroSalas.js)
+  exponerSalas(router, salas, {
+    expulsar(sala, id) {
+      const idx = sala.jugadores.findIndex((j) => j.id === id);
+      if (idx === -1) return { ok: false, error: 'Ese jugador ya no está.' };
+      const [fuera] = sala.jugadores.splice(idx, 1);
+      if (sala.estado === 'jugando' && sala.partida) { try { M.abandonar(sala.partida, fuera.id, Date.now()); revisar(sala); } catch { /* nada */ } }
+      if (!sala.jugadores.length) delete salas[sala.code];
+      else if (sala.adminToken === fuera.token) sala.adminToken = sala.jugadores[0].token;
+      return { ok: true };
+    },
+    forzar(sala) {
+      if (sala.estado !== 'jugando' || !sala.partida) return { ok: false, error: 'La partida no ha empezado.' };
+      if (typeof M.forzar !== 'function') return { ok: false, error: 'Este juego no se puede adelantar.' };
+      const r = M.forzar(sala.partida, Date.now()) || { ok: true }; revisar(sala); sala.ultimaActividad = Date.now();
+      return r.ok === false ? r : { ok: true };
+    },
+    terminar(sala) {
+      if (sala.estado !== 'jugando' || !sala.partida) return { ok: false, error: 'La partida no ha empezado.' };
+      if (typeof M.terminar !== 'function') return { ok: false, error: 'Este juego no se puede terminar desde el panel.' };
+      M.terminar(sala.partida); revisar(sala); sala.ultimaActividad = Date.now();
+      return { ok: true };
+    },
+    // Jugador de prueba: entra en la sala de espera y se devuelve su token para abrirlo en otra pestaña
+    prueba(sala) {
+      if (sala.estado !== 'lobby') return { ok: false, error: 'Solo en la sala de espera.' };
+      if (sala.jugadores.length >= MAX_S) return { ok: false, error: 'La sala está completa.' };
+      let n = 1; while (sala.jugadores.some((j) => j.nombre === `Prueba ${n}`)) n += 1;
+      const token = nuevoToken();
+      sala.contadorIds += 1;
+      sala.jugadores.push({ id: sala.contadorIds, token, nombre: `Prueba ${n}`, puntos: 0, visto: Date.now(), prueba: true });
+      sala.ultimaActividad = Date.now();
+      return { ok: true, token, code: sala.code, nombre: `Prueba ${n}` };
+    }
+  });
   return { salas, itemDe };
 }
 

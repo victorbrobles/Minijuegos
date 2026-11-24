@@ -10,6 +10,7 @@
 //   POST /api/usuarios/borrar     { password }   (borra la cuenta y todo lo guardado con su nombre)
 //   GET  /api/usuarios/libre?jugador=Ana%231234 → { libre } (si ese nombre no tiene cuenta)
 //   POST /api/usuarios/admin/restablecer { busca, nueva? } (solo administrador) → contraseña provisional
+import { bloqueado as cuentaBloqueada } from '../lib/ajustesWeb.js';
 import express from 'express';
 import { randomBytes } from 'node:crypto';
 import db from '../db.js';
@@ -85,6 +86,7 @@ router.post('/entrar', (req, res) => {
     anotarFallo(req, email);
     return res.status(401).json({ error: 'Correo o contraseña incorrectos.' });
   }
+  if (cuentaBloqueada(u.jugador)) return res.status(403).json({ error: 'Esta cuenta está bloqueada. Si crees que es un error, escribe al correo de contacto de la web.' });
   db.prepare('UPDATE usuarios SET acceso = ? WHERE id = ?').run(Date.now(), u.id);
   crearSesion(res, req, u);
   res.json({ success: true, usuario: publico(u) });
@@ -124,7 +126,7 @@ router.post('/password', (req, res) => {
 });
 
 // Borrar la cuenta y lo guardado con su nombre (derecho de supresión)
-const BORRADOS = [
+export const BORRADOS = [
   ['registros_resultados', 'jugador'], ['perfiles', 'jugador'], ['grupo_miembros', 'jugador'], ['valoraciones', 'quien'],
   ['diario_resultados', 'jugador'], ['retos_intentos', 'jugador'], ['retos_amigo_resultados', 'jugador'], ['grupo_preguntas', 'autor'], ['grupo_activo', 'jugador'], ['grupo_expulsados', 'jugador']
 ];

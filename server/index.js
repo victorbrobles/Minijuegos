@@ -102,6 +102,10 @@ import valoracionesRoutes from './routes/valoraciones.js';
 import metricasRoutes from './routes/metricas.js';
 import { cabecerasSeguridad, limitePeticiones, ES_ESCRITURA } from './lib/seguridad.js';
 import usuariosRoutes from './routes/usuarios.js';
+import soporteRoutes from './routes/soporte.js';
+import adminPanelRoutes from './routes/adminPanel.js';
+import { filtroModeracion } from './lib/ajustesWeb.js';
+import { recogerSalas } from './lib/registroSalas.js';
 import { leerSesion, bloquearSiNoEs } from './lib/usuarios.js';
 import { JUEGOS_OCULTOS, soloConAcceso, puedeVerOcultos } from './lib/ocultos.js';
 
@@ -157,6 +161,9 @@ app.use(express.static(path.join(__dirname, '../client/dist'), {
 
 // Cuenta con la sesión iniciada (si la hay) en req.usuario
 app.use('/api', leerSesion);
+// Palabras prohibidas y cuentas bloqueadas (panel de administración → Moderación)
+app.use('/api', filtroModeracion);
+app.use('/api/soporte', soporteRoutes);
 app.use('/api/usuarios', usuariosRoutes);
 // Si alguien guarda algo «como» un Nick#número que tiene cuenta (grupos, sala del grupo, perfil, retos, votos…),
 // tiene que haber iniciado sesión con esa cuenta. Los invitados (nombres sin cuenta) siguen funcionando igual.
@@ -169,6 +176,7 @@ app.use(['/api/social', '/api/perfil', '/api/reto', '/api/solo', '/api/valoracio
 // Juegos ocultos: sus datos solo para el administrador o quien esté con él en la sala de un grupo
 JUEGOS_OCULTOS.forEach((id) => app.use(`/api/${id}`, soloConAcceso));
 app.get('/api/ocultos', (req, res) => res.json({ success: true, permitido: puedeVerOcultos(req), juegos: JUEGOS_OCULTOS }));
+app.use('/api/admin/panel', adminPanelRoutes);
 app.use('/api/admin', adminRouter);
 app.use('/api/games', gamesRouter);
 app.use('/api/registros', registrosRoutes);
@@ -258,6 +266,9 @@ app.use('/api/lapiz', lapizRoutes);
 app.use('/api/intruso', intrusoRoutes);
 app.use('/api/ponorden', ponordenRoutes);
 app.use('/api/escondite', esconditeRoutes);
+
+// Salas en directo del panel: apunta los routers de juegos que exponen sus salas
+recogerSalas(app);
 
 // 5. Redirección para React Router (Single Page Application)
 app.get('*', (req, res) => {

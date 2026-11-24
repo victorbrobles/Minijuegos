@@ -16,6 +16,7 @@ import parte4 from '../data/seeds/cancion/parte4.js';
 import parte5 from '../data/seeds/cancion/parte5.js';
 import parte6 from '../data/seeds/cancion/parte6.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
+import { exponerSalas } from '../lib/registroSalas.js';
 const LIM = limitesOnline('cancion');
 
 const router = express.Router();
@@ -503,4 +504,6 @@ setInterval(() => {
   for (const [code, s] of salasOnline) if (ahora - (s.creada || 0) > 8 * 3600 * 1000) salasOnline.delete(code);
 }, 30 * 60 * 1000).unref();
 
+// Panel de administración («Salas en directo»): ver y cerrar estas salas
+exponerSalas(router, salasOnline);
 export default router;

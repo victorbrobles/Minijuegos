@@ -14,6 +14,9 @@ import '../components/MenuJuego.css';
 import { AyudaContexto } from '../lib/ayuda.js';
 import { usePilotoGrupo } from '../lib/grupoActivo.js';
 import { esOculto, useAccesoOculto } from '../lib/ocultos.js';
+import { capturarPrueba, usePortada } from '../lib/soporte.js';
+import { useAdmin } from '../lib/admin.js';
+import { BotonReporte, AvisoMantenimiento } from '../components/Soporte.jsx';
 
 // Ayuda común (se descarga solo al abrirla)
 const AyudaJuego = lazy(() => import('../components/AyudaJuego.jsx'));
@@ -21,6 +24,12 @@ const BOTON_AYUDA = '.qq-btn-ayuda, [aria-label="Cómo jugar"], [title="Cómo ju
 
 export default function GamePage() {
   const { gameId } = useParams();
+  // Modo pruebas del panel: ?probar=CODIGO.TOKEN entra en la sala como un jugador de prueba (antes de montar el juego)
+  useState(() => capturarPrueba(gameId));
+  const esAdmin = useAdmin();
+  const portada = usePortada();
+  const [entrarIgual, setEntrarIgual] = useState(false);
+  const enMantenimiento = Boolean(portada?.mantenimiento?.includes(gameId)) && !entrarIgual;
   const acceso = useAccesoOculto();
   const bloqueado = esOculto(gameId) && acceso !== 'si';
   const Game = bloqueado ? null : registry[gameId];
@@ -63,6 +72,15 @@ export default function GamePage() {
     };
   }, [m.colores]);
 
+  if (Game && enMantenimiento) {
+    return (
+      <>
+        <Link to="/" className="back"><Icon name="arrowLeft" size={20} strokeWidth={2.500} />Portada</Link>
+        <AvisoMantenimiento nombre={m.titulo} esAdmin={esAdmin} onEntrar={() => setEntrarIgual(true)} />
+      </>
+    );
+  }
+
   if (!Game) {
     return (
       <>
@@ -85,6 +103,7 @@ export default function GamePage() {
       <AyudaContexto.Provider value={abrirAyudaJuego}>
         <Suspense fallback={<p className="loading">Cargando el juego…</p>}><Game key={claveNavegacion} /></Suspense>
       </AyudaContexto.Provider>
+      <BotonReporte juego={gameId} />
       <Reacciones juego={gameId} />
       {avisoPiloto && <p className="sgg-piloto" role="status">👥 {avisoPiloto}</p>}
       {ayuda && <Suspense fallback={null}><AyudaJuego juegoId={gameId} onCerrar={() => setAyuda(false)} /></Suspense>}

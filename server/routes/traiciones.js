@@ -6,6 +6,7 @@ import { randomUUID } from 'node:crypto';
 import express from 'express';
 import * as E from '../traiciones/engine.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
+import { exponerSalas } from '../lib/registroSalas.js';
 const LIM = limitesOnline('traiciones');
 
 const router = express.Router();
@@ -260,4 +261,6 @@ router.post('/online/sala/:code/salir', (req, res) => {
   res.json({ success: true });
 });
 
+// Panel de administración («Salas en directo»): ver y cerrar estas salas
+exponerSalas(router, salas);
 export default router;

@@ -16,9 +16,11 @@ import './styles/accesibilidad.css';
 import { iniciarMetricas } from './lib/metricas.js';
 import { iniciarCuenta } from './lib/cuenta.js';
 import { asegurarAvatar } from './lib/avatarPorDefecto.js';
+import { instalarCapturaErrores } from './lib/soporte.js';
 
 // Accesibilidad (letra, contraste, animaciones) antes de pintar nada
 aplicarAjustes();
+instalarCapturaErrores(); // errores de JavaScript → panel de administración
 instalarEfectos();
 instalarSalaViva();
 iniciarMetricas();

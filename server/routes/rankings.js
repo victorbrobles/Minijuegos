@@ -7,6 +7,7 @@ import { limitesOnline } from '../../client/src/games/limites.js';
 import { totalRondas } from '../../client/src/games/rondas.js';
 import { rutaExpulsar, rutaSalir } from '../lib/expulsar.js';
 import { normalizar, buscarElemento } from '../lib/rankingRespuestas.js';
+import { exponerSalas } from '../lib/registroSalas.js';
 const LIM = limitesOnline('rankings');
 
 const router = Router();
@@ -511,4 +512,6 @@ rutaSalir(router, '/online/sala/:code/salir', {
 });
 rutaExpulsar(router, '/online/sala/:code/expulsar', { sala: (c) => salasOnline.get(c), esAnfitrion: (s, j) => s.adminToken === j.token });
 
+// Panel de administración («Salas en directo»): ver y cerrar estas salas
+exponerSalas(router, salasOnline);
 export default router;

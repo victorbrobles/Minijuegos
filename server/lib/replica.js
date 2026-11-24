@@ -317,7 +317,8 @@ export function hacerCopia() {
   if (!local || estadoDatos.origen === 'memoria') return null;
   try {
     mkdirSync(DIR_COPIAS, { recursive: true });
-    const destino = join(DIR_COPIAS, `minigames-${marca()}.db`);
+    let destino = join(DIR_COPIAS, `minigames-${marca()}.db`);
+    for (let n = 2; existsSync(destino); n++) destino = join(DIR_COPIAS, `minigames-${marca()}-${n}.db`); // dos en el mismo segundo
     local.exec(`VACUUM INTO '${destino.replace(/'/g, "''")}'`);
     const todas = readdirSync(DIR_COPIAS).filter((f) => /^minigames-.*\.db$/.test(f)).sort();
     for (const f of todas.slice(0, Math.max(0, todas.length - COPIAS_A_GUARDAR))) { try { unlinkSync(join(DIR_COPIAS, f)); } catch { /* nada */ } }
@@ -350,3 +351,62 @@ export async function cerrarDatos(ms = 8000) {
 
 /** Fuerza una subida inmediata (pruebas y panel de administración). */
 export const subirAhora = () => subir();
+
+/* ───────── Panel de administración: copias guardadas y restaurar una ───────── */
+const NOMBRE_COPIA = /^minigames-[\w.-]+\.db$/;
+/** Copias en fichero que hay ahora (de la más nueva a la más vieja). */
+export function listarCopias() {
+  try {
+    if (!existsSync(DIR_COPIAS)) return [];
+    return readdirSync(DIR_COPIAS).filter((f) => NOMBRE_COPIA.test(f)).sort().reverse()
+      .map((f) => { const st = statSync(join(DIR_COPIAS, f)); return { nombre: f, bytes: st.size, fecha: st.mtimeMs }; });
+  } catch { return []; }
+}
+/** Ruta de una copia (solo si el nombre es de una copia de verdad). */
+export function rutaCopia(nombre) {
+  if (!NOMBRE_COPIA.test(String(nombre)) || nombre.includes('..')) return null;
+  const r = join(DIR_COPIAS, nombre);
+  return existsSync(r) ? r : null;
+}
+/**
+ * Vuelve a dejar los datos como estaban en una copia, sin apagar la web. Antes guarda una copia de cómo está ahora
+ * (por si hay que deshacerlo). Cada tabla se vacía y se rellena con la de la copia (mismas filas y mismo rowid);
+ * los disparadores del diario apuntan esos cambios, así que Turso se actualiza solo. Las tablas que no estaban en la
+ * copia (más nuevas) no se tocan.
+ */
+export function restaurarCopia(nombre) {
+  const ruta = rutaCopia(nombre);
+  if (!ruta) return { ok: false, error: 'Esa copia no existe.' };
+  if (!local || estadoDatos.origen === 'memoria') return { ok: false, error: 'La base de datos está en memoria: no hay nada que restaurar.' };
+  const seguridad = hacerCopia();
+  if (!seguridad) return { ok: false, error: 'No se pudo guardar la copia de seguridad previa: no se restaura nada.' };
+  const tablas = [];
+  local.exec(`ATTACH DATABASE '${ruta.replace(/'/g, "''")}' AS copia`);
+  try {
+    const enCopia = new Set(local.prepare("SELECT name FROM copia.sqlite_master WHERE type = 'table'").all().map((r) => sinMeta(r).name).filter(esTablaPropia));
+    const enLocal = local.prepare("SELECT name FROM main.sqlite_master WHERE type = 'table'").all().map((r) => sinMeta(r).name).filter(esTablaPropia);
+    local.exec('BEGIN');
+    try {
+      for (const t of enLocal) {
+        if (!enCopia.has(t)) continue;
+        const cols = (b) => new Set(local.prepare(`PRAGMA ${b}.table_info(${q(t)})`).all().map((c) => sinMeta(c).name));
+        const deLocal = cols('main'); const comunes = [...cols('copia')].filter((c) => deLocal.has(c));
+        if (!comunes.length) continue;
+        const lista = comunes.map(q).join(', ');
+        local.exec(`DELETE FROM main.${q(t)}`);
+        local.exec(`INSERT INTO main.${q(t)} (rowid, ${lista}) SELECT rowid, ${lista} FROM copia.${q(t)}`);
+        tablas.push(t);
+      }
+      local.exec('COMMIT');
+    } catch (e) {
+      try { local.exec('ROLLBACK'); } catch { /* nada */ }
+      throw e;
+    }
+  } catch (e) {
+    return { ok: false, error: `No se pudo restaurar: ${e.message}` };
+  } finally {
+    try { local.exec('DETACH DATABASE copia'); } catch { /* nada */ }
+  }
+  if (remota && estadoDatos.subiendo) subir();
+  return { ok: true, tablas: tablas.length, seguridad: seguridad.split(/[\\/]/).pop() };
+}

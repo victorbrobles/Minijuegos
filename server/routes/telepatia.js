@@ -3,6 +3,7 @@ import crypto from 'crypto';
 import { limitesOnline } from '../../client/src/games/limites.js';
 import { totalRondas } from '../../client/src/games/rondas.js';
 import { rutaExpulsar } from '../lib/expulsar.js';
+import { exponerSalas } from '../lib/registroSalas.js';
 const LIM = limitesOnline('telepatia');
 
 const router = express.Router();
@@ -253,4 +254,6 @@ router.post('/sala/:code/salir', (req, res) => {
 
 rutaExpulsar(router, '/sala/:code/expulsar', { sala: (c) => salas[c], esAnfitrion: (s, j) => Boolean(j.esAdmin) });
 
+// Panel de administración («Salas en directo»): ver y cerrar estas salas
+exponerSalas(router, salas);
 export default router;

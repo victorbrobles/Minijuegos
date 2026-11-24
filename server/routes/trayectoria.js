@@ -7,6 +7,7 @@ import * as E from '../trayectoria/engine.js';
 import { RETOS_TRAYECTORIAS } from '../data/seeds/trayectoria/trayectorias.seed.js';
 import { limitesOnline } from '../../client/src/games/limites.js';
 
+import { exponerSalas } from '../lib/registroSalas.js';
 const barajar = (a) => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
 /** Elige retos sin repetir los ya jugados en la sala mientras queden. */
 function elegirRetos(sala) {
@@ -232,4 +233,6 @@ router.post('/online/sala/:code/salir', (req, res) => {
   res.json({ success: true });
 });
 
+// Panel de administración («Salas en directo»): ver y cerrar estas salas
+exponerSalas(router, salas);
 export default router;
