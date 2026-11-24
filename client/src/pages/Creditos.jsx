@@ -39,7 +39,19 @@ export default function Creditos() {
           <li><b>Escudos</b> (Modo carrera, El club de los cuatro, 301 Goles): no se usan escudos reales; se dibujan con los colores y las siglas de cada club o selección.</li>
           <li><b>Datos de futbolistas</b>: nombres, clubes y trayectorias son datos públicos. Las «medias» y los precios de Director Deportivo, Manager por un Día y Futbolista Misterioso son valoraciones aproximadas propias, no oficiales ni de ningún videojuego.</li>
           <li><b>Tipografías</b>: Bricolage Grotesque y Figtree (SIL Open Font License), servidas desde esta misma web.</li>
+          <li><b>Banderas</b> (reto diario): <a href="https://gitlab.com/catamphetamine/country-flag-icons" target="_blank" rel="noreferrer">country-flag-icons</a> (MIT); su licencia se publica junto a las imágenes, en <a href="/banderas/LICENSE.txt" target="_blank" rel="noreferrer">/banderas/LICENSE.txt</a>.</li>
           <li><b>Juegos de habilidad</b> (Fútbol chapas, Artillería, Curling, Estelas, Carrera de Canicas, Minigolf, Torre Inestable…): física, circuitos y gráficos hechos para esta web.</li>
+        </ul>
+      </section>
+
+      <section className="est-tarjeta">
+        <h2>✏️ Contenido propio</h2>
+        <ul className="crd-lista">
+          <li><b>Avatares</b>: dibujados por código para esta web (cuerpos, caras, peinados, ropa y complementos); no usan imágenes de terceros.</li>
+          <li><b>Portadas e iconos</b> de los juegos: ilustraciones hechas para esta web.</li>
+          <li><b>Preguntas, categorías, titulares y textos</b> de los juegos (Qué malo es conocerse, El Escondite, La Hemeroteca, El Tablero de Puntos…): redactados para esta web. Los titulares de La Hemeroteca describen hechos históricos; no reproducen titulares de ningún periódico.</li>
+          <li><b>Cartas, tableros, escudos y campos</b>: dibujados por código. La baraja española se dibuja a partir de los palos tradicionales, sin copiar ninguna edición comercial.</li>
+          <li><b>Sonidos y vibraciones</b>: generados en el propio navegador; no se usan grabaciones de terceros.</li>
         </ul>
       </section>
 
@@ -53,6 +65,7 @@ export default function Creditos() {
           <li><b>Partidas online</b>: <a href="https://socket.io" target="_blank" rel="noreferrer">Socket.IO</a> y <a href="https://expressjs.com" target="_blank" rel="noreferrer">Express</a>.</li>
           <li><b>Datos</b>: <a href="https://github.com/tursodatabase/libsql" target="_blank" rel="noreferrer">libSQL</a> (SQLite) y <a href="https://turso.tech" target="_blank" rel="noreferrer">Turso</a>.</li>
           <li><b>Banderas del reto diario</b>: <a href="https://gitlab.com/catamphetamine/country-flag-icons" target="_blank" rel="noreferrer">country-flag-icons</a> (MIT), guardadas en la propia web.</li>
+          <li><b>Avisos de licencia</b>: el texto completo de las licencias de todo el software y las tipografías de terceros que se sirven con esta web está en <a href="/licencias-terceros.txt" target="_blank" rel="noreferrer">licencias-terceros.txt</a>.</li>
           <li><b>Imágenes y códigos QR</b>: <a href="https://sharp.pixelplumbing.com" target="_blank" rel="noreferrer">sharp</a> y <a href="https://github.com/soldair/node-qrcode" target="_blank" rel="noreferrer">node-qrcode</a>.</li>
         </ul>
       </section>

@@ -720,7 +720,7 @@ export const FAMOSOS = [
     rasgo: 'ojos',
     recorte: { x: 0.05, y: 0.25, ancho: 0.80, alto: 0.20 },
     attribution: {
-      autor: 'https://www.flickr.com/photos/146461623@N05',
+      autor: 'Usuario de Flickr 146461623@N05',
       fuenteUrl: 'https://commons.wikimedia.org/wiki/File:Robbie_at_2019_Cannes_(cropped).jpg',
       licencia: 'CC BY 2.0',
       licenciaUrl: 'https://creativecommons.org/licenses/by/2.0'
