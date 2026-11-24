@@ -25,7 +25,11 @@ export const SEG_TURNO = 45;
 export const BOTON = 1.4; // radio del botón (centro de la diana): una piedra con el centro dentro vale doble
 export const BARRIDO_FRAMES = 12; // fotogramas de simulación (1/60 s) por cada valor del barrido
 export const BARRIDO_MAX = 3;
-export const BARRIDO_ROCE = 0.15; // roce que quita cada nivel de barrido
+export const BARRIDO_ROCE = 0.2; // roce que quita cada nivel de barrido (a tope, un 60 %)
+/** Fotogramas de simulación que se ven por segundo real (la piedra va a ~1,2× su velocidad: da tiempo a barrer). */
+export const REPRO = 70;
+/** Desvío máximo (grados) si fallas por completo el medidor de precisión: cuanto más fuerte tiras, más se desvía. */
+export const errorMaximo = (pot) => 0.8 + (Math.max(0, Math.min(100, pot)) / 100) * 5.2;
 const BARRIDO_LARGO = 500;
 const PESO_PESADA = 2.2;
 /**
@@ -98,7 +102,7 @@ export function crearLanzamiento(piedras, tiro, de, hielo) {
   };
   // Barrer reduce el roce de la piedra lanzada (hasta un 45 %, se nota: puede alargarla más de media casa)
   const roceDe = (c, f) => (c.id === 'nueva' ? h.roce * (1 - BARRIDO_ROCE * barridoEn(barrido, f)) : h.roce);
-  return crearSimulacion(cs, { roce: h.roce, roceDe, rebote: 0.85, paredes, fuerza, pasosMax: 60 * 16, cadaFrame: 3 });
+  return crearSimulacion(cs, { roce: h.roce, roceDe, rebote: 0.8, paredes, fuerza, pasosMax: 60 * 16, cadaFrame: 3 });
 }
 /** Reglas al acabar el lanzamiento: si la lanzada no pasa la línea de juego (y no ha tocado nada), se retira. */
 export function cerrarLanzamiento(cs, hielo) {
@@ -181,7 +185,7 @@ export function lanzar(p, id, d, ahora = Date.now()) {
   p.contador += 1;
   const nuevas = r.cuerpos.filter((c) => !c.fuera).map((c) => ({ id: c.id === 'nueva' ? `p${p.contador}` : c.id, de: c.de, x: c.x, y: c.y, ...(c.pesada ? { pesada: true } : {}) }));
   p.piedras = nuevas; p.lanzadas += 1; p.n += 1;
-  const ms = Math.round((r.frames.length / 40) * 1000); // los móviles lo reproducen a doble velocidad
+  const ms = Math.round(((r.frames.length * 3) / REPRO) * 1000); // tiempo que tarda en verse el tiro
   p.ultimo = { n: p.n, de: quien, antes, tiro, ms, hielo: p.hielo };
   if (p.lanzadas >= p.orden.length) cerrarManga(p, ahora, ms);
   else p.limite = ahora + ms + SEG_TURNO * 1000;

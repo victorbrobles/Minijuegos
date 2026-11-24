@@ -29,3 +29,11 @@
 .cu-barrer[data-n='3'] { box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12), inset 0 0 0 3px #22c55e; }
 .cu-mapa { margin: 0; padding: 0.45rem 0.7rem; border-radius: 12px; background: #e0f2fe; color: #075985; font-size: 0.8rem; font-weight: 700; text-align: center; }
 .cu-mapa b { display: block; font-size: 0.95rem; color: #0c4a6e; }
+.cu-precision { display: grid; justify-items: center; gap: 0.45rem; margin-top: 0.6rem; padding: 0.9rem 0.8rem; border-radius: 18px; background: linear-gradient(160deg, #fef3c7, #ffffff); box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12), inset 0 0 0 2px rgba(245, 158, 11, 0.4); cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; text-align: center; }
+.cu-precision b { font-size: 1rem; color: #92400e; }
+.cu-precision small { font-size: 0.7rem; font-weight: 700; color: #78716c; }
+.cu-prec-barra { position: relative; width: 100%; height: 2.2rem; border-radius: 999px; background: linear-gradient(90deg, #ef4444, #f59e0b 30%, #22c55e 47%, #22c55e 53%, #f59e0b 70%, #ef4444); box-shadow: inset 0 0 0 2px rgba(15, 23, 42, 0.15); }
+.cu-prec-centro { position: absolute; left: 50%; top: -4px; bottom: -4px; width: 3px; margin-left: -1.5px; border-radius: 2px; background: #0f172a; }
+.cu-prec-barra i { position: absolute; top: 50%; left: 50%; width: 1.1rem; height: 2.8rem; margin: -1.4rem 0 0 -0.55rem; border-radius: 8px; background: #ffffff; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35), inset 0 0 0 3px #0f172a; }
+.cu-desvio { padding: 0.15rem 0.7rem; border-radius: 999px; background: #fee2e2; color: #991b1b; font-size: 0.8rem; font-weight: 900; }
+.cu-desvio.bien { background: #dcfce7; color: #166534; }

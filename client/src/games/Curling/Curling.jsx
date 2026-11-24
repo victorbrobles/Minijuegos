@@ -84,8 +84,10 @@ function montarPabellon(ctx, util, m) {
   // Dónde se pararía la piedra si dejas de barrer (para ver lo que hace el barrido)
   const proy = new THREE.Mesh(new THREE.RingGeometry(1.1, 1.6, 32), new THREE.MeshBasicMaterial({ color: 0xf97316, transparent: true, opacity: 0.85 })); proy.rotation.x = -Math.PI / 2; proy.visible = false; scene.add(proy);
   const proyTxt = crea.texto('sin barrer', { tam: 2.2, color: '#c2410c', ancho: 640 }); proyTxt.visible = false; scene.add(proyTxt);
+  const proyB = new THREE.Mesh(new THREE.RingGeometry(1.1, 1.7, 32), new THREE.MeshBasicMaterial({ color: 0x22c55e, transparent: true, opacity: 0.9 })); proyB.rotation.x = -Math.PI / 2; proyB.visible = false; scene.add(proyB);
+  const proyBTxt = crea.texto('barriendo', { tam: 2.2, color: '#15803d', ancho: 640 }); proyBTxt.visible = false; scene.add(proyBTxt);
   const cam = { p: a3(E.W / 2, m.HOG - 22, 15), mira: a3(m.CASA.x, m.CASA.y, 0) };
-  return { ctx, m, piedras, pedir, linea, diana, efectos, barrenderos, proy, proyTxt, cam, chispa: 0 };
+  return { ctx, m, piedras, pedir, linea, diana, efectos, barrenderos, proy, proyTxt, proyB, proyBTxt, cam, chispa: 0 };
 }
 // lista: [[x, y, color, pesada], …] (la primera es la que se mueve si hay tiro); apunta: { anim, mio, ang, efecto, barre, color }
 function pintarPabellon(o, lista, apunta, util, dt, t) {
@@ -105,6 +107,8 @@ function pintarPabellon(o, lista, apunta, util, dt, t) {
   }
   o.proy.visible = Boolean(apunta?.proy); o.proyTxt.visible = o.proy.visible;
   if (apunta?.proy) { const [px, py] = apunta.proy; o.proy.position.copy(a3(px, py, 0.04)); o.proyTxt.position.copy(a3(px, py, 2.2)); }
+  o.proyB.visible = Boolean(apunta?.proyB); o.proyBTxt.visible = o.proyB.visible;
+  if (apunta?.proyB) { const [px, py] = apunta.proyB; o.proyB.position.copy(a3(px, py, 0.05)); o.proyBTxt.position.copy(a3(px, py, 4.4)); }
   // Barrenderos delante de la piedra que desliza
   const moviendo = apunta?.barre != null && lista.length && lista[0][1] > -5;
   o.barrenderos.forEach((b, i) => {
@@ -128,7 +132,9 @@ function pintarPabellon(o, lista, apunta, util, dt, t) {
   cam.position.copy(o.cam.p); cam.lookAt(o.cam.mira);
 }
 
-const FPS_SIM = 120; // fotogramas de simulación por segundo real (la piedra se ve a doble velocidad)
+const FPS_SIM = E.REPRO; // fotogramas de simulación por segundo real
+const FPS_REPE = E.REPRO / 3; // las repeticiones guardan un fotograma de cada 3
+const PERIODO_PREC = 900; // ms del medidor de precisión (ida y vuelta)
 const nivelDe = (e) => (e > 200 ? 3 : e > 110 ? 2 : e > 40 ? 1 : 0);
 
 function Pista({ v, enviar, local }) {
@@ -144,13 +150,15 @@ function Pista({ v, enviar, local }) {
   const anim = useRef(null);
   const carga = useRef(null);
   const [pot, setPot] = useState(null);
+  const [precision, setPrecision] = useState(null); const precisionRef = useRef(null); precisionRef.current = precision; const agujaRef = useRef(null);
+  const [ultimoDesvio, setUltimoDesvio] = useState(null);
   // Lanzamiento en directo (el que tira barre mientras la piedra desliza)
   const vivo = useRef(null); const [enVivo, setEnVivo] = useState(false);
   const propio = useRef(false);
   const energia = useRef(0); const nivel = useRef(0); const ultimoPt = useRef(null);
   const medidor = useRef(null);
   const datos = useRef({}); datos.current = { v, enviar };
-  const ocupado = animando || enVivo;
+  const ocupado = animando || enVivo || Boolean(precision);
 
   const ultimoN = v.ultimo?.n;
   useEffect(() => {
@@ -161,7 +169,7 @@ function Pista({ v, enviar, local }) {
     const r = E.simularLanzamiento(u.antes, u.tiro, u.de, u.hielo);
     anim.current = { frames: r.frames, ids: [{ de: u.de, pesada: u.tiro.pesada }, ...u.antes], t0: performance.now(), barrido: u.tiro.barrido || [] };
     setAnimando(true); setVer((x) => x + 1); sonar('toque');
-    const t = setTimeout(() => { setAnimando(false); anim.current = null; setVer((x) => x + 1); }, (r.frames.length / 40) * 1000 + 200);
+    const t = setTimeout(() => { setAnimando(false); anim.current = null; setVer((x) => x + 1); }, (r.frames.length / FPS_REPE) * 1000 + 200);
     return () => clearTimeout(t);
   }, [ultimoN]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -176,7 +184,7 @@ function Pista({ v, enviar, local }) {
   // Barrer: frotar la pantalla (cuanto más rápido, más fuerte) o pulsar la barra espaciadora
   const frotar = (e) => {
     if (!vivo.current || vivo.current.hecho) return;
-    if (e.type === 'pointerdown') { ultimoPt.current = [e.clientX, e.clientY]; return; }
+    if (e.type === 'pointerdown') { ultimoPt.current = [e.clientX, e.clientY]; energia.current = Math.min(420, energia.current + 70); return; } // cada toque/clic también barre
     if (e.type !== 'pointermove' || (e.pointerType !== 'mouse' && !ultimoPt.current)) return;
     if (e.pointerType === 'mouse' && !e.buttons && !ultimoPt.current) { ultimoPt.current = [e.clientX, e.clientY]; return; }
     const [x0, y0] = ultimoPt.current || [e.clientX, e.clientY];
@@ -202,15 +210,40 @@ function Pista({ v, enviar, local }) {
   const soltar = () => {
     if (!carga.current) return;
     const t = ((performance.now() - carga.current) % PERIODO) / PERIODO; const valor = Math.round((t < 0.5 ? t * 2 : 2 - t * 2) * 100);
-    carga.current = null; setPot(null); vibrar(15); sonar('toque');
+    carga.current = null; setPot(null); vibrar(15);
+    // Tercer paso: el medidor de precisión
+    setPrecision({ pot: valor, t0: performance.now() });
+  };
+  // Medidor de precisión: la aguja va y viene; pulsa cuando esté en el centro. Fallar desvía el tiro (más si tiras fuerte)
+  const posPrecision = (t0) => Math.sin(((performance.now() - t0) / PERIODO_PREC) * Math.PI * 2);
+  const fijarPrecision = () => {
+    const pr = precisionRef.current; if (!pr) return;
+    const dev = posPrecision(pr.t0);
+    const desvio = Math.round(dev * E.errorMaximo(pr.pot) * 10) / 10;
+    setPrecision(null); sonar('toque'); vibrar(15);
+    setUltimoDesvio(desvio);
     // Empieza el lanzamiento en directo: la misma simulación que hará el servidor, con el barrido que vayas haciendo
+    const angFinal = Math.max(-10, Math.min(10, ang + desvio));
     const barrido = [];
     const usaPesada = pesada && tirador?.pesada;
-    const tiro = E.tiroDe(ang, valor, efecto, usaPesada, barrido);
-    vivo.current = { sim: E.crearLanzamiento(v.piedras, tiro, v.turno, v.hielo), barrido, t0: performance.now(), datos: { ang, pot: valor, efecto, pesada: usaPesada }, de: v.turno, hecho: false };
+    const tiro = E.tiroDe(angFinal, pr.pot, efecto, usaPesada, barrido);
+    vivo.current = { sim: E.crearLanzamiento(v.piedras, tiro, v.turno, v.hielo), barrido, t0: performance.now(), datos: { ang: angFinal, pot: pr.pot, efecto, pesada: usaPesada }, de: v.turno, hecho: false };
     energia.current = 0; nivel.current = 0; ultimoPt.current = null;
     setEnVivo(true);
   };
+  useEffect(() => {
+    if (!precision) return undefined;
+    let r; const paso = () => {
+      if (!precisionRef.current) return;
+      if (agujaRef.current) agujaRef.current.style.left = `${50 + posPrecision(precisionRef.current.t0) * 46}%`;
+      if (performance.now() - precisionRef.current.t0 > 5000) { fijarPrecision(); return; } // si no pulsas, sale donde esté
+      r = requestAnimationFrame(paso);
+    };
+    r = requestAnimationFrame(paso);
+    const tecla = (e) => { if (e.code === 'Space' || e.key === 'Enter') { e.preventDefault(); fijarPrecision(); } };
+    window.addEventListener('keydown', tecla);
+    return () => { cancelAnimationFrame(r); window.removeEventListener('keydown', tecla); };
+  }, [precision]); // eslint-disable-line react-hooks/exhaustive-deps
   const terminarVivo = () => {
     const vv = vivo.current; if (!vv || vv.enviado) return;
     vv.enviado = true;
@@ -230,7 +263,7 @@ function Pista({ v, enviar, local }) {
           // Energía del barrido: sube al frotar y se va gastando
           energia.current *= Math.exp(-(dt || 0.016) * 5); nivel.current = nivelDe(energia.current);
           if (medidor.current) medidor.current.dataset.n = String(nivel.current);
-          const a = anim.current; const vv = vivo.current; let lista; let barre = null; let color = null; let proy = null;
+          const a = anim.current; const vv = vivo.current; let lista; let barre = null; let color = null; let proy = null; let proyB = null;
           if (vv) {
             if (!vv.hecho) {
               const objetivo = Math.floor(((performance.now() - vv.t0) / 1000) * FPS_SIM);
@@ -246,20 +279,32 @@ function Pista({ v, enviar, local }) {
             barre = vv.hecho ? null : nivel.current; color = colorDe(vv.de);
             // Dónde se pararía sin barrer más (sin contar el efecto): ves cómo avanza al barrer
             const c0 = vv.sim.cs[0]; const vel = Math.hypot(c0.vx, c0.vy);
-            if (!vv.hecho && vel > 1) { const dd = (vel * vel) / (2 * hielo.roce); proy = [Math.max(1, Math.min(E.W - 1, c0.x + (c0.vx / vel) * dd)), Math.min(E.L - 1, c0.y + (c0.vy / vel) * dd)]; }
+            if (!vv.hecho && vel > 1) {
+              const punto = (roce) => { const dd = (vel * vel) / (2 * roce); return [Math.max(1, Math.min(E.W - 1, c0.x + (c0.vx / vel) * dd)), Math.min(E.L - 1, c0.y + (c0.vy / vel) * dd)]; };
+              proy = punto(hielo.roce);
+              if (nivel.current > 0) proyB = punto(hielo.roce * (1 - E.BARRIDO_ROCE * nivel.current));
+            }
           } else if (a) {
-            const f = Math.min(a.frames.length - 1, Math.floor(((performance.now() - a.t0) / 1000) * 40));
+            const f = Math.min(a.frames.length - 1, Math.floor(((performance.now() - a.t0) / 1000) * FPS_REPE));
             lista = a.ids.map((s, i) => [a.frames[f][i][0], a.frames[f][i][1], colorDe(s.de), s.pesada]);
             barre = f < a.frames.length - 1 ? E.barridoEn(a.barrido, f * 3) : null; color = colorDe(a.ids[0].de);
           } else lista = v.piedras.map((s) => [s.x, s.y, colorDe(s.de), s.pesada]);
-          pintarPabellon(o, lista, { anim: Boolean(a || vv), mio: miTurno && !a && !vv, ang: angRef.current, efecto: efectoRef.current, barre, color, proy }, util, dt, t);
+          pintarPabellon(o, lista, { anim: Boolean(a || vv), mio: miTurno && !a && !vv, ang: angRef.current, efecto: efectoRef.current, barre, color, proy, proyB }, util, dt, t);
         }}
         onPuntero={puntero} />
       {enVivo && (
         <div className="cu-barrer" ref={medidor} data-n="0">
           <b>🧹 ¡Frota la pantalla para barrer!</b>
+          {ultimoDesvio != null && <span className={`cu-desvio${Math.abs(ultimoDesvio) < 0.6 ? ' bien' : ''}`}>{Math.abs(ultimoDesvio) < 0.6 ? '🎯 ¡Tiro limpio!' : `Desvío ${ultimoDesvio > 0 ? '+' : ''}${ultimoDesvio}°`}</span>}
           <span className="cu-escoba"><i /><i /><i /></span>
-          <small>Barrer = llega más lejos y se curva menos (mira el aro naranja «sin barrer» avanzar) · en ordenador: arrastra o pulsa espacio</small>
+          <small>Barrer = frena mucho menos y se curva menos: el aro verde marca adónde vas barriendo y el naranja dónde pararía sin barrer · en ordenador: mueve el ratón, haz clics rápidos o mantén el espacio</small>
+        </div>
+      )}
+      {precision && (
+        <div className="cu-precision" onPointerDown={(e) => { e.stopPropagation(); fijarPrecision(); }}>
+          <b>🎯 ¡Pulsa cuando la aguja esté en el centro!</b>
+          <div className="cu-prec-barra"><span className="cu-prec-centro" /><i ref={agujaRef} /></div>
+          <small>Fuerza {precision.pot} · cuanto más fuerte tiras, más se desvía si fallas (hasta ±{E.errorMaximo(precision.pot).toFixed(1)}°) · en ordenador: espacio</small>
         </div>
       )}
       {miTurno && !ocupado && (
