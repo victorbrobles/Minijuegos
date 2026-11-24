@@ -1,7 +1,7 @@
 // server/routes/escondite.js
 // «El Escondite» online y su contenido para el modo un dispositivo. Motor: client/src/games/Escondite/engine.js.
 import express from 'express';
-import { M, minimoOpciones } from '../../client/src/games/Escondite/engine.js';
+import { M, minimoOpciones, CAMBIOS } from '../../client/src/games/Escondite/engine.js';
 import { accionSimultaneo } from '../../client/src/games/comun/simultaneo.js';
 import { TODAS } from '../data/seeds/escondite/index.js';
 import { montarSalas } from '../lib/salasJuego.js';
@@ -25,9 +25,16 @@ export function elegir(usados, n, jugadores) {
   return out.map(({ titulo, emoji, opciones }) => ({ titulo, emoji, opciones }));
 }
 
+/** Las categorías de la partida, cada una con CAMBIOS categorías de reserva (por si el escondido la cambia). */
+export function elegirConReservas(usados, n, jugadores) {
+  const items = elegir(usados, n, jugadores);
+  const reservas = elegir(usados, n * CAMBIOS, jugadores);
+  return items.map((it, i) => ({ ...it, alternativas: reservas.slice(i * CAMBIOS, (i + 1) * CAMBIOS) }));
+}
+
 router.get('/local', (req, res) => {
   const j = Math.max(1, Number(req.query.j) || 3);
-  res.json({ success: true, items: elegir(new Set(), totalRondas('escondite', req.query.r, j), j) });
+  res.json({ success: true, items: elegirConReservas(new Set(), totalRondas('escondite', req.query.r, j), j) });
 });
 
 montarSalas(router, {
@@ -36,8 +43,8 @@ montarSalas(router, {
   config: { rondas: rondasValidas('escondite') },
   validarConfig: (b, c) => ({ ...c, rondas: rondasValidas('escondite', b.rondas, c.rondas) }),
   reglas: () => ({}),
-  prepararItems: async (sala) => elegir(sala.usados, totalRondas('escondite', sala.config.rondas, sala.jugadores.length), sala.jugadores.length),
-  accion: accionSimultaneo
+  prepararItems: async (sala) => elegirConReservas(sala.usados, totalRondas('escondite', sala.config.rondas, sala.jugadores.length), sala.jugadores.length),
+  accion: (Mo, p, d, ctx) => (d.tipo === 'cambiar' ? Mo.cambiar(p, ctx.id, ctx.ahora) : accionSimultaneo(Mo, p, d, ctx))
 });
 
 export default router;

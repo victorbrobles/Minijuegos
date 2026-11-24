@@ -75,7 +75,7 @@ function PartidaOnline(def) {
         <Hero v={v} juego={def} onSalir={onSalir} etiqueta={def.etiqueta?.(v) ?? ''} titulo={titulo} />
         {v.fase === 'jugando' && v.hasta && <Cuenta ms={restante} total={(v.segundos || 60) * 1000} />}
         {v.fase === 'jugando' && (toca
-          ? <def.Responder key={`${v.ronda}`} v={v} id={yo} enviarRespuesta={(valor) => enviar('responder', { valor })} enviarBorrador={(valor) => enviar('borrador', { valor })} />
+          ? <def.Responder key={`${v.ronda}`} v={v} id={yo} enviarRespuesta={(valor) => enviar('responder', { valor })} enviarBorrador={(valor) => enviar('borrador', { valor })} accion={(tipo, datos = {}) => enviar(tipo, datos)} />
           : <>{def.Previa && <def.Previa v={v} id={yo} />}<Esperando v={v} /></>)}
         {v.fase === 'revision' && def.Revision && (
           <>
@@ -191,7 +191,8 @@ function Local(def) {
       return envolver(
         <>
           <Hero v={{ ...v, yo: null }} juego={def} onSalir={() => setModal(true)} etiqueta={`Turno de ${nombreDe(v, id)}`} titulo={def.tituloResponder?.(v, id) ?? '¡Responde!'} turno={id} />
-          <def.Responder key={clave} v={v} id={id} local enviarRespuesta={enviarRespuesta} enviarBorrador={(valor) => def.M.borrador(p, id, valor)} />
+          <def.Responder key={clave} v={v} id={id} local enviarRespuesta={enviarRespuesta} enviarBorrador={(valor) => def.M.borrador(p, id, valor)}
+            accion={(tipo, datos = {}) => { const r = def.M.accion?.(p, id, { tipo, ...datos }, Date.now()); refrescar(); return r; }} />
         </>
       );
     }

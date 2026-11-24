@@ -223,11 +223,12 @@ export default {
     objetivo: 'Escóndete en una respuesta que **nadie adivine**… o encuentra dónde se ha escondido otro.',
     pasos: [
       'Sale una categoría con **pocas respuestas posibles** (de 5 a 11): los ríos más largos de España, un once histórico, los planetas…',
-      'Cada ronda un jugador **se esconde**: escribe en secreto una de esas respuestas.',
-      'Los demás escriben cuál creen que ha elegido.',
-      'Si escribes algo que no está entre las posibles, no vale: se te muestran y vuelves a intentarlo.'
+      'Cada ronda un jugador **se esconde**: antes de responder puede **cambiar la categoría hasta 3 veces** si no le convence.',
+      'Escribe en secreto dónde se esconde y su respuesta **se da por buena tal cual**: nadie le enseña las respuestas posibles, así que tiene que conocer la categoría.',
+      'Cuando se ha escondido, los demás escriben dónde creen que está.',
+      'Al final de la ronda se desvelan todas las respuestas posibles.'
     ],
     secciones: [{ icono: '⏱️', titulo: 'Rondas', color: 'cian', items: ['Online hay **60 segundos** por ronda.', 'Son 2, 3 o 4 rondas por jugador: todos se esconden las mismas veces.', 'Con muchos jugadores solo salen categorías con muchas respuestas.'] }],
-    puntos: [['🙈', 'Nadie te encuentra', '+1 (escondido)'], ['🔎', 'Encuentras al escondido', '+1 cada uno']]
+    puntos: [['🙈', 'Nadie te encuentra', '+1 (escondido)'], ['🔎', 'Encuentras al escondido', '+1 cada uno'], ['🚫', 'El escondido pone algo que no es de la categoría', 'él 0 · todos los demás +1']]
   }
 };
