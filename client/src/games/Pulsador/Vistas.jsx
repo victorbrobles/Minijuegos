@@ -7,6 +7,7 @@ import Icon from '../../components/Icon.jsx';
 import { OPCIONES_RONDAS } from './engine.js';
 import './Pulsador.css';
 import { metaDe } from '../meta.js';
+import CuerpoJugador from '../../components/CuerpoJugador.jsx';
 import CaraJugador from '../../components/CaraJugador.jsx';
 
 export const COLORES = ['#ef4444', '#2563eb', '#16a34a', '#f59e0b', '#9333ea', '#ec4899', '#0d9488', '#ea580c', '#475569', '#65a30d', '#6366f1', '#0ea5e9', '#e11d48', '#84cc16', '#a855f7'];
@@ -35,7 +36,7 @@ export function TurnoDe({ v, id, puedo, onListo, texto, children, boton = '¡Lis
     <>
       {juego && <Hero v={v} juego={juego} onSalir={onSalir} chip={chipHero} turno={id} />}
       <div className="pzp-tarjeta pzp-gate">
-        <Avatar id={id} nombre={j?.nombre} grande />
+        <span className="pzp-gate-cuerpo" style={{ '--c': colorDe(id) }}><CuerpoJugador nombre={j?.nombre} alto={170} /></span>
         <p className="pzp-etiqueta centrada">{etiqueta}</p>
         <h2>{j?.nombre ?? '¿?'}{!pasar && v.yo?.id === id ? ' (tú)' : ''}</h2>
         {texto && <p className="pzp-texto">{texto}</p>}
@@ -499,7 +500,7 @@ export function PantallaFin({ v, juego, onSalir, children }) {
               const puesto = top.indexOf(j);
               return (
                 <div key={j.id} className={`pzp-podio-col ${alturas[puesto]}`} style={{ '--c': colorDe(j.id) }}>
-                  <Avatar id={j.id} nombre={j.nombre} grande />
+                  <CuerpoJugador nombre={j.nombre} alto={puesto === 0 ? 132 : 108} baile={puesto === 0 ? 'salta' : 'flota'} />
                   <span className="pzp-podio-nombre">{j.nombre}</span>
                   <span className="pzp-podio-pts">{j.puntos} {unidad}</span>
                   <span className="pzp-podio-base">{j.puesto}</span>

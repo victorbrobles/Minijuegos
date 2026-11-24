@@ -5,8 +5,8 @@ import { PIEZAS, AVATAR_INICIAL as INICIAL, avatarAleatorio as aleatorio } from 
 
 export { PIEZAS };
 export const AVATAR_INICIAL = { ...INICIAL };
-export const PIEZAS_CARA = ['piel', 'pelo', 'colorPelo', 'ojos', 'colorOjos', 'boca', 'barba', 'gafas', 'extra', 'colorExtra'];
-export const PIEZAS_ROPA = ['cuerpo', 'arriba', 'colorArriba', 'abajo', 'colorAbajo', 'calzado'];
+export const PIEZAS_CARA = ['piel', 'caraTipo', 'pelo', 'colorPelo', 'ojos', 'colorOjos', 'cejas', 'nariz', 'boca', 'labios', 'rasgos', 'barba', 'gafas', 'extra', 'colorExtra'];
+export const PIEZAS_ROPA = ['cuerpo', 'arriba', 'estampado', 'colorArriba', 'abajo', 'colorAbajo', 'calzado'];
 
 /** Devuelve el avatar limpio (solo piezas conocidas y dentro de rango) o null. */
 export function validarAvatar(a) {

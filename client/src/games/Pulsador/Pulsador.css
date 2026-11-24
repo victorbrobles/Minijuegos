@@ -613,3 +613,8 @@
 .pzp-turno-sub { display: inline-block; margin-top: 0.7rem !important; padding: 0.3rem 0.8rem; border-radius: 999px; background: #f1f5f9; color: #475569; font-size: 0.82rem; font-weight: 700; }
 .pzp-credito { margin: 0.35rem 0 0; font-size: 0.72rem; font-weight: 700; color: #94a3b8; text-align: center; }
 .pzp-credito a { color: inherit; text-decoration: underline; }
+/* Personaje de cuerpo entero en la pantalla de «pasa el móvil» y en el podio */
+.pzp-gate-cuerpo { position: relative; display: flex; justify-content: center; align-items: flex-end; width: 150px; height: 182px; margin-bottom: 0.4rem; }
+.pzp-gate-cuerpo::before { content: ''; position: absolute; left: 50%; bottom: 0; width: 130px; height: 130px; margin-left: -65px; border-radius: 50%; background: radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--c, #6366f1) 45%, #ffffff) 0%, color-mix(in srgb, var(--c, #6366f1) 20%, #ffffff) 70%, transparent 71%); }
+.pzp-gate-cuerpo .cuerpo-jugador { position: relative; }
+.pzp-podio-col .cuerpo-jugador { margin-bottom: -6px; position: relative; z-index: 1; }

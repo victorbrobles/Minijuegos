@@ -39,8 +39,8 @@
 }
 .pf-previa-pie { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; width: 100%; margin-top: 0.5rem; }
 .pf-azar { padding: 0.35rem 0.8rem; border: 2px solid #e2e8f0; border-radius: 999px; background: #ffffff; color: #475569; font: inherit; font-weight: 800; cursor: pointer; }
-.pf-bloques { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.35rem; margin: 0.3rem 0 0.5rem; padding: 0.25rem; border-radius: 16px; background: #f1f5f9; }
-.pf-bloques button { display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem; padding: 0.55rem; border: none; border-radius: 12px; background: transparent; color: #475569; font: inherit; font-weight: 900; cursor: pointer; }
+.pf-bloques { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.35rem; margin: 0.3rem 0 0.5rem; padding: 0.25rem; border-radius: 16px; background: #f1f5f9; }
+.pf-bloques button { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.1rem; padding: 0.4rem 0.2rem; font-size: 0.78rem; border: none; border-radius: 12px; background: transparent; color: #475569; font: inherit; font-weight: 900; cursor: pointer; }
 .pf-bloques button.sel { background: #ffffff; color: #5b21b6; box-shadow: 0 2px 6px rgba(15, 23, 42, 0.12); }
 .pf-pestanas { display: flex; gap: 0.35rem; margin: 0 -0.2rem 0.7rem; padding: 0.2rem 0.2rem 0.5rem; overflow-x: auto; scrollbar-width: thin; }
 .pf-pestanas button { flex: none; padding: 0.4rem 0.75rem; border: 2px solid #e2e8f0; border-radius: 999px; background: #f8fafc; color: #334155; font: inherit; font-size: 0.82rem; font-weight: 800; white-space: nowrap; cursor: pointer; }

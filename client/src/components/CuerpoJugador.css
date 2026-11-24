@@ -1,0 +1,15 @@
+/* client/src/components/CuerpoJugador.css — personaje de cuerpo entero con un poco de vida */
+.cuerpo-jugador { display: inline-flex; align-items: flex-end; justify-content: center; line-height: 0; }
+.cuerpo-jugador .av-svg { filter: drop-shadow(0 6px 8px rgba(15, 23, 42, 0.18)); }
+.cj-flota .av-svg { animation: cjFlota 2.8s ease-in-out infinite; transform-origin: 50% 100%; }
+.cj-salta .av-svg { animation: cjSalta 0.9s cubic-bezier(0.3, 0, 0.4, 1) infinite; transform-origin: 50% 100%; }
+.cj-quieto .av-svg { animation: none; }
+.cj-salta .av-brazo-i { animation: cjBrazoI 0.9s ease-in-out infinite; transform-origin: 70px 158px; }
+.cj-salta .av-brazo-d { animation: cjBrazoD 0.9s ease-in-out infinite; transform-origin: 130px 158px; }
+.cj-flota .av-brazo-d { animation: cjSaludo 2.8s ease-in-out infinite; transform-origin: 130px 158px; }
+@keyframes cjFlota { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-4px) rotate(-1.5deg); } }
+@keyframes cjSalta { 0%, 100% { transform: translateY(0) scale(1, 1); } 15% { transform: translateY(0) scale(1.04, 0.95); } 50% { transform: translateY(-14px) scale(0.98, 1.03); } }
+@keyframes cjBrazoI { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(150deg); } }
+@keyframes cjBrazoD { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-150deg); } }
+@keyframes cjSaludo { 0%, 60%, 100% { transform: rotate(0deg); } 70%, 90% { transform: rotate(-150deg); } 80% { transform: rotate(-125deg); } }
+@media (prefers-reduced-motion: reduce) { .cuerpo-jugador .av-svg, .cuerpo-jugador .av-brazo-i, .cuerpo-jugador .av-brazo-d { animation: none !important; } }

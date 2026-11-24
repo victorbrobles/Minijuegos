@@ -41,10 +41,16 @@ export function EscenaAvatar({ a, fondo, alto = 230, titulo }) {
 }
 
 const BLOQUES = [
-  { id: 'cara', nombre: 'Cara', emoji: '😀', piezas: PIEZAS_CARA },
-  { id: 'ropa', nombre: 'Cuerpo y ropa', emoji: '👕', piezas: PIEZAS_ROPA },
+  { id: 'cara', nombre: 'Cara', emoji: '😀', piezas: ['piel', 'caraTipo', 'ojos', 'colorOjos', 'cejas', 'nariz', 'boca', 'labios', 'rasgos', 'barba'] },
+  { id: 'pelo', nombre: 'Pelo', emoji: '💇', piezas: ['pelo', 'colorPelo'] },
+  { id: 'ropa', nombre: 'Ropa', emoji: '👕', piezas: PIEZAS_ROPA },
+  { id: 'extras', nombre: 'Extras', emoji: '🕶️', piezas: ['gafas', 'extra', 'colorExtra', 'objeto'] },
   { id: 'fondo', nombre: 'Fondo', emoji: '🎨', piezas: [] }
 ];
+// Piezas cuya miniatura es de cuerpo entero (el resto, la cara)
+const DE_CUERPO = ['cuerpo', 'arriba', 'estampado', 'abajo', 'calzado', 'objeto'];
+// Al cambiar de pestaña, la primera pieza que se enseña
+const PRIMERA = { cara: 'caraTipo', pelo: 'pelo', ropa: 'arriba', extras: 'extra' };
 
 export function EditarPerfil({ jugador, onCerrar }) {
   const actual = usePerfiles([jugador])[jugador];
@@ -56,10 +62,10 @@ export function EditarPerfil({ jugador, onCerrar }) {
   const [error, setError] = useState('');
   useEffect(() => { cargarOpciones().then((o) => { setOps(o); setColor((c) => c || o.colores[7]); }).catch(() => setError('Sin conexión.')); }, []);
   const guardar = async () => { try { await guardarPerfil(jugador, textoAvatar(a), color); onCerrar(); } catch (e) { setError(e.message); } };
-  const cambiarBloque = (b) => { setBloque(b.id); if (b.piezas.length) setPieza(b.piezas[b.id === 'cara' ? 1 : 0]); };
+  const cambiarBloque = (b) => { setBloque(b.id); if (b.piezas.length) setPieza(PRIMERA[b.id] || b.piezas[0]); };
   const def = PIEZAS.find((p) => p.id === pieza);
   const fondo = color || '#6366f1';
-  const enRopa = PIEZAS_ROPA.includes(pieza);
+  const enRopa = DE_CUERPO.includes(pieza);
   const piezasBloque = BLOQUES.find((b) => b.id === bloque).piezas;
   return createPortal(
     <div className="rg-modal-fondo pf-fondo" onClick={onCerrar}>
