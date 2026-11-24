@@ -500,29 +500,9 @@ export default function Home() {
           </div>
 
           <div className="footer-col contact">
-            <h4>Contacto y Redes</h4>
-            <p className="footer-subtext">¿Tienes sugerencias o ideas para un nuevo juego? ¡Hablemos!</p>
+            <h4>Contacto</h4>
+            <p className="footer-subtext">¿Tienes sugerencias o ideas para un nuevo juego? ¡Escríbenos!</p>
             <div className="footer-links">
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noreferrer"
-                className="footer-btn"
-                title="Instagram"
-              >
-                <span className="footer-btn-icon">📷</span>
-                <span>Instagram</span>
-              </a>
-              <a
-                href="https://x.com"
-                target="_blank"
-                rel="noreferrer"
-                className="footer-btn"
-                title="X (Twitter)"
-              >
-                <span className="footer-btn-icon">𝕏</span>
-                <span>X (Twitter)</span>
-              </a>
               <a
                 href={`mailto:${LEGAL.contacto}`}
                 className="footer-btn email"
