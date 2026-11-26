@@ -1,6 +1,6 @@
 // server/routes/fichajes.js
 // «Fichaje exprés» online y contenido del modo un dispositivo. Motor: client/src/games/Fichajes/engine.js.
-// Futbolistas de la temporada 2025/26 (los mismos de «Director Deportivo»).
+// Futbolistas de la temporada 2026/27 (los mismos de «Director Deportivo»).
 import express from 'express';
 import * as E from '../../client/src/games/Fichajes/engine.js';
 import { FUTBOLISTAS } from '../data/seeds/director/futbolistas.js';

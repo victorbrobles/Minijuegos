@@ -32,7 +32,7 @@ export default {
   'fichajes': {
     objetivo: 'Di en qué **equipo juega ahora** cada futbolista y aguanta la racha más larga.',
     pasos: [
-      'Sale un futbolista: di en qué equipo juega ahora (temporada 2025/26). Tienes **15 segundos**.',
+      'Sale un futbolista: di en qué equipo juega ahora (temporada 2026/27). Tienes **15 segundos**.',
       'Si aciertas, sale otro; si fallas o se acaba el tiempo, tu racha termina.',
       'Cuanto más aguantas, **menos conocidos** son los futbolistas.',
       'Cada ronda juegan todos, uno detrás de otro. Se juegan 5, 7 o 10 rondas.'
@@ -124,7 +124,7 @@ export default {
       'Hay **5 retos**: los dos primeros se cierran con un jugador en medio y los demás con dos.'
     ],
     puntos: [['🔗', 'Cada reto', 'hasta +5'], ['➖', 'Eslabones de más, fallos y pista', 'Restan'], ['🏳️', 'Rendirse', '0']],
-    consejos: ['Solo valen las coincidencias de los datos del juego: los grandes partidos y trayectorias de la web y las plantillas de 2025/26.']
+    consejos: ['Solo valen las coincidencias de los datos del juego: los grandes partidos y trayectorias de la web y las plantillas de 2026/27.']
   },
   'duelofutbol': {
     objetivo: 'Elige entre dos futbolistas según la pregunta y aguanta la **racha** más larga.',
@@ -134,7 +134,7 @@ export default {
       'Los duelos se van **igualando**. El primer fallo acaba la partida.'
     ],
     puntos: [['🔥', 'Cada acierto', '+1 a la racha']],
-    consejos: ['Edad, media y valor son los de la temporada 2025/26 de «Director Deportivo».']
+    consejos: ['Edad, media y valor son los de la temporada 2026/27 de «Director Deportivo».']
   },
   'manager': {
     objetivo: 'Con **220 M€**, ficha un once y gana todos los puntos posibles en una liga de 38 jornadas.',
@@ -148,7 +148,7 @@ export default {
     consejos: ['Los jóvenes con potencial rinden algo más y los veteranos, algo menos.']
   },
   'misterioso': {
-    objetivo: 'Adivina el **futbolista misterioso** (2025/26, media 83 o más) en 8 intentos.',
+    objetivo: 'Adivina el **futbolista misterioso** (2026/27, media 83 o más) en 8 intentos.',
     pasos: ['Escribe cualquier futbolista y verás cuánto se parece al misterioso.', 'Son **3 misterios** por partida.'],
     secciones: [{ icono: '🔎', titulo: 'Las pistas', color: 'verde', tabla: [['🟩', '**Igual**'], ['🟨', '**Cerca**: mismo continente, o edad/media a 2 o menos'], ['⬜', '**Distinto**'], ['⬆️', 'Las **flechas** dicen si el misterioso tiene más o menos edad y media']] }],
     puntos: [['🕵️', 'Cada misterio', '+9 − intentos gastados']]

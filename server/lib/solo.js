@@ -128,14 +128,14 @@ function construirGrafo() {
       }
     }
   }
-  // 3) Compañeros esta temporada (Director Deportivo, 2025/26)
+  // 3) Compañeros esta temporada (Director Deportivo, 2026/27)
   const actuales = new Map();
   for (const f of FUTBOLISTAS) {
     const k = nodo(f.nombre, [], f.media >= 85);
     if (!actuales.has(f.club)) actuales.set(f.club, []);
     actuales.get(f.club).push(k);
   }
-  for (const [club, ks] of actuales) ks.forEach((a) => ks.forEach((b) => unir(a, b, `Compañeros en el ${club} (2025/26)`)));
+  for (const [club, ks] of actuales) ks.forEach((a) => ks.forEach((b) => unir(a, b, `Compañeros en el ${club} (2026/27)`)));
   return { nodos, enlaces };
 }
 let GRAFO = null;
@@ -200,8 +200,8 @@ export function duelofutbol() {
   const TIPOS = [
     { id: 'clubes', pregunta: '¿Quién ha jugado en MÁS clubes en su carrera?', lista: tray, campo: 'clubes', unidad: (v) => `${v} clubes`, mayor: true },
     { id: 'debut', pregunta: '¿Quién empezó ANTES su carrera profesional?', lista: tray, campo: 'debut', unidad: (v) => `debutó en ${v}`, mayor: false },
-    { id: 'edad', pregunta: '¿Quién es MAYOR? (temporada 2025/26)', lista: actuales, campo: 'edad', unidad: (v) => `${v} años`, mayor: true },
-    { id: 'media', pregunta: '¿Quién tiene MÁS media en Director Deportivo? (2025/26)', lista: actuales, campo: 'media', unidad: (v) => `media ${v}`, mayor: true },
+    { id: 'edad', pregunta: '¿Quién es MAYOR? (temporada 2026/27)', lista: actuales, campo: 'edad', unidad: (v) => `${v} años`, mayor: true },
+    { id: 'media', pregunta: '¿Quién tiene MÁS media en Director Deportivo? (2026/27)', lista: actuales, campo: 'media', unidad: (v) => `media ${v}`, mayor: true },
     { id: 'valor', pregunta: '¿Quién vale MÁS en el mercado de Director Deportivo?', lista: actuales, campo: 'valor', unidad: (v) => `${v} M€`, mayor: true }
   ];
   const duelos = [];
@@ -241,15 +241,19 @@ export function manager() {
 // ------------------------------------------------------------------ Futbolista misterioso
 const LIGA = {
   'Real Madrid': 'LaLiga', Barcelona: 'LaLiga', 'Atlético': 'LaLiga', Athletic: 'LaLiga', 'Real Sociedad': 'LaLiga', Celta: 'LaLiga', Betis: 'LaLiga', Villarreal: 'LaLiga',
-  Osasuna: 'LaLiga', Valencia: 'LaLiga', Mallorca: 'LaLiga', 'Rayo Vallecano': 'LaLiga', Girona: 'LaLiga', Espanyol: 'LaLiga', Sevilla: 'LaLiga',
-  Liverpool: 'Premier League', 'Man City': 'Premier League', Arsenal: 'Premier League', Tottenham: 'Premier League', 'Aston Villa': 'Premier League', Burnley: 'Premier League',
-  Chelsea: 'Premier League', 'Man United': 'Premier League', Newcastle: 'Premier League', Sunderland: 'Premier League', 'West Ham': 'Premier League', Brighton: 'Premier League',
+  Osasuna: 'LaLiga', Valencia: 'LaLiga', 'Rayo Vallecano': 'LaLiga', Espanyol: 'LaLiga', Sevilla: 'LaLiga', Getafe: 'LaLiga', Deportivo: 'LaLiga', 'Racing de Santander': 'LaLiga',
+  // Temporada 2026/27: Mallorca, Girona y Leganés en Segunda; West Ham, Burnley y Wolves en la Championship
+  Mallorca: 'Segunda División', Girona: 'Segunda División', 'Leganés': 'Segunda División', 'West Ham': 'Championship', Burnley: 'Championship', Wolves: 'Championship',
+  Liverpool: 'Premier League', 'Man City': 'Premier League', Arsenal: 'Premier League', Tottenham: 'Premier League', 'Aston Villa': 'Premier League', Bournemouth: 'Premier League', Ipswich: 'Premier League',
+  Chelsea: 'Premier League', 'Man United': 'Premier League', Newcastle: 'Premier League', Sunderland: 'Premier League', Brighton: 'Premier League',
   Everton: 'Premier League', 'Nottingham Forest': 'Premier League', 'Crystal Palace': 'Premier League', Fulham: 'Premier League',
-  Milan: 'Serie A', Inter: 'Serie A', Juventus: 'Serie A', 'Nápoles': 'Serie A', Atalanta: 'Serie A', Como: 'Serie A', Fiorentina: 'Serie A', Roma: 'Serie A', Lazio: 'Serie A', Bolonia: 'Serie A',
-  Dortmund: 'Bundesliga', Bayern: 'Bundesliga', Leverkusen: 'Bundesliga', Hoffenheim: 'Bundesliga', Stuttgart: 'Bundesliga', Leipzig: 'Bundesliga', 'Eintracht Fráncfort': 'Bundesliga',
-  PSG: 'Ligue 1', 'Paris FC': 'Ligue 1',
-  'Fenerbahçe': 'Liga turca', Trabzonspor: 'Liga turca', Galatasaray: 'Liga turca', Oporto: 'Liga portuguesa', Sporting: 'Liga portuguesa',
-  'Al Hilal': 'Liga saudí', 'Al Nassr': 'Liga saudí', 'Al Ittihad': 'Liga saudí', 'Los Angeles FC': 'MLS', 'Inter Miami': 'MLS', Santos: 'Liga brasileña'
+  Milan: 'Serie A', Inter: 'Serie A', Juventus: 'Serie A', 'Nápoles': 'Serie A', Atalanta: 'Serie A', Como: 'Serie A', Fiorentina: 'Serie A', Roma: 'Serie A', Lazio: 'Serie A', Bolonia: 'Serie A', Udinese: 'Serie A', Genoa: 'Serie A',
+  Dortmund: 'Bundesliga', Bayern: 'Bundesliga', Leverkusen: 'Bundesliga', Hoffenheim: 'Bundesliga', Stuttgart: 'Bundesliga', Leipzig: 'Bundesliga', 'Eintracht Fráncfort': 'Bundesliga', 'Werder Bremen': 'Bundesliga',
+  PSG: 'Ligue 1', 'Paris FC': 'Ligue 1', Lyon: 'Ligue 1', Estrasburgo: 'Ligue 1', Ajax: 'Eredivisie', 'Club Brujas': 'Liga belga',
+  'Fenerbahçe': 'Liga turca', Trabzonspor: 'Liga turca', Galatasaray: 'Liga turca', 'Beşiktaş': 'Liga turca', Benfica: 'Liga portuguesa', Oporto: 'Liga portuguesa', Sporting: 'Liga portuguesa',
+  'Al Hilal': 'Liga saudí', 'Al Nassr': 'Liga saudí', 'Al Ittihad': 'Liga saudí', 'Al Qadsiah': 'Liga saudí', 'Al Shabab': 'Liga saudí',
+  'Los Angeles FC': 'MLS', 'Inter Miami': 'MLS', 'Chicago Fire': 'MLS', 'Orlando City': 'MLS', 'Columbus Crew': 'MLS',
+  Santos: 'Liga brasileña', Flamengo: 'Liga brasileña', 'River Plate': 'Liga argentina'
 };
 const PAIS = {
   BEL: ['Bélgica', 'eu'], BRA: ['Brasil', 'am'], ITA: ['Italia', 'eu'], GER: ['Alemania', 'eu'], SVN: ['Eslovenia', 'eu'], FRA: ['Francia', 'eu'], ESP: ['España', 'eu'],

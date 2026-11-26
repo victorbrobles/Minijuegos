@@ -61,7 +61,7 @@ export const TIPOS = {
       const nombreClub = (c) => CLUBES[c].split('|')[0];
       const fichajes = barajar(FUTBOLISTAS.filter((f) => f.media >= 80 && f.media <= 85)).slice(0, 3).map((f) => {
         const otros = barajar([...new Set(FUTBOLISTAS.map((x) => x.club))].filter((c) => c !== f.club)).slice(0, 3);
-        return { p: `¿En qué equipo juega ${f.nombre} (temporada 2025/26)?`, opciones: barajar([f.club, ...otros].map(nombreClub)), correcta: nombreClub(f.club), etiqueta: '🔁 Fichajes' };
+        return { p: `¿En qué equipo juega ${f.nombre} (temporada 2026/27)?`, opciones: barajar([f.club, ...otros].map(nombreClub)), correcta: nombreClub(f.club), etiqueta: '🔁 Fichajes' };
       });
       return { modo: 'quiz', preguntas: barajar([...historia, ...fichajes]), segundos: 20, umbral: 4 };
     }

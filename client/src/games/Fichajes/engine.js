@@ -2,7 +2,7 @@
 // «Fichaje exprés»: sale un futbolista y hay que decir su equipo actual en 15 segundos. Si aciertas, sale otro (cada
 // vez menos conocido); si fallas o se acaba el tiempo, tu racha termina y sumas tantos puntos como aciertos llevabas.
 // Cada ronda juegan todos, uno detrás de otro. Motor puro (servidor y modo un dispositivo).
-// futbolistas: [{ nombre, club, media, pos, pais }] (temporada 2025/26)
+// futbolistas: [{ nombre, club, media, pos, pais }] (temporada 2026/27)
 import { buscarOpcion, nombreOpcion } from '../comun/simultaneo.js';
 
 export const SEGUNDOS = 15;
@@ -25,7 +25,15 @@ export const CLUBES = {
   Oporto: 'Oporto|porto|fc porto', Sporting: 'Sporting de Portugal|sporting|sporting lisboa', 'Fenerbahçe': 'Fenerbahçe|fenerbahce',
   Galatasaray: 'Galatasaray', Trabzonspor: 'Trabzonspor',
   'Al Hilal': 'Al-Hilal|al hilal', 'Al Nassr': 'Al-Nassr|al nassr', 'Al Ittihad': 'Al-Ittihad|al ittihad',
-  'Inter Miami': 'Inter Miami|miami', 'Los Angeles FC': 'Los Angeles FC|lafc', Santos: 'Santos'
+  'Inter Miami': 'Inter Miami|miami', 'Los Angeles FC': 'Los Angeles FC|lafc', Santos: 'Santos',
+  // Clubes nuevos tras los fichajes de 2026
+  Getafe: 'Getafe', Deportivo: 'Deportivo de La Coruña|deportivo|depor|deportivo la coruña', 'Racing de Santander': 'Racing de Santander|racing|racing santander',
+  'Leganés': 'Leganés|leganes', Bournemouth: 'Bournemouth', Wolves: 'Wolverhampton|wolves', Ipswich: 'Ipswich Town|ipswich',
+  'Werder Bremen': 'Werder Bremen|werder|bremen', Udinese: 'Udinese', Genoa: 'Génova|genoa', Lyon: 'Olympique de Lyon|lyon|olympique lyon',
+  Estrasburgo: 'Estrasburgo|strasbourg', Ajax: 'Ajax', 'Club Brujas': 'Club Brujas|brujas|club brugge|brugge', Benfica: 'Benfica',
+  'Beşiktaş': 'Beşiktaş|besiktas', 'Al Qadsiah': 'Al-Qadsiah|al qadsiah', 'Al Shabab': 'Al-Shabab|al shabab',
+  'Chicago Fire': 'Chicago Fire|chicago', 'Orlando City': 'Orlando City|orlando', 'Columbus Crew': 'Columbus Crew|columbus',
+  'River Plate': 'River Plate|river', Flamengo: 'Flamengo'
 };
 export const OPCIONES_CLUB = Object.values(CLUBES);
 export const NOMBRES_CLUB = OPCIONES_CLUB.map(nombreOpcion).sort((a, b) => a.localeCompare(b));
