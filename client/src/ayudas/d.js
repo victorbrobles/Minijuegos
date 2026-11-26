@@ -368,8 +368,8 @@ export default {
   'emojis': {
     objetivo: 'Adivina al famoso cuya **vida se cuenta en emojis**, con los menos emojis posibles.',
     pasos: [
-      'Los emojis aparecen **de uno en uno** (cada 3,5 s), de la pista más vaga a la más clara.',
-      'Todos responden a la vez eligiendo entre **6 nombres**. Solo hay una oportunidad: si fallas, te quedas fuera de esa ronda.',
+      'Salen **5 emojis de uno en uno** (cada 5 s), de la pista más vaga a la más clara: con el primero es muy difícil; con el último, casi regalado. La bandera nunca sale la primera.',
+      'Todos a la vez, **escribe quién es**: vale el nombre completo, el apellido o el apodo (se perdonan faltas pequeñas). Tienes **3 intentos** por ronda.',
       'Cuanto antes aciertes, más puntos: 5 con el primer emoji, 4 con el segundo… y 1 con todos.'
     ],
     secciones: [{ icono: '✏️', titulo: 'Modo autor', color: 'rosa', items: ['En cada ronda, un jugador elige un famoso entre tres y **escribe él los emojis** (de 2 a 6).', 'El autor gana **2 puntos por cada jugador que acierte**: le interesa ser claro, pero no demasiado pronto.'] }],

@@ -1,5 +1,5 @@
 // client/src/games/Emojis/Emojis.jsx
-// «Biografía en emojis»: adivina al famoso con los menos emojis posibles. Online (todos a la vez).
+// «Biografía en emojis»: adivina al famoso con los menos emojis posibles, escribiendo su nombre. Online (todos a la vez).
 import React, { useState } from 'react';
 import JuegoPulsador from '../Pulsador/JuegoPulsador.jsx';
 import { useReloj } from '../comun/Lienzo2D.jsx';
@@ -45,6 +45,30 @@ function Escribir({ v, enviar }) {
   );
 }
 
+function Adivinar({ v, enviar }) {
+  const [texto, setTexto] = useState('');
+  const [aviso, setAviso] = useState('');
+  const quedan = v.intentos - v.misFallos.length;
+  const mandar = async (e) => {
+    e.preventDefault();
+    const t = texto.trim(); if (t.length < 3) return;
+    const r = (await enviar('responder', { texto: t }))?.datos?.resultado;
+    setTexto('');
+    if (r && r.bien === false && r.quedan) setAviso(`❌ No es ${t}. Te ${r.quedan === 1 ? 'queda 1 intento' : `quedan ${r.quedan} intentos`}.`);
+  };
+  return (
+    <form className="pzp-tarjeta em-adivinar" onSubmit={mandar}>
+      <label className="pzp-etiqueta" htmlFor="em-nombre">¿Quién es? Escribe su nombre</label>
+      <div className="em-fila-input">
+        <input id="em-nombre" className="em-input" value={texto} onChange={(e) => { setTexto(e.target.value); setAviso(''); }} placeholder="Nombre o apellido" autoComplete="off" autoCapitalize="words" spellCheck="false" enterKeyHint="send" autoFocus />
+        <button type="submit" className="em-probar" disabled={texto.trim().length < 3}>Probar</button>
+      </div>
+      {aviso && <p className="em-aviso" role="status">{aviso}</p>}
+      <p className="pzp-nota">Vale el nombre, el apellido o el apodo (se perdonan faltas pequeñas). {quedan} {quedan === 1 ? 'intento' : 'intentos'}{v.misFallos.length ? ` · ya has dicho: ${v.misFallos.join(', ')}` : ''}</p>
+    </form>
+  );
+}
+
 function Partida({ v, enviar, onSalir }) {
   const autor = v.jugadores.find((j) => j.id === v.autor);
   const soyAutor = v.autor != null && v.autor === v.yo?.id;
@@ -67,7 +91,7 @@ function Partida({ v, enviar, onSalir }) {
         <ul className="em-resultados">
           {v.jugadores.filter((j) => j.id !== r.autor && !j.fuera).map((j) => {
             const x = r.respuestas[j.id];
-            return <li key={j.id} className={x?.bien ? 'bien' : 'mal'}><b>{j.nombre}</b><span>{x ? (x.bien ? `✅ con ${x.vistos} ${x.vistos === 1 ? 'emoji' : 'emojis'}` : `❌ dijo ${x.nombre}`) : '⌛ no contestó'}</span><em>{x?.bien ? `+${x.pts}` : ''}</em></li>;
+            return <li key={j.id} className={x?.bien ? 'bien' : 'mal'}><b>{j.nombre}</b><span>{x ? (x.bien ? `✅ con ${x.vistos} ${x.vistos === 1 ? 'emoji' : 'emojis'}` : `❌ dijo ${x.nombre}`) : '⌛ no lo sacó'}</span><em>{x?.bien ? `+${x.pts}` : ''}</em></li>;
           })}
           {r.autor != null && <li className="autor"><b>✏️ {v.jugadores.find((j) => j.id === r.autor)?.nombre}</b><span>autor</span><em>+{r.ptsAutor}</em></li>}
         </ul>
@@ -82,9 +106,7 @@ function Partida({ v, enviar, onSalir }) {
       {soyAutor ? <p className="pzp-esperando">✏️ Eres el autor: mira cómo adivinan…</p> : mia ? (
         <p className={`em-mia ${mia.bien ? 'bien' : 'mal'}`}>{mia.bien ? `✅ ¡Correcto! +${mia.pts}` : `❌ No era ${mia.nombre}`}</p>
       ) : (
-        <div className="em-opciones">
-          {v.opciones.map((n, i) => <button key={n} type="button" onClick={() => enviar('responder', { opcion: i })}>{n}</button>)}
-        </div>
+        <Adivinar v={v} enviar={enviar} />
       )}
     </>
   );
@@ -112,7 +134,7 @@ const JUEGO = {
   Partida: (props) => <Partida {...props} />,
   Config,
   textoEmpezar: '¡A adivinar!',
-  notaSala: '🤔 Todos a la vez: cuanto antes aciertes, más puntos. Si fallas, te quedas fuera de esa ronda.',
+  notaSala: '🤔 Los emojis van de la pista más vaga a la más clara. Escribe quién es: cuanto antes aciertes, más puntos (3 intentos).',
   ganador: (n) => `¡${n.join(' y ')} ${n.length > 1 ? 'hablan' : 'habla'} emoji mejor que nadie!`,
   detalleFin: (j) => `${j.puntos} ${j.puntos === 1 ? 'punto' : 'puntos'}`
 };

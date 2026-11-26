@@ -1069,7 +1069,7 @@ export const META = {
     icono: 'smile',
     colores: ['#f59e0b', '#ec4899'],
     etiquetas: 'emojis famosos adivinar biografia rapidez autor online',
-    descripcion: "La vida de un famoso contada en emojis que aparecen uno a uno. Cuanto antes aciertes, más puntos. En el modo autor, sois vosotros quienes la contáis en emojis.",
+    descripcion: "La vida de un famoso contada en 5 emojis, de la pista más vaga a la más clara. Escribe quién es: cuanto antes aciertes, más puntos. En el modo autor, sois vosotros quienes la contáis en emojis.",
     categorias: ['famosos']
   },
   'habilidad': {

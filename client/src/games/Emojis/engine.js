@@ -1,15 +1,17 @@
 // client/src/games/Emojis/engine.js
 // «Biografía en emojis»: motor puro (salas online en server/routes/emojis.js).
-// La vida de un famoso contada en emojis que van apareciendo uno a uno. Todos eligen a la vez entre 6 nombres:
-// cuanto antes se acierta, más puntos (5 con el primer emoji, 4 con el segundo…). Fallar deja fuera de la ronda.
+// La vida de un famoso contada en 5 emojis que van apareciendo uno a uno, de la pista más vaga a la más clara.
+// Todos escriben a la vez quién creen que es (vale el nombre, el apellido o el apodo, con faltas pequeñas):
+// cuanto antes se acierta, más puntos (5 con el primer emoji, 4 con el segundo…). Hay 3 intentos por ronda.
 // Modo «autor»: en cada ronda un jugador elige un famoso y escribe él mismo los emojis; gana 2 puntos por cada
 // jugador que acierte (le interesa que sean claros, pero cada emoji de más da menos puntos a los demás).
 import { BANCO, CATEGORIAS } from './banco.js';
 
 export const OPCIONES_RONDAS = [6, 10, 15];
 export const MODOS = ['banco', 'autor'];
-export const MS_EMOJI = 3500;
-export const SEG_EXTRA = 6;
+export const MS_EMOJI = 5000;
+export const SEG_EXTRA = 10;
+export const INTENTOS = 3;
 export const SEG_ESCRIBIR = 45;
 export const SEG_RESULTADO = 6;
 export const MAX_EMOJIS = 6;
@@ -24,16 +26,32 @@ export function limpiarEmojis(texto) {
   return seg.filter((g) => /\p{Extended_Pictographic}|\p{Regional_Indicator}|[#-9]️?⃣/u.test(g)).slice(0, MAX_EMOJIS);
 }
 
-function opcionesDe(item) {
-  const misma = BANCO.filter((b) => b.c === item.c && b.n !== item.n);
-  return barajar([item.n, ...barajar(misma).slice(0, 5).map((b) => b.n)]);
+const normalizar = (t) => String(t ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9ñ ]/g, ' ').replace(/\s+/g, ' ').trim();
+function distancia(a, b) {
+  const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
+  for (let j = 1; j <= b.length; j++) d[0][j] = j;
+  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+  return d[a.length][b.length];
+}
+/** ¿Lo escrito es este famoso? Vale el nombre completo, el apellido (o los dos últimos nombres) y los alias. */
+export function esFamoso(texto, item) {
+  const t = normalizar(texto);
+  if (t.length < 3) return false;
+  const palabras = normalizar(item.n).split(' ');
+  const formas = new Set([palabras.join(' '), ...(item.alias || []).map(normalizar)]);
+  if (palabras.length > 1) {
+    const ultima = palabras[palabras.length - 1];
+    if (ultima.length >= 4) formas.add(ultima);
+    if (palabras.length > 2) formas.add(palabras.slice(-2).join(' '));
+  }
+  return [...formas].some((f) => f === t || (f.length >= 5 && distancia(f, t) <= (f.length >= 9 ? 2 : 1)));
 }
 
 export function crearPartida(jugadores, items = [], reglas = {}, ahora = Date.now()) {
   const rondas = OPCIONES_RONDAS.includes(reglas.rondas) ? reglas.rondas : 10;
   const modo = MODOS.includes(reglas.modo) ? reglas.modo : 'banco';
   const p = {
-    fase: 'adivinar', modo, ronda: 0, rondas, mazo: barajar(BANCO), item: null, emojis: [], opciones: [], inicio: 0, limite: 0,
+    fase: 'adivinar', modo, ronda: 0, rondas, mazo: barajar(BANCO), item: null, emojis: [], intentos: {}, inicio: 0, limite: 0,
     autor: null, candidatos: [], respuestas: {}, resultado: null, fin: null,
     jugadores: jugadores.map((j) => ({ id: j.id, nombre: j.nombre, puntos: 0, fuera: false }))
   };
@@ -56,7 +74,7 @@ function nuevaRonda(p, ahora) {
   }
 }
 function empezarAdivinar(p, ahora) {
-  p.opciones = opcionesDe(p.item);
+  p.intentos = {};
   p.fase = 'adivinar'; p.inicio = ahora;
   p.limite = ahora + p.emojis.length * MS_EMOJI + SEG_EXTRA * 1000;
 }
@@ -77,13 +95,18 @@ export function responder(p, id, d, ahora = Date.now()) {
   if (p.fase !== 'adivinar') return { ok: false, error: 'Ahora no.' };
   const j = jug(p, id);
   if (!j || j.fuera || id === p.autor) return { ok: false };
-  if (p.respuestas[id]) return { ok: false, error: 'Ya has respondido.' };
-  const nombre = p.opciones[Number(d.opcion)];
-  if (!nombre) return { ok: false };
+  if (p.respuestas[id]) return { ok: false, error: 'Ya has terminado esta ronda.' };
+  const texto = String(d.texto ?? '').trim().slice(0, 60);
+  if (texto.length < 3) return { ok: false, error: 'Escribe un nombre.' };
   const vistos = visibles(p, ahora);
-  const bien = nombre === p.item.n;
+  const bien = esFamoso(texto, p.item);
+  const usados = (p.intentos[id] || []);
+  if (!bien) {
+    usados.push(texto); p.intentos[id] = usados;
+    if (usados.length < INTENTOS) return { ok: true, bien: false, quedan: INTENTOS - usados.length };
+  }
   const pts = bien ? Math.max(1, 6 - vistos) : 0;
-  p.respuestas[id] = { nombre, bien, vistos, pts, t: ahora - p.inicio };
+  p.respuestas[id] = { nombre: texto, bien, vistos, pts, t: ahora - p.inicio, fallos: usados.length };
   if (bien) j.puntos += pts;
   const faltan = activos(p).filter((x) => x.id !== p.autor && !p.respuestas[x.id]);
   if (!faltan.length) cerrar(p, ahora);
@@ -143,7 +166,7 @@ export function vistaDe(p, id, ahora = Date.now()) {
   const vistos = p.fase === 'adivinar' ? visibles(p, ahora) : p.fase === 'resultado' ? p.emojis.length : 0;
   return {
     fase: p.fase, modo: p.modo, ronda: p.ronda, rondas: p.rondas, inicio: p.inicio, limite: p.limite, ahora, msEmoji: MS_EMOJI,
-    categoria: p.item ? CATEGORIAS[p.item.c] : null, emojis: p.emojis.slice(0, vistos), total: p.emojis.length, opciones: p.fase === 'escribir' ? [] : p.opciones,
+    categoria: p.item ? CATEGORIAS[p.item.c] : null, emojis: p.emojis.slice(0, vistos), total: p.emojis.length, misFallos: (p.intentos || {})[id] || [], intentos: INTENTOS,
     autor: p.autor, candidatos: p.fase === 'escribir' && id === p.autor ? p.candidatos.map((c) => ({ n: c.n, cat: CATEGORIAS[c.c].nombre })) : [],
     miRespuesta: p.respuestas[id] || null, respondidos: Object.keys(p.respuestas).map(Number), resultado: p.resultado,
     jugadores: p.jugadores.map((j) => ({ id: j.id, nombre: j.nombre, puntos: j.puntos, fuera: j.fuera })),
