@@ -1,23 +1,45 @@
 /* client/src/games/Draft/Draft.css */
-.dr-criterios { margin: 0.5rem 0; }
-.dr-criterios > div { display: flex; flex-wrap: wrap; gap: 0.35rem; }
-.dr-criterio { padding: 0.35rem 0.7rem; border-radius: 999px; background: #ffffff; color: #0f172a; font-size: 0.8rem; font-weight: 800; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); }
-.dr-criterio.sale { background: #facc15; transform: scale(1.08); }
-.dr-criterio.no { opacity: 0.35; text-decoration: line-through; }
-.dr-reloj { text-align: center; margin: 0.2rem 0 0.4rem; }
-.dr-pool { display: grid; grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr)); gap: 0.4rem; margin-bottom: 1rem; }
-.dr-famoso { display: grid; gap: 0.1rem; justify-items: center; min-height: 3.4rem; padding: 0.5rem 0.4rem; border: 2px solid #e2e8f0; border-radius: 14px; background: #ffffff; color: #0f172a; font: inherit; font-size: 0.85rem; text-align: center; cursor: pointer; transition: transform 0.12s; }
+.dr-criterio-titulo { display: block; margin-top: 0.2rem; font-size: 0.62em; letter-spacing: 0.01em; }
+.dr-barra { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.4rem; margin: 0.4rem 0; }
+.dr-reloj { padding: 0.3rem 0.7rem; border-radius: 999px; background: #ffffff; color: #0f172a; font-weight: 800; font-size: 0.85rem; }
+.dr-urgente { color: #dc2626; }
+.dr-extras { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+.dr-extra { padding: 0.35rem 0.6rem; border: 2px solid transparent; border-radius: 999px; background: #ffffff; color: #4c1d95; font: inherit; font-size: 0.78rem; font-weight: 800; cursor: pointer; box-shadow: none; }
+.dr-extra.activo { border-color: #7c3aed; background: #ede9fe; }
+.dr-extra:disabled { opacity: 0.45; cursor: default; }
+.dr-modo { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; margin: 0 0 0.4rem; padding: 0.4rem 0.7rem; border-radius: 12px; background: #fef9c3; color: #713f12; font-size: 0.82rem; font-weight: 700; }
+.dr-modo button { margin-left: auto; padding: 0.2rem 0.6rem; border: none; border-radius: 8px; background: #ffffff; color: #713f12; font: inherit; font-size: 0.75rem; font-weight: 800; cursor: pointer; box-shadow: none; }
+.dr-ultimo { margin: 0.3rem 0; padding: 0.35rem 0.7rem; border-radius: 12px; background: #fee2e2; color: #991b1b; font-size: 0.82rem; font-weight: 800; text-align: center; animation: dr-aparece 0.3s ease; }
+@keyframes dr-aparece { from { transform: scale(0.9); opacity: 0; } to { transform: none; opacity: 1; } }
+/* Todos los famosos a la vista, también en el móvil: celdas compactas */
+.dr-pool { display: grid; grid-template-columns: repeat(auto-fill, minmax(6.6rem, 1fr)); gap: 0.3rem; margin-bottom: 0.6rem; }
+.dr-famoso { position: relative; display: grid; align-content: center; gap: 0.05rem; justify-items: center; min-height: 2.9rem; padding: 0.3rem 0.25rem; border: 2px solid #e2e8f0; border-radius: 11px; background: #ffffff; color: #0f172a; font: inherit; font-size: 0.74rem; line-height: 1.15; text-align: center; cursor: pointer; transition: transform 0.12s, border-color 0.12s; box-shadow: none; }
+.dr-famoso b { font-weight: 800; overflow-wrap: anywhere; }
 .dr-famoso:not(:disabled):hover { transform: translateY(-2px); border-color: #a855f7; }
-.dr-famoso.cogido { border-color: var(--c); background: color-mix(in srgb, var(--c) 14%, #ffffff); opacity: 0.85; }
-.dr-famoso small { font-size: 0.7rem; font-weight: 800; color: var(--c); }
-.dr-famoso:disabled { cursor: default; }
-.dr-mini { display: block; max-width: 9rem; font-size: 0.6rem; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.dr-equipos { display: grid; gap: 0.5rem; margin-bottom: 0.8rem; }
+.dr-famoso:not(:disabled):active { transform: scale(0.96); }
+.dr-famoso.cogido { border-color: var(--c); background: color-mix(in srgb, var(--c) 16%, #ffffff); }
+.dr-famoso.mio { box-shadow: 0 0 0 2px var(--c); }
+.dr-famoso.apagado { cursor: default; }
+.dr-famoso.apagado:not(.cogido) { opacity: 0.55; }
+.dr-famoso.objetivo { border-color: #f59e0b; animation: dr-latido 1s ease-in-out infinite; }
+@keyframes dr-latido { 50% { box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.45); } }
+.dr-famoso small { font-size: 0.64rem; font-weight: 800; color: var(--c); }
+.dr-dato { font-size: 0.66rem; font-style: normal; font-weight: 800; color: #7c3aed; }
+.dr-pool-fin .dr-famoso { cursor: default; }
+.dr-pool-fin .dr-famoso small { color: #475569; }
+.dr-mini { display: block; max-width: 9.5rem; font-size: 0.6rem; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dr-nota { text-align: center; }
+.dr-mejor { text-align: center; }
+.dr-equipos { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); gap: 0.5rem; margin-bottom: 0.6rem; }
 .dr-equipo { border-left: 6px solid var(--c); }
 .dr-equipo.gana { box-shadow: 0 0 0 2px #f59e0b, 0 6px 18px rgba(245, 158, 11, 0.3); }
 .dr-equipo-nombre { display: flex; align-items: center; gap: 0.4rem; margin: 0 0 0.3rem; font-weight: 900; }
 .dr-equipo-nombre em { margin-left: auto; font-style: normal; color: #7c3aed; }
 .dr-equipo ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.15rem; }
 .dr-equipo li { display: flex; justify-content: space-between; gap: 0.5rem; font-size: 0.85rem; }
-.dr-equipo li b { color: #475569; }
+.dr-equipo li b { color: #475569; white-space: nowrap; }
 .dr-suma { margin: 0.3rem 0 0; text-align: right; font-weight: 900; color: #0f172a; }
+@media (max-width: 420px) {
+  .dr-pool { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .dr-famoso { min-height: 2.6rem; font-size: 0.7rem; }
+}

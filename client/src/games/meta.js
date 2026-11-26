@@ -1048,8 +1048,8 @@ export const META = {
     imagen: '/covers/draft.webp',
     icono: 'star',
     colores: ['#7c3aed', '#f59e0b'],
-    etiquetas: 'draft famosos fichajes estrategia criterio oculto edad altura nombre online',
-    descripcion: "Ficha famosos por turnos sin saber qué contará: los más mayores, los más altos, el nombre más largo… Al final se desvela el criterio y se suman los datos de tu equipo. ¡Estrategia y cultura!",
+    etiquetas: 'draft famosos fichajes rapidez estrategia cultura edad altura robar online',
+    descripcion: "Cada ronda, una categoría y un criterio: los más altos, los que nacieron antes… Todos fichan a la vez y el más rápido se lo queda. Con 4 famosos cada uno se desvelan los datos. ¡Roba, cambia y usa el chivato!",
     categorias: ['famosos']
   },
   'conocerse': {

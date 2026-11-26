@@ -331,14 +331,17 @@ export default {
     gana: 'Quien más puntos sume al acabar las rondas.'
   },
   'draft': {
-    objetivo: 'Ficha famosos **sin saber qué criterio contará** y arma el mejor equipo.',
+    objetivo: 'Demuestra lo que sabes de famosos: ficha a los **4 mejores** para el criterio de la ronda.',
     pasos: [
-      'En cada ronda sale una **categoría** (futbolistas, cine, música…) y una lista de famosos.',
-      'Se muestran **tres criterios posibles** (por ejemplo: los más mayores, los más altos, el nombre más largo). Solo uno contará, pero no se sabe cuál hasta el final.',
-      'Por turnos y en **serpiente** (1-2-3-3-2-1…), cada jugador ficha **3 famosos**. Tienes 25 segundos; si se acaba, fichas al azar.',
-      'Al final se desvela el criterio y se suman los datos de cada equipo (años, centímetros o letras).'
+      'Cada ronda sale una **categoría** (futbolistas, cine, música…) y un **criterio** claro desde el principio: los más altos, los más bajitos, los que nacieron antes o los que nacieron después.',
+      'Aparece una lista de famosos con sus datos **ocultos**. Todos fichan **a la vez**: el primero que toca un famoso se lo queda y ya nadie más puede ficharlo.',
+      'Cada jugador ficha **4 famosos**. Cuando todos los tienen (o se acaba el tiempo, y entonces los huecos se rellenan al azar), se desvelan los datos y se suman.',
+      'En un solo móvil se ficha **por turnos** (en serpiente: 1-2-3-3-2-1…), uno cada vez.'
     ],
-    secciones: [{ icono: '🧠', titulo: 'Estrategia', color: 'violeta', items: ['Busca famosos que sirvan para **varios criterios** a la vez.', 'Fíjate en lo que fichan los demás: a veces conviene quitarles el que necesitan.'] }],
+    secciones: [
+      { icono: '🃏', titulo: 'Comodines (una vez por partida cada uno)', color: 'violeta', items: ['**🦹 Robar**: quítale un famoso a un rival (necesitas un hueco libre). Él tendrá que fichar otro.', '**🔁 Cambiar**: devuelve uno de los tuyos a la lista y ficha otro.', '**👁️ Chivato**: mira el dato de un famoso antes de ficharlo.'] },
+      { icono: '🧠', titulo: 'Estrategia', color: 'cian', items: ['Sé rápido con los que tengas claros, y guarda el chivato para la duda.', 'Si un rival ha fichado justo al que necesitabas… ¡róbaselo!'] }
+    ],
     puntos: [['🌟', 'Por cada rival al que superas en la ronda', '+1']],
     gana: 'Quien más puntos sume al acabar las rondas.'
   },
