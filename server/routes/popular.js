@@ -211,6 +211,23 @@ function coincideConRespuesta(inputRaw, resp) {
   return false;
 }
 
+/**
+ * La respuesta que corresponde a lo escrito, entre las que quedan por descubrir. Primero se busca la coincidencia
+ * exacta (también entre las ya descubiertas, para que «gorra» repetida no cuente como «gorro»); si no la hay, de
+ * las que encajan de forma aproximada se elige la más parecida.
+ */
+function buscarRespuesta(inputRaw, respuestas, descubiertos = []) {
+  const inputNorm = normalizar(inputRaw);
+  if (!inputNorm) return null;
+  const opciones = (resp) => [resp.texto, ...String(resp.texto ?? '').split(/[\/(),]/), ...(resp.alias || [])].map(normalizar).filter(Boolean);
+  const exacta = respuestas.find((r) => opciones(r).includes(inputNorm));
+  if (exacta) return descubiertos.includes(exacta.puesto) ? null : exacta;
+  const candidatas = respuestas.filter((r) => !descubiertos.includes(r.puesto) && coincideConRespuesta(inputRaw, r));
+  if (candidatas.length <= 1) return candidatas[0] || null;
+  const distancia = (r) => Math.min(...opciones(r).map((o) => distanciaLevenshtein(inputNorm, o)));
+  return candidatas.reduce((mejor, r) => (distancia(r) < distancia(mejor) ? r : mejor));
+}
+
 function barajarArray(array) {
   const copia = [...array];
   for (let i = copia.length - 1; i > 0; i--) {
@@ -302,10 +319,9 @@ router.post('/validar', (req, res) => {
 
   if (!normalizar(respuesta)) return res.json({ acierto: false });
 
-  for (const resp of item.respuestas) {
-    if (acertados.includes(resp.puesto)) continue;
-
-    if (coincideConRespuesta(respuesta, resp)) {
+  {
+    const resp = buscarRespuesta(respuesta, item.respuestas, acertados);
+    if (resp) {
       const pts = PUNTUACION_PUESTOS[resp.puesto] || 2;
       return res.json({
         acierto: true,
@@ -541,16 +557,7 @@ router.post('/online/sala/:code/validar', (req, res) => {
   if (!normalizar(respuesta)) return res.status(400).json({ error: 'Texto vacío.' });
 
   const puestosDescubiertos = Object.keys(sala.ronda.acertados).map(Number);
-  let encontrado = null;
-
-  for (const resp of sala.ronda.respuestasOriginales) {
-    if (puestosDescubiertos.includes(resp.puesto)) continue;
-
-    if (coincideConRespuesta(respuesta, resp)) {
-      encontrado = resp;
-      break;
-    }
-  }
+  const encontrado = buscarRespuesta(respuesta, sala.ronda.respuestasOriginales, puestosDescubiertos);
 
   if (encontrado) {
     const pts = PUNTUACION_PUESTOS[encontrado.puesto] || 2;

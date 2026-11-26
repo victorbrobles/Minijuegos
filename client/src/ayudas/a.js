@@ -197,7 +197,7 @@ export default {
     pasos: [
       'Cada ronda se plantea una situación cotidiana.',
       'Por turnos, tienes **45 segundos** para escribir una idea que creas que está en el Top 5.',
-      'Basta con la palabra clave o un sinónimo claro.'
+      'Todas las respuestas son de **una o dos palabras**: escribe la palabra o un sinónimo (se perdonan las faltas pequeñas).'
     ],
     secciones: [{ icono: '💡', titulo: 'Pistas (-1 punto)', color: 'cian', items: ['**💡 Pista** en una fila oculta: muestra los huecos de letras.', '**🔤 +Letras**: revela las letras iniciales.'] }],
     puntos: [['🥇', 'Puestos #1 y #2', '+2 / +4'], ['🥈', 'Puestos #3 y #4', '+6 / +8'], ['🏆', 'Puesto #5 (el menos obvio)', '+10']],

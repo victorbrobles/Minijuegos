@@ -519,7 +519,7 @@ export const META = {
     icono: 'flame',
     colores: ['#fb923c', '#dc2626'],
     etiquetas: 'popular mayoria top 5 tendencia moda categorias encuesta',
-    descripcion: 'Adivina las 5 cosas que más repsonde la gente sobre cuestiones típicas y cotidianas. Intenta averiguar primero las últimas, más difíciles pero más valiosas.',
+    descripcion: 'Adivina las 5 cosas que más responde la gente sobre cuestiones típicas y cotidianas. Intenta averiguar primero las últimas, más difíciles pero más valiosas.',
     categorias: ['chill']
   },
   'logos': {

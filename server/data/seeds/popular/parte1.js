@@ -1,1102 +1,1104 @@
+// server/data/seeds/popular/parte1.js
+// «Sigue la moda»: las 5 respuestas más populares, de pocas palabras (y sinónimos que también valen).
 export default [
   {
-    id: 'pop_1',
-    pregunta: 'Algo que siempre llevas contigo al salir de casa',
+    id: "pop_001",
+    pregunta: "Algo que siempre llevas al salir de casa",
     respuestas: [
-      { puesto: 1, texto: 'Móvil / Teléfono', alias: ['telefono', 'celular', 'smartphone'] },
-      { puesto: 2, texto: 'Llaves', alias: ['llaves de casa', 'llavero'] },
-      { puesto: 3, texto: 'Cartera / Billetera', alias: ['monedero', 'dinero', 'tarjetas'] },
-      { puesto: 4, texto: 'Gafas de sol', alias: ['gafas', 'lentes'] },
-      { puesto: 5, texto: 'Pañuelos', alias: ['pañuelo', 'klinex', 'kleenex'] }
+      { puesto: 1, texto: "Móvil", alias: ["telefono", "celular"] },
+      { puesto: 2, texto: "Llaves", alias: ["llave"] },
+      { puesto: 3, texto: "Cartera", alias: ["billetera", "monedero"] },
+      { puesto: 4, texto: "Dinero", alias: ["efectivo", "tarjeta"] },
+      { puesto: 5, texto: "Gafas", alias: ["gafas de sol"] }
     ]
   },
   {
-    id: 'pop_2',
-    pregunta: 'Un ingrediente imprescindible en una pizza',
+    id: "pop_002",
+    pregunta: "Un ingrediente imprescindible en una pizza",
     respuestas: [
-      { puesto: 1, texto: 'Queso / Mozzarella', alias: ['mozzarella', 'queso'] },
-      { puesto: 2, texto: 'Tomate', alias: ['salsa de tomate', 'tomate frito'] },
-      { puesto: 3, texto: 'Jamón', alias: ['jamon york', 'jamon cocido'] },
-      { puesto: 4, texto: 'Bacon', alias: ['beicon', 'tocino'] },
-      { puesto: 5, texto: 'Champiñones', alias: ['setas', 'hongos'] }
+      { puesto: 1, texto: "Queso", alias: ["mozzarella"] },
+      { puesto: 2, texto: "Tomate", alias: ["salsa de tomate"] },
+      { puesto: 3, texto: "Jamón", alias: ["jamon york"] },
+      { puesto: 4, texto: "Orégano", alias: [] },
+      { puesto: 5, texto: "Champiñones", alias: ["setas", "champis"] }
     ]
   },
   {
-    id: 'pop_3',
-    pregunta: 'Una excusa típica para llegar tarde',
+    id: "pop_003",
+    pregunta: "Una excusa típica para llegar tarde",
     respuestas: [
-      { puesto: 1, texto: 'Había mucho tráfico', alias: ['atasco', 'trafico', 'caravana'] },
-      { puesto: 2, texto: 'Se me pegaron las sábanas / Me quedé dormido', alias: ['me quede dormido', 'dormido', 'no sono el despertador'] },
-      { puesto: 3, texto: 'Retraso en el transporte público', alias: ['el metro iba con retraso', 'el autobus no pasaba', 'retraso en el tren'] },
-      { puesto: 4, texto: 'No encontraba las llaves', alias: ['las llaves', 'perdi las llaves'] },
-      { puesto: 5, texto: 'No encontraba aparcamiento', alias: ['no habia sitio', 'aparcamiento', 'no encontraba sitio'] }
+      { puesto: 1, texto: "Tráfico", alias: ["atasco"] },
+      { puesto: 2, texto: "Despertador", alias: ["me dormi", "dormirse"] },
+      { puesto: 3, texto: "Autobús", alias: ["bus", "metro", "transporte"] },
+      { puesto: 4, texto: "Lluvia", alias: ["llovia"] },
+      { puesto: 5, texto: "Aparcar", alias: ["aparcamiento"] }
     ]
   },
   {
-    id: 'pop_4',
-    pregunta: 'Un animal de compañía habitual',
+    id: "pop_004",
+    pregunta: "Un animal de compañía habitual",
     respuestas: [
-      { puesto: 1, texto: 'Perro', alias: ['can', 'perrito'] },
-      { puesto: 2, texto: 'Gato', alias: ['felino', 'gatito'] },
-      { puesto: 3, texto: 'Pez', alias: ['peces', 'pez dorado'] },
-      { puesto: 4, texto: 'Pájaro / Canario', alias: ['loro', 'periquito', 'canario', 'pajaro'] },
-      { puesto: 5, texto: 'Hámster', alias: ['hamster', 'cobaya', 'conejo'] }
+      { puesto: 1, texto: "Perro", alias: ["perrito"] },
+      { puesto: 2, texto: "Gato", alias: ["gatito"] },
+      { puesto: 3, texto: "Pájaro", alias: ["canario", "periquito"] },
+      { puesto: 4, texto: "Pez", alias: ["peces"] },
+      { puesto: 5, texto: "Hámster", alias: ["conejo"] }
     ]
   },
   {
-    id: 'pop_5',
-    pregunta: 'Una red social muy utilizada',
+    id: "pop_005",
+    pregunta: "Una red social muy utilizada",
     respuestas: [
-      { puesto: 1, texto: 'Instagram', alias: ['insta'] },
-      { puesto: 2, texto: 'TikTok', alias: ['tik tok'] },
-      { puesto: 3, texto: 'WhatsApp', alias: ['wasap', 'watsapp'] },
-      { puesto: 4, texto: 'Twitter / X', alias: ['x', 'twitter'] },
-      { puesto: 5, texto: 'Facebook', alias: ['face'] }
+      { puesto: 1, texto: "Instagram", alias: ["insta"] },
+      { puesto: 2, texto: "TikTok", alias: [] },
+      { puesto: 3, texto: "Facebook", alias: [] },
+      { puesto: 4, texto: "X", alias: ["twitter"] },
+      { puesto: 5, texto: "WhatsApp", alias: ["whatsapp"] }
     ]
   },
   {
-    id: 'pop_6',
-    pregunta: 'Algo que se desayuna habitualmente',
+    id: "pop_006",
+    pregunta: "Algo que se desayuna habitualmente",
     respuestas: [
-      { puesto: 1, texto: 'Café', alias: ['cafe con leche', 'un cafe'] },
-      { puesto: 2, texto: 'Tostadas', alias: ['tostada con tomate', 'pan tostado', 'tostada'] },
-      { puesto: 3, texto: 'Cereales', alias: ['leche con cereales', 'cereales con leche'] },
-      { puesto: 4, texto: 'Zumo de naranja', alias: ['zumo', 'jugo de naranja'] },
-      { puesto: 5, texto: 'Galletas', alias: ['galleta'] }
+      { puesto: 1, texto: "Café", alias: ["cafe con leche"] },
+      { puesto: 2, texto: "Tostadas", alias: ["tostada", "pan"] },
+      { puesto: 3, texto: "Cereales", alias: [] },
+      { puesto: 4, texto: "Zumo", alias: ["zumo de naranja"] },
+      { puesto: 5, texto: "Galletas", alias: [] }
     ]
   },
   {
-    id: 'pop_7',
-    pregunta: 'Un deporte que se juega con balón o pelota',
+    id: "pop_007",
+    pregunta: "Un deporte que se juega con balón",
     respuestas: [
-      { puesto: 1, texto: 'Fútbol', alias: ['balompie', 'futbol 11'] },
-      { puesto: 2, texto: 'Baloncesto', alias: ['basket', 'basquet'] },
-      { puesto: 3, texto: 'Tenis', alias: ['tennis'] },
-      { puesto: 4, texto: 'Voleibol', alias: ['voley', 'volei'] },
-      { puesto: 5, texto: 'Balonmano', alias: ['handball'] }
+      { puesto: 1, texto: "Fútbol", alias: [] },
+      { puesto: 2, texto: "Baloncesto", alias: ["basket"] },
+      { puesto: 3, texto: "Voleibol", alias: ["voley"] },
+      { puesto: 4, texto: "Balonmano", alias: [] },
+      { puesto: 5, texto: "Rugby", alias: [] }
     ]
   },
   {
-    id: 'pop_8',
-    pregunta: 'Lo primero que hace la gente al despertarse',
+    id: "pop_008",
+    pregunta: "Lo primero que haces al despertarte",
     respuestas: [
-      { puesto: 1, texto: 'Mirar el móvil', alias: ['ver el movil', 'revisar el celular', 'mirar el telefono'] },
-      { puesto: 2, texto: 'Ir al baño / Hacer pis', alias: ['orinar', 'ir al servicio', 'hacer pis'] },
-      { puesto: 3, texto: 'Apagar la alarma', alias: ['apagar el despertador', 'despertador'] },
-      { puesto: 4, texto: 'Lavarse la cara o dientes', alias: ['lavarse los dientes', 'ducharse'] },
-      { puesto: 5, texto: 'Tomar café', alias: ['cafe', 'hacer cafe', 'desayunar'] }
+      { puesto: 1, texto: "Mirar el móvil", alias: ["movil"] },
+      { puesto: 2, texto: "Ir al baño", alias: ["baño", "mear"] },
+      { puesto: 3, texto: "Ducharse", alias: ["ducha"] },
+      { puesto: 4, texto: "Café", alias: [] },
+      { puesto: 5, texto: "Apagar el despertador", alias: ["despertador"] }
     ]
   },
   {
-    id: 'pop_9',
-    pregunta: 'Una fruta muy consumida',
+    id: "pop_009",
+    pregunta: "Una fruta muy consumida",
     respuestas: [
-      { puesto: 1, texto: 'Manzana', alias: ['manzanas'] },
-      { puesto: 2, texto: 'Plátano / Banana', alias: ['platano', 'banana'] },
-      { puesto: 3, texto: 'Naranja', alias: ['naranjas'] },
-      { puesto: 4, texto: 'Fresa', alias: ['fresas', 'frutilla'] },
-      { puesto: 5, texto: 'Sandía', alias: ['sandia'] }
+      { puesto: 1, texto: "Plátano", alias: ["banana"] },
+      { puesto: 2, texto: "Manzana", alias: [] },
+      { puesto: 3, texto: "Naranja", alias: [] },
+      { puesto: 4, texto: "Fresa", alias: ["fresas"] },
+      { puesto: 5, texto: "Pera", alias: [] }
     ]
   },
   {
-    id: 'pop_10',
-    pregunta: 'Planes habituales en vacaciones de verano',
+    id: "pop_010",
+    pregunta: "Un plan típico de vacaciones de verano",
     respuestas: [
-      { puesto: 1, texto: 'Ir a la playa', alias: ['playa', 'tomar el sol'] },
-      { puesto: 2, texto: 'Viajar a otro país / ciudad', alias: ['hacer un viaje', 'viajes', 'turismo'] },
-      { puesto: 3, texto: 'Bañarse en la piscina', alias: ['piscina', 'ir a la piscina'] },
-      { puesto: 4, texto: 'Dormir y descansar', alias: ['dormir', 'no hacer nada', 'relajarse'] },
-      { puesto: 5, texto: 'Salir de fiesta o terrazas', alias: ['fiesta', 'ir de terrazas', 'cervezas'] }
+      { puesto: 1, texto: "Playa", alias: [] },
+      { puesto: 2, texto: "Piscina", alias: [] },
+      { puesto: 3, texto: "Viajar", alias: ["viaje"] },
+      { puesto: 4, texto: "Pueblo", alias: [] },
+      { puesto: 5, texto: "Montaña", alias: [] }
     ]
   },
   {
-    id: 'pop_11',
-    pregunta: 'Una profesión con gran prestigio social',
+    id: "pop_011",
+    pregunta: "Una profesión con mucho prestigio",
     respuestas: [
-      { puesto: 1, texto: 'Médico / Doctor', alias: ['medico', 'doctor', 'cirujano'] },
-      { puesto: 2, texto: 'Abogado', alias: ['juez', 'abogada', 'fiscal'] },
-      { puesto: 3, texto: 'Profesor / Maestro', alias: ['profesor', 'maestro', 'docente'] },
-      { puesto: 4, texto: 'Ingeniero', alias: ['ingeniera', 'ingenieria'] },
-      { puesto: 5, texto: 'Arquitecto', alias: ['arquitecta'] }
+      { puesto: 1, texto: "Médico", alias: ["doctor"] },
+      { puesto: 2, texto: "Abogado", alias: [] },
+      { puesto: 3, texto: "Ingeniero", alias: [] },
+      { puesto: 4, texto: "Piloto", alias: [] },
+      { puesto: 5, texto: "Juez", alias: [] }
     ]
   },
   {
-    id: 'pop_12',
-    pregunta: 'Lugares donde la gente suele tener que hacer cola',
+    id: "pop_012",
+    pregunta: "Un lugar donde hay que hacer cola",
     respuestas: [
-      { puesto: 1, texto: 'Supermercado', alias: ['caja del super', 'cajas'] },
-      { puesto: 2, texto: 'Banco', alias: ['oficina bancaria', 'cajero'] },
-      { puesto: 3, texto: 'Médico / Hospital', alias: ['centro de salud', 'ambulatorio', 'sala de espera'] },
-      { puesto: 4, texto: 'Parada de autobús o metro', alias: ['autobus', 'metro', 'estacion'] },
-      { puesto: 5, texto: 'Cine', alias: ['taquilla del cine', 'palomitas'] }
+      { puesto: 1, texto: "Supermercado", alias: ["super"] },
+      { puesto: 2, texto: "Banco", alias: [] },
+      { puesto: 3, texto: "Médico", alias: ["centro de salud", "ambulatorio"] },
+      { puesto: 4, texto: "Aeropuerto", alias: [] },
+      { puesto: 5, texto: "Cine", alias: [] }
     ]
   },
   {
-    id: 'pop_13',
-    pregunta: 'Algo que se guarda en la mesilla de noche',
+    id: "pop_013",
+    pregunta: "Algo que hay en la mesilla de noche",
     respuestas: [
-      { puesto: 1, texto: 'Lámpara', alias: ['lamparita', 'luz'] },
-      { puesto: 2, texto: 'Cargador del móvil', alias: ['cargador', 'cable'] },
-      { puesto: 3, texto: 'Libro', alias: ['novela', 'lectura'] },
-      { puesto: 4, texto: 'Vaso de agua', alias: ['agua', 'botella de agua'] },
-      { puesto: 5, texto: 'Reloj despertador', alias: ['despertador', 'reloj'] }
+      { puesto: 1, texto: "Lámpara", alias: ["luz"] },
+      { puesto: 2, texto: "Móvil", alias: ["cargador"] },
+      { puesto: 3, texto: "Libro", alias: [] },
+      { puesto: 4, texto: "Despertador", alias: [] },
+      { puesto: 5, texto: "Agua", alias: ["vaso de agua"] }
     ]
   },
   {
-    id: 'pop_14',
-    pregunta: 'Un color favorito común',
+    id: "pop_014",
+    pregunta: "Un color favorito",
     respuestas: [
-      { puesto: 1, texto: 'Azul', alias: ['azul marino', 'celeste'] },
-      { puesto: 2, texto: 'Rojo', alias: ['carmesi'] },
-      { puesto: 3, texto: 'Verde', alias: ['verde esmeralda'] },
-      { puesto: 4, texto: 'Negro', alias: ['oscuro'] },
-      { puesto: 5, texto: 'Amarillo', alias: ['dorado'] }
+      { puesto: 1, texto: "Azul", alias: [] },
+      { puesto: 2, texto: "Rojo", alias: [] },
+      { puesto: 3, texto: "Verde", alias: [] },
+      { puesto: 4, texto: "Negro", alias: [] },
+      { puesto: 5, texto: "Morado", alias: ["lila", "violeta"] }
     ]
   },
   {
-    id: 'pop_15',
-    pregunta: 'Hábitos antes de meterse en la cama',
+    id: "pop_015",
+    pregunta: "Algo que haces antes de dormir",
     respuestas: [
-      { puesto: 1, texto: 'Cepillarse los dientes', alias: ['lavarse los dientes', 'dientes'] },
-      { puesto: 2, texto: 'Ponerse el pijama', alias: ['pijama', 'cambiarse de ropa'] },
-      { puesto: 3, texto: 'Mirar el móvil', alias: ['revisar el movil', 'usar el movil'] },
-      { puesto: 4, texto: 'Poner la alarma', alias: ['alarma', 'despertador'] },
-      { puesto: 5, texto: 'Apagar las luces', alias: ['apagar la luz', 'cerrar persianas'] }
+      { puesto: 1, texto: "Lavarse los dientes", alias: ["dientes"] },
+      { puesto: 2, texto: "Mirar el móvil", alias: ["movil"] },
+      { puesto: 3, texto: "Leer", alias: [] },
+      { puesto: 4, texto: "Ducharse", alias: ["ducha"] },
+      { puesto: 5, texto: "Ver la tele", alias: ["tele", "serie"] }
     ]
   },
   {
-    id: 'pop_16',
-    pregunta: 'Una bebida caliente popular',
+    id: "pop_016",
+    pregunta: "Una bebida caliente",
     respuestas: [
-      { puesto: 1, texto: 'Café', alias: ['espresso', 'cortado'] },
-      { puesto: 2, texto: 'Té', alias: ['te verde', 'te negro'] },
-      { puesto: 3, texto: 'Chocolate caliente', alias: ['colacao', 'cacao', 'chocolate'] },
-      { puesto: 4, texto: 'Infusión / Manzanilla', alias: ['manzanilla', 'poleo menta', 'infusion'] },
-      { puesto: 5, texto: 'Caldo / Sopa', alias: ['consome', 'caldo de pollo'] }
+      { puesto: 1, texto: "Café", alias: [] },
+      { puesto: 2, texto: "Té", alias: [] },
+      { puesto: 3, texto: "Chocolate", alias: [] },
+      { puesto: 4, texto: "Infusión", alias: ["manzanilla", "tila"] },
+      { puesto: 5, texto: "Caldo", alias: ["sopa"] }
     ]
   },
   {
-    id: 'pop_17',
-    pregunta: 'Algo que se suele perder con facilidad',
+    id: "pop_017",
+    pregunta: "Algo que se pierde con facilidad",
     respuestas: [
-      { puesto: 1, texto: 'Llaves', alias: ['llaves de casa', 'llave del coche'] },
-      { puesto: 2, texto: 'Móvil', alias: ['telefono', 'celular'] },
-      { puesto: 3, texto: 'Gafas', alias: ['gafas de sol', 'gafas de ver'] },
-      { puesto: 4, texto: 'Mando de la televisión', alias: ['el mando', 'control remoto'] },
-      { puesto: 5, texto: 'Bolígrafo', alias: ['boli', 'lapiz'] }
+      { puesto: 1, texto: "Llaves", alias: [] },
+      { puesto: 2, texto: "Móvil", alias: [] },
+      { puesto: 3, texto: "Gafas", alias: [] },
+      { puesto: 4, texto: "Mando", alias: ["mando de la tele"] },
+      { puesto: 5, texto: "Calcetines", alias: ["calcetin"] }
     ]
   },
   {
-    id: 'pop_18',
-    pregunta: 'Un género cinematográfico muy visto',
+    id: "pop_018",
+    pregunta: "Un género de película",
     respuestas: [
-      { puesto: 1, texto: 'Comedia', alias: ['humor', 'comica'] },
-      { puesto: 2, texto: 'Acción', alias: ['peliculas de accion'] },
-      { puesto: 3, texto: 'Terror / Miedo', alias: ['miedo', 'horror'] },
-      { puesto: 4, texto: 'Ciencia ficción', alias: ['sci fi', 'ficcion'] },
-      { puesto: 5, texto: 'Drama / Romance', alias: ['romantica', 'drama'] }
+      { puesto: 1, texto: "Comedia", alias: [] },
+      { puesto: 2, texto: "Terror", alias: ["miedo"] },
+      { puesto: 3, texto: "Acción", alias: [] },
+      { puesto: 4, texto: "Drama", alias: [] },
+      { puesto: 5, texto: "Romántica", alias: ["amor"] }
     ]
   },
   {
-    id: 'pop_19',
-    pregunta: 'Un mueble presente en cualquier salón',
+    id: "pop_019",
+    pregunta: "Un mueble del salón",
     respuestas: [
-      { puesto: 1, texto: 'Sofá', alias: ['sofa cama', 'sillon'] },
-      { puesto: 2, texto: 'Televisor / Mueble de TV', alias: ['tele', 'television'] },
-      { puesto: 3, texto: 'Mesa de centro', alias: ['mesa baja', 'mesita'] },
-      { puesto: 4, texto: 'Estantería', alias: ['libreria', 'baldas'] },
-      { puesto: 5, texto: 'Lámpara de pie', alias: ['lampara', 'foco'] }
+      { puesto: 1, texto: "Sofá", alias: [] },
+      { puesto: 2, texto: "Mesa", alias: [] },
+      { puesto: 3, texto: "Televisión", alias: ["tele"] },
+      { puesto: 4, texto: "Estantería", alias: ["libreria"] },
+      { puesto: 5, texto: "Sillón", alias: ["butaca"] }
     ]
   },
   {
-    id: 'pop_20',
-    pregunta: 'Un motivo frecuente para pedir una baja médica',
+    id: "pop_020",
+    pregunta: "Un ingrediente de una ensalada",
     respuestas: [
-      { puesto: 1, texto: 'Gripe / Fiebre', alias: ['resfriado', 'catarro', 'gripe'] },
-      { puesto: 2, texto: 'Dolor de espalda / Lumbalgia', alias: ['lumbago', 'espalda', 'ciatica'] },
-      { puesto: 3, texto: 'Estrés / Ansiedad', alias: ['depresion', 'ansiedad', 'salud mental'] },
-      { puesto: 4, texto: 'Gastroenteritis', alias: ['vomitos', 'diarrea', 'estomago'] },
-      { puesto: 5, texto: 'Fractura o esguince', alias: ['rotura de hueso', 'esguince de tobillo', 'rotura'] }
+      { puesto: 1, texto: "Lechuga", alias: [] },
+      { puesto: 2, texto: "Tomate", alias: [] },
+      { puesto: 3, texto: "Cebolla", alias: [] },
+      { puesto: 4, texto: "Atún", alias: [] },
+      { puesto: 5, texto: "Aceitunas", alias: ["olivas"] }
     ]
   },
   {
-    id: 'pop_21',
-    pregunta: 'Un ingrediente clásico en una ensalada',
+    id: "pop_021",
+    pregunta: "Algo que se hace en el gimnasio",
     respuestas: [
-      { puesto: 1, texto: 'Lechuga', alias: ['hojas verdes', 'canonigos'] },
-      { puesto: 2, texto: 'Tomate', alias: ['tomates cherry'] },
-      { puesto: 3, texto: 'Cebolla', alias: ['cebolla morada'] },
-      { puesto: 4, texto: 'Atún', alias: ['atun de lata'] },
-      { puesto: 5, texto: 'Aceite de oliva / Vinagre', alias: ['aceite', 'vinagreta', 'sal'] }
+      { puesto: 1, texto: "Pesas", alias: ["musculacion"] },
+      { puesto: 2, texto: "Correr", alias: ["cinta"] },
+      { puesto: 3, texto: "Bicicleta", alias: ["bici", "spinning"] },
+      { puesto: 4, texto: "Abdominales", alias: [] },
+      { puesto: 5, texto: "Estiramientos", alias: ["estirar"] }
     ]
   },
   {
-    id: 'pop_22',
-    pregunta: 'Algo que se hace habitualmente en el gimnasio',
+    id: "pop_022",
+    pregunta: "Un animal peligroso",
     respuestas: [
-      { puesto: 1, texto: 'Levantar pesas / Mancuernas', alias: ['pesas', 'musculacion'] },
-      { puesto: 2, texto: 'Correr en la cinta', alias: ['cinta', 'correr'] },
-      { puesto: 3, texto: 'Hacer bicicleta estática', alias: ['bici', 'spinning'] },
-      { puesto: 4, texto: 'Estirar', alias: ['estiramientos'] },
-      { puesto: 5, texto: 'Hacer abdominales', alias: ['core', 'planchas'] }
+      { puesto: 1, texto: "Tiburón", alias: [] },
+      { puesto: 2, texto: "León", alias: [] },
+      { puesto: 3, texto: "Serpiente", alias: ["vibora"] },
+      { puesto: 4, texto: "Cocodrilo", alias: [] },
+      { puesto: 5, texto: "Oso", alias: [] }
     ]
   },
   {
-    id: 'pop_23',
-    pregunta: 'Un animal peligroso que da miedo encontrarse',
+    id: "pop_023",
+    pregunta: "Una fiesta del año",
     respuestas: [
-      { puesto: 1, texto: 'Tiburón', alias: ['tiburon blanco'] },
-      { puesto: 2, texto: 'Serpiente', alias: ['vibora', 'cobra'] },
-      { puesto: 3, texto: 'Oso', alias: ['oso pardo', 'oso grizzly'] },
-      { puesto: 4, texto: 'León', alias: ['leon africano'] },
-      { puesto: 5, texto: 'Cocodrilo', alias: ['caiman'] }
+      { puesto: 1, texto: "Navidad", alias: [] },
+      { puesto: 2, texto: "Nochevieja", alias: ["fin de año"] },
+      { puesto: 3, texto: "Cumpleaños", alias: [] },
+      { puesto: 4, texto: "Carnaval", alias: [] },
+      { puesto: 5, texto: "Halloween", alias: [] }
     ]
   },
   {
-    id: 'pop_24',
-    pregunta: 'Una fiesta o celebración del año',
+    id: "pop_024",
+    pregunta: "Un medio de transporte urbano",
     respuestas: [
-      { puesto: 1, texto: 'Navidad', alias: ['nochebuena'] },
-      { puesto: 2, texto: 'Cumpleaños', alias: ['aniversario'] },
-      { puesto: 3, texto: 'Nochevieja / Año Nuevo', alias: ['fin de año'] },
-      { puesto: 4, texto: 'Halloween', alias: ['noche de brujas'] },
-      { puesto: 5, texto: 'Carnaval', alias: ['carnavales'] }
+      { puesto: 1, texto: "Autobús", alias: ["bus"] },
+      { puesto: 2, texto: "Metro", alias: [] },
+      { puesto: 3, texto: "Taxi", alias: [] },
+      { puesto: 4, texto: "Bicicleta", alias: ["bici"] },
+      { puesto: 5, texto: "Tranvía", alias: [] }
     ]
   },
   {
-    id: 'pop_25',
-    pregunta: 'Un medio de transporte urbano',
+    id: "pop_025",
+    pregunta: "Una chuchería de quiosco",
     respuestas: [
-      { puesto: 1, texto: 'Autobús', alias: ['bus', 'colectivo'] },
-      { puesto: 2, texto: 'Metro', alias: ['subte', 'tren subterraneo'] },
-      { puesto: 3, texto: 'Coche / Automóvil', alias: ['carro', 'auto'] },
-      { puesto: 4, texto: 'Bicicleta', alias: ['bici'] },
-      { puesto: 5, texto: 'Patinete eléctrico', alias: ['patinete', 'scooter'] }
+      { puesto: 1, texto: "Gominolas", alias: ["chuches", "ositos"] },
+      { puesto: 2, texto: "Piruleta", alias: ["chupachups", "chupa chups"] },
+      { puesto: 3, texto: "Regaliz", alias: [] },
+      { puesto: 4, texto: "Chicle", alias: [] },
+      { puesto: 5, texto: "Pipas", alias: [] }
     ]
   },
   {
-    id: 'pop_26',
-    pregunta: 'Un dulce o chuchería de quiosco',
+    id: "pop_026",
+    pregunta: "Algo que se lleva a la playa",
     respuestas: [
-      { puesto: 1, texto: 'Chicle', alias: ['goma de mascar'] },
-      { puesto: 2, texto: 'Piruleta / Chupa Chups', alias: ['chupachup', 'chupeta'] },
-      { puesto: 3, texto: 'Gominolas', alias: ['gominola', 'ositos'] },
-      { puesto: 4, texto: 'Chocolate / Chocolatina', alias: ['tableta de chocolate'] },
-      { puesto: 5, texto: 'Regaliz', alias: ['regaliz rojo', 'regaliz negro'] }
+      { puesto: 1, texto: "Toalla", alias: [] },
+      { puesto: 2, texto: "Crema", alias: ["protector solar"] },
+      { puesto: 3, texto: "Sombrilla", alias: [] },
+      { puesto: 4, texto: "Agua", alias: [] },
+      { puesto: 5, texto: "Gafas de sol", alias: ["gafas"] }
     ]
   },
   {
-    id: 'pop_27',
-    pregunta: 'Algo que se lleva a la playa en la bolsa',
+    id: "pop_027",
+    pregunta: "Un idioma que la gente quiere aprender",
     respuestas: [
-      { puesto: 1, texto: 'Toalla', alias: ['toalla de playa'] },
-      { puesto: 2, texto: 'Protector solar / Crema', alias: ['crema de sol', 'bloqueador'] },
-      { puesto: 3, texto: 'Bañador', alias: ['traje de baño', 'bikini'] },
-      { puesto: 4, texto: 'Gafas de sol', alias: ['lentes de sol'] },
-      { puesto: 5, texto: 'Botella de agua', alias: ['agua fria', 'bebida'] }
+      { puesto: 1, texto: "Inglés", alias: [] },
+      { puesto: 2, texto: "Francés", alias: [] },
+      { puesto: 3, texto: "Alemán", alias: [] },
+      { puesto: 4, texto: "Chino", alias: [] },
+      { puesto: 5, texto: "Italiano", alias: [] }
     ]
   },
   {
-    id: 'pop_28',
-    pregunta: 'Un idioma que mucha gente quiere aprender',
+    id: "pop_028",
+    pregunta: "Una verdura que no gusta a los niños",
     respuestas: [
-      { puesto: 1, texto: 'Inglés', alias: ['lengua inglesa'] },
-      { puesto: 2, texto: 'Francés', alias: ['frances'] },
-      { puesto: 3, texto: 'Alemán', alias: ['aleman'] },
-      { puesto: 4, texto: 'Chino / Mandarín', alias: ['chino mandarin', 'chino'] },
-      { puesto: 5, texto: 'Italiano', alias: ['lengua italiana'] }
+      { puesto: 1, texto: "Brócoli", alias: [] },
+      { puesto: 2, texto: "Espinacas", alias: [] },
+      { puesto: 3, texto: "Coliflor", alias: [] },
+      { puesto: 4, texto: "Judías verdes", alias: ["judias"] },
+      { puesto: 5, texto: "Acelgas", alias: [] }
     ]
   },
   {
-    id: 'pop_29',
-    pregunta: 'Una verdura que suele gustar poco a los niños',
+    id: "pop_029",
+    pregunta: "Un electrodoméstico que gasta mucha luz",
     respuestas: [
-      { puesto: 1, texto: 'Brócoli', alias: ['brocoli'] },
-      { puesto: 2, texto: 'Espinacas', alias: ['espinaca'] },
-      { puesto: 3, texto: 'Coliflor', alias: ['col'] },
-      { puesto: 4, texto: 'Acelgas', alias: ['acelga'] },
-      { puesto: 5, texto: 'Alcachofas', alias: ['alcachofa'] }
+      { puesto: 1, texto: "Horno", alias: [] },
+      { puesto: 2, texto: "Aire acondicionado", alias: ["aire"] },
+      { puesto: 3, texto: "Secadora", alias: [] },
+      { puesto: 4, texto: "Lavadora", alias: [] },
+      { puesto: 5, texto: "Calefactor", alias: ["radiador"] }
     ]
   },
   {
-    id: 'pop_30',
-    pregunta: 'Un electrodoméstico que consume mucha luz',
+    id: "pop_030",
+    pregunta: "Algo que se pide en un bar de tapas",
     respuestas: [
-      { puesto: 1, texto: 'Aire acondicionado', alias: ['clima', 'bomba de calor'] },
-      { puesto: 2, texto: 'Horno', alias: ['horno electrico'] },
-      { puesto: 3, texto: 'Lavadora', alias: ['lavarropa'] },
-      { puesto: 4, texto: 'Secadora', alias: ['secadora de ropa'] },
-      { puesto: 5, texto: 'Frigorífico / Nevera', alias: ['nevera'] }
+      { puesto: 1, texto: "Patatas bravas", alias: ["bravas"] },
+      { puesto: 2, texto: "Croquetas", alias: [] },
+      { puesto: 3, texto: "Calamares", alias: [] },
+      { puesto: 4, texto: "Tortilla", alias: [] },
+      { puesto: 5, texto: "Jamón", alias: [] }
     ]
   },
   {
-    id: 'pop_31',
-    pregunta: 'Algo que se pide en un bar de tapas',
+    id: "pop_031",
+    pregunta: "Una fobia frecuente",
     respuestas: [
-      { puesto: 1, texto: 'Cerveza / Caña', alias: ['cerveza', 'tubo', 'quinto'] },
-      { puesto: 2, texto: 'Patatas bravas', alias: ['bravas'] },
-      { puesto: 3, texto: 'Croquetas', alias: ['croquetas caseras'] },
-      { puesto: 4, texto: 'Calamares', alias: ['calamares a la romana', 'rabas'] },
-      { puesto: 5, texto: 'Tortilla de patatas', alias: ['pincho de tortilla'] }
+      { puesto: 1, texto: "Arañas", alias: ["aracnofobia"] },
+      { puesto: 2, texto: "Alturas", alias: ["vertigo"] },
+      { puesto: 3, texto: "Serpientes", alias: [] },
+      { puesto: 4, texto: "Oscuridad", alias: [] },
+      { puesto: 5, texto: "Agujas", alias: ["inyecciones"] }
     ]
   },
   {
-    id: 'pop_32',
-    pregunta: 'Una fobia frecuente',
+    id: "pop_032",
+    pregunta: "Un instrumento que se aprende de niño",
     respuestas: [
-      { puesto: 1, texto: 'A las alturas (Acrofobia)', alias: ['alturas', 'vertigo'] },
-      { puesto: 2, texto: 'A las arañas (Aracnofobia)', alias: ['arañas', 'bichos'] },
-      { puesto: 3, texto: 'A los espacios cerrados (Claustrofobia)', alias: ['claustrofobia', 'ascensor'] },
-      { puesto: 4, texto: 'A volar en avión', alias: ['aviones', 'volar'] },
-      { puesto: 5, texto: 'A la oscuridad', alias: ['la noche', 'oscuridad'] }
+      { puesto: 1, texto: "Flauta", alias: [] },
+      { puesto: 2, texto: "Piano", alias: [] },
+      { puesto: 3, texto: "Guitarra", alias: [] },
+      { puesto: 4, texto: "Violín", alias: [] },
+      { puesto: 5, texto: "Batería", alias: ["tambor"] }
     ]
   },
   {
-    id: 'pop_33',
-    pregunta: 'Un instrumento musical que se aprende de niño',
+    id: "pop_033",
+    pregunta: "Un juego de mesa clásico",
     respuestas: [
-      { puesto: 1, texto: 'Flauta dulce', alias: ['flauta'] },
-      { puesto: 2, texto: 'Piano', alias: ['teclado'] },
-      { puesto: 3, texto: 'Guitarra', alias: ['guitarra española', 'guitarra acustica'] },
-      { puesto: 4, texto: 'Violín', alias: ['violin'] },
-      { puesto: 5, texto: 'Batería', alias: ['tambor'] }
+      { puesto: 1, texto: "Parchís", alias: [] },
+      { puesto: 2, texto: "Monopoly", alias: [] },
+      { puesto: 3, texto: "Ajedrez", alias: [] },
+      { puesto: 4, texto: "Trivial", alias: [] },
+      { puesto: 5, texto: "Oca", alias: [] }
     ]
   },
   {
-    id: 'pop_34',
-    pregunta: 'Un juego de mesa clásico para toda la familia',
+    id: "pop_034",
+    pregunta: "Una prenda de invierno",
     respuestas: [
-      { puesto: 1, texto: 'Monopoly', alias: ['monopoli'] },
-      { puesto: 2, texto: 'Parchís', alias: ['parchis'] },
-      { puesto: 3, texto: 'Trivial Pursuit', alias: ['trivial'] },
-      { puesto: 4, texto: 'Scrabble', alias: ['palabras cruzadas'] },
-      { puesto: 5, texto: 'Ajedrez', alias: ['el ajedrez'] }
+      { puesto: 1, texto: "Abrigo", alias: [] },
+      { puesto: 2, texto: "Bufanda", alias: [] },
+      { puesto: 3, texto: "Guantes", alias: [] },
+      { puesto: 4, texto: "Gorro", alias: [] },
+      { puesto: 5, texto: "Jersey", alias: ["sueter"] }
     ]
   },
   {
-    id: 'pop_35',
-    pregunta: 'Una prenda que llevas puesta en invierno',
+    id: "pop_035",
+    pregunta: "Algo que compras siempre en el supermercado",
     respuestas: [
-      { puesto: 1, texto: 'Abrigo / Chaqueta', alias: ['abrigo', 'anorak'] },
-      { puesto: 2, texto: 'Bufanda', alias: ['cuello'] },
-      { puesto: 3, texto: 'Guantes', alias: ['manoplas'] },
-      { puesto: 4, texto: 'Gorro de lana', alias: ['gorro'] },
-      { puesto: 5, texto: 'Jersey', alias: ['sueter', 'sudadera'] }
+      { puesto: 1, texto: "Leche", alias: [] },
+      { puesto: 2, texto: "Pan", alias: [] },
+      { puesto: 3, texto: "Huevos", alias: [] },
+      { puesto: 4, texto: "Fruta", alias: [] },
+      { puesto: 5, texto: "Agua", alias: [] }
     ]
   },
   {
-    id: 'pop_36',
-    pregunta: 'Algo que compras cuando vas al supermercado',
+    id: "pop_036",
+    pregunta: "Una comida rápida",
     respuestas: [
-      { puesto: 1, texto: 'Leche', alias: ['brick de leche'] },
-      { puesto: 2, texto: 'Pan', alias: ['barra de pan'] },
-      { puesto: 3, texto: 'Huevos', alias: ['docena de huevos'] },
-      { puesto: 4, texto: 'Papel higiénico', alias: ['papel de baño'] },
-      { puesto: 5, texto: 'Agua mineral', alias: ['agua'] }
+      { puesto: 1, texto: "Hamburguesa", alias: [] },
+      { puesto: 2, texto: "Pizza", alias: [] },
+      { puesto: 3, texto: "Kebab", alias: [] },
+      { puesto: 4, texto: "Perrito caliente", alias: ["perrito", "hot dog"] },
+      { puesto: 5, texto: "Pollo frito", alias: ["nuggets"] }
     ]
   },
   {
-    id: 'pop_37',
-    pregunta: 'Un tipo de comida rápida internacional',
+    id: "pop_037",
+    pregunta: "Algo que se lleva en la cabeza",
     respuestas: [
-      { puesto: 1, texto: 'Hamburguesa', alias: ['burger'] },
-      { puesto: 2, texto: 'Pizza', alias: ['pizzas'] },
-      { puesto: 3, texto: 'Perrito caliente', alias: ['hot dog'] },
-      { puesto: 4, texto: 'Kebab', alias: ['shawarma'] },
-      { puesto: 5, texto: 'Pollo frito', alias: ['kfc', 'nuggets'] }
+      { puesto: 1, texto: "Gorra", alias: [] },
+      { puesto: 2, texto: "Sombrero", alias: [] },
+      { puesto: 3, texto: "Gorro", alias: [] },
+      { puesto: 4, texto: "Gafas", alias: [] },
+      { puesto: 5, texto: "Diadema", alias: [] }
     ]
   },
   {
-    id: 'pop_38',
-    pregunta: 'Un accesorio que se lleva en la cabeza',
+    id: "pop_038",
+    pregunta: "Un animal de granja",
     respuestas: [
-      { puesto: 1, texto: 'Gorra', alias: ['visera'] },
-      { puesto: 2, texto: 'Sombrero', alias: ['pamela'] },
-      { puesto: 3, texto: 'Gorro de lana', alias: ['gorrito'] },
-      { puesto: 4, texto: 'Diadema / Cinta', alias: ['cinta de pelo'] },
-      { puesto: 5, texto: 'Casco', alias: ['casco de moto'] }
+      { puesto: 1, texto: "Vaca", alias: [] },
+      { puesto: 2, texto: "Cerdo", alias: [] },
+      { puesto: 3, texto: "Gallina", alias: [] },
+      { puesto: 4, texto: "Oveja", alias: [] },
+      { puesto: 5, texto: "Caballo", alias: [] }
     ]
   },
   {
-    id: 'pop_39',
-    pregunta: 'Un animal de granja',
+    id: "pop_039",
+    pregunta: "Un motivo de discusión de pareja",
     respuestas: [
-      { puesto: 1, texto: 'Vaca', alias: ['toro'] },
-      { puesto: 2, texto: 'Gallina / Pollo', alias: ['gallo', 'pollo'] },
-      { puesto: 3, texto: 'Cerdo', alias: ['puerco', 'cochino'] },
-      { puesto: 4, texto: 'Oveja', alias: ['cordero'] },
-      { puesto: 5, texto: 'Caballo', alias: ['yegua'] }
+      { puesto: 1, texto: "Celos", alias: [] },
+      { puesto: 2, texto: "Dinero", alias: [] },
+      { puesto: 3, texto: "Tareas de casa", alias: ["tareas", "limpiar"] },
+      { puesto: 4, texto: "Familia", alias: ["suegra", "suegros"] },
+      { puesto: 5, texto: "Móvil", alias: [] }
     ]
   },
   {
-    id: 'pop_40',
-    pregunta: 'Una razón típica para discutir con la pareja',
+    id: "pop_040",
+    pregunta: "Algo que metes en la maleta",
     respuestas: [
-      { puesto: 1, texto: 'Las tareas del hogar / Limpieza', alias: ['limpiar', 'la casa', 'fregar'] },
-      { puesto: 2, texto: 'El dinero / Gastos', alias: ['economia', 'gastos', 'dinero'] },
-      { puesto: 3, texto: 'Los celos', alias: ['desconfianza', 'celos'] },
-      { puesto: 4, texto: 'La familia política / Suegros', alias: ['la suegra', 'los suegros'] },
-      { puesto: 5, texto: 'Estar todo el día con el móvil', alias: ['el telefono', 'no hacer caso'] }
+      { puesto: 1, texto: "Ropa", alias: [] },
+      { puesto: 2, texto: "Cepillo de dientes", alias: ["cepillo"] },
+      { puesto: 3, texto: "Cargador", alias: [] },
+      { puesto: 4, texto: "Zapatos", alias: [] },
+      { puesto: 5, texto: "Pijama", alias: [] }
     ]
   },
   {
-    id: 'pop_41',
-    pregunta: 'Algo que se echa en una maleta de viaje',
+    id: "pop_041",
+    pregunta: "Un sabor de helado",
     respuestas: [
-      { puesto: 1, texto: 'Ropa / Camisetas', alias: ['ropa interior', 'pantalones'] },
-      { puesto: 2, texto: 'Neceser / Cepillo de dientes', alias: ['pasta de dientes', 'champu'] },
-      { puesto: 3, texto: 'Cargadores', alias: ['cargador del movil'] },
-      { puesto: 4, texto: 'Calzado / Zapatos', alias: ['zapatillas'] },
-      { puesto: 5, texto: 'Documentación / Pasaporte', alias: ['dni', 'pasaporte'] }
+      { puesto: 1, texto: "Chocolate", alias: [] },
+      { puesto: 2, texto: "Vainilla", alias: [] },
+      { puesto: 3, texto: "Fresa", alias: [] },
+      { puesto: 4, texto: "Turrón", alias: [] },
+      { puesto: 5, texto: "Limón", alias: [] }
     ]
   },
   {
-    id: 'pop_42',
-    pregunta: 'Un sabor de helado popular',
+    id: "pop_042",
+    pregunta: "Una parte del cuerpo que te lesionas",
     respuestas: [
-      { puesto: 1, texto: 'Chocolate', alias: ['chocolate negro'] },
-      { puesto: 2, texto: 'Vainilla', alias: ['vainilla francesa'] },
-      { puesto: 3, texto: 'Fresa', alias: ['frutilla'] },
-      { puesto: 4, texto: 'Limón', alias: ['sorbete de limon'] },
-      { puesto: 5, texto: 'Pistacho', alias: ['pistache'] }
+      { puesto: 1, texto: "Rodilla", alias: [] },
+      { puesto: 2, texto: "Tobillo", alias: [] },
+      { puesto: 3, texto: "Espalda", alias: [] },
+      { puesto: 4, texto: "Muñeca", alias: [] },
+      { puesto: 5, texto: "Hombro", alias: [] }
     ]
   },
   {
-    id: 'pop_43',
-    pregunta: 'Una parte del cuerpo humano que solemos lesionarnos',
+    id: "pop_043",
+    pregunta: "Algo que haces mientras ves la tele",
     respuestas: [
-      { puesto: 1, texto: 'Rodilla', alias: ['ligamento cruzado', 'menisco'] },
-      { puesto: 2, texto: 'Tobillo', alias: ['esguince de tobillo'] },
-      { puesto: 3, texto: 'Espalda / Lumbares', alias: ['lumbago', 'cuello'] },
-      { puesto: 4, texto: 'Hombro', alias: ['manguito rotador'] },
-      { puesto: 5, texto: 'Muñeca', alias: ['mano'] }
+      { puesto: 1, texto: "Comer", alias: ["cenar"] },
+      { puesto: 2, texto: "Mirar el móvil", alias: ["movil"] },
+      { puesto: 3, texto: "Dormirse", alias: ["dormir"] },
+      { puesto: 4, texto: "Hablar", alias: [] },
+      { puesto: 5, texto: "Palomitas", alias: [] }
     ]
   },
   {
-    id: 'pop_44',
-    pregunta: 'Algo que la gente hace mientras mira la televisión',
+    id: "pop_044",
+    pregunta: "Una capital europea turística",
     respuestas: [
-      { puesto: 1, texto: 'Cenar / Comer', alias: ['comer', 'cenando'] },
-      { puesto: 2, texto: 'Mirar el móvil', alias: ['usar el telefono', 'redes sociales'] },
-      { puesto: 3, texto: 'Comer palomitas o snacks', alias: ['picar algo', 'patatas fritas'] },
-      { puesto: 4, texto: 'Quedarse dormido', alias: ['dormir la siesta', 'dormirse'] },
-      { puesto: 5, texto: 'Comentar la serie o programa', alias: ['hablar'] }
+      { puesto: 1, texto: "París", alias: [] },
+      { puesto: 2, texto: "Roma", alias: [] },
+      { puesto: 3, texto: "Londres", alias: [] },
+      { puesto: 4, texto: "Ámsterdam", alias: [] },
+      { puesto: 5, texto: "Berlín", alias: [] }
     ]
   },
   {
-    id: 'pop_45',
-    pregunta: 'Una capital europea muy visitada por turistas',
+    id: "pop_045",
+    pregunta: "Una bebida de un pub",
     respuestas: [
-      { puesto: 1, texto: 'París', alias: ['paris'] },
-      { puesto: 2, texto: 'Roma', alias: ['roma'] },
-      { puesto: 3, texto: 'Londres', alias: ['london'] },
-      { puesto: 4, texto: 'Madrid', alias: ['madrid'] },
-      { puesto: 5, texto: 'Berlín', alias: ['berlin'] }
+      { puesto: 1, texto: "Cerveza", alias: [] },
+      { puesto: 2, texto: "Cubata", alias: ["gin tonic", "copa"] },
+      { puesto: 3, texto: "Vino", alias: [] },
+      { puesto: 4, texto: "Chupito", alias: [] },
+      { puesto: 5, texto: "Mojito", alias: [] }
     ]
   },
   {
-    id: 'pop_46',
-    pregunta: 'Una bebida que se consume en un pub de noche',
+    id: "pop_046",
+    pregunta: "Un superhéroe",
     respuestas: [
-      { puesto: 1, texto: 'Cerveza', alias: ['birra', 'pinta'] },
-      { puesto: 2, texto: 'Gin-Tonic', alias: ['gintonic', 'ginebra con tonica'] },
-      { puesto: 3, texto: 'Ron con cola (Cubata)', alias: ['roncola', 'cuba libre'] },
-      { puesto: 4, texto: 'Vodka', alias: ['vodka con limon', 'vodka con naranja'] },
-      { puesto: 5, texto: 'Chupito de tequila o licor', alias: ['tequila', 'chupitos'] }
+      { puesto: 1, texto: "Superman", alias: [] },
+      { puesto: 2, texto: "Batman", alias: [] },
+      { puesto: 3, texto: "Spiderman", alias: [] },
+      { puesto: 4, texto: "Iron Man", alias: [] },
+      { puesto: 5, texto: "Capitán América", alias: [] }
     ]
   },
   {
-    id: 'pop_47',
-    pregunta: 'Un superhéroe de cómic clásico',
+    id: "pop_047",
+    pregunta: "Un pequeño electrodoméstico de cocina",
     respuestas: [
-      { puesto: 1, texto: 'Spider-Man', alias: ['spiderman', 'hombre araña'] },
-      { puesto: 2, texto: 'Batman', alias: ['el caballero oscuro'] },
-      { puesto: 3, texto: 'Superman', alias: ['el hombre de acero'] },
-      { puesto: 4, texto: 'Iron Man', alias: ['ironman'] },
-      { puesto: 5, texto: 'Hulk', alias: ['la masa'] }
+      { puesto: 1, texto: "Microondas", alias: [] },
+      { puesto: 2, texto: "Tostadora", alias: [] },
+      { puesto: 3, texto: "Batidora", alias: [] },
+      { puesto: 4, texto: "Cafetera", alias: [] },
+      { puesto: 5, texto: "Exprimidor", alias: [] }
     ]
   },
   {
-    id: 'pop_48',
-    pregunta: 'Un electrodoméstico pequeño que casi todos tienen',
+    id: "pop_048",
+    pregunta: "Una asignatura favorita del colegio",
     respuestas: [
-      { puesto: 1, texto: 'Tostadora', alias: ['tostador'] },
-      { puesto: 2, texto: 'Batidora / Minipímer', alias: ['batidora de mano'] },
-      { puesto: 3, texto: 'Cafetera', alias: ['cafetera de capsulas'] },
-      { puesto: 4, texto: 'Secador de pelo', alias: ['secador'] },
-      { puesto: 5, texto: 'Plancha de ropa', alias: ['plancha'] }
+      { puesto: 1, texto: "Educación física", alias: ["gimnasia"] },
+      { puesto: 2, texto: "Matemáticas", alias: ["mates"] },
+      { puesto: 3, texto: "Plástica", alias: ["dibujo"] },
+      { puesto: 4, texto: "Música", alias: [] },
+      { puesto: 5, texto: "Historia", alias: [] }
     ]
   },
   {
-    id: 'pop_49',
-    pregunta: 'Una asignatura del colegio que suele gustar a muchos',
+    id: "pop_049",
+    pregunta: "Algo que se celebra con tarta",
     respuestas: [
-      { puesto: 1, texto: 'Educación Física', alias: ['gimnasia', 'deporte'] },
-      { puesto: 2, texto: 'Educación Plástica / Dibujo', alias: ['plastica', 'arte'] },
-      { puesto: 3, texto: 'Música', alias: ['clase de musica'] },
-      { puesto: 4, texto: 'Historia', alias: ['ciencias sociales'] },
-      { puesto: 5, texto: 'Recreo (aunque no sea asignatura)', alias: ['el recreo'] }
+      { puesto: 1, texto: "Cumpleaños", alias: [] },
+      { puesto: 2, texto: "Boda", alias: [] },
+      { puesto: 3, texto: "Aniversario", alias: [] },
+      { puesto: 4, texto: "Bautizo", alias: [] },
+      { puesto: 5, texto: "Comunión", alias: [] }
     ]
   },
   {
-    id: 'pop_50',
-    pregunta: 'Algo que se celebra con una tarta y velas',
+    id: "pop_050",
+    pregunta: "Una carne habitual",
     respuestas: [
-      { puesto: 1, texto: 'Cumpleaños', alias: ['aniversario de nacimiento'] },
-      { puesto: 2, texto: 'Boda / Matrimonio', alias: ['casamiento'] },
-      { puesto: 3, texto: 'Aniversario de pareja', alias: ['bodas de plata', 'aniversario'] },
-      { puesto: 4, texto: 'Primera Comunión', alias: ['comunion'] },
-      { puesto: 5, texto: 'Bautizo', alias: ['nacimiento'] }
+      { puesto: 1, texto: "Pollo", alias: [] },
+      { puesto: 2, texto: "Cerdo", alias: [] },
+      { puesto: 3, texto: "Ternera", alias: [] },
+      { puesto: 4, texto: "Cordero", alias: [] },
+      { puesto: 5, texto: "Pavo", alias: [] }
     ]
   },
   {
-    id: 'pop_51',
-    pregunta: 'Una carne que se consume habitualmente',
+    id: "pop_051",
+    pregunta: "Un síntoma de resfriado",
     respuestas: [
-      { puesto: 1, texto: 'Pollo', alias: ['pechuga de pollo'] },
-      { puesto: 2, texto: 'Ternera / Vaca', alias: ['ternera', 'res'] },
-      { puesto: 3, texto: 'Cerdo', alias: ['lomo de cerdo'] },
-      { puesto: 4, texto: 'Pavo', alias: ['pechuga de pavo'] },
-      { puesto: 5, texto: 'Cordero', alias: ['chuletas de cordero'] }
+      { puesto: 1, texto: "Mocos", alias: [] },
+      { puesto: 2, texto: "Tos", alias: [] },
+      { puesto: 3, texto: "Fiebre", alias: [] },
+      { puesto: 4, texto: "Estornudos", alias: [] },
+      { puesto: 5, texto: "Dolor de garganta", alias: ["garganta"] }
     ]
   },
   {
-    id: 'pop_52',
-    pregunta: 'Un síntoma habitual de un resfriado',
+    id: "pop_052",
+    pregunta: "Una app imprescindible del móvil",
     respuestas: [
-      { puesto: 1, texto: 'Congestión nasal / Mocos', alias: ['mocos', 'nariz tapada'] },
-      { puesto: 2, texto: 'Estornudos', alias: ['estornudar'] },
-      { puesto: 3, texto: 'Tos', alias: ['toser'] },
-      { puesto: 4, texto: 'Dolor de garganta', alias: ['garganta irritada'] },
-      { puesto: 5, texto: 'Dolor de cabeza', alias: ['jaqueca'] }
+      { puesto: 1, texto: "WhatsApp", alias: [] },
+      { puesto: 2, texto: "Instagram", alias: [] },
+      { puesto: 3, texto: "Google Maps", alias: ["maps"] },
+      { puesto: 4, texto: "YouTube", alias: [] },
+      { puesto: 5, texto: "Banco", alias: [] }
     ]
   },
   {
-    id: 'pop_53',
-    pregunta: 'Una aplicación imprescindible en el teléfono móvil',
+    id: "pop_053",
+    pregunta: "Un vehículo de dos ruedas",
     respuestas: [
-      { puesto: 1, texto: 'WhatsApp', alias: ['wasap'] },
-      { puesto: 2, texto: 'Google Maps / GPS', alias: ['mapas', 'waze'] },
-      { puesto: 3, texto: 'Instagram', alias: ['insta'] },
-      { puesto: 4, texto: 'YouTube', alias: ['videos'] },
-      { puesto: 5, texto: 'Spotify', alias: ['musica'] }
+      { puesto: 1, texto: "Bicicleta", alias: ["bici"] },
+      { puesto: 2, texto: "Moto", alias: [] },
+      { puesto: 3, texto: "Patinete", alias: [] },
+      { puesto: 4, texto: "Vespa", alias: ["scooter"] },
+      { puesto: 5, texto: "Ciclomotor", alias: [] }
     ]
   },
   {
-    id: 'pop_54',
-    pregunta: 'Un tipo de vehículo de dos ruedas',
+    id: "pop_054",
+    pregunta: "Algo que se pide prestado a un vecino",
     respuestas: [
-      { puesto: 1, texto: 'Bicicleta', alias: ['bici'] },
-      { puesto: 2, texto: 'Motocicleta / Moto', alias: ['ciclomotor'] },
-      { puesto: 3, texto: 'Patinete', alias: ['patinete electrico'] },
-      { puesto: 4, texto: 'Scooter', alias: ['vespa'] },
-      { puesto: 5, texto: 'Segway / Hoverboard', alias: ['segway'] }
+      { puesto: 1, texto: "Sal", alias: [] },
+      { puesto: 2, texto: "Azúcar", alias: [] },
+      { puesto: 3, texto: "Huevos", alias: [] },
+      { puesto: 4, texto: "Herramientas", alias: ["taladro"] },
+      { puesto: 5, texto: "Leche", alias: [] }
     ]
   },
   {
-    id: 'pop_55',
-    pregunta: 'Algo que se pide prestado a los vecinos',
+    id: "pop_055",
+    pregunta: "Una actividad de relax en fin de semana",
     respuestas: [
-      { puesto: 1, texto: 'Sal', alias: ['un poco de sal'] },
-      { puesto: 2, texto: 'Azúcar', alias: ['azucar'] },
-      { puesto: 3, texto: 'Aceite', alias: ['aceite de oliva'] },
-      { puesto: 4, texto: 'Herramientas / Taladro', alias: ['taladro', 'destornillador'] },
-      { puesto: 5, texto: 'Huevos', alias: ['un huevo'] }
+      { puesto: 1, texto: "Dormir", alias: ["siesta"] },
+      { puesto: 2, texto: "Leer", alias: [] },
+      { puesto: 3, texto: "Ver series", alias: ["series"] },
+      { puesto: 4, texto: "Pasear", alias: [] },
+      { puesto: 5, texto: "Spa", alias: ["masaje"] }
     ]
   },
   {
-    id: 'pop_56',
-    pregunta: 'Una actividad de relax para el fin de semana',
+    id: "pop_056",
+    pregunta: "Un instrumento de percusión",
     respuestas: [
-      { puesto: 1, texto: 'Ver películas o series en el sofá', alias: ['netflix', 'ver una peli'] },
-      { puesto: 2, texto: 'Pasear por el parque o naturaleza', alias: ['dar un paseo', 'caminar'] },
-      { puesto: 3, texto: 'Dormir hasta tarde', alias: ['dormir', 'quedarse en la cama'] },
-      { puesto: 4, texto: 'Leer un libro', alias: ['lectura'] },
-      { puesto: 5, texto: 'Tomar algo con amigos', alias: ['tomar una cerveza', 'ver amigos'] }
+      { puesto: 1, texto: "Batería", alias: [] },
+      { puesto: 2, texto: "Tambor", alias: [] },
+      { puesto: 3, texto: "Bongó", alias: ["bongos"] },
+      { puesto: 4, texto: "Pandereta", alias: [] },
+      { puesto: 5, texto: "Xilófono", alias: [] }
     ]
   },
   {
-    id: 'pop_57',
-    pregunta: 'Un instrumento de percusión',
+    id: "pop_057",
+    pregunta: "Un motivo para llamar a la policía",
     respuestas: [
-      { puesto: 1, texto: 'Batería', alias: ['bateria acustica'] },
-      { puesto: 2, texto: 'Tambor', alias: ['caja'] },
-      { puesto: 3, texto: 'Platillos', alias: ['platos'] },
-      { puesto: 4, texto: 'Triángulo', alias: ['triangulo'] },
-      { puesto: 5, texto: 'Pandereta', alias: ['maracas', 'bongo'] }
+      { puesto: 1, texto: "Robo", alias: [] },
+      { puesto: 2, texto: "Accidente", alias: [] },
+      { puesto: 3, texto: "Pelea", alias: [] },
+      { puesto: 4, texto: "Ruido", alias: [] },
+      { puesto: 5, texto: "Incendio", alias: [] }
     ]
   },
   {
-    id: 'pop_58',
-    pregunta: 'Una razón común para llamar a la policía',
+    id: "pop_058",
+    pregunta: "Algo que hay en una oficina",
     respuestas: [
-      { puesto: 1, texto: 'Robo en casa o coche', alias: ['ladron', 'me han robado'] },
-      { puesto: 2, texto: 'Accidente de tráfico', alias: ['choque', 'accidente'] },
-      { puesto: 3, texto: 'Ruidos molestos de vecinos a deshoras', alias: ['fiesta del vecino', 'musica alta'] },
-      { puesto: 4, texto: 'Pelea en la calle', alias: ['discusion', 'pelea'] },
-      { puesto: 5, texto: 'Pérdida de un familiar o menor', alias: ['desaparicion'] }
+      { puesto: 1, texto: "Ordenador", alias: [] },
+      { puesto: 2, texto: "Impresora", alias: [] },
+      { puesto: 3, texto: "Mesa", alias: [] },
+      { puesto: 4, texto: "Silla", alias: [] },
+      { puesto: 5, texto: "Teléfono", alias: [] }
     ]
   },
   {
-    id: 'pop_59',
-    pregunta: 'Un elemento presente en una oficina tradicional',
+    id: "pop_059",
+    pregunta: "Un regalo de San Valentín",
     respuestas: [
-      { puesto: 1, texto: 'Ordenador / Portátil', alias: ['computadora', 'pantalla'] },
-      { puesto: 2, texto: 'Silla de oficina', alias: ['silla giratoria'] },
-      { puesto: 3, texto: 'Escritorio / Mesa', alias: ['mesa de trabajo'] },
-      { puesto: 4, texto: 'Impresora', alias: ['fotocopiadora'] },
-      { puesto: 5, texto: 'Cafetera', alias: ['maquina de cafe'] }
+      { puesto: 1, texto: "Flores", alias: ["rosas"] },
+      { puesto: 2, texto: "Bombones", alias: ["chocolate"] },
+      { puesto: 3, texto: "Joyas", alias: ["collar"] },
+      { puesto: 4, texto: "Peluche", alias: [] },
+      { puesto: 5, texto: "Perfume", alias: [] }
     ]
   },
   {
-    id: 'pop_60',
-    pregunta: 'Un regalo clásico de San Valentín',
+    id: "pop_060",
+    pregunta: "Una flor muy conocida",
     respuestas: [
-      { puesto: 1, texto: 'Ramo de flores / Rosas', alias: ['rosas', 'flores'] },
-      { puesto: 2, texto: 'Caja de bombones', alias: ['chocolates'] },
-      { puesto: 3, texto: 'Cena romántica', alias: ['ir a cenar'] },
-      { puesto: 4, texto: 'Perfume', alias: ['colonia'] },
-      { puesto: 5, texto: 'Joya / Colgante', alias: ['anillo', 'pulsera'] }
+      { puesto: 1, texto: "Rosa", alias: [] },
+      { puesto: 2, texto: "Margarita", alias: [] },
+      { puesto: 3, texto: "Tulipán", alias: [] },
+      { puesto: 4, texto: "Girasol", alias: [] },
+      { puesto: 5, texto: "Clavel", alias: [] }
     ]
   },
   {
-    id: 'pop_61',
-    pregunta: 'Una flor muy conocida y vendida',
+    id: "pop_061",
+    pregunta: "Un ingrediente de una hamburguesa",
     respuestas: [
-      { puesto: 1, texto: 'Rosa', alias: ['rosas rojas'] },
-      { puesto: 2, texto: 'Margarita', alias: ['margaritas'] },
-      { puesto: 3, texto: 'Tulipán', alias: ['tulipanes'] },
-      { puesto: 4, texto: 'Orquídea', alias: ['orquideas'] },
-      { puesto: 5, texto: 'Girasol', alias: ['girasoles'] }
+      { puesto: 1, texto: "Carne", alias: [] },
+      { puesto: 2, texto: "Queso", alias: [] },
+      { puesto: 3, texto: "Lechuga", alias: [] },
+      { puesto: 4, texto: "Tomate", alias: [] },
+      { puesto: 5, texto: "Cebolla", alias: [] }
     ]
   },
   {
-    id: 'pop_62',
-    pregunta: 'Un ingrediente clásico en una hamburguesa completa',
+    id: "pop_062",
+    pregunta: "Un país famoso por su cerveza",
     respuestas: [
-      { puesto: 1, texto: 'Queso', alias: ['queso cheddar'] },
-      { puesto: 2, texto: 'Bacon', alias: ['beicon'] },
-      { puesto: 3, texto: 'Lechuga', alias: ['hoja de lechuga'] },
-      { puesto: 4, texto: 'Tomate', alias: ['rodaja de tomate'] },
-      { puesto: 5, texto: 'Cebolla', alias: ['cebolla caramelizada'] }
+      { puesto: 1, texto: "Alemania", alias: [] },
+      { puesto: 2, texto: "Bélgica", alias: [] },
+      { puesto: 3, texto: "Irlanda", alias: [] },
+      { puesto: 4, texto: "República Checa", alias: [] },
+      { puesto: 5, texto: "México", alias: [] }
     ]
   },
   {
-    id: 'pop_63',
-    pregunta: 'Un país famoso por su cerveza',
+    id: "pop_063",
+    pregunta: "Algo que se hace en la peluquería",
     respuestas: [
-      { puesto: 1, texto: 'Alemania', alias: ['baviera'] },
-      { puesto: 2, texto: 'Bélgica', alias: ['belgica'] },
-      { puesto: 3, texto: 'Irlanda', alias: ['guinness'] },
-      { puesto: 4, texto: 'República Checa', alias: ['pilsen'] },
-      { puesto: 5, texto: 'España', alias: ['espana'] }
+      { puesto: 1, texto: "Cortar", alias: ["corte"] },
+      { puesto: 2, texto: "Teñir", alias: ["tinte"] },
+      { puesto: 3, texto: "Lavar", alias: [] },
+      { puesto: 4, texto: "Peinar", alias: [] },
+      { puesto: 5, texto: "Mechas", alias: [] }
     ]
   },
   {
-    id: 'pop_64',
-    pregunta: 'Algo que se hace en una peluquería',
+    id: "pop_064",
+    pregunta: "Un producto lácteo",
     respuestas: [
-      { puesto: 1, texto: 'Cortarse el pelo', alias: ['corte de pelo'] },
-      { puesto: 2, texto: 'Teñirse / Poner mechas', alias: ['tinte', 'color'] },
-      { puesto: 3, texto: 'Lavarse la cabeza', alias: ['lavado con champu'] },
-      { puesto: 4, texto: 'Peinarse / Moldear', alias: ['marcar', 'planchar'] },
-      { puesto: 5, texto: 'Afeitarse / Arreglarse la barba', alias: ['barberia', 'barba'] }
+      { puesto: 1, texto: "Leche", alias: [] },
+      { puesto: 2, texto: "Yogur", alias: [] },
+      { puesto: 3, texto: "Queso", alias: [] },
+      { puesto: 4, texto: "Mantequilla", alias: [] },
+      { puesto: 5, texto: "Nata", alias: [] }
     ]
   },
   {
-    id: 'pop_65',
-    pregunta: 'Un producto lácteo de consumo común',
+    id: "pop_065",
+    pregunta: "Una cualidad de un buen amigo",
     respuestas: [
-      { puesto: 1, texto: 'Leche', alias: ['leche entera', 'leche desnatada'] },
-      { puesto: 2, texto: 'Queso', alias: ['quesos'] },
-      { puesto: 3, texto: 'Yogur', alias: ['yogur natural'] },
-      { puesto: 4, texto: 'Mantequilla', alias: ['manteca'] },
-      { puesto: 5, texto: 'Nata', alias: ['crema de leche'] }
+      { puesto: 1, texto: "Lealtad", alias: ["leal"] },
+      { puesto: 2, texto: "Sinceridad", alias: ["sincero"] },
+      { puesto: 3, texto: "Confianza", alias: [] },
+      { puesto: 4, texto: "Divertido", alias: ["humor"] },
+      { puesto: 5, texto: "Apoyo", alias: [] }
     ]
   },
   {
-    id: 'pop_66',
-    pregunta: 'Una cualidad valorada en un buen amigo',
+    id: "pop_066",
+    pregunta: "Un insecto molesto en verano",
     respuestas: [
-      { puesto: 1, texto: 'Lealtad / Fidelidad', alias: ['leal', 'fiel'] },
-      { puesto: 2, texto: 'Sinceridad / Honestidad', alias: ['sincero', 'honesto'] },
-      { puesto: 3, texto: 'Sentido del humor / Gracioso', alias: ['hacer reir', 'divertido'] },
-      { puesto: 4, texto: 'Empatía / Saber escuchar', alias: ['escuchar', 'comprension'] },
-      { puesto: 5, texto: 'Generosidad', alias: ['generoso', 'apoyo'] }
+      { puesto: 1, texto: "Mosquito", alias: [] },
+      { puesto: 2, texto: "Mosca", alias: [] },
+      { puesto: 3, texto: "Avispa", alias: [] },
+      { puesto: 4, texto: "Cucaracha", alias: [] },
+      { puesto: 5, texto: "Hormiga", alias: [] }
     ]
   },
   {
-    id: 'pop_67',
-    pregunta: 'Un insecto que resulta molesto en verano',
+    id: "pop_067",
+    pregunta: "Una salsa para las patatas fritas",
     respuestas: [
-      { puesto: 1, texto: 'Mosquito', alias: ['zancudo', 'mosquitos'] },
-      { puesto: 2, texto: 'Mosca', alias: ['moscas'] },
-      { puesto: 3, texto: 'Avispa', alias: ['avispon'] },
-      { puesto: 4, texto: 'Cucaracha', alias: ['cucarachas'] },
-      { puesto: 5, texto: 'Hormiga', alias: ['hormigas'] }
+      { puesto: 1, texto: "Kétchup", alias: [] },
+      { puesto: 2, texto: "Mayonesa", alias: [] },
+      { puesto: 3, texto: "Alioli", alias: [] },
+      { puesto: 4, texto: "Brava", alias: ["salsa brava"] },
+      { puesto: 5, texto: "Barbacoa", alias: [] }
     ]
   },
   {
-    id: 'pop_68',
-    pregunta: 'Un condimento o salsa que se pone a las patatas fritas',
+    id: "pop_068",
+    pregunta: "Un monumento muy visitado",
     respuestas: [
-      { puesto: 1, texto: 'Kétchup', alias: ['ketchup', 'catsup'] },
-      { puesto: 2, texto: 'Mayonesa', alias: ['mahonesa'] },
-      { puesto: 3, texto: 'Salsa brava / Picante', alias: ['brava', 'tabasco'] },
-      { puesto: 4, texto: 'Mostaza', alias: ['mostaza dulce'] },
-      { puesto: 5, texto: 'Salsa barbacoa', alias: ['bbq'] }
+      { puesto: 1, texto: "Torre Eiffel", alias: [] },
+      { puesto: 2, texto: "Coliseo", alias: [] },
+      { puesto: 3, texto: "Sagrada Familia", alias: [] },
+      { puesto: 4, texto: "Pirámides", alias: [] },
+      { puesto: 5, texto: "Estatua de la Libertad", alias: [] }
     ]
   },
   {
-    id: 'pop_69',
-    pregunta: 'Un monumento histórico visitado por millones',
+    id: "pop_069",
+    pregunta: "Algo para limpiar la casa",
     respuestas: [
-      { puesto: 1, texto: 'Torre Eiffel (París)', alias: ['torre eiffel'] },
-      { puesto: 2, texto: 'Coliseo (Roma)', alias: ['coliseo romano'] },
-      { puesto: 3, texto: 'Gran Muralla China', alias: ['muralla china'] },
-      { puesto: 4, texto: 'Estatua de la Libertad (Nueva York)', alias: ['estatua de la libertad'] },
-      { puesto: 5, texto: 'Pirámides de Guiza (Egipto)', alias: ['las piramides'] }
+      { puesto: 1, texto: "Escoba", alias: [] },
+      { puesto: 2, texto: "Fregona", alias: [] },
+      { puesto: 3, texto: "Aspiradora", alias: [] },
+      { puesto: 4, texto: "Bayeta", alias: ["trapo"] },
+      { puesto: 5, texto: "Lejía", alias: [] }
     ]
   },
   {
-    id: 'pop_70',
-    pregunta: 'Algo que se usa para limpiar la casa',
+    id: "pop_070",
+    pregunta: "Un tipo de calzado",
     respuestas: [
-      { puesto: 1, texto: 'Fregona', alias: ['trapero', 'mopa'] },
-      { puesto: 2, texto: 'Escoba', alias: ['cepillo de barrer'] },
-      { puesto: 3, texto: 'Aspiradora', alias: ['aspirador'] },
-      { puesto: 4, texto: 'Bayeta / Trapo', alias: ['bayetas', 'estropajo'] },
-      { puesto: 5, texto: 'Lejía / Jabón', alias: ['cloro', 'fregasuelos'] }
+      { puesto: 1, texto: "Zapatillas", alias: ["deportivas"] },
+      { puesto: 2, texto: "Botas", alias: [] },
+      { puesto: 3, texto: "Sandalias", alias: [] },
+      { puesto: 4, texto: "Chanclas", alias: [] },
+      { puesto: 5, texto: "Tacones", alias: [] }
     ]
   },
   {
-    id: 'pop_71',
-    pregunta: 'Un tipo de calzado habitual',
+    id: "pop_071",
+    pregunta: "Algo que acompaña a un café",
     respuestas: [
-      { puesto: 1, texto: 'Zapatillas de deporte (Sneakers)', alias: ['deportivas', 'tenis', 'bambas'] },
-      { puesto: 2, texto: 'Botas', alias: ['botines'] },
-      { puesto: 3, texto: 'Sandalias / Chanclas', alias: ['chanclas', 'chancletas'] },
-      { puesto: 4, texto: 'Zapatos de vestir', alias: ['mocasines'] },
-      { puesto: 5, texto: 'Tacones', alias: ['zapatos de tacon'] }
+      { puesto: 1, texto: "Galletas", alias: [] },
+      { puesto: 2, texto: "Croissant", alias: [] },
+      { puesto: 3, texto: "Azúcar", alias: [] },
+      { puesto: 4, texto: "Churros", alias: [] },
+      { puesto: 5, texto: "Magdalena", alias: [] }
     ]
   },
   {
-    id: 'pop_72',
-    pregunta: 'Una razón para poner el despertador un día festivo',
+    id: "pop_072",
+    pregunta: "Un electrodoméstico que se estropea",
     respuestas: [
-      { puesto: 1, texto: 'Tener que coger un vuelo / Viajar', alias: ['avion', 'viaje'] },
-      { puesto: 2, texto: 'Hacer una ruta o excursión', alias: ['senderismo', 'ir al campo'] },
-      { puesto: 3, texto: 'Hacer deporte o carrera popular', alias: ['maraton', 'partido'] },
-      { puesto: 4, texto: 'Estudiar para un examen', alias: ['estudiar', 'oposiciones'] },
-      { puesto: 5, texto: 'Tener que trabajar de guardia', alias: ['trabajar'] }
+      { puesto: 1, texto: "Lavadora", alias: [] },
+      { puesto: 2, texto: "Nevera", alias: ["frigorifico"] },
+      { puesto: 3, texto: "Lavavajillas", alias: [] },
+      { puesto: 4, texto: "Microondas", alias: [] },
+      { puesto: 5, texto: "Horno", alias: [] }
     ]
   },
   {
-    id: 'pop_73',
-    pregunta: 'Algo que acompaña bien a una taza de café',
+    id: "pop_073",
+    pregunta: "Un plato de pasta",
     respuestas: [
-      { puesto: 1, texto: 'Galletas', alias: ['galletitas'] },
-      { puesto: 2, texto: 'Un croissant / Bollería', alias: ['cruasan', 'napolitana'] },
-      { puesto: 3, texto: 'Un trozo de tarta', alias: ['pastel', 'tarta'] },
-      { puesto: 4, texto: 'Tostada con mantequilla o aceite', alias: ['pan tostado'] },
-      { puesto: 5, texto: 'Un bombón de chocolate', alias: ['chocolate'] }
+      { puesto: 1, texto: "Espaguetis", alias: ["spaghetti"] },
+      { puesto: 2, texto: "Macarrones", alias: [] },
+      { puesto: 3, texto: "Lasaña", alias: [] },
+      { puesto: 4, texto: "Carbonara", alias: [] },
+      { puesto: 5, texto: "Boloñesa", alias: [] }
     ]
   },
   {
-    id: 'pop_74',
-    pregunta: 'Un electrodoméstico que suele estropearse con los años',
+    id: "pop_074",
+    pregunta: "Una actividad al aire libre",
     respuestas: [
-      { puesto: 1, texto: 'Lavadora', alias: ['lavarropas'] },
-      { puesto: 2, texto: 'Frigorífico / Nevera', alias: ['nevera'] },
-      { puesto: 3, texto: 'Lavavajillas', alias: ['lavaplatos'] },
-      { puesto: 4, texto: 'Microondas', alias: ['microondas'] },
-      { puesto: 5, texto: 'Televisor', alias: ['television'] }
+      { puesto: 1, texto: "Senderismo", alias: ["andar", "caminar"] },
+      { puesto: 2, texto: "Bicicleta", alias: ["bici"] },
+      { puesto: 3, texto: "Correr", alias: [] },
+      { puesto: 4, texto: "Picnic", alias: [] },
+      { puesto: 5, texto: "Escalada", alias: [] }
     ]
   },
   {
-    id: 'pop_75',
-    pregunta: 'Un plato de pasta muy cocinado en casa',
+    id: "pop_075",
+    pregunta: "Un síntoma de cansancio",
     respuestas: [
-      { puesto: 1, texto: 'Espaguetis con tomate', alias: ['bolognesa', 'boloñesa'] },
-      { puesto: 2, texto: 'Espaguetis a la carbonara', alias: ['carbonara'] },
-      { puesto: 3, texto: 'Macarrones con queso', alias: ['mac and cheese', 'gratinados'] },
-      { puesto: 4, texto: 'Lasaña de carne', alias: ['lasaña'] },
-      { puesto: 5, texto: 'Pasta al pesto', alias: ['pesto'] }
+      { puesto: 1, texto: "Bostezos", alias: ["bostezar"] },
+      { puesto: 2, texto: "Ojeras", alias: [] },
+      { puesto: 3, texto: "Sueño", alias: [] },
+      { puesto: 4, texto: "Dolor de cabeza", alias: [] },
+      { puesto: 5, texto: "Ojos rojos", alias: [] }
     ]
   },
   {
-    id: 'pop_76',
-    pregunta: 'Una actividad al aire libre popular los fines de semana',
+    id: "pop_076",
+    pregunta: "Una bebida de verano",
     respuestas: [
-      { puesto: 1, texto: 'Senderismo / Caminar por la montaña', alias: ['trekking', 'andar'] },
-      { puesto: 2, texto: 'Montar en bicicleta', alias: ['hacer bici', 'ciclismo'] },
-      { puesto: 3, texto: 'Hacer un picnic en el parque', alias: ['picnic', 'comer en el cesped'] },
-      { puesto: 4, texto: 'Pasear al perro', alias: ['sacar al perro'] },
-      { puesto: 5, texto: 'Ir a correr / Running', alias: ['footing', 'jogging'] }
+      { puesto: 1, texto: "Agua", alias: [] },
+      { puesto: 2, texto: "Cerveza", alias: [] },
+      { puesto: 3, texto: "Tinto de verano", alias: [] },
+      { puesto: 4, texto: "Limonada", alias: [] },
+      { puesto: 5, texto: "Granizado", alias: [] }
     ]
   },
   {
-    id: 'pop_77',
-    pregunta: 'Un síntoma de estar cansado',
+    id: "pop_077",
+    pregunta: "Algo que se olvida en un hotel",
     respuestas: [
-      { puesto: 1, texto: 'Bostezar', alias: ['bostezos'] },
-      { puesto: 2, texto: 'Ojeras o pesadez en los ojos', alias: ['cerrar los ojos', 'ojeras'] },
-      { puesto: 3, texto: 'Falta de concentración', alias: ['despiste', 'aturdimiento'] },
-      { puesto: 4, texto: 'Dolor muscular o pesadez en el cuerpo', alias: ['cuerpo pesado'] },
-      { puesto: 5, texto: 'Mal humor / Irritabilidad', alias: ['enfado', 'poca paciencia'] }
+      { puesto: 1, texto: "Cargador", alias: [] },
+      { puesto: 2, texto: "Cepillo de dientes", alias: ["cepillo"] },
+      { puesto: 3, texto: "Pijama", alias: [] },
+      { puesto: 4, texto: "Gafas", alias: [] },
+      { puesto: 5, texto: "Champú", alias: [] }
     ]
   },
   {
-    id: 'pop_78',
-    pregunta: 'Una bebida típica de verano',
+    id: "pop_078",
+    pregunta: "Un animal nocturno",
     respuestas: [
-      { puesto: 1, texto: 'Horchata', alias: ['horchata de chufa'] },
-      { puesto: 2, texto: 'Tinto de verano', alias: ['tinto con limon'] },
-      { puesto: 3, texto: 'Limonada fresca', alias: ['agua con limon'] },
-      { puesto: 4, texto: 'Cerveza bien fría', alias: ['cerveza helada'] },
-      { puesto: 5, texto: 'Gazpacho bien frío', alias: ['salmorejo'] }
+      { puesto: 1, texto: "Búho", alias: ["lechuza"] },
+      { puesto: 2, texto: "Murciélago", alias: [] },
+      { puesto: 3, texto: "Gato", alias: [] },
+      { puesto: 4, texto: "Mapache", alias: [] },
+      { puesto: 5, texto: "Zorro", alias: [] }
     ]
   },
   {
-    id: 'pop_79',
-    pregunta: 'Algo que se suele olvidar en un hotel al marcharse',
+    id: "pop_079",
+    pregunta: "Un juego de cartas",
     respuestas: [
-      { puesto: 1, texto: 'Cargador del móvil', alias: ['enchufe', 'cable'] },
-      { puesto: 2, texto: 'Pijama', alias: ['ropa de dormir'] },
-      { puesto: 3, texto: 'Neceser o cepillo de dientes', alias: ['champu', 'crema'] },
-      { puesto: 4, texto: 'Gafas de sol o de ver', alias: ['gafas'] },
-      { puesto: 5, texto: 'Zapatos o zapatillas de estar por casa', alias: ['chanclas'] }
+      { puesto: 1, texto: "Póquer", alias: [] },
+      { puesto: 2, texto: "Mus", alias: [] },
+      { puesto: 3, texto: "Chinchón", alias: [] },
+      { puesto: 4, texto: "Solitario", alias: [] },
+      { puesto: 5, texto: "Brisca", alias: [] }
     ]
   },
   {
-    id: 'pop_80',
-    pregunta: 'Un animal nocturno conocido',
+    id: "pop_080",
+    pregunta: "Algo para un cumpleaños infantil",
     respuestas: [
-      { puesto: 1, texto: 'Búho', alias: ['lechuza'] },
-      { puesto: 2, texto: 'Murciélago', alias: ['murcielago'] },
-      { puesto: 3, texto: 'Lobo', alias: ['lobos'] },
-      { puesto: 4, texto: 'Gato', alias: ['felino nocturno'] },
-      { puesto: 5, texto: 'Zorro', alias: ['zorra'] }
+      { puesto: 1, texto: "Globos", alias: [] },
+      { puesto: 2, texto: "Tarta", alias: [] },
+      { puesto: 3, texto: "Velas", alias: [] },
+      { puesto: 4, texto: "Piñata", alias: [] },
+      { puesto: 5, texto: "Chuches", alias: [] }
     ]
   },
   {
-    id: 'pop_81',
-    pregunta: 'Un juego que se juega con una baraja de cartas',
+    id: "pop_081",
+    pregunta: "Un motivo para cambiar de móvil",
     respuestas: [
-      { puesto: 1, texto: 'Póquer', alias: ['poker'] },
-      { puesto: 2, texto: 'Mus', alias: ['el mus'] },
-      { puesto: 3, texto: 'Tute', alias: ['tute cabron'] },
-      { puesto: 4, texto: 'Cinco y medio / Blackjack', alias: ['veintiuno', 'blackjack'] },
-      { puesto: 5, texto: 'Uno (juego de cartas)', alias: ['cartas del uno'] }
+      { puesto: 1, texto: "Batería", alias: [] },
+      { puesto: 2, texto: "Pantalla rota", alias: [] },
+      { puesto: 3, texto: "Lento", alias: [] },
+      { puesto: 4, texto: "Cámara", alias: [] },
+      { puesto: 5, texto: "Moda", alias: ["nuevo"] }
     ]
   },
   {
-    id: 'pop_82',
-    pregunta: 'Algo que compras para una fiesta de cumpleaños infantil',
+    id: "pop_082",
+    pregunta: "Un deporte individual",
     respuestas: [
-      { puesto: 1, texto: 'Tarta con velas', alias: ['tarta de cumple', 'pastel'] },
-      { puesto: 2, texto: 'Globos', alias: ['guirnaldas', 'adornos'] },
-      { puesto: 3, texto: 'Piñata', alias: ['piñatas'] },
-      { puesto: 4, texto: 'Bolsas de chuches / Dulces', alias: ['gominolas'] },
-      { puesto: 5, texto: 'Platos y vasos desechables', alias: ['menaje de papel'] }
+      { puesto: 1, texto: "Tenis", alias: [] },
+      { puesto: 2, texto: "Natación", alias: [] },
+      { puesto: 3, texto: "Atletismo", alias: ["correr"] },
+      { puesto: 4, texto: "Golf", alias: [] },
+      { puesto: 5, texto: "Boxeo", alias: [] }
     ]
   },
   {
-    id: 'pop_83',
-    pregunta: 'Un motivo para cambiar de móvil',
+    id: "pop_083",
+    pregunta: "Una comida mexicana",
     respuestas: [
-      { puesto: 1, texto: 'La batería ya no dura nada', alias: ['bateria degradada', 'se apaga'] },
-      { puesto: 2, texto: 'Se ha roto la pantalla', alias: ['pantalla rajada', 'cristal roto'] },
-      { puesto: 3, texto: 'Va muy lento o sin memoria', alias: ['no tiene espacio', 'se traba'] },
-      { puesto: 4, texto: 'Se ha caído al agua o no enciende', alias: ['se mojo', 'ha muerto'] },
-      { puesto: 5, texto: 'Por tener el último modelo', alias: ['capricho', 'camara mejor'] }
+      { puesto: 1, texto: "Tacos", alias: [] },
+      { puesto: 2, texto: "Burritos", alias: [] },
+      { puesto: 3, texto: "Nachos", alias: [] },
+      { puesto: 4, texto: "Fajitas", alias: [] },
+      { puesto: 5, texto: "Guacamole", alias: [] }
     ]
   },
   {
-    id: 'pop_84',
-    pregunta: 'Un deporte individual donde no se juega en equipo',
+    id: "pop_084",
+    pregunta: "Algo que haces en el banco",
     respuestas: [
-      { puesto: 1, texto: 'Tenis (individual)', alias: ['tenis'] },
-      { puesto: 2, texto: 'Natación', alias: ['nadar'] },
-      { puesto: 3, texto: 'Atletismo / Correr', alias: ['running', 'maraton'] },
-      { puesto: 4, texto: 'Ciclismo', alias: ['bici'] },
-      { puesto: 5, texto: 'Golf', alias: ['jugar al golf'] }
+      { puesto: 1, texto: "Sacar dinero", alias: ["sacar"] },
+      { puesto: 2, texto: "Ingresar", alias: [] },
+      { puesto: 3, texto: "Transferencia", alias: [] },
+      { puesto: 4, texto: "Hipoteca", alias: [] },
+      { puesto: 5, texto: "Préstamo", alias: [] }
     ]
   },
   {
-    id: 'pop_85',
-    pregunta: 'Un plato típico de comida mexicana internacional',
+    id: "pop_085",
+    pregunta: "Un postre casero",
     respuestas: [
-      { puesto: 1, texto: 'Tacos', alias: ['taco'] },
-      { puesto: 2, texto: 'Guacamole con totopos', alias: ['guacamole', 'nachos'] },
-      { puesto: 3, texto: 'Burritos', alias: ['burrito'] },
-      { puesto: 4, texto: 'Quesadillas', alias: ['quesadilla'] },
-      { puesto: 5, texto: 'Enchiladas', alias: ['fajitas'] }
+      { puesto: 1, texto: "Flan", alias: [] },
+      { puesto: 2, texto: "Arroz con leche", alias: [] },
+      { puesto: 3, texto: "Natillas", alias: [] },
+      { puesto: 4, texto: "Tarta de queso", alias: [] },
+      { puesto: 5, texto: "Bizcocho", alias: [] }
     ]
   },
   {
-    id: 'pop_86',
-    pregunta: 'Una razón para ir al banco físicamente',
+    id: "pop_086",
+    pregunta: "Una tarea de casa que da pereza",
     respuestas: [
-      { puesto: 1, texto: 'Sacar o ingresar dinero en efectivo', alias: ['efectivo', 'sacar dinero'] },
-      { puesto: 2, texto: 'Pedir una hipoteca o préstamo', alias: ['prestamo', 'credito'] },
-      { puesto: 3, texto: 'Resolver un bloqueo de tarjeta', alias: ['tarjeta rota', 'tarjeta bloqueada'] },
-      { puesto: 4, texto: 'Abrir una cuenta nueva', alias: ['nueva cuenta'] },
-      { puesto: 5, texto: 'Firmar documentación oficial', alias: ['firmar papeles'] }
+      { puesto: 1, texto: "Planchar", alias: [] },
+      { puesto: 2, texto: "Fregar", alias: [] },
+      { puesto: 3, texto: "Limpiar el baño", alias: ["baño"] },
+      { puesto: 4, texto: "Tender", alias: [] },
+      { puesto: 5, texto: "Barrer", alias: [] }
     ]
   },
   {
-    id: 'pop_87',
-    pregunta: 'Un postre casero tradicional',
+    id: "pop_087",
+    pregunta: "Un animal de Australia",
     respuestas: [
-      { puesto: 1, texto: 'Flan de huevo', alias: ['flan'] },
-      { puesto: 2, texto: 'Arroz con leche', alias: ['arroz con canela'] },
-      { puesto: 3, texto: 'Natillas con galleta', alias: ['natillas'] },
-      { puesto: 4, texto: 'Tarta de queso', alias: ['cheesecake'] },
-      { puesto: 5, texto: 'Torrijas', alias: ['torrija'] }
+      { puesto: 1, texto: "Canguro", alias: [] },
+      { puesto: 2, texto: "Koala", alias: [] },
+      { puesto: 3, texto: "Ornitorrinco", alias: [] },
+      { puesto: 4, texto: "Cocodrilo", alias: [] },
+      { puesto: 5, texto: "Emú", alias: [] }
     ]
   },
   {
-    id: 'pop_88',
-    pregunta: 'Una tarea del hogar que a casi todo el mundo le da pereza',
+    id: "pop_088",
+    pregunta: "Una cualidad de un buen jefe",
     respuestas: [
-      { puesto: 1, texto: 'Planchar la ropa', alias: ['la plancha'] },
-      { puesto: 2, texto: 'Limpiar los cristales y ventanas', alias: ['ventanas'] },
-      { puesto: 3, texto: 'Limpiar el baño y váter', alias: ['fregar el baño', 'inodoro'] },
-      { puesto: 4, texto: 'Fregar los platos a mano', alias: ['los platos', 'la sarten'] },
-      { puesto: 5, texto: 'Limpiar el horno o campana', alias: ['la grasa del horno'] }
+      { puesto: 1, texto: "Liderazgo", alias: [] },
+      { puesto: 2, texto: "Empatía", alias: [] },
+      { puesto: 3, texto: "Justicia", alias: ["justo"] },
+      { puesto: 4, texto: "Paciencia", alias: [] },
+      { puesto: 5, texto: "Comunicación", alias: [] }
     ]
   },
   {
-    id: 'pop_89',
-    pregunta: 'Un animal característico de Australia',
+    id: "pop_089",
+    pregunta: "Algo que compras en la farmacia",
     respuestas: [
-      { puesto: 1, texto: 'Canguro', alias: ['canguros'] },
-      { puesto: 2, texto: 'Koala', alias: ['koalas'] },
-      { puesto: 3, texto: 'Ornitorrinco', alias: ['platypus'] },
-      { puesto: 4, texto: 'Dingo (perro salvaje)', alias: ['dingo'] },
-      { puesto: 5, texto: 'Demonio de Tasmania', alias: ['diablo de tasmania'] }
+      { puesto: 1, texto: "Paracetamol", alias: [] },
+      { puesto: 2, texto: "Ibuprofeno", alias: [] },
+      { puesto: 3, texto: "Tiritas", alias: [] },
+      { puesto: 4, texto: "Crema", alias: [] },
+      { puesto: 5, texto: "Preservativos", alias: [] }
     ]
   },
   {
-    id: 'pop_90',
-    pregunta: 'Una cualidad necesaria para ser un buen jefe',
+    id: "pop_090",
+    pregunta: "Un motivo para que un perro ladre",
     respuestas: [
-      { puesto: 1, texto: 'Saber escuchar y comunicarse', alias: ['comunicacion', 'escucha activa'] },
-      { puesto: 2, texto: 'Empatía y respeto', alias: ['comprension', 'amabilidad'] },
-      { puesto: 3, texto: 'Liderazgo y saber motivar', alias: ['liderazgo', 'motivar'] },
-      { puesto: 4, texto: 'Organización y claridad en objetivos', alias: ['organizado'] },
-      { puesto: 5, texto: 'Saber delegar', alias: ['confianza en el equipo'] }
+      { puesto: 1, texto: "Timbre", alias: ["llaman a la puerta"] },
+      { puesto: 2, texto: "Gatos", alias: ["gato"] },
+      { puesto: 3, texto: "Extraños", alias: ["desconocidos"] },
+      { puesto: 4, texto: "Hambre", alias: [] },
+      { puesto: 5, texto: "Pasear", alias: [] }
     ]
   },
   {
-    id: 'pop_91',
-    pregunta: 'Algo que se compra en una farmacia sin receta',
+    id: "pop_091",
+    pregunta: "Un instrumento de viento",
     respuestas: [
-      { puesto: 1, texto: 'Tiritas / Gasas', alias: ['vendas', 'tiritas'] },
-      { puesto: 2, texto: 'Paracetamol / Ibuprofeno suave', alias: ['analgesico'] },
-      { puesto: 3, texto: 'Termómetro', alias: ['termometro digital'] },
-      { puesto: 4, texto: 'Cacao de labios / Protector labial', alias: ['vaselina'] },
-      { puesto: 5, texto: 'Pastillas para la garganta', alias: ['caramelos de miel'] }
+      { puesto: 1, texto: "Flauta", alias: [] },
+      { puesto: 2, texto: "Trompeta", alias: [] },
+      { puesto: 3, texto: "Saxofón", alias: [] },
+      { puesto: 4, texto: "Clarinete", alias: [] },
+      { puesto: 5, texto: "Gaita", alias: [] }
     ]
   },
   {
-    id: 'pop_92',
-    pregunta: 'Una razón por la que un perro empieza a ladrar',
+    id: "pop_092",
+    pregunta: "Una profesión con uniforme",
     respuestas: [
-      { puesto: 1, texto: 'Alguien ha llamado al timbre o a la puerta', alias: ['el cartero', 'timbre'] },
-      { puesto: 2, texto: 'Ha visto a otro perro por la calle', alias: ['otro perro'] },
-      { puesto: 3, texto: 'Para pedir comida o salir a pasear', alias: ['quiere salir', 'hambre'] },
-      { puesto: 4, texto: 'Ha escuchado un ruido extraño', alias: ['un susto', 'ruidos'] },
-      { puesto: 5, texto: 'Por alegría cuando llega su dueño', alias: ['emocion', 'saludo'] }
+      { puesto: 1, texto: "Policía", alias: [] },
+      { puesto: 2, texto: "Bombero", alias: [] },
+      { puesto: 3, texto: "Enfermero", alias: [] },
+      { puesto: 4, texto: "Militar", alias: ["soldado"] },
+      { puesto: 5, texto: "Piloto", alias: [] }
     ]
   },
   {
-    id: 'pop_93',
-    pregunta: 'Un instrumento musical de viento',
+    id: "pop_093",
+    pregunta: "Algo para aliñar una ensalada",
     respuestas: [
-      { puesto: 1, texto: 'Flauta', alias: ['flauta travesera'] },
-      { puesto: 2, texto: 'Trompeta', alias: ['trompeta de laton'] },
-      { puesto: 3, texto: 'Saxofón', alias: ['saxo'] },
-      { puesto: 4, texto: 'Clarinete', alias: ['clarinete'] },
-      { puesto: 5, texto: 'Trombón', alias: ['trombon de varas'] }
+      { puesto: 1, texto: "Aceite", alias: [] },
+      { puesto: 2, texto: "Vinagre", alias: [] },
+      { puesto: 3, texto: "Sal", alias: [] },
+      { puesto: 4, texto: "Limón", alias: [] },
+      { puesto: 5, texto: "Pimienta", alias: [] }
     ]
   },
   {
-    id: 'pop_94',
-    pregunta: 'Una profesión donde es obligatorio llevar uniforme',
+    id: "pop_094",
+    pregunta: "Algo que hacer un día de lluvia",
     respuestas: [
-      { puesto: 1, texto: 'Policía', alias: ['agente de policia', 'guardia civil'] },
-      { puesto: 2, texto: 'Bombero', alias: ['cuerpo de bomberos'] },
-      { puesto: 3, texto: 'Médico / Enfermero', alias: ['enfermera', 'sanitario', 'bata blanca'] },
-      { puesto: 4, texto: 'Militar / Soldado', alias: ['ejercito'] },
-      { puesto: 5, texto: 'Piloto o azafato de avión', alias: ['tripulante de cabina', 'piloto'] }
+      { puesto: 1, texto: "Ver una película", alias: ["peli", "pelicula"] },
+      { puesto: 2, texto: "Dormir", alias: [] },
+      { puesto: 3, texto: "Leer", alias: [] },
+      { puesto: 4, texto: "Juegos de mesa", alias: [] },
+      { puesto: 5, texto: "Cocinar", alias: [] }
     ]
   },
   {
-    id: 'pop_95',
-    pregunta: 'Algo que se usa para aliñar una ensalada',
+    id: "pop_095",
+    pregunta: "Una plataforma de vídeos",
     respuestas: [
-      { puesto: 1, texto: 'Aceite de oliva', alias: ['aceite virgen extra'] },
-      { puesto: 2, texto: 'Vinagre', alias: ['vinagre balsamico', 'vinagre de manzana'] },
-      { puesto: 3, texto: 'Sal', alias: ['sal fina', 'sal gorda'] },
-      { puesto: 4, texto: 'Limón exprimido', alias: ['jugo de limon'] },
-      { puesto: 5, texto: 'Salsa césar / Mostaza y miel', alias: ['vinagreta', 'aderezo'] }
+      { puesto: 1, texto: "YouTube", alias: [] },
+      { puesto: 2, texto: "Netflix", alias: [] },
+      { puesto: 3, texto: "TikTok", alias: [] },
+      { puesto: 4, texto: "Twitch", alias: [] },
+      { puesto: 5, texto: "HBO", alias: [] }
     ]
   },
   {
-    id: 'pop_96',
-    pregunta: 'Una actividad típica de un día de lluvia',
+    id: "pop_096",
+    pregunta: "Un topping para un helado",
     respuestas: [
-      { puesto: 1, texto: 'Ver maratón de series y pelis en el sofá', alias: ['mantita y peli', 'sofa'] },
-      { puesto: 2, texto: 'Leer un libro con una infusión', alias: ['leer'] },
-      { puesto: 3, texto: 'Jugar a juegos de mesa en familia', alias: ['juegos de mesa'] },
-      { puesto: 4, texto: 'Cocinar o hacer repostería', alias: ['hacer un bizcocho'] },
-      { puesto: 5, texto: 'Dormir una buena siesta', alias: ['la siesta'] }
+      { puesto: 1, texto: "Chocolate", alias: [] },
+      { puesto: 2, texto: "Nata", alias: [] },
+      { puesto: 3, texto: "Sirope", alias: [] },
+      { puesto: 4, texto: "Galleta", alias: [] },
+      { puesto: 5, texto: "Lacasitos", alias: ["confeti"] }
     ]
   },
   {
-    id: 'pop_97',
-    pregunta: 'Una red social para ver vídeos',
+    id: "pop_097",
+    pregunta: "Una prenda básica del armario",
     respuestas: [
-      { puesto: 1, texto: 'YouTube', alias: ['yotube'] },
-      { puesto: 2, texto: 'TikTok', alias: ['tik tok'] },
-      { puesto: 3, texto: 'Instagram (Reels)', alias: ['reels'] },
-      { puesto: 4, texto: 'Twitch', alias: ['directos'] },
-      { puesto: 5, texto: 'Facebook Watch', alias: ['facebook'] }
+      { puesto: 1, texto: "Vaqueros", alias: ["pantalon vaquero"] },
+      { puesto: 2, texto: "Camiseta", alias: [] },
+      { puesto: 3, texto: "Camisa", alias: [] },
+      { puesto: 4, texto: "Chaqueta", alias: [] },
+      { puesto: 5, texto: "Sudadera", alias: [] }
     ]
   },
   {
-    id: 'pop_98',
-    pregunta: 'Un topping popular para echar a un yogur o helado',
+    id: "pop_098",
+    pregunta: "Un sonido relajante de la naturaleza",
     respuestas: [
-      { puesto: 1, texto: 'Trozos de chocolate / Virutas', alias: ['sirope de chocolate', 'pepitas'] },
-      { puesto: 2, texto: 'Fruta fresca cortada (fresas, plátano)', alias: ['fruta', 'fresas'] },
-      { puesto: 3, texto: 'Frutos secos / Nueces', alias: ['nueces', 'almendras picadas'] },
-      { puesto: 4, texto: 'Miel', alias: ['un chorro de miel'] },
-      { puesto: 5, texto: 'Galleta triturada (Oreo)', alias: ['galleta oreo'] }
+      { puesto: 1, texto: "Lluvia", alias: [] },
+      { puesto: 2, texto: "Mar", alias: ["olas"] },
+      { puesto: 3, texto: "Pájaros", alias: [] },
+      { puesto: 4, texto: "Viento", alias: [] },
+      { puesto: 5, texto: "Río", alias: ["agua"] }
     ]
   },
   {
-    id: 'pop_99',
-    pregunta: 'Una prenda básica del fondo de armario',
+    id: "pop_099",
+    pregunta: "Algo que se compra en una panadería",
     respuestas: [
-      { puesto: 1, texto: 'Camiseta blanca básica', alias: ['camiseta blanca'] },
-      { puesto: 2, texto: 'Pantalones vaqueros (Jeans)', alias: ['vaqueros', 'tejanos'] },
-      { puesto: 3, texto: 'Zapatillas blancas deportivas', alias: ['deportivas blancas'] },
-      { puesto: 4, texto: 'Chaqueta de cuero o vaquera', alias: ['cazadora'] },
-      { puesto: 5, texto: 'Camisa negra o blanca', alias: ['camisa de botones'] }
+      { puesto: 1, texto: "Pan", alias: ["barra"] },
+      { puesto: 2, texto: "Croissant", alias: ["cruasan"] },
+      { puesto: 3, texto: "Magdalenas", alias: [] },
+      { puesto: 4, texto: "Napolitana", alias: [] },
+      { puesto: 5, texto: "Empanada", alias: [] }
     ]
   },
   {
-    id: 'pop_100',
-    pregunta: 'Un sonido agradable y relajante de la naturaleza',
+    id: "pop_100",
+    pregunta: "Una serie de televisión mítica",
     respuestas: [
-      { puesto: 1, texto: 'El oleaje del mar rompiendo en la orilla', alias: ['las olas', 'el mar'] },
-      { puesto: 2, texto: 'La lluvia suave cayendo sobre el tejado', alias: ['la lluvia'] },
-      { puesto: 3, texto: 'El canto de los pájaros por la mañana', alias: ['pajaros cantando'] },
-      { puesto: 4, texto: 'El agua de un río fluyendo', alias: ['un arroyo', 'corriente de agua'] },
-      { puesto: 5, texto: 'El crepitar del fuego en la chimenea', alias: ['fuego', 'leña'] }
+      { puesto: 1, texto: "Friends", alias: [] },
+      { puesto: 2, texto: "Los Simpson", alias: ["simpson"] },
+      { puesto: 3, texto: "Breaking Bad", alias: [] },
+      { puesto: 4, texto: "Juego de Tronos", alias: [] },
+      { puesto: 5, texto: "La Casa de Papel", alias: [] }
     ]
   }
 ];
